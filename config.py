@@ -23,6 +23,7 @@ MIN_SIGNALS_TO_PASS = 2    # coin needs at least 2 bullish or 2 bearish signals
 # --- Signal deduplication ---
 SIGNAL_COOLDOWN_HOURS = 4  # don't resend same direction for same coin within 4h
 
-# --- Binance ---
-BINANCE_BASE_URL = "https://api.binance.com"
+# --- Bybit (no geo-restrictions) ---
+BYBIT_BASE_URL = "https://api.bybit.com"
 QUOTE_ASSET = "USDT"
+TIMEFRAME_BYBIT = "15"  # Bybit uses minutes as integer string
