@@ -14,12 +14,12 @@ import os
 import time
 import threading
 
-from flask import Flask
+from flask import Flask, request as flask_request
 from apscheduler.schedulers.background import BackgroundScheduler
 
 import requests as _requests
 
-from config import SCAN_INTERVAL_MINUTES, SIGNAL_COOLDOWN_HOURS
+from config import SCAN_INTERVAL_MINUTES, SIGNAL_COOLDOWN_HOURS, TELEGRAM_TOKEN, TELEGRAM_CHAT_ID
 from src.binance_client import get_top_coins, get_klines
 from src.signal_filter import analyze_coin
 from src.claude_analyzer import analyze_with_claude
@@ -45,6 +45,55 @@ def health():
 @app.route("/status")
 def status():
     return f"Scanning every {SCAN_INTERVAL_MINUTES} min. Signal cache: {len(_signal_cache)} entries.", 200
+
+
+# ── Telegram webhook — handles incoming messages ──────────────────────────────
+@app.route("/webhook", methods=["POST"])
+def webhook():
+    data = flask_request.get_json(silent=True)
+    if not data:
+        return "ok", 200
+
+    message = data.get("message") or data.get("channel_post")
+    if not message:
+        return "ok", 200
+
+    chat_id = message.get("chat", {}).get("id")
+    text = message.get("text", "").strip().lower()
+
+    if not chat_id or not text:
+        return "ok", 200
+
+    # "привет" — проверка что бот живой
+    if "привет" in text:
+        _reply(chat_id,
+               "👋 Привет! Бот работает.\n"
+               f"⏱ Сканирую каждые {SCAN_INTERVAL_MINUTES} мин.\n"
+               f"📊 Монет в кэше: {len(_signal_cache)}")
+
+    # /status — подробный статус
+    elif text in ("/status", "/старт", "/start"):
+        _reply(chat_id,
+               f"🤖 *TUSA CRYPTO BOT*\n"
+               f"✅ Работает\n"
+               f"⏱ Интервал: {SCAN_INTERVAL_MINUTES} мин\n"
+               f"📊 Сигналов в кэше: {len(_signal_cache)}\n"
+               f"💾 Данные: KuCoin\n"
+               f"🧠 AI: Claude Haiku")
+
+    return "ok", 200
+
+
+def _reply(chat_id: int, text: str):
+    """Send a reply to a specific chat."""
+    try:
+        _requests.post(
+            f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage",
+            json={"chat_id": chat_id, "text": text, "parse_mode": "Markdown"},
+            timeout=10,
+        )
+    except Exception as e:
+        log.warning(f"Reply failed: {e}")
 
 
 # ── Signal deduplication cache ────────────────────────────────────────────────
@@ -140,6 +189,25 @@ def _self_ping():
             log.warning(f"Self-ping failed: {e}")
 
 
+# ── Webhook setup ────────────────────────────────────────────────────────────
+def _setup_webhook():
+    """Register Telegram webhook so bot can receive messages."""
+    render_url = os.environ.get("RENDER_EXTERNAL_URL", "").rstrip("/")
+    if not render_url:
+        log.info("RENDER_EXTERNAL_URL not set — webhook skipped (local run)")
+        return
+    webhook_url = f"{render_url}/webhook"
+    try:
+        resp = _requests.post(
+            f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/setWebhook",
+            json={"url": webhook_url},
+            timeout=10,
+        )
+        log.info(f"Webhook set: {webhook_url} → {resp.json().get('description', '?')}")
+    except Exception as e:
+        log.warning(f"Webhook setup failed: {e}")
+
+
 # ── Startup ───────────────────────────────────────────────────────────────────
 def start_bot():
     log.info("Starting Crypto Signal Bot...")
@@ -156,6 +224,9 @@ def start_bot():
     scheduler.add_job(run_scan, "interval", minutes=SCAN_INTERVAL_MINUTES)
     scheduler.start()
     log.info(f"Scheduler running — interval {SCAN_INTERVAL_MINUTES} min")
+
+    # Register Telegram webhook
+    _setup_webhook()
 
     # First scan immediately
     threading.Thread(target=run_scan, daemon=True).start()
