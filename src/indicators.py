@@ -1,47 +1,67 @@
-import pandas as pd
+"""
+Pure Python technical indicators — no pandas, no numpy.
+Works on any Python version.
+"""
 
 
-def calculate_ema(series: pd.Series, period: int) -> pd.Series:
-    return series.ewm(span=period, adjust=False).mean()
+def calculate_ema(values: list, period: int) -> list:
+    """Exponential Moving Average."""
+    k = 2 / (period + 1)
+    ema = [values[0]]
+    for v in values[1:]:
+        ema.append(v * k + ema[-1] * (1 - k))
+    return ema
 
 
-def calculate_rsi(series: pd.Series, period: int = 14) -> pd.Series:
-    delta = series.diff()
-    gain = delta.clip(lower=0)
-    loss = -delta.clip(upper=0)
-    avg_gain = gain.ewm(span=period, adjust=False).mean()
-    avg_loss = loss.ewm(span=period, adjust=False).mean()
-    rs = avg_gain / (avg_loss + 1e-10)  # avoid division by zero
-    return 100 - (100 / (1 + rs))
+def calculate_rsi(closes: list, period: int = 14) -> float:
+    """RSI — returns only the latest value."""
+    if len(closes) < period + 2:
+        return 50.0
+
+    deltas = [closes[i] - closes[i - 1] for i in range(1, len(closes))]
+    gains  = [max(d, 0.0) for d in deltas]
+    losses = [abs(min(d, 0.0)) for d in deltas]
+
+    avg_gain = sum(gains[:period]) / period
+    avg_loss = sum(losses[:period]) / period
+
+    for i in range(period, len(deltas)):
+        avg_gain = (avg_gain * (period - 1) + gains[i]) / period
+        avg_loss = (avg_loss * (period - 1) + losses[i]) / period
+
+    rs = avg_gain / (avg_loss + 1e-10)
+    return 100 - 100 / (1 + rs)
 
 
-def get_indicators(df: pd.DataFrame) -> dict:
-    """Calculate all indicators and return latest values as a dict."""
-    close = df["close"]
-    volume = df["volume"]
+def get_indicators(candles: dict) -> dict:
+    """Calculate all indicators from candles dict. Returns latest values."""
+    closes  = candles["close"]
+    highs   = candles["high"]
+    lows    = candles["low"]
+    volumes = candles["volume"]
 
-    ema9 = calculate_ema(close, 9)
-    ema21 = calculate_ema(close, 21)
-    rsi = calculate_rsi(close, 14)
+    ema9  = calculate_ema(closes, 9)
+    ema21 = calculate_ema(closes, 21)
+    rsi   = calculate_rsi(closes, 14)
 
-    # Volume spike: last candle vs average of previous 20 candles
-    avg_volume = volume.iloc[-21:-1].mean()
-    current_volume = volume.iloc[-1]
-    volume_ratio = current_volume / avg_volume if avg_volume > 0 else 1.0
+    # Volume: last candle vs average of previous 20
+    avg_volume     = sum(volumes[-21:-1]) / 20 if len(volumes) >= 21 else sum(volumes) / len(volumes)
+    current_volume = volumes[-1]
+    volume_ratio   = current_volume / avg_volume if avg_volume > 0 else 1.0
 
-    # Breakout: current close vs highest/lowest of previous 20 candles
-    recent_high = df["high"].iloc[-21:-1].max()
-    recent_low = df["low"].iloc[-21:-1].min()
+    # Breakout levels: high/low of previous 20 candles
+    recent_high = max(highs[-21:-1])
+    recent_low  = min(lows[-21:-1])
 
     return {
-        "ema9":         ema9.iloc[-1],
-        "ema21":        ema21.iloc[-1],
-        "ema9_prev":    ema9.iloc[-2],
-        "ema21_prev":   ema21.iloc[-2],
-        "rsi":          rsi.iloc[-1],
-        "volume_ratio": volume_ratio,
-        "recent_high":  recent_high,
-        "recent_low":   recent_low,
-        "current_close": close.iloc[-1],
-        "current_open":  df["open"].iloc[-1],
+        "ema9":          ema9[-1],
+        "ema21":         ema21[-1],
+        "ema9_prev":     ema9[-2],
+        "ema21_prev":    ema21[-2],
+        "rsi":           rsi,
+        "volume_ratio":  volume_ratio,
+        "recent_high":   recent_high,
+        "recent_low":    recent_low,
+        "current_close": closes[-1],
+        "current_open":  candles["open"][-1],
     }

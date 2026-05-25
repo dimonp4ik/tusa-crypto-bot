@@ -1,5 +1,4 @@
 import requests
-import pandas as pd
 import sys
 import os
 
@@ -14,21 +13,20 @@ def get_top_coins():
     response.raise_for_status()
     data = response.json()
 
-    # Keep only USDT pairs with real volume
     usdt_pairs = [
         d for d in data
-        if d["symbol"].endswith(QUOTE_ASSET)
-        and float(d["quoteVolume"]) > 0
+        if d["symbol"].endswith(QUOTE_ASSET) and float(d["quoteVolume"]) > 0
     ]
-
-    # Sort by USDT volume (highest first)
     usdt_pairs.sort(key=lambda x: float(x["quoteVolume"]), reverse=True)
 
     return [p["symbol"] for p in usdt_pairs[:TOP_COINS_COUNT]]
 
 
 def get_klines(symbol, interval=TIMEFRAME, limit=KLINES_LIMIT):
-    """Fetch OHLCV candlestick data for a symbol. Returns a pandas DataFrame."""
+    """
+    Fetch OHLCV data. Returns a plain dict of lists:
+    { "open": [...], "high": [...], "low": [...], "close": [...], "volume": [...] }
+    """
     url = f"{BINANCE_BASE_URL}/api/v3/klines"
     params = {"symbol": symbol, "interval": interval, "limit": limit}
 
@@ -36,13 +34,10 @@ def get_klines(symbol, interval=TIMEFRAME, limit=KLINES_LIMIT):
     response.raise_for_status()
     data = response.json()
 
-    df = pd.DataFrame(data, columns=[
-        "timestamp", "open", "high", "low", "close", "volume",
-        "close_time", "quote_volume", "trades",
-        "taker_buy_base", "taker_buy_quote", "ignore"
-    ])
-
-    for col in ["open", "high", "low", "close", "volume"]:
-        df[col] = df[col].astype(float)
-
-    return df[["timestamp", "open", "high", "low", "close", "volume"]].copy()
+    return {
+        "open":   [float(c[1]) for c in data],
+        "high":   [float(c[2]) for c in data],
+        "low":    [float(c[3]) for c in data],
+        "close":  [float(c[4]) for c in data],
+        "volume": [float(c[5]) for c in data],
+    }
