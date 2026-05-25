@@ -9,7 +9,7 @@ TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")
 CLAUDE_API_KEY = os.getenv("CLAUDE_API_KEY")
 
 # --- Scan settings ---
-SCAN_INTERVAL_MINUTES = int(os.getenv("SCAN_INTERVAL_MINUTES", "30"))
+SCAN_INTERVAL_MINUTES = int(os.getenv("SCAN_INTERVAL_MINUTES", "10"))
 TOP_COINS_COUNT = 50
 TIMEFRAME = "15m"          # candle size for analysis
 KLINES_LIMIT = 100         # number of candles to fetch per coin
