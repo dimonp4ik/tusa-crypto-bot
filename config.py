@@ -23,7 +23,8 @@ MIN_SIGNALS_TO_PASS = 2    # coin needs at least 2 bullish or 2 bearish signals
 # --- Signal deduplication ---
 SIGNAL_COOLDOWN_HOURS = 4  # don't resend same direction for same coin within 4h
 
-# --- Bybit (no geo-restrictions) ---
-BYBIT_BASE_URL = "https://api.bybit.com"
+# --- KuCoin (accessible from cloud/US servers) ---
+KUCOIN_BASE_URL = "https://api.kucoin.com"
 QUOTE_ASSET = "USDT"
-TIMEFRAME_BYBIT = "15"  # Bybit uses minutes as integer string
+TIMEFRAME_KUCOIN = "15min"   # KuCoin interval format
+KLINES_INTERVAL_SEC = 15 * 60  # 15 minutes in seconds
