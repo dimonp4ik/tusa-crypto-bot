@@ -4,7 +4,7 @@ import os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from config import (
     RSI_OVERSOLD, RSI_OVERBOUGHT, VOLUME_SPIKE_MULTIPLIER, MIN_SIGNALS_TO_PASS,
-    SMC_MIN_CONFIRMATIONS, SMC_BOS_MIN_VOLUME,
+    SMC_MIN_CONFIRMATIONS, SMC_BOS_MIN_VOLUME, BTC_BLOCK_THRESHOLD_PCT,
 )
 from src.indicators import get_indicators, get_smc_indicators
 
@@ -12,7 +12,7 @@ from src.indicators import get_indicators, get_smc_indicators
 # ── SMC filter ────────────────────────────────────────────────────────────────
 
 def analyze_coin_smc(candles_15m: dict, candles_1h: dict, symbol: str,
-                     candles_4h: dict = None) -> dict | None:
+                     candles_4h: dict = None, btc_change_pct: float = 0.0) -> dict | None:
     """
     SMC-based setup detector with multi-timeframe confirmation.
 
@@ -50,6 +50,12 @@ def analyze_coin_smc(candles_15m: dict, candles_1h: dict, symbol: str,
     if ind["volume_ratio"] < SMC_BOS_MIN_VOLUME:
         return None
 
+    # 4b. BTC correlation filter — skip if BTC moving strongly against direction
+    if bos == "bullish"  and btc_change_pct < -BTC_BLOCK_THRESHOLD_PCT:
+        return None
+    if bos == "bearish"  and btc_change_pct > +BTC_BLOCK_THRESHOLD_PCT:
+        return None
+
     # 5. Build confirmation list — need >= SMC_MIN_CONFIRMATIONS
     if bos == "bullish":
         confirmations = []
@@ -82,10 +88,12 @@ def analyze_coin_smc(candles_15m: dict, candles_1h: dict, symbol: str,
         "order_block":   ind["bull_ob"]     if direction == "LONG" else ind["bear_ob"],
         "liq_sweep":     ind["bull_sweep"]  if direction == "LONG" else ind["bear_sweep"],
         "rsi":           ind["rsi"],
+        "atr":           ind["atr"],
         "volume_ratio":  ind["volume_ratio"],
         "current_price": round(ind["current_close"], 8),
         "recent_high":   round(ind["recent_high"], 8),
         "recent_low":    round(ind["recent_low"], 8),
+        "btc_change":    round(btc_change_pct, 2),
         "signals":       signals,
         "bullish_score": score if direction == "LONG"  else 0,
         "bearish_score": score if direction == "SHORT" else 0,

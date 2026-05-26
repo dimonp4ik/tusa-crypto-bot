@@ -24,10 +24,15 @@ from config import (
     SCAN_INTERVAL_MINUTES, SIGNAL_COOLDOWN_HOURS, TELEGRAM_TOKEN, TELEGRAM_CHAT_ID,
     TRADING_HOURS_START, TRADING_HOURS_END, TRADE_WEEKENDS,
 )
-from src.binance_client import get_top_coins, get_klines, get_klines_1h, get_klines_4h
+from src.binance_client import (
+    get_top_coins, get_klines, get_klines_1h, get_klines_4h,
+    get_btc_change_1h, get_funding_rate,
+)
 from src.signal_filter import analyze_coin_smc
 from src.claude_analyzer import analyze_batch_with_claude
-from src.telegram_notifier import send_signal, send_status
+from src.telegram_notifier import send_signal, send_status, calculate_tp_sl
+from src.news_filter import check_news_sentiment
+from src.db import init_db, get_open_signals, update_signal_status, get_stats
 
 # ── Logging ──────────────────────────────────────────────────────────────────
 logging.basicConfig(
@@ -85,6 +90,24 @@ def webhook():
                f"💾 Данные: KuCoin\n"
                f"🧠 AI: Claude Haiku")
 
+    # /stats — статистика побед/поражений
+    elif text in ("/stats", "/статистика"):
+        try:
+            s7  = get_stats(days=7)
+            s30 = get_stats(days=30)
+            _reply(chat_id,
+                   f"📈 *СТАТИСТИКА*\n\n"
+                   f"*За 7 дней:*\n"
+                   f"  Всего: {s7['total']}\n"
+                   f"  TP1: {s7['tp1_hit']}  TP2: {s7['tp2_hit']}  SL: {s7['sl_hit']}\n"
+                   f"  Win rate: *{s7['win_rate']}%*\n\n"
+                   f"*За 30 дней:*\n"
+                   f"  Всего: {s30['total']}\n"
+                   f"  TP1: {s30['tp1_hit']}  TP2: {s30['tp2_hit']}  SL: {s30['sl_hit']}\n"
+                   f"  Win rate: *{s30['win_rate']}%*")
+        except Exception as e:
+            _reply(chat_id, f"Ошибка статистики: {e}")
+
     return "ok", 200
 
 
@@ -119,6 +142,55 @@ def _cache_signal(symbol: str, direction: str):
     _signal_cache[symbol] = (direction, time.time())
 
 
+# ── Open-signal monitor (updates TP/SL hits in DB) ────────────────────────────
+def _check_open_signals():
+    """For each OPEN signal in DB, fetch current price and update status."""
+    open_signals = get_open_signals()
+    if not open_signals:
+        return
+
+    for sig in open_signals:
+        try:
+            df = get_klines(sig["symbol"], limit=2)
+            current = df["close"][-1]
+            high    = df["high"][-1]
+            low     = df["low"][-1]
+
+            direction = sig["direction"]
+            tp1, tp2, sl = sig["tp1"], sig["tp2"], sig["sl"]
+            opened_at = sig["opened_at"]
+
+            new_status = None
+            exit_px    = current
+
+            if direction == "LONG":
+                if low <= sl:
+                    new_status, exit_px = "SL_HIT", sl
+                elif high >= tp2:
+                    new_status, exit_px = "TP2_HIT", tp2
+                elif high >= tp1:
+                    new_status, exit_px = "TP1_HIT", tp1
+            else:  # SHORT
+                if high >= sl:
+                    new_status, exit_px = "SL_HIT", sl
+                elif low <= tp2:
+                    new_status, exit_px = "TP2_HIT", tp2
+                elif low <= tp1:
+                    new_status, exit_px = "TP1_HIT", tp1
+
+            # Expire after 24h with no result
+            age_hours = (time.time() - opened_at) / 3600
+            if new_status is None and age_hours > 24:
+                new_status = "EXPIRED"
+
+            if new_status:
+                update_signal_status(sig["id"], new_status, exit_px)
+                log.info(f"  Signal #{sig['id']} {sig['symbol']} → {new_status}")
+
+        except Exception as e:
+            log.warning(f"  Could not check signal #{sig['id']}: {e}")
+
+
 # ── Main scanning function ────────────────────────────────────────────────────
 def run_scan():
     now_utc = datetime.now(timezone.utc)
@@ -137,19 +209,26 @@ def run_scan():
     log.info("=== Scan started (SMC mode) ===")
 
     try:
-        # Step 1: top 50 coins by volume
+        # Step 0: BTC 1h change for correlation filter
+        btc_change = get_btc_change_1h()
+        log.info(f"BTC 1h change: {btc_change:+.2f}%")
+
+        # Check open signals from previous scans → update TP/SL hits
+        _check_open_signals()
+
+        # Step 1: top 100 coins by volume
         coins = get_top_coins()
         log.info(f"Fetched {len(coins)} coins from KuCoin")
 
         setups = []
 
-        # Step 2: SMC filter — BOS + 2 confirmations + 1h/4h trend alignment
+        # Step 2: SMC filter — BOS + confirmation + 1h/4h trend + BTC correlation
         for symbol in coins:
             try:
                 df_15m = get_klines(symbol)
                 df_1h  = get_klines_1h(symbol)
                 df_4h  = get_klines_4h(symbol)
-                setup  = analyze_coin_smc(df_15m, df_1h, symbol, df_4h)
+                setup  = analyze_coin_smc(df_15m, df_1h, symbol, df_4h, btc_change)
                 if setup:
                     log.info(
                         f"  SMC setup: {symbol:12s}  {setup['direction']}  "
@@ -165,15 +244,29 @@ def run_scan():
 
         # Step 3: remove duplicates
         fresh = [s for s in setups if not _is_duplicate(s["symbol"], s["direction"])]
-        log.info(f"After dedup: {len(fresh)} fresh setups → sending to Claude")
+        log.info(f"After dedup: {len(fresh)} fresh setups")
 
-        if not fresh:
+        # Step 3b: news + funding enrichment
+        enriched = []
+        for s in fresh:
+            # News check — block on bad news
+            news = check_news_sentiment(s["symbol"])
+            if not news["safe"]:
+                log.info(f"  Skip {s['symbol']} — {news['reason']}")
+                continue
+            # Funding rate (best effort)
+            s["funding_rate"] = get_funding_rate(s["symbol"])
+            enriched.append(s)
+
+        log.info(f"After news/funding: {len(enriched)} setups → sending to Claude")
+
+        if not enriched:
             log.info("=== Scan complete — 0 signal(s) sent ===\n")
             return
 
         # Step 4: ONE batch call to Claude Haiku
         try:
-            analyses = analyze_batch_with_claude(fresh)
+            analyses = analyze_batch_with_claude(enriched)
         except Exception as e:
             log.error(f"Claude batch call failed: {e}")
             return
@@ -239,10 +332,17 @@ def _setup_webhook():
 def start_bot():
     log.info("Starting Crypto Signal Bot...")
 
+    # Initialise signal-tracking DB
+    try:
+        init_db()
+        log.info("Database initialised")
+    except Exception as e:
+        log.warning(f"DB init failed: {e}")
+
     try:
         send_status(
             "🤖 *Crypto Signal Bot Online*\n"
-            f"Сканирую топ-50 монет каждые {SCAN_INTERVAL_MINUTES} минут."
+            f"Сканирую топ-100 монет каждые {SCAN_INTERVAL_MINUTES} мин (Пн-Пт, 07-23 UTC)."
         )
     except Exception as e:
         log.warning(f"Could not send startup message: {e}")

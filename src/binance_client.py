@@ -97,3 +97,41 @@ def get_klines_4h(symbol):
         limit=KLINES_4H_LIMIT,
         interval_sec=KLINES_4H_INTERVAL_SEC,
     )
+
+
+def get_btc_change_1h() -> float:
+    """
+    Return BTC price change over the last hour, as a percentage.
+    Used for market correlation filter.
+    """
+    try:
+        candles = get_klines_1h("BTC-USDT")
+        closes = candles["close"]
+        if len(closes) < 2:
+            return 0.0
+        prev = closes[-2]
+        last = closes[-1]
+        return (last - prev) / prev * 100.0
+    except Exception:
+        return 0.0
+
+
+def get_funding_rate(symbol: str) -> float | None:
+    """
+    Get current funding rate from KuCoin futures.
+    Maps spot symbol (BTC-USDT) → futures (XBTUSDTM / SYMBOLUSDTM).
+    Returns None if symbol has no futures contract.
+    """
+    base = symbol.replace("-USDT", "")
+    futures_symbol = "XBTUSDTM" if base == "BTC" else f"{base}USDTM"
+
+    try:
+        url = f"https://api-futures.kucoin.com/api/v1/funding-rate/{futures_symbol}/current"
+        resp = requests.get(url, timeout=10)
+        if resp.status_code != 200:
+            return None
+        data = resp.json()
+        rate = data.get("data", {}).get("value")
+        return float(rate) if rate is not None else None
+    except Exception:
+        return None

@@ -6,7 +6,7 @@ No pandas, no numpy — works on any Python version.
 import sys
 import os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from config import SMC_SWING_LOOKBACK, SMC_FVG_MIN_PCT, SMC_OB_LOOKBACK
+from config import SMC_SWING_LOOKBACK, SMC_FVG_MIN_PCT, SMC_OB_LOOKBACK, ATR_PERIOD
 
 
 # ── Basic indicators ──────────────────────────────────────────────────────────
@@ -18,6 +18,29 @@ def calculate_ema(values: list, period: int) -> list:
     for v in values[1:]:
         ema.append(v * k + ema[-1] * (1 - k))
     return ema
+
+
+def calculate_atr(highs: list, lows: list, closes: list, period: int = ATR_PERIOD) -> float:
+    """
+    Average True Range — measures volatility.
+    Returns latest ATR value (in price units).
+    """
+    if len(closes) < period + 1:
+        return 0.0
+
+    trs = []
+    for i in range(1, len(closes)):
+        h_l    = highs[i] - lows[i]
+        h_pc   = abs(highs[i] - closes[i - 1])
+        l_pc   = abs(lows[i]  - closes[i - 1])
+        trs.append(max(h_l, h_pc, l_pc))
+
+    # Wilder smoothing
+    atr = sum(trs[:period]) / period
+    for i in range(period, len(trs)):
+        atr = (atr * (period - 1) + trs[i]) / period
+
+    return atr
 
 
 def calculate_rsi(closes: list, period: int = 14) -> float:
@@ -276,6 +299,9 @@ def get_smc_indicators(candles_15m: dict, candles_1h: dict = None,
     # RSI
     rsi = calculate_rsi(closes, 14)
 
+    # ATR for stops/takes
+    atr = calculate_atr(highs, lows, closes)
+
     # TP/SL reference levels
     recent_high = max(highs[-21:-1]) if len(highs) >= 22 else max(highs)
     recent_low  = min(lows[-21:-1])  if len(lows)  >= 22 else min(lows)
@@ -295,6 +321,7 @@ def get_smc_indicators(candles_15m: dict, candles_1h: dict = None,
         "trend_1h":      trend_1h,
         "trend_4h":      trend_4h,
         "rsi":           round(rsi, 2),
+        "atr":           atr,
         "volume_ratio":  round(vol_ratio, 2),
         "current_close": closes[-1],
         "current_open":  opens[-1],

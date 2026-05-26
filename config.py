@@ -50,3 +50,23 @@ SMC_FVG_MIN_PCT       = 0.0005  # minimum FVG size (0.05%)
 SMC_OB_LOOKBACK       = 30      # candles back to search for order blocks
 SMC_MIN_CONFIRMATIONS = 1       # 1 confirmation from FVG/OB/Sweep (more signals)
 SMC_BOS_MIN_VOLUME    = 1.5     # BOS candle volume must be >= 1.5x average
+
+# --- ATR-based stops/takes ---
+ATR_PERIOD       = 14
+ATR_SL_MULT      = 1.5   # SL distance = ATR * 1.5
+ATR_TP1_MULT     = 1.5   # TP1 distance = ATR * 1.5  (1:1 R:R — close 50%)
+ATR_TP2_MULT     = 3.0   # TP2 distance = ATR * 3.0  (1:2 R:R — close rest)
+
+# --- BTC correlation filter ---
+BTC_BLOCK_THRESHOLD_PCT = 1.0  # if BTC moved >1% against direction → skip signal
+
+# --- News filter (CryptoPanic) ---
+CRYPTOPANIC_API_KEY = os.getenv("CRYPTOPANIC_API_KEY", "")  # optional
+NEWS_BLOCK_KEYWORDS = ["hack", "exploit", "scam", "lawsuit", "sec ", "ban", "delist", "rug"]
+
+# --- Database ---
+DB_PATH = "signals.db"
+
+# --- Backtest ---
+BACKTEST_CANDLES = 1000   # ~10 days of 15m data
+BACKTEST_TP_WINDOW = 24   # candles after entry to wait for TP/SL hit (6 hours)

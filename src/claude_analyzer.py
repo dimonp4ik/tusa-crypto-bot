@@ -28,14 +28,16 @@ def analyze_batch_with_claude(setups: list) -> list:
 
     coins_text = ""
     for i, s in enumerate(setups, 1):
-        fvg   = "✓" if s.get("fvg")         else "✗"
-        ob    = "✓" if s.get("order_block") else "✗"
-        sweep = "✓" if s.get("liq_sweep")   else "✗"
+        fvg     = "✓" if s.get("fvg")         else "✗"
+        ob      = "✓" if s.get("order_block") else "✗"
+        sweep   = "✓" if s.get("liq_sweep")   else "✗"
+        funding = s.get("funding_rate")
+        fund_s  = f"{funding*100:+.3f}%" if funding is not None else "n/a"
         coins_text += (
             f"{i}. {s['symbol']} → {s['direction']} | "
             f"4h:{s.get('trend_4h','?')} 1h:{s.get('trend_1h','?')} | "
             f"BOS:{s.get('bos','?')} | FVG:{fvg} OB:{ob} Sweep:{sweep} | "
-            f"RSI:{s['rsi']} | Vol:{s['volume_ratio']}x\n"
+            f"RSI:{s['rsi']} Vol:{s['volume_ratio']}x Funding:{fund_s}\n"
         )
 
     prompt = f"""You are a Smart Money Concepts (SMC) crypto trader. Analyze each setup and decide whether to trade.
@@ -47,6 +49,8 @@ Rules:
 - Skip (NO TRADE) if RSI > 75 on LONG or RSI < 25 on SHORT (overextended)
 - FVG + OB together = highest probability setup
 - Volume above 2x = institutional confirmation
+- Funding > +0.05% means crowded LONG → prefer SHORT, avoid LONG
+- Funding < -0.05% means crowded SHORT → prefer LONG, avoid SHORT
 
 Setups to analyze:
 {coins_text}
