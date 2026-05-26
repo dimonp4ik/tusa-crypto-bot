@@ -90,7 +90,7 @@ def find_swing_points(highs: list, lows: list, lookback: int = SMC_SWING_LOOKBAC
 # ── SMC: Break of Structure ───────────────────────────────────────────────────
 
 def detect_bos(closes: list, swing_highs: list, swing_lows: list,
-               recent_candles: int = 5) -> str | None:
+               recent_candles: int = 10) -> str | None:
     """
     Detect Break of Structure in the last `recent_candles` candles.
     Returns 'bullish', 'bearish', or None.
