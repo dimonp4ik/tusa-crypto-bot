@@ -34,7 +34,18 @@ TIMEFRAME_1H_KUCOIN = "1hour"
 KLINES_1H_LIMIT = 50
 KLINES_1H_INTERVAL_SEC = 3600
 
+# --- 4h candles for higher timeframe bias ---
+TIMEFRAME_4H_KUCOIN = "4hour"
+KLINES_4H_LIMIT = 30
+KLINES_4H_INTERVAL_SEC = 4 * 3600
+
+# --- Trading hours filter (UTC) ---
+TRADING_HOURS_START = 7    # 07:00 UTC — London open
+TRADING_HOURS_END   = 23   # 23:00 UTC — NY close
+
 # --- SMC settings ---
-SMC_SWING_LOOKBACK = 5      # candles each side to confirm swing point
-SMC_FVG_MIN_PCT = 0.0005    # minimum FVG size (0.05%)
-SMC_OB_LOOKBACK = 30        # candles back to search for order blocks
+SMC_SWING_LOOKBACK    = 5       # candles each side to confirm swing point
+SMC_FVG_MIN_PCT       = 0.0005  # minimum FVG size (0.05%)
+SMC_OB_LOOKBACK       = 30      # candles back to search for order blocks
+SMC_MIN_CONFIRMATIONS = 2       # need FVG+OB, FVG+Sweep, or OB+Sweep (not just one)
+SMC_BOS_MIN_VOLUME    = 1.5     # BOS candle volume must be >= 1.5x average

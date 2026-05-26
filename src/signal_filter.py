@@ -2,68 +2,81 @@ import sys
 import os
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from config import RSI_OVERSOLD, RSI_OVERBOUGHT, VOLUME_SPIKE_MULTIPLIER, MIN_SIGNALS_TO_PASS
+from config import (
+    RSI_OVERSOLD, RSI_OVERBOUGHT, VOLUME_SPIKE_MULTIPLIER, MIN_SIGNALS_TO_PASS,
+    SMC_MIN_CONFIRMATIONS, SMC_BOS_MIN_VOLUME,
+)
 from src.indicators import get_indicators, get_smc_indicators
 
 
-# ── SMC filter (new) ──────────────────────────────────────────────────────────
+# ── SMC filter ────────────────────────────────────────────────────────────────
 
-def analyze_coin_smc(candles_15m: dict, candles_1h: dict, symbol: str) -> dict | None:
+def analyze_coin_smc(candles_15m: dict, candles_1h: dict, symbol: str,
+                     candles_4h: dict = None) -> dict | None:
     """
-    SMC-based setup detector.
+    SMC-based setup detector with multi-timeframe confirmation.
 
-    Entry conditions (all must be true):
-      1. BOS (Break of Structure) exists on 15m
-      2. BOS direction matches 1h trend (trend filter)
-      3. At least one SMC confirmation: FVG, Order Block, or Liquidity Sweep
+    Entry conditions (ALL must be true):
+      1. BOS on 15m
+      2. 1h trend matches BOS direction
+      3. 4h trend matches BOS direction (or neutral)
+      4. BOS candle had elevated volume (>= SMC_BOS_MIN_VOLUME)
+      5. At least SMC_MIN_CONFIRMATIONS (default 2) from: FVG, OB, LiqSweep
 
     Returns setup dict or None.
     """
     if len(candles_15m.get("close", [])) < 30:
         return None
 
-    ind = get_smc_indicators(candles_15m, candles_1h)
+    ind = get_smc_indicators(candles_15m, candles_1h, candles_4h)
 
-    bos   = ind["bos"]      # 'bullish' | 'bearish' | None
-    trend = ind["trend_1h"] # 'bullish' | 'bearish' | 'neutral'
+    bos      = ind["bos"]        # 'bullish' | 'bearish' | None
+    trend_1h = ind["trend_1h"]
+    trend_4h = ind["trend_4h"]
 
-    # Must have BOS
+    # 1. Must have BOS
     if not bos:
         return None
 
-    # Must align with 1h trend (skip if trend is opposite; neutral = OK)
-    if trend not in ("neutral",) and trend != bos:
+    # 2. 1h trend must match (neutral is OK)
+    if trend_1h != "neutral" and trend_1h != bos:
         return None
 
-    # Build confirmation list
+    # 3. 4h trend must match (neutral is OK)
+    if trend_4h != "neutral" and trend_4h != bos:
+        return None
+
+    # 4. Volume on BOS candle
+    if ind["volume_ratio"] < SMC_BOS_MIN_VOLUME:
+        return None
+
+    # 5. Build confirmation list — need >= SMC_MIN_CONFIRMATIONS
     if bos == "bullish":
         confirmations = []
         if ind["bullish_fvg"]:  confirmations.append("FVG")
-        if ind["bull_ob"]:      confirmations.append("OrderBlock")
+        if ind["bull_ob"]:      confirmations.append("OB")
         if ind["bull_sweep"]:   confirmations.append("LiqSweep")
-        if not confirmations:
-            return None
         direction = "LONG"
-
     elif bos == "bearish":
         confirmations = []
         if ind["bearish_fvg"]:  confirmations.append("FVG")
-        if ind["bear_ob"]:      confirmations.append("OrderBlock")
+        if ind["bear_ob"]:      confirmations.append("OB")
         if ind["bear_sweep"]:   confirmations.append("LiqSweep")
-        if not confirmations:
-            return None
         direction = "SHORT"
-
     else:
         return None
 
-    signals = [f"BOS {bos}"] + confirmations
+    if len(confirmations) < SMC_MIN_CONFIRMATIONS:
+        return None
+
+    signals = [f"BOS {bos}", f"Vol {ind['volume_ratio']:.1f}x"] + confirmations
     score   = len(signals)
 
     return {
         "symbol":        symbol,
         "direction":     direction,
-        "trend_1h":      trend,
+        "trend_1h":      trend_1h,
+        "trend_4h":      trend_4h,
         "bos":           bos,
         "fvg":           ind["bullish_fvg"] if direction == "LONG" else ind["bearish_fvg"],
         "order_block":   ind["bull_ob"]     if direction == "LONG" else ind["bear_ob"],

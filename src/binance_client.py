@@ -13,6 +13,7 @@ from config import (
     KUCOIN_BASE_URL, QUOTE_ASSET, TOP_COINS_COUNT,
     KLINES_LIMIT, TIMEFRAME_KUCOIN, KLINES_INTERVAL_SEC,
     TIMEFRAME_1H_KUCOIN, KLINES_1H_LIMIT, KLINES_1H_INTERVAL_SEC,
+    TIMEFRAME_4H_KUCOIN, KLINES_4H_LIMIT, KLINES_4H_INTERVAL_SEC,
 )
 
 
@@ -85,4 +86,14 @@ def get_klines_1h(symbol):
         interval=TIMEFRAME_1H_KUCOIN,
         limit=KLINES_1H_LIMIT,
         interval_sec=KLINES_1H_INTERVAL_SEC,
+    )
+
+
+def get_klines_4h(symbol):
+    """Fetch 4h candles for higher timeframe bias."""
+    return get_klines(
+        symbol,
+        interval=TIMEFRAME_4H_KUCOIN,
+        limit=KLINES_4H_LIMIT,
+        interval_sec=KLINES_4H_INTERVAL_SEC,
     )

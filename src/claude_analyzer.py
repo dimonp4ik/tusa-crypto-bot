@@ -33,20 +33,20 @@ def analyze_batch_with_claude(setups: list) -> list:
         sweep = "✓" if s.get("liq_sweep")   else "✗"
         coins_text += (
             f"{i}. {s['symbol']} → {s['direction']} | "
-            f"1h:{s.get('trend_1h','?')} | BOS:{s.get('bos','?')} | "
-            f"FVG:{fvg} OB:{ob} Sweep:{sweep} | "
+            f"4h:{s.get('trend_4h','?')} 1h:{s.get('trend_1h','?')} | "
+            f"BOS:{s.get('bos','?')} | FVG:{fvg} OB:{ob} Sweep:{sweep} | "
             f"RSI:{s['rsi']} | Vol:{s['volume_ratio']}x\n"
         )
 
     prompt = f"""You are a Smart Money Concepts (SMC) crypto trader. Analyze each setup and decide whether to trade.
 
 Rules:
-- LONG only if 1h trend = bullish AND BOS = bullish
-- SHORT only if 1h trend = bearish AND BOS = bearish
+- LONG only if 4h=bullish AND 1h=bullish AND BOS=bullish (strongest)
+- SHORT only if 4h=bearish AND 1h=bearish AND BOS=bearish (strongest)
+- If one timeframe is neutral — still trade but lower confidence
 - Skip (NO TRADE) if RSI > 75 on LONG or RSI < 25 on SHORT (overextended)
-- Prefer setups with FVG + OB confluence (both ✓)
-- Volume above 2x average adds confidence
-- If 1h trend = neutral, require FVG + OB both present
+- FVG + OB together = highest probability setup
+- Volume above 2x = institutional confirmation
 
 Setups to analyze:
 {coins_text}

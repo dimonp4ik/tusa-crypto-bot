@@ -242,7 +242,8 @@ def get_1h_trend(candles_1h: dict) -> str:
 
 # ── Combined SMC indicator dict ───────────────────────────────────────────────
 
-def get_smc_indicators(candles_15m: dict, candles_1h: dict = None) -> dict:
+def get_smc_indicators(candles_15m: dict, candles_1h: dict = None,
+                        candles_4h: dict = None) -> dict:
     """
     Run all SMC indicators on 15m candles + optional 1h for trend.
     Returns a flat dict of all signals.
@@ -279,20 +280,22 @@ def get_smc_indicators(candles_15m: dict, candles_1h: dict = None) -> dict:
     recent_high = max(highs[-21:-1]) if len(highs) >= 22 else max(highs)
     recent_low  = min(lows[-21:-1])  if len(lows)  >= 22 else min(lows)
 
-    # 1h trend
+    # 1h + 4h trend
     trend_1h = get_1h_trend(candles_1h) if candles_1h else "neutral"
+    trend_4h = get_1h_trend(candles_4h) if candles_4h else "neutral"  # same EMA logic
 
     return {
-        "bos":          bos,              # 'bullish' | 'bearish' | None
-        "bullish_fvg":  fvg["bullish"],
-        "bearish_fvg":  fvg["bearish"],
-        "bull_ob":      ob["bullish"],
-        "bear_ob":      ob["bearish"],
-        "bull_sweep":   sweep["bullish"],
-        "bear_sweep":   sweep["bearish"],
-        "trend_1h":     trend_1h,
-        "rsi":          round(rsi, 2),
-        "volume_ratio": round(vol_ratio, 2),
+        "bos":           bos,              # 'bullish' | 'bearish' | None
+        "bullish_fvg":   fvg["bullish"],
+        "bearish_fvg":   fvg["bearish"],
+        "bull_ob":       ob["bullish"],
+        "bear_ob":       ob["bearish"],
+        "bull_sweep":    sweep["bullish"],
+        "bear_sweep":    sweep["bearish"],
+        "trend_1h":      trend_1h,
+        "trend_4h":      trend_4h,
+        "rsi":           round(rsi, 2),
+        "volume_ratio":  round(vol_ratio, 2),
         "current_close": closes[-1],
         "current_open":  opens[-1],
         "recent_high":   recent_high,

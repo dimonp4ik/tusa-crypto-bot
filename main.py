@@ -13,14 +13,18 @@ import logging
 import os
 import time
 import threading
+from datetime import datetime, timezone
 
 from flask import Flask, request as flask_request
 from apscheduler.schedulers.background import BackgroundScheduler
 
 import requests as _requests
 
-from config import SCAN_INTERVAL_MINUTES, SIGNAL_COOLDOWN_HOURS, TELEGRAM_TOKEN, TELEGRAM_CHAT_ID
-from src.binance_client import get_top_coins, get_klines, get_klines_1h
+from config import (
+    SCAN_INTERVAL_MINUTES, SIGNAL_COOLDOWN_HOURS, TELEGRAM_TOKEN, TELEGRAM_CHAT_ID,
+    TRADING_HOURS_START, TRADING_HOURS_END,
+)
+from src.binance_client import get_top_coins, get_klines, get_klines_1h, get_klines_4h
 from src.signal_filter import analyze_coin_smc
 from src.claude_analyzer import analyze_batch_with_claude
 from src.telegram_notifier import send_signal, send_status
@@ -117,6 +121,12 @@ def _cache_signal(symbol: str, direction: str):
 
 # ── Main scanning function ────────────────────────────────────────────────────
 def run_scan():
+    # Trading hours filter (UTC)
+    utc_hour = datetime.now(timezone.utc).hour
+    if not (TRADING_HOURS_START <= utc_hour < TRADING_HOURS_END):
+        log.info(f"Outside trading hours (UTC {utc_hour:02d}:xx) — scan skipped")
+        return
+
     log.info("=== Scan started (SMC mode) ===")
 
     try:
@@ -126,16 +136,18 @@ def run_scan():
 
         setups = []
 
-        # Step 2: SMC filter — checks BOS + FVG/OB/Sweep aligned with 1h trend
+        # Step 2: SMC filter — BOS + 2 confirmations + 1h/4h trend alignment
         for symbol in coins:
             try:
                 df_15m = get_klines(symbol)
                 df_1h  = get_klines_1h(symbol)
-                setup  = analyze_coin_smc(df_15m, df_1h, symbol)
+                df_4h  = get_klines_4h(symbol)
+                setup  = analyze_coin_smc(df_15m, df_1h, symbol, df_4h)
                 if setup:
                     log.info(
                         f"  SMC setup: {symbol:12s}  {setup['direction']}  "
-                        f"1h={setup['trend_1h']}  signals={setup['signals']}"
+                        f"4h={setup['trend_4h']} 1h={setup['trend_1h']}  "
+                        f"signals={setup['signals']}"
                     )
                     setups.append(setup)
                 time.sleep(0.2)  # 2 API calls per coin — small delay
