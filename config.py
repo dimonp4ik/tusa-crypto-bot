@@ -26,5 +26,15 @@ SIGNAL_COOLDOWN_HOURS = 4  # don't resend same direction for same coin within 4h
 # --- KuCoin (accessible from cloud/US servers) ---
 KUCOIN_BASE_URL = "https://api.kucoin.com"
 QUOTE_ASSET = "USDT"
-TIMEFRAME_KUCOIN = "15min"   # KuCoin interval format
-KLINES_INTERVAL_SEC = 15 * 60  # 15 minutes in seconds
+TIMEFRAME_KUCOIN = "15min"      # KuCoin interval format
+KLINES_INTERVAL_SEC = 15 * 60   # 15 minutes in seconds
+
+# --- 1h candles for trend direction ---
+TIMEFRAME_1H_KUCOIN = "1hour"
+KLINES_1H_LIMIT = 50
+KLINES_1H_INTERVAL_SEC = 3600
+
+# --- SMC settings ---
+SMC_SWING_LOOKBACK = 5      # candles each side to confirm swing point
+SMC_FVG_MIN_PCT = 0.0005    # minimum FVG size (0.05%)
+SMC_OB_LOOKBACK = 30        # candles back to search for order blocks

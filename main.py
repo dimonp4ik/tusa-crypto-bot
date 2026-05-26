@@ -20,9 +20,9 @@ from apscheduler.schedulers.background import BackgroundScheduler
 import requests as _requests
 
 from config import SCAN_INTERVAL_MINUTES, SIGNAL_COOLDOWN_HOURS, TELEGRAM_TOKEN, TELEGRAM_CHAT_ID
-from src.binance_client import get_top_coins, get_klines
-from src.signal_filter import analyze_coin
-from src.claude_analyzer import analyze_with_claude
+from src.binance_client import get_top_coins, get_klines, get_klines_1h
+from src.signal_filter import analyze_coin_smc
+from src.claude_analyzer import analyze_batch_with_claude
 from src.telegram_notifier import send_signal, send_status
 
 # ── Logging ──────────────────────────────────────────────────────────────────
@@ -117,55 +117,63 @@ def _cache_signal(symbol: str, direction: str):
 
 # ── Main scanning function ────────────────────────────────────────────────────
 def run_scan():
-    log.info("=== Scan started ===")
+    log.info("=== Scan started (SMC mode) ===")
 
     try:
-        # Step 1: top 50 coins
+        # Step 1: top 50 coins by volume
         coins = get_top_coins()
-        log.info(f"Fetched {len(coins)} coins from Binance")
+        log.info(f"Fetched {len(coins)} coins from KuCoin")
 
         setups = []
 
-        # Step 2: technical filter
+        # Step 2: SMC filter — checks BOS + FVG/OB/Sweep aligned with 1h trend
         for symbol in coins:
             try:
-                df = get_klines(symbol)
-                setup = analyze_coin(df, symbol)
+                df_15m = get_klines(symbol)
+                df_1h  = get_klines_1h(symbol)
+                setup  = analyze_coin_smc(df_15m, df_1h, symbol)
                 if setup:
                     log.info(
-                        f"  Setup: {symbol:12s}  {setup['direction']}  "
-                        f"B={setup['bullish_score']} S={setup['bearish_score']}  "
-                        f"signals={setup['signals']}"
+                        f"  SMC setup: {symbol:12s}  {setup['direction']}  "
+                        f"1h={setup['trend_1h']}  signals={setup['signals']}"
                     )
                     setups.append(setup)
-                time.sleep(0.12)  # stay well within Bybit rate limits
+                time.sleep(0.2)  # 2 API calls per coin — small delay
             except Exception as e:
                 log.warning(f"  Skip {symbol}: {e}")
 
-        log.info(f"Pre-filter: {len(setups)} setups passed from {len(coins)} coins")
+        log.info(f"SMC filter: {len(setups)} setups from {len(coins)} coins")
 
-        # Step 3–4: Claude analysis + Telegram
+        # Step 3: remove duplicates
+        fresh = [s for s in setups if not _is_duplicate(s["symbol"], s["direction"])]
+        log.info(f"After dedup: {len(fresh)} fresh setups → sending to Claude")
+
+        if not fresh:
+            log.info("=== Scan complete — 0 signal(s) sent ===\n")
+            return
+
+        # Step 4: ONE batch call to Claude Haiku
+        try:
+            analyses = analyze_batch_with_claude(fresh)
+        except Exception as e:
+            log.error(f"Claude batch call failed: {e}")
+            return
+
+        # Step 5: Send signals to Telegram
         sent_count = 0
-        for setup in setups:
+        for analysis in analyses:
             try:
-                if _is_duplicate(setup["symbol"], setup["direction"]):
-                    log.info(f"  Duplicate skip: {setup['symbol']} {setup['direction']}")
-                    continue
-
-                analysis = analyze_with_claude(setup)
                 log.info(
-                    f"  Claude: {setup['symbol']} → {analysis['decision']} "
+                    f"  Claude: {analysis['symbol']} → {analysis['decision']} "
                     f"({analysis.get('confidence','?')}) — {analysis.get('reason','')}"
                 )
-
                 if analysis["decision"] != "NO TRADE":
                     if send_signal(analysis):
-                        _cache_signal(setup["symbol"], analysis["decision"])
+                        _cache_signal(analysis["symbol"], analysis["decision"])
                         sent_count += 1
-                        log.info(f"  Signal sent: {setup['symbol']} {analysis['decision']}")
-
+                        log.info(f"  Signal sent: {analysis['symbol']} {analysis['decision']}")
             except Exception as e:
-                log.error(f"  Error processing {setup['symbol']}: {e}")
+                log.error(f"  Error sending {analysis.get('symbol','?')}: {e}")
 
         log.info(f"=== Scan complete — {sent_count} signal(s) sent ===\n")
 

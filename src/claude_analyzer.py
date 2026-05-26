@@ -5,7 +5,7 @@ import os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from config import CLAUDE_API_KEY
 
-# Reuse client across calls to avoid reconnecting every time
+# Reuse client across calls
 _client = None
 
 
@@ -16,10 +16,116 @@ def _get_client():
     return _client
 
 
+# ── Batch SMC analysis (main) ─────────────────────────────────────────────────
+
+def analyze_batch_with_claude(setups: list) -> list:
+    """
+    Send ALL filtered setups to Claude Haiku in ONE call.
+    Returns list of result dicts, one per setup.
+    """
+    if not setups:
+        return []
+
+    coins_text = ""
+    for i, s in enumerate(setups, 1):
+        fvg   = "✓" if s.get("fvg")         else "✗"
+        ob    = "✓" if s.get("order_block") else "✗"
+        sweep = "✓" if s.get("liq_sweep")   else "✗"
+        coins_text += (
+            f"{i}. {s['symbol']} → {s['direction']} | "
+            f"1h:{s.get('trend_1h','?')} | BOS:{s.get('bos','?')} | "
+            f"FVG:{fvg} OB:{ob} Sweep:{sweep} | "
+            f"RSI:{s['rsi']} | Vol:{s['volume_ratio']}x\n"
+        )
+
+    prompt = f"""You are a Smart Money Concepts (SMC) crypto trader. Analyze each setup and decide whether to trade.
+
+Rules:
+- LONG only if 1h trend = bullish AND BOS = bullish
+- SHORT only if 1h trend = bearish AND BOS = bearish
+- Skip (NO TRADE) if RSI > 75 on LONG or RSI < 25 on SHORT (overextended)
+- Prefer setups with FVG + OB confluence (both ✓)
+- Volume above 2x average adds confidence
+- If 1h trend = neutral, require FVG + OB both present
+
+Setups to analyze:
+{coins_text}
+Reply EXACTLY one line per setup, same numbering:
+1. DECISION|REASON (max 8 words)|CONFIDENCE
+2. DECISION|REASON (max 8 words)|CONFIDENCE
+...
+
+DECISION must be: LONG or SHORT or NO TRADE
+CONFIDENCE must be: HIGH or MEDIUM or LOW"""
+
+    client = _get_client()
+    message = client.messages.create(
+        model="claude-haiku-4-5-20251001",
+        max_tokens=60 * len(setups) + 50,
+        messages=[{"role": "user", "content": prompt}],
+    )
+
+    raw = message.content[0].text.strip()
+    return _parse_batch_response(raw, setups)
+
+
+def _parse_batch_response(raw: str, setups: list) -> list:
+    """Parse Claude's multi-line response into a list of result dicts."""
+    # Build index: "1" → line text
+    line_map = {}
+    for line in raw.splitlines():
+        line = line.strip()
+        if not line:
+            continue
+        dot = line.find(".")
+        if dot > 0:
+            key = line[:dot].strip()
+            if key.isdigit():
+                line_map[key] = line[dot + 1:].strip()
+
+    results = []
+    for i, setup in enumerate(setups, 1):
+        base = {
+            "symbol":        setup["symbol"],
+            "direction":     setup["direction"],
+            "current_price": setup["current_price"],
+            "recent_high":   setup.get("recent_high", 0),
+            "recent_low":    setup.get("recent_low", 0),
+            "rsi":           setup["rsi"],
+            "volume_ratio":  setup["volume_ratio"],
+            "signals":       setup["signals"],
+            "decision":      "NO TRADE",
+            "reason":        "Not evaluated",
+            "confidence":    "LOW",
+        }
+
+        text = line_map.get(str(i), "")
+        if text:
+            parts = [p.strip() for p in text.split("|")]
+            if parts:
+                val = parts[0].upper()
+                if "LONG"  in val: base["decision"] = "LONG"
+                elif "SHORT" in val: base["decision"] = "SHORT"
+                else:                base["decision"] = "NO TRADE"
+            if len(parts) >= 2:
+                base["reason"] = parts[1]
+            if len(parts) >= 3:
+                conf = parts[2].upper()
+                if "HIGH"   in conf: base["confidence"] = "HIGH"
+                elif "MEDIUM" in conf: base["confidence"] = "MEDIUM"
+                else:                  base["confidence"] = "LOW"
+
+        results.append(base)
+
+    return results
+
+
+# ── Legacy single-coin analysis (kept for reference) ─────────────────────────
+
 def analyze_with_claude(setup: dict) -> dict:
     """
-    Send a pre-filtered setup to Claude Haiku for final confirmation.
-    Returns a result dict with 'decision' = LONG | SHORT | NO TRADE.
+    Original single-coin analysis. Not used in main scan anymore.
+    Kept for reference / manual testing.
     """
     signals_text = ", ".join(setup["signals"])
 
@@ -29,7 +135,6 @@ Symbol: {setup['symbol']}
 Suggested Direction: {setup['direction']}
 Current Price: {setup['current_price']}
 RSI: {setup['rsi']}
-EMA9: {setup['ema9']} | EMA21: {setup['ema21']}
 Volume ratio vs average: {setup['volume_ratio']}x
 Technical signals triggered: {signals_text}
 
@@ -46,10 +151,7 @@ CONFIDENCE: HIGH or MEDIUM or LOW"""
     )
 
     raw = message.content[0].text.strip()
-    return _parse_response(raw, setup)
 
-
-def _parse_response(raw: str, setup: dict) -> dict:
     result = {
         "symbol":        setup["symbol"],
         "direction":     setup["direction"],
@@ -68,12 +170,9 @@ def _parse_response(raw: str, setup: dict) -> dict:
         line = line.strip()
         if line.startswith("DECISION:"):
             val = line.replace("DECISION:", "").strip().upper()
-            if "LONG" in val:
-                result["decision"] = "LONG"
-            elif "SHORT" in val:
-                result["decision"] = "SHORT"
-            else:
-                result["decision"] = "NO TRADE"
+            if "LONG" in val:   result["decision"] = "LONG"
+            elif "SHORT" in val: result["decision"] = "SHORT"
+            else:                result["decision"] = "NO TRADE"
         elif line.startswith("REASON:"):
             result["reason"] = line.replace("REASON:", "").strip()
         elif line.startswith("CONFIDENCE:"):

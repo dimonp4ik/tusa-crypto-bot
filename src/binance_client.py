@@ -11,7 +11,8 @@ import os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from config import (
     KUCOIN_BASE_URL, QUOTE_ASSET, TOP_COINS_COUNT,
-    KLINES_LIMIT, TIMEFRAME_KUCOIN, KLINES_INTERVAL_SEC
+    KLINES_LIMIT, TIMEFRAME_KUCOIN, KLINES_INTERVAL_SEC,
+    TIMEFRAME_1H_KUCOIN, KLINES_1H_LIMIT, KLINES_1H_INTERVAL_SEC,
 )
 
 
@@ -37,7 +38,8 @@ def get_top_coins():
     return [t["symbol"] for t in usdt[:TOP_COINS_COUNT]]
 
 
-def get_klines(symbol, interval=TIMEFRAME_KUCOIN, limit=KLINES_LIMIT):
+def get_klines(symbol, interval=TIMEFRAME_KUCOIN, limit=KLINES_LIMIT,
+               interval_sec=KLINES_INTERVAL_SEC):
     """
     Fetch OHLCV data from KuCoin.
     Returns plain dict of lists (oldest → newest):
@@ -48,7 +50,7 @@ def get_klines(symbol, interval=TIMEFRAME_KUCOIN, limit=KLINES_LIMIT):
     """
     url = f"{KUCOIN_BASE_URL}/api/v1/market/candles"
     now = int(time.time())
-    start_at = now - (limit * KLINES_INTERVAL_SEC)
+    start_at = now - (limit * interval_sec)
 
     params = {
         "symbol":  symbol,
@@ -74,3 +76,13 @@ def get_klines(symbol, interval=TIMEFRAME_KUCOIN, limit=KLINES_LIMIT):
         "close":  [float(c[2]) for c in candles],   # index 2 = close
         "volume": [float(c[5]) for c in candles],
     }
+
+
+def get_klines_1h(symbol):
+    """Fetch 1h candles for trend direction."""
+    return get_klines(
+        symbol,
+        interval=TIMEFRAME_1H_KUCOIN,
+        limit=KLINES_1H_LIMIT,
+        interval_sec=KLINES_1H_INTERVAL_SEC,
+    )
