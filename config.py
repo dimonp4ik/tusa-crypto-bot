@@ -10,7 +10,7 @@ CLAUDE_API_KEY = os.getenv("CLAUDE_API_KEY")
 
 # --- Scan settings ---
 SCAN_INTERVAL_MINUTES = int(os.getenv("SCAN_INTERVAL_MINUTES", "10"))
-TOP_COINS_COUNT = 50
+TOP_COINS_COUNT = 100      # top 100 by volume → more setups per scan
 TIMEFRAME = "15m"          # candle size for analysis
 KLINES_LIMIT = 100         # number of candles to fetch per coin
 
@@ -42,10 +42,11 @@ KLINES_4H_INTERVAL_SEC = 4 * 3600
 # --- Trading hours filter (UTC) ---
 TRADING_HOURS_START = 7    # 07:00 UTC — London open
 TRADING_HOURS_END   = 23   # 23:00 UTC — NY close
+TRADE_WEEKENDS      = False  # skip Saturday and Sunday
 
 # --- SMC settings ---
 SMC_SWING_LOOKBACK    = 5       # candles each side to confirm swing point
 SMC_FVG_MIN_PCT       = 0.0005  # minimum FVG size (0.05%)
 SMC_OB_LOOKBACK       = 30      # candles back to search for order blocks
-SMC_MIN_CONFIRMATIONS = 2       # need FVG+OB, FVG+Sweep, or OB+Sweep (not just one)
+SMC_MIN_CONFIRMATIONS = 1       # 1 confirmation from FVG/OB/Sweep (more signals)
 SMC_BOS_MIN_VOLUME    = 1.5     # BOS candle volume must be >= 1.5x average

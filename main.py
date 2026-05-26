@@ -22,7 +22,7 @@ import requests as _requests
 
 from config import (
     SCAN_INTERVAL_MINUTES, SIGNAL_COOLDOWN_HOURS, TELEGRAM_TOKEN, TELEGRAM_CHAT_ID,
-    TRADING_HOURS_START, TRADING_HOURS_END,
+    TRADING_HOURS_START, TRADING_HOURS_END, TRADE_WEEKENDS,
 )
 from src.binance_client import get_top_coins, get_klines, get_klines_1h, get_klines_4h
 from src.signal_filter import analyze_coin_smc
@@ -121,8 +121,15 @@ def _cache_signal(symbol: str, direction: str):
 
 # ── Main scanning function ────────────────────────────────────────────────────
 def run_scan():
+    now_utc = datetime.now(timezone.utc)
+
+    # Weekend filter (Mon=0 ... Sun=6)
+    if not TRADE_WEEKENDS and now_utc.weekday() >= 5:
+        log.info(f"Weekend ({now_utc.strftime('%A')}) — scan skipped")
+        return
+
     # Trading hours filter (UTC)
-    utc_hour = datetime.now(timezone.utc).hour
+    utc_hour = now_utc.hour
     if not (TRADING_HOURS_START <= utc_hour < TRADING_HOURS_END):
         log.info(f"Outside trading hours (UTC {utc_hour:02d}:xx) — scan skipped")
         return
