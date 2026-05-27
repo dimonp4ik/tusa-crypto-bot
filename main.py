@@ -384,7 +384,7 @@ def start_bot():
     try:
         send_status(
             "🤖 *Crypto Signal Bot Online*\n"
-            f"Сканирую топ-100 монет каждые {SCAN_INTERVAL_MINUTES} мин (Пн-Пт, 07-23 UTC)."
+            f"Сканирую топ-50 монет каждые {SCAN_INTERVAL_MINUTES} мин (Пн-Пт, 10:00–02:00 по Риге)."
         )
     except Exception as e:
         log.warning(f"Could not send startup message: {e}")
