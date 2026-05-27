@@ -2,7 +2,7 @@
 Crypto Signal Bot — entry point.
 
 Flow every N minutes:
-  1. Fetch top 30 USDT pairs from KuCoin (by 24h volume)
+  1. Fetch top 45 USDT pairs from KuCoin (by 24h volume)
   2. Run SMC technical filter (BOS + FVG + OB + multi-timeframe)
   3. Send only strong setups to Claude Sonnet
   4. Claude returns LONG / SHORT / NO TRADE
@@ -93,7 +93,7 @@ def webhook():
                f"⏱ Интервал: {SCAN_INTERVAL_MINUTES} мин\n"
                f"📊 Сигналов в кэше: {len(_signal_cache)}\n"
                f"💾 Данные: KuCoin\n"
-               f"🧠 AI: Claude Haiku")
+               f"🧠 AI: Claude Sonnet")
 
     # /stats — статистика побед/поражений
     elif text in ("/stats", "/статистика"):
@@ -358,7 +358,7 @@ def run_scan():
             log.info("=== Scan complete — 0 signal(s) sent ===\n")
             return
 
-        # Step 4: ONE batch call to Claude Haiku (+ news context)
+        # Step 4: ONE batch call to Claude Sonnet (+ news context)
         try:
             analyses = analyze_batch_with_claude(enriched, news_context=news)
         except Exception as e:
@@ -454,7 +454,7 @@ def start_bot():
     try:
         send_status(
             "🤖 *Crypto Signal Bot Online*\n"
-            f"Сканирую топ-30 монет каждые {SCAN_INTERVAL_MINUTES} мин (Пн-Пт, 10:00–02:00 по Риге)."
+            f"Сканирую топ-45 монет каждые {SCAN_INTERVAL_MINUTES} мин (Пн-Пт, 10:00–02:00 по Риге)."
         )
     except Exception as e:
         log.warning(f"Could not send startup message: {e}")
