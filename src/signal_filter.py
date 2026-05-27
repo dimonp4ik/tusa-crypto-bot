@@ -75,28 +75,46 @@ def analyze_coin_smc(candles_15m: dict, candles_1h: dict, symbol: str,
     if len(confirmations) < SMC_MIN_CONFIRMATIONS:
         return None
 
+    # RSI momentum zone — avoid entries after exhaustion
+    rsi = ind["rsi"]
+    if direction == "LONG"  and not (40 <= rsi <= 75):
+        return None   # oversold bounce or overbought — skip
+    if direction == "SHORT" and not (25 <= rsi <= 60):
+        return None   # oversold or too early short — skip
+
+    # Bonus signals for quality scoring
+    session = ind.get("session", "OFF_HOURS")
+    if session in ("LONDON", "NEW_YORK", "OVERLAP"):
+        confirmations.append(f"Session:{session}")
+
+    if ind.get("trend_1h_strong"):
+        confirmations.append("StrongTrend1h")
+
     signals = [f"BOS {bos}", f"Vol {ind['volume_ratio']:.1f}x"] + confirmations
     score   = len(signals)
 
     return {
-        "symbol":        symbol,
-        "direction":     direction,
-        "trend_1h":      trend_1h,
-        "trend_4h":      trend_4h,
-        "bos":           bos,
-        "fvg":           ind["bullish_fvg"] if direction == "LONG" else ind["bearish_fvg"],
-        "order_block":   ind["bull_ob"]     if direction == "LONG" else ind["bear_ob"],
-        "liq_sweep":     ind["bull_sweep"]  if direction == "LONG" else ind["bear_sweep"],
-        "rsi":           ind["rsi"],
-        "atr":           ind["atr"],
-        "volume_ratio":  ind["volume_ratio"],
-        "current_price": round(ind["current_close"], 8),
-        "recent_high":   round(ind["recent_high"], 8),
-        "recent_low":    round(ind["recent_low"], 8),
-        "btc_change":    round(btc_change_pct, 2),
-        "signals":       signals,
-        "bullish_score": score if direction == "LONG"  else 0,
-        "bearish_score": score if direction == "SHORT" else 0,
+        "symbol":           symbol,
+        "direction":        direction,
+        "trend_1h":         trend_1h,
+        "trend_4h":         ind["trend_4h"],
+        "trend_1h_strong":  ind.get("trend_1h_strong", False),
+        "session":          session,
+        "bos":              bos,
+        "bos_body_strong":  ind.get("bos_body_strong", False),
+        "fvg":              ind["bullish_fvg"] if direction == "LONG" else ind["bearish_fvg"],
+        "order_block":      ind["bull_ob"]     if direction == "LONG" else ind["bear_ob"],
+        "liq_sweep":        ind["bull_sweep"]  if direction == "LONG" else ind["bear_sweep"],
+        "rsi":              rsi,
+        "atr":              ind["atr"],
+        "volume_ratio":     ind["volume_ratio"],
+        "current_price":    round(ind["current_close"], 8),
+        "recent_high":      round(ind["recent_high"], 8),
+        "recent_low":       round(ind["recent_low"], 8),
+        "btc_change":       round(btc_change_pct, 2),
+        "signals":          signals,
+        "bullish_score":    score if direction == "LONG"  else 0,
+        "bearish_score":    score if direction == "SHORT" else 0,
     }
 
 

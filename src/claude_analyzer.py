@@ -28,16 +28,20 @@ def analyze_batch_with_claude(setups: list, news_context: dict = None) -> list:
 
     coins_text = ""
     for i, s in enumerate(setups, 1):
-        fvg     = "✓" if s.get("fvg")         else "✗"
-        ob      = "✓" if s.get("order_block") else "✗"
-        sweep   = "✓" if s.get("liq_sweep")   else "✗"
-        funding = s.get("funding_rate")
-        fund_s  = f"{funding*100:+.3f}%" if funding is not None else "n/a"
+        fvg      = "✓" if s.get("fvg")          else "✗"
+        ob       = "✓" if s.get("order_block")  else "✗"
+        sweep    = "✓" if s.get("liq_sweep")    else "✗"
+        body     = "✓" if s.get("bos_body_strong") else "✗"
+        strong1h = "✓" if s.get("trend_1h_strong") else "✗"
+        funding  = s.get("funding_rate")
+        fund_s   = f"{funding*100:+.3f}%" if funding is not None else "n/a"
+        session  = s.get("session", "?")
         coins_text += (
             f"{i}. {s['symbol']} → {s['direction']} | "
-            f"4h:{s.get('trend_4h','?')} 1h:{s.get('trend_1h','?')} | "
-            f"BOS:{s.get('bos','?')} | FVG:{fvg} OB:{ob} Sweep:{sweep} | "
-            f"RSI:{s['rsi']} Vol:{s['volume_ratio']}x Funding:{fund_s}\n"
+            f"4h:{s.get('trend_4h','?')} 1h:{s.get('trend_1h','?')} Strong:{strong1h} | "
+            f"BOS body:{body} | FVG:{fvg} OB:{ob} Sweep:{sweep} | "
+            f"RSI:{s['rsi']} Vol:{s['volume_ratio']}x | "
+            f"Session:{session} Funding:{fund_s}\n"
         )
 
     # Build news context block
@@ -56,15 +60,16 @@ def analyze_batch_with_claude(setups: list, news_context: dict = None) -> list:
 
     prompt = f"""You are a Smart Money Concepts (SMC) crypto trader. Analyze each setup and decide whether to trade.
 {news_block}
-Rules:
-- LONG only if 4h=bullish AND 1h=bullish AND BOS=bullish (strongest)
-- SHORT only if 4h=bearish AND 1h=bearish AND BOS=bearish (strongest)
-- If one timeframe is neutral — still trade but lower confidence
-- Skip (NO TRADE) if RSI > 75 on LONG or RSI < 25 on SHORT (overextended)
-- FVG + OB together = highest probability setup
-- Volume above 2x = institutional confirmation
-- Funding > +0.05% means crowded LONG → prefer SHORT, avoid LONG
-- Funding < -0.05% means crowded SHORT → prefer LONG, avoid SHORT
+Rules (apply strictly):
+- LONG: need 4h=bullish AND 1h=bullish. One neutral OK but confidence=MEDIUM only
+- SHORT: need 4h=bearish AND 1h=bearish. One neutral OK but confidence=MEDIUM only
+- Strong1h=✓ → trend is EMA9>EMA21>EMA50, much higher win rate → prefer these
+- BOS body=✓ → real candle break (not wick). body=✗ → NO TRADE (fake breakout)
+- Session LONDON/NEW_YORK/OVERLAP → highest volume, prefer these. OFF_HOURS → NO TRADE unless all other signals perfect
+- FVG+OB both ✓ → HIGH confidence. Only one → MEDIUM. Neither → NO TRADE
+- Volume ≥ 2x → institutional. Volume 1.2-2x → acceptable
+- Funding crowded same direction → NO TRADE (squeeze risk)
+- Skip if news=BEARISH on LONG or news=BULLISH on SHORT
 
 Setups to analyze:
 {coins_text}

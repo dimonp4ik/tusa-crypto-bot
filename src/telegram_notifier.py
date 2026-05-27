@@ -80,6 +80,13 @@ def send_signal(analysis: dict) -> bool:
     conf_icon = {"HIGH": "🔥", "MEDIUM": "⚡", "LOW": "⚠️"}.get(analysis.get("confidence", ""), "⚡")
     conf_ru   = {"HIGH": "ВЫСОКАЯ", "MEDIUM": "СРЕДНЯЯ", "LOW": "НИЗКАЯ"}.get(analysis.get("confidence", ""), "—")
 
+    session_icons = {
+        "LONDON":    "🇬🇧 London",
+        "NEW_YORK":  "🇺🇸 New York",
+        "OVERLAP":   "🔥 London/NY",
+        "OFF_HOURS": "🌙 Off-hours",
+    }
+    session_str  = session_icons.get(analysis.get("session", ""), "")
     signals_text = "\n".join(f"  • {s}" for s in analysis["signals"])
     timestamp    = datetime.now(timezone.utc).strftime("%d.%m.%Y %H:%M UTC")
 
@@ -104,7 +111,7 @@ def send_signal(analysis: dict) -> bool:
         f"\n*Сигналы:*\n{signals_text}\n\n"
         f"{conf_icon} Уверенность: *{conf_ru}*\n"
         f"📝 _{analysis.get('reason', '')}_\n\n"
-        f"⏰ {timestamp}"
+        f"🕐 {session_str}  ⏰ {timestamp}"
     )
 
     if _send_message(message):

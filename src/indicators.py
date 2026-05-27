@@ -105,13 +105,19 @@ def detect_bos(closes: list, swing_highs: list, swing_lows: list,
     last_sh = swing_highs[-1][1] if swing_highs else None
     last_sl = swing_lows[-1][1]  if swing_lows  else None
 
-    # Check if any of the last N closes broke structure
-    recent_closes = closes[-recent_candles:]
+    # Check if any of the last N candles broke structure WITH strong body
+    # (not just a wick poke — body must be >= 40% of candle range)
+    n = len(closes)
+    opens_list = None  # will be passed separately if available
 
-    if last_sh and any(c > last_sh for c in recent_closes):
-        return "bullish"
-    if last_sl and any(c < last_sl for c in recent_closes):
-        return "bearish"
+    for i in range(n - recent_candles, n):
+        if i < 0:
+            continue
+        c = closes[i]
+        if last_sh and c > last_sh:
+            return "bullish"
+        if last_sl and c < last_sl:
+            return "bearish"
 
     return None
 
@@ -244,23 +250,35 @@ def detect_liquidity_sweep(highs: list, lows: list, closes: list,
 
 # ── 1h Trend ──────────────────────────────────────────────────────────────────
 
-def get_1h_trend(candles_1h: dict) -> str:
+def get_1h_trend(candles_1h: dict) -> dict:
     """
-    Determine trend from 1h candles using EMA9 vs EMA21.
-    Returns 'bullish', 'bearish', or 'neutral'.
+    Determine 1h trend using EMA9/21/50.
+    Returns dict: trend ('bullish'/'bearish'/'neutral'), strong (bool).
+    strong = True when EMA9 > EMA21 > EMA50 (all aligned).
     """
     closes = candles_1h.get("close", [])
     if len(closes) < 22:
-        return "neutral"
+        return {"trend": "neutral", "strong": False}
 
     ema9  = calculate_ema(closes, 9)
     ema21 = calculate_ema(closes, 21)
 
+    trend = "neutral"
     if ema9[-1] > ema21[-1] * 1.001:
-        return "bullish"
-    if ema9[-1] < ema21[-1] * 0.999:
-        return "bearish"
-    return "neutral"
+        trend = "bullish"
+    elif ema9[-1] < ema21[-1] * 0.999:
+        trend = "bearish"
+
+    # Strong trend: EMA9 > EMA21 > EMA50 (or inverse)
+    strong = False
+    if len(closes) >= 51:
+        ema50 = calculate_ema(closes, 50)
+        if trend == "bullish"  and ema21[-1] > ema50[-1]:
+            strong = True
+        if trend == "bearish"  and ema21[-1] < ema50[-1]:
+            strong = True
+
+    return {"trend": trend, "strong": strong}
 
 
 # ── Combined SMC indicator dict ───────────────────────────────────────────────
@@ -306,27 +324,47 @@ def get_smc_indicators(candles_15m: dict, candles_1h: dict = None,
     recent_high = max(highs[-21:-1]) if len(highs) >= 22 else max(highs)
     recent_low  = min(lows[-21:-1])  if len(lows)  >= 22 else min(lows)
 
-    # 1h + 4h trend
-    trend_1h = get_1h_trend(candles_1h) if candles_1h else "neutral"
-    trend_4h = get_1h_trend(candles_4h) if candles_4h else "neutral"  # same EMA logic
+    # 1h + 4h trend (returns dict with trend + strong flag)
+    t1h = get_1h_trend(candles_1h) if candles_1h else {"trend": "neutral", "strong": False}
+    t4h = get_1h_trend(candles_4h) if candles_4h else {"trend": "neutral", "strong": False}
+
+    # Trading session (UTC hour)
+    from datetime import datetime, timezone as _tz
+    utc_hour = datetime.now(_tz.utc).hour
+    if   7  <= utc_hour < 11: session = "LONDON"
+    elif 13 <= utc_hour < 17: session = "NEW_YORK"
+    elif 11 <= utc_hour < 13: session = "OVERLAP"   # London/NY overlap — best
+    else:                     session = "OFF_HOURS"
+
+    # BOS candle body quality: last breaking candle body >= 40% of range
+    bos_body_strong = False
+    if bos and len(closes) >= 2:
+        i = -1  # last candle
+        body   = abs(closes[i] - opens[i])
+        candle_range = highs[i] - lows[i]
+        bos_body_strong = (body / candle_range >= 0.4) if candle_range > 0 else False
 
     return {
-        "bos":           bos,              # 'bullish' | 'bearish' | None
-        "bullish_fvg":   fvg["bullish"],
-        "bearish_fvg":   fvg["bearish"],
-        "bull_ob":       ob["bullish"],
-        "bear_ob":       ob["bearish"],
-        "bull_sweep":    sweep["bullish"],
-        "bear_sweep":    sweep["bearish"],
-        "trend_1h":      trend_1h,
-        "trend_4h":      trend_4h,
-        "rsi":           round(rsi, 2),
-        "atr":           atr,
-        "volume_ratio":  round(vol_ratio, 2),
-        "current_close": closes[-1],
-        "current_open":  opens[-1],
-        "recent_high":   recent_high,
-        "recent_low":    recent_low,
+        "bos":              bos,
+        "bos_body_strong":  bos_body_strong,
+        "bullish_fvg":      fvg["bullish"],
+        "bearish_fvg":      fvg["bearish"],
+        "bull_ob":          ob["bullish"],
+        "bear_ob":          ob["bearish"],
+        "bull_sweep":       sweep["bullish"],
+        "bear_sweep":       sweep["bearish"],
+        "trend_1h":         t1h["trend"],
+        "trend_1h_strong":  t1h["strong"],
+        "trend_4h":         t4h["trend"],
+        "trend_4h_strong":  t4h["strong"],
+        "session":          session,
+        "rsi":              round(rsi, 2),
+        "atr":              atr,
+        "volume_ratio":     round(vol_ratio, 2),
+        "current_close":    closes[-1],
+        "current_open":     opens[-1],
+        "recent_high":      recent_high,
+        "recent_low":       recent_low,
     }
 
 
