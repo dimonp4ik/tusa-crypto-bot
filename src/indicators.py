@@ -234,9 +234,10 @@ def detect_bos(closes: list, swing_highs: list, swing_lows: list,
     # Check if any of the last N candles broke structure WITH strong body
     # (not just a wick poke — body must be >= 40% of candle range)
     n = len(closes)
-    opens_list = None  # will be passed separately if available
 
-    for i in range(n - recent_candles, n):
+    # Exclude last candle (index n-1) — still forming, close not final yet.
+    # Only check confirmed closed candles (up to index n-2).
+    for i in range(n - recent_candles, n - 1):
         if i < 0:
             continue
         c = closes[i]

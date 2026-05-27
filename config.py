@@ -48,8 +48,8 @@ TRADE_WEEKENDS      = False  # skip Saturday and Sunday
 SMC_SWING_LOOKBACK    = 5       # candles each side to confirm swing point
 SMC_FVG_MIN_PCT       = 0.0005  # minimum FVG size (0.05%)
 SMC_OB_LOOKBACK       = 30      # candles back to search for order blocks
-SMC_MIN_CONFIRMATIONS = 1       # 1 confirmation from FVG/OB/Sweep (more signals)
-SMC_BOS_MIN_VOLUME    = 1.2     # BOS candle volume must be >= 1.2x average (lowered from 1.5)
+SMC_MIN_CONFIRMATIONS = 2       # 2 confirmations required (FVG/OB/Sweep/Div/Wick/Stoch)
+SMC_BOS_MIN_VOLUME    = 1.5     # BOS candle volume must be >= 1.5x average
 
 # --- ATR-based stops/takes ---
 ATR_PERIOD       = 14
