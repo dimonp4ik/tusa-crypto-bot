@@ -10,7 +10,7 @@ CLAUDE_API_KEY = os.getenv("CLAUDE_API_KEY")
 
 # --- Scan settings ---
 SCAN_INTERVAL_MINUTES = int(os.getenv("SCAN_INTERVAL_MINUTES", "5"))
-TOP_COINS_COUNT = 50       # top 50 by volume — most volatile, best quality
+TOP_COINS_COUNT = 30       # top 30 by volume — most volatile, best quality
 TIMEFRAME = "5m"           # 5m candle → signals resolve in 30-90 min
 KLINES_LIMIT = 200         # 200 × 5m = ~16 hours of data for SMC
 

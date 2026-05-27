@@ -2,9 +2,9 @@
 Crypto Signal Bot — entry point.
 
 Flow every N minutes:
-  1. Fetch top 50 USDT pairs from Bybit (by 24h volume)
-  2. Run technical filter (EMA + RSI + Volume + Breakout)
-  3. Send only strong setups (~3-8 coins) to Claude Haiku
+  1. Fetch top 30 USDT pairs from KuCoin (by 24h volume)
+  2. Run SMC technical filter (BOS + FVG + OB + multi-timeframe)
+  3. Send only strong setups to Claude Sonnet
   4. Claude returns LONG / SHORT / NO TRADE
   5. Telegram receives only actionable signals
 """
@@ -254,7 +254,7 @@ def run_scan():
         # Check open signals from previous scans → update TP/SL hits
         _check_open_signals()
 
-        # Step 1: top 100 coins by volume
+        # Step 1: top 30 coins by volume
         coins = get_top_coins()
         log.info(f"Fetched {len(coins)} coins from KuCoin")
 
@@ -384,7 +384,7 @@ def start_bot():
     try:
         send_status(
             "🤖 *Crypto Signal Bot Online*\n"
-            f"Сканирую топ-50 монет каждые {SCAN_INTERVAL_MINUTES} мин (Пн-Пт, 10:00–02:00 по Риге)."
+            f"Сканирую топ-30 монет каждые {SCAN_INTERVAL_MINUTES} мин (Пн-Пт, 10:00–02:00 по Риге)."
         )
     except Exception as e:
         log.warning(f"Could not send startup message: {e}")
