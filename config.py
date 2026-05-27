@@ -43,7 +43,7 @@ VOLUME_SPIKE_MULTIPLIER = 1.8
 MIN_SIGNALS_TO_PASS = 2
 
 # --- Signal deduplication ---
-SIGNAL_COOLDOWN_HOURS = 4  # same coin/direction not repeated within 4 hours
+SIGNAL_COOLDOWN_HOURS = 1  # 5m signals resolve in 30-90 min — 1h cooldown per coin/direction
 
 # --- KuCoin (accessible from cloud/US servers) ---
 KUCOIN_BASE_URL = "https://api.kucoin.com"
