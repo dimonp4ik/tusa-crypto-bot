@@ -136,6 +136,80 @@ def _parse_groq(raw: str) -> dict:
     return result
 
 
+def detect_major_events(headlines: list[str]) -> list[dict]:
+    """
+    Detect HIGH IMPACT macro events from headlines.
+    Returns list of {name, direction, level (1-3), explanation} dicts.
+    Max 2 events per call.
+    """
+    if not headlines or not GROQ_API_KEY:
+        return []
+
+    text = "\n".join(f"• {h}" for h in headlines)
+
+    prompt = f"""Analyze these headlines for HIGH IMPACT macro events that significantly move crypto markets.
+
+HIGH IMPACT events only: Fed rate decision, ECB decision, US CPI release, NFP jobs report, GDP surprise, major crypto regulatory ban, exchange collapse or hack >$500M.
+
+Headlines:
+{text}
+
+If HIGH IMPACT event found, reply one line per event (max 2 events):
+EVENT|[event name in Russian, max 8 words]|BULLISH or BEARISH|[1 or 2 or 3]|[market effect in Russian, max 10 words]
+
+Impact scale: 1=moderate, 2=significant, 3=major market mover
+
+If NO high impact events found, reply only: NONE"""
+
+    try:
+        resp = _req.post(
+            "https://api.groq.com/openai/v1/chat/completions",
+            headers={
+                "Authorization": f"Bearer {GROQ_API_KEY}",
+                "Content-Type": "application/json",
+            },
+            json={
+                "model":       "llama-3.1-8b-instant",
+                "messages":    [{"role": "user", "content": prompt}],
+                "max_tokens":  150,
+                "temperature": 0.1,
+            },
+            timeout=12,
+        )
+        raw = resp.json()["choices"][0]["message"]["content"].strip()
+        return _parse_events(raw)
+    except Exception:
+        return []
+
+
+def _parse_events(raw: str) -> list[dict]:
+    """Parse: EVENT|name|direction|level|explanation"""
+    events = []
+    for line in raw.splitlines():
+        line = line.strip()
+        if not line or line.upper() == "NONE":
+            continue
+        if not line.startswith("EVENT|"):
+            continue
+        parts = line.split("|")
+        if len(parts) < 5:
+            continue
+        try:
+            direction = parts[2].strip().upper()
+            if direction not in ("BULLISH", "BEARISH"):
+                direction = "NEUTRAL"
+            level = int(parts[3].strip())
+            events.append({
+                "name":        parts[1].strip(),
+                "direction":   direction,
+                "level":       level,
+                "explanation": parts[4].strip(),
+            })
+        except (ValueError, IndexError):
+            continue
+    return events[:2]
+
+
 def get_market_news() -> dict:
     """
     Main entry point. Fetch headlines → analyze → return context dict.

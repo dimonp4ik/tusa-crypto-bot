@@ -3,6 +3,13 @@ from datetime import datetime, timezone
 import sys
 import os
 
+try:
+    from zoneinfo import ZoneInfo
+    _RIGA = ZoneInfo("Europe/Riga")
+except Exception:
+    from datetime import timedelta
+    _RIGA = timezone(timedelta(hours=3))  # fallback UTC+3
+
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from config import (
     TELEGRAM_TOKEN, TELEGRAM_CHAT_ID,
@@ -88,7 +95,7 @@ def send_signal(analysis: dict) -> bool:
     }
     session_str  = session_icons.get(analysis.get("session", ""), "")
     signals_text = "\n".join(f"  • {s}" for s in analysis["signals"])
-    timestamp    = datetime.now(timezone.utc).strftime("%d.%m.%Y %H:%M UTC")
+    timestamp    = datetime.now(_RIGA).strftime("%d.%m.%Y %H:%M (Рига)")
 
     btc_change   = analysis.get("btc_change", 0)
     btc_line     = f"₿ BTC за час: `{btc_change:+.2f}%`\n" if btc_change else ""
@@ -123,6 +130,42 @@ def send_signal(analysis: dict) -> bool:
             print(f"[DB] log_signal failed: {e}")
         return True
     return False
+
+
+def send_news_alert(event: dict) -> bool:
+    """
+    Send investing.com-style high-impact news alert.
+    event keys: name, direction (BULLISH/BEARISH), level (1-3), explanation
+    """
+    direction = event.get("direction", "NEUTRAL")
+    level     = min(max(int(event.get("level", 1)), 1), 3)
+    name      = event.get("name", "")
+    expl      = event.get("explanation", "")
+
+    if direction == "BULLISH":
+        icons     = "🐂" * level
+        impact_ru = "БЫЧЬЕ"
+        dir_icon  = "📈"
+    elif direction == "BEARISH":
+        icons     = "🐻" * level
+        impact_ru = "МЕДВЕЖЬЕ"
+        dir_icon  = "📉"
+    else:
+        icons     = "⚪" * level
+        impact_ru = "НЕЙТРАЛЬНОЕ"
+        dir_icon  = "➡️"
+
+    timestamp = datetime.now(_RIGA).strftime("%d.%m.%Y %H:%M (Рига)")
+
+    message = (
+        f"⚡ *ВАЖНАЯ НОВОСТЬ*\n"
+        f"🏦 {name}\n"
+        f"━━━━━━━━━━━━━━━━━━━\n"
+        f"{dir_icon} Влияние: {icons} *{impact_ru}*\n"
+        f"_{expl}_\n"
+        f"⏰ {timestamp}"
+    )
+    return _send_message(message)
 
 
 def send_status(text: str) -> bool:

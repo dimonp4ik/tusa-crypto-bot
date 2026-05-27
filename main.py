@@ -30,9 +30,9 @@ from src.binance_client import (
 )
 from src.signal_filter import analyze_coin_smc
 from src.claude_analyzer import analyze_batch_with_claude
-from src.telegram_notifier import send_signal, send_status, calculate_tp_sl
+from src.telegram_notifier import send_signal, send_status, send_news_alert, calculate_tp_sl
 from src.news_filter import check_news_sentiment
-from src.news_agent import get_market_news
+from src.news_agent import get_market_news, detect_major_events, fetch_recent_headlines
 from src.db import init_db, get_open_signals, update_signal_status, get_stats
 
 # ── Logging ──────────────────────────────────────────────────────────────────
@@ -129,6 +129,20 @@ def _reply(chat_id: int, text: str):
 # Format: { "BTCUSDT": ("LONG", 1714000000.0) }
 _signal_cache: dict[str, tuple[str, float]] = {}
 
+# ── News alert deduplication cache ────────────────────────────────────────────
+# Prevents re-sending the same major event alert for 6 hours.
+# Format: { "event name": timestamp_sent }
+_news_alert_cache: dict[str, float] = {}
+_NEWS_ALERT_COOLDOWN_HOURS = 6
+
+
+def _is_alert_duplicate(name: str) -> bool:
+    if name in _news_alert_cache:
+        age_hours = (time.time() - _news_alert_cache[name]) / 3600
+        if age_hours < _NEWS_ALERT_COOLDOWN_HOURS:
+            return True
+    return False
+
 
 def _is_duplicate(symbol: str, direction: str) -> bool:
     if symbol in _signal_cache:
@@ -220,6 +234,18 @@ def run_scan():
             log.warning("News agent: PAUSE — extreme market event, skipping scan")
             send_status(f"⚠️ *СТОП* — новостной агент остановил скан:\n_{news['summary']}_")
             return
+
+        # Step 0a-2: Detect and broadcast high-impact macro events
+        try:
+            headlines = fetch_recent_headlines()
+            events = detect_major_events(headlines)
+            for ev in events:
+                if not _is_alert_duplicate(ev["name"]):
+                    if send_news_alert(ev):
+                        _news_alert_cache[ev["name"]] = time.time()
+                        log.info(f"News alert sent: {ev['name']} ({ev['direction']} {ev['level']}x)")
+        except Exception as e:
+            log.warning(f"Major event check failed: {e}")
 
         # Step 0b: BTC 1h change for correlation filter
         btc_change = get_btc_change_1h()
