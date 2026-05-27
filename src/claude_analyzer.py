@@ -20,7 +20,7 @@ def _get_client():
 
 def analyze_batch_with_claude(setups: list, news_context: dict = None) -> list:
     """
-    Send ALL filtered setups to Claude Haiku in ONE call.
+    Send ALL filtered setups to Claude Sonnet in ONE call.
     Returns list of result dicts, one per setup.
     """
     if not setups:
@@ -28,72 +28,43 @@ def analyze_batch_with_claude(setups: list, news_context: dict = None) -> list:
 
     coins_text = ""
     for i, s in enumerate(setups, 1):
-        fvg      = "✓" if s.get("fvg")             else "✗"
-        ob       = "✓" if s.get("order_block")    else "✗"
-        sweep    = "✓" if s.get("liq_sweep")      else "✗"
-        body     = "✓" if s.get("bos_body_strong")else "✗"
-        strong1h = "✓" if s.get("trend_1h_strong")else "✗"
-        div      = s.get("divergence") or "—"
-        wick     = s.get("wick_rejection") or "—"
-        sk       = s.get("stoch_k", 50)
-        sd       = s.get("stoch_d", 50)
-        funding  = s.get("funding_rate")
-        fund_s   = f"{funding*100:+.3f}%" if funding is not None else "n/a"
-        session  = s.get("session", "?")
+        fvg     = "✓" if s.get("fvg")         else "✗"
+        ob      = "✓" if s.get("order_block") else "✗"
+        sweep   = "✓" if s.get("liq_sweep")   else "✗"
+        funding = s.get("funding_rate")
+        fund_s  = f"{funding*100:+.3f}%" if funding is not None else "n/a"
+        zone    = f"{s.get('entry_source','?')}:{s.get('entry_low',0):.4g}-{s.get('entry_high',0):.4g}"
         coins_text += (
-            f"{i}. {s['symbol']} → {s['direction']} | "
-            f"4h:{s.get('trend_4h','?')} 1h:{s.get('trend_1h','?')} Strong:{strong1h} | "
-            f"BOS body:{body} FVG:{fvg} OB:{ob} Sweep:{sweep} | "
-            f"RSI:{s['rsi']} StochK:{sk}/D:{sd} | "
-            f"Div:{div} Wick:{wick} | "
-            f"Vol:{s['volume_ratio']}x Session:{session} Funding:{fund_s}\n"
+            f"{i} {s['symbol']} {s['direction']} "
+            f"S={s.get('mtf_score','?')} "
+            f"4h={s.get('trend_4h','?')} 1h={s.get('trend_1h','?')} "
+            f"FVG={fvg} OB={ob} SW={sweep} "
+            f"Z={zone} RSI={s['rsi']} V={s['volume_ratio']}x F={fund_s}\n"
         )
 
-    # Build news context block
+    news_block = ""
     if news_context:
-        news_sentiment = news_context.get("sentiment", "NEUTRAL")
-        news_summary   = news_context.get("summary", "")
-        news_block = (
-            f"\nGLOBAL NEWS CONTEXT:\n"
-            f"  Market sentiment: {news_sentiment}\n"
-            f"  Key event: {news_summary}\n"
-            f"  Rule: if news=BEARISH → avoid LONG (lower confidence); "
-            f"if news=BULLISH → avoid SHORT (lower confidence)\n"
-        )
-    else:
-        news_block = ""
+        sent = news_context.get("sentiment", "NEUTRAL")
+        summ = news_context.get("summary", "")
+        if sent != "NEUTRAL" and summ:
+            news_block = (
+                f"\nNEWS: {sent} — {summ}\n"
+                f"Rule: BEARISH news → avoid LONG; BULLISH news → avoid SHORT\n"
+            )
 
-    prompt = f"""You are a Smart Money Concepts (SMC) crypto trader. Analyze each setup and decide whether to trade.
+    prompt = f"""SMC crypto validator. Confirm suggested side only; otherwise NO TRADE.
 {news_block}
-Rules (apply strictly):
-- LONG: need 4h=bullish AND 1h=bullish. One neutral OK but confidence=MEDIUM only
-- SHORT: need 4h=bearish AND 1h=bearish. One neutral OK but confidence=MEDIUM only
-- Strong1h=✓ → trend is EMA9>EMA21>EMA50, much higher win rate → prefer these
-- BOS body=✓ → real candle break (not wick). body=✗ → NO TRADE (fake breakout)
-- Session LONDON/NEW_YORK/OVERLAP → highest volume, prefer these. OFF_HOURS → NO TRADE unless all other signals perfect
-- FVG+OB both ✓ → HIGH confidence. Only one → MEDIUM. Neither → NO TRADE
-- Volume ≥ 2x → institutional. Volume 1.2-2x → acceptable
-- Funding crowded same direction → NO TRADE (squeeze risk)
-- Skip if news=BEARISH on LONG or news=BULLISH on SHORT
-- RSI divergence = strong reversal signal, adds HIGH confidence
-- StochK < 20 rising above StochD = oversold reversal (great LONG entry)
-- StochK > 80 falling below StochD = overbought reversal (great SHORT entry)
-- Bullish/bearish wick rejection on last candle = price rejected the level cleanly
-
-Setups to analyze:
+Rules: prefer S>=12; FVG+OB+zone = strongest; neutral TF ok=MEDIUM; avoid crowded funding; OFF_HOURS = NO TRADE.
+Data:
 {coins_text}
-Reply EXACTLY one line per setup, same numbering:
-1. DECISION|REASON (max 8 words)|CONFIDENCE
-2. DECISION|REASON (max 8 words)|CONFIDENCE
-...
-
-DECISION must be: LONG or SHORT or NO TRADE
-CONFIDENCE must be: HIGH or MEDIUM or LOW"""
+Return same count, one line each (no extra text):
+1. DECISION|REASON<=6w|CONFIDENCE
+DECISION: LONG/SHORT/NO TRADE. CONFIDENCE: HIGH/MEDIUM/LOW."""
 
     client = _get_client()
     message = client.messages.create(
         model="claude-sonnet-4-5",
-        max_tokens=60 * len(setups) + 50,
+        max_tokens=24 * len(setups) + 20,
         messages=[{"role": "user", "content": prompt}],
     )
 
@@ -101,9 +72,19 @@ CONFIDENCE must be: HIGH or MEDIUM or LOW"""
     return _parse_batch_response(raw, setups)
 
 
+def _enforce_suggested_side(result: dict) -> dict:
+    """Claude may only confirm the setup direction, never flip it."""
+    decision  = result.get("decision", "NO TRADE")
+    direction = result.get("direction")
+    if decision in ("LONG", "SHORT") and decision != direction:
+        result["decision"]    = "NO TRADE"
+        result["confidence"]  = "LOW"
+        result["reason"]      = "Opposite side blocked"
+    return result
+
+
 def _parse_batch_response(raw: str, setups: list) -> list:
     """Parse Claude's multi-line response into a list of result dicts."""
-    # Build index: "1" → line text
     line_map = {}
     for line in raw.splitlines():
         line = line.strip()
@@ -114,40 +95,39 @@ def _parse_batch_response(raw: str, setups: list) -> list:
             key = line[:dot].strip()
             if key.isdigit():
                 line_map[key] = line[dot + 1:].strip()
+                continue
+        # Also accept compact: "1 LONG|reason|HIGH"
+        first, _, rest = line.partition(" ")
+        if first.isdigit() and rest:
+            line_map[first] = rest.strip()
 
     results = []
     for i, setup in enumerate(setups, 1):
-        base = {
-            "symbol":        setup["symbol"],
-            "direction":     setup["direction"],
-            "current_price": setup["current_price"],
-            "recent_high":   setup.get("recent_high", 0),
-            "recent_low":    setup.get("recent_low", 0),
-            "rsi":           setup["rsi"],
-            "volume_ratio":  setup["volume_ratio"],
-            "signals":       setup["signals"],
-            "decision":      "NO TRADE",
-            "reason":        "Not evaluated",
-            "confidence":    "LOW",
-        }
+        # Preserve full setup dict; Claude only adds verdict fields
+        base = dict(setup)
+        base.update({
+            "decision":   "NO TRADE",
+            "reason":     "Not evaluated",
+            "confidence": "LOW",
+        })
 
         text = line_map.get(str(i), "")
         if text:
             parts = [p.strip() for p in text.split("|")]
             if parts:
                 val = parts[0].upper()
-                if "LONG"  in val: base["decision"] = "LONG"
+                if "LONG"    in val: base["decision"] = "LONG"
                 elif "SHORT" in val: base["decision"] = "SHORT"
                 else:                base["decision"] = "NO TRADE"
             if len(parts) >= 2:
                 base["reason"] = parts[1]
             if len(parts) >= 3:
                 conf = parts[2].upper()
-                if "HIGH"   in conf: base["confidence"] = "HIGH"
+                if "HIGH"    in conf: base["confidence"] = "HIGH"
                 elif "MEDIUM" in conf: base["confidence"] = "MEDIUM"
                 else:                  base["confidence"] = "LOW"
 
-        results.append(base)
+        results.append(_enforce_suggested_side(base))
 
     return results
 

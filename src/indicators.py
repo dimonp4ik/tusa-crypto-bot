@@ -256,39 +256,41 @@ def detect_fvg(opens: list, highs: list, lows: list, closes: list,
     """
     Detect Fair Value Gaps in last 40 candles, active near current price.
 
-    Bullish FVG: highs[i] < lows[i+2]  (gap above candle i, below candle i+2)
-    Bearish FVG: lows[i]  > highs[i+2] (gap below candle i, above candle i+2)
+    Bullish FVG zone: [high[i], low[i+2]]
+    Bearish FVG zone: [high[i+2], low[i]]
 
-    Returns {'bullish': bool, 'bearish': bool}.
+    Returns booleans + zone tuples (low, high) for entry zone calculation.
     """
     current = closes[-1]
     n = len(closes)
     search_from = max(0, n - 40)
 
-    bullish_fvg = False
-    bearish_fvg = False
+    bullish_zone = None
+    bearish_zone = None
 
     for i in range(search_from, n - 2):
         # Bullish FVG
         if highs[i] < lows[i + 2]:
             gap_bot = highs[i]
             gap_top = lows[i + 2]
-            size = (gap_top - gap_bot) / gap_bot
-            if size >= min_pct:
-                # Active if price is testing or inside the gap
-                if gap_bot * 0.999 <= current <= gap_top * 1.01:
-                    bullish_fvg = True
+            size = (gap_top - gap_bot) / (gap_bot + 1e-10)
+            if size >= min_pct and gap_bot * 0.999 <= current <= gap_top * 1.01:
+                bullish_zone = (gap_bot, gap_top)  # keep most recent active zone
 
         # Bearish FVG
         elif lows[i] > highs[i + 2]:
             gap_bot = highs[i + 2]
             gap_top = lows[i]
-            size = (gap_top - gap_bot) / gap_bot
-            if size >= min_pct:
-                if gap_bot * 0.99 <= current <= gap_top * 1.001:
-                    bearish_fvg = True
+            size = (gap_top - gap_bot) / (gap_bot + 1e-10)
+            if size >= min_pct and gap_bot * 0.99 <= current <= gap_top * 1.001:
+                bearish_zone = (gap_bot, gap_top)
 
-    return {"bullish": bullish_fvg, "bearish": bearish_fvg}
+    return {
+        "bullish":      bullish_zone is not None,
+        "bearish":      bearish_zone is not None,
+        "bullish_zone": bullish_zone,
+        "bearish_zone": bearish_zone,
+    }
 
 
 # ── SMC: Order Block ──────────────────────────────────────────────────────────
@@ -301,15 +303,14 @@ def detect_order_block(opens: list, highs: list, lows: list, closes: list,
     Bullish OB: last bearish candle before a strong bullish impulse (3+ bull candles).
     Bearish OB: last bullish candle before a strong bearish impulse (3+ bear candles).
 
-    Active if current price is retesting the OB zone.
-    Returns {'bullish': bool, 'bearish': bool}.
+    Returns booleans + zone tuples (low, high) for entry zone calculation.
     """
     current = closes[-1]
     n = len(closes)
     start = max(0, n - lookback)
 
-    bull_ob = False
-    bear_ob = False
+    bull_zone = None
+    bear_zone = None
 
     for i in range(start, n - 4):
         # Bullish OB: bearish candle → strong bullish impulse
@@ -317,12 +318,11 @@ def detect_order_block(opens: list, highs: list, lows: list, closes: list,
             next3_bull = all(closes[j] > opens[j] for j in range(i + 1, min(i + 4, n)))
             if next3_bull:
                 move = (closes[min(i + 3, n - 1)] - closes[i]) / (closes[i] + 1e-10)
-                if move > 0.005:  # at least 0.5% impulse
+                if move > 0.005:
                     ob_top = max(opens[i], closes[i])
                     ob_bot = min(opens[i], closes[i])
-                    # Active if price returned to OB zone
                     if ob_bot * 0.998 <= current <= ob_top * 1.005:
-                        bull_ob = True
+                        bull_zone = (ob_bot, ob_top)
 
         # Bearish OB: bullish candle → strong bearish impulse
         elif closes[i] > opens[i]:
@@ -333,9 +333,14 @@ def detect_order_block(opens: list, highs: list, lows: list, closes: list,
                     ob_top = max(opens[i], closes[i])
                     ob_bot = min(opens[i], closes[i])
                     if ob_bot * 0.995 <= current <= ob_top * 1.002:
-                        bear_ob = True
+                        bear_zone = (ob_bot, ob_top)
 
-    return {"bullish": bull_ob, "bearish": bear_ob}
+    return {
+        "bullish":      bull_zone is not None,
+        "bearish":      bear_zone is not None,
+        "bullish_zone": bull_zone,
+        "bearish_zone": bear_zone,
+    }
 
 
 # ── SMC: Liquidity Sweep ──────────────────────────────────────────────────────
@@ -485,8 +490,12 @@ def get_smc_indicators(candles_15m: dict, candles_1h: dict = None,
         "bos_body_strong":  bos_body_strong,
         "bullish_fvg":      fvg["bullish"],
         "bearish_fvg":      fvg["bearish"],
+        "bullish_fvg_zone": fvg.get("bullish_zone"),
+        "bearish_fvg_zone": fvg.get("bearish_zone"),
         "bull_ob":          ob["bullish"],
         "bear_ob":          ob["bearish"],
+        "bull_ob_zone":     ob.get("bullish_zone"),
+        "bear_ob_zone":     ob.get("bearish_zone"),
         "bull_sweep":       sweep["bullish"],
         "bear_sweep":       sweep["bearish"],
         "trend_1h":         t1h["trend"],

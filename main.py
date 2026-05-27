@@ -23,6 +23,7 @@ import requests as _requests
 from config import (
     SCAN_INTERVAL_MINUTES, SIGNAL_COOLDOWN_HOURS, TELEGRAM_TOKEN, TELEGRAM_CHAT_ID,
     TRADING_HOURS_START, TRADING_HOURS_END, TRADE_WEEKENDS,
+    MAX_SETUPS_TO_CLAUDE, ALLOWED_SYMBOLS, KLINES_INTERVAL_SEC,
 )
 from src.binance_client import (
     get_top_coins, get_klines, get_klines_1h, get_klines_4h,
@@ -33,7 +34,10 @@ from src.claude_analyzer import analyze_batch_with_claude
 from src.telegram_notifier import send_signal, send_status, send_news_alert, calculate_tp_sl
 from src.news_filter import check_news_sentiment
 from src.news_agent import get_market_news, detect_major_events, fetch_recent_headlines
-from src.db import init_db, get_open_signals, update_signal_status, get_stats
+from src.db import (
+    init_db, get_open_signals, update_signal_status, get_stats,
+    auto_block_bad_symbols, is_symbol_auto_blocked, get_active_symbol_blocks,
+)
 
 # ── Logging ──────────────────────────────────────────────────────────────────
 logging.basicConfig(
@@ -96,16 +100,21 @@ def webhook():
         try:
             s7  = get_stats(days=7)
             s30 = get_stats(days=30)
+            blocks = get_active_symbol_blocks()
+            blocks_line = ", ".join(b["symbol"] for b in blocks[:6]) if blocks else "нет"
             _reply(chat_id,
                    f"📈 *СТАТИСТИКА*\n\n"
                    f"*За 7 дней:*\n"
-                   f"  Всего: {s7['total']}\n"
-                   f"  TP1: {s7['tp1_hit']}  TP2: {s7['tp2_hit']}  SL: {s7['sl_hit']}\n"
+                   f"  Сигналов: {s7['total']}  Закрыто: {s7['closed']}\n"
+                   f"  TP1: {s7['tp1_hit']} ({s7['tp1_rate']}%)  TP2: {s7['tp2_hit']}\n"
+                   f"  BE: {s7['breakeven']}  SL: {s7['sl_hit']}  Expired: {s7['expired']}\n"
                    f"  Win rate: *{s7['win_rate']}%*\n\n"
                    f"*За 30 дней:*\n"
-                   f"  Всего: {s30['total']}\n"
-                   f"  TP1: {s30['tp1_hit']}  TP2: {s30['tp2_hit']}  SL: {s30['sl_hit']}\n"
-                   f"  Win rate: *{s30['win_rate']}%*")
+                   f"  Сигналов: {s30['total']}  Закрыто: {s30['closed']}\n"
+                   f"  TP1: {s30['tp1_hit']} ({s30['tp1_rate']}%)  TP2: {s30['tp2_hit']}\n"
+                   f"  BE: {s30['breakeven']}  SL: {s30['sl_hit']}  Expired: {s30['expired']}\n"
+                   f"  Win rate: *{s30['win_rate']}%*\n\n"
+                   f"🚫 Авто-блок: {blocks_line}")
         except Exception as e:
             _reply(chat_id, f"Ошибка статистики: {e}")
 
@@ -157,46 +166,77 @@ def _cache_signal(symbol: str, direction: str):
     _signal_cache[symbol] = (direction, time.time())
 
 
+def _setup_rank(setup: dict) -> tuple:
+    """Rank setups before Claude so only the strongest spend LLM tokens."""
+    mtf_score    = int(setup.get("mtf_score", 0) or 0)
+    confirmations = sum(1 for k in ("fvg", "order_block", "liq_sweep") if setup.get(k))
+    volume_score  = float(setup.get("volume_ratio", 0.0))
+    zone_bonus    = 1 if setup.get("entry_source") in ("OB", "FVG") else 0
+    return (mtf_score, zone_bonus, confirmations, volume_score)
+
+
 # ── Open-signal monitor (updates TP/SL hits in DB) ────────────────────────────
+def _slice_candles_from_open(candles: dict, after_ts: float) -> dict:
+    """Return only candles that opened after after_ts to avoid counting pre-entry moves."""
+    idxs = [i for i, ts in enumerate(candles.get("time", [])) if float(ts) >= float(after_ts)]
+    return {k: [v[i] for i in idxs] for k, v in candles.items()}
+
+
 def _check_open_signals():
     """For each OPEN signal in DB, fetch current price and update status."""
-    open_signals = get_open_signals()
-    if not open_signals:
+    active_signals = get_open_signals()
+    if not active_signals:
         return
 
-    for sig in open_signals:
-        try:
-            df = get_klines(sig["symbol"], limit=2)
-            current = df["close"][-1]
-            high    = df["high"][-1]
-            low     = df["low"][-1]
+    now = time.time()
 
+    for sig in active_signals:
+        try:
+            opened_at  = float(sig["opened_at"])
+            age_hours  = (now - opened_at) / 3600
+            candle_lim = max(8, min(220, int(age_hours * 12) + 12))
+            df_all     = get_klines(sig["symbol"], limit=candle_lim)
+
+            status    = sig["status"]
             direction = sig["direction"]
-            tp1, tp2, sl = sig["tp1"], sig["tp2"], sig["sl"]
-            opened_at = sig["opened_at"]
+            entry     = float(sig["entry_price"])
+            tp1, tp2, sl = float(sig["tp1"]), float(sig["tp2"]), float(sig["sl"])
+
+            # Inspect only candles that opened after signal time (OPEN)
+            # or after TP1 was recorded (TP1_PARTIAL) to avoid pre-entry moves
+            monitor_from = opened_at if status == "OPEN" else float(sig.get("tp1_hit_at") or opened_at)
+            df = _slice_candles_from_open(df_all, monitor_from)
 
             new_status = None
-            exit_px    = current
+            exit_px    = df_all["close"][-1] if df_all.get("close") else entry
 
-            if direction == "LONG":
-                if low <= sl:
-                    new_status, exit_px = "SL_HIT", sl
-                elif high >= tp2:
-                    new_status, exit_px = "TP2_HIT", tp2
-                elif high >= tp1:
-                    new_status, exit_px = "TP1_HIT", tp1
-            else:  # SHORT
-                if high >= sl:
-                    new_status, exit_px = "SL_HIT", sl
-                elif low <= tp2:
-                    new_status, exit_px = "TP2_HIT", tp2
-                elif low <= tp1:
-                    new_status, exit_px = "TP1_HIT", tp1
+            for i in range(len(df.get("close", []))):
+                high  = float(df["high"][i])
+                low   = float(df["low"][i])
+                close = float(df["close"][i])
+                exit_px = close
 
-            # Expire after 24h with no result
-            age_hours = (time.time() - opened_at) / 3600
+                if status == "OPEN":
+                    if direction == "LONG":
+                        if low <= sl:             new_status, exit_px = "SL_HIT",     sl;  break
+                        if high >= tp2:           new_status, exit_px = "TP2_HIT",    tp2; break
+                        if high >= tp1:           new_status, exit_px = "TP1_PARTIAL", tp1; break
+                    else:
+                        if high >= sl:            new_status, exit_px = "SL_HIT",     sl;  break
+                        if low <= tp2:            new_status, exit_px = "TP2_HIT",    tp2; break
+                        if low <= tp1:            new_status, exit_px = "TP1_PARTIAL", tp1; break
+
+                elif status == "TP1_PARTIAL":
+                    # Remaining 50% — SL moved to breakeven (entry)
+                    if direction == "LONG":
+                        if low <= entry:          new_status, exit_px = "BREAKEVEN",  entry; break
+                        if high >= tp2:           new_status, exit_px = "TP2_HIT",    tp2;   break
+                    else:
+                        if high >= entry:         new_status, exit_px = "BREAKEVEN",  entry; break
+                        if low <= tp2:            new_status, exit_px = "TP2_HIT",    tp2;   break
+
             if new_status is None and age_hours > 24:
-                new_status = "EXPIRED"
+                new_status = "TP1_EXPIRED" if status == "TP1_PARTIAL" else "EXPIRED"
 
             if new_status:
                 update_signal_status(sig["id"], new_status, exit_px)
@@ -254,9 +294,19 @@ def run_scan():
         # Check open signals from previous scans → update TP/SL hits
         _check_open_signals()
 
-        # Step 1: top 30 coins by volume
+        # Auto-block symbols with consistently bad stats (local DB, no API calls)
+        new_blocks = auto_block_bad_symbols()
+        for b in new_blocks:
+            log.info(f"  Auto-blocked: {b['reason']}")
+
+        # Step 1: top 45 liquid coins (quality filtered)
         coins = get_top_coins()
-        log.info(f"Fetched {len(coins)} coins from KuCoin")
+        before_blocks = len(coins)
+        coins = [s for s in coins if not is_symbol_auto_blocked(s)]
+        if len(coins) != before_blocks:
+            log.info(f"Auto-block: skipped {before_blocks - len(coins)} blocked symbol(s)")
+        mode = "whitelist" if ALLOWED_SYMBOLS else "auto top-volume"
+        log.info(f"Fetched {len(coins)} coins from KuCoin ({mode})")
 
         setups = []
 
@@ -296,7 +346,13 @@ def run_scan():
             s["funding_rate"] = get_funding_rate(s["symbol"])
             enriched.append(s)
 
-        log.info(f"After news/funding: {len(enriched)} setups → sending to Claude")
+        # Sort by quality score, keep only top MAX_SETUPS_TO_CLAUDE (saves tokens)
+        enriched.sort(key=_setup_rank, reverse=True)
+        if len(enriched) > MAX_SETUPS_TO_CLAUDE:
+            log.info(f"Token saver: top {MAX_SETUPS_TO_CLAUDE} of {len(enriched)} → Claude")
+            enriched = enriched[:MAX_SETUPS_TO_CLAUDE]
+
+        log.info(f"After news/funding/ranking: {len(enriched)} setups → sending to Claude")
 
         if not enriched:
             log.info("=== Scan complete — 0 signal(s) sent ===\n")
@@ -321,11 +377,25 @@ def run_scan():
                     f"  Claude: {analysis['symbol']} → {analysis['decision']} "
                     f"({analysis.get('confidence','?')}) — {analysis.get('reason','')}"
                 )
-                if analysis["decision"] != "NO TRADE":
+                decision   = analysis.get("decision", "NO TRADE")
+                direction  = analysis.get("direction")
+                confidence = analysis.get("confidence", "LOW").upper()
+
+                # Guard: Claude must confirm setup direction, not flip it
+                if decision in ("LONG", "SHORT") and decision != direction:
+                    log.warning(f"  Skip {analysis['symbol']} — Claude flipped side blocked")
+                    continue
+
+                # Skip LOW confidence signals
+                if confidence == "LOW":
+                    log.info(f"  Skip {analysis['symbol']} — LOW confidence")
+                    continue
+
+                if decision != "NO TRADE":
                     if send_signal(analysis):
-                        _cache_signal(analysis["symbol"], analysis["decision"])
+                        _cache_signal(analysis["symbol"], direction)
                         sent_count += 1
-                        log.info(f"  Signal sent: {analysis['symbol']} {analysis['decision']}")
+                        log.info(f"  Signal sent: {analysis['symbol']} {direction}")
             except Exception as e:
                 log.error(f"  Error sending {analysis.get('symbol','?')}: {e}")
 

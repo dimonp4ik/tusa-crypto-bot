@@ -5,8 +5,94 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from config import (
     RSI_OVERSOLD, RSI_OVERBOUGHT, VOLUME_SPIKE_MULTIPLIER, MIN_SIGNALS_TO_PASS,
     SMC_MIN_CONFIRMATIONS, SMC_BOS_MIN_VOLUME, BTC_BLOCK_THRESHOLD_PCT,
+    SMC_RSI_LONG_MAX, SMC_RSI_SHORT_MIN, MTF_MIN_SCORE,
+    REQUIRE_ENTRY_ZONE, ENTRY_ZONE_SL_BUFFER_ATR,
 )
 from src.indicators import get_indicators, get_smc_indicators
+
+
+# ── Entry zone helpers ────────────────────────────────────────────────────────
+
+def _zone_payload(zone, source: str, current: float):
+    """Normalize a (low, high) zone tuple into entry dict form."""
+    if not zone:
+        return None
+    low, high = sorted([float(zone[0]), float(zone[1])])
+    if low <= 0 or high <= 0 or high <= low:
+        return None
+    return {
+        "entry_low":    round(low, 8),
+        "entry_high":   round(high, 8),
+        "entry_price":  round((low + high) / 2, 8),
+        "entry_source": source,
+        "market_price": round(current, 8),
+    }
+
+
+def _select_entry_zone(ind: dict, direction: str):
+    """Prefer Order Block zone, then FVG zone as entry area."""
+    current = ind["current_close"]
+    if direction == "LONG":
+        return (
+            _zone_payload(ind.get("bull_ob_zone"), "OB", current)
+            or _zone_payload(ind.get("bullish_fvg_zone"), "FVG", current)
+        )
+    return (
+        _zone_payload(ind.get("bear_ob_zone"), "OB", current)
+        or _zone_payload(ind.get("bearish_fvg_zone"), "FVG", current)
+    )
+
+
+# ── MTF Score ─────────────────────────────────────────────────────────────────
+
+def _calc_mtf_score(ind: dict, bos: str, direction: str, confirmations: list,
+                    btc_change_pct: float, entry_zone) -> tuple:
+    """
+    Deterministic quality score (max ~15) before Claude.
+    Weak setups filtered here save Claude tokens.
+    """
+    score = 0
+    tags = []
+
+    score += 2; tags.append("BOS+2")
+
+    if ind.get("trend_1h") == bos:
+        score += 2; tags.append("1h+2")
+    elif ind.get("trend_1h") == "neutral":
+        score += 1; tags.append("1hN+1")
+
+    if ind.get("trend_4h") == bos:
+        score += 2; tags.append("4h+2")
+    elif ind.get("trend_4h") == "neutral":
+        score += 1; tags.append("4hN+1")
+
+    vol = float(ind.get("volume_ratio", 0.0))
+    if vol >= max(SMC_BOS_MIN_VOLUME * 1.35, 2.0):
+        score += 2; tags.append("Vol+2")
+    elif vol >= SMC_BOS_MIN_VOLUME:
+        score += 1; tags.append("Vol+1")
+
+    rsi = float(ind.get("rsi", 50.0))
+    if direction == "LONG" and 38 <= rsi <= 68:
+        score += 1; tags.append("RSI+1")
+    elif direction == "SHORT" and 32 <= rsi <= 62:
+        score += 1; tags.append("RSI+1")
+
+    if direction == "LONG" and btc_change_pct >= 0:
+        score += 2; tags.append("BTC+2")
+    elif direction == "SHORT" and btc_change_pct <= 0:
+        score += 2; tags.append("BTC+2")
+    else:
+        score += 1; tags.append("BTCok+1")
+
+    for name in confirmations:
+        if name in ("FVG", "OB", "LiqSweep"):
+            score += 1; tags.append(f"{name}+1")
+
+    if entry_zone:
+        score += 1; tags.append(f"Zone:{entry_zone['entry_source']}+1")
+
+    return score, tags
 
 
 # ── SMC filter ────────────────────────────────────────────────────────────────
@@ -14,23 +100,24 @@ from src.indicators import get_indicators, get_smc_indicators
 def analyze_coin_smc(candles_15m: dict, candles_1h: dict, symbol: str,
                      candles_4h: dict = None, btc_change_pct: float = 0.0) -> dict | None:
     """
-    SMC-based setup detector with multi-timeframe confirmation.
+    SMC-based setup detector with MTF score and zone entry.
 
-    Entry conditions (ALL must be true):
-      1. BOS on 15m
-      2. 1h trend matches BOS direction
-      3. 4h trend matches BOS direction (or neutral)
-      4. BOS candle had elevated volume (>= SMC_BOS_MIN_VOLUME)
-      5. At least SMC_MIN_CONFIRMATIONS (default 2) from: FVG, OB, LiqSweep
-
-    Returns setup dict or None.
+    Filters (all must pass before Claude):
+      1. BOS on closed candles
+      2. 1h/4h trend not against setup
+      3. Volume >= SMC_BOS_MIN_VOLUME on BOS context
+      4. BTC not strongly against direction
+      5. RSI not exhausted (SMC_RSI_LONG_MAX / SMC_RSI_SHORT_MIN)
+      6. >= SMC_MIN_CONFIRMATIONS from FVG/OB/Sweep/Div/Wick/Stoch
+      7. Active FVG/OB entry zone when REQUIRE_ENTRY_ZONE=True
+      8. MTF score >= MTF_MIN_SCORE
     """
     if len(candles_15m.get("close", [])) < 30:
         return None
 
     ind = get_smc_indicators(candles_15m, candles_1h, candles_4h)
 
-    bos      = ind["bos"]        # 'bullish' | 'bearish' | None
+    bos      = ind["bos"]
     trend_1h = ind["trend_1h"]
     trend_4h = ind["trend_4h"]
 
@@ -38,51 +125,53 @@ def analyze_coin_smc(candles_15m: dict, candles_1h: dict, symbol: str,
     if not bos:
         return None
 
-    # 2. 1h trend must match (neutral is OK)
+    # 2. Trend must match (neutral OK)
     if trend_1h != "neutral" and trend_1h != bos:
         return None
-
-    # 3. 4h trend must match (neutral is OK)
     if trend_4h != "neutral" and trend_4h != bos:
         return None
 
-    # 4. Volume on BOS candle
+    # 3. Volume on BOS context
     if ind["volume_ratio"] < SMC_BOS_MIN_VOLUME:
         return None
 
-    # 4b. BTC correlation filter — skip if BTC moving strongly against direction
-    if bos == "bullish"  and btc_change_pct < -BTC_BLOCK_THRESHOLD_PCT:
+    # 4. BTC correlation
+    if bos == "bullish" and btc_change_pct < -BTC_BLOCK_THRESHOLD_PCT:
         return None
-    if bos == "bearish"  and btc_change_pct > +BTC_BLOCK_THRESHOLD_PCT:
+    if bos == "bearish" and btc_change_pct > +BTC_BLOCK_THRESHOLD_PCT:
         return None
 
-    # 5. Build confirmation list — need >= SMC_MIN_CONFIRMATIONS
+    # 5. RSI not exhausted
+    rsi = ind["rsi"]
+    if bos == "bullish" and rsi > SMC_RSI_LONG_MAX:
+        return None
+    if bos == "bearish" and rsi < SMC_RSI_SHORT_MIN:
+        return None
+
+    # 6. Build confirmations
     wicks  = ind.get("wicks", {})
     div    = ind.get("divergence")
     sk, sd = ind.get("stoch_k", 50), ind.get("stoch_d", 50)
 
     if bos == "bullish":
         confirmations = []
-        if ind["bullish_fvg"]:                          confirmations.append("FVG")
-        if ind["bull_ob"]:                              confirmations.append("OB")
-        if ind["bull_sweep"]:                           confirmations.append("LiqSweep")
-        # New confirmations
-        if div == "bullish":                            confirmations.append("RSI_Div")
+        if ind["bullish_fvg"]:                              confirmations.append("FVG")
+        if ind["bull_ob"]:                                  confirmations.append("OB")
+        if ind["bull_sweep"]:                               confirmations.append("LiqSweep")
+        if div == "bullish":                                confirmations.append("RSI_Div")
         if wicks.get("bull_pressure") or wicks.get("rejection") == "bullish":
-                                                        confirmations.append("BullWick")
-        if sk < 25 and sk > sd:                        confirmations.append("StochCross")
+                                                            confirmations.append("BullWick")
+        if sk < 25 and sk > sd:                            confirmations.append("StochCross")
         direction = "LONG"
-
     elif bos == "bearish":
         confirmations = []
-        if ind["bearish_fvg"]:                          confirmations.append("FVG")
-        if ind["bear_ob"]:                              confirmations.append("OB")
-        if ind["bear_sweep"]:                           confirmations.append("LiqSweep")
-        # New confirmations
-        if div == "bearish":                            confirmations.append("RSI_Div")
+        if ind["bearish_fvg"]:                              confirmations.append("FVG")
+        if ind["bear_ob"]:                                  confirmations.append("OB")
+        if ind["bear_sweep"]:                               confirmations.append("LiqSweep")
+        if div == "bearish":                                confirmations.append("RSI_Div")
         if wicks.get("bear_pressure") or wicks.get("rejection") == "bearish":
-                                                        confirmations.append("BearWick")
-        if sk > 75 and sk < sd:                        confirmations.append("StochCross")
+                                                            confirmations.append("BearWick")
+        if sk > 75 and sk < sd:                            confirmations.append("StochCross")
         direction = "SHORT"
     else:
         return None
@@ -90,23 +179,38 @@ def analyze_coin_smc(candles_15m: dict, candles_1h: dict, symbol: str,
     if len(confirmations) < SMC_MIN_CONFIRMATIONS:
         return None
 
-    # RSI momentum zone — avoid entries after exhaustion
-    rsi = ind["rsi"]
-    if direction == "LONG"  and not (40 <= rsi <= 75):
-        return None   # oversold bounce or overbought — skip
-    if direction == "SHORT" and not (25 <= rsi <= 60):
-        return None   # oversold or too early short — skip
+    # 7. Entry zone
+    entry_zone = _select_entry_zone(ind, direction)
+    if REQUIRE_ENTRY_ZONE and not entry_zone:
+        return None
 
-    # Bonus signals for quality scoring
+    # 8. MTF score
+    mtf_score, score_tags = _calc_mtf_score(
+        ind, bos, direction, confirmations, btc_change_pct, entry_zone
+    )
+    if mtf_score < MTF_MIN_SCORE:
+        return None
+
+    # Bonus signals for context
     session = ind.get("session", "OFF_HOURS")
     if session in ("LONDON", "NEW_YORK", "OVERLAP"):
         confirmations.append(f"Session:{session}")
-
     if ind.get("trend_1h_strong"):
         confirmations.append("StrongTrend1h")
 
     signals = [f"BOS {bos}", f"Vol {ind['volume_ratio']:.1f}x"] + confirmations
-    score   = len(signals)
+    if entry_zone:
+        signals.append(f"Zone:{entry_zone['entry_source']}")
+    signals.append(f"MTF {mtf_score}")
+
+    # Use zone midpoint as entry price when available
+    price_payload = entry_zone or {
+        "entry_low":    round(ind["current_close"], 8),
+        "entry_high":   round(ind["current_close"], 8),
+        "entry_price":  round(ind["current_close"], 8),
+        "entry_source": "MARKET",
+        "market_price": round(ind["current_close"], 8),
+    }
 
     return {
         "symbol":           symbol,
@@ -127,23 +231,26 @@ def analyze_coin_smc(candles_15m: dict, candles_1h: dict, symbol: str,
         "wick_rejection":   wicks.get("rejection"),
         "atr":              ind["atr"],
         "volume_ratio":     ind["volume_ratio"],
-        "current_price":    round(ind["current_close"], 8),
+        "current_price":    price_payload["entry_price"],
+        "market_price":     price_payload["market_price"],
+        "entry_low":        price_payload["entry_low"],
+        "entry_high":       price_payload["entry_high"],
+        "entry_source":     price_payload["entry_source"],
         "recent_high":      round(ind["recent_high"], 8),
         "recent_low":       round(ind["recent_low"], 8),
         "btc_change":       round(btc_change_pct, 2),
         "signals":          signals,
-        "bullish_score":    score if direction == "LONG"  else 0,
-        "bearish_score":    score if direction == "SHORT" else 0,
+        "mtf_score":        mtf_score,
+        "score_tags":       score_tags,
+        "bullish_score":    mtf_score if direction == "LONG"  else 0,
+        "bearish_score":    mtf_score if direction == "SHORT" else 0,
     }
 
 
 # ── Legacy EMA/RSI filter (kept as fallback) ──────────────────────────────────
 
 def analyze_coin(df, symbol: str) -> dict | None:
-    """
-    Original EMA+RSI filter. Not used in main scan anymore.
-    Kept for reference / fallback testing.
-    """
+    """Original EMA+RSI filter. Not used in main scan. Kept for reference."""
     if len(df) < 30:
         return None
 
