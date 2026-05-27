@@ -28,20 +28,25 @@ def analyze_batch_with_claude(setups: list, news_context: dict = None) -> list:
 
     coins_text = ""
     for i, s in enumerate(setups, 1):
-        fvg      = "✓" if s.get("fvg")          else "✗"
-        ob       = "✓" if s.get("order_block")  else "✗"
-        sweep    = "✓" if s.get("liq_sweep")    else "✗"
-        body     = "✓" if s.get("bos_body_strong") else "✗"
-        strong1h = "✓" if s.get("trend_1h_strong") else "✗"
+        fvg      = "✓" if s.get("fvg")             else "✗"
+        ob       = "✓" if s.get("order_block")    else "✗"
+        sweep    = "✓" if s.get("liq_sweep")      else "✗"
+        body     = "✓" if s.get("bos_body_strong")else "✗"
+        strong1h = "✓" if s.get("trend_1h_strong")else "✗"
+        div      = s.get("divergence") or "—"
+        wick     = s.get("wick_rejection") or "—"
+        sk       = s.get("stoch_k", 50)
+        sd       = s.get("stoch_d", 50)
         funding  = s.get("funding_rate")
         fund_s   = f"{funding*100:+.3f}%" if funding is not None else "n/a"
         session  = s.get("session", "?")
         coins_text += (
             f"{i}. {s['symbol']} → {s['direction']} | "
             f"4h:{s.get('trend_4h','?')} 1h:{s.get('trend_1h','?')} Strong:{strong1h} | "
-            f"BOS body:{body} | FVG:{fvg} OB:{ob} Sweep:{sweep} | "
-            f"RSI:{s['rsi']} Vol:{s['volume_ratio']}x | "
-            f"Session:{session} Funding:{fund_s}\n"
+            f"BOS body:{body} FVG:{fvg} OB:{ob} Sweep:{sweep} | "
+            f"RSI:{s['rsi']} StochK:{sk}/D:{sd} | "
+            f"Div:{div} Wick:{wick} | "
+            f"Vol:{s['volume_ratio']}x Session:{session} Funding:{fund_s}\n"
         )
 
     # Build news context block
@@ -70,6 +75,10 @@ Rules (apply strictly):
 - Volume ≥ 2x → institutional. Volume 1.2-2x → acceptable
 - Funding crowded same direction → NO TRADE (squeeze risk)
 - Skip if news=BEARISH on LONG or news=BULLISH on SHORT
+- RSI divergence = strong reversal signal, adds HIGH confidence
+- StochK < 20 rising above StochD = oversold reversal (great LONG entry)
+- StochK > 80 falling below StochD = overbought reversal (great SHORT entry)
+- Bullish/bearish wick rejection on last candle = price rejected the level cleanly
 
 Setups to analyze:
 {coins_text}
@@ -83,7 +92,7 @@ CONFIDENCE must be: HIGH or MEDIUM or LOW"""
 
     client = _get_client()
     message = client.messages.create(
-        model="claude-haiku-4-5-20251001",
+        model="claude-sonnet-4-5",
         max_tokens=60 * len(setups) + 50,
         messages=[{"role": "user", "content": prompt}],
     )

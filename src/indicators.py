@@ -43,6 +43,132 @@ def calculate_atr(highs: list, lows: list, closes: list, period: int = ATR_PERIO
     return atr
 
 
+def calculate_stoch_rsi(closes: list, rsi_period: int = 14,
+                        stoch_period: int = 14,
+                        smooth_k: int = 3, smooth_d: int = 3) -> tuple:
+    """
+    Stochastic RSI — normalises RSI into 0-100 oscillator.
+    Returns (k, d):
+      k < 20 and rising  → oversold reversal (LONG signal)
+      k > 80 and falling → overbought reversal (SHORT signal)
+      k crosses d        → momentum confirmation
+    """
+    needed = rsi_period + stoch_period + smooth_k + smooth_d + 2
+    if len(closes) < needed:
+        return 50.0, 50.0
+
+    # Build RSI series
+    rsi_values = []
+    for i in range(rsi_period, len(closes)):
+        rsi_values.append(calculate_rsi(closes[:i + 1], rsi_period))
+
+    if len(rsi_values) < stoch_period:
+        return 50.0, 50.0
+
+    # Raw %K
+    raw_k = []
+    for i in range(stoch_period, len(rsi_values) + 1):
+        w  = rsi_values[i - stoch_period:i]
+        lo = min(w); hi = max(w)
+        raw_k.append((rsi_values[i - 1] - lo) / (hi - lo) * 100 if hi != lo else 50.0)
+
+    if len(raw_k) < smooth_k + smooth_d:
+        return 50.0, 50.0
+
+    # Smooth %K
+    k_line = [sum(raw_k[i - smooth_k:i]) / smooth_k
+              for i in range(smooth_k, len(raw_k) + 1)]
+
+    if len(k_line) < smooth_d:
+        return k_line[-1], k_line[-1]
+
+    d = sum(k_line[-smooth_d:]) / smooth_d
+    return round(k_line[-1], 2), round(d, 2)
+
+
+def analyze_wicks(opens: list, highs: list, lows: list, closes: list,
+                  lookback: int = 6) -> dict:
+    """
+    Detect buying / selling pressure via candle wicks.
+
+    bull_pressure : lower wicks dominate last N candles (buyers rejecting lows)
+    bear_pressure : upper wicks dominate (sellers rejecting highs)
+    rejection     : 'bullish' | 'bearish' | None  (last candle pin-bar)
+    """
+    n = len(closes)
+    if n < lookback + 1:
+        return {"bull_pressure": False, "bear_pressure": False, "rejection": None}
+
+    upper_wicks, lower_wicks = [], []
+    for i in range(n - lookback, n):
+        top    = max(opens[i], closes[i])
+        bottom = min(opens[i], closes[i])
+        upper_wicks.append(highs[i] - top)
+        lower_wicks.append(bottom - lows[i])
+
+    avg_u = sum(upper_wicks) / lookback
+    avg_l = sum(lower_wicks) / lookback
+
+    bull_pressure = avg_l > avg_u * 1.5
+    bear_pressure = avg_u > avg_l * 1.5
+
+    # Last-candle pin bar
+    rng = highs[-1] - lows[-1]
+    if rng > 0:
+        u = highs[-1] - max(opens[-1], closes[-1])
+        l = min(opens[-1], closes[-1]) - lows[-1]
+        if   l / rng >= 0.4: rejection = "bullish"
+        elif u / rng >= 0.4: rejection = "bearish"
+        else:                rejection = None
+    else:
+        rejection = None
+
+    return {"bull_pressure": bull_pressure,
+            "bear_pressure": bear_pressure,
+            "rejection":     rejection}
+
+
+def detect_rsi_divergence(closes: list, highs: list, lows: list,
+                          lookback: int = 30) -> str | None:
+    """
+    RSI divergence over last `lookback` candles.
+
+    Bullish  : price makes lower low, RSI makes higher low → reversal UP
+    Bearish  : price makes higher high, RSI makes lower high → reversal DOWN
+
+    Returns 'bullish', 'bearish', or None.
+    """
+    if len(closes) < lookback + 16:
+        return None
+
+    # Build RSI series for the window
+    src = closes[-(lookback + 14):]
+    rsi_ser = [calculate_rsi(src[:i + 1], 14) for i in range(14, len(src))]
+    if len(rsi_ser) < lookback:
+        return None
+
+    price_w = closes[-lookback:]
+    high_w  = highs[-lookback:]
+    low_w   = lows[-lookback:]
+    rsi_w   = rsi_ser[-lookback:]
+
+    mid = lookback // 2
+
+    # Bearish: higher price high + lower RSI high
+    ph1, ph2 = max(high_w[:mid]),  max(high_w[mid:])
+    rh1, rh2 = max(rsi_w[:mid]),   max(rsi_w[mid:])
+    if ph2 > ph1 * 1.001 and rh2 < rh1 * 0.985:
+        return "bearish"
+
+    # Bullish: lower price low + higher RSI low
+    pl1, pl2 = min(low_w[:mid]),   min(low_w[mid:])
+    rl1, rl2 = min(rsi_w[:mid]),   min(rsi_w[mid:])
+    if pl2 < pl1 * 0.999 and rl2 > rl1 * 1.015:
+        return "bullish"
+
+    return None
+
+
 def calculate_rsi(closes: list, period: int = 14) -> float:
     """RSI — returns only the latest value."""
     if len(closes) < period + 2:
@@ -317,6 +443,15 @@ def get_smc_indicators(candles_15m: dict, candles_1h: dict = None,
     # RSI
     rsi = calculate_rsi(closes, 14)
 
+    # Stochastic RSI
+    stoch_k, stoch_d = calculate_stoch_rsi(closes)
+
+    # Wick analysis
+    wicks = analyze_wicks(opens, highs, lows, closes)
+
+    # RSI divergence
+    divergence = detect_rsi_divergence(closes, highs, lows)
+
     # ATR for stops/takes
     atr = calculate_atr(highs, lows, closes)
 
@@ -359,6 +494,10 @@ def get_smc_indicators(candles_15m: dict, candles_1h: dict = None,
         "trend_4h_strong":  t4h["strong"],
         "session":          session,
         "rsi":              round(rsi, 2),
+        "stoch_k":          stoch_k,
+        "stoch_d":          stoch_d,
+        "wicks":            wicks,
+        "divergence":       divergence,
         "atr":              atr,
         "volume_ratio":     round(vol_ratio, 2),
         "current_close":    closes[-1],

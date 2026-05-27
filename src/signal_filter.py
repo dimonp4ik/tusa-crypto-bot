@@ -57,17 +57,32 @@ def analyze_coin_smc(candles_15m: dict, candles_1h: dict, symbol: str,
         return None
 
     # 5. Build confirmation list — need >= SMC_MIN_CONFIRMATIONS
+    wicks  = ind.get("wicks", {})
+    div    = ind.get("divergence")
+    sk, sd = ind.get("stoch_k", 50), ind.get("stoch_d", 50)
+
     if bos == "bullish":
         confirmations = []
-        if ind["bullish_fvg"]:  confirmations.append("FVG")
-        if ind["bull_ob"]:      confirmations.append("OB")
-        if ind["bull_sweep"]:   confirmations.append("LiqSweep")
+        if ind["bullish_fvg"]:                          confirmations.append("FVG")
+        if ind["bull_ob"]:                              confirmations.append("OB")
+        if ind["bull_sweep"]:                           confirmations.append("LiqSweep")
+        # New confirmations
+        if div == "bullish":                            confirmations.append("RSI_Div")
+        if wicks.get("bull_pressure") or wicks.get("rejection") == "bullish":
+                                                        confirmations.append("BullWick")
+        if sk < 25 and sk > sd:                        confirmations.append("StochCross")
         direction = "LONG"
+
     elif bos == "bearish":
         confirmations = []
-        if ind["bearish_fvg"]:  confirmations.append("FVG")
-        if ind["bear_ob"]:      confirmations.append("OB")
-        if ind["bear_sweep"]:   confirmations.append("LiqSweep")
+        if ind["bearish_fvg"]:                          confirmations.append("FVG")
+        if ind["bear_ob"]:                              confirmations.append("OB")
+        if ind["bear_sweep"]:                           confirmations.append("LiqSweep")
+        # New confirmations
+        if div == "bearish":                            confirmations.append("RSI_Div")
+        if wicks.get("bear_pressure") or wicks.get("rejection") == "bearish":
+                                                        confirmations.append("BearWick")
+        if sk > 75 and sk < sd:                        confirmations.append("StochCross")
         direction = "SHORT"
     else:
         return None
@@ -106,6 +121,10 @@ def analyze_coin_smc(candles_15m: dict, candles_1h: dict, symbol: str,
         "order_block":      ind["bull_ob"]     if direction == "LONG" else ind["bear_ob"],
         "liq_sweep":        ind["bull_sweep"]  if direction == "LONG" else ind["bear_sweep"],
         "rsi":              rsi,
+        "stoch_k":          sk,
+        "stoch_d":          sd,
+        "divergence":       div,
+        "wick_rejection":   wicks.get("rejection"),
         "atr":              ind["atr"],
         "volume_ratio":     ind["volume_ratio"],
         "current_price":    round(ind["current_close"], 8),
