@@ -83,8 +83,12 @@ def send_signal(analysis: dict) -> bool:
     signals_text = "\n".join(f"  • {s}" for s in analysis["signals"])
     timestamp    = datetime.now(timezone.utc).strftime("%d.%m.%Y %H:%M UTC")
 
-    btc_change = analysis.get("btc_change", 0)
-    btc_line   = f"₿ BTC за час: `{btc_change:+.2f}%`\n" if btc_change else ""
+    btc_change   = analysis.get("btc_change", 0)
+    btc_line     = f"₿ BTC за час: `{btc_change:+.2f}%`\n" if btc_change else ""
+    news_sent    = analysis.get("news_sentiment", "")
+    news_summary = analysis.get("news_summary", "")
+    news_icon    = {"BULLISH": "📰🟢", "BEARISH": "📰🔴"}.get(news_sent, "")
+    news_line    = f"{news_icon} _{news_summary}_\n" if news_sent and news_summary and news_sent != "NEUTRAL" else ""
 
     message = (
         f"{arrow} — *{analysis['symbol']}*\n"
@@ -96,6 +100,7 @@ def send_signal(analysis: dict) -> bool:
         f"━━━━━━━━━━━━━━━━━━━\n"
         f"📊 RSI: `{analysis['rsi']}`   📈 Объём: `{analysis['volume_ratio']}x`\n"
         f"{btc_line}"
+        f"{news_line}"
         f"\n*Сигналы:*\n{signals_text}\n\n"
         f"{conf_icon} Уверенность: *{conf_ru}*\n"
         f"📝 _{analysis.get('reason', '')}_\n\n"

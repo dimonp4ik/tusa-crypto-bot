@@ -60,9 +60,13 @@ ATR_TP2_MULT     = 2.0   # TP2 = ATR * 2.0 (close rest — 1:2 R:R)
 # --- BTC correlation filter ---
 BTC_BLOCK_THRESHOLD_PCT = 1.0  # if BTC moved >1% against direction → skip signal
 
-# --- News filter (CryptoPanic) ---
+# --- News filter (CryptoPanic per-coin) ---
 CRYPTOPANIC_API_KEY = os.getenv("CRYPTOPANIC_API_KEY", "")  # optional
 NEWS_BLOCK_KEYWORDS = ["hack", "exploit", "scam", "lawsuit", "sec ", "ban", "delist", "rug"]
+
+# --- Global macro news agent (Groq free tier) ---
+GROQ_API_KEY       = os.getenv("GROQ_API_KEY", "")
+NEWS_LOOKBACK_HOURS = 2  # fetch headlines from last 2 hours
 
 # --- Database ---
 DB_PATH = "signals.db"

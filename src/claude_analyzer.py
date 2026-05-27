@@ -18,7 +18,7 @@ def _get_client():
 
 # ── Batch SMC analysis (main) ─────────────────────────────────────────────────
 
-def analyze_batch_with_claude(setups: list) -> list:
+def analyze_batch_with_claude(setups: list, news_context: dict = None) -> list:
     """
     Send ALL filtered setups to Claude Haiku in ONE call.
     Returns list of result dicts, one per setup.
@@ -40,8 +40,22 @@ def analyze_batch_with_claude(setups: list) -> list:
             f"RSI:{s['rsi']} Vol:{s['volume_ratio']}x Funding:{fund_s}\n"
         )
 
-    prompt = f"""You are a Smart Money Concepts (SMC) crypto trader. Analyze each setup and decide whether to trade.
+    # Build news context block
+    if news_context:
+        news_sentiment = news_context.get("sentiment", "NEUTRAL")
+        news_summary   = news_context.get("summary", "")
+        news_block = (
+            f"\nGLOBAL NEWS CONTEXT:\n"
+            f"  Market sentiment: {news_sentiment}\n"
+            f"  Key event: {news_summary}\n"
+            f"  Rule: if news=BEARISH → avoid LONG (lower confidence); "
+            f"if news=BULLISH → avoid SHORT (lower confidence)\n"
+        )
+    else:
+        news_block = ""
 
+    prompt = f"""You are a Smart Money Concepts (SMC) crypto trader. Analyze each setup and decide whether to trade.
+{news_block}
 Rules:
 - LONG only if 4h=bullish AND 1h=bullish AND BOS=bullish (strongest)
 - SHORT only if 4h=bearish AND 1h=bearish AND BOS=bearish (strongest)

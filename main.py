@@ -32,6 +32,7 @@ from src.signal_filter import analyze_coin_smc
 from src.claude_analyzer import analyze_batch_with_claude
 from src.telegram_notifier import send_signal, send_status, calculate_tp_sl
 from src.news_filter import check_news_sentiment
+from src.news_agent import get_market_news
 from src.db import init_db, get_open_signals, update_signal_status, get_stats
 
 # ── Logging ──────────────────────────────────────────────────────────────────
@@ -209,7 +210,18 @@ def run_scan():
     log.info("=== Scan started (SMC mode) ===")
 
     try:
-        # Step 0: BTC 1h change for correlation filter
+        # Step 0a: Global macro news (Groq free tier)
+        news = get_market_news()
+        log.info(
+            f"News: {news['sentiment']} — {news['summary']} "
+            f"({news['headline_count']} headlines)"
+        )
+        if news["pause"]:
+            log.warning("News agent: PAUSE — extreme market event, skipping scan")
+            send_status(f"⚠️ *СТОП* — новостной агент остановил скан:\n_{news['summary']}_")
+            return
+
+        # Step 0b: BTC 1h change for correlation filter
         btc_change = get_btc_change_1h()
         log.info(f"BTC 1h change: {btc_change:+.2f}%")
 
@@ -264,9 +276,9 @@ def run_scan():
             log.info("=== Scan complete — 0 signal(s) sent ===\n")
             return
 
-        # Step 4: ONE batch call to Claude Haiku
+        # Step 4: ONE batch call to Claude Haiku (+ news context)
         try:
-            analyses = analyze_batch_with_claude(enriched)
+            analyses = analyze_batch_with_claude(enriched, news_context=news)
         except Exception as e:
             log.error(f"Claude batch call failed: {e}")
             return
@@ -275,6 +287,10 @@ def run_scan():
         sent_count = 0
         for analysis in analyses:
             try:
+                # Attach news context to each analysis for Telegram message
+                analysis["news_sentiment"] = news.get("sentiment", "")
+                analysis["news_summary"]   = news.get("summary", "")
+
                 log.info(
                     f"  Claude: {analysis['symbol']} → {analysis['decision']} "
                     f"({analysis.get('confidence','?')}) — {analysis.get('reason','')}"
