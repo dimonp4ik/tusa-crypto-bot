@@ -17,7 +17,7 @@ KLINES_LIMIT = 200         # 200 × 5m = ~16 hours of data for SMC
 # --- Symbol quality filter ---
 # ALLOWED_SYMBOLS="" (default) → auto top-volume mode, top 45 by 24h USDT volume.
 # Set ALLOWED_SYMBOLS=BTC-USDT,ETH-USDT,... in .env for strict whitelist.
-MIN_24H_QUOTE_VOLUME_USDT = float(os.getenv("MIN_24H_QUOTE_VOLUME_USDT", "5000000"))
+MIN_24H_QUOTE_VOLUME_USDT = float(os.getenv("MIN_24H_QUOTE_VOLUME_USDT", "3000000"))
 MAX_SPREAD_PCT            = float(os.getenv("MAX_SPREAD_PCT", "0.20"))
 
 def _parse_symbol_list(value, default=None):
