@@ -11,8 +11,8 @@ CLAUDE_API_KEY = os.getenv("CLAUDE_API_KEY")
 # --- Scan settings ---
 SCAN_INTERVAL_MINUTES = int(os.getenv("SCAN_INTERVAL_MINUTES", "5"))
 TOP_COINS_COUNT = int(os.getenv("TOP_COINS_COUNT", "45"))
-TIMEFRAME = "5m"           # 5m candle → signals resolve in 30-90 min
-KLINES_LIMIT = 200         # 200 × 5m = ~16 hours of data for SMC
+TIMEFRAME = "15m"          # 15m candle → swing signals, hold 2-8h
+KLINES_LIMIT = 200         # 200 × 15m = ~50 hours of data for SMC
 
 # --- Symbol quality filter ---
 # ALLOWED_SYMBOLS="" (default) → auto top-volume mode, top 45 by 24h USDT volume.
@@ -43,13 +43,16 @@ VOLUME_SPIKE_MULTIPLIER = 1.8
 MIN_SIGNALS_TO_PASS = 2
 
 # --- Signal deduplication ---
-SIGNAL_COOLDOWN_HOURS = 1  # 5m signals resolve in 30-90 min — 1h cooldown per coin/direction
+SIGNAL_COOLDOWN_HOURS = 3  # 15m swing signals hold 2-8h — 3h cooldown per coin/direction
+
+# --- Signal expiry (no TP1/SL within this window → EXPIRED) ---
+SIGNAL_EXPIRY_HOURS = int(os.getenv("SIGNAL_EXPIRY_HOURS", "48"))
 
 # --- KuCoin (accessible from cloud/US servers) ---
 KUCOIN_BASE_URL = "https://api.kucoin.com"
 QUOTE_ASSET = "USDT"
-TIMEFRAME_KUCOIN = "5min"
-KLINES_INTERVAL_SEC = 5 * 60
+TIMEFRAME_KUCOIN = "15min"
+KLINES_INTERVAL_SEC = 15 * 60
 
 # --- 1h candles for trend direction ---
 TIMEFRAME_1H_KUCOIN = "1hour"
@@ -81,14 +84,41 @@ MAX_SETUPS_TO_CLAUDE  = int(os.getenv("MAX_SETUPS_TO_CLAUDE", "8"))  # only stro
 REQUIRE_ENTRY_ZONE       = os.getenv("REQUIRE_ENTRY_ZONE", "1") != "0"
 ENTRY_ZONE_SL_BUFFER_ATR = float(os.getenv("ENTRY_ZONE_SL_BUFFER_ATR", "0.25"))
 
+# --- Regime / retest filters (cut chop + false breakouts) ---
+# REQUIRE_HTF_TREND : reject when both 1h AND 4h are neutral (no real trend = chop).
+# REQUIRE_RETEST    : price must currently sit at/near the entry zone (true retest),
+#                     not a far-away limit order that the backtest fills optimistically.
+REQUIRE_HTF_TREND   = os.getenv("REQUIRE_HTF_TREND", "1") != "0"
+REQUIRE_RETEST      = os.getenv("REQUIRE_RETEST", "1") != "0"
+RETEST_MAX_DIST_PCT = float(os.getenv("RETEST_MAX_DIST_PCT", "0.015"))  # within 1.5% of zone edge
+
 # --- Multi-timeframe score gate (max ~15) ---
 MTF_MIN_SCORE = int(os.getenv("MTF_MIN_SCORE", "9"))
 
-# --- ATR-based stops/takes ---
-ATR_PERIOD   = 14
-ATR_SL_MULT  = 1.5   # SL  = entry ± ATR * 1.5
-ATR_TP1_MULT = 1.5   # TP1 = entry ± ATR * 1.5  (close 50%, move SL to BE)
-ATR_TP2_MULT = 3.0   # TP2 = entry ± ATR * 3.0  (1:2 R:R on remaining 50%)
+# --- Claude tiered analysis (cascade: cheap LIGHT gate + rare deep HEAVY) ---
+# LIGHT  : Haiku validates every passed setup in ONE cached batch call (JSON via tool).
+# HEAVY  : Sonnet re-checks only top setups (score >= HEAVY_MIN_SCORE) with coin memory.
+# Caching: static rules block cached 1h → cheap re-reads on the 5-min scan loop.
+CLAUDE_LIGHT_MODEL        = os.getenv("CLAUDE_LIGHT_MODEL", "claude-haiku-4-5")
+CLAUDE_HEAVY_MODEL        = os.getenv("CLAUDE_HEAVY_MODEL", "claude-sonnet-4-5")
+CLAUDE_HEAVY_MIN_SCORE    = int(os.getenv("CLAUDE_HEAVY_MIN_SCORE", "12"))   # score >= → HEAVY 2nd opinion
+CLAUDE_HEAVY_MAX_PER_SCAN = int(os.getenv("CLAUDE_HEAVY_MAX_PER_SCAN", "3")) # cost cap per scan
+CLAUDE_MEMORY_LIMIT       = int(os.getenv("CLAUDE_MEMORY_LIMIT", "8"))       # recent outcomes per coin (HEAVY)
+CLAUDE_MAX_RISK_SCORE     = int(os.getenv("CLAUDE_MAX_RISK_SCORE", "8"))     # counter-arg auto-reject if risk >= this
+CLAUDE_CACHE_TTL          = os.getenv("CLAUDE_CACHE_TTL", "1h")              # prompt cache TTL ("5m" or "1h")
+
+# --- Structure-based stops/takes (swing mode, 15m, ~20x leverage) ---
+# SL sits at swing invalidation (recent swing low/high) + ATR buffer, then
+# clamped to safe leverage bounds. TPs are R-multiples for swing-sized moves.
+#   risk%  ~1.2–3.0% of price  → on 20x = 24–60% margin at risk per stop
+#   TP1 = 1.5R (1.8–4.5% move → 36–90% on 20x), close 50%, move SL to BE
+#   TP2 = 3.0R (3.6–9%   move → 72–180% on 20x), let winner run
+ATR_PERIOD    = 14
+SL_ATR_BUFFER = float(os.getenv("SL_ATR_BUFFER", "0.5"))   # buffer beyond swing, in ATR
+RISK_MIN_PCT  = float(os.getenv("RISK_MIN_PCT", "0.012"))  # min SL distance = 1.2%
+RISK_MAX_PCT  = float(os.getenv("RISK_MAX_PCT", "0.03"))   # max SL distance = 3.0% (20x safe)
+TP1_R_MULT    = float(os.getenv("TP1_R_MULT", "1.5"))      # TP1 = entry ± risk * 1.5
+TP2_R_MULT    = float(os.getenv("TP2_R_MULT", "3.0"))      # TP2 = entry ± risk * 3.0
 
 # --- BTC correlation filter ---
 BTC_BLOCK_THRESHOLD_PCT = 1.0
@@ -113,8 +143,8 @@ AUTO_BLOCK_DAYS              = int(os.getenv("AUTO_BLOCK_DAYS", "7"))
 DB_PATH = "signals.db"
 
 # --- Backtest ---
-BACKTEST_CANDLES        = int(os.getenv("BACKTEST_CANDLES", "2000"))
-BACKTEST_TP_WINDOW      = int(os.getenv("BACKTEST_TP_WINDOW", "24"))
+BACKTEST_CANDLES        = int(os.getenv("BACKTEST_CANDLES", "1152"))  # 1152 × 15m ≈ 12 days
+BACKTEST_TP_WINDOW      = int(os.getenv("BACKTEST_TP_WINDOW", "48"))
 BACKTEST_TOP_COINS      = int(os.getenv("BACKTEST_TOP_COINS", "20"))
 BACKTEST_FEE_RATE       = float(os.getenv("BACKTEST_FEE_RATE", "0.001"))
 BACKTEST_SLIPPAGE_RATE  = float(os.getenv("BACKTEST_SLIPPAGE_RATE", "0.0005"))

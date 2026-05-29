@@ -187,6 +187,19 @@ def get_symbol_performance(symbol: str, lookback: int = None) -> dict:
     }
 
 
+def get_recent_outcomes(symbol: str, limit: int = 8) -> list:
+    """Recent final outcomes for one symbol — fuel for HEAVY coin memory."""
+    placeholders = ",".join("?" for _ in FINAL_STATUSES)
+    with _conn() as c:
+        rows = c.execute(
+            f"SELECT direction, status, entry_price, exit_price, confidence, mtf_score "
+            f"FROM signals WHERE symbol = ? AND status IN ({placeholders}) "
+            f"ORDER BY opened_at DESC LIMIT ?",
+            [symbol, *FINAL_STATUSES, limit],
+        ).fetchall()
+    return [dict(r) for r in rows]
+
+
 def set_symbol_block(symbol: str, days: int, reason: str, stats: dict = None) -> None:
     now   = time_mod.time()
     until = now + days * 86400

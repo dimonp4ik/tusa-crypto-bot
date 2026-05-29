@@ -46,8 +46,8 @@ def calculate_tp_sl(price: float, direction: str, atr: float = 0.0,
         risk = min(max(risk, min_risk), max_risk)
         sl   = price - risk
 
-        # TP1: structural swing high if valid (min 1.5R away, above price)
-        if tp1_level and tp1_level > price * 1.001 and (tp1_level - price) >= risk * 1.5:
+        # TP1: structural swing high if valid (min 1.0R away, above price)
+        if tp1_level and tp1_level > price * 1.001 and (tp1_level - price) >= risk * 1.0:
             tp1 = tp1_level
         else:
             tp1 = price + risk * TP1_R_MULT
@@ -66,8 +66,8 @@ def calculate_tp_sl(price: float, direction: str, atr: float = 0.0,
         risk = min(max(risk, min_risk), max_risk)
         sl   = price + risk
 
-        # TP1: structural swing low if valid (min 1.5R away, below price)
-        if tp1_level and tp1_level < price * 0.999 and (price - tp1_level) >= risk * 1.5:
+        # TP1: structural swing low if valid (min 1.0R away, below price)
+        if tp1_level and tp1_level < price * 0.999 and (price - tp1_level) >= risk * 1.0:
             tp1 = tp1_level
         else:
             tp1 = price - risk * TP1_R_MULT

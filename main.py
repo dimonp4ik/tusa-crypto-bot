@@ -24,19 +24,21 @@ from config import (
     SCAN_INTERVAL_MINUTES, SIGNAL_COOLDOWN_HOURS, TELEGRAM_TOKEN, TELEGRAM_CHAT_ID,
     TRADING_HOURS_START, TRADING_HOURS_END, TRADE_WEEKENDS,
     MAX_SETUPS_TO_CLAUDE, ALLOWED_SYMBOLS, KLINES_INTERVAL_SEC, SIGNAL_EXPIRY_HOURS,
+    CLAUDE_HEAVY_MIN_SCORE, CLAUDE_HEAVY_MAX_PER_SCAN, CLAUDE_MEMORY_LIMIT,
 )
 from src.binance_client import (
     get_top_coins, get_klines, get_klines_1h, get_klines_4h,
     get_btc_change_1h, get_funding_rate,
 )
 from src.signal_filter import analyze_coin_smc
-from src.claude_analyzer import analyze_batch_with_claude
+from src.claude_analyzer import analyze_batch_with_claude, analyze_heavy
 from src.telegram_notifier import send_signal, send_status, send_news_alert, send_signal_update, calculate_tp_sl, send_morning_digest
 from src.news_filter import check_news_sentiment
 from src.news_agent import get_market_news, detect_major_events, fetch_recent_headlines, get_daily_digest
 from src.db import (
     init_db, get_open_signals, update_signal_status, get_stats,
     auto_block_bad_symbols, is_symbol_auto_blocked, get_active_symbol_blocks,
+    get_recent_outcomes,
 )
 
 # ── Logging ──────────────────────────────────────────────────────────────────
@@ -363,12 +365,39 @@ def run_scan():
             log.info("=== Scan complete — 0 signal(s) sent ===\n")
             return
 
-        # Step 4: ONE batch call to Claude Sonnet (+ news context)
+        # Step 4: LIGHT tier — ONE batch call to Claude Haiku (cached rules + news)
         try:
             analyses = analyze_batch_with_claude(enriched, news_context=news)
         except Exception as e:
-            log.error(f"Claude batch call failed: {e}")
+            log.error(f"Claude LIGHT batch call failed: {e}")
             return
+
+        # Step 4b: HEAVY tier — Sonnet second opinion on the strongest survivors.
+        # Only setups the LIGHT gate approved (LONG/SHORT, not LOW) with a high
+        # mtf_score qualify; capped per scan to protect the budget. Coin memory
+        # (recent outcomes) is injected so Sonnet learns from this symbol's past.
+        heavy_done = 0
+        for analysis in analyses:
+            if heavy_done >= CLAUDE_HEAVY_MAX_PER_SCAN:
+                break
+            decision = analysis.get("decision", "NO TRADE")
+            conf     = analysis.get("confidence", "LOW").upper()
+            score    = int(analysis.get("mtf_score", 0) or 0)
+            if decision in ("LONG", "SHORT") and conf != "LOW" and score >= CLAUDE_HEAVY_MIN_SCORE:
+                try:
+                    history = get_recent_outcomes(analysis["symbol"], limit=CLAUDE_MEMORY_LIMIT)
+                    heavy = analyze_heavy(analysis, news_context=news, history=history)
+                    for k in ("decision", "confidence", "risk_score", "trend_strength", "reason", "counter"):
+                        if k in heavy:
+                            analysis[k] = heavy[k]
+                    heavy_done += 1
+                    log.info(
+                        f"  HEAVY: {analysis['symbol']} → {analysis['decision']} "
+                        f"({analysis.get('confidence','?')}) risk={analysis.get('risk_score','?')} "
+                        f"— {analysis.get('reason','')}"
+                    )
+                except Exception as e:
+                    log.warning(f"  HEAVY check failed {analysis.get('symbol','?')}: {e}")
 
         # Step 5: Send signals to Telegram
         sent_count = 0

@@ -8,6 +8,7 @@ Outputs: total trades, win rate, avg R:R, max drawdown.
 import time
 import sys
 import os
+import pickle
 from datetime import datetime
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -18,14 +19,33 @@ from config import (
     TIMEFRAME_1H_KUCOIN, KLINES_1H_INTERVAL_SEC,
     TIMEFRAME_4H_KUCOIN, KLINES_4H_INTERVAL_SEC,
     BACKTEST_CANDLES, BACKTEST_TP_WINDOW,
-    ATR_SL_MULT, ATR_TP1_MULT, ATR_TP2_MULT,
 )
 from src.signal_filter import analyze_coin_smc
 from src.binance_client import get_top_coins
+from src.telegram_notifier import calculate_tp_sl
+
+
+_CACHE_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "backtest_cache")
+_CACHE_TTL  = 2 * 3600  # 2 hours — refresh if older
+
+
+def _cache_path(symbol: str, interval: str, count: int) -> str:
+    os.makedirs(_CACHE_DIR, exist_ok=True)
+    safe = symbol.replace("/", "_")
+    return os.path.join(_CACHE_DIR, f"{safe}_{interval}_{count}.pkl")
 
 
 def fetch_history(symbol: str, interval: str, interval_sec: int, count: int) -> dict:
-    """Fetch `count` historical candles."""
+    """Fetch `count` historical candles. Uses local cache (TTL 2h) to avoid re-fetching."""
+    path = _cache_path(symbol, interval, count)
+
+    # Return cached data if fresh
+    if os.path.exists(path):
+        age = time.time() - os.path.getmtime(path)
+        if age < _CACHE_TTL:
+            with open(path, "rb") as f:
+                return pickle.load(f)
+
     url = f"{KUCOIN_BASE_URL}/api/v1/market/candles"
     now = int(time.time())
     start_at = now - count * interval_sec
@@ -38,7 +58,7 @@ def fetch_history(symbol: str, interval: str, interval_sec: int, count: int) -> 
     if not candles:
         raise ValueError(f"No data for {symbol}")
 
-    return {
+    data = {
         "open":   [float(c[1]) for c in candles],
         "high":   [float(c[3]) for c in candles],
         "low":    [float(c[4]) for c in candles],
@@ -46,24 +66,30 @@ def fetch_history(symbol: str, interval: str, interval_sec: int, count: int) -> 
         "volume": [float(c[5]) for c in candles],
     }
 
+    with open(path, "wb") as f:
+        pickle.dump(data, f)
 
-def simulate_trade(direction: str, entry: float, atr: float, future_candles: dict,
-                   window: int) -> str:
+    return data
+
+
+def simulate_trade(setup: dict, future_candles: dict, window: int) -> str:
     """
     Walk forward `window` candles after entry, return outcome:
     'TP2', 'TP1', 'SL', or 'EXPIRED'.
-    """
-    if atr <= 0:
-        return "EXPIRED"
 
-    if direction == "LONG":
-        sl  = entry - atr * ATR_SL_MULT
-        tp1 = entry + atr * ATR_TP1_MULT
-        tp2 = entry + atr * ATR_TP2_MULT
-    else:
-        sl  = entry + atr * ATR_SL_MULT
-        tp1 = entry - atr * ATR_TP1_MULT
-        tp2 = entry - atr * ATR_TP2_MULT
+    Uses the same structure-based calculate_tp_sl as the live bot so the
+    backtest reflects real TP/SL placement.
+    """
+    direction = setup["direction"]
+    entry     = setup["current_price"]
+    tp1, tp2, sl = calculate_tp_sl(
+        entry, direction,
+        atr=setup.get("atr", 0.0),
+        recent_high=setup.get("recent_high", 0.0),
+        recent_low=setup.get("recent_low", 0.0),
+        tp1_level=setup.get("tp1_level"),
+        tp2_level=setup.get("tp2_level"),
+    )
 
     highs = future_candles["high"][:window]
     lows  = future_candles["low"][:window]
@@ -112,10 +138,8 @@ def backtest_symbol(symbol: str) -> dict:
             continue
 
         # Simulate from entry
-        entry  = snap_15["close"][-1]
-        atr    = setup.get("atr", 0)
         future = {k: v[i:i + BACKTEST_TP_WINDOW] for k, v in c15.items()}
-        outcome = simulate_trade(setup["direction"], entry, atr, future, BACKTEST_TP_WINDOW)
+        outcome = simulate_trade(setup, future, BACKTEST_TP_WINDOW)
 
         trades += 1
         if   outcome == "TP1":     tp1 += 1
@@ -130,7 +154,7 @@ def backtest_symbol(symbol: str) -> dict:
 def main():
     print("Fetching top coins...")
     coins = get_top_coins()[:20]  # backtest top 20 to keep it fast
-    print(f"Backtesting {len(coins)} coins on last ~10 days of 15m data...\n")
+    print(f"Backtesting {len(coins)} coins on last ~21 days of 15m data...\n")
 
     total = {"trades": 0, "tp1": 0, "tp2": 0, "sl": 0, "expired": 0}
     for sym in coins:
@@ -151,11 +175,13 @@ def main():
     if total["trades"] > 0:
         wins = total["tp1"] + total["tp2"]
         win_rate = wins / total["trades"] * 100
-        # Approx P&L assuming 1R risk per trade, partial at TP1 (1R), rest at TP2 (2R)
-        # TP1-only ≈ +1R*0.5 + (-1R)*0.5 = 0 (breakeven on the rest)
-        # Actually if we move SL to BE after TP1, TP1-only ≈ +0.5R, TP2 ≈ +1.5R, SL ≈ -1R
-        pnl = total["tp2"] * 1.5 + total["tp1"] * 0.5 - total["sl"] * 1.0
-        print(f"\nWin rate:   {win_rate:.1f}%")
+        # Structure-based R-multiples (TP1=2.5R, TP2=5R), 50% close at TP1 then SL→BE:
+        #   TP2  → 0.5*2.5R + 0.5*5R = +3.75R
+        #   TP1  → 0.5*2.5R + 0.5*0  = +1.25R (rest stopped at breakeven)
+        #   SL   → -1.0R
+        #   EXP  →  0
+        pnl = total["tp2"] * 3.75 + total["tp1"] * 1.25 - total["sl"] * 1.0
+        print(f"\nWin rate:   {win_rate:.1f}%  (lower than scalping — high R:R is normal)")
         print(f"Expected R: {pnl:+.1f}R total ({pnl / total['trades']:+.2f}R per trade)")
 
 

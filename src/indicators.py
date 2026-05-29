@@ -380,6 +380,146 @@ def detect_liquidity_sweep(highs: list, lows: list, closes: list,
     return {"bullish": bull_sweep, "bearish": bear_sweep}
 
 
+# ── MACD ─────────────────────────────────────────────────────────────────────
+
+def calculate_macd(closes: list, fast: int = 12, slow: int = 26,
+                   signal_p: int = 9) -> tuple:
+    """
+    Returns (macd_line, signal_line, histogram) — all same length as closes.
+    MACD = EMA(12) - EMA(26).  Signal = EMA(9) of MACD.
+    """
+    if len(closes) < slow + signal_p:
+        empty = [0.0] * len(closes)
+        return empty, empty, empty
+    ema_fast   = calculate_ema(closes, fast)
+    ema_slow   = calculate_ema(closes, slow)
+    macd_line  = [f - s for f, s in zip(ema_fast, ema_slow)]
+    signal_line = calculate_ema(macd_line, signal_p)
+    histogram  = [m - s for m, s in zip(macd_line, signal_line)]
+    return macd_line, signal_line, histogram
+
+
+def detect_macd_divergence(closes: list, highs: list, lows: list,
+                            lookback: int = 30) -> str | None:
+    """
+    MACD histogram divergence over last `lookback` candles.
+
+    Bullish  : price makes lower low, MACD histogram makes higher low → reversal UP
+    Bearish  : price makes higher high, MACD histogram makes lower high → reversal DOWN
+    """
+    if len(closes) < lookback + 40:
+        return None
+    _, _, histogram = calculate_macd(closes)
+    if len(histogram) < lookback:
+        return None
+
+    high_w = highs[-lookback:]
+    low_w  = lows[-lookback:]
+    hist_w = histogram[-lookback:]
+    mid    = lookback // 2
+
+    # Bearish: price higher high + MACD histogram lower high
+    ph1, ph2 = max(high_w[:mid]), max(high_w[mid:])
+    mh1, mh2 = max(hist_w[:mid]), max(hist_w[mid:])
+    if ph2 > ph1 * 1.001 and mh2 < mh1 - 1e-10:
+        return "bearish"
+
+    # Bullish: price lower low + MACD histogram higher (less negative) low
+    pl1, pl2 = min(low_w[:mid]), min(low_w[mid:])
+    ml1, ml2 = min(hist_w[:mid]), min(hist_w[mid:])
+    if pl2 < pl1 * 0.999 and ml2 > ml1 + 1e-10:
+        return "bullish"
+
+    return None
+
+
+# ── Change of Character ────────────────────────────────────────────────────────
+
+def detect_choch(closes: list, highs: list, lows: list,
+                 swing_lookback: int = 3, check_recent: int = 8) -> str | None:
+    """
+    Change of Character — faster micro-structure shift.
+
+    Uses a shorter swing lookback (3 vs BOS's 5) to detect when price breaks
+    a recent intermediate swing high/low before or alongside the main BOS.
+    Acts as early confirmation of the structural reversal.
+
+    Returns 'bullish', 'bearish', or None.
+    """
+    n = len(closes)
+    if n < swing_lookback * 2 + check_recent + 2:
+        return None
+    sh, sl = find_swing_points(highs, lows, lookback=swing_lookback)
+    if not sh or not sl:
+        return None
+    last_sh = sh[-1][1]
+    last_sl = sl[-1][1]
+    for i in range(max(0, n - check_recent), n - 1):
+        if closes[i] > last_sh:
+            return "bullish"
+        if closes[i] < last_sl:
+            return "bearish"
+    return None
+
+
+# ── Engulfing Pattern ─────────────────────────────────────────────────────────
+
+def detect_engulfing(opens: list, closes: list, lookback: int = 4) -> str | None:
+    """
+    Detect bullish/bearish engulfing candle patterns in the last N closed candles.
+
+    Bullish engulfing: previous bearish candle, current bullish candle whose body
+      fully contains the previous body (close > prev open, open < prev close).
+    Bearish engulfing: mirror image.
+    Only closed candles checked (excludes index n-1 = still forming).
+    """
+    n = len(closes)
+    if n < 4:
+        return None
+    # Check closed candles only: indices n-lookback to n-2
+    for i in range(max(1, n - lookback), n - 1):
+        po, pc = opens[i - 1], closes[i - 1]
+        co, cc = opens[i],     closes[i]
+        prev_top = max(po, pc); prev_bot = min(po, pc)
+        curr_top = max(co, cc); curr_bot = min(co, cc)
+        if (prev_top - prev_bot) <= 0 or (curr_top - curr_bot) <= 0:
+            continue
+        # Bullish: prev red, curr green, curr body wraps prev body
+        if pc < po and cc > co:
+            if curr_bot <= prev_bot and curr_top >= prev_top:
+                return "bullish"
+        # Bearish: prev green, curr red, curr body wraps prev body
+        elif pc > po and cc < co:
+            if curr_bot <= prev_bot and curr_top >= prev_top:
+                return "bearish"
+    return None
+
+
+# ── Premium / Discount zones ──────────────────────────────────────────────────
+
+def get_premium_discount(swing_highs: list, swing_lows: list,
+                          closes: list) -> dict:
+    """
+    Premium / Discount based on recent swing range midpoint (50% Fibonacci level).
+
+    Below 50% of the swing range = Discount (cheaper, prefer LONG entries).
+    Above 50% of the swing range = Premium (expensive, prefer SHORT entries).
+    """
+    if not swing_highs or not swing_lows or not closes:
+        return {"in_discount": False, "in_premium": False, "midpoint": closes[-1] if closes else 0}
+    hi  = max(p for _, p in swing_highs[-3:])
+    lo  = min(p for _, p in swing_lows[-3:])
+    if hi <= lo:
+        return {"in_discount": False, "in_premium": False, "midpoint": closes[-1]}
+    mid     = (hi + lo) / 2
+    current = closes[-1]
+    return {
+        "in_discount": current < mid,
+        "in_premium":  current > mid,
+        "midpoint":    round(mid, 8),
+    }
+
+
 # ── 1h Trend ──────────────────────────────────────────────────────────────────
 
 def get_1h_trend(candles_1h: dict) -> dict:
@@ -458,6 +598,18 @@ def get_smc_indicators(candles_15m: dict, candles_1h: dict = None,
     # RSI divergence
     divergence = detect_rsi_divergence(closes, highs, lows)
 
+    # MACD divergence
+    macd_div = detect_macd_divergence(closes, highs, lows)
+
+    # Change of Character (micro-structure shift, faster than BOS)
+    choch = detect_choch(closes, highs, lows)
+
+    # Engulfing candle pattern
+    engulfing = detect_engulfing(opens, closes)
+
+    # Premium / Discount zones
+    prem_disc = get_premium_discount(swing_highs, swing_lows, closes)
+
     # ATR for stops/takes
     atr = calculate_atr(highs, lows, closes)
 
@@ -485,6 +637,35 @@ def get_smc_indicators(candles_15m: dict, candles_1h: dict = None,
         candle_range = highs[i] - lows[i]
         bos_body_strong = (body / candle_range >= 0.4) if candle_range > 0 else False
 
+    # ── Structural TP levels ──────────────────────────────────────────────────
+    # TP1 = nearest confirmed 15m swing high/low beyond price (min 0.5% away)
+    # TP2 = second 15m swing level OR nearest 1h swing level
+    current_px = closes[-1]
+    _bull_tps = sorted(
+        [p for _, p in swing_highs if p > current_px * 1.005],
+        key=lambda x: x
+    )
+    _bear_tps = sorted(
+        [p for _, p in swing_lows if p < current_px * 0.995],
+        key=lambda x: x, reverse=True
+    )
+    bull_tp1 = _bull_tps[0] if _bull_tps else None
+    bull_tp2 = _bull_tps[1] if len(_bull_tps) > 1 else None
+    bear_tp1 = _bear_tps[0] if _bear_tps else None
+    bear_tp2 = _bear_tps[1] if len(_bear_tps) > 1 else None
+
+    # Use 1h swing levels as TP2 fallback when 15m only has one level
+    if candles_1h and len(candles_1h.get("high", [])) >= 10:
+        sh_1h, sl_1h = find_swing_points(
+            candles_1h["high"], candles_1h["low"], lookback=3
+        )
+        _bull_1h = sorted([p for _, p in sh_1h if p > current_px * 1.005], key=lambda x: x)
+        _bear_1h = sorted([p for _, p in sl_1h if p < current_px * 0.995], key=lambda x: x, reverse=True)
+        if bull_tp2 is None and _bull_1h:
+            bull_tp2 = _bull_1h[0]
+        if bear_tp2 is None and _bear_1h:
+            bear_tp2 = _bear_1h[0]
+
     return {
         "bos":              bos,
         "bos_body_strong":  bos_body_strong,
@@ -508,12 +689,23 @@ def get_smc_indicators(candles_15m: dict, candles_1h: dict = None,
         "stoch_d":          stoch_d,
         "wicks":            wicks,
         "divergence":       divergence,
+        "macd_divergence":  macd_div,
+        "choch":            choch,
+        "engulfing":        engulfing,
+        "in_discount":      prem_disc["in_discount"],
+        "in_premium":       prem_disc["in_premium"],
+        "midpoint":         prem_disc["midpoint"],
         "atr":              atr,
         "volume_ratio":     round(vol_ratio, 2),
         "current_close":    closes[-1],
         "current_open":     opens[-1],
         "recent_high":      recent_high,
         "recent_low":       recent_low,
+        # Structural TP targets (direction-specific swing levels)
+        "bull_tp1":         bull_tp1,
+        "bull_tp2":         bull_tp2,
+        "bear_tp1":         bear_tp1,
+        "bear_tp2":         bear_tp2,
     }
 
 
