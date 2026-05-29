@@ -23,7 +23,7 @@ import requests as _requests
 from config import (
     SCAN_INTERVAL_MINUTES, SIGNAL_COOLDOWN_HOURS, TELEGRAM_TOKEN, TELEGRAM_CHAT_ID,
     TRADING_HOURS_START, TRADING_HOURS_END, TRADE_WEEKENDS,
-    MAX_SETUPS_TO_CLAUDE, ALLOWED_SYMBOLS, KLINES_INTERVAL_SEC,
+    MAX_SETUPS_TO_CLAUDE, ALLOWED_SYMBOLS, KLINES_INTERVAL_SEC, SIGNAL_EXPIRY_HOURS,
 )
 from src.binance_client import (
     get_top_coins, get_klines, get_klines_1h, get_klines_4h,
@@ -31,9 +31,9 @@ from src.binance_client import (
 )
 from src.signal_filter import analyze_coin_smc
 from src.claude_analyzer import analyze_batch_with_claude
-from src.telegram_notifier import send_signal, send_status, send_news_alert, calculate_tp_sl
+from src.telegram_notifier import send_signal, send_status, send_news_alert, send_signal_update, calculate_tp_sl, send_morning_digest
 from src.news_filter import check_news_sentiment
-from src.news_agent import get_market_news, detect_major_events, fetch_recent_headlines
+from src.news_agent import get_market_news, detect_major_events, fetch_recent_headlines, get_daily_digest
 from src.db import (
     init_db, get_open_signals, update_signal_status, get_stats,
     auto_block_bad_symbols, is_symbol_auto_blocked, get_active_symbol_blocks,
@@ -194,7 +194,8 @@ def _check_open_signals():
         try:
             opened_at  = float(sig["opened_at"])
             age_hours  = (now - opened_at) / 3600
-            candle_lim = max(8, min(220, int(age_hours * 12) + 12))
+            # 15m candles = 4 per hour; fetch enough to cover the signal's age
+            candle_lim = max(8, min(220, int(age_hours * 4) + 6))
             df_all     = get_klines(sig["symbol"], limit=candle_lim)
 
             status    = sig["status"]
@@ -235,12 +236,16 @@ def _check_open_signals():
                         if high >= entry:         new_status, exit_px = "BREAKEVEN",  entry; break
                         if low <= tp2:            new_status, exit_px = "TP2_HIT",    tp2;   break
 
-            if new_status is None and age_hours > 24:
+            if new_status is None and age_hours > SIGNAL_EXPIRY_HOURS:
                 new_status = "TP1_EXPIRED" if status == "TP1_PARTIAL" else "EXPIRED"
 
             if new_status:
                 update_signal_status(sig["id"], new_status, exit_px)
                 log.info(f"  Signal #{sig['id']} {sig['symbol']} → {new_status}")
+                try:
+                    send_signal_update(sig, new_status, exit_px)
+                except Exception as _e:
+                    log.warning(f"  Update notification failed #{sig['id']}: {_e}")
 
         except Exception as e:
             log.warning(f"  Could not check signal #{sig['id']}: {e}")
@@ -405,6 +410,21 @@ def run_scan():
         log.error(f"Scan failed: {e}")
 
 
+# ── Morning digest ────────────────────────────────────────────────────────────
+def run_morning_digest():
+    """Fetch last 18h headlines, ask Groq to rank top 5, send to Telegram."""
+    log.info("=== Morning digest started ===")
+    try:
+        digest = get_daily_digest()
+        send_morning_digest(digest)
+        log.info(
+            f"Morning digest sent — {len(digest.get('items', []))} items, "
+            f"overall={digest.get('overall')}"
+        )
+    except Exception as e:
+        log.error(f"Morning digest failed: {e}")
+
+
 # ── Self-ping (keeps Render free tier awake) ──────────────────────────────────
 def _self_ping():
     """Ping own health endpoint every 4 minutes so Render never sleeps."""
@@ -461,6 +481,11 @@ def start_bot():
 
     scheduler = BackgroundScheduler(daemon=True)
     scheduler.add_job(run_scan, "interval", minutes=SCAN_INTERVAL_MINUTES)
+    scheduler.add_job(
+        run_morning_digest, "cron",
+        day_of_week="mon-fri", hour=10, minute=0,
+        timezone="Europe/Riga",
+    )
     scheduler.start()
     log.info(f"Scheduler running — interval {SCAN_INTERVAL_MINUTES} min")
 

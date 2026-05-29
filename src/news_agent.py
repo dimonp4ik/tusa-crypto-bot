@@ -210,6 +210,118 @@ def _parse_events(raw: str) -> list[dict]:
     return events[:2]
 
 
+def fetch_headlines_with_meta(hours: int = 18) -> list[dict]:
+    """
+    Return [{title, source, published_utc}] from last `hours` hours.
+    Sorted newest-first. Used for morning digest.
+    """
+    cutoff = datetime.now(timezone.utc) - timedelta(hours=hours)
+    result = []
+    for name, url in RSS_FEEDS:
+        items = _fetch_rss(url)
+        for it in items[:20]:
+            pub = it["published"]
+            if pub and pub < cutoff:
+                continue
+            result.append({
+                "title":     it["title"],
+                "source":    name,
+                "published": pub,
+            })
+    result.sort(
+        key=lambda x: x["published"] or datetime.min.replace(tzinfo=timezone.utc),
+        reverse=True,
+    )
+    return result[:50]
+
+
+def get_daily_digest() -> dict:
+    """
+    Morning digest: fetch last 18h headlines, ask Groq to select top 5 and explain.
+    Returns {items: [...], overall: str, key_theme: str}.
+    Each item: {title, time_utc, direction, explanation, impact}.
+    """
+    raw_items = fetch_headlines_with_meta(hours=18)
+    if not raw_items:
+        return {"items": [], "overall": "NEUTRAL", "key_theme": "Нет новостей за последние 18 часов"}
+
+    if not GROQ_API_KEY:
+        return {"items": [], "overall": "NEUTRAL", "key_theme": "GROQ_API_KEY не задан"}
+
+    # Build headlines text with source + time
+    lines = []
+    for it in raw_items[:40]:
+        pub = it["published"]
+        t   = pub.strftime("%H:%M UTC") if pub else "??:??"
+        lines.append(f"• [{it['source']}, {t}] {it['title']}")
+    headlines_text = "\n".join(lines)
+
+    prompt = f"""Ты — аналитик криптовалютного рынка. Вот заголовки новостей за последние 18 часов.
+
+{headlines_text}
+
+Выбери 5 САМЫХ ВАЖНЫХ для крипто/финансовых рынков. Для каждой — одна строка:
+ITEM|[название на рус., макс 8 слов]|[время HH:MM UTC из заголовка или ?]|BULLISH или BEARISH или NEUTRAL|[объяснение на рус., макс 12 слов]|[влияние на рынок на рус., макс 8 слов]
+
+После 5 строк ITEM добавь одну строку:
+OVERALL|BULLISH или BEARISH или NEUTRAL|[ключевая тема дня на рус., макс 10 слов]"""
+
+    try:
+        resp = _req.post(
+            "https://api.groq.com/openai/v1/chat/completions",
+            headers={
+                "Authorization": f"Bearer {GROQ_API_KEY}",
+                "Content-Type":  "application/json",
+            },
+            json={
+                "model":       "llama-3.1-8b-instant",
+                "messages":    [{"role": "user", "content": prompt}],
+                "max_tokens":  550,
+                "temperature": 0.2,
+            },
+            timeout=25,
+        )
+        raw = resp.json()["choices"][0]["message"]["content"].strip()
+        return _parse_digest(raw)
+    except Exception as e:
+        return {"items": [], "overall": "NEUTRAL", "key_theme": f"Ошибка Groq: {e}"}
+
+
+def _parse_digest(raw: str) -> dict:
+    """Parse ITEM|...|...|...|...|... lines + OVERALL|...|..."""
+    items     = []
+    overall   = "NEUTRAL"
+    key_theme = ""
+    for line in raw.splitlines():
+        line = line.strip()
+        if not line:
+            continue
+        if line.startswith("ITEM|"):
+            parts = [p.strip() for p in line.split("|")]
+            if len(parts) >= 6:
+                try:
+                    direction = parts[3].upper()
+                    if direction not in ("BULLISH", "BEARISH", "NEUTRAL"):
+                        direction = "NEUTRAL"
+                    items.append({
+                        "title":       parts[1],
+                        "time_utc":    parts[2],
+                        "direction":   direction,
+                        "explanation": parts[4],
+                        "impact":      parts[5],
+                    })
+                except (IndexError, ValueError):
+                    continue
+        elif line.startswith("OVERALL|"):
+            parts = [p.strip() for p in line.split("|")]
+            if len(parts) >= 3:
+                val = parts[1].upper()
+                if val in ("BULLISH", "BEARISH", "NEUTRAL"):
+                    overall = val
+                key_theme = parts[2]
+    return {"items": items[:5], "overall": overall, "key_theme": key_theme}
+
+
 def get_market_news() -> dict:
     """
     Main entry point. Fetch headlines → analyze → return context dict.
