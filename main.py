@@ -38,8 +38,9 @@ from src.news_agent import get_market_news, detect_major_events, fetch_recent_he
 from src.db import (
     init_db, get_open_signals, update_signal_status, get_stats,
     auto_block_bad_symbols, is_symbol_auto_blocked, get_active_symbol_blocks,
-    get_recent_outcomes,
+    get_recent_outcomes, unblock_symbol, get_symbols_performance,
 )
+from config import ADMIN_IDS
 
 # ── Logging ──────────────────────────────────────────────────────────────────
 logging.basicConfig(
@@ -63,6 +64,194 @@ def status():
     return f"Scanning every {SCAN_INTERVAL_MINUTES} min. Signal cache: {len(_signal_cache)} entries.", 200
 
 
+# ── Admin panel helpers ───────────────────────────────────────────────────────
+
+_ADMIN_KEYBOARD = {
+    "inline_keyboard": [[
+        {"text": "📊 Статистика",       "callback_data": "adm_stats"},
+        {"text": "📋 Открытые сделки",  "callback_data": "adm_open"},
+    ], [
+        {"text": "🚫 Авто-блок",        "callback_data": "adm_blocks"},
+        {"text": "🏆 Топ монет",        "callback_data": "adm_top"},
+        {"text": "💀 Худшие монеты",    "callback_data": "adm_worst"},
+    ]]
+}
+
+
+def _send_keyboard(chat_id: int, text: str):
+    """Send message with admin inline keyboard."""
+    try:
+        _requests.post(
+            f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage",
+            json={
+                "chat_id": chat_id, "text": text,
+                "parse_mode": "Markdown",
+                "reply_markup": _ADMIN_KEYBOARD,
+            },
+            timeout=10,
+        )
+    except Exception as e:
+        log.warning(f"_send_keyboard failed: {e}")
+
+
+def _answer_callback(callback_id: str, text: str = ""):
+    """Acknowledge a button press (stops Telegram spinner)."""
+    try:
+        _requests.post(
+            f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/answerCallbackQuery",
+            json={"callback_query_id": callback_id, "text": text},
+            timeout=5,
+        )
+    except Exception:
+        pass
+
+
+def _edit_message(chat_id: int, message_id: int, text: str):
+    """Edit an existing message and re-attach the keyboard."""
+    try:
+        _requests.post(
+            f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/editMessageText",
+            json={
+                "chat_id": chat_id, "message_id": message_id,
+                "text": text, "parse_mode": "Markdown",
+                "reply_markup": _ADMIN_KEYBOARD,
+            },
+            timeout=10,
+        )
+    except Exception as e:
+        log.warning(f"_edit_message failed: {e}")
+
+
+def _handle_admin_callback(callback_id: str, chat_id: int,
+                           message_id: int, data: str):
+    """Dispatch inline-button presses for the admin panel."""
+    _answer_callback(callback_id)
+
+    if data == "adm_stats":
+        try:
+            s7  = get_stats(days=7)
+            s30 = get_stats(days=30)
+            txt = (
+                f"📈 *СТАТИСТИКА*\n\n"
+                f"*За 7 дней:*\n"
+                f"  Сигналов: {s7['total']}  Закрыто: {s7['closed']}\n"
+                f"  TP1: {s7['tp1_hit']} ({s7['tp1_rate']}%)  TP2: {s7['tp2_hit']}\n"
+                f"  BE: {s7['breakeven']}  SL: {s7['sl_hit']}  Expired: {s7['expired']}\n"
+                f"  Win rate: *{s7['win_rate']}%*\n\n"
+                f"*За 30 дней:*\n"
+                f"  Сигналов: {s30['total']}  Закрыто: {s30['closed']}\n"
+                f"  TP1: {s30['tp1_hit']} ({s30['tp1_rate']}%)  TP2: {s30['tp2_hit']}\n"
+                f"  BE: {s30['breakeven']}  SL: {s30['sl_hit']}  Expired: {s30['expired']}\n"
+                f"  Win rate: *{s30['win_rate']}%*"
+            )
+        except Exception as e:
+            txt = f"Ошибка: {e}"
+        _edit_message(chat_id, message_id, txt)
+
+    elif data == "adm_open":
+        try:
+            sigs = get_open_signals()
+            if not sigs:
+                txt = "📋 *Открытые сделки*\n\nНет активных позиций."
+            else:
+                lines = ["📋 *Открытые сделки*\n"]
+                for s in sigs:
+                    import time as _t
+                    age_h = round((_t.time() - s["opened_at"]) / 3600, 1)
+                    lines.append(
+                        f"• *{s['symbol']}* {s['direction']} "
+                        f"@ {s['entry_price']}  [{s['status']}]  {age_h}ч"
+                    )
+                txt = "\n".join(lines)
+        except Exception as e:
+            txt = f"Ошибка: {e}"
+        _edit_message(chat_id, message_id, txt)
+
+    elif data == "adm_blocks":
+        try:
+            blocks = get_active_symbol_blocks()
+            if not blocks:
+                txt = "🚫 *Авто-блок*\n\nЗаблокированных монет нет."
+                _edit_message(chat_id, message_id, txt)
+            else:
+                import time as _t
+                lines = ["🚫 *Авто-блок*\n"]
+                keyboard_rows = []
+                for b in blocks:
+                    until = datetime.fromtimestamp(b["blocked_until"]).strftime("%d.%m %H:%M")
+                    lines.append(f"• *{b['symbol']}* до {until}\n  _{b['reason']}_")
+                    keyboard_rows.append([{
+                        "text": f"✅ Разблокировать {b['symbol']}",
+                        "callback_data": f"adm_unblock_{b['symbol']}",
+                    }])
+                # add back-row with main buttons
+                keyboard_rows.append([
+                    {"text": "« Назад", "callback_data": "adm_back"}
+                ])
+                try:
+                    _requests.post(
+                        f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/editMessageText",
+                        json={
+                            "chat_id": chat_id, "message_id": message_id,
+                            "text": "\n".join(lines), "parse_mode": "Markdown",
+                            "reply_markup": {"inline_keyboard": keyboard_rows},
+                        },
+                        timeout=10,
+                    )
+                except Exception as e:
+                    log.warning(f"blocks keyboard failed: {e}")
+        except Exception as e:
+            _edit_message(chat_id, message_id, f"Ошибка: {e}")
+
+    elif data.startswith("adm_unblock_"):
+        symbol = data[len("adm_unblock_"):]
+        try:
+            unblock_symbol(symbol)
+            txt = f"✅ *{symbol}* разблокирована.\n\nНажми 🚫 Авто-блок чтобы обновить список."
+        except Exception as e:
+            txt = f"Ошибка разблокировки: {e}"
+        _edit_message(chat_id, message_id, txt)
+
+    elif data == "adm_top":
+        try:
+            perfs = get_symbols_performance(days=30)
+            top = [p for p in perfs if p["total_r"] > 0][:8]
+            if not top:
+                txt = "🏆 *Топ монет (30д)*\n\nНет прибыльных монет с данными."
+            else:
+                lines = ["🏆 *Топ монет (30д)*\n"]
+                for i, p in enumerate(top, 1):
+                    lines.append(
+                        f"{i}. *{p['symbol']}*  {p['total_r']:+.2f}R  "
+                        f"win {p['win_rate']}%  ({p['trades']} сд)"
+                    )
+                txt = "\n".join(lines)
+        except Exception as e:
+            txt = f"Ошибка: {e}"
+        _edit_message(chat_id, message_id, txt)
+
+    elif data == "adm_worst":
+        try:
+            perfs = get_symbols_performance(days=30)
+            worst = [p for p in reversed(perfs) if p["trades"] >= 2][:8]
+            if not worst:
+                txt = "💀 *Худшие монеты (30д)*\n\nНедостаточно данных."
+            else:
+                lines = ["💀 *Худшие монеты (30д)*\n"]
+                for i, p in enumerate(worst, 1):
+                    lines.append(
+                        f"{i}. *{p['symbol']}*  {p['total_r']:+.2f}R  "
+                        f"win {p['win_rate']}%  ({p['trades']} сд)"
+                    )
+                txt = "\n".join(lines)
+        except Exception as e:
+            txt = f"Ошибка: {e}"
+        _edit_message(chat_id, message_id, txt)
+
+    elif data == "adm_back":
+        _edit_message(chat_id, message_id, "🛠 *TUSA Admin Panel*\nВыбери раздел:")
+
+
 # ── Telegram webhook — handles incoming messages ──────────────────────────────
 @app.route("/webhook", methods=["POST"])
 def webhook():
@@ -70,11 +259,26 @@ def webhook():
     if not data:
         return "ok", 200
 
+    # ── Inline button press ───────────────────────────────────────────────────
+    cb = data.get("callback_query")
+    if cb:
+        user_id    = cb.get("from", {}).get("id")
+        chat_id    = cb.get("message", {}).get("chat", {}).get("id")
+        message_id = cb.get("message", {}).get("message_id")
+        cb_data    = cb.get("data", "")
+        cb_id      = cb.get("id")
+        if user_id in ADMIN_IDS:
+            _handle_admin_callback(cb_id, chat_id, message_id, cb_data)
+        else:
+            _answer_callback(cb_id, "Нет доступа.")
+        return "ok", 200
+
     message = data.get("message") or data.get("channel_post")
     if not message:
         return "ok", 200
 
     chat_id = message.get("chat", {}).get("id")
+    user_id = message.get("from", {}).get("id")
     text = message.get("text", "").strip().lower()
 
     if not chat_id or not text:
@@ -86,6 +290,13 @@ def webhook():
                "👋 Привет! Бот работает.\n"
                f"⏱ Сканирую каждые {SCAN_INTERVAL_MINUTES} мин.\n"
                f"📊 Монет в кэше: {len(_signal_cache)}")
+
+    # /admin — панель управления (только для ADMIN_IDS)
+    elif text in ("/admin", "/панель"):
+        if user_id in ADMIN_IDS:
+            _send_keyboard(chat_id, "🛠 *TUSA Admin Panel*\nВыбери раздел:")
+        else:
+            _reply(chat_id, "Нет доступа.")
 
     # /status — подробный статус
     elif text in ("/status", "/старт", "/start"):

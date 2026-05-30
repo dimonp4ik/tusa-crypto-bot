@@ -8,6 +8,9 @@ TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")
 TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")
 CLAUDE_API_KEY = os.getenv("CLAUDE_API_KEY")
 
+# --- Admin panel: Telegram user IDs that can access /admin in DM ---
+ADMIN_IDS = {671071896, 1254580347}
+
 # --- Scan settings ---
 SCAN_INTERVAL_MINUTES = int(os.getenv("SCAN_INTERVAL_MINUTES", "5"))
 TOP_COINS_COUNT = int(os.getenv("TOP_COINS_COUNT", "45"))

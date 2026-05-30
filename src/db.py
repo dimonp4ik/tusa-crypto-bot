@@ -272,6 +272,48 @@ def auto_block_bad_symbols() -> list:
     return blocked
 
 
+def unblock_symbol(symbol: str) -> None:
+    """Manually remove a symbol from the block list."""
+    with _conn() as c:
+        c.execute("DELETE FROM symbol_blocks WHERE symbol = ?", (symbol,))
+
+
+def get_symbols_performance(days: int = 30) -> list:
+    """
+    Per-symbol closed-signal performance over `days` days.
+    Returns list of dicts sorted by total_r descending.
+    """
+    cutoff = time_mod.time() - days * 86400
+    placeholders = ",".join("?" for _ in FINAL_STATUSES)
+    with _conn() as c:
+        rows = c.execute(
+            f"SELECT symbol, status FROM signals "
+            f"WHERE opened_at >= ? AND status IN ({placeholders})",
+            [cutoff, *FINAL_STATUSES],
+        ).fetchall()
+
+    from collections import defaultdict
+    by_sym: dict = defaultdict(list)
+    for r in rows:
+        by_sym[r["symbol"]].append(_status_to_r(r["status"]))
+
+    results = []
+    for sym, rs in by_sym.items():
+        total   = len(rs)
+        wins    = sum(1 for r in rs if r > 0)
+        total_r = round(sum(rs), 2)
+        results.append({
+            "symbol":   sym,
+            "trades":   total,
+            "wins":     wins,
+            "win_rate": round(wins / total * 100, 1) if total else 0.0,
+            "total_r":  total_r,
+        })
+
+    results.sort(key=lambda x: x["total_r"], reverse=True)
+    return results
+
+
 def get_stats(days: int = 7) -> dict:
     """Aggregate honest lifecycle stats. Win rate calculated on final closed signals only."""
     cutoff = time_mod.time() - days * 86400
