@@ -66,11 +66,23 @@ def status():
 
 # ── Admin panel helpers ───────────────────────────────────────────────────────
 
-# Persistent bottom-bar button — set once via /start, stays forever in DM.
-_PERSISTENT_KB = {
-    "keyboard":          [[ {"text": "🛠 Админ панель"} ]],
-    "resize_keyboard":   True,
-    "is_persistent":     True,
+# Persistent bottom-bar keyboards — set once via /start, stay forever in DM.
+_USER_KB = {
+    "keyboard": [
+        [{"text": "📋 Открытые сделки"}, {"text": "📈 Результаты"}],
+        [{"text": "❓ Помощь"}],
+    ],
+    "resize_keyboard": True,
+    "is_persistent":   True,
+}
+_ADMIN_KB = {
+    "keyboard": [
+        [{"text": "🛠 Админ панель"}],
+        [{"text": "📋 Открытые сделки"}, {"text": "📈 Результаты"}],
+        [{"text": "❓ Помощь"}],
+    ],
+    "resize_keyboard": True,
+    "is_persistent":   True,
 }
 
 # Inline keyboard shown inside the panel message.
@@ -86,16 +98,16 @@ _ADMIN_KEYBOARD = {
 }
 
 
-def _send_persistent_menu(chat_id: int):
-    """Send the persistent bottom-bar button to an admin DM."""
+def _send_persistent_menu(chat_id: int, is_admin: bool = False):
+    """Send the persistent bottom-bar keyboard. Admins get extra admin button."""
+    kb   = _ADMIN_KB if is_admin else _USER_KB
+    text = ("✅ Меню активировано.\n🛠 Админ панель доступна."
+            if is_admin else
+            "✅ Меню активировано. Кнопки внизу всегда доступны.")
     try:
         _requests.post(
             f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage",
-            json={
-                "chat_id": chat_id,
-                "text": "✅ Панель активирована. Кнопка внизу всегда доступна.",
-                "reply_markup": _PERSISTENT_KB,
-            },
+            json={"chat_id": chat_id, "text": text, "reply_markup": kb},
             timeout=10,
         )
     except Exception as e:
@@ -315,23 +327,73 @@ def webhook():
                f"⏱ Сканирую каждые {SCAN_INTERVAL_MINUTES} мин.\n"
                f"📊 Монет в кэше: {len(_signal_cache)}")
 
-    # /start в личке от админа → ставим постоянную кнопку внизу
+    # /start → постоянное меню (у админов расширенное)
     elif text == "/start":
-        if user_id in ADMIN_IDS:
-            _send_persistent_menu(chat_id)
-        else:
-            _reply(chat_id,
-                   f"🤖 *TUSA CRYPTO BOT*\n✅ Работает\n"
-                   f"⏱ Интервал: {SCAN_INTERVAL_MINUTES} мин")
+        _send_persistent_menu(chat_id, is_admin=(user_id in ADMIN_IDS))
 
-    # Нажатие постоянной кнопки внизу → открываем инлайн-панель
+    # 🛠 Кнопка "Админ панель" → инлайн-панель
     elif text == "🛠 админ панель":
         if user_id in ADMIN_IDS:
             _send_keyboard(chat_id, "🛠 *TUSA Admin Panel*\nВыбери раздел:")
         else:
             _reply(chat_id, "Нет доступа.")
 
-    # /admin — тоже работает (запасной вариант)
+    # 📋 Открытые сделки
+    elif text == "📋 открытые сделки":
+        try:
+            sigs = get_open_signals()
+            if not sigs:
+                _reply(chat_id, "📋 *Открытые сделки*\n\nНет активных позиций.")
+            else:
+                import time as _t
+                lines = ["📋 *Открытые сделки*\n"]
+                for s in sigs:
+                    age_h = round((_t.time() - s["opened_at"]) / 3600, 1)
+                    icon  = "🟡" if s["status"] == "TP1_PARTIAL" else "🟢"
+                    lines.append(
+                        f"{icon} *{s['symbol']}* {s['direction']} "
+                        f"@ {s['entry_price']}  _{age_h}ч_"
+                    )
+                _reply(chat_id, "\n".join(lines))
+        except Exception as e:
+            _reply(chat_id, f"Ошибка: {e}")
+
+    # 📈 Результаты
+    elif text == "📈 результаты":
+        try:
+            s7  = get_stats(days=7)
+            s30 = get_stats(days=30)
+            _reply(chat_id,
+                   f"📈 *Результаты бота*\n\n"
+                   f"*За 7 дней:*\n"
+                   f"  Сигналов: {s7['total']}  •  Win rate: *{s7['win_rate']}%*\n"
+                   f"  TP1: {s7['tp1_hit']}  TP2: {s7['tp2_hit']}  SL: {s7['sl_hit']}\n\n"
+                   f"*За 30 дней:*\n"
+                   f"  Сигналов: {s30['total']}  •  Win rate: *{s30['win_rate']}%*\n"
+                   f"  TP1: {s30['tp1_hit']}  TP2: {s30['tp2_hit']}  SL: {s30['sl_hit']}")
+        except Exception as e:
+            _reply(chat_id, f"Ошибка: {e}")
+
+    # ❓ Помощь
+    elif text == "❓ помощь":
+        _reply(chat_id,
+               "❓ *Как читать сигналы*\n\n"
+               "*Направление:*\n"
+               "  📈 LONG — ожидаем рост, покупаем\n"
+               "  📉 SHORT — ожидаем падение, продаём\n\n"
+               "*Уровни:*\n"
+               "  🎯 *TP1* — первая цель. Закрываем 50% позиции\n"
+               "  🎯 *TP2* — вторая цель. Закрываем остаток\n"
+               "  🛑 *SL* — стоп-лосс. Выход если цена пошла против\n\n"
+               "*Исходы сделки:*\n"
+               "  ✅ TP1 / TP2 — прибыль\n"
+               "  ⚖️ BE — безубыток (TP1 взят, остаток закрыт в ноль)\n"
+               "  ❌ SL — убыток\n"
+               "  ⏱ Expired — время вышло, сделка закрыта без результата\n\n"
+               "*Win rate* — % прибыльных от закрытых.\n"
+               "Норма для SMC стратегии: 35–45% при высоком R\\:R.")
+
+    # /admin — запасной вариант текстом
     elif text in ("/admin", "/панель"):
         if user_id in ADMIN_IDS:
             _send_keyboard(chat_id, "🛠 *TUSA Admin Panel*\nВыбери раздел:")
