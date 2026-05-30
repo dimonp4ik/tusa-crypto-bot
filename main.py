@@ -66,6 +66,14 @@ def status():
 
 # ── Admin panel helpers ───────────────────────────────────────────────────────
 
+# Persistent bottom-bar button — set once via /start, stays forever in DM.
+_PERSISTENT_KB = {
+    "keyboard":          [[ {"text": "🛠 Админ панель"} ]],
+    "resize_keyboard":   True,
+    "is_persistent":     True,
+}
+
+# Inline keyboard shown inside the panel message.
 _ADMIN_KEYBOARD = {
     "inline_keyboard": [[
         {"text": "📊 Статистика",       "callback_data": "adm_stats"},
@@ -76,6 +84,22 @@ _ADMIN_KEYBOARD = {
         {"text": "💀 Худшие монеты",    "callback_data": "adm_worst"},
     ]]
 }
+
+
+def _send_persistent_menu(chat_id: int):
+    """Send the persistent bottom-bar button to an admin DM."""
+    try:
+        _requests.post(
+            f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage",
+            json={
+                "chat_id": chat_id,
+                "text": "✅ Панель активирована. Кнопка внизу всегда доступна.",
+                "reply_markup": _PERSISTENT_KB,
+            },
+            timeout=10,
+        )
+    except Exception as e:
+        log.warning(f"_send_persistent_menu failed: {e}")
 
 
 def _send_keyboard(chat_id: int, text: str):
@@ -291,7 +315,23 @@ def webhook():
                f"⏱ Сканирую каждые {SCAN_INTERVAL_MINUTES} мин.\n"
                f"📊 Монет в кэше: {len(_signal_cache)}")
 
-    # /admin — панель управления (только для ADMIN_IDS)
+    # /start в личке от админа → ставим постоянную кнопку внизу
+    elif text == "/start":
+        if user_id in ADMIN_IDS:
+            _send_persistent_menu(chat_id)
+        else:
+            _reply(chat_id,
+                   f"🤖 *TUSA CRYPTO BOT*\n✅ Работает\n"
+                   f"⏱ Интервал: {SCAN_INTERVAL_MINUTES} мин")
+
+    # Нажатие постоянной кнопки внизу → открываем инлайн-панель
+    elif text == "🛠 админ панель":
+        if user_id in ADMIN_IDS:
+            _send_keyboard(chat_id, "🛠 *TUSA Admin Panel*\nВыбери раздел:")
+        else:
+            _reply(chat_id, "Нет доступа.")
+
+    # /admin — тоже работает (запасной вариант)
     elif text in ("/admin", "/панель"):
         if user_id in ADMIN_IDS:
             _send_keyboard(chat_id, "🛠 *TUSA Admin Panel*\nВыбери раздел:")
@@ -299,7 +339,7 @@ def webhook():
             _reply(chat_id, "Нет доступа.")
 
     # /status — подробный статус
-    elif text in ("/status", "/старт", "/start"):
+    elif text in ("/status", "/старт"):
         _reply(chat_id,
                f"🤖 *TUSA CRYPTO BOT*\n"
                f"✅ Работает\n"
