@@ -6,7 +6,7 @@ No pandas, no numpy — works on any Python version.
 import sys
 import os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from config import SMC_SWING_LOOKBACK, SMC_FVG_MIN_PCT, SMC_OB_LOOKBACK, ATR_PERIOD
+from config import SMC_SWING_LOOKBACK, SMC_FVG_MIN_PCT, SMC_OB_LOOKBACK, ATR_PERIOD, EFF_RATIO_LOOKBACK
 
 
 # ── Basic indicators ──────────────────────────────────────────────────────────
@@ -187,6 +187,60 @@ def calculate_rsi(closes: list, period: int = 14) -> float:
 
     rs = avg_gain / (avg_loss + 1e-10)
     return 100 - 100 / (1 + rs)
+
+
+# ── Volatility regime ─────────────────────────────────────────────────────────
+
+def volatility_regime(highs: list, lows: list, closes: list,
+                      lookback: int = 50) -> dict:
+    """
+    Normalised-volatility regime via per-candle True Range as % of price.
+
+    atr_pct : recent volatility (avg of last 3 candles' TR%) — the "now".
+    ratio   : atr_pct vs its median over `lookback` candles.
+              < 1  = volatility collapsing (dead/range → trades expire)
+              > 1  = volatility expanding (spike/news → whipsaw stops)
+    """
+    n = len(closes)
+    if n < lookback + 2:
+        return {"atr_pct": 0.0, "median_atr_pct": 0.0, "ratio": 1.0}
+
+    tr_pct = []
+    for i in range(1, n):
+        tr = max(highs[i] - lows[i],
+                 abs(highs[i] - closes[i - 1]),
+                 abs(lows[i]  - closes[i - 1]))
+        tr_pct.append(tr / (closes[i] + 1e-10))
+
+    recent = tr_pct[-lookback:]
+    srt    = sorted(recent)
+    median = srt[len(srt) // 2] if srt else 0.0
+    cur    = sum(tr_pct[-3:]) / 3 if len(tr_pct) >= 3 else (tr_pct[-1] if tr_pct else 0.0)
+    ratio  = cur / median if median > 0 else 1.0
+
+    return {"atr_pct": cur, "median_atr_pct": median, "ratio": ratio}
+
+
+def efficiency_ratio(closes: list, lookback: int = 20) -> float:
+    """
+    Kaufman Efficiency Ratio — directionality of price over `lookback` bars.
+
+      ER = abs(close[-1] - close[-1-lookback]) / sum(abs(bar-to-bar change))
+
+    ~1.0 = clean one-way trend (net move ≈ total path travelled)
+    ~0.0 = chop (price wandered a lot but went nowhere → false BOS → SL)
+
+    Distinct from ATR/vol-regime: that measures candle *size*, this measures
+    *direction*. A choppy range can be high-ATR yet near-zero ER.
+    """
+    n = len(closes)
+    if n < lookback + 1:
+        return 1.0  # not enough data → don't block
+    net = abs(closes[-1] - closes[-1 - lookback])
+    path = sum(abs(closes[i] - closes[i - 1]) for i in range(n - lookback, n))
+    if path <= 0:
+        return 0.0
+    return net / path
 
 
 # ── SMC: Swing Points ─────────────────────────────────────────────────────────
@@ -613,6 +667,12 @@ def get_smc_indicators(candles_15m: dict, candles_1h: dict = None,
     # ATR for stops/takes
     atr = calculate_atr(highs, lows, closes)
 
+    # Volatility regime (dead vs spike) — quality gate
+    vol_reg = volatility_regime(highs, lows, closes)
+
+    # Efficiency ratio (chop vs trend) — quality gate
+    eff_ratio = efficiency_ratio(closes, EFF_RATIO_LOOKBACK)
+
     # TP/SL reference levels
     recent_high = max(highs[-21:-1]) if len(highs) >= 22 else max(highs)
     recent_low  = min(lows[-21:-1])  if len(lows)  >= 22 else min(lows)
@@ -696,6 +756,10 @@ def get_smc_indicators(candles_15m: dict, candles_1h: dict = None,
         "in_premium":       prem_disc["in_premium"],
         "midpoint":         prem_disc["midpoint"],
         "atr":              atr,
+        "vol_atr_pct":      vol_reg["atr_pct"],
+        "vol_median_pct":   vol_reg["median_atr_pct"],
+        "vol_ratio_regime": vol_reg["ratio"],
+        "eff_ratio":        eff_ratio,
         "volume_ratio":     round(vol_ratio, 2),
         "current_close":    closes[-1],
         "current_open":     opens[-1],

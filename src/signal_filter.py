@@ -8,6 +8,11 @@ from config import (
     SMC_RSI_LONG_MAX, SMC_RSI_SHORT_MIN, MTF_MIN_SCORE,
     REQUIRE_ENTRY_ZONE, ENTRY_ZONE_SL_BUFFER_ATR,
     REQUIRE_HTF_TREND, REQUIRE_RETEST, RETEST_MAX_DIST_PCT,
+    VOL_REGIME_FILTER, VOL_MIN_ATR_PCT, VOL_MIN_RATIO, VOL_MAX_RATIO,
+    REQUIRE_STRONG_BOS, STRONG_BOS_VOL_MULT,
+    REQUIRE_STRONG_CONFIRM,
+    EFF_RATIO_FILTER, EFF_RATIO_MIN,
+    REQUIRE_STRICT_HTF,
 )
 from src.indicators import get_indicators, get_smc_indicators
 
@@ -138,9 +143,34 @@ def analyze_coin_smc(candles_15m: dict, candles_1h: dict, symbol: str,
     if REQUIRE_HTF_TREND and trend_1h == "neutral" and trend_4h == "neutral":
         return None
 
+    # 2b-A. Efficiency-Ratio chop gate — false BOS in ranges → SL clusters
+    if EFF_RATIO_FILTER and ind.get("eff_ratio", 1.0) < EFF_RATIO_MIN:
+        return None
+
+    # 2b-B. Strict HTF alignment — both 1h AND 4h must back the signal
+    if REQUIRE_STRICT_HTF and (trend_1h != bos or trend_4h != bos):
+        return None
+
+    # 2c. Volatility regime — skip dead markets (→ EXPIRED) and spikes (→ SL)
+    if VOL_REGIME_FILTER:
+        atr_pct = ind.get("vol_atr_pct", 0.0)
+        v_ratio = ind.get("vol_ratio_regime", 1.0)
+        if atr_pct < VOL_MIN_ATR_PCT:
+            return None
+        if v_ratio < VOL_MIN_RATIO or v_ratio > VOL_MAX_RATIO:
+            return None
+
     # 3. Volume on BOS context
     if ind["volume_ratio"] < SMC_BOS_MIN_VOLUME:
         return None
+
+    # 3b. Strong BOS — real break needs decisive body OR volume surge, not a
+    #     thin-wick poke (classic false breakout → SL).
+    if REQUIRE_STRONG_BOS:
+        strong_body = ind.get("bos_body_strong", False)
+        vol_surge   = ind["volume_ratio"] >= SMC_BOS_MIN_VOLUME * STRONG_BOS_VOL_MULT
+        if not (strong_body or vol_surge):
+            return None
 
     # 4. BTC correlation
     if bos == "bullish" and btc_change_pct < -BTC_BLOCK_THRESHOLD_PCT:
@@ -193,6 +223,13 @@ def analyze_coin_smc(candles_15m: dict, candles_1h: dict, symbol: str,
 
     if len(confirmations) < SMC_MIN_CONFIRMATIONS:
         return None
+
+    # 6b. Require >=1 STRUCTURAL confirmation — two weak candle signals
+    #     (Engulfing + Wick) alone are noise, not smart-money structure.
+    if REQUIRE_STRONG_CONFIRM:
+        _STRUCTURAL = {"FVG", "OB", "LiqSweep", "ChoCH"}
+        if not any(c in _STRUCTURAL for c in confirmations):
+            return None
 
     # 7. Entry zone
     entry_zone = _select_entry_zone(ind, direction)

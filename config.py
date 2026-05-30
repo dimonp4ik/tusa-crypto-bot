@@ -95,6 +95,43 @@ RETEST_MAX_DIST_PCT = float(os.getenv("RETEST_MAX_DIST_PCT", "0.015"))  # within
 # --- Multi-timeframe score gate (max ~15) ---
 MTF_MIN_SCORE = int(os.getenv("MTF_MIN_SCORE", "9"))
 
+# --- Signal-quality filters (backtested on a PINNED 20-coin / ~21-day set) ---
+# All three were A/B-tested apples-to-apples and DEFAULT OFF — none beat baseline:
+# №1 Volatility regime: lower bound cut only ~3 dead trades → +0.11R vs +0.11R
+#    (zero net effect). Upper ceiling actively hurt (cut TP2 runners). Off.
+#    NOTE: an earlier "+0.13R" win was a measurement artifact — the live
+#    get_top_coins() list reshuffled between runs (SUI drifting in/out). Fixed
+#    by pinning BACKTEST_SYMBOLS in backtest.py.
+VOL_REGIME_FILTER = os.getenv("VOL_REGIME_FILTER", "0") != "0"
+VOL_MIN_ATR_PCT   = float(os.getenv("VOL_MIN_ATR_PCT", "0.0015"))  # <0.15% range = too dead
+VOL_MIN_RATIO     = float(os.getenv("VOL_MIN_RATIO", "0.55"))      # cur/median below = collapsed
+VOL_MAX_RATIO     = float(os.getenv("VOL_MAX_RATIO", "99"))        # ceiling OFF (hurt R in backtest)
+VOL_REGIME_LOOKBACK = int(os.getenv("VOL_REGIME_LOOKBACK", "50"))
+
+# №3 Strong BOS and №4 Structural-only confirmation were BOTH backtested and
+# DROPPED (default off): each lowered win rate (37.5% → 35.0%) and Expected R
+# (+0.12R → +0.03R). Strong-BOS pushed entries late (momentum spent → SL);
+# structural-only cut valid reversals. Flags kept for experimentation.
+REQUIRE_STRONG_BOS = os.getenv("REQUIRE_STRONG_BOS", "0") != "0"
+STRONG_BOS_VOL_MULT = float(os.getenv("STRONG_BOS_VOL_MULT", "1.3"))  # x SMC_BOS_MIN_VOLUME
+REQUIRE_STRONG_CONFIRM = os.getenv("REQUIRE_STRONG_CONFIRM", "0") != "0"
+
+# №A Efficiency-Ratio chop filter — DEFAULT ON (backtest-proven winner).
+#    Kaufman ER over EFF_RATIO_LOOKBACK bars: ER~1 = clean trend, ER~0 = chop.
+#    Skip setup if ER < EFF_RATIO_MIN. Targets the proven loss source: false BOS
+#    in ranges (LINK 2W/26SL, SOL 6W/19SL). Distinct from ATR-vol (size) — ER
+#    measures DIRECTION. Backtest (pinned 20 symbols, ~21d 15m), threshold sweep:
+#       base 430tr 36.7% +0.08R/+33R | 0.10 341tr +0.11R/+38R | 0.12 323tr +0.12R/+39R
+#       0.15 293tr 37.2% +0.14R/+41R (PEAK) | 0.20 245tr +0.13R/+31R | 0.30 151tr +0.13R/+20R
+#    0.15 = clean unimodal peak: beats baseline on win%, R/trade AND total R while
+#    cutting 32% junk trades. First filter to beat baseline on every axis.
+EFF_RATIO_FILTER   = os.getenv("EFF_RATIO_FILTER", "1") != "0"
+EFF_RATIO_LOOKBACK = int(os.getenv("EFF_RATIO_LOOKBACK", "20"))
+EFF_RATIO_MIN      = float(os.getenv("EFF_RATIO_MIN", "0.15"))
+# №B Strict HTF alignment — DROPPED (default off). Backtested: 232tr +0.04R/+8R,
+#    half of baseline. Cutting counter-trend also cut winners. Flag kept for experiments.
+REQUIRE_STRICT_HTF = os.getenv("REQUIRE_STRICT_HTF", "0") != "0"
+
 # --- Claude tiered analysis (cascade: cheap LIGHT gate + rare deep HEAVY) ---
 # LIGHT  : Haiku validates every passed setup in ONE cached batch call (JSON via tool).
 # HEAVY  : Sonnet re-checks only top setups (score >= HEAVY_MIN_SCORE) with coin memory.

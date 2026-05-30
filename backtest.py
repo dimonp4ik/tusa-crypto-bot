@@ -122,16 +122,21 @@ def backtest_symbol(symbol: str) -> dict:
     n = len(c15["close"])
     trades = tp1 = tp2 = sl_hit = expired = 0
 
+    # Analysis only looks back ~50-70 candles; cap snapshot length so each
+    # call is near-constant time instead of growing to the full history.
+    # (Quadratic Stoch-RSI/divergence cost dominated runtime otherwise.)
+    W15, W1H, W4H = 300, 90, 50
+
     # Slide a window forward through the data
     for i in range(50, n - BACKTEST_TP_WINDOW):
-        # Build a "candles up to i" snapshot
-        snap_15 = {k: v[:i] for k, v in c15.items()}
+        # Build a "candles up to i" snapshot, capped to the lookback window
+        snap_15 = {k: v[max(0, i - W15):i] for k, v in c15.items()}
 
         # Approximate 1h/4h snapshots (rough — assume time aligned)
         i_1h = max(1, i // 4)
         i_4h = max(1, i // 16)
-        snap_1h = {k: v[:i_1h] for k, v in c1h.items()} if i_1h <= len(c1h["close"]) else c1h
-        snap_4h = {k: v[:i_4h] for k, v in c4h.items()} if i_4h <= len(c4h["close"]) else c4h
+        snap_1h = {k: v[max(0, i_1h - W1H):i_1h] for k, v in c1h.items()} if i_1h <= len(c1h["close"]) else c1h
+        snap_4h = {k: v[max(0, i_4h - W4H):i_4h] for k, v in c4h.items()} if i_4h <= len(c4h["close"]) else c4h
 
         setup = analyze_coin_smc(snap_15, snap_1h, symbol, snap_4h, btc_change_pct=0.0)
         if not setup:
@@ -151,9 +156,25 @@ def backtest_symbol(symbol: str) -> dict:
     return {"trades": trades, "tp1": tp1, "tp2": tp2, "sl": sl_hit, "expired": expired}
 
 
+# Fixed symbol set — pinned so every A/B run uses the SAME coins.
+# (Live get_top_coins() reshuffles by 24h volume each run, which contaminated
+#  filter comparisons: a big winner like SUI drifting in/out swung the totals.)
+BACKTEST_SYMBOLS = [
+    "BTC-USDT", "ETH-USDT", "XRP-USDT", "SOL-USDT", "XMR-USDT",
+    "DOT-USDT", "XLM-USDT", "LINK-USDT", "SUI-USDT", "HYPE-USDT",
+    "ZEC-USDT", "SEI-USDT", "AAVE-USDT", "TAO-USDT", "NEAR-USDT",
+    "TON-USDT", "BILL-USDT", "LAB-USDT", "PIEVERSE-USDT", "NEX-USDT",
+]
+
+
 def main():
-    print("Fetching top coins...")
-    coins = get_top_coins()[:20]  # backtest top 20 to keep it fast
+    env_syms = os.getenv("BACKTEST_SYMBOLS", "").strip()
+    if env_syms:
+        coins = [s.strip().upper() for s in env_syms.split(",") if s.strip()]
+        print(f"Using {len(coins)} symbols from BACKTEST_SYMBOLS env...")
+    else:
+        coins = BACKTEST_SYMBOLS
+        print(f"Using {len(coins)} pinned symbols (reproducible A/B)...")
     print(f"Backtesting {len(coins)} coins on last ~21 days of 15m data...\n")
 
     total = {"trades": 0, "tp1": 0, "tp2": 0, "sl": 0, "expired": 0}
