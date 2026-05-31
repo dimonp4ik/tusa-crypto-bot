@@ -232,7 +232,15 @@ def fetch_headlines_with_meta(hours: int = 18) -> list[dict]:
         key=lambda x: x["published"] or datetime.min.replace(tzinfo=timezone.utc),
         reverse=True,
     )
-    return result[:50]
+    # Drop duplicate titles (same story syndicated across feeds)
+    seen, deduped = set(), []
+    for it in result:
+        key = it["title"].strip().lower()
+        if key in seen:
+            continue
+        seen.add(key)
+        deduped.append(it)
+    return deduped[:50]
 
 
 def get_daily_digest() -> dict:
@@ -260,10 +268,10 @@ def get_daily_digest() -> dict:
 
 {headlines_text}
 
-Выбери 5 САМЫХ ВАЖНЫХ для крипто/финансовых рынков. Для каждой — одна строка:
+Выбери до 5 РАЗНЫХ самых важных для крипто/финансовых рынков. КАЖДАЯ новость уникальна — НЕ повторяй одну и ту же. Если важных меньше 5 — выведи меньше строк. Для каждой — одна строка:
 ITEM|[название на рус., макс 8 слов]|[время HH:MM UTC из заголовка или ?]|BULLISH или BEARISH или NEUTRAL|[объяснение на рус., макс 12 слов]|[влияние на рынок на рус., макс 8 слов]
 
-После 5 строк ITEM добавь одну строку:
+После строк ITEM добавь одну строку:
 OVERALL|BULLISH или BEARISH или NEUTRAL|[ключевая тема дня на рус., макс 10 слов]"""
 
     try:
@@ -290,6 +298,7 @@ OVERALL|BULLISH или BEARISH или NEUTRAL|[ключевая тема дня 
 def _parse_digest(raw: str) -> dict:
     """Parse ITEM|...|...|...|...|... lines + OVERALL|...|..."""
     items     = []
+    seen      = set()
     overall   = "NEUTRAL"
     key_theme = ""
     for line in raw.splitlines():
@@ -300,6 +309,10 @@ def _parse_digest(raw: str) -> dict:
             parts = [p.strip() for p in line.split("|")]
             if len(parts) >= 6:
                 try:
+                    title_key = parts[1].strip().lower()
+                    if not title_key or title_key in seen:
+                        continue            # skip blank/duplicate titles
+                    seen.add(title_key)
                     direction = parts[3].upper()
                     if direction not in ("BULLISH", "BEARISH", "NEUTRAL"):
                         direction = "NEUTRAL"
