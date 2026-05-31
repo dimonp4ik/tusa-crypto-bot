@@ -320,13 +320,6 @@ def webhook():
     if not chat_id or not text:
         return "ok", 200
 
-    # "привет" — проверка что бот живой
-    if "привет" in text:
-        _reply(chat_id,
-               "👋 Привет! Бот работает.\n"
-               f"⏱ Сканирую каждые {SCAN_INTERVAL_MINUTES} мин.\n"
-               f"📊 Монет в кэше: {len(_signal_cache)}")
-
     # /start → постоянное меню (у админов расширенное)
     elif text == "/start":
         _send_persistent_menu(chat_id, is_admin=(user_id in ADMIN_IDS))
