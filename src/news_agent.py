@@ -417,3 +417,108 @@ def get_upcoming_high_impact_events(within_hours: float = 3.0) -> list[dict]:
             upcoming.append({**ev, "hours_until": round(delta_h, 1)})
     upcoming.sort(key=lambda x: x["hours_until"])
     return upcoming
+
+
+# ── "Новости на сегодня" — full day digest with forecast/result ───────────────
+
+_day_cache: dict = {"fetched_at": 0.0, "raw": b""}
+
+
+def _parse_ff_event_full(ev) -> dict | None:
+    """Parse one <event> → rich dict (High/Medium impact, scheduled time)."""
+    title    = (ev.findtext("title")    or "").strip()
+    country  = (ev.findtext("country")  or "").strip()
+    impact   = (ev.findtext("impact")   or "").strip()
+    date_s   = (ev.findtext("date")     or "").strip()   # MM-DD-YYYY
+    time_s   = (ev.findtext("time")     or "").strip()   # "8:30am"
+    forecast = (ev.findtext("forecast") or "").strip()
+    previous = (ev.findtext("previous") or "").strip()
+    actual   = (ev.findtext("actual")   or "").strip()
+
+    if impact.lower() not in ("high", "medium") or not title or not date_s:
+        return None
+    try:
+        mo, da, yr = date_s.split("-")
+        ev_date = datetime(int(yr), int(mo), int(da)).date()
+    except Exception:
+        return None
+
+    when_utc, all_day = None, True
+    ts = time_s.lower().replace(" ", "")
+    if ts and ts not in ("allday", "tentative", "day1", "day2"):
+        try:
+            ampm, hm = ts[-2:], ts[:-2]
+            hh, mm = hm.split(":")
+            hour, minute = int(hh), int(mm)
+            if ampm == "pm" and hour != 12:
+                hour += 12
+            if ampm == "am" and hour == 12:
+                hour = 0
+            import datetime as _dt
+            when_et  = _dt.datetime(int(yr), int(mo), int(da), hour, minute, tzinfo=_ET_TZ)
+            when_utc = when_et.astimezone(timezone.utc)
+            all_day  = False
+        except Exception:
+            all_day = True
+
+    return {
+        "title": title, "country": country, "impact": impact.lower(),
+        "ev_date": ev_date, "when_utc": when_utc, "all_day": all_day,
+        "forecast": forecast, "previous": previous, "actual": actual,
+    }
+
+
+def get_day_events(max_events: int = 10) -> dict:
+    """
+    High/Medium-impact macro events for *today* (US Eastern calendar day).
+    If today is Sat/Sun → rolls to next Monday.
+    Returns {"date": <date>, "weekend_rolled": bool, "events": [...]} where each
+    event = {title, country, impact, when_utc, all_day, forecast, previous,
+             actual, passed}. Cached 1h. Never raises — returns empty on failure.
+    """
+    import time as _t
+    now = _t.time()
+    if now - _day_cache["fetched_at"] > 3600 or not _day_cache["raw"]:
+        try:
+            resp = _req.get(_FF_CALENDAR_URL, timeout=8,
+                            headers={"User-Agent": "Mozilla/5.0 CryptoBot/1.0"})
+            if resp.status_code == 200:
+                _day_cache["raw"] = resp.content
+            _day_cache["fetched_at"] = now
+        except Exception:
+            _day_cache["fetched_at"] = now
+
+    now_et  = datetime.now(_ET_TZ)
+    target  = now_et.date()
+    rolled  = False
+    if now_et.weekday() >= 5:                       # Sat=5, Sun=6 → next Monday
+        target += timedelta(days=7 - now_et.weekday())
+        rolled  = True
+
+    out = {"date": target, "weekend_rolled": rolled, "events": []}
+    if not _day_cache["raw"]:
+        return out
+
+    try:
+        root = ET.fromstring(_day_cache["raw"])
+    except Exception:
+        return out
+
+    now_utc = datetime.now(timezone.utc)
+    parsed = []
+    for ev in root.iter("event"):
+        p = _parse_ff_event_full(ev)
+        if not p or p["ev_date"] != target:
+            continue
+        if p["all_day"] or p["when_utc"] is None:
+            passed = (target < now_et.date())
+        else:
+            passed = p["when_utc"] < now_utc
+        parsed.append({**p, "passed": passed})
+
+    # High first, then by time (all-day events last within group)
+    far = datetime.max.replace(tzinfo=timezone.utc)
+    parsed.sort(key=lambda e: (0 if e["impact"] == "high" else 1,
+                               e["when_utc"] or far))
+    out["events"] = parsed[:max_events]
+    return out

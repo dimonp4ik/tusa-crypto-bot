@@ -36,7 +36,7 @@ from src.telegram_notifier import send_signal, send_status, send_news_alert, sen
 from src.news_filter import check_news_sentiment
 from src.news_agent import (
     get_market_news, detect_major_events, fetch_recent_headlines,
-    get_daily_digest, get_upcoming_high_impact_events,
+    get_daily_digest, get_upcoming_high_impact_events, get_day_events,
 )
 from config import EVENT_WARN_HOURS
 from src.db import (
@@ -74,6 +74,7 @@ def status():
 _USER_KB = {
     "keyboard": [
         [{"text": "📋 Открытые сделки"}, {"text": "📈 Результаты"}],
+        [{"text": "📰 Новости на сегодня"}],
         [{"text": "❓ Помощь"}],
     ],
     "resize_keyboard": True,
@@ -83,6 +84,7 @@ _ADMIN_KB = {
     "keyboard": [
         [{"text": "🛠 Админ панель"}],
         [{"text": "📋 Открытые сделки"}, {"text": "📈 Результаты"}],
+        [{"text": "📰 Новости на сегодня"}],
         [{"text": "❓ Помощь"}],
     ],
     "resize_keyboard": True,
@@ -292,6 +294,69 @@ def _handle_admin_callback(callback_id: str, chat_id: int,
         _edit_message(chat_id, message_id, "🛠 *TUSA Admin Panel*\nВыбери раздел:")
 
 
+def _num(s):
+    """Parse FF numeric string ('0.3%', '187K', '<0.1') → float or None."""
+    if not s:
+        return None
+    t = s.strip().replace(",", "").replace("%", "").replace("<", "").replace(">", "")
+    mult = 1.0
+    if t and t[-1] in ("K", "k"):
+        mult, t = 1e3, t[:-1]
+    elif t and t[-1] in ("M", "m"):
+        mult, t = 1e6, t[:-1]
+    elif t and t[-1] in ("B", "b"):
+        mult, t = 1e9, t[:-1]
+    try:
+        return float(t) * mult
+    except Exception:
+        return None
+
+
+def _format_day_news() -> str:
+    """Build the '📰 Новости на сегодня' message from the FF calendar."""
+    from datetime import timezone as _tz, timedelta as _td
+    MSK = _tz(_td(hours=3))
+
+    data   = get_day_events(max_events=10)
+    events = data["events"]
+    d      = data["date"]
+    header = f"📰 *Новости на сегодня* ({d.strftime('%d.%m')})"
+    if data["weekend_rolled"]:
+        header += "\n_Выходной — показываю понедельник._"
+
+    if not events:
+        return (header + "\n\nВажных макро-событий не запланировано. "
+                "Спокойный день 🌤")
+
+    lines = [header, ""]
+    for e in events:
+        flag  = "🔴" if e["impact"] == "high" else "🟡"
+        when  = ("весь день" if e["all_day"] or not e["when_utc"]
+                 else e["when_utc"].astimezone(MSK).strftime("%H:%M МСК"))
+        cc    = f"{e['country']} " if e["country"] else ""
+        lines.append(f"{flag} *{cc}{e['title']}* — {when}")
+
+        f_, p_, a_ = e["forecast"], e["previous"], e["actual"]
+        if e["passed"] and a_:
+            af, ff = _num(a_), _num(f_)
+            if af is not None and ff is not None:
+                tag = ("📈 лучше прогноза" if af > ff else
+                       "📉 хуже прогноза"  if af < ff else "➡️ по прогнозу")
+            else:
+                tag = "✅ вышло"
+            extra = f" / пред {p_}" if p_ else ""
+            lines.append(f"   факт {a_} / прогноз {f_ or '—'}{extra} → {tag}")
+        else:
+            extra = f" / пред {p_}" if p_ else ""
+            lines.append(f"   🔮 прогноз {f_ or '—'}{extra}")
+        lines.append("")
+
+    lines.append("🔴 высокая важность  🟡 средняя")
+    lines.append("_Сильные данные → доллар крепче → давление на крипту. "
+                 "Слабые → поддержка._")
+    return "\n".join(lines)
+
+
 # ── Telegram webhook — handles incoming messages ──────────────────────────────
 @app.route("/webhook", methods=["POST"])
 def webhook():
@@ -368,6 +433,13 @@ def webhook():
                    f"*За 30 дней:*\n"
                    f"  Сигналов: {s30['total']}  •  Win rate: *{s30['win_rate']}%*\n"
                    f"  TP1: {s30['tp1_hit']}  TP2: {s30['tp2_hit']}  SL: {s30['sl_hit']}")
+        except Exception as e:
+            _reply(chat_id, f"Ошибка: {e}")
+
+    # 📰 Новости на сегодня
+    elif text == "📰 новости на сегодня":
+        try:
+            _reply(chat_id, _format_day_news())
         except Exception as e:
             _reply(chat_id, f"Ошибка: {e}")
 
