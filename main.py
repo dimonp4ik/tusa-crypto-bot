@@ -813,11 +813,22 @@ def start_bot():
     except Exception as e:
         log.warning(f"DB init failed: {e}")
 
+    # Dedup guard: only send once per 60s per container (prevents
+    # double-message during Render zero-downtime deploys where old + new
+    # instances briefly overlap).
+    _flag = "/tmp/tusa_started"
     try:
-        send_status(
-            "🤖 *Crypto Signal Bot Online*\n"
-            f"Сканирую топ-45 монет каждые {SCAN_INTERVAL_MINUTES} мин (Пн-Пт, 10:00–02:00 по Риге)."
-        )
+        skip = False
+        if os.path.exists(_flag):
+            if time.time() - os.path.getmtime(_flag) < 60:
+                skip = True
+        if not skip:
+            open(_flag, "w").close()
+            send_status(
+                "🤖 *Crypto Signal Bot Online*\n"
+                f"Сканирую топ-45 монет каждые {SCAN_INTERVAL_MINUTES} мин "
+                f"(Пн-Пт, 10:00–02:00 по Риге)."
+            )
     except Exception as e:
         log.warning(f"Could not send startup message: {e}")
 
