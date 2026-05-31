@@ -312,6 +312,85 @@ def _num(s):
         return None
 
 
+# (keyword substring, RU title, short RU explanation) — first match wins,
+# so put more specific phrases before generic ones.
+_RU_EVENTS = [
+    ("ism manufacturing prices", "Цены в промышленности (ISM)",
+     "ценовое давление у производителей — сигнал по инфляции"),
+    ("ism manufacturing", "Деловая активность в промышленности (ISM)",
+     "настроения производителей; выше 50 = рост экономики"),
+    ("ism services", "Деловая активность в услугах (ISM)",
+     "настроения в секторе услуг; выше 50 = рост"),
+    ("non-farm", "Занятость вне сельского хозяйства (NFP)",
+     "ключевой отчёт по рынку труда США"),
+    ("nonfarm", "Занятость вне сельского хозяйства (NFP)",
+     "ключевой отчёт по рынку труда США"),
+    ("adp", "Занятость в частном секторе (ADP)",
+     "предвестник NFP по найму в частном секторе"),
+    ("unemployment rate", "Уровень безработицы", "доля безработных"),
+    ("unemployment claims", "Заявки на пособие по безработице",
+     "число новых заявок за неделю"),
+    ("jobless claims", "Заявки на пособие по безработице",
+     "число новых заявок за неделю"),
+    ("core cpi", "Базовая инфляция (Core CPI)",
+     "рост цен без еды и энергии"),
+    ("cpi", "Инфляция (CPI)", "рост потребительских цен"),
+    ("core ppi", "Базовые цены производителей (Core PPI)", "оптовая инфляция"),
+    ("ppi", "Цены производителей (PPI)", "оптовая инфляция"),
+    ("core pce", "Базовый PCE", "любимый показатель инфляции ФРС"),
+    ("pce", "Расходы на личное потребление (PCE)", "инфляция и траты"),
+    ("retail sales", "Розничные продажи", "потребительский спрос"),
+    ("gdp", "ВВП", "темп роста экономики"),
+    ("federal funds rate", "Решение ФРС по ставке",
+     "главное событие — ставка ФРС"),
+    ("interest rate decision", "Решение по процентной ставке",
+     "уровень ключевой ставки"),
+    ("fomc statement", "Заявление ФРС", "сопроводительный текст к ставке"),
+    ("fomc meeting minutes", "Протокол заседания ФРС",
+     "детали обсуждения ставки"),
+    ("fomc economic projections", "Экономические прогнозы ФРС",
+     "ожидания ФРС по ставке и инфляции"),
+    ("powell", "Выступление главы ФРС Пауэлла",
+     "намёки на курс по ставке"),
+    ("bailey", "Выступление главы Банка Англии",
+     "намёки на курс по ставке"),
+    ("lagarde", "Выступление главы ЕЦБ", "намёки на курс по ставке"),
+    ("fomc member", "Выступление члена ФРС", "намёки на курс по ставке"),
+    ("fed chair", "Выступление главы ФРС", "намёки на курс по ставке"),
+    ("member", "Выступление представителя ЦБ", "намёки на курс по ставке"),
+    ("speaks", "Выступление представителя ЦБ", "намёки на курс по ставке"),
+    ("consumer confidence", "Индекс доверия потребителей",
+     "настроения покупателей"),
+    ("consumer sentiment", "Индекс настроений потребителей",
+     "настроения покупателей"),
+    ("durable goods", "Заказы на товары длительного пользования",
+     "спрос на дорогие товары"),
+    ("trade balance", "Торговый баланс", "экспорт минус импорт"),
+    ("building permits", "Разрешения на строительство",
+     "активность в недвижимости"),
+    ("crude oil inventories", "Запасы нефти", "влияет на цену нефти"),
+    ("manufacturing pmi", "PMI в промышленности",
+     "деловая активность; выше 50 = рост"),
+    ("services pmi", "PMI в услугах", "деловая активность; выше 50 = рост"),
+    ("flash manufacturing pmi", "Предв. PMI в промышленности",
+     "ранняя оценка деловой активности"),
+    ("flash services pmi", "Предв. PMI в услугах",
+     "ранняя оценка деловой активности"),
+    ("pmi", "Индекс деловой активности (PMI)",
+     "выше 50 = рост, ниже = спад"),
+    ("bank holiday", "Банковский выходной", "биржи/банки закрыты"),
+]
+
+
+def _ru_event(title: str):
+    """Map an English FF title → (ru_title, ru_note). Falls back to original."""
+    low = title.lower()
+    for kw, ru, note in _RU_EVENTS:
+        if kw in low:
+            return ru, note
+    return title, ""
+
+
 def _format_day_news() -> str:
     """Build the '📰 Новости на сегодня' message from the FF calendar."""
     from datetime import timezone as _tz, timedelta as _td
@@ -333,8 +412,11 @@ def _format_day_news() -> str:
         flag  = "🔴" if e["impact"] == "high" else "🟡"
         when  = ("весь день" if e["all_day"] or not e["when_utc"]
                  else e["when_utc"].astimezone(MSK).strftime("%H:%M МСК"))
-        cc    = f"{e['country']} " if e["country"] else ""
-        lines.append(f"{flag} *{cc}{e['title']}* — {when}")
+        cc        = f"{e['country']} " if e["country"] else ""
+        ru, note  = _ru_event(e["title"])
+        lines.append(f"{flag} *{cc}{ru}* — {when}")
+        if note:
+            lines.append(f"   📖 {note}")
 
         f_, p_, a_ = e["forecast"], e["previous"], e["actual"]
         if e["passed"] and a_:
@@ -352,8 +434,6 @@ def _format_day_news() -> str:
         lines.append("")
 
     lines.append("🔴 высокая важность  🟡 средняя")
-    lines.append("_Сильные данные → доллар крепче → давление на крипту. "
-                 "Слабые → поддержка._")
     return "\n".join(lines)
 
 
