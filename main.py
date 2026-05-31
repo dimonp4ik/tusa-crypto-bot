@@ -391,49 +391,93 @@ def _ru_event(title: str):
     return title, ""
 
 
+# Crypto digest cache — get_daily_digest() hits Groq + RSS, cache 30 min so
+# repeated button presses don't spam the API.
+_digest_cache = {"at": 0.0, "items": []}
+
+
+def _cached_digest() -> list:
+    import time as _t
+    now = _t.time()
+    if now - _digest_cache["at"] > 1800:
+        try:
+            _digest_cache["items"] = get_daily_digest().get("items", [])
+        except Exception:
+            pass
+        _digest_cache["at"] = now
+    return _digest_cache["items"]
+
+
+def _riga_tz():
+    try:
+        from zoneinfo import ZoneInfo
+        return ZoneInfo("Europe/Riga")
+    except Exception:
+        from datetime import timezone as _tz, timedelta as _td
+        return _tz(_td(hours=3))
+
+
 def _format_day_news() -> str:
-    """Build the '📰 Новости на сегодня' message from the FF calendar."""
-    from datetime import timezone as _tz, timedelta as _td
-    MSK = _tz(_td(hours=3))
+    """'📰 Новости на сегодня' — economic calendar + crypto headlines, ≤10 total."""
+    RIGA = _riga_tz()
 
     data   = get_day_events(max_events=10)
     events = data["events"]
     d      = data["date"]
+    crypto = _cached_digest()                      # ≤5 AI-picked crypto items
+
+    # Budget: ≤10 total. Reserve up to 4 slots for crypto, grow if calendar small.
+    n_crypto = min(len(crypto), 4)
+    n_macro  = min(len(events), 10 - n_crypto)
+    n_crypto = min(len(crypto), 10 - n_macro)
+    events, crypto = events[:n_macro], crypto[:n_crypto]
+
     header = f"📰 *Новости на сегодня* ({d.strftime('%d.%m')})"
     if data["weekend_rolled"]:
-        header += "\n_Выходной — показываю понедельник._"
+        header += "\n_Выходной — календарь на понедельник._"
+    lines = [header]
 
-    if not events:
-        return (header + "\n\nВажных макро-событий не запланировано. "
-                "Спокойный день 🌤")
-
-    lines = [header, ""]
-    for e in events:
-        flag  = "🔴" if e["impact"] == "high" else "🟡"
-        when  = ("весь день" if e["all_day"] or not e["when_utc"]
-                 else e["when_utc"].astimezone(MSK).strftime("%H:%M МСК"))
-        cc        = f"{e['country']} " if e["country"] else ""
-        ru, note  = _ru_event(e["title"])
-        lines.append(f"{flag} *{cc}{ru}* — {when}")
-        if note:
-            lines.append(f"   📖 {note}")
-
-        f_, p_, a_ = e["forecast"], e["previous"], e["actual"]
-        if e["passed"] and a_:
-            af, ff = _num(a_), _num(f_)
-            if af is not None and ff is not None:
-                tag = ("📈 лучше прогноза" if af > ff else
-                       "📉 хуже прогноза"  if af < ff else "➡️ по прогнозу")
+    # ── Economic calendar ──
+    if events:
+        lines.append("\n🗓 *Экономический календарь*")
+        for e in events:
+            flag = "🔴" if e["impact"] == "high" else "🟡"
+            when = ("весь день" if e["all_day"] or not e["when_utc"]
+                    else e["when_utc"].astimezone(RIGA).strftime("%H:%M по Риге"))
+            cc       = f"{e['country']} " if e["country"] else ""
+            ru, note = _ru_event(e["title"])
+            lines.append(f"{flag} *{cc}{ru}* — {when}")
+            if note:
+                lines.append(f"   📖 {note}")
+            f_, p_, a_ = e["forecast"], e["previous"], e["actual"]
+            if e["passed"] and a_:
+                af, ff = _num(a_), _num(f_)
+                if af is not None and ff is not None:
+                    tag = ("📈 лучше прогноза" if af > ff else
+                           "📉 хуже прогноза"  if af < ff else "➡️ по прогнозу")
+                else:
+                    tag = "✅ вышло"
+                extra = f" / пред {p_}" if p_ else ""
+                lines.append(f"   факт {a_} / прогноз {f_ or '—'}{extra} → {tag}")
             else:
-                tag = "✅ вышло"
-            extra = f" / пред {p_}" if p_ else ""
-            lines.append(f"   факт {a_} / прогноз {f_ or '—'}{extra} → {tag}")
-        else:
-            extra = f" / пред {p_}" if p_ else ""
-            lines.append(f"   🔮 прогноз {f_ or '—'}{extra}")
-        lines.append("")
+                extra = f" / пред {p_}" if p_ else ""
+                lines.append(f"   🔮 прогноз {f_ or '—'}{extra}")
 
-    lines.append("🔴 высокая важность  🟡 средняя")
+    # ── Crypto headlines ──
+    if crypto:
+        dir_emoji = {"BULLISH": "📈", "BEARISH": "📉", "NEUTRAL": "➡️"}
+        lines.append("\n🪙 *Крипто-новости*")
+        for it in crypto:
+            em = dir_emoji.get(it.get("direction", "NEUTRAL"), "➡️")
+            lines.append(f"{em} *{it.get('title', '')}*")
+            expl = it.get("explanation", "")
+            if expl:
+                lines.append(f"   {expl}")
+
+    if not events and not crypto:
+        return header + "\n\nВажных событий и новостей нет. Спокойно 🌤"
+
+    lines.append("\n🔴 высокая важность  🟡 средняя")
     return "\n".join(lines)
 
 
