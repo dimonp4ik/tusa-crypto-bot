@@ -34,6 +34,9 @@ RSS_FEEDS = [
     ("BBC Biz",   "https://feeds.bbci.co.uk/news/business/rss.xml"),
     ("CoinDesk",  "https://www.coindesk.com/arc/outboundfeeds/rss/"),
     ("Decrypt",   "https://decrypt.co/feed"),
+    ("Cointelegraph", "https://cointelegraph.com/rss"),
+    ("CryptoSlate",   "https://cryptoslate.com/feed/"),
+    ("BTC Magazine",  "https://bitcoinmagazine.com/feed"),
 ]
 
 
@@ -529,9 +532,8 @@ def get_day_events(max_events: int = 10) -> dict:
             passed = p["when_utc"] < now_utc
         parsed.append({**p, "passed": passed})
 
-    # High first, then by time (all-day events last within group)
+    # Chronological — earliest first; all-day (no time) sink to the end
     far = datetime.max.replace(tzinfo=timezone.utc)
-    parsed.sort(key=lambda e: (0 if e["impact"] == "high" else 1,
-                               e["when_utc"] or far))
+    parsed.sort(key=lambda e: e["when_utc"] or far)
     out["events"] = parsed[:max_events]
     return out
