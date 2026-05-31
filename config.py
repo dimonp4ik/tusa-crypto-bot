@@ -171,6 +171,11 @@ NEWS_BLOCK_KEYWORDS = ["hack", "exploit", "scam", "lawsuit", "sec ", "ban", "del
 GROQ_API_KEY        = os.getenv("GROQ_API_KEY", "")
 NEWS_LOOKBACK_HOURS = 2
 
+# --- Economic calendar warning (ForexFactory weekly XML, free) ---
+# Warn on a signal when a HIGH-impact macro event (CPI/FOMC/NFP) lands within
+# this many hours — high whipsaw risk around scheduled releases.
+EVENT_WARN_HOURS = float(os.getenv("EVENT_WARN_HOURS", "3"))
+
 # --- Auto-block symbols with bad recent stats ---
 AUTO_BLOCK_ENABLED           = os.getenv("AUTO_BLOCK_ENABLED", "1") != "0"
 AUTO_BLOCK_LOOKBACK_TRADES   = int(os.getenv("AUTO_BLOCK_LOOKBACK_TRADES", "20"))

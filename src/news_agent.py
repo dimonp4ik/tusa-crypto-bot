@@ -335,3 +335,85 @@ def get_market_news() -> dict:
         "pause":           analysis["pause"],
         "headline_count":  len(headlines),
     }
+
+
+# ── Economic calendar (ForexFactory weekly XML — free, no key) ─────────────────
+
+_FF_CALENDAR_URL = "https://nfs.faireconomy.media/ff_calendar_thisweek.xml"
+
+try:
+    from zoneinfo import ZoneInfo
+    _ET_TZ = ZoneInfo("America/New_York")   # ForexFactory times are US Eastern
+except Exception:
+    _ET_TZ = timezone(timedelta(hours=-5))  # fallback EST
+
+# 6-hour cache — calendar barely changes intraday, avoid re-fetching every scan.
+_calendar_cache: dict = {"fetched_at": 0.0, "events": []}
+
+
+def _parse_ff_event(ev) -> dict | None:
+    """Parse one <event> node → {title, country, when_utc} or None if no usable time."""
+    title   = (ev.findtext("title")   or "").strip()
+    country = (ev.findtext("country") or "").strip()
+    impact  = (ev.findtext("impact")  or "").strip()
+    date_s  = (ev.findtext("date")    or "").strip()   # MM-DD-YYYY
+    time_s  = (ev.findtext("time")    or "").strip()   # e.g. "8:30am"
+
+    if impact.lower() != "high" or not title or not date_s:
+        return None
+    # Skip non-scheduled rows
+    if not time_s or time_s.lower() in ("all day", "tentative", "day 1", "day 2"):
+        return None
+
+    try:
+        t = time_s.lower().replace(" ", "")
+        ampm = t[-2:]
+        hm   = t[:-2]
+        hh, mm = hm.split(":")
+        hour, minute = int(hh), int(mm)
+        if ampm == "pm" and hour != 12:
+            hour += 12
+        if ampm == "am" and hour == 12:
+            hour = 0
+        mo, da, yr = date_s.split("-")
+        import datetime as _dt
+        when_et = _dt.datetime(int(yr), int(mo), int(da), hour, minute, tzinfo=_ET_TZ)
+        when_utc = when_et.astimezone(timezone.utc)
+    except Exception:
+        return None
+
+    return {"title": title, "country": country, "when_utc": when_utc}
+
+
+def get_upcoming_high_impact_events(within_hours: float = 3.0) -> list[dict]:
+    """
+    High-impact scheduled macro events in the next `within_hours`.
+    Returns list of {title, country, when_utc, hours_until} sorted by soonest.
+    Cached 6h. Never raises — returns [] on any failure.
+    """
+    import time as _t
+    now = _t.time()
+    if now - _calendar_cache["fetched_at"] > 6 * 3600:
+        try:
+            resp = _req.get(_FF_CALENDAR_URL, timeout=8,
+                            headers={"User-Agent": "Mozilla/5.0 CryptoBot/1.0"})
+            events = []
+            if resp.status_code == 200:
+                root = ET.fromstring(resp.content)
+                for ev in root.iter("event"):
+                    parsed = _parse_ff_event(ev)
+                    if parsed:
+                        events.append(parsed)
+            _calendar_cache["events"] = events
+            _calendar_cache["fetched_at"] = now
+        except Exception:
+            _calendar_cache["fetched_at"] = now  # don't hammer on failure
+
+    now_utc = datetime.now(timezone.utc)
+    upcoming = []
+    for ev in _calendar_cache["events"]:
+        delta_h = (ev["when_utc"] - now_utc).total_seconds() / 3600
+        if 0 <= delta_h <= within_hours:
+            upcoming.append({**ev, "hours_until": round(delta_h, 1)})
+    upcoming.sort(key=lambda x: x["hours_until"])
+    return upcoming

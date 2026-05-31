@@ -34,7 +34,11 @@ from src.signal_filter import analyze_coin_smc
 from src.claude_analyzer import analyze_batch_with_claude, analyze_heavy
 from src.telegram_notifier import send_signal, send_status, send_news_alert, send_signal_update, calculate_tp_sl, send_morning_digest
 from src.news_filter import check_news_sentiment
-from src.news_agent import get_market_news, detect_major_events, fetch_recent_headlines, get_daily_digest
+from src.news_agent import (
+    get_market_news, detect_major_events, fetch_recent_headlines,
+    get_daily_digest, get_upcoming_high_impact_events,
+)
+from config import EVENT_WARN_HOURS
 from src.db import (
     init_db, get_open_signals, update_signal_status, get_stats,
     auto_block_bad_symbols, is_symbol_auto_blocked, get_active_symbol_blocks,
@@ -563,15 +567,23 @@ def _check_open_signals():
 def run_scan():
     now_utc = datetime.now(timezone.utc)
 
+    # Monitor open signals 24/7 — TP1/SL/BE updates must fire regardless of
+    # trading hours or weekends (a trade opened at 01:00 can hit TP at 05:00).
+    # Only NEW signal generation is gated by the hours/weekend filters below.
+    try:
+        _check_open_signals()
+    except Exception as e:
+        log.warning(f"Open-signal monitor failed: {e}")
+
     # Weekend filter (Mon=0 ... Sun=6)
     if not TRADE_WEEKENDS and now_utc.weekday() >= 5:
-        log.info(f"Weekend ({now_utc.strftime('%A')}) — scan skipped")
+        log.info(f"Weekend ({now_utc.strftime('%A')}) — new-signal scan skipped")
         return
 
     # Trading hours filter (UTC)
     utc_hour = now_utc.hour
     if not (TRADING_HOURS_START <= utc_hour < TRADING_HOURS_END):
-        log.info(f"Outside trading hours (UTC {utc_hour:02d}:xx) — scan skipped")
+        log.info(f"Outside trading hours (UTC {utc_hour:02d}:xx) — new-signal scan skipped")
         return
 
     log.info("=== Scan started (SMC mode) ===")
@@ -603,9 +615,6 @@ def run_scan():
         # Step 0b: BTC 1h change for correlation filter
         btc_change = get_btc_change_1h()
         log.info(f"BTC 1h change: {btc_change:+.2f}%")
-
-        # Check open signals from previous scans → update TP/SL hits
-        _check_open_signals()
 
         # Auto-block symbols with consistently bad stats (local DB, no API calls)
         new_blocks = auto_block_bad_symbols()
@@ -705,6 +714,20 @@ def run_scan():
                 except Exception as e:
                     log.warning(f"  HEAVY check failed {analysis.get('symbol','?')}: {e}")
 
+        # Upcoming high-impact macro events (CPI/FOMC/NFP) — warn on signals
+        event_warning = ""
+        try:
+            events = get_upcoming_high_impact_events(EVENT_WARN_HOURS)
+            if events:
+                ev = events[0]
+                cc = f"{ev['country']} " if ev.get("country") else ""
+                event_warning = (
+                    f"{cc}{ev['title']} через {ev['hours_until']}ч — "
+                    f"высокая волатильность, осторожно"
+                )
+        except Exception as e:
+            log.warning(f"Calendar check failed: {e}")
+
         # Step 5: Send signals to Telegram
         sent_count = 0
         for analysis in analyses:
@@ -712,6 +735,7 @@ def run_scan():
                 # Attach news context to each analysis for Telegram message
                 analysis["news_sentiment"] = news.get("sentiment", "")
                 analysis["news_summary"]   = news.get("summary", "")
+                analysis["event_warning"]  = event_warning
 
                 log.info(
                     f"  Claude: {analysis['symbol']} → {analysis['decision']} "

@@ -184,6 +184,8 @@ def send_signal(analysis: dict) -> bool:
     news_summary = analysis.get("news_summary", "")
     news_icon    = {"BULLISH": "📰🟢", "BEARISH": "📰🔴"}.get(news_sent, "")
     news_line    = f"{news_icon} _{news_summary}_\n" if news_sent and news_summary and news_sent != "NEUTRAL" else ""
+    event_warn   = analysis.get("event_warning", "")
+    event_line   = f"⚠️ {event_warn}\n" if event_warn else ""
 
     lev = lev_info["leverage"]
     message = (
@@ -201,6 +203,7 @@ def send_signal(analysis: dict) -> bool:
         f"📊 RSI: `{analysis['rsi']}`   📈 Объём: `{analysis['volume_ratio']}x`\n"
         f"{btc_line}"
         f"{news_line}"
+        f"{event_line}"
         f"\n*Сигналы:*\n{signals_text}\n\n"
         f"{conf_icon} Уверенность: *{conf_ru}*\n"
         f"📝 _{analysis.get('reason', '')}_\n\n"
