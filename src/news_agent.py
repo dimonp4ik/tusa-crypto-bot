@@ -504,11 +504,18 @@ def get_day_events(max_events: int = 10) -> dict:
         except Exception:
             _day_cache["fetched_at"] = now
 
-    now_et  = datetime.now(_ET_TZ)
-    target  = now_et.date()
+    # Use Riga timezone for "today" — bot users are in EU, not US Eastern.
+    # ET is only used for parsing event times from the feed, not for date selection.
+    try:
+        from zoneinfo import ZoneInfo as _ZI
+        _RIGA_TZ = _ZI("Europe/Riga")
+    except Exception:
+        _RIGA_TZ = timezone(timedelta(hours=3))
+    now_local = datetime.now(_RIGA_TZ)
+    target  = now_local.date()
     rolled  = False
-    if now_et.weekday() >= 5:                       # Sat=5, Sun=6 → next Monday
-        target += timedelta(days=7 - now_et.weekday())
+    if now_local.weekday() >= 5:                    # Sat=5, Sun=6 → next Monday
+        target += timedelta(days=7 - now_local.weekday())
         rolled  = True
 
     out = {"date": target, "weekend_rolled": rolled, "events": []}
