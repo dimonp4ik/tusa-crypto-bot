@@ -18,9 +18,19 @@ from config import (
     TIMEFRAME_4H_KUCOIN, KLINES_4H_LIMIT, KLINES_4H_INTERVAL_SEC,
 )
 
-# Bybit geoblocks some cloud IPs (e.g. US Render) on api.bybit.com with HTTP 403.
-# api.bytick.com is Bybit's mirror domain that often bypasses that block.
-# Try each in order; remember the one that worked to avoid repeat failures.
+# Bybit geoblocks US cloud IPs (e.g. Render) with HTTP 403 on every domain.
+# Workaround: route requests through a non-US proxy.
+#
+# BYBIT_PROXY_BASE — full base URL of a proxy that forwards to Bybit, e.g. a
+#   Cloudflare Worker "https://bybit-proxy.xxx.workers.dev". When set, it
+#   REPLACES the Bybit host (path + params are appended unchanged).
+# BYBIT_HTTPS_PROXY — standard HTTP(S) proxy URL, e.g. "http://user:pass@ip:port".
+#   When set, requests are tunnelled through it to the real Bybit host.
+_PROXY_BASE  = os.getenv("BYBIT_PROXY_BASE", "").strip().rstrip("/")
+_HTTPS_PROXY = os.getenv("BYBIT_HTTPS_PROXY", "").strip()
+
+# Host candidates (used when no BYBIT_PROXY_BASE override). api.bytick.com is
+# Bybit's mirror; both share the same geoblock but kept as a cheap fallback.
 BYBIT_HOSTS = [
     "https://api.bybit.com",
     "https://api.bytick.com",
@@ -40,10 +50,21 @@ BYBIT_INTERVAL_4H = TIMEFRAME_MAP.get(TIMEFRAME_4H_KUCOIN, "240")
 
 def _bybit_get(path: str, params: dict, timeout: int = 15):
     """
-    GET a Bybit endpoint, trying each host until one returns 200.
+    GET a Bybit endpoint with geoblock workarounds:
+      1. If BYBIT_PROXY_BASE set → hit that URL directly (proxy forwards to Bybit).
+      2. Else try each Bybit host, optionally tunnelled via BYBIT_HTTPS_PROXY.
     Caches the first working host so later calls hit it directly.
-    Raises the last error if every host fails.
+    Raises the last error if every attempt fails.
     """
+    proxies = {"http": _HTTPS_PROXY, "https": _HTTPS_PROXY} if _HTTPS_PROXY else None
+
+    # Proxy-base override: single endpoint, no host rotation needed.
+    if _PROXY_BASE:
+        resp = requests.get(f"{_PROXY_BASE}{path}", params=params,
+                            timeout=timeout, proxies=proxies)
+        resp.raise_for_status()
+        return resp
+
     # Order hosts so the last known-good one is tried first.
     hosts = list(BYBIT_HOSTS)
     if _working_host["url"] in hosts:
@@ -53,7 +74,8 @@ def _bybit_get(path: str, params: dict, timeout: int = 15):
     last_err = None
     for base in hosts:
         try:
-            resp = requests.get(f"{base}{path}", params=params, timeout=timeout)
+            resp = requests.get(f"{base}{path}", params=params,
+                                timeout=timeout, proxies=proxies)
             resp.raise_for_status()
             _working_host["url"] = base
             return resp
