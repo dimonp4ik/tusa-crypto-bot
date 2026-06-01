@@ -1030,6 +1030,10 @@ def _setup_webhook():
 # ── Startup ───────────────────────────────────────────────────────────────────
 def start_bot():
     log.info("Starting Crypto Signal Bot...")
+    # Proxy diagnostics — shows in Railway logs so we can verify env vars loaded
+    _prx = os.environ.get("BYBIT_HTTPS_PROXY", "")
+    _prx_base = os.environ.get("BYBIT_PROXY_BASE", "")
+    log.info(f"Bybit proxy: HTTPS_PROXY={'SET ('+_prx[:30]+'...)' if _prx else 'NOT SET'} PROXY_BASE={'SET' if _prx_base else 'NOT SET'}")
 
     # Initialise signal-tracking DB
     try:
