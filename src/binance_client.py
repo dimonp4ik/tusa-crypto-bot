@@ -145,7 +145,7 @@ def get_top_coins():
     Filters out no-name, leveraged, stablecoin, and low-volume pairs before
     any candle downloads or Claude calls are made.
     """
-    response = _bybit_get("/v5/market/tickers", {"category": "spot"})
+    response = _bybit_get("/v5/market/tickers", {"category": "linear"})
     data = response.json()
 
     tickers = data.get("result", {}).get("list", [])
@@ -190,7 +190,7 @@ def get_klines(symbol, interval=TIMEFRAME_KUCOIN, limit=KLINES_LIMIT,
     bybit_interval = TIMEFRAME_MAP.get(interval, "15")
 
     params = {
-        "category": "spot",
+        "category": "linear",
         "symbol":   symbol,
         "interval": bybit_interval,
         "limit":    limit + 1,  # Fetch one extra; closed_only may drop it
