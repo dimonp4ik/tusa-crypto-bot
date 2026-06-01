@@ -185,7 +185,7 @@ AUTO_BLOCK_MAX_WIN_RATE      = float(os.getenv("AUTO_BLOCK_MAX_WIN_RATE", "35"))
 AUTO_BLOCK_DAYS              = int(os.getenv("AUTO_BLOCK_DAYS", "7"))
 
 # --- Database ---
-DB_PATH = "signals.db"
+DB_PATH = os.getenv("DB_PATH", "signals.db")  # Railway: set DB_PATH=/data/signals.db
 
 # --- Backtest ---
 BACKTEST_CANDLES        = int(os.getenv("BACKTEST_CANDLES", "1152"))  # 1152 × 15m ≈ 12 days
