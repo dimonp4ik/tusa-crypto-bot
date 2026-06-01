@@ -763,13 +763,7 @@ def _check_open_signals():
 def run_scan():
     now_utc = datetime.now(timezone.utc)
 
-    # Monitor open signals 24/7 — TP1/SL/BE updates must fire regardless of
-    # trading hours or weekends (a trade opened at 01:00 can hit TP at 05:00).
-    # Only NEW signal generation is gated by the hours/weekend filters below.
-    try:
-        _check_open_signals()
-    except Exception as e:
-        log.warning(f"Open-signal monitor failed: {e}")
+    # TP/SL monitoring moved to dedicated 1-min job (_monitor_open_signals)
 
     # Weekend filter (Mon=0 ... Sun=6)
     if not TRADE_WEEKENDS and now_utc.weekday() >= 5:
@@ -1028,6 +1022,14 @@ def _setup_webhook():
 
 
 # ── Startup ───────────────────────────────────────────────────────────────────
+def _monitor_open_signals():
+    """Lightweight 1-min job: check open trades for TP1/SL/BE hits. 24/7."""
+    try:
+        _check_open_signals()
+    except Exception as e:
+        log.warning(f"Open-signal monitor failed: {e}")
+
+
 def start_bot():
     log.info("Starting Crypto Signal Bot...")
     # Proxy diagnostics — shows in Railway logs so we can verify env vars loaded
@@ -1063,23 +1065,28 @@ def start_bot():
 
     scheduler = BackgroundScheduler(daemon=True)
 
-    # Align scans to candle closes: 15m candles close at :00/:15/:30/:45.
-    # Scan at :01/:16/:31/:46 (1 min after close) to get fresh closed candles.
-    # Extra scans at :06/:11/:21/:26/:36/:41/:51/:56 catch any missed setups
-    # and keep TP/SL monitoring frequent. All API calls are free; only proxy
-    # traffic matters (~4GB/month at this cadence).
+    # Signal scan — every 5 min aligned to candle closes.
+    # 15m candles close at :00/:15/:30/:45 → scan at :01/:16/:31/:46 (+1 min buffer).
     scheduler.add_job(
         run_scan, "cron",
         minute="1,6,11,16,21,26,31,36,41,46,51,56",
         timezone="UTC",
     )
+
+    # TP/SL monitor — every 1 min, 24/7, lightweight (only price checks).
+    scheduler.add_job(
+        _monitor_open_signals, "cron",
+        minute="*",
+        timezone="UTC",
+    )
+
     scheduler.add_job(
         run_morning_digest, "cron",
         day_of_week="mon-fri", hour=10, minute=0,
         timezone="Europe/Riga",
     )
     scheduler.start()
-    log.info("Scheduler running — scans at :01/:06/:11/:16/:21/:26/:31/:36/:41/:46/:51/:56 UTC")
+    log.info("Scheduler: signal scan every 5 min (:01/:06/...), TP/SL monitor every 1 min")
 
     # Register Telegram webhook
     _setup_webhook()
