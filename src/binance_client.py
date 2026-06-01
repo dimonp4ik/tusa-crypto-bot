@@ -83,7 +83,6 @@ def _bybit_get(path: str, params: dict, timeout: int = 15):
                                 timeout=timeout, proxies=proxies)
             resp.raise_for_status()
             _working_host["url"] = base
-            _logger.info(f"Bybit OK via {base} proxy={'YES' if proxies else 'NO'}")
             return resp
         except Exception as e:
             _logger.warning(f"Bybit FAIL {base}: {e}")
