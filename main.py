@@ -981,16 +981,28 @@ def run_morning_digest():
 
 
 # ── Self-ping (keeps Render free tier awake) ──────────────────────────────────
+def _app_url() -> str:
+    """Return the public URL of this deployment from any known env var."""
+    for key in ("APP_URL", "RENDER_EXTERNAL_URL", "RAILWAY_PUBLIC_DOMAIN"):
+        val = os.environ.get(key, "").strip().rstrip("/")
+        if val:
+            # RAILWAY_PUBLIC_DOMAIN gives just the domain, add https://
+            if not val.startswith("http"):
+                val = f"https://{val}"
+            return val
+    return ""
+
+
 def _self_ping():
-    """Ping own health endpoint every 4 minutes so Render never sleeps."""
-    render_url = os.environ.get("RENDER_EXTERNAL_URL", "").rstrip("/")
-    if not render_url:
-        log.info("RENDER_EXTERNAL_URL not set — self-ping disabled (local run)")
+    """Ping own health endpoint every 4 minutes to keep the service alive."""
+    url = _app_url()
+    if not url:
+        log.info("No APP_URL set — self-ping disabled (local run)")
         return
     while True:
         time.sleep(240)  # 4 minutes
         try:
-            _requests.get(f"{render_url}/", timeout=10)
+            _requests.get(f"{url}/", timeout=10)
             log.info("Self-ping OK")
         except Exception as e:
             log.warning(f"Self-ping failed: {e}")
@@ -999,11 +1011,11 @@ def _self_ping():
 # ── Webhook setup ────────────────────────────────────────────────────────────
 def _setup_webhook():
     """Register Telegram webhook so bot can receive messages."""
-    render_url = os.environ.get("RENDER_EXTERNAL_URL", "").rstrip("/")
-    if not render_url:
-        log.info("RENDER_EXTERNAL_URL not set — webhook skipped (local run)")
+    url = _app_url()
+    if not url:
+        log.info("No APP_URL set — webhook skipped (local run)")
         return
-    webhook_url = f"{render_url}/webhook"
+    webhook_url = f"{url}/webhook"
     try:
         resp = _requests.post(
             f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/setWebhook",
