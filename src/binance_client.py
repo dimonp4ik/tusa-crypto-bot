@@ -18,7 +18,15 @@ from config import (
     TIMEFRAME_4H_KUCOIN, KLINES_4H_LIMIT, KLINES_4H_INTERVAL_SEC,
 )
 
-BYBIT_BASE_URL = "https://api.bybit.com"
+# Bybit geoblocks some cloud IPs (e.g. US Render) on api.bybit.com with HTTP 403.
+# api.bytick.com is Bybit's mirror domain that often bypasses that block.
+# Try each in order; remember the one that worked to avoid repeat failures.
+BYBIT_HOSTS = [
+    "https://api.bybit.com",
+    "https://api.bytick.com",
+]
+_working_host = {"url": None}
+
 # Map KuCoin timeframe strings to Bybit interval param
 TIMEFRAME_MAP = {
     "15min": "15",
@@ -28,6 +36,31 @@ TIMEFRAME_MAP = {
 BYBIT_INTERVAL_15M = TIMEFRAME_MAP.get(TIMEFRAME_KUCOIN, "15")
 BYBIT_INTERVAL_1H = TIMEFRAME_MAP.get(TIMEFRAME_1H_KUCOIN, "60")
 BYBIT_INTERVAL_4H = TIMEFRAME_MAP.get(TIMEFRAME_4H_KUCOIN, "240")
+
+
+def _bybit_get(path: str, params: dict, timeout: int = 15):
+    """
+    GET a Bybit endpoint, trying each host until one returns 200.
+    Caches the first working host so later calls hit it directly.
+    Raises the last error if every host fails.
+    """
+    # Order hosts so the last known-good one is tried first.
+    hosts = list(BYBIT_HOSTS)
+    if _working_host["url"] in hosts:
+        hosts.remove(_working_host["url"])
+        hosts.insert(0, _working_host["url"])
+
+    last_err = None
+    for base in hosts:
+        try:
+            resp = requests.get(f"{base}{path}", params=params, timeout=timeout)
+            resp.raise_for_status()
+            _working_host["url"] = base
+            return resp
+        except Exception as e:
+            last_err = e
+            continue
+    raise last_err
 
 
 def _drop_unclosed_candle(candles: list, interval_sec: int, now_ts: int) -> list:
@@ -84,10 +117,7 @@ def get_top_coins():
     Filters out no-name, leveraged, stablecoin, and low-volume pairs before
     any candle downloads or Claude calls are made.
     """
-    url = f"{BYBIT_BASE_URL}/v5/market/tickers"
-    params = {"category": "spot"}
-    response = requests.get(url, params=params, timeout=15)
-    response.raise_for_status()
+    response = _bybit_get("/v5/market/tickers", {"category": "spot"})
     data = response.json()
 
     tickers = data.get("result", {}).get("list", [])
@@ -131,7 +161,6 @@ def get_klines(symbol, interval=TIMEFRAME_KUCOIN, limit=KLINES_LIMIT,
     # Map interval (e.g. "15min") to Bybit format ("15")
     bybit_interval = TIMEFRAME_MAP.get(interval, "15")
 
-    url = f"{BYBIT_BASE_URL}/v5/market/kline"
     params = {
         "category": "spot",
         "symbol":   symbol,
@@ -139,8 +168,7 @@ def get_klines(symbol, interval=TIMEFRAME_KUCOIN, limit=KLINES_LIMIT,
         "limit":    limit + 1,  # Fetch one extra; closed_only may drop it
     }
 
-    response = requests.get(url, params=params, timeout=15)
-    response.raise_for_status()
+    response = _bybit_get("/v5/market/kline", params)
     data = response.json()
 
     # Bybit returns oldest-first (already in correct order)
@@ -204,15 +232,12 @@ def get_funding_rate(symbol: str):
     """Get current funding rate from Bybit futures. Returns None if unavailable."""
     # Convert BTCUSDT to BTCUSDT (already correct format for Bybit)
     try:
-        url = f"{BYBIT_BASE_URL}/v5/market/funding/history"
         params = {
             "category": "linear",
             "symbol":   symbol,
             "limit":    1,
         }
-        resp = requests.get(url, params=params, timeout=10)
-        if resp.status_code != 200:
-            return None
+        resp = _bybit_get("/v5/market/funding/history", params, timeout=10)
         data = resp.json().get("result", {}).get("list", [])
         if not data:
             return None
