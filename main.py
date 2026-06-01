@@ -824,7 +824,7 @@ def run_scan():
         if len(coins) != before_blocks:
             log.info(f"Auto-block: skipped {before_blocks - len(coins)} blocked symbol(s)")
         mode = "whitelist" if ALLOWED_SYMBOLS else "auto top-volume"
-        log.info(f"Fetched {len(coins)} coins from KuCoin ({mode})")
+        log.info(f"Fetched {len(coins)} coins ({mode})")
 
         setups = []
 

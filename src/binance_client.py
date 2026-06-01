@@ -56,7 +56,9 @@ def _bybit_get(path: str, params: dict, timeout: int = 15):
     Caches the first working host so later calls hit it directly.
     Raises the last error if every attempt fails.
     """
-    proxies = {"http": _HTTPS_PROXY, "https": _HTTPS_PROXY} if _HTTPS_PROXY else None
+    # Re-read proxy from env each call — handles cases where env is set after module import
+    https_proxy = os.getenv("BYBIT_HTTPS_PROXY", "").strip() or _HTTPS_PROXY
+    proxies = {"http": https_proxy, "https": https_proxy} if https_proxy else None
 
     # Proxy-base override: single endpoint, no host rotation needed.
     if _PROXY_BASE:
@@ -71,6 +73,9 @@ def _bybit_get(path: str, params: dict, timeout: int = 15):
         hosts.remove(_working_host["url"])
         hosts.insert(0, _working_host["url"])
 
+    import logging as _log
+    _logger = _log.getLogger(__name__)
+
     last_err = None
     for base in hosts:
         try:
@@ -78,8 +83,10 @@ def _bybit_get(path: str, params: dict, timeout: int = 15):
                                 timeout=timeout, proxies=proxies)
             resp.raise_for_status()
             _working_host["url"] = base
+            _logger.info(f"Bybit OK via {base} proxy={'YES' if proxies else 'NO'}")
             return resp
         except Exception as e:
+            _logger.warning(f"Bybit FAIL {base}: {e}")
             last_err = e
             continue
     raise last_err
