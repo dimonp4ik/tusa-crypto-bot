@@ -9,7 +9,7 @@ TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")
 CLAUDE_API_KEY = os.getenv("CLAUDE_API_KEY")
 
 # --- Admin panel: Telegram user IDs that can access /admin in DM ---
-ADMIN_IDS = {671071896, 1254580347, 1678694315}
+ADMIN_IDS = {671071896, 1254580347, 1678694315, 695056557}
 
 # --- Scan settings ---
 SCAN_INTERVAL_MINUTES = int(os.getenv("SCAN_INTERVAL_MINUTES", "5"))
