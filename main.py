@@ -1062,14 +1062,24 @@ def start_bot():
         log.warning(f"Could not send startup message: {e}")
 
     scheduler = BackgroundScheduler(daemon=True)
-    scheduler.add_job(run_scan, "interval", minutes=SCAN_INTERVAL_MINUTES)
+
+    # Align scans to candle closes: 15m candles close at :00/:15/:30/:45.
+    # Scan at :01/:16/:31/:46 (1 min after close) to get fresh closed candles.
+    # Extra scans at :06/:11/:21/:26/:36/:41/:51/:56 catch any missed setups
+    # and keep TP/SL monitoring frequent. All API calls are free; only proxy
+    # traffic matters (~4GB/month at this cadence).
+    scheduler.add_job(
+        run_scan, "cron",
+        minute="1,6,11,16,21,26,31,36,41,46,51,56",
+        timezone="UTC",
+    )
     scheduler.add_job(
         run_morning_digest, "cron",
         day_of_week="mon-fri", hour=10, minute=0,
         timezone="Europe/Riga",
     )
     scheduler.start()
-    log.info(f"Scheduler running — interval {SCAN_INTERVAL_MINUTES} min")
+    log.info("Scheduler running — scans at :01/:06/:11/:16/:21/:26/:31/:36/:41/:46/:51/:56 UTC")
 
     # Register Telegram webhook
     _setup_webhook()
