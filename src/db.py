@@ -93,6 +93,30 @@ def init_db():
             )
         """)
 
+        # ── User tracking ────────────────────────────────────────────────────
+        c.execute("""
+            CREATE TABLE IF NOT EXISTS users (
+                user_id       INTEGER PRIMARY KEY,
+                username      TEXT,
+                first_name    TEXT,
+                last_name     TEXT,
+                first_seen    REAL NOT NULL,
+                last_seen     REAL NOT NULL,
+                message_count INTEGER NOT NULL DEFAULT 1
+            )
+        """)
+
+        # ── Dynamic admins (added via bot; super-admins stay in config.py) ──
+        c.execute("""
+            CREATE TABLE IF NOT EXISTS admins (
+                user_id    INTEGER PRIMARY KEY,
+                username   TEXT,
+                first_name TEXT,
+                added_by   INTEGER,
+                added_at   REAL NOT NULL
+            )
+        """)
+
 
 def log_signal(analysis: dict, tp1: float, tp2: float, sl: float):
     """Insert a new signal into DB. Status starts as OPEN."""
@@ -276,6 +300,82 @@ def unblock_symbol(symbol: str) -> None:
     """Manually remove a symbol from the block list."""
     with _conn() as c:
         c.execute("DELETE FROM symbol_blocks WHERE symbol = ?", (symbol,))
+
+
+# ── User tracking ────────────────────────────────────────────────────────────
+
+def upsert_user(user_id: int, username: str = None,
+                first_name: str = None, last_name: str = None) -> None:
+    """Insert or update a user record on every bot interaction."""
+    now = time_mod.time()
+    with _conn() as c:
+        c.execute("""
+            INSERT INTO users (user_id, username, first_name, last_name,
+                               first_seen, last_seen, message_count)
+            VALUES (?, ?, ?, ?, ?, ?, 1)
+            ON CONFLICT(user_id) DO UPDATE SET
+                username      = COALESCE(excluded.username,    username),
+                first_name    = COALESCE(excluded.first_name,  first_name),
+                last_name     = COALESCE(excluded.last_name,   last_name),
+                last_seen     = excluded.last_seen,
+                message_count = message_count + 1
+        """, (user_id, username, first_name, last_name, now, now))
+
+
+def get_user_by_id(user_id: int) -> dict | None:
+    """Return a single user record or None."""
+    with _conn() as c:
+        row = c.execute("SELECT * FROM users WHERE user_id = ?",
+                        (user_id,)).fetchone()
+        return dict(row) if row else None
+
+
+def get_all_users(limit: int = 100) -> list:
+    """Return up to `limit` users sorted by most recent interaction."""
+    with _conn() as c:
+        rows = c.execute(
+            "SELECT * FROM users ORDER BY last_seen DESC LIMIT ?", (limit,)
+        ).fetchall()
+        return [dict(r) for r in rows]
+
+
+# ── Dynamic admin management ──────────────────────────────────────────────────
+
+def add_dynamic_admin(user_id: int, username: str = None,
+                      first_name: str = None, added_by: int = None) -> None:
+    """Add (or update) a dynamic admin entry in DB."""
+    now = time_mod.time()
+    with _conn() as c:
+        c.execute("""
+            INSERT INTO admins (user_id, username, first_name, added_by, added_at)
+            VALUES (?, ?, ?, ?, ?)
+            ON CONFLICT(user_id) DO UPDATE SET
+                username   = COALESCE(excluded.username,   username),
+                first_name = COALESCE(excluded.first_name, first_name)
+        """, (user_id, username, first_name, added_by, now))
+
+
+def remove_dynamic_admin(user_id: int) -> None:
+    """Remove a dynamic admin from DB."""
+    with _conn() as c:
+        c.execute("DELETE FROM admins WHERE user_id = ?", (user_id,))
+
+
+def get_dynamic_admins() -> list:
+    """Return all dynamic admins ordered by when they were added."""
+    with _conn() as c:
+        rows = c.execute(
+            "SELECT * FROM admins ORDER BY added_at ASC"
+        ).fetchall()
+        return [dict(r) for r in rows]
+
+
+def is_dynamic_admin(user_id: int) -> bool:
+    """True when user_id has an entry in the admins table."""
+    with _conn() as c:
+        return c.execute(
+            "SELECT 1 FROM admins WHERE user_id = ?", (user_id,)
+        ).fetchone() is not None
 
 
 def get_symbols_performance(days: int = 30) -> list:

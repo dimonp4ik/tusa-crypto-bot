@@ -43,8 +43,26 @@ from src.db import (
     init_db, get_open_signals, update_signal_status, get_stats,
     auto_block_bad_symbols, is_symbol_auto_blocked, get_active_symbol_blocks,
     get_recent_outcomes, unblock_symbol, get_symbols_performance,
+    upsert_user, get_user_by_id, get_all_users,
+    add_dynamic_admin, remove_dynamic_admin, get_dynamic_admins, is_dynamic_admin,
 )
 from config import ADMIN_IDS
+
+# ── Admin helpers ─────────────────────────────────────────────────────────────
+
+def _is_admin(user_id: int) -> bool:
+    """True for config super-admins OR dynamically added DB admins."""
+    return user_id in ADMIN_IDS or is_dynamic_admin(user_id)
+
+
+def _is_super_admin(user_id: int) -> bool:
+    """True only for hardcoded config admins (can manage other admins)."""
+    return user_id in ADMIN_IDS
+
+
+# State: super-admin is typing a new admin's Telegram ID.
+# { chat_id: True } — cleared on next message regardless of content.
+_pending_add_admin: dict = {}
 
 # ── Logging ──────────────────────────────────────────────────────────────────
 logging.basicConfig(
@@ -100,6 +118,9 @@ _ADMIN_KEYBOARD = {
         {"text": "🚫 Авто-блок",        "callback_data": "adm_blocks"},
         {"text": "🏆 Топ монет",        "callback_data": "adm_top"},
         {"text": "💀 Худшие монеты",    "callback_data": "adm_worst"},
+    ], [
+        {"text": "👥 Пользователи",     "callback_data": "adm_users"},
+        {"text": "👮 Админы",           "callback_data": "adm_admins"},
     ]]
 }
 
@@ -165,7 +186,7 @@ def _edit_message(chat_id: int, message_id: int, text: str):
 
 
 def _handle_admin_callback(callback_id: str, chat_id: int,
-                           message_id: int, data: str):
+                           message_id: int, data: str, user_id: int = 0):
     """Dispatch inline-button presses for the admin panel."""
     _answer_callback(callback_id)
 
@@ -289,6 +310,100 @@ def _handle_admin_callback(callback_id: str, chat_id: int,
         except Exception as e:
             txt = f"Ошибка: {e}"
         _edit_message(chat_id, message_id, txt)
+
+    elif data == "adm_users":
+        try:
+            users = get_all_users(limit=50)
+            if not users:
+                txt = "👥 *Пользователи*\n\nНикто ещё не писал боту."
+            else:
+                lines = [f"👥 *Пользователи* — {len(users)} чел.\n"]
+                for u in users:
+                    parts = []
+                    fn = u.get("first_name") or ""
+                    ln = u.get("last_name") or ""
+                    name = (fn + (" " + ln if ln else "")).strip() or "—"
+                    uname = f"@{u['username']}" if u.get("username") else f"`{u['user_id']}`"
+                    last = datetime.fromtimestamp(u["last_seen"]).strftime("%d.%m %H:%M")
+                    lines.append(f"• {name} {uname} — {last} ({u.get('message_count', 1)} сообщ.)")
+                txt = "\n".join(lines)
+        except Exception as e:
+            txt = f"Ошибка: {e}"
+        _edit_message(chat_id, message_id, txt)
+
+    elif data == "adm_admins":
+        try:
+            dynamic = get_dynamic_admins()
+            lines = ["👮 *Управление админами*\n"]
+            lines.append("🔒 *Супер-админы (config):*")
+            for aid in sorted(ADMIN_IDS):
+                lines.append(f"  `{aid}`")
+            if dynamic:
+                lines.append("\n➕ *Добавленные:*")
+                for a in dynamic:
+                    fn   = a.get("first_name") or ""
+                    un   = f" @{a['username']}" if a.get("username") else ""
+                    lines.append(f"  • {fn}{un} `{a['user_id']}`")
+            else:
+                lines.append("\n_Добавленных админов нет._")
+
+            kb_rows = []
+            if _is_super_admin(user_id):
+                for a in dynamic:
+                    label = a.get("first_name") or str(a["user_id"])
+                    kb_rows.append([{
+                        "text": f"❌ Удалить {label}",
+                        "callback_data": f"adm_rm_admin_{a['user_id']}",
+                    }])
+                kb_rows.append([{
+                    "text": "➕ Добавить администратора",
+                    "callback_data": "adm_add_admin",
+                }])
+            kb_rows.append([{"text": "« Назад", "callback_data": "adm_back"}])
+            try:
+                _requests.post(
+                    f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/editMessageText",
+                    json={
+                        "chat_id": chat_id, "message_id": message_id,
+                        "text": "\n".join(lines), "parse_mode": "Markdown",
+                        "reply_markup": {"inline_keyboard": kb_rows},
+                    },
+                    timeout=10,
+                )
+            except Exception as e:
+                log.warning(f"adm_admins keyboard failed: {e}")
+        except Exception as e:
+            _edit_message(chat_id, message_id, f"Ошибка: {e}")
+
+    elif data.startswith("adm_rm_admin_"):
+        if not _is_super_admin(user_id):
+            _edit_message(chat_id, message_id, "⛔ Только супер-администратор может удалять.")
+            return
+        try:
+            rm_id = int(data[len("adm_rm_admin_"):])
+            remove_dynamic_admin(rm_id)
+            txt = f"✅ Администратор `{rm_id}` удалён.\n\nНажми 👮 Админы чтобы обновить список."
+        except Exception as e:
+            txt = f"Ошибка удаления: {e}"
+        _edit_message(chat_id, message_id, txt)
+
+    elif data == "adm_add_admin":
+        if not _is_super_admin(user_id):
+            _edit_message(chat_id, message_id, "⛔ Только супер-администратор может добавлять.")
+            return
+        _pending_add_admin[chat_id] = True
+        try:
+            _requests.post(
+                f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage",
+                json={
+                    "chat_id": chat_id,
+                    "text": "Отправь *Telegram ID* нового администратора.\nПример: `123456789`",
+                    "parse_mode": "Markdown",
+                },
+                timeout=10,
+            )
+        except Exception as e:
+            log.warning(f"add_admin prompt failed: {e}")
 
     elif data == "adm_back":
         _edit_message(chat_id, message_id, "🛠 *TUSA Admin Panel*\nВыбери раздел:")
@@ -496,8 +611,8 @@ def webhook():
         message_id = cb.get("message", {}).get("message_id")
         cb_data    = cb.get("data", "")
         cb_id      = cb.get("id")
-        if user_id in ADMIN_IDS:
-            _handle_admin_callback(cb_id, chat_id, message_id, cb_data)
+        if _is_admin(user_id):
+            _handle_admin_callback(cb_id, chat_id, message_id, cb_data, user_id)
         else:
             _answer_callback(cb_id, "Нет доступа.")
         return "ok", 200
@@ -506,21 +621,63 @@ def webhook():
     if not message:
         return "ok", 200
 
-    chat_id = message.get("chat", {}).get("id")
-    user_id = message.get("from", {}).get("id")
-    text = message.get("text", "").strip().lower()
+    chat_id  = message.get("chat", {}).get("id")
+    user_id  = message.get("from", {}).get("id")
+    from_obj = message.get("from", {})
+    text_raw = message.get("text", "").strip()
+    text     = text_raw.lower()
 
-    if not chat_id or not text:
+    if not chat_id:
         return "ok", 200
 
-    # /start → постоянное меню (у админов расширенное)
-    elif text == "/start":
-        _send_persistent_menu(chat_id, is_admin=(user_id in ADMIN_IDS))
+    # Track every user who interacts with the bot
+    if user_id:
+        try:
+            upsert_user(
+                user_id,
+                username=from_obj.get("username"),
+                first_name=from_obj.get("first_name"),
+                last_name=from_obj.get("last_name"),
+            )
+        except Exception as _ue:
+            log.warning(f"upsert_user failed: {_ue}")
 
-    # 🛠 Кнопка "Админ панель" → инлайн-панель
+    if not text:
+        return "ok", 200
+
+    # DM = positive chat_id (private chat with bot)
+    is_dm = isinstance(chat_id, int) and chat_id > 0
+
+    # ── Pending "add admin" state — super-admin just typed a new admin's ID ──
+    if is_dm and _is_super_admin(user_id) and _pending_add_admin.pop(chat_id, False):
+        raw_id = text_raw.strip()
+        if raw_id.lstrip("-").isdigit():
+            new_id = int(raw_id)
+            # Try to look up name from users table (may already have interacted)
+            u_info = get_user_by_id(new_id) or {}
+            add_dynamic_admin(
+                new_id,
+                username=u_info.get("username"),
+                first_name=u_info.get("first_name"),
+                added_by=user_id,
+            )
+            _reply(chat_id,
+                   f"✅ Администратор `{new_id}` добавлен.\n"
+                   f"Ему нужно написать /start чтобы получить панель.")
+        else:
+            _reply(chat_id, "❌ Не похоже на Telegram ID. Нужно число, например `123456789`.")
+        return "ok", 200
+
+    # /start → постоянное меню (у админов расширенное, только в ЛС)
+    if text == "/start":
+        _send_persistent_menu(chat_id, is_admin=(is_dm and _is_admin(user_id)))
+
+    # 🛠 Кнопка "Админ панель" → инлайн-панель (только ЛС)
     elif text == "🛠 админ панель":
-        if user_id in ADMIN_IDS:
+        if is_dm and _is_admin(user_id):
             _send_keyboard(chat_id, "🛠 *TUSA Admin Panel*\nВыбери раздел:")
+        elif not is_dm:
+            pass  # silence in group chats
         else:
             _reply(chat_id, "Нет доступа.")
 
@@ -586,10 +743,12 @@ def webhook():
                "*Win rate* — % прибыльных от закрытых.\n"
                "Норма для SMC стратегии: 35–45% при высоком R\\:R.")
 
-    # /admin — запасной вариант текстом
+    # /admin — запасной вариант текстом (только ЛС)
     elif text in ("/admin", "/панель"):
-        if user_id in ADMIN_IDS:
+        if is_dm and _is_admin(user_id):
             _send_keyboard(chat_id, "🛠 *TUSA Admin Panel*\nВыбери раздел:")
+        elif not is_dm:
+            pass
         else:
             _reply(chat_id, "Нет доступа.")
 
