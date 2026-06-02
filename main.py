@@ -241,7 +241,7 @@ def _handle_admin_callback(callback_id: str, chat_id: int,
                 lines = ["🚫 *Авто-блок*\n"]
                 keyboard_rows = []
                 for b in blocks:
-                    until = datetime.fromtimestamp(b["blocked_until"]).strftime("%d.%m %H:%M")
+                    until = datetime.fromtimestamp(b["blocked_until"], tz=_riga_tz()).strftime("%d.%m %H:%M")
                     lines.append(f"• *{b['symbol']}* до {until}\n  _{b['reason']}_")
                     keyboard_rows.append([{
                         "text": f"✅ Разблокировать {b['symbol']}",
@@ -324,7 +324,7 @@ def _handle_admin_callback(callback_id: str, chat_id: int,
                     ln = u.get("last_name") or ""
                     name = (fn + (" " + ln if ln else "")).strip() or "—"
                     uname = f"@{u['username']}" if u.get("username") else f"`{u['user_id']}`"
-                    last = datetime.fromtimestamp(u["last_seen"]).strftime("%d.%m %H:%M")
+                    last = datetime.fromtimestamp(u["last_seen"], tz=_riga_tz()).strftime("%d.%m %H:%M")
                     lines.append(f"• {name} {uname} — {last} ({u.get('message_count', 1)} сообщ.)")
                 txt = "\n".join(lines)
         except Exception as e:
