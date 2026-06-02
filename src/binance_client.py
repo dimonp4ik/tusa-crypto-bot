@@ -199,8 +199,8 @@ def get_klines(symbol, interval=TIMEFRAME_KUCOIN, limit=KLINES_LIMIT,
     response = _bybit_get("/v5/market/kline", params)
     data = response.json()
 
-    # Bybit returns oldest-first (already in correct order)
-    candles = data.get("result", {}).get("list", [])
+    # Bybit returns newest-first — reverse to oldest-first so index[-1] = latest
+    candles = list(reversed(data.get("result", {}).get("list", [])))
     if not candles:
         raise ValueError(f"No candle data for {symbol}")
 
