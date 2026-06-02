@@ -304,7 +304,7 @@ def analyze_heavy(setup: dict, news_context: dict = None, history: list = None) 
     client = _get_client()
     message = client.messages.create(
         model=CLAUDE_HEAVY_MODEL,
-        max_tokens=400,
+        max_tokens=600,
         system=_system_param(),
         tools=[_verdict_tool()],
         tool_choice={"type": "tool", "name": "submit_verdict"},
