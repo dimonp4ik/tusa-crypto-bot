@@ -413,6 +413,8 @@ def _send_message(text: str) -> bool:
             json={"chat_id": TELEGRAM_CHAT_ID, "text": text, "parse_mode": "Markdown"},
             timeout=15,
         )
+        if resp.status_code != 200:
+            print(f"[Telegram] HTTP {resp.status_code}: {resp.text[:200]}")
         return resp.status_code == 200
     except Exception as e:
         print(f"[Telegram] Ошибка отправки: {e}")
