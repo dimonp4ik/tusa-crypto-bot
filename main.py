@@ -45,6 +45,7 @@ from src.db import (
     get_recent_outcomes, unblock_symbol, get_symbols_performance,
     upsert_user, get_user_by_id, get_all_users,
     add_dynamic_admin, remove_dynamic_admin, get_dynamic_admins, is_dynamic_admin,
+    delete_signal, get_recent_signals,
 )
 from config import ADMIN_IDS
 
@@ -121,6 +122,8 @@ _ADMIN_KEYBOARD = {
     ], [
         {"text": "👥 Пользователи",     "callback_data": "adm_users"},
         {"text": "👮 Админы",           "callback_data": "adm_admins"},
+    ], [
+        {"text": "🗑 Управление сделками", "callback_data": "adm_deals"},
     ]]
 }
 
@@ -404,6 +407,61 @@ def _handle_admin_callback(callback_id: str, chat_id: int,
             )
         except Exception as e:
             log.warning(f"add_admin prompt failed: {e}")
+
+    elif data == "adm_deals":
+        try:
+            sigs = get_recent_signals(limit=20)
+            if not sigs:
+                txt = "🗑 *Управление сделками*\n\nСделок в базе нет."
+                _edit_message(chat_id, message_id, txt)
+            else:
+                _RIGA = _riga_tz()
+                STATUS_ICON = {
+                    "OPEN": "🟢", "TP1_PARTIAL": "🟡", "TP2_HIT": "✅",
+                    "BREAKEVEN": "⚖️", "SL_HIT": "❌", "EXPIRED": "⏱",
+                    "TP1_EXPIRED": "⏱", "TP1_HIT": "✅",
+                }
+                lines = [f"🗑 *Управление сделками* (последние {len(sigs)})\n"]
+                kb_rows = []
+                import time as _t
+                for s in sigs:
+                    icon   = STATUS_ICON.get(s["status"], "•")
+                    opened = datetime.fromtimestamp(s["opened_at"], tz=_RIGA).strftime("%d.%m %H:%M")
+                    lines.append(
+                        f"{icon} `#{s['id']}` *{s['symbol']}* {s['direction']} "
+                        f"@ {s['entry_price']}  [{s['status']}]  {opened}"
+                    )
+                    kb_rows.append([{
+                        "text": f"🗑 Удалить #{s['id']} {s['symbol']} {s['direction']}",
+                        "callback_data": f"adm_del_sig_{s['id']}",
+                    }])
+                kb_rows.append([{"text": "« Назад", "callback_data": "adm_back"}])
+                try:
+                    _requests.post(
+                        f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/editMessageText",
+                        json={
+                            "chat_id": chat_id, "message_id": message_id,
+                            "text": "\n".join(lines), "parse_mode": "Markdown",
+                            "reply_markup": {"inline_keyboard": kb_rows},
+                        },
+                        timeout=10,
+                    )
+                except Exception as e:
+                    log.warning(f"adm_deals keyboard failed: {e}")
+        except Exception as e:
+            _edit_message(chat_id, message_id, f"Ошибка: {e}")
+
+    elif data.startswith("adm_del_sig_"):
+        try:
+            sig_id = int(data[len("adm_del_sig_"):])
+            removed = delete_signal(sig_id)
+            if removed:
+                txt = f"✅ Сделка `#{sig_id}` удалена из базы."
+            else:
+                txt = f"⚠️ Сделка `#{sig_id}` не найдена (уже удалена?)."
+        except Exception as e:
+            txt = f"Ошибка удаления: {e}"
+        _edit_message(chat_id, message_id, txt)
 
     elif data == "adm_back":
         _edit_message(chat_id, message_id, "🛠 *TUSA Admin Panel*\nВыбери раздел:")

@@ -118,6 +118,22 @@ def init_db():
         """)
 
 
+def delete_signal(signal_id: int) -> bool:
+    """Hard-delete a signal row by ID. Returns True if a row was removed."""
+    with _conn() as c:
+        cur = c.execute("DELETE FROM signals WHERE id = ?", (signal_id,))
+        return cur.rowcount > 0
+
+
+def get_recent_signals(limit: int = 20) -> list:
+    """Return the most recent signals (any status) for admin review."""
+    with _conn() as c:
+        rows = c.execute(
+            "SELECT * FROM signals ORDER BY opened_at DESC LIMIT ?", (limit,)
+        ).fetchall()
+        return [dict(r) for r in rows]
+
+
 def log_signal(analysis: dict, tp1: float, tp2: float, sl: float):
     """Insert a new signal into DB. Status starts as OPEN."""
     with _conn() as c:
