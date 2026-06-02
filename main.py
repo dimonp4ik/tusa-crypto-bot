@@ -564,6 +564,65 @@ def _ru_event(title: str):
     return title, ""
 
 
+# Market impact one-liners shown after actual result (better / worse than forecast).
+# Tuple: (note_if_better, note_if_worse)
+_MARKET_NOTES: dict = {
+    "core cpi":        ("Базовая инфляция выше → ФРС не снижает ставку → крипта ↓",
+                        "Базовая инфляция ниже → ФРС ближе к снижению → крипта ↑"),
+    "cpi":             ("Инфляция выше ожиданий → ФРС жёстче → крипта/акции ↓",
+                        "Инфляция ниже ожиданий → путь к снижению ставки → крипта ↑"),
+    "core ppi":        ("Оптовая инфляция выше → давление сохраняется → осторожно",
+                        "Оптовая инфляция ниже → хороший сигнал для рынков"),
+    "ppi":             ("Цены производителей выше → инфляционное давление → крипта ↓",
+                        "Цены производителей ниже → меньше инфляции → позитив"),
+    "core pce":        ("PCE выше → ФРС не спешит со снижением → риски для крипты",
+                        "PCE ниже → снижение ставки ближе → позитив для крипты"),
+    "pce":             ("Расходы выше ожиданий → инфляционное давление",
+                        "Расходы ниже → потребитель экономит → осторожно"),
+    "non-farm":        ("Рынок труда силён → доллар ↑, крипта под давлением",
+                        "Занятость слабее → доллар ↓, позитив для крипты"),
+    "nonfarm":         ("Рынок труда силён → доллар ↑, крипта под давлением",
+                        "Занятость слабее → доллар ↓, позитив для крипты"),
+    "adp":             ("Частный найм активен → рынок труда силён → доллар ↑",
+                        "Частный найм слабее → сигнал охлаждения экономики"),
+    "unemployment rate": ("Безработица выше → экономика охлаждается",
+                          "Безработица ниже → сильный рынок труда → доллар ↑"),
+    "unemployment":    ("Заявки выросли → рынок труда слабеет",
+                        "Заявки упали → рынок труда устойчив"),
+    "jobless":         ("Заявки выросли → рынок труда слабеет",
+                        "Заявки упали → рынок труда устойчив"),
+    "gdp":             ("ВВП выше ожиданий → экономика сильнее → доллар ↑",
+                        "ВВП ниже ожиданий → риски замедления → осторожно"),
+    "retail sales":    ("Потребитель тратит больше → рост экономики",
+                        "Розничные продажи слабее → потребитель экономит"),
+    "federal funds":   ("Ставка выше ожиданий → доллар ↑, крипта ↓",
+                        "Ставка ниже ожиданий → доллар ↓, крипта ↑"),
+    "interest rate":   ("Ставка выше ожиданий → доллар ↑, крипта ↓",
+                        "Ставка ниже ожиданий → доллар ↓, крипта ↑"),
+    "ism manufacturing": ("Промышленность растёт → позитив для экономики",
+                          "Промышленность сокращается → риски рецессии"),
+    "ism services":    ("Сектор услуг растёт → позитив",
+                        "Сектор услуг замедляется → осторожно"),
+    "manufacturing pmi": ("Промышленность выше 50 → рост → позитив",
+                          "Промышленность ниже 50 → сжатие → осторожно"),
+    "services pmi":    ("Услуги выше 50 → рост экономики",
+                        "Услуги ниже 50 → замедление"),
+    "consumer confidence": ("Потребители оптимистичны → рост трат → позитив",
+                            "Потребители пессимистичны → спад трат → осторожно"),
+    "durable goods":   ("Спрос на товары высок → экономика активна",
+                        "Спрос на товары слаб → инвестиции снижаются"),
+}
+
+
+def _market_note(event_title: str, is_better: bool) -> str:
+    """Brief market impact note for a past event. Empty string if unknown."""
+    low = event_title.lower()
+    for kw, (note_b, note_w) in _MARKET_NOTES.items():
+        if kw in low:
+            return note_b if is_better else note_w
+    return ""
+
+
 # Crypto digest cache — get_daily_digest() hits Groq + RSS, cache 30 min so
 # repeated button presses don't spam the API.
 _digest_cache = {"at": 0.0, "items": []}
@@ -623,18 +682,28 @@ def _format_day_news() -> str:
             if note:
                 lines.append(f"   📖 {note}")
             f_, p_, a_ = e["forecast"], e["previous"], e["actual"]
+            extra_prev = f" / пред {p_}" if p_ else ""
             if e["passed"] and a_:
+                # Event passed AND actual value published
                 af, ff = _num(a_), _num(f_)
                 if af is not None and ff is not None:
-                    tag = ("📈 лучше прогноза" if af > ff else
+                    is_better = af > ff
+                    tag = ("📈 лучше прогноза" if is_better else
                            "📉 хуже прогноза"  if af < ff else "➡️ по прогнозу")
                 else:
+                    is_better = None
                     tag = "✅ вышло"
-                extra = f" / пред {p_}" if p_ else ""
-                lines.append(f"   факт {a_} / прогноз {f_ or '—'}{extra} → {tag}")
+                lines.append(f"   факт *{a_}* / прогноз {f_ or '—'}{extra_prev} → {tag}")
+                if is_better is not None:
+                    impact = _market_note(e["title"], is_better)
+                    if impact:
+                        lines.append(f"   💡 _{impact}_")
+            elif e["passed"]:
+                # Event passed but actual not published yet
+                lines.append(f"   ✅ прошло · прогноз {f_ or '—'}{extra_prev} · _факт не опубликован_")
             else:
-                extra = f" / пред {p_}" if p_ else ""
-                lines.append(f"   🔮 прогноз {f_ or '—'}{extra}")
+                # Upcoming event
+                lines.append(f"   🔮 прогноз {f_ or '—'}{extra_prev}")
 
     # ── Crypto headlines ──
     if crypto:
