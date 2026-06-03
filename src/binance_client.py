@@ -78,16 +78,25 @@ def _bybit_get(path: str, params: dict, timeout: int = 15):
 
     last_err = None
     for base in hosts:
-        try:
-            resp = requests.get(f"{base}{path}", params=params,
-                                timeout=timeout, proxies=proxies)
-            resp.raise_for_status()
-            _working_host["url"] = base
-            return resp
-        except Exception as e:
-            _logger.warning(f"Bybit FAIL {base}: {e}")
-            last_err = e
-            continue
+        for attempt in range(2):          # 1 retry on proxy errors
+            try:
+                resp = requests.get(f"{base}{path}", params=params,
+                                    timeout=timeout, proxies=proxies)
+                resp.raise_for_status()
+                _working_host["url"] = base
+                return resp
+            except requests.exceptions.ProxyError as e:
+                last_err = e
+                if attempt == 0:
+                    _logger.warning(f"Bybit proxy 502 {base} — retry in 3s...")
+                    time.sleep(3)
+                    continue
+                _logger.warning(f"Bybit FAIL {base}: {e}")
+                break
+            except Exception as e:
+                _logger.warning(f"Bybit FAIL {base}: {e}")
+                last_err = e
+                break
     raise last_err
 
 
