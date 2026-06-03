@@ -47,6 +47,7 @@ from src.db import (
     add_dynamic_admin, remove_dynamic_admin, get_dynamic_admins, is_dynamic_admin,
     delete_signal, get_recent_signals,
     get_claude_spend_stats,
+    get_bot_state, set_bot_state,
 )
 from config import ADMIN_IDS
 
@@ -1188,10 +1189,12 @@ def run_scan():
             f"({news['headline_count']} headlines)"
         )
         if news["pause"]:
-            global _scan_paused
             log.warning("News agent: PAUSE — extreme market event, skipping scan")
-            if not _scan_paused:
-                _scan_paused = True
+            # Only notify once — check DB so this survives server restarts/redeploys
+            last_pause = get_bot_state("scan_paused_at")
+            already_notified = last_pause and (time.time() - float(last_pause)) < 7200
+            if not already_notified:
+                set_bot_state("scan_paused_at", str(time.time()))
                 trigger = news.get("trigger", "")
                 reason  = news.get("summary", "")
                 detail  = f"\n\n📰 *Причина:* {trigger}" if trigger else (f"\n\n📰 {reason}" if reason else "")
@@ -1204,8 +1207,9 @@ def run_scan():
             return
 
         # Scan unpaused — notify once when news situation clears
-        if _scan_paused:
-            _scan_paused = False
+        last_pause = get_bot_state("scan_paused_at")
+        if last_pause and (time.time() - float(last_pause)) < 7200:
+            set_bot_state("scan_paused_at", "0")
             send_status("▶️ *Скан возобновлён* — рыночная ситуация нормализовалась.")
 
         # Step 0a-2: Detect and broadcast high-impact macro events

@@ -117,6 +117,14 @@ def init_db():
             )
         """)
 
+        # ── Persistent bot state (survives restarts) ─────────────────────────
+        c.execute("""
+            CREATE TABLE IF NOT EXISTS bot_state (
+                key   TEXT PRIMARY KEY,
+                value TEXT NOT NULL
+            )
+        """)
+
         # ── Claude API budget tracking ────────────────────────────────────────
         # One row per API call. Queried by summing today's spend.
         c.execute("""
@@ -132,6 +140,22 @@ def init_db():
                 ok           INTEGER NOT NULL DEFAULT 1  -- 0 = failed/timeout
             )
         """)
+
+
+def get_bot_state(key: str) -> str | None:
+    """Read a persistent bot state value. Returns None if key not set."""
+    with _conn() as c:
+        row = c.execute("SELECT value FROM bot_state WHERE key=?", (key,)).fetchone()
+        return row["value"] if row else None
+
+
+def set_bot_state(key: str, value: str) -> None:
+    """Write a persistent bot state value (upsert)."""
+    with _conn() as c:
+        c.execute("""
+            INSERT INTO bot_state (key, value) VALUES (?, ?)
+            ON CONFLICT(key) DO UPDATE SET value = excluded.value
+        """, (key, value))
 
 
 def delete_signal(signal_id: int) -> bool:
