@@ -189,8 +189,9 @@ def _format_open_signal(s: dict) -> str:
     nearest_tp    = tp2 if s["status"] == "TP1_PARTIAL" else tp1
     nearest_label = "TP2" if s["status"] == "TP1_PARTIAL" else "TP1"
 
-    # Live price fetch (best-effort; proxy/network failures graceful)
-    cur = get_current_price(s["symbol"])
+    # Live price: use cached value from last 1-min monitor run (no extra API call).
+    # Falls back to a fresh Bybit request only if cache is empty (bot just started).
+    cur = _last_prices.get(s["symbol"]) or get_current_price(s["symbol"])
     if cur and entry:
         pct   = (cur - entry) / entry * 100
         arrow = "📈" if direction == "LONG" else "📉"
@@ -1044,6 +1045,11 @@ _NEWS_ALERT_COOLDOWN_HOURS = 6
 # Send "scan paused" only on the FIRST blocked scan, "scan resumed" when it lifts.
 _scan_paused: bool = False
 
+# ── Live price cache ───────────────────────────────────────────────────────────
+# Updated every 1 min by _check_open_signals() from kline close data.
+# Used by _format_open_signal() so "open trades" never makes a live API call.
+_last_prices: dict[str, float] = {}  # symbol → last known close price
+
 
 def _is_alert_duplicate(name: str) -> bool:
     if name in _news_alert_cache:
@@ -1097,6 +1103,10 @@ def _check_open_signals():
             # 15m candles = 4 per hour; fetch enough to cover the signal's age
             candle_lim = max(8, min(220, int(age_hours * 4) + 6))
             df_all     = get_klines(sig["symbol"], limit=candle_lim)
+
+            # Cache last close price — used by "open trades" display (no extra API call)
+            if df_all.get("close"):
+                _last_prices[sig["symbol"]] = df_all["close"][-1]
 
             status    = sig["status"]
             direction = sig["direction"]

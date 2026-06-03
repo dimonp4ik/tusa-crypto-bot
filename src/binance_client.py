@@ -257,14 +257,29 @@ def get_btc_change_1h() -> float:
 
 
 def get_current_price(symbol: str):
-    """Fetch last traded price from Bybit linear ticker. Returns None on error."""
+    """Fetch last traded price from Bybit linear ticker.
+    Falls back to last kline close if ticker endpoint fails.
+    Returns None only if both attempts fail.
+    """
+    import logging as _log
+    _logger = _log.getLogger(__name__)
     try:
         resp = _bybit_get("/v5/market/tickers", {"category": "linear", "symbol": symbol}, timeout=8)
         lst  = resp.json().get("result", {}).get("list", [])
         if lst:
-            return float(lst[0].get("lastPrice", 0)) or None
-    except Exception:
-        pass
+            price = float(lst[0].get("lastPrice", 0))
+            if price > 0:
+                return price
+        _logger.warning(f"get_current_price: empty/zero result for {symbol}")
+    except Exception as e:
+        _logger.warning(f"get_current_price ticker failed for {symbol}: {e}")
+    # Fallback: use last closed candle close price
+    try:
+        klines = get_klines(symbol, limit=2)
+        close = klines["close"][-1]
+        return close if close > 0 else None
+    except Exception as e2:
+        _logger.warning(f"get_current_price kline fallback failed for {symbol}: {e2}")
     return None
 
 
