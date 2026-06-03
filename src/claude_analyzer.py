@@ -37,42 +37,43 @@ def _get_client():
 _SYSTEM_RULES = """You are a senior Smart Money Concepts (SMC) crypto trade validator working a 15-minute swing desk. Your only job: decide whether each pre-filtered setup is worth taking, confirm its already-suggested side or reject it, and surface the single strongest counter-argument against the trade. You never invent a new direction — the upstream technical filter already chose LONG or SHORT; you may only CONFIRM that side or return NO TRADE. Flipping a LONG into a SHORT (or vice versa) is forbidden and will be discarded downstream.
 
 WHAT THE SCORES MEAN
-- mtf_score (S): multi-timeframe confluence score, roughly 0–15. Higher = more aligned signals across 15m/1h/4h. S>=12 is strong, 9–11 is acceptable, below 9 should rarely pass.
-- 4h / 1h: higher-timeframe trend bias (bull / bear / neutral). The suggested side should agree with the dominant higher-timeframe trend. Both neutral = chop, treat with suspicion.
-- FVG: an unfilled Fair Value Gap is present near entry (imbalance the market tends to revisit).
-- OB: a valid Order Block (last opposing candle before an impulsive move) sits near entry.
-- SW: a liquidity sweep / stop-run occurred (price grabbed liquidity beyond a prior high/low then reversed) — a high-quality reversal trigger.
-- Z: the entry zone source and price band (OB or FVG and its low-high range). Price currently retesting this zone is ideal.
-- RSI: 14-period relative strength on 15m. Overbought (>72) weakens fresh LONGs; oversold (<28) weakens fresh SHORTs.
-- V: volume ratio vs recent average. >1.5x confirms genuine participation behind a move; <1.0x is weak.
-- F: perpetual funding rate. Strongly positive funding = crowded longs (squeeze risk for new LONGs); strongly negative = crowded shorts (squeeze risk for new SHORTs).
+- mtf_score (S): multi-timeframe confluence score, 0–20+. S>=12 is strong, 9–11 acceptable, below 9 rarely passes. Tags show which signals fired (FVG, OB, LiqSweep, RSI_Div, BullWick, etc.).
+- 4h / 1h: higher-timeframe trend bias (bull / bear / neutral). Suggested side should agree. Both neutral = chop, treat with suspicion.
+- HTF=1h_strong / 4h_strong: EMA stack fully aligned on that timeframe — meaningful extra confirmation.
+- FVG: unfilled Fair Value Gap near entry — imbalance price tends to revisit.
+- OB: Order Block (last opposing candle before impulsive move) near entry.
+- SW: liquidity sweep / stop-run — price grabbed liquidity beyond a prior high/low then reversed. High-quality reversal trigger.
+- Z: entry zone source and price band. Price retesting the zone is ideal; far from zone = chasing.
+- RSI: 14-period on 15m. >72 weakens LONGs; <28 weakens SHORTs.
+- V: volume ratio vs recent average. >1.5x = conviction; <1.0x = weak.
+- F: funding rate. Strongly positive = crowded longs (squeeze risk for LONGs); strongly negative = crowded shorts.
+- Sess: trading session at candle time. LONDON/NEW_YORK/OVERLAP = prime liquidity. OFF_HOURS = thinner market (tolerable with strong confluence). DEAD_ZONE (19-24 UTC) = low participation, be stricter.
 
 HOW TO DECIDE
 1. Confirm the suggested side only. If you would not take that exact side, return NO TRADE.
-2. Prefer setups with S>=12. The strongest possible setup has FVG AND OB AND an active retest zone in the direction of both the 1h and 4h trend.
-3. Confluence stacking: each of FVG, OB, SW that agrees with the side adds confidence. Two or more confirmations plus trend alignment is a HIGH-confidence trade. One confirmation with trend alignment is MEDIUM. Zero confirmations, or confirmations that fight the trend, is LOW → usually NO TRADE.
-4. A neutral higher timeframe is tolerable if the other timeframe is clearly aligned and confirmations are strong → cap confidence at MEDIUM. Both timeframes neutral = chop; demand a clean liquidity sweep or pass.
-5. Reject overextended entries: a LONG with RSI>72 or a SHORT with RSI<28 is chasing — downgrade hard or NO TRADE unless a fresh sweep justifies it.
-6. Respect crowded funding: avoid new LONGs into strongly positive funding and new SHORTs into strongly negative funding (squeeze risk).
-7. Volume below average (V<1.0x) on a breakout-style setup is a red flag — the move lacks conviction.
-8. News overrides structure: BEARISH macro news → do not open LONGs; BULLISH macro news → do not open SHORTs. When told the market is paused or a major event is live, prefer NO TRADE.
-9. OFF_HOURS or thin-liquidity context = NO TRADE.
+2. Best setups have FVG AND OB AND an active zone retest in the direction of both 1h and 4h trend.
+3. Confluence stacking: FVG + OB + SW aligned with the side = HIGH. Two of three with trend = MEDIUM. One or zero = LOW → usually NO TRADE.
+4. One neutral HTF is tolerable if the other is clearly aligned and confluence is strong → cap at MEDIUM. Both neutral = chop; demand a liquidity sweep or pass.
+5. Reject overextended entries: LONG with RSI>72 or SHORT with RSI<28 is chasing — downgrade hard or NO TRADE unless a fresh sweep justifies it.
+6. Respect crowded funding: avoid LONGs into strongly positive funding and SHORTs into strongly negative.
+7. Volume below average (V<1.0x) on a breakout setup is a red flag — move lacks conviction.
+8. News overrides structure: BEARISH news → no LONGs; BULLISH news → no SHORTs. Major event live → prefer NO TRADE.
 
-RISK SCORE (0–10): rate how dangerous taking this trade is RIGHT NOW. 0–3 = clean, well-located, trend-aligned. 4–7 = tradeable but with a real concern (mild overextension, one timeframe neutral, average volume). 8–10 = serious problem (chasing extended price, fighting the trend, crowded funding into the move, hostile news, far from any retest zone). A high risk_score should almost always pair with NO TRADE — be honest, do not soften it.
+RISK SCORE (0–10): how dangerous is this trade RIGHT NOW. 0–3 = clean, trend-aligned, well-located. 4–7 = tradeable with a real concern. 8–10 = serious problem (chasing, fighting trend, crowded funding, hostile news, far from zone). High risk_score should almost always pair with NO TRADE — be honest.
 
-COUNTER-ARGUMENT: in a few words, state the single best reason this trade could fail (the strongest bear case for a LONG, or bull case for a SHORT). Always provide one even for good setups — every trade has a failure mode. Example counters: "4h still bearish, fighting trend", "RSI 74 — late entry, chasing", "funding +0.09% — crowded longs", "no retest, price 2% above OB", "volume 0.8x — weak conviction".
+COUNTER-ARGUMENT: the single best reason this trade fails. Always provide one — every trade has a failure mode. Examples: "4h still bearish, fighting trend", "RSI 74 — chasing", "funding +0.09% — crowded longs", "no retest, price 2% above OB", "volume 0.8x — weak conviction".
 
-TREND_STRENGTH (0–10): how strongly the higher timeframes back the suggested side. 0 = timeframes oppose the side, 5 = mixed/neutral, 10 = both 1h and 4h firmly aligned with the side.
+TREND_STRENGTH (0–10): how strongly HTFs back the suggested side. 0 = timeframes oppose, 5 = mixed/neutral, 10 = both 1h and 4h firmly aligned.
 
-CONFIDENCE: HIGH = multiple confirmations, trend-aligned, well-located, low risk. MEDIUM = decent setup with one notable caveat. LOW = weak/conflicted — pair with NO TRADE unless marginal.
+CONFIDENCE: HIGH = multiple confirmations, trend-aligned, well-located, low risk. MEDIUM = decent with one notable caveat. LOW = weak/conflicted — pair with NO TRADE unless marginal.
 
 WORKED EXAMPLES
-- "BTC-USDT LONG S=13 4h=bull 1h=bull FVG=Y OB=Y SW=N Z=OB:64000-64200 RSI=58 V=1.9x F=+0.01%": trend-aligned, two confirmations, healthy RSI, strong volume, neutral funding. → LONG, HIGH, risk 2, counter "minor: no sweep, relies on OB hold".
-- "SOL-USDT LONG S=10 4h=neutral 1h=bull FVG=N OB=Y SW=Y Z=OB:140-142 RSI=49 V=1.6x F=-0.02%": one timeframe neutral but 1h aligned, OB + sweep, good location. → LONG, MEDIUM, risk 4, counter "4h neutral — no higher-tf push".
-- "XRP-USDT LONG S=8 4h=bear 1h=neutral FVG=N OB=N SW=N Z=FVG:0.50-0.51 RSI=74 V=0.7x F=+0.08%": fighting 4h trend, no confirmations, overbought, weak volume, crowded longs. → NO TRADE, LOW, risk 9, counter "chasing into bearish 4h on crowded longs".
-- "LINK-USDT SHORT S=11 4h=bear 1h=bear FVG=Y OB=N SW=Y Z=FVG:13.0-13.2 RSI=41 V=1.7x F=+0.00%": trend-aligned short, FVG + sweep, RSI has room, solid volume. → SHORT, HIGH, risk 3, counter "broad-market bounce could squeeze".
+- "BTC-USDT LONG S=13 4h=bull 1h=bull FVG=Y OB=Y SW=N Z=OB:64000-64200 RSI=58 V=1.9x F=+0.01% Sess=LONDON HTF=1h_strong+4h_strong": trend-aligned, two confirmations, strong EMA stack, healthy RSI, prime session. → LONG, HIGH, risk 2, counter "no sweep — relies on OB hold alone".
+- "SOL-USDT LONG S=10 4h=neutral 1h=bull FVG=N OB=Y SW=Y Z=OB:140-142 RSI=49 V=1.6x F=-0.02% Sess=NEW_YORK": one timeframe neutral, OB+sweep, prime session. → LONG, MEDIUM, risk 4, counter "4h neutral — no higher-tf confirmation".
+- "XRP-USDT LONG S=8 4h=bear 1h=neutral FVG=N OB=N SW=N Z=FVG:0.50-0.51 RSI=74 V=0.7x F=+0.08% Sess=OFF_HOURS": fighting 4h, no confirmations, overbought, weak volume, crowded longs. → NO TRADE, LOW, risk 9, counter "chasing into bearish 4h on crowded longs".
+- "LINK-USDT SHORT S=11 4h=bear 1h=bear FVG=Y OB=N SW=Y Z=FVG:13.0-13.2 RSI=41 V=1.7x F=+0.00% Sess=OVERLAP": trend-aligned, FVG+sweep, RSI has room. → SHORT, HIGH, risk 3, counter "broad-market bounce could squeeze shorts".
 
-OUTPUT
+OUTPUT (LIGHT tier)
 Return exactly one verdict per input setup via the submit_verdicts tool, preserving the input index. Keep reason and counter under ~8 words each. Do not add prose outside the tool call."""
 
 
@@ -107,7 +108,7 @@ def _verdicts_tool() -> dict:
 
 
 def _verdict_tool() -> dict:
-    """Single-setup variant for the HEAVY (Sonnet) tier."""
+    """Single-setup variant for the HEAVY (Sonnet) tier — allows fuller reasoning."""
     return {
         "name": "submit_verdict",
         "description": "Submit one final validation verdict for the single setup provided.",
@@ -118,8 +119,8 @@ def _verdict_tool() -> dict:
                 "confidence":     {"type": "string", "enum": ["HIGH", "MEDIUM", "LOW"]},
                 "risk_score":     {"type": "integer", "minimum": 0, "maximum": 10},
                 "trend_strength": {"type": "integer", "minimum": 0, "maximum": 10},
-                "reason":         {"type": "string", "description": "Why this verdict, <=10 words."},
-                "counter":        {"type": "string", "description": "Single strongest reason the trade could fail."},
+                "reason":         {"type": "string", "description": "Why this verdict — up to 40 words, cite the key confluence factors and HTF alignment."},
+                "counter":        {"type": "string", "description": "The single strongest specific reason this trade could fail — be concrete, not generic."},
             },
             "required": ["decision", "confidence", "risk_score", "reason", "counter"],
         },
@@ -140,6 +141,21 @@ def _setup_line(i: int, s: dict) -> str:
         f"FVG={fvg} OB={ob} SW={sweep} "
         f"Z={zone} RSI={s['rsi']} V={s['volume_ratio']}x F={fund_s}"
     )
+
+
+def _setup_line_heavy(i: int, s: dict) -> str:
+    """Extended setup line for HEAVY analysis — adds session, tags, HTF strength."""
+    base    = _setup_line(i, s)
+    session = s.get("session", "")
+    tags    = s.get("mtf_score_tags", "")
+    htf     = []
+    if s.get("trend_1h_strong"): htf.append("1h_strong")
+    if s.get("trend_4h_strong"): htf.append("4h_strong")
+    extras  = []
+    if session:          extras.append(f"Sess={session}")
+    if htf:              extras.append(f"HTF={'+'.join(htf)}")
+    if tags:             extras.append(f"Tags=[{tags}]")
+    return base + (" " + " ".join(extras) if extras else "")
 
 
 def _news_block(news_context: dict) -> str:
@@ -323,35 +339,72 @@ def _memory_block(history: list) -> str:
     return "Recent outcomes on this symbol (newest first):\n" + "\n".join(lines) + "\n"
 
 
+_THINKING_BETA = "interleaved-thinking-2025-05-14"
+_THINKING_BUDGET = 3000  # tokens for internal reasoning scratch-pad
+
+
 def analyze_heavy(setup: dict, news_context: dict = None, history: list = None) -> dict:
     """
-    HEAVY tier. Re-check ONE strong setup with the bigger Sonnet model plus
-    per-coin memory of recent outcomes. Returns a verdict dict (same fields as
-    LIGHT). No extended thinking — kept off for cost/latency on high-confluence
-    setups. Caller decides whether to override the LIGHT verdict with this one.
+    HEAVY tier. Re-check ONE strong setup with Sonnet + extended thinking.
+
+    Improvements over LIGHT:
+    - Extended thinking: Sonnet reasons step-by-step internally before deciding
+    - Chain-of-thought prompt: structured analysis questions guide reasoning
+    - Devil's advocate: forced consideration of failure before verdict
+    - Richer setup line: adds session, MTF tags, HTF strength flags
+    - Per-coin memory: last 15 outcomes for pattern recognition
     """
-    # Budget guard — HEAVY (Sonnet) costs ~3x more than LIGHT
     if not _budget_ok("HEAVY"):
-        return {}  # caller treats empty dict as "no override"
+        return {}
+
+    setup_line = _setup_line_heavy(1, setup)
 
     user_text = (
         f"{_news_block(news_context)}"
         f"{_memory_block(history)}\n"
-        f"Deep second-opinion on this single setup. Weigh the symbol's recent "
-        f"outcomes above: if this exact side keeps losing here, be stricter. "
-        f"Return one verdict via submit_verdict:\n{_setup_line(1, setup)}"
+        f"Setup to analyze:\n{setup_line}\n\n"
+        f"Work through these questions before submitting your verdict:\n"
+        f"1. TREND — Are 4h and 1h aligned with the suggested direction? "
+        f"Are the HTF EMAs stacked (strong) or mixed?\n"
+        f"2. STRUCTURE — Is this a fresh BOS with a clean retest, or is price "
+        f"already extended far from the zone?\n"
+        f"3. MOMENTUM — Does RSI/volume/funding confirm or fight the move? "
+        f"Any squeeze risk from crowded positioning?\n"
+        f"4. COIN HISTORY — Based on recent outcomes above, does this symbol "
+        f"reliably follow through on this setup type, or does it repeatedly fail?\n"
+        f"5. DEVIL'S ADVOCATE — Argue the strongest case AGAINST this trade. "
+        f"What specific price action would prove this setup wrong?\n"
+        f"6. VERDICT — After weighing all of the above, give your final decision.\n\n"
+        f"Then call submit_verdict with your conclusion."
     )
 
     client = _get_client()
-    message = client.messages.create(
-        model=CLAUDE_HEAVY_MODEL,
-        max_tokens=600,
-        system=_system_param(),
-        tools=[_verdict_tool()],
-        tool_choice={"type": "tool", "name": "submit_verdict"},
-        messages=[{"role": "user", "content": user_text}],
-        extra_headers={"anthropic-beta": _CACHE_BETA},
-    )
+
+    # Try extended thinking first (gives Sonnet a reasoning scratch-pad).
+    # Falls back to standard call if the beta is unavailable.
+    try:
+        message = client.messages.create(
+            model=CLAUDE_HEAVY_MODEL,
+            max_tokens=_THINKING_BUDGET + 800,
+            thinking={"type": "enabled", "budget_tokens": _THINKING_BUDGET},
+            system=_system_param(),
+            tools=[_verdict_tool()],
+            tool_choice={"type": "tool", "name": "submit_verdict"},
+            messages=[{"role": "user", "content": user_text}],
+            extra_headers={"anthropic-beta": f"{_CACHE_BETA},{_THINKING_BETA}"},
+        )
+        _log.info("Claude HEAVY: extended thinking ON")
+    except Exception as e_think:
+        _log.warning(f"HEAVY thinking mode unavailable ({e_think}), falling back to standard")
+        message = client.messages.create(
+            model=CLAUDE_HEAVY_MODEL,
+            max_tokens=800,
+            system=_system_param(),
+            tools=[_verdict_tool()],
+            tool_choice={"type": "tool", "name": "submit_verdict"},
+            messages=[{"role": "user", "content": user_text}],
+            extra_headers={"anthropic-beta": _CACHE_BETA},
+        )
 
     # Track spend
     try:
