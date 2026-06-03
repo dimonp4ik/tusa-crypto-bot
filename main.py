@@ -1219,7 +1219,7 @@ def run_scan():
         for b in new_blocks:
             log.info(f"  Auto-blocked: {b['reason']}")
 
-        # Step 1: top 45 liquid coins (quality filtered)
+        # Step 1: top 25 liquid coins (quality filtered)
         coins = get_top_coins()
         before_blocks = len(coins)
         coins = [s for s in coins if not is_symbol_auto_blocked(s)]
@@ -1483,7 +1483,7 @@ def start_bot():
             open(_flag, "w").close()
             send_status(
                 "🤖 *Crypto Signal Bot Online*\n"
-                f"Сканирую топ-45 монет каждые {SCAN_INTERVAL_MINUTES} мин "
+                f"Сканирую топ-25 монет каждые {SCAN_INTERVAL_MINUTES} мин "
                 f"(Пн-Пт, 10:00–02:00 по Риге)."
             )
     except Exception as e:
