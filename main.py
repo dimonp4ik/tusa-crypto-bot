@@ -28,7 +28,7 @@ from config import (
 )
 from src.binance_client import (
     get_top_coins, get_klines, get_klines_1h, get_klines_4h,
-    get_btc_change_1h, get_funding_rate,
+    get_btc_change_1h, get_funding_rate, get_current_price,
 )
 from src.signal_filter import analyze_coin_smc
 from src.claude_analyzer import analyze_batch_with_claude, analyze_heavy
@@ -174,6 +174,37 @@ def _answer_callback(callback_id: str, text: str = ""):
         pass
 
 
+def _format_open_signal(s: dict) -> str:
+    """One-liner display for an open signal with live price, nearest TP and SL."""
+    import time as _t
+    age_h = round((_t.time() - s["opened_at"]) / 3600, 1)
+    icon  = "🟡" if s["status"] == "TP1_PARTIAL" else "🟢"
+    entry = float(s["entry_price"])
+    tp1   = float(s["tp1"])
+    tp2   = float(s["tp2"])
+    sl    = float(s["sl"])
+    direction = s["direction"]
+
+    # Nearest TP depends on status
+    nearest_tp    = tp2 if s["status"] == "TP1_PARTIAL" else tp1
+    nearest_label = "TP2" if s["status"] == "TP1_PARTIAL" else "TP1"
+
+    # Live price fetch (best-effort; proxy/network failures graceful)
+    cur = get_current_price(s["symbol"])
+    if cur and entry:
+        pct   = (cur - entry) / entry * 100
+        arrow = "📈" if direction == "LONG" else "📉"
+        # positive pnl means price moved in our favour
+        pnl   = pct if direction == "LONG" else -pct
+        pnl_s = f"+{pnl:.2f}%" if pnl >= 0 else f"{pnl:.2f}%"
+        price_line = f"   {arrow} `{cur}` ({pnl_s}) | 🎯 {nearest_label}: `{nearest_tp}` | 🛑 SL: `{sl}`"
+    else:
+        price_line = f"   🎯 {nearest_label}: `{nearest_tp}` | 🛑 SL: `{sl}`"
+
+    header = f"{icon} *{s['symbol']}* {direction} @ `{entry}`  _{age_h}ч_"
+    return f"{header}\n{price_line}"
+
+
 def _edit_message(chat_id: int, message_id: int, text: str):
     """Edit an existing message and re-attach the keyboard."""
     try:
@@ -224,13 +255,8 @@ def _handle_admin_callback(callback_id: str, chat_id: int,
             else:
                 lines = ["📋 *Открытые сделки*\n"]
                 for s in sigs:
-                    import time as _t
-                    age_h = round((_t.time() - s["opened_at"]) / 3600, 1)
-                    lines.append(
-                        f"• *{s['symbol']}* {s['direction']} "
-                        f"@ {s['entry_price']}  [{s['status']}]  {age_h}ч"
-                    )
-                txt = "\n".join(lines)
+                    lines.append(_format_open_signal(s))
+                txt = "\n\n".join(lines)
         except Exception as e:
             txt = f"Ошибка: {e}"
         _edit_message(chat_id, message_id, txt)
@@ -838,16 +864,10 @@ def webhook():
             if not sigs:
                 _reply(chat_id, "📋 *Открытые сделки*\n\nНет активных позиций.")
             else:
-                import time as _t
                 lines = ["📋 *Открытые сделки*\n"]
                 for s in sigs:
-                    age_h = round((_t.time() - s["opened_at"]) / 3600, 1)
-                    icon  = "🟡" if s["status"] == "TP1_PARTIAL" else "🟢"
-                    lines.append(
-                        f"{icon} *{s['symbol']}* {s['direction']} "
-                        f"@ {s['entry_price']}  _{age_h}ч_"
-                    )
-                _reply(chat_id, "\n".join(lines))
+                    lines.append(_format_open_signal(s))
+                _reply(chat_id, "\n\n".join(lines))
         except Exception as e:
             _reply(chat_id, f"Ошибка: {e}")
 

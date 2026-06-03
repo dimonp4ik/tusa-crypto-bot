@@ -256,6 +256,18 @@ def get_btc_change_1h() -> float:
         return 0.0
 
 
+def get_current_price(symbol: str):
+    """Fetch last traded price from Bybit linear ticker. Returns None on error."""
+    try:
+        resp = _bybit_get("/v5/market/tickers", {"category": "linear", "symbol": symbol}, timeout=8)
+        lst  = resp.json().get("result", {}).get("list", [])
+        if lst:
+            return float(lst[0].get("lastPrice", 0)) or None
+    except Exception:
+        pass
+    return None
+
+
 def get_funding_rate(symbol: str):
     """Get current funding rate from Bybit futures. Returns None if unavailable."""
     # Convert BTCUSDT to BTCUSDT (already correct format for Bybit)
