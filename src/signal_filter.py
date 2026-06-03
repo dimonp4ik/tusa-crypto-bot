@@ -50,7 +50,16 @@ _FVG_MAX_FILL = 0.80   # skip FVG if price already through > 80% of the zone
 
 
 def _fvg_fresh(zone, current: float, direction: str) -> bool:
-    """Return True when an FVG zone still has >= 40% unfilled (fresh retest)."""
+    """Return True when price has not yet gone through > 80% of the FVG zone.
+
+    LONG bullish FVG (support below): price enters from the TOP (high) moving down.
+        fill=0 → price just touched the top (fresh ideal entry)
+        fill=1 → price reached the bottom (zone exhausted, likely breaking)
+
+    SHORT bearish FVG (resistance above): price enters from the BOTTOM (low) moving up.
+        fill=0 → price just touched the bottom (fresh ideal entry)
+        fill=1 → price reached the top (zone exhausted, likely breaking through)
+    """
     if not zone:
         return False
     low, high = float(zone[0]), float(zone[1])
@@ -58,9 +67,9 @@ def _fvg_fresh(zone, current: float, direction: str) -> bool:
     if rng <= 0:
         return False
     if direction == "LONG":
-        fill = (current - low) / rng     # 0 = just entering bottom, 1 = at top
+        fill = (high - current) / rng   # 0 = just entered from top (fresh), 1 = at bottom
     else:
-        fill = (high - current) / rng    # 0 = just entering top, 1 = at bottom
+        fill = (current - low) / rng    # 0 = just entered from bottom (fresh), 1 = at top
     return fill <= _FVG_MAX_FILL
 
 
