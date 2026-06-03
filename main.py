@@ -1040,6 +1040,10 @@ _signal_cache: dict[str, tuple[str, float]] = {}
 _news_alert_cache: dict[str, float] = {}
 _NEWS_ALERT_COOLDOWN_HOURS = 6
 
+# ── Scan-pause state ───────────────────────────────────────────────────────────
+# Send "scan paused" only on the FIRST blocked scan, "scan resumed" when it lifts.
+_scan_paused: bool = False
+
 
 def _is_alert_duplicate(name: str) -> bool:
     if name in _news_alert_cache:
@@ -1174,9 +1178,25 @@ def run_scan():
             f"({news['headline_count']} headlines)"
         )
         if news["pause"]:
+            global _scan_paused
             log.warning("News agent: PAUSE — extreme market event, skipping scan")
-            send_status(f"⚠️ *СТОП* — новостной агент остановил скан:\n_{news['summary']}_")
+            if not _scan_paused:
+                _scan_paused = True
+                trigger = news.get("trigger", "")
+                reason  = news.get("summary", "")
+                detail  = f"\n\n📰 *Причина:* {trigger}" if trigger else (f"\n\n📰 {reason}" if reason else "")
+                send_status(
+                    f"⏸ *Скан приостановлен*\n"
+                    f"Новостной агент обнаружил экстремальное рыночное событие — "
+                    f"торговля остановлена до нормализации обстановки."
+                    f"{detail}"
+                )
             return
+
+        # Scan unpaused — notify once when news situation clears
+        if _scan_paused:
+            _scan_paused = False
+            send_status("▶️ *Скан возобновлён* — рыночная ситуация нормализовалась.")
 
         # Step 0a-2: Detect and broadcast high-impact macro events
         try:

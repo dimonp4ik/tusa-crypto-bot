@@ -97,10 +97,11 @@ def analyze_with_groq(headlines: list[str]) -> dict:
 
 {text}
 
-Reply in EXACTLY this format (3 lines):
+Reply in EXACTLY this format (4 lines, SUMMARY and TRIGGER must be in Russian):
 SENTIMENT: BULLISH or BEARISH or NEUTRAL
-PAUSE: YES or NO  (YES only for: exchange hacks >$500M, total regulatory ban, major war start)
-SUMMARY: [max 12 words describing the key market-moving event]"""
+PAUSE: YES or NO  (YES only for: exchange hacks >$500M, total regulatory ban, major war start, extreme panic event)
+SUMMARY: [на русском, макс 15 слов — главное рыночное событие]
+TRIGGER: [на русском, точная причина если PAUSE=YES, иначе "нет"]"""
 
     try:
         resp = _req.post(
@@ -125,7 +126,7 @@ SUMMARY: [max 12 words describing the key market-moving event]"""
 
 
 def _parse_groq(raw: str) -> dict:
-    result = {"sentiment": "NEUTRAL", "summary": "", "pause": False}
+    result = {"sentiment": "NEUTRAL", "summary": "", "pause": False, "trigger": ""}
     for line in raw.splitlines():
         line = line.strip()
         if line.startswith("SENTIMENT:"):
@@ -136,6 +137,10 @@ def _parse_groq(raw: str) -> dict:
             result["pause"] = "YES" in line.upper()
         elif line.startswith("SUMMARY:"):
             result["summary"] = line.split(":", 1)[1].strip()
+        elif line.startswith("TRIGGER:"):
+            t = line.split(":", 1)[1].strip()
+            if t.lower() not in ("нет", "no", "-", "none", ""):
+                result["trigger"] = t
     return result
 
 
@@ -349,6 +354,7 @@ def get_market_news() -> dict:
         "sentiment":       analysis["sentiment"],
         "summary":         analysis["summary"],
         "pause":           analysis["pause"],
+        "trigger":         analysis.get("trigger", ""),
         "headline_count":  len(headlines),
     }
 
