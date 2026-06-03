@@ -93,7 +93,7 @@ ENTRY_ZONE_SL_BUFFER_ATR = float(os.getenv("ENTRY_ZONE_SL_BUFFER_ATR", "0.25"))
 #                     not a far-away limit order that the backtest fills optimistically.
 REQUIRE_HTF_TREND   = os.getenv("REQUIRE_HTF_TREND", "1") != "0"
 REQUIRE_RETEST      = os.getenv("REQUIRE_RETEST", "1") != "0"
-RETEST_MAX_DIST_PCT = float(os.getenv("RETEST_MAX_DIST_PCT", "0.008"))  # within 0.8% of zone edge (tightened from 0.015)
+RETEST_MAX_DIST_PCT = float(os.getenv("RETEST_MAX_DIST_PCT", "0.015"))  # within 1.5% of zone edge
 
 # --- Multi-timeframe score gate (max ~15) ---
 MTF_MIN_SCORE = int(os.getenv("MTF_MIN_SCORE", "9"))
