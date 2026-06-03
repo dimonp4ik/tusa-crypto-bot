@@ -96,7 +96,7 @@ REQUIRE_RETEST      = os.getenv("REQUIRE_RETEST", "1") != "0"
 RETEST_MAX_DIST_PCT = float(os.getenv("RETEST_MAX_DIST_PCT", "0.015"))  # within 1.5% of zone edge
 
 # --- Multi-timeframe score gate (max ~15) ---
-MTF_MIN_SCORE = int(os.getenv("MTF_MIN_SCORE", "9"))
+MTF_MIN_SCORE = int(os.getenv("MTF_MIN_SCORE", "11"))  # raised from 9 (session+2, strong+2, nestedOB+2 added)
 
 # --- Signal-quality filters (backtested on a PINNED 20-coin / ~21-day set) ---
 # All three were A/B-tested apples-to-apples and DEFAULT OFF — none beat baseline:

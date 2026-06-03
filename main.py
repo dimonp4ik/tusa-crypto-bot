@@ -1163,8 +1163,16 @@ def run_scan():
             if not news["safe"]:
                 log.info(f"  Skip {s['symbol']} — {news['reason']}")
                 continue
-            # Funding rate (best effort)
-            s["funding_rate"] = get_funding_rate(s["symbol"])
+            # Funding rate — fetch + hard filter crowded positions
+            fr = get_funding_rate(s["symbol"])
+            s["funding_rate"] = fr
+            if fr is not None:
+                if s["direction"] == "LONG"  and fr >  0.0005:   # >+0.05% = crowded longs
+                    log.info(f"  Skip {s['symbol']} LONG — funding {fr*100:+.3f}% crowded")
+                    continue
+                if s["direction"] == "SHORT" and fr < -0.0005:   # <-0.05% = crowded shorts
+                    log.info(f"  Skip {s['symbol']} SHORT — funding {fr*100:+.3f}% crowded")
+                    continue
             enriched.append(s)
 
         # Sort by quality score, keep only top MAX_SETUPS_TO_CLAUDE (saves tokens)

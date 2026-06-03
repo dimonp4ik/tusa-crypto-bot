@@ -19,6 +19,17 @@ from src.indicators import get_indicators, get_smc_indicators
 
 # ── Entry zone helpers ────────────────────────────────────────────────────────
 
+def _zones_overlap(z1, z2, buffer_pct: float = 0.005) -> bool:
+    """True when two (low, high) price zones overlap or are within buffer_pct of each other."""
+    if not z1 or not z2:
+        return False
+    l1, h1 = float(z1[0]), float(z1[1])
+    l2, h2 = float(z2[0]), float(z2[1])
+    h1_b = h1 * (1 + buffer_pct)
+    l1_b = l1 * (1 - buffer_pct)
+    return l2 <= h1_b and h2 >= l1_b
+
+
 def _zone_payload(zone, source: str, current: float):
     """Normalize a (low, high) zone tuple into entry dict form."""
     if not zone:
@@ -35,18 +46,36 @@ def _zone_payload(zone, source: str, current: float):
     }
 
 
+_FVG_MAX_FILL = 0.60   # skip FVG if price already through > 60% of the zone
+
+
+def _fvg_fresh(zone, current: float, direction: str) -> bool:
+    """Return True when an FVG zone still has >= 40% unfilled (fresh retest)."""
+    if not zone:
+        return False
+    low, high = float(zone[0]), float(zone[1])
+    rng = high - low
+    if rng <= 0:
+        return False
+    if direction == "LONG":
+        fill = (current - low) / rng     # 0 = just entering bottom, 1 = at top
+    else:
+        fill = (high - current) / rng    # 0 = just entering top, 1 = at bottom
+    return fill <= _FVG_MAX_FILL
+
+
 def _select_entry_zone(ind: dict, direction: str):
-    """Prefer Order Block zone, then FVG zone as entry area."""
+    """Prefer OB zone, then FVG zone. Skip FVG if > 60% already filled."""
     current = ind["current_close"]
     if direction == "LONG":
-        return (
-            _zone_payload(ind.get("bull_ob_zone"), "OB", current)
-            or _zone_payload(ind.get("bullish_fvg_zone"), "FVG", current)
-        )
-    return (
-        _zone_payload(ind.get("bear_ob_zone"), "OB", current)
-        or _zone_payload(ind.get("bearish_fvg_zone"), "FVG", current)
-    )
+        ob_z  = _zone_payload(ind.get("bull_ob_zone"), "OB", current)
+        fvg_z = ind.get("bullish_fvg_zone")
+        fvg_p = _zone_payload(fvg_z, "FVG", current) if _fvg_fresh(fvg_z, current, "LONG") else None
+        return ob_z or fvg_p
+    ob_z  = _zone_payload(ind.get("bear_ob_zone"), "OB", current)
+    fvg_z = ind.get("bearish_fvg_zone")
+    fvg_p = _zone_payload(fvg_z, "FVG", current) if _fvg_fresh(fvg_z, current, "SHORT") else None
+    return ob_z or fvg_p
 
 
 # ── MTF Score ─────────────────────────────────────────────────────────────────
@@ -91,14 +120,34 @@ def _calc_mtf_score(ind: dict, bos: str, direction: str, confirmations: list,
     else:
         score += 1; tags.append("BTCok+1")
 
+    # Confirmations — RSI_Div, Wicks, StochCross now score too (previously missed)
     _SCORED = ("FVG", "OB", "LiqSweep", "ChoCH", "MACD_Div", "Engulfing",
-               "Discount", "Premium")
+               "Discount", "Premium", "RSI_Div", "BullWick", "BearWick", "StochCross")
     for name in confirmations:
         if name in _SCORED:
             score += 1; tags.append(f"{name}+1")
 
     if entry_zone:
         score += 1; tags.append(f"Zone:{entry_zone['entry_source']}+1")
+
+    # Session bonus: prime trading hours confirmed via candle timestamp
+    session = ind.get("session", "OFF_HOURS")
+    if session in ("LONDON", "NEW_YORK", "OVERLAP"):
+        score += 2; tags.append(f"Sess:{session}+2")
+    elif session == "DEAD_ZONE":
+        score -= 1; tags.append("DeadZone-1")
+
+    # Strong HTF trend alignment (EMA stack confirmed)
+    if ind.get("trend_1h_strong") and ind.get("trend_1h") == bos:
+        score += 1; tags.append("Strong1h+1")
+    if ind.get("trend_4h_strong") and ind.get("trend_4h") == bos:
+        score += 1; tags.append("Strong4h+1")
+
+    # Nested OB: 1h OB overlaps 15m entry zone → double confluence
+    if entry_zone:
+        ob_1h_z = ind.get("bull_ob_1h_zone") if direction == "LONG" else ind.get("bear_ob_1h_zone")
+        if ob_1h_z and _zones_overlap(ob_1h_z, (entry_zone["entry_low"], entry_zone["entry_high"])):
+            score += 2; tags.append("NestedOB_1h+2")
 
     return score, tags
 

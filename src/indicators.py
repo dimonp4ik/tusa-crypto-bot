@@ -681,12 +681,28 @@ def get_smc_indicators(candles_15m: dict, candles_1h: dict = None,
     t1h = get_1h_trend(candles_1h) if candles_1h else {"trend": "neutral", "strong": False}
     t4h = get_1h_trend(candles_4h) if candles_4h else {"trend": "neutral", "strong": False}
 
-    # Trading session (UTC hour)
+    # 1h Order Block — nested OB: stronger entry when 1h OB overlaps 15m entry zone
+    ob_1h = {"bullish": False, "bearish": False, "bullish_zone": None, "bearish_zone": None}
+    if candles_1h and len(candles_1h.get("close", [])) >= 10:
+        try:
+            ob_1h = detect_order_block(
+                candles_1h["open"], candles_1h["high"],
+                candles_1h["low"],  candles_1h["close"],
+            )
+        except Exception:
+            pass
+
+    # Trading session — use CANDLE timestamp (not live clock) so backtest is accurate
     from datetime import datetime, timezone as _tz
-    utc_hour = datetime.now(_tz.utc).hour
+    _ts = (candles_15m.get("time") or [None])[-1]
+    if _ts:
+        utc_hour = datetime.fromtimestamp(int(_ts), tz=_tz.utc).hour
+    else:
+        utc_hour = datetime.now(_tz.utc).hour
     if   7  <= utc_hour < 11: session = "LONDON"
     elif 13 <= utc_hour < 17: session = "NEW_YORK"
     elif 11 <= utc_hour < 13: session = "OVERLAP"   # London/NY overlap — best
+    elif 19 <= utc_hour < 24: session = "DEAD_ZONE" # low liquidity Asia evening
     else:                     session = "OFF_HOURS"
 
     # BOS candle body quality: last breaking candle body >= 40% of range
@@ -743,6 +759,8 @@ def get_smc_indicators(candles_15m: dict, candles_1h: dict = None,
         "trend_1h_strong":  t1h["strong"],
         "trend_4h":         t4h["trend"],
         "trend_4h_strong":  t4h["strong"],
+        "bull_ob_1h_zone":  ob_1h.get("bullish_zone"),
+        "bear_ob_1h_zone":  ob_1h.get("bearish_zone"),
         "session":          session,
         "rsi":              round(rsi, 2),
         "stoch_k":          stoch_k,
