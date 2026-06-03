@@ -130,12 +130,11 @@ def _calc_mtf_score(ind: dict, bos: str, direction: str, confirmations: list,
     if entry_zone:
         score += 1; tags.append(f"Zone:{entry_zone['entry_source']}+1")
 
-    # Session bonus: prime trading hours confirmed via candle timestamp
+    # Session: informational only — backtest showed +2/-1 gating cuts 80% of
+    # signals without quality improvement (WR 23% → 13%, -38R vs +13R).
+    # Session label still passed in tags for the signal text display.
     session = ind.get("session", "OFF_HOURS")
-    if session in ("LONDON", "NEW_YORK", "OVERLAP"):
-        score += 2; tags.append(f"Sess:{session}+2")
-    elif session == "DEAD_ZONE":
-        score -= 1; tags.append("DeadZone-1")
+    tags.append(f"Sess:{session}")
 
     # Strong HTF trend alignment (EMA stack confirmed)
     if ind.get("trend_1h_strong") and ind.get("trend_1h") == bos:
