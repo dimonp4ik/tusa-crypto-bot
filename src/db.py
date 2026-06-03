@@ -117,6 +117,22 @@ def init_db():
             )
         """)
 
+        # ── Claude API budget tracking ────────────────────────────────────────
+        # One row per API call. Queried by summing today's spend.
+        c.execute("""
+            CREATE TABLE IF NOT EXISTS claude_usage (
+                id           INTEGER PRIMARY KEY AUTOINCREMENT,
+                ts           REAL NOT NULL,
+                tier         TEXT NOT NULL,   -- 'LIGHT' | 'HEAVY'
+                input_tok    INTEGER NOT NULL DEFAULT 0,
+                output_tok   INTEGER NOT NULL DEFAULT 0,
+                cache_write  INTEGER NOT NULL DEFAULT 0,
+                cache_read   INTEGER NOT NULL DEFAULT 0,
+                cost_usd     REAL NOT NULL DEFAULT 0.0,
+                ok           INTEGER NOT NULL DEFAULT 1  -- 0 = failed/timeout
+            )
+        """)
+
 
 def delete_signal(signal_id: int) -> bool:
     """Hard-delete a signal row by ID. Returns True if a row was removed."""
@@ -392,6 +408,84 @@ def is_dynamic_admin(user_id: int) -> bool:
         return c.execute(
             "SELECT 1 FROM admins WHERE user_id = ?", (user_id,)
         ).fetchone() is not None
+
+
+# ── Claude budget tracking ────────────────────────────────────────────────────
+
+# Pricing per 1M tokens (USD) — update if Anthropic changes rates.
+_CLAUDE_PRICES = {
+    # model_prefix: (input, cache_write, cache_read, output)
+    "claude-haiku":  (1.00, 1.25, 0.10, 5.00),
+    "claude-sonnet": (3.00, 3.75, 0.30, 15.00),
+}
+
+def _model_price(model: str) -> tuple:
+    for prefix, prices in _CLAUDE_PRICES.items():
+        if prefix in model.lower():
+            return prices
+    return _CLAUDE_PRICES["claude-haiku"]   # safe default
+
+
+def log_claude_call(tier: str, model: str, usage, ok: bool = True) -> float:
+    """
+    Record one Claude API call and return its cost in USD.
+    `usage` is the anthropic Usage object (input_tokens, output_tokens,
+    cache_creation_input_tokens, cache_read_input_tokens).
+    """
+    inp  = getattr(usage, "input_tokens", 0) or 0
+    out  = getattr(usage, "output_tokens", 0) or 0
+    cw   = getattr(usage, "cache_creation_input_tokens", 0) or 0
+    cr   = getattr(usage, "cache_read_input_tokens", 0) or 0
+
+    p_in, p_cw, p_cr, p_out = _model_price(model)
+    cost = (inp * p_in + cw * p_cw + cr * p_cr + out * p_out) / 1_000_000
+
+    with _conn() as c:
+        c.execute("""
+            INSERT INTO claude_usage (ts, tier, input_tok, output_tok,
+                                      cache_write, cache_read, cost_usd, ok)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        """, (time_mod.time(), tier, inp, out, cw, cr, round(cost, 6), int(ok)))
+    return round(cost, 6)
+
+
+def get_claude_spend_today() -> float:
+    """Return total Claude USD spend since midnight UTC today."""
+    import time as _t
+    from datetime import datetime, timezone
+    now = datetime.now(timezone.utc)
+    midnight = now.replace(hour=0, minute=0, second=0, microsecond=0).timestamp()
+    with _conn() as c:
+        row = c.execute(
+            "SELECT COALESCE(SUM(cost_usd),0) FROM claude_usage WHERE ts >= ?",
+            (midnight,)
+        ).fetchone()
+    return float(row[0])
+
+
+def get_claude_spend_stats() -> dict:
+    """Return spend summary: today, this week, total."""
+    import time as _t
+    from datetime import datetime, timezone
+    now_ts = _t.time()
+    now    = datetime.now(timezone.utc)
+    today  = now.replace(hour=0, minute=0, second=0, microsecond=0).timestamp()
+    week   = now_ts - 7 * 86400
+    with _conn() as c:
+        def _sum(since):
+            r = c.execute(
+                "SELECT COALESCE(SUM(cost_usd),0), COUNT(*) FROM claude_usage WHERE ts >= ?",
+                (since,)
+            ).fetchone()
+            return round(float(r[0]), 4), int(r[1])
+        today_usd, today_calls = _sum(today)
+        week_usd,  week_calls  = _sum(week)
+        total_usd, total_calls = _sum(0)
+    return {
+        "today_usd": today_usd, "today_calls": today_calls,
+        "week_usd":  week_usd,  "week_calls":  week_calls,
+        "total_usd": total_usd, "total_calls": total_calls,
+    }
 
 
 def get_symbols_performance(days: int = 30) -> list:

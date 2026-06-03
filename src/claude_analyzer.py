@@ -1,4 +1,5 @@
 import anthropic
+import logging
 import sys
 import os
 
@@ -6,7 +7,11 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from config import (
     CLAUDE_API_KEY, CLAUDE_LIGHT_MODEL, CLAUDE_HEAVY_MODEL,
     CLAUDE_MAX_RISK_SCORE, CLAUDE_CACHE_TTL, CLAUDE_MEMORY_LIMIT,
+    CLAUDE_DAILY_BUDGET_USD, CLAUDE_BUDGET_RESERVE_USD,
 )
+from src.db import log_claude_call, get_claude_spend_today
+
+_log = logging.getLogger(__name__)
 
 # Reuse client across calls
 _client = None
@@ -207,6 +212,25 @@ def _apply_verdict(base: dict, v: dict) -> dict:
     return _enforce_suggested_side(base)
 
 
+# ── Daily budget guard ───────────────────────────────────────────────────────
+
+def _budget_ok(tier: str = "LIGHT") -> bool:
+    """Return False when today's Claude spend is within reserve of the daily cap."""
+    try:
+        spent = get_claude_spend_today()
+        remaining = CLAUDE_DAILY_BUDGET_USD - spent
+        ok = remaining >= CLAUDE_BUDGET_RESERVE_USD
+        if not ok:
+            _log.warning(
+                f"Claude budget cap reached: spent ${spent:.4f} / ${CLAUDE_DAILY_BUDGET_USD} "
+                f"(reserve ${CLAUDE_BUDGET_RESERVE_USD}) — skipping {tier} call"
+            )
+        return ok
+    except Exception as e:
+        _log.warning(f"Budget check failed ({e}) — allowing call")
+        return True  # fail-open: don't block on DB errors
+
+
 # ── LIGHT batch (Haiku, cached rules, forced-tool JSON) ───────────────────────
 
 def analyze_batch_with_claude(setups: list, news_context: dict = None) -> list:
@@ -218,6 +242,12 @@ def analyze_batch_with_claude(setups: list, news_context: dict = None) -> list:
     """
     if not setups:
         return []
+
+    # Budget guard — skip if daily cap reached
+    if not _budget_ok("LIGHT"):
+        _log.warning("LIGHT skipped (budget cap) — returning NO TRADE for all setups")
+        return [dict(s, decision="NO TRADE", confidence="LOW", reason="Budget cap",
+                     risk_score=0, trend_strength=0, counter="") for s in setups]
 
     coins_text = "\n".join(_setup_line(i, s) for i, s in enumerate(setups, 1))
     user_text = (
@@ -236,6 +266,13 @@ def analyze_batch_with_claude(setups: list, news_context: dict = None) -> list:
         messages=[{"role": "user", "content": user_text}],
         extra_headers={"anthropic-beta": _CACHE_BETA},
     )
+
+    # Track spend
+    try:
+        cost = log_claude_call("LIGHT", CLAUDE_LIGHT_MODEL, message.usage)
+        _log.info(f"Claude LIGHT: ${cost:.5f} (today total: ${get_claude_spend_today():.4f})")
+    except Exception as _e:
+        _log.warning(f"Budget logging failed: {_e}")
 
     tool_input = _extract_tool_input(message, "submit_verdicts") or {}
     verdicts = tool_input.get("verdicts", []) if isinstance(tool_input, dict) else []
@@ -293,6 +330,10 @@ def analyze_heavy(setup: dict, news_context: dict = None, history: list = None) 
     LIGHT). No extended thinking — kept off for cost/latency on high-confluence
     setups. Caller decides whether to override the LIGHT verdict with this one.
     """
+    # Budget guard — HEAVY (Sonnet) costs ~3x more than LIGHT
+    if not _budget_ok("HEAVY"):
+        return {}  # caller treats empty dict as "no override"
+
     user_text = (
         f"{_news_block(news_context)}"
         f"{_memory_block(history)}\n"
@@ -311,6 +352,13 @@ def analyze_heavy(setup: dict, news_context: dict = None, history: list = None) 
         messages=[{"role": "user", "content": user_text}],
         extra_headers={"anthropic-beta": _CACHE_BETA},
     )
+
+    # Track spend
+    try:
+        cost = log_claude_call("HEAVY", CLAUDE_HEAVY_MODEL, message.usage)
+        _log.info(f"Claude HEAVY: ${cost:.5f} (today total: ${get_claude_spend_today():.4f})")
+    except Exception as _e:
+        _log.warning(f"Budget logging failed: {_e}")
 
     v = _extract_tool_input(message, "submit_verdict") or {}
     base = dict(setup)

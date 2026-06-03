@@ -93,7 +93,7 @@ ENTRY_ZONE_SL_BUFFER_ATR = float(os.getenv("ENTRY_ZONE_SL_BUFFER_ATR", "0.25"))
 #                     not a far-away limit order that the backtest fills optimistically.
 REQUIRE_HTF_TREND   = os.getenv("REQUIRE_HTF_TREND", "1") != "0"
 REQUIRE_RETEST      = os.getenv("REQUIRE_RETEST", "1") != "0"
-RETEST_MAX_DIST_PCT = float(os.getenv("RETEST_MAX_DIST_PCT", "0.015"))  # within 1.5% of zone edge
+RETEST_MAX_DIST_PCT = float(os.getenv("RETEST_MAX_DIST_PCT", "0.008"))  # within 0.8% of zone edge (tightened from 0.015)
 
 # --- Multi-timeframe score gate (max ~15) ---
 MTF_MIN_SCORE = int(os.getenv("MTF_MIN_SCORE", "9"))
@@ -146,6 +146,8 @@ CLAUDE_HEAVY_MAX_PER_SCAN = int(os.getenv("CLAUDE_HEAVY_MAX_PER_SCAN", "3")) # c
 CLAUDE_MEMORY_LIMIT       = int(os.getenv("CLAUDE_MEMORY_LIMIT", "8"))       # recent outcomes per coin (HEAVY)
 CLAUDE_MAX_RISK_SCORE     = int(os.getenv("CLAUDE_MAX_RISK_SCORE", "8"))     # counter-arg auto-reject if risk >= this
 CLAUDE_CACHE_TTL          = os.getenv("CLAUDE_CACHE_TTL", "1h")              # prompt cache TTL ("5m" or "1h")
+CLAUDE_DAILY_BUDGET_USD   = float(os.getenv("CLAUDE_DAILY_BUDGET_USD", "1.00"))  # hard daily cap
+CLAUDE_BUDGET_RESERVE_USD = float(os.getenv("CLAUDE_BUDGET_RESERVE_USD", "0.05")) # stop when remaining < reserve
 
 # --- Structure-based stops/takes (swing mode, 15m, ~20x leverage) ---
 # SL sits at swing invalidation (recent swing low/high) + ATR buffer, then

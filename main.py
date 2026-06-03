@@ -46,6 +46,7 @@ from src.db import (
     upsert_user, get_user_by_id, get_all_users,
     add_dynamic_admin, remove_dynamic_admin, get_dynamic_admins, is_dynamic_admin,
     delete_signal, get_recent_signals,
+    get_claude_spend_stats,
 )
 from config import ADMIN_IDS
 
@@ -124,6 +125,7 @@ _ADMIN_KEYBOARD = {
         {"text": "👮 Админы",           "callback_data": "adm_admins"},
     ], [
         {"text": "🗑 Управление сделками", "callback_data": "adm_deals"},
+        {"text": "💰 Бюджет Claude",       "callback_data": "adm_budget"},
     ]]
 }
 
@@ -461,6 +463,27 @@ def _handle_admin_callback(callback_id: str, chat_id: int,
                 txt = f"⚠️ Сделка `#{sig_id}` не найдена (уже удалена?)."
         except Exception as e:
             txt = f"Ошибка удаления: {e}"
+        _edit_message(chat_id, message_id, txt)
+
+    elif data == "adm_budget":
+        try:
+            from config import CLAUDE_DAILY_BUDGET_USD
+            s = get_claude_spend_stats()
+            remaining = max(0.0, round(CLAUDE_DAILY_BUDGET_USD - s["today_usd"], 4))
+            bar_filled = int((s["today_usd"] / CLAUDE_DAILY_BUDGET_USD) * 10) if CLAUDE_DAILY_BUDGET_USD else 0
+            bar_filled = min(bar_filled, 10)
+            bar = "█" * bar_filled + "░" * (10 - bar_filled)
+            txt = (
+                f"💰 *Бюджет Claude*\n\n"
+                f"Лимит: ${CLAUDE_DAILY_BUDGET_USD:.2f}/день\n"
+                f"[{bar}] ${s['today_usd']:.4f}\n"
+                f"Осталось сегодня: *${remaining:.4f}*\n\n"
+                f"*За сегодня:* {s['today_calls']} вызовов · ${s['today_usd']:.4f}\n"
+                f"*За 7 дней:* {s['week_calls']} вызовов · ${s['week_usd']:.4f}\n"
+                f"*Всего:* {s['total_calls']} вызовов · ${s['total_usd']:.4f}"
+            )
+        except Exception as e:
+            txt = f"Ошибка: {e}"
         _edit_message(chat_id, message_id, txt)
 
     elif data == "adm_back":
