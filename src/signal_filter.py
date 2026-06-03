@@ -46,7 +46,7 @@ def _zone_payload(zone, source: str, current: float):
     }
 
 
-_FVG_MAX_FILL = 0.60   # skip FVG if price already through > 60% of the zone
+_FVG_MAX_FILL = 0.80   # skip FVG if price already through > 80% of the zone
 
 
 def _fvg_fresh(zone, current: float, direction: str) -> bool:

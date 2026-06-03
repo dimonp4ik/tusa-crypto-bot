@@ -38,7 +38,7 @@ CACHE_DIR    = "backtest_cache_hist"
 CACHE_TTL    = 72 * 3600      # 72h -- historical data doesn't change
 
 # Signal window: 7 days + 2-day buffer so forward window doesn't overflow
-CANDLES_15M  = 672 + 192      # 864 x 15min ≈ 9 days
+CANDLES_15M  = 672 + 192      # 864 x 15min ~= 9 days
 CANDLES_1H   = CANDLES_15M // 4
 CANDLES_4H   = CANDLES_15M // 16
 TP_WINDOW    = 48             # 12h forward simulation
@@ -240,7 +240,7 @@ def main():
     print("\n" + "=" * 65)
     print("SUMMARY  (5 weeks x 10 symbols combined)")
     print("=" * 65)
-    print(f"{'Metric':<22} {'RETEST=0.015':>14} {'RETEST=0.004':>14}  {'Δ':>8}")
+    print(f"{'Metric':<22} {'RETEST=0.015':>14} {'RETEST=0.004':>14}  {'diff':>8}")
     print("-" * 65)
 
     totals = [all_results[label]["total"] for label, _ in RETEST_CONFIGS]
