@@ -876,14 +876,73 @@ def webhook():
         try:
             s7  = get_stats(days=7)
             s30 = get_stats(days=30)
-            _reply(chat_id,
-                   f"📈 *Результаты бота*\n\n"
-                   f"*За 7 дней:*\n"
-                   f"  Сигналов: {s7['total']}  •  Win rate: *{s7['win_rate']}%*\n"
-                   f"  TP1: {s7['tp1_hit']}  TP2: {s7['tp2_hit']}  SL: {s7['sl_hit']}\n\n"
-                   f"*За 30 дней:*\n"
-                   f"  Сигналов: {s30['total']}  •  Win rate: *{s30['win_rate']}%*\n"
-                   f"  TP1: {s30['tp1_hit']}  TP2: {s30['tp2_hit']}  SL: {s30['sl_hit']}")
+
+            def _fmt_stats(s: dict, label: str) -> str:
+                # R sign and emoji
+                r_val  = s["total_r"]
+                r_sign = "📈" if r_val > 0 else ("📉" if r_val < 0 else "➖")
+                r_str  = f"{r_val:+.2f}R"
+                rpt    = s["r_per_trade"]
+                rpt_str = f"{rpt:+.3f}R"
+
+                # Direction lines (only show if data exists)
+                lo = s.get("long",  {})
+                sh = s.get("short", {})
+                dir_lines = ""
+                if lo.get("total", 0) or sh.get("total", 0):
+                    def _dir(d, name):
+                        if not d.get("total"):
+                            return ""
+                        wr  = d["win_rate"]
+                        dr  = d["total_r"]
+                        dr_s = f"{dr:+.2f}R"
+                        icon = "🟢" if dr > 0 else ("🔴" if dr < 0 else "⚪")
+                        return f"  {icon} {name}: {d['total']} сд. → {wr}% win  {dr_s}\n"
+                    dir_lines = "\n" + _dir(lo, "LONG") + _dir(sh, "SHORT")
+
+                # Streak
+                streak_str = ""
+                if s["streak"]:
+                    icons = " ".join(s["streak"])
+                    run   = s["current_run"]
+                    first = s["streak"][0]
+                    if first == "❌" and run >= 2:
+                        run_txt = f"  ⚠️ {run} SL подряд"
+                    elif first in ("✅", "🏆") and run >= 2:
+                        run_txt = f"  🔥 {run} в прибыли подряд"
+                    else:
+                        run_txt = ""
+                    streak_str = f"\n🕐 Последние: {icons}{run_txt}\n"
+
+                in_work = s["open"] + s["tp1_partial_open"]
+                in_work_str = ""
+                if in_work:
+                    tp1p = s["tp1_partial_open"]
+                    in_work_str = f"  В работе сейчас: *{in_work}*"
+                    if tp1p:
+                        in_work_str += f" ({tp1p} уже взяли TP1)"
+                    in_work_str += "\n"
+
+                return (
+                    f"*{label}*\n"
+                    f"  Сигналов: {s['total']}  •  Закрыто: {s['closed']}\n"
+                    f"{in_work_str}"
+                    f"  TP1: {s['tp1_hit']}  TP2: {s['tp2_hit']}  "
+                    f"BE: {s['breakeven']}  SL: {s['sl_hit']}\n"
+                    f"  Win rate: *{s['win_rate']}%*  "
+                    f"•  TP1 reach: {s['tp1_rate']}%\n"
+                    f"{dir_lines}"
+                    f"\n{r_sign} Итого: *{r_str}*  •  {rpt_str} за сделку"
+                    f"{streak_str}"
+                )
+
+            text_out = (
+                "📈 *Результаты бота*\n\n"
+                + _fmt_stats(s7,  "За 7 дней")
+                + "\n\n"
+                + _fmt_stats(s30, "За 30 дней")
+            )
+            _reply(chat_id, text_out)
         except Exception as e:
             _reply(chat_id, f"Ошибка: {e}")
 

@@ -524,29 +524,91 @@ def get_symbols_performance(days: int = 30) -> list:
     return results
 
 
+def _status_r(status: str) -> float:
+    """R value of a closed trade outcome (fixed R model, TP1=1.5R TP2=3.0R SL=1R)."""
+    # TP2: 50% closed at TP1 (0.75R) + 50% at TP2 (1.5R) = 2.25R
+    if status == "TP2_HIT":    return  2.25
+    # TP1 only outcomes: 50% at TP1 = 0.75R
+    if status in ("TP1_HIT", "BREAKEVEN", "TP1_EXPIRED"): return 0.75
+    # Full SL before TP1
+    if status == "SL_HIT":     return -1.00
+    # Expired before any TP — no profit, small fee drag (treat as 0)
+    return 0.0
+
+
 def get_stats(days: int = 7) -> dict:
-    """Aggregate honest lifecycle stats. Win rate calculated on final closed signals only."""
+    """Aggregate stats with R-value, direction breakdown and recent streak."""
     cutoff = time_mod.time() - days * 86400
     with _conn() as c:
         rows = c.execute(
-            "SELECT status FROM signals WHERE opened_at >= ?", (cutoff,)
+            "SELECT status, direction, opened_at FROM signals WHERE opened_at >= ?",
+            (cutoff,)
+        ).fetchall()
+        # Last 7 closed signals for streak (independent of days filter)
+        streak_rows = c.execute(
+            f"SELECT status FROM signals "
+            f"WHERE status IN ({','.join('?'*len(FINAL_STATUSES))}) "
+            f"ORDER BY opened_at DESC LIMIT 7",
+            FINAL_STATUSES,
         ).fetchall()
 
-    statuses = [r["status"] for r in rows]
-    total    = len(statuses)
-    active_open = statuses.count("OPEN")
-    active_tp1  = statuses.count("TP1_PARTIAL")
-    closed  = sum(1 for s in statuses if s in FINAL_STATUSES)
-    tp1_hit = sum(1 for s in statuses if s in TP1_STATUSES)
-    tp2_hit = statuses.count("TP2_HIT")
-    breakeven   = statuses.count("BREAKEVEN")
-    sl_hit      = statuses.count("SL_HIT")
-    expired     = statuses.count("EXPIRED")
-    tp1_expired = statuses.count("TP1_EXPIRED")
-    profitable  = sum(1 for s in statuses if s in PROFIT_STATUSES)
+    rows = [dict(r) for r in rows]
+
+    # ── Basic counts ──────────────────────────────────────────────────────────
+    total       = len(rows)
+    active_open = sum(1 for r in rows if r["status"] == "OPEN")
+    active_tp1  = sum(1 for r in rows if r["status"] == "TP1_PARTIAL")
+    closed      = sum(1 for r in rows if r["status"] in FINAL_STATUSES)
+    tp1_hit     = sum(1 for r in rows if r["status"] in TP1_STATUSES)
+    tp2_hit     = sum(1 for r in rows if r["status"] == "TP2_HIT")
+    breakeven   = sum(1 for r in rows if r["status"] == "BREAKEVEN")
+    sl_hit      = sum(1 for r in rows if r["status"] == "SL_HIT")
+    expired     = sum(1 for r in rows if r["status"] == "EXPIRED")
+    tp1_expired = sum(1 for r in rows if r["status"] == "TP1_EXPIRED")
+    profitable  = sum(1 for r in rows if r["status"] in PROFIT_STATUSES)
 
     win_rate = (profitable / closed * 100) if closed else 0.0
-    tp1_rate = (tp1_hit / total * 100) if total else 0.0
+    tp1_rate = (tp1_hit    / total  * 100) if total  else 0.0
+
+    # ── Total R ───────────────────────────────────────────────────────────────
+    total_r = sum(_status_r(r["status"]) for r in rows if r["status"] in FINAL_STATUSES)
+    r_per_trade = (total_r / closed) if closed else 0.0
+
+    # ── Direction breakdown ───────────────────────────────────────────────────
+    dir_stats = {}
+    for direction in ("LONG", "SHORT"):
+        dr = [r for r in rows if r.get("direction") == direction]
+        dr_closed = [r for r in dr if r["status"] in FINAL_STATUSES]
+        dr_wins   = sum(1 for r in dr_closed if r["status"] in PROFIT_STATUSES)
+        dr_r      = sum(_status_r(r["status"]) for r in dr_closed)
+        dir_stats[direction] = {
+            "total":    len(dr),
+            "closed":   len(dr_closed),
+            "wins":     dr_wins,
+            "win_rate": round(dr_wins / len(dr_closed) * 100, 1) if dr_closed else 0.0,
+            "total_r":  round(dr_r, 2),
+        }
+
+    # ── Recent streak (last 7 closed, newest first) ───────────────────────────
+    streak = []
+    for r in streak_rows:
+        st = r["status"]
+        if st == "TP2_HIT":
+            streak.append("🏆")
+        elif st in PROFIT_STATUSES:
+            streak.append("✅")
+        elif st == "SL_HIT":
+            streak.append("❌")
+        else:
+            streak.append("➖")
+    # Count current run (consecutive same outcome from newest)
+    current_run = 1
+    if len(streak) >= 2:
+        for i in range(1, len(streak)):
+            if streak[i] == streak[0]:
+                current_run += 1
+            else:
+                break
 
     return {
         "days":             days,
@@ -562,4 +624,10 @@ def get_stats(days: int = 7) -> dict:
         "sl_hit":           sl_hit,
         "expired":          expired,
         "win_rate":         round(win_rate, 1),
+        "total_r":          round(total_r, 2),
+        "r_per_trade":      round(r_per_trade, 3),
+        "long":             dir_stats.get("LONG",  {}),
+        "short":            dir_stats.get("SHORT", {}),
+        "streak":           streak,
+        "current_run":      current_run,
     }
