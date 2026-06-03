@@ -1231,7 +1231,17 @@ def run_scan():
         log.info(f"SMC filter: {len(setups)} setups from {len(coins)} coins")
 
         # Step 3: remove duplicates
-        fresh = [s for s in setups if not _is_duplicate(s["symbol"], s["direction"])]
+        # Also block any symbol that already has an OPEN or TP1_PARTIAL position in DB.
+        # This prevents re-signalling a coin we're already trading (e.g. BNB hit TP1,
+        # still waiting for TP2 — bot must not open a second trade on BNB).
+        _active_now = {sig["symbol"] for sig in get_open_signals()}
+        def _blocked(s):
+            sym = s["symbol"]
+            if sym in _active_now:
+                log.info(f"  Skip {sym} — already have open position")
+                return True
+            return _is_duplicate(sym, s["direction"])
+        fresh = [s for s in setups if not _blocked(s)]
         log.info(f"After dedup: {len(fresh)} fresh setups")
 
         # Step 3b: news + funding enrichment
