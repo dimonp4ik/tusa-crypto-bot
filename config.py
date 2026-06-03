@@ -13,14 +13,14 @@ ADMIN_IDS = {671071896}  # super-admin only; others added via bot → DB
 
 # --- Scan settings ---
 SCAN_INTERVAL_MINUTES = int(os.getenv("SCAN_INTERVAL_MINUTES", "5"))
-TOP_COINS_COUNT = int(os.getenv("TOP_COINS_COUNT", "45"))
+TOP_COINS_COUNT = int(os.getenv("TOP_COINS_COUNT", "25"))
 TIMEFRAME = "15m"          # 15m candle → swing signals, hold 2-8h
 KLINES_LIMIT = 200         # 200 × 15m = ~50 hours of data for SMC
 
 # --- Symbol quality filter ---
 # ALLOWED_SYMBOLS="" (default) → auto top-volume mode, top 45 by 24h USDT volume.
 # Set ALLOWED_SYMBOLS=BTC-USDT,ETH-USDT,... in .env for strict whitelist.
-MIN_24H_QUOTE_VOLUME_USDT = float(os.getenv("MIN_24H_QUOTE_VOLUME_USDT", "3000000"))
+MIN_24H_QUOTE_VOLUME_USDT = float(os.getenv("MIN_24H_QUOTE_VOLUME_USDT", "5000000"))
 MAX_SPREAD_PCT            = float(os.getenv("MAX_SPREAD_PCT", "0.20"))
 
 def _parse_symbol_list(value, default=None):
