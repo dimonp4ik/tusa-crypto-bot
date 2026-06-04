@@ -46,6 +46,7 @@ from src.db import (
     upsert_user, get_user_by_id, get_all_users,
     add_dynamic_admin, remove_dynamic_admin, get_dynamic_admins, is_dynamic_admin,
     delete_signal, get_recent_signals,
+    get_signals_count, get_signals_page, get_distinct_signal_symbols,
     get_claude_spend_stats,
     get_bot_state, set_bot_state,
 )
@@ -205,6 +206,101 @@ def _format_open_signal(s: dict) -> str:
 
     header = f"{icon} *{s['symbol']}* {direction} @ `{entry}`  _{age_h}ч_"
     return f"{header}\n{price_line}"
+
+
+# ── Deals journal: pagination + symbol search ─────────────────────────────────
+_DEALS_PER_PAGE = 5
+_DEAL_STATUS_ICON = {
+    "OPEN": "🟢", "TP1_PARTIAL": "🟡", "TP2_HIT": "✅",
+    "BREAKEVEN": "⚖️", "SL_HIT": "❌", "EXPIRED": "⏱",
+    "TP1_EXPIRED": "⏱", "TP1_HIT": "✅",
+}
+
+
+def _edit_with_keyboard(chat_id: int, message_id: int, text: str, kb_rows: list):
+    """Edit a message with a custom inline keyboard (Markdown)."""
+    try:
+        _requests.post(
+            f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/editMessageText",
+            json={
+                "chat_id": chat_id, "message_id": message_id,
+                "text": text, "parse_mode": "Markdown",
+                "reply_markup": {"inline_keyboard": kb_rows},
+            },
+            timeout=10,
+        )
+    except Exception as e:
+        log.warning(f"_edit_with_keyboard failed: {e}")
+
+
+def _render_deals_page(chat_id: int, message_id: int, page: int, symbol: str = None):
+    """Render one page (5 deals) of the journal with delete + nav + search buttons."""
+    per   = _DEALS_PER_PAGE
+    total = get_signals_count(symbol)
+    if total == 0:
+        msg = (f"🗑 *Сделки по {symbol}*\n\nНет сделок." if symbol
+               else "🗑 *Управление сделками*\n\nСделок в базе нет.")
+        _edit_message(chat_id, message_id, msg)
+        return
+
+    pages  = (total + per - 1) // per
+    page   = max(0, min(page, pages - 1))
+    offset = page * per
+    sigs   = get_signals_page(per, offset, symbol)
+    _RIGA  = _riga_tz()
+
+    title = f"🗑 *Сделки по {symbol}*" if symbol else "🗑 *Управление сделками*"
+    lines = [f"{title}  (стр. {page + 1}/{pages}, всего {total})\n"]
+    kb_rows = []
+    for s in sigs:
+        icon   = _DEAL_STATUS_ICON.get(s["status"], "•")
+        opened = datetime.fromtimestamp(s["opened_at"], tz=_RIGA).strftime("%d.%m %H:%M")
+        lines.append(
+            f"{icon} `#{s['id']}` *{s['symbol']}* {s['direction']} "
+            f"@ {s['entry_price']}  [{s['status']}]  {opened}"
+        )
+        kb_rows.append([{
+            "text": f"🗑 Удалить #{s['id']} {s['symbol']} {s['direction']}",
+            "callback_data": f"adm_del_sig_{s['id']}",
+        }])
+
+    # Nav row: ◀️ (prev) | 🔍 Поиск | ▶️ (next)
+    def _pcb(p):
+        return f"adm_dsym_{symbol}_p{p}" if symbol else f"adm_deals_p{p}"
+    nav = []
+    if page > 0:
+        nav.append({"text": "◀️", "callback_data": _pcb(page - 1)})
+    nav.append({"text": "🔍 Поиск", "callback_data": "adm_deals_search"})
+    if page < pages - 1:
+        nav.append({"text": "▶️", "callback_data": _pcb(page + 1)})
+    kb_rows.append(nav)
+
+    if symbol:
+        kb_rows.append([{"text": "📋 Все сделки", "callback_data": "adm_deals_p0"}])
+    kb_rows.append([{"text": "« Назад", "callback_data": "adm_back"}])
+
+    _edit_with_keyboard(chat_id, message_id, "\n".join(lines), kb_rows)
+
+
+def _render_deals_symbol_picker(chat_id: int, message_id: int):
+    """Show all journal symbols as buttons; click → that symbol's deals."""
+    symbols = get_distinct_signal_symbols()
+    if not symbols:
+        _edit_message(chat_id, message_id, "🔍 *Поиск*\n\nВ журнале нет монет.")
+        return
+    kb_rows, row = [], []
+    for sym in symbols:
+        row.append({"text": sym, "callback_data": f"adm_dsym_{sym}_p0"})
+        if len(row) == 3:
+            kb_rows.append(row); row = []
+    if row:
+        kb_rows.append(row)
+    kb_rows.append([{"text": "« Назад к сделкам", "callback_data": "adm_deals_p0"}])
+    _edit_with_keyboard(
+        chat_id, message_id,
+        "🔍 *Поиск по монете*\nВыбери монету — покажу все её сделки:",
+        kb_rows,
+    )
 
 
 def _edit_message(chat_id: int, message_id: int, text: str):
@@ -446,60 +542,37 @@ def _handle_admin_callback(callback_id: str, chat_id: int,
         except Exception as e:
             log.warning(f"add_admin prompt failed: {e}")
 
-    elif data == "adm_deals":
+    elif data == "adm_deals" or data == "adm_deals_p0":
+        _render_deals_page(chat_id, message_id, 0)
+
+    elif data.startswith("adm_deals_p"):
         try:
-            sigs = get_recent_signals(limit=20)
-            if not sigs:
-                txt = "🗑 *Управление сделками*\n\nСделок в базе нет."
-                _edit_message(chat_id, message_id, txt)
-            else:
-                _RIGA = _riga_tz()
-                STATUS_ICON = {
-                    "OPEN": "🟢", "TP1_PARTIAL": "🟡", "TP2_HIT": "✅",
-                    "BREAKEVEN": "⚖️", "SL_HIT": "❌", "EXPIRED": "⏱",
-                    "TP1_EXPIRED": "⏱", "TP1_HIT": "✅",
-                }
-                lines = [f"🗑 *Управление сделками* (последние {len(sigs)})\n"]
-                kb_rows = []
-                import time as _t
-                for s in sigs:
-                    icon   = STATUS_ICON.get(s["status"], "•")
-                    opened = datetime.fromtimestamp(s["opened_at"], tz=_RIGA).strftime("%d.%m %H:%M")
-                    lines.append(
-                        f"{icon} `#{s['id']}` *{s['symbol']}* {s['direction']} "
-                        f"@ {s['entry_price']}  [{s['status']}]  {opened}"
-                    )
-                    kb_rows.append([{
-                        "text": f"🗑 Удалить #{s['id']} {s['symbol']} {s['direction']}",
-                        "callback_data": f"adm_del_sig_{s['id']}",
-                    }])
-                kb_rows.append([{"text": "« Назад", "callback_data": "adm_back"}])
-                try:
-                    _requests.post(
-                        f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/editMessageText",
-                        json={
-                            "chat_id": chat_id, "message_id": message_id,
-                            "text": "\n".join(lines), "parse_mode": "Markdown",
-                            "reply_markup": {"inline_keyboard": kb_rows},
-                        },
-                        timeout=10,
-                    )
-                except Exception as e:
-                    log.warning(f"adm_deals keyboard failed: {e}")
-        except Exception as e:
-            _edit_message(chat_id, message_id, f"Ошибка: {e}")
+            page = int(data[len("adm_deals_p"):])
+        except ValueError:
+            page = 0
+        _render_deals_page(chat_id, message_id, page)
+
+    elif data == "adm_deals_search":
+        _render_deals_symbol_picker(chat_id, message_id)
+
+    elif data.startswith("adm_dsym_"):
+        # Format: adm_dsym_{SYMBOL}_p{N}
+        rest = data[len("adm_dsym_"):]
+        try:
+            sym_part, page_part = rest.rsplit("_p", 1)
+            page = int(page_part)
+        except ValueError:
+            sym_part, page = rest, 0
+        _render_deals_page(chat_id, message_id, page, symbol=sym_part)
 
     elif data.startswith("adm_del_sig_"):
         try:
             sig_id = int(data[len("adm_del_sig_"):])
-            removed = delete_signal(sig_id)
-            if removed:
-                txt = f"✅ Сделка `#{sig_id}` удалена из базы."
-            else:
-                txt = f"⚠️ Сделка `#{sig_id}` не найдена (уже удалена?)."
+            delete_signal(sig_id)
         except Exception as e:
-            txt = f"Ошибка удаления: {e}"
-        _edit_message(chat_id, message_id, txt)
+            log.warning(f"delete signal failed: {e}")
+        # Refresh the deals list so the deleted row disappears in place
+        _render_deals_page(chat_id, message_id, 0)
 
     elif data == "adm_budget":
         try:

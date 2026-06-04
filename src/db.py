@@ -174,6 +174,44 @@ def get_recent_signals(limit: int = 20) -> list:
         return [dict(r) for r in rows]
 
 
+def get_signals_count(symbol: str = None) -> int:
+    """Total number of signals (optionally filtered by symbol)."""
+    with _conn() as c:
+        if symbol:
+            row = c.execute(
+                "SELECT COUNT(*) FROM signals WHERE symbol = ?", (symbol,)
+            ).fetchone()
+        else:
+            row = c.execute("SELECT COUNT(*) FROM signals").fetchone()
+        return int(row[0])
+
+
+def get_signals_page(limit: int, offset: int, symbol: str = None) -> list:
+    """Return a page of signals (newest first), optionally filtered by symbol."""
+    with _conn() as c:
+        if symbol:
+            rows = c.execute(
+                "SELECT * FROM signals WHERE symbol = ? "
+                "ORDER BY opened_at DESC LIMIT ? OFFSET ?",
+                (symbol, limit, offset),
+            ).fetchall()
+        else:
+            rows = c.execute(
+                "SELECT * FROM signals ORDER BY opened_at DESC LIMIT ? OFFSET ?",
+                (limit, offset),
+            ).fetchall()
+        return [dict(r) for r in rows]
+
+
+def get_distinct_signal_symbols() -> list:
+    """All distinct symbols that ever appeared in the signals journal, A→Z."""
+    with _conn() as c:
+        rows = c.execute(
+            "SELECT DISTINCT symbol FROM signals ORDER BY symbol ASC"
+        ).fetchall()
+        return [r["symbol"] for r in rows]
+
+
 def log_signal(analysis: dict, tp1: float, tp2: float, sl: float):
     """Insert a new signal into DB. Status starts as OPEN."""
     with _conn() as c:
