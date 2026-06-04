@@ -52,8 +52,8 @@ def calculate_tp_sl(price: float, direction: str, atr: float = 0.0,
         else:
             tp1 = price + risk * TP1_R_MULT
 
-        # TP2: next structural level above TP1
-        if tp2_level and tp2_level > tp1 * 1.001:
+        # TP2: next structural level above TP1 AND at least 1.5R from entry
+        if tp2_level and tp2_level > tp1 * 1.001 and (tp2_level - price) >= risk * 1.5:
             tp2 = tp2_level
         else:
             tp2 = price + risk * TP2_R_MULT
@@ -72,8 +72,8 @@ def calculate_tp_sl(price: float, direction: str, atr: float = 0.0,
         else:
             tp1 = price - risk * TP1_R_MULT
 
-        # TP2: next structural level below TP1
-        if tp2_level and tp2_level < tp1 * 0.999:
+        # TP2: next structural level below TP1 AND at least 1.5R from entry
+        if tp2_level and tp2_level < tp1 * 0.999 and (price - tp2_level) >= risk * 1.5:
             tp2 = tp2_level
         else:
             tp2 = price - risk * TP2_R_MULT

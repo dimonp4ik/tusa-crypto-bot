@@ -160,7 +160,7 @@ SL_ATR_BUFFER = float(os.getenv("SL_ATR_BUFFER", "0.5"))   # buffer beyond swing
 RISK_MIN_PCT  = float(os.getenv("RISK_MIN_PCT", "0.012"))  # min SL distance = 1.2%
 RISK_MAX_PCT  = float(os.getenv("RISK_MAX_PCT", "0.03"))   # max SL distance = 3.0% (20x safe)
 TP1_R_MULT    = float(os.getenv("TP1_R_MULT", "1.5"))      # TP1 = entry ± risk * 1.5
-TP2_R_MULT    = float(os.getenv("TP2_R_MULT", "3.0"))      # TP2 = entry ± risk * 3.0
+TP2_R_MULT    = float(os.getenv("TP2_R_MULT", "2.0"))      # TP2 = entry ± risk * 2.0 (was 3.0 — unreachable)
 
 # --- BTC correlation filter ---
 BTC_BLOCK_THRESHOLD_PCT = 1.0
