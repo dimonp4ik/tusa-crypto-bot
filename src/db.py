@@ -560,9 +560,13 @@ def _status_r(status: str) -> float:
     return 0.0
 
 
-def get_stats(days: int = 7) -> dict:
-    """Aggregate stats with R-value, direction breakdown and recent streak."""
-    cutoff = time_mod.time() - days * 86400
+def get_stats(days: int = 7, since_ts: float = None) -> dict:
+    """Aggregate stats with R-value, direction breakdown and recent streak.
+
+    `days`     — rolling window (last N×24h) when since_ts is None.
+    `since_ts` — explicit epoch cutoff (e.g. Riga midnight for calendar 'today').
+    """
+    cutoff = since_ts if since_ts is not None else time_mod.time() - days * 86400
     with _conn() as c:
         rows = c.execute(
             "SELECT status, direction, opened_at FROM signals WHERE opened_at >= ?",

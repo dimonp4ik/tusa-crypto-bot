@@ -876,6 +876,10 @@ def webhook():
     # 📈 Результаты
     elif text == "📈 результаты":
         try:
+            # "Today" = since midnight Europe/Riga (calendar day, not rolling 24h)
+            _now_riga    = datetime.now(_riga_tz())
+            _riga_midnight = _now_riga.replace(hour=0, minute=0, second=0, microsecond=0).timestamp()
+            sd  = get_stats(since_ts=_riga_midnight)
             s7  = get_stats(days=7)
             s30 = get_stats(days=30)
 
@@ -940,6 +944,8 @@ def webhook():
 
             text_out = (
                 "📈 *Результаты бота*\n\n"
+                + _fmt_stats(sd,  "Сегодня")
+                + "\n\n"
                 + _fmt_stats(s7,  "За 7 дней")
                 + "\n\n"
                 + _fmt_stats(s30, "За 30 дней")
