@@ -294,6 +294,15 @@ def send_signal_update(sig: dict, new_status: str, exit_price: float) -> bool:
             f"TP1 был взят, TP2 не достигнут за 48ч\n"
             f"Цена: `{_format_price(exit_price)}`"
         )
+    elif new_status == "TP1_TRAIL":
+        icon  = "🎯"
+        title = "РАННЕР ЗАКРЫТ (трейлинг)"
+        body  = (
+            f"TP1 был взят, остаток вёлся трейлингом\n"
+            f"Закрыто по `{_format_price(exit_price)}`\n"
+            f"Движение: `{sign}{move_pct:.2f}%`  (x{lev}: `{sign}{lev_profit:.0f}%`)\n"
+            f"✅ Сделка полностью закрыта в прибыли"
+        )
     else:
         return False
 

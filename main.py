@@ -25,6 +25,7 @@ from config import (
     TRADING_HOURS_START, TRADING_HOURS_END, TRADE_WEEKENDS,
     MAX_SETUPS_TO_CLAUDE, ALLOWED_SYMBOLS, KLINES_INTERVAL_SEC, SIGNAL_EXPIRY_HOURS,
     CLAUDE_HEAVY_MIN_SCORE, CLAUDE_HEAVY_MAX_PER_SCAN, CLAUDE_MEMORY_LIMIT,
+    TRAIL_RUNNER_ENABLED, TRAIL_ATR_MULT,
 )
 from src.binance_client import (
     get_top_coins, get_klines, get_klines_1h, get_klines_4h,
@@ -213,7 +214,7 @@ _DEALS_PER_PAGE = 5
 _DEAL_STATUS_ICON = {
     "OPEN": "🟢", "TP1_PARTIAL": "🟡", "TP2_HIT": "✅",
     "BREAKEVEN": "⚖️", "SL_HIT": "❌", "EXPIRED": "⏱",
-    "TP1_EXPIRED": "⏱", "TP1_HIT": "✅",
+    "TP1_EXPIRED": "⏱", "TP1_HIT": "✅", "TP1_TRAIL": "✅",
 }
 
 
@@ -1230,8 +1231,16 @@ def _check_open_signals():
             monitor_from = opened_at if status == "OPEN" else float(sig.get("tp1_hit_at") or opened_at)
             df = _slice_candles_from_open(df_all, monitor_from)
 
-            new_status = None
-            exit_px    = df_all["close"][-1] if df_all.get("close") else entry
+            new_status   = None
+            realized_r   = None
+            exit_px      = df_all["close"][-1] if df_all.get("close") else entry
+
+            # Trailing-runner setup (after TP1): peak ∓ TRAIL_ATR_MULT×ATR, floored at BE.
+            atr        = float(sig.get("atr") or 0.0)
+            risk       = abs(entry - sl)
+            tp1_r      = (abs(tp1 - entry) / risk) if risk > 0 else 0.0
+            use_trail  = TRAIL_RUNNER_ENABLED and atr > 0 and risk > 0
+            best_price = entry   # running peak since TP1
 
             for i in range(len(df.get("close", []))):
                 high  = float(df["high"][i])
@@ -1250,19 +1259,42 @@ def _check_open_signals():
                         if low <= tp1:            new_status, exit_px = "TP1_PARTIAL", tp1; break
 
                 elif status == "TP1_PARTIAL":
-                    # Remaining 50% — SL moved to breakeven (entry)
-                    if direction == "LONG":
-                        if low <= entry:          new_status, exit_px = "BREAKEVEN",  entry; break
-                        if high >= tp2:           new_status, exit_px = "TP2_HIT",    tp2;   break
+                    if use_trail:
+                        # Trail the remaining 50% by ATR; stop never below breakeven.
+                        if direction == "LONG":
+                            best_price = max(best_price, high)
+                            trail_stop = max(entry, best_price - atr * TRAIL_ATR_MULT)
+                            if low <= trail_stop:
+                                runner_r   = max(0.0, (trail_stop - entry) / risk)
+                                realized_r = round(0.5 * tp1_r + 0.5 * runner_r, 4)
+                                new_status, exit_px = "TP1_TRAIL", trail_stop; break
+                            if high >= tp2:
+                                realized_r = round(0.5 * tp1_r + 0.5 * (abs(tp2 - entry) / risk), 4)
+                                new_status, exit_px = "TP2_HIT", tp2; break
+                        else:
+                            best_price = min(best_price, low)
+                            trail_stop = min(entry, best_price + atr * TRAIL_ATR_MULT)
+                            if high >= trail_stop:
+                                runner_r   = max(0.0, (entry - trail_stop) / risk)
+                                realized_r = round(0.5 * tp1_r + 0.5 * runner_r, 4)
+                                new_status, exit_px = "TP1_TRAIL", trail_stop; break
+                            if low <= tp2:
+                                realized_r = round(0.5 * tp1_r + 0.5 * (abs(entry - tp2) / risk), 4)
+                                new_status, exit_px = "TP2_HIT", tp2; break
                     else:
-                        if high >= entry:         new_status, exit_px = "BREAKEVEN",  entry; break
-                        if low <= tp2:            new_status, exit_px = "TP2_HIT",    tp2;   break
+                        # Legacy: SL moved to breakeven, fixed TP2 (no stored ATR).
+                        if direction == "LONG":
+                            if low <= entry:      new_status, exit_px = "BREAKEVEN", entry; break
+                            if high >= tp2:       new_status, exit_px = "TP2_HIT",   tp2;   break
+                        else:
+                            if high >= entry:     new_status, exit_px = "BREAKEVEN", entry; break
+                            if low <= tp2:        new_status, exit_px = "TP2_HIT",   tp2;   break
 
             if new_status is None and age_hours > SIGNAL_EXPIRY_HOURS:
                 new_status = "TP1_EXPIRED" if status == "TP1_PARTIAL" else "EXPIRED"
 
             if new_status:
-                update_signal_status(sig["id"], new_status, exit_px)
+                update_signal_status(sig["id"], new_status, exit_px, realized_r=realized_r)
                 log.info(f"  Signal #{sig['id']} {sig['symbol']} → {new_status}")
                 try:
                     send_signal_update(sig, new_status, exit_px)

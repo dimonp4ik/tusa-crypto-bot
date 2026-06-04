@@ -24,9 +24,9 @@ from config import (
 )
 
 ACTIVE_STATUSES = ("OPEN", "TP1_PARTIAL")
-FINAL_STATUSES  = ("TP2_HIT", "BREAKEVEN", "SL_HIT", "EXPIRED", "TP1_EXPIRED", "TP1_HIT")
-TP1_STATUSES    = ("TP1_PARTIAL", "TP2_HIT", "BREAKEVEN", "TP1_EXPIRED", "TP1_HIT")
-PROFIT_STATUSES = ("TP2_HIT", "BREAKEVEN", "TP1_EXPIRED", "TP1_HIT")
+FINAL_STATUSES  = ("TP2_HIT", "BREAKEVEN", "SL_HIT", "EXPIRED", "TP1_EXPIRED", "TP1_HIT", "TP1_TRAIL")
+TP1_STATUSES    = ("TP1_PARTIAL", "TP2_HIT", "BREAKEVEN", "TP1_EXPIRED", "TP1_HIT", "TP1_TRAIL")
+PROFIT_STATUSES = ("TP2_HIT", "BREAKEVEN", "TP1_EXPIRED", "TP1_HIT", "TP1_TRAIL")
 
 
 def _conn():
@@ -68,7 +68,9 @@ def init_db():
                 market_price  REAL,
                 mtf_score     INTEGER,
                 mtf_score_max INTEGER,
-                premium       INTEGER DEFAULT 0
+                premium       INTEGER DEFAULT 0,
+                atr           REAL,
+                realized_r    REAL
             )
         """)
         # Migrate older DBs
@@ -82,6 +84,8 @@ def init_db():
             "mtf_score":     "INTEGER",
             "mtf_score_max": "INTEGER",
             "premium":       "INTEGER DEFAULT 0",
+            "atr":           "REAL",
+            "realized_r":    "REAL",
         }.items():
             _ensure_column(c, "signals", col, ddl)
 
@@ -221,9 +225,9 @@ def log_signal(analysis: dict, tp1: float, tp2: float, sl: float):
             INSERT INTO signals (
                 symbol, direction, entry_price, tp1, tp2, sl, opened_at, status,
                 confidence, reason, entry_low, entry_high, entry_source, market_price,
-                mtf_score, mtf_score_max, premium
+                mtf_score, mtf_score_max, premium, atr
             )
-            VALUES (?, ?, ?, ?, ?, ?, ?, 'OPEN', ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            VALUES (?, ?, ?, ?, ?, ?, ?, 'OPEN', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """, (
             analysis["symbol"], analysis["direction"], analysis["current_price"],
             tp1, tp2, sl, time_mod.time(),
@@ -232,6 +236,7 @@ def log_signal(analysis: dict, tp1: float, tp2: float, sl: float):
             analysis.get("entry_source"), analysis.get("market_price"),
             analysis.get("mtf_score"), analysis.get("mtf_score"),
             1 if analysis.get("premium") else 0,
+            analysis.get("atr"),
         ))
 
 
@@ -246,11 +251,12 @@ def get_open_signals() -> list:
         return [dict(r) for r in rows]
 
 
-def update_signal_status(signal_id: int, status: str, exit_price=None):
+def update_signal_status(signal_id: int, status: str, exit_price=None, realized_r=None):
     """
     Update signal lifecycle.
     TP1_PARTIAL records TP1 but keeps signal active for TP2/BE monitoring.
     All other statuses close the signal.
+    `realized_r` (optional) stores the actual R for variable-exit closes (trailing).
     """
     now = time_mod.time()
     with _conn() as c:
@@ -262,15 +268,17 @@ def update_signal_status(signal_id: int, status: str, exit_price=None):
             """, (now, exit_price, signal_id))
         else:
             c.execute("""
-                UPDATE signals SET status = ?, closed_at = ?, exit_price = ?
+                UPDATE signals SET status = ?, closed_at = ?, exit_price = ?, realized_r = ?
                 WHERE id = ?
-            """, (status, now, exit_price, signal_id))
+            """, (status, now, exit_price, realized_r, signal_id))
 
 
 def _status_to_r(status: str) -> float:
     """Approximate R for symbol-level blocking."""
     if status == "TP2_HIT":
         return 1.5   # 50% at 1R + 50% at 2R
+    if status == "TP1_TRAIL":
+        return 0.75  # TP1 taken + trailed runner in profit
     if status in ("BREAKEVEN", "TP1_EXPIRED", "TP1_HIT"):
         return 0.5
     if status == "SL_HIT":
@@ -590,15 +598,29 @@ def get_symbols_performance(days: int = 30) -> list:
 
 
 def _status_r(status: str) -> float:
-    """R value of a closed trade outcome (fixed R model, TP1=1.5R TP2=3.0R SL=1R)."""
-    # TP2: 50% closed at TP1 (0.75R) + 50% at TP2 (1.5R) = 2.25R
-    if status == "TP2_HIT":    return  2.25
+    """R value of a closed trade outcome (fixed R model, TP1=1.5R TP2=2.0R SL=1R).
+
+    NOTE: for TP1_TRAIL the real R is variable and stored in the realized_r column;
+    this fixed value is only a fallback when realized_r is missing.
+    """
+    # TP2: 50% closed at TP1 (0.75R) + 50% at TP2 (1.0R) = 1.75R
+    if status == "TP2_HIT":    return  1.75
+    # Trailed runner — fallback estimate (real value comes from realized_r)
+    if status == "TP1_TRAIL":  return  1.00
     # TP1 only outcomes: 50% at TP1 = 0.75R
     if status in ("TP1_HIT", "BREAKEVEN", "TP1_EXPIRED"): return 0.75
     # Full SL before TP1
     if status == "SL_HIT":     return -1.00
     # Expired before any TP — no profit, small fee drag (treat as 0)
     return 0.0
+
+
+def _row_r(row) -> float:
+    """Realized R for a row — prefers the stored realized_r, falls back to status R."""
+    rr = row["realized_r"] if "realized_r" in row.keys() else None
+    if rr is not None:
+        return float(rr)
+    return _status_r(row["status"])
 
 
 def get_stats(days: int = 7, since_ts: float = None) -> dict:
@@ -610,7 +632,7 @@ def get_stats(days: int = 7, since_ts: float = None) -> dict:
     cutoff = since_ts if since_ts is not None else time_mod.time() - days * 86400
     with _conn() as c:
         rows = c.execute(
-            "SELECT status, direction, opened_at, premium FROM signals WHERE opened_at >= ?",
+            "SELECT status, direction, opened_at, premium, realized_r FROM signals WHERE opened_at >= ?",
             (cutoff,)
         ).fetchall()
         # Last 7 closed signals for streak (independent of days filter)
@@ -640,7 +662,7 @@ def get_stats(days: int = 7, since_ts: float = None) -> dict:
     tp1_rate = (tp1_hit    / total  * 100) if total  else 0.0
 
     # ── Total R ───────────────────────────────────────────────────────────────
-    total_r = sum(_status_r(r["status"]) for r in rows if r["status"] in FINAL_STATUSES)
+    total_r = sum(_row_r(r) for r in rows if r["status"] in FINAL_STATUSES)
     r_per_trade = (total_r / closed) if closed else 0.0
 
     # ── Direction breakdown ───────────────────────────────────────────────────
@@ -649,7 +671,7 @@ def get_stats(days: int = 7, since_ts: float = None) -> dict:
         dr = [r for r in rows if r.get("direction") == direction]
         dr_closed = [r for r in dr if r["status"] in FINAL_STATUSES]
         dr_wins   = sum(1 for r in dr_closed if r["status"] in PROFIT_STATUSES)
-        dr_r      = sum(_status_r(r["status"]) for r in dr_closed)
+        dr_r      = sum(_row_r(r) for r in dr_closed)
         dir_stats[direction] = {
             "total":    len(dr),
             "closed":   len(dr_closed),
@@ -662,7 +684,7 @@ def get_stats(days: int = 7, since_ts: float = None) -> dict:
     prem_rows   = [r for r in rows if r.get("premium")]
     prem_closed = [r for r in prem_rows if r["status"] in FINAL_STATUSES]
     prem_wins   = sum(1 for r in prem_closed if r["status"] in PROFIT_STATUSES)
-    prem_r      = sum(_status_r(r["status"]) for r in prem_closed)
+    prem_r      = sum(_row_r(r) for r in prem_closed)
     premium = {
         "total":    len(prem_rows),
         "closed":   len(prem_closed),
