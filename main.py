@@ -230,10 +230,18 @@ def _handle_admin_callback(callback_id: str, chat_id: int,
 
     if data == "adm_stats":
         try:
+            _now_riga      = datetime.now(_riga_tz())
+            _riga_midnight = _now_riga.replace(hour=0, minute=0, second=0, microsecond=0).timestamp()
+            sd  = get_stats(since_ts=_riga_midnight)
             s7  = get_stats(days=7)
             s30 = get_stats(days=30)
             txt = (
                 f"📈 *СТАТИСТИКА*\n\n"
+                f"*Сегодня:*\n"
+                f"  Сигналов: {sd['total']}  Закрыто: {sd['closed']}\n"
+                f"  TP1: {sd['tp1_hit']} ({sd['tp1_rate']}%)  TP2: {sd['tp2_hit']}\n"
+                f"  BE: {sd['breakeven']}  SL: {sd['sl_hit']}  Expired: {sd['expired']}\n"
+                f"  Win rate: *{sd['win_rate']}%*\n\n"
                 f"*За 7 дней:*\n"
                 f"  Сигналов: {s7['total']}  Закрыто: {s7['closed']}\n"
                 f"  TP1: {s7['tp1_hit']} ({s7['tp1_rate']}%)  TP2: {s7['tp2_hit']}\n"
@@ -1002,12 +1010,20 @@ def webhook():
     # /stats — статистика побед/поражений
     elif text in ("/stats", "/статистика"):
         try:
+            _now_riga      = datetime.now(_riga_tz())
+            _riga_midnight = _now_riga.replace(hour=0, minute=0, second=0, microsecond=0).timestamp()
+            sd  = get_stats(since_ts=_riga_midnight)
             s7  = get_stats(days=7)
             s30 = get_stats(days=30)
             blocks = get_active_symbol_blocks()
             blocks_line = ", ".join(b["symbol"] for b in blocks[:6]) if blocks else "нет"
             _reply(chat_id,
                    f"📈 *СТАТИСТИКА*\n\n"
+                   f"*Сегодня:*\n"
+                   f"  Сигналов: {sd['total']}  Закрыто: {sd['closed']}\n"
+                   f"  TP1: {sd['tp1_hit']} ({sd['tp1_rate']}%)  TP2: {sd['tp2_hit']}\n"
+                   f"  BE: {sd['breakeven']}  SL: {sd['sl_hit']}  Expired: {sd['expired']}\n"
+                   f"  Win rate: *{sd['win_rate']}%*\n\n"
                    f"*За 7 дней:*\n"
                    f"  Сигналов: {s7['total']}  Закрыто: {s7['closed']}\n"
                    f"  TP1: {s7['tp1_hit']} ({s7['tp1_rate']}%)  TP2: {s7['tp2_hit']}\n"
