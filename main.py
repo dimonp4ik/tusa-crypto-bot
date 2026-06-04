@@ -1358,7 +1358,8 @@ def run_scan():
         except Exception as e:
             log.warning(f"Calendar check failed: {e}")
 
-        # Step 5: Send signals to Telegram
+        # Step 5: Send signals to Telegram (hard cap: max 3 per scan)
+        MAX_SIGNALS_PER_SCAN = 3
         sent_count = 0
         for analysis in analyses:
             try:
@@ -1386,6 +1387,9 @@ def run_scan():
                     continue
 
                 if decision != "NO TRADE":
+                    if sent_count >= MAX_SIGNALS_PER_SCAN:
+                        log.info(f"  Skip {analysis['symbol']} — scan cap {MAX_SIGNALS_PER_SCAN} reached")
+                        continue
                     if send_signal(analysis):
                         _cache_signal(analysis["symbol"], direction)
                         sent_count += 1

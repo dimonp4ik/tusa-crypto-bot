@@ -80,7 +80,7 @@ SMC_MIN_CONFIRMATIONS = int(os.getenv("SMC_MIN_CONFIRMATIONS", "2"))
 SMC_BOS_MIN_VOLUME    = float(os.getenv("SMC_BOS_MIN_VOLUME", "1.5"))
 SMC_RSI_LONG_MAX      = float(os.getenv("SMC_RSI_LONG_MAX", "72"))   # skip overextended longs
 SMC_RSI_SHORT_MIN     = float(os.getenv("SMC_RSI_SHORT_MIN", "28"))  # skip overextended shorts
-MAX_SETUPS_TO_CLAUDE  = int(os.getenv("MAX_SETUPS_TO_CLAUDE", "8"))  # only strongest go to Claude
+MAX_SETUPS_TO_CLAUDE  = int(os.getenv("MAX_SETUPS_TO_CLAUDE", "5"))  # only strongest go to Claude
 
 # --- Entry zone (FVG / Order Block) ---
 # When enabled, setups without an active FVG or OB zone near price are skipped.
@@ -96,7 +96,7 @@ REQUIRE_RETEST      = os.getenv("REQUIRE_RETEST", "1") != "0"
 RETEST_MAX_DIST_PCT = float(os.getenv("RETEST_MAX_DIST_PCT", "0.015"))  # within 1.5% of zone edge
 
 # --- Multi-timeframe score gate (max ~15) ---
-MTF_MIN_SCORE = int(os.getenv("MTF_MIN_SCORE", "9"))   # session/OB bonuses boost top signals; base entry threshold stays 9
+MTF_MIN_SCORE = int(os.getenv("MTF_MIN_SCORE", "10"))  # raised 9→10: fewer but stronger setups reach Claude
 
 # --- Signal-quality filters (backtested on a PINNED 20-coin / ~21-day set) ---
 # All three were A/B-tested apples-to-apples and DEFAULT OFF — none beat baseline:
@@ -141,8 +141,8 @@ REQUIRE_STRICT_HTF = os.getenv("REQUIRE_STRICT_HTF", "0") != "0"
 # Caching: static rules block cached 1h → cheap re-reads on the 5-min scan loop.
 CLAUDE_LIGHT_MODEL        = os.getenv("CLAUDE_LIGHT_MODEL", "claude-haiku-4-5")
 CLAUDE_HEAVY_MODEL        = os.getenv("CLAUDE_HEAVY_MODEL", "claude-sonnet-4-5")
-CLAUDE_HEAVY_MIN_SCORE    = int(os.getenv("CLAUDE_HEAVY_MIN_SCORE", "10"))   # score >= → HEAVY 2nd opinion
-CLAUDE_HEAVY_MAX_PER_SCAN = int(os.getenv("CLAUDE_HEAVY_MAX_PER_SCAN", "5")) # cost cap per scan
+CLAUDE_HEAVY_MIN_SCORE    = int(os.getenv("CLAUDE_HEAVY_MIN_SCORE", "9"))    # lowered 10→9: all survivors get Sonnet check
+CLAUDE_HEAVY_MAX_PER_SCAN = int(os.getenv("CLAUDE_HEAVY_MAX_PER_SCAN", "3")) # lowered 5→3: budget cap per scan
 CLAUDE_MEMORY_LIMIT       = int(os.getenv("CLAUDE_MEMORY_LIMIT", "15"))      # recent outcomes per coin (HEAVY)
 CLAUDE_MAX_RISK_SCORE     = int(os.getenv("CLAUDE_MAX_RISK_SCORE", "8"))     # counter-arg auto-reject if risk >= this
 CLAUDE_CACHE_TTL          = os.getenv("CLAUDE_CACHE_TTL", "1h")              # prompt cache TTL ("5m" or "1h")
