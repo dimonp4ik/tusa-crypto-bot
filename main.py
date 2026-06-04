@@ -329,7 +329,7 @@ def _handle_admin_callback(callback_id: str, chat_id: int,
     elif data == "adm_worst":
         try:
             perfs = get_symbols_performance(days=30)
-            worst = [p for p in reversed(perfs) if p["trades"] >= 2][:8]
+            worst = [p for p in reversed(perfs) if p["trades"] >= 2 and p["total_r"] < 0][:8]
             if not worst:
                 txt = "💀 *Худшие монеты (30д)*\n\nНедостаточно данных."
             else:
