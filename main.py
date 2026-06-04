@@ -10,6 +10,7 @@ Flow every N minutes:
 """
 
 import logging
+import json
 import os
 import time
 import threading
@@ -79,6 +80,11 @@ log = logging.getLogger(__name__)
 
 # ── Flask (keeps Render dyno alive) ──────────────────────────────────────────
 app = Flask(__name__)
+ADMIN_PANEL_IMAGE_PATH = os.path.join(
+    os.path.dirname(os.path.abspath(__file__)),
+    "assets",
+    "tusa_crypto_banner.png",
+)
 
 
 @app.route("/")
@@ -152,6 +158,22 @@ def _send_persistent_menu(chat_id: int, is_admin: bool = False):
 def _send_keyboard(chat_id: int, text: str):
     """Send message with admin inline keyboard."""
     try:
+        if os.path.exists(ADMIN_PANEL_IMAGE_PATH):
+            with open(ADMIN_PANEL_IMAGE_PATH, "rb") as photo:
+                resp = _requests.post(
+                    f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendPhoto",
+                    data={
+                        "chat_id": chat_id,
+                        "caption": text,
+                        "parse_mode": "Markdown",
+                        "reply_markup": json.dumps(_ADMIN_KEYBOARD),
+                    },
+                    files={"photo": photo},
+                    timeout=10,
+                )
+            if resp.status_code == 200:
+                return
+
         _requests.post(
             f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage",
             json={

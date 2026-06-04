@@ -17,11 +17,6 @@ from config import (
 )
 
 TELEGRAM_API = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}"
-BRAND_IMAGE_PATH = os.path.join(
-    os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
-    "assets",
-    "tusa_crypto_banner.png",
-)
 
 
 def calculate_tp_sl(price: float, direction: str, atr: float = 0.0,
@@ -216,7 +211,7 @@ def send_signal(analysis: dict) -> bool:
         f"🕐 {session_str}  ⏰ {timestamp}"
     )
 
-    if _send_message(message, include_brand_image=True):
+    if _send_message(message):
         # Log to DB
         try:
             from src.db import log_signal
@@ -318,7 +313,7 @@ def send_signal_update(sig: dict, new_status: str, exit_price: float) -> bool:
         f"{body}\n"
         f"⏰ {timestamp}"
     )
-    return _send_message(message, include_brand_image=True)
+    return _send_message(message)
 
 
 def send_news_alert(event: dict) -> bool:
@@ -421,31 +416,7 @@ def send_status(text: str) -> bool:
     return _send_message(text)
 
 
-def _send_brand_image() -> bool:
-    if not os.path.exists(BRAND_IMAGE_PATH):
-        print(f"[Telegram] Brand image not found: {BRAND_IMAGE_PATH}")
-        return False
-
-    try:
-        with open(BRAND_IMAGE_PATH, "rb") as photo:
-            resp = requests.post(
-                f"{TELEGRAM_API}/sendPhoto",
-                data={"chat_id": TELEGRAM_CHAT_ID},
-                files={"photo": photo},
-                timeout=15,
-            )
-        if resp.status_code != 200:
-            print(f"[Telegram] Photo HTTP {resp.status_code}: {resp.text[:200]}")
-        return resp.status_code == 200
-    except Exception as e:
-        print(f"[Telegram] Photo send error: {e}")
-        return False
-
-
-def _send_message(text: str, include_brand_image: bool = False) -> bool:
-    if include_brand_image:
-        _send_brand_image()
-
+def _send_message(text: str) -> bool:
     try:
         resp = requests.post(
             f"{TELEGRAM_API}/sendMessage",
