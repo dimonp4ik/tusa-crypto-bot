@@ -87,18 +87,46 @@ def _select_entry_zone(ind: dict, direction: str):
     return ob_z or fvg_p
 
 
+def _ob_fvg_overlap(ind: dict, direction: str) -> bool:
+    """True when an Order Block and FVG zone overlap (double confluence, no sweep req)."""
+    if direction == "LONG":
+        ob_z, fvg_z = ind.get("bull_ob_zone"), ind.get("bullish_fvg_zone")
+    else:
+        ob_z, fvg_z = ind.get("bear_ob_zone"), ind.get("bearish_fvg_zone")
+    if not ob_z or not fvg_z:
+        return False
+    return _zones_overlap(ob_z, fvg_z)
+
+
+def _premium_setup(ind: dict, direction: str) -> bool:
+    """Institutional TRIPLE confluence: OB + FVG zones overlap AND liquidity sweep.
+
+    Research consensus: an OB+FVG overlap zone is the single highest-probability
+    ICT setup (~65% WR vs ~52% for a lone OB). Adding a liquidity sweep (stop-hunt
+    before the move) confirms smart-money intent. These are rare but premium.
+    """
+    if not _ob_fvg_overlap(ind, direction):
+        return False
+    sweep = ind.get("bull_sweep") if direction == "LONG" else ind.get("bear_sweep")
+    return bool(sweep)
+
+
 # ── MTF Score ─────────────────────────────────────────────────────────────────
 
 def _calc_mtf_score(ind: dict, bos: str, direction: str, confirmations: list,
-                    btc_change_pct: float, entry_zone) -> tuple:
+                    btc_change_pct: float, entry_zone, premium: bool = False) -> tuple:
     """
-    Deterministic quality score (max ~15) before Claude.
+    Deterministic quality score (max ~20) before Claude.
     Weak setups filtered here save Claude tokens.
     """
     score = 0
     tags = []
 
     score += 2; tags.append("BOS+2")
+
+    # Clean break body (not a thin-wick poke) — research: false-break wicks → SL.
+    if ind.get("bos_body_strong"):
+        score += 1; tags.append("BodyStrong+1")
 
     if ind.get("trend_1h") == bos:
         score += 2; tags.append("1h+2")
@@ -156,6 +184,10 @@ def _calc_mtf_score(ind: dict, bos: str, direction: str, confirmations: list,
         ob_1h_z = ind.get("bull_ob_1h_zone") if direction == "LONG" else ind.get("bear_ob_1h_zone")
         if ob_1h_z and _zones_overlap(ob_1h_z, (entry_zone["entry_low"], entry_zone["entry_high"])):
             score += 2; tags.append("NestedOB_1h+2")
+
+    # Premium triple confluence (OB+FVG overlap + sweep) — highest-WR ICT setup.
+    if premium:
+        score += 3; tags.append("💎Premium+3")
 
     return score, tags
 
@@ -307,9 +339,11 @@ def analyze_coin_smc(candles_15m: dict, candles_1h: dict, symbol: str,
         if dist > RETEST_MAX_DIST_PCT:
             return None
 
-    # 8. MTF score
+    # 8. MTF score (premium triple-confluence boosts score)
+    premium = _premium_setup(ind, direction)
+    ob_fvg_overlap = _ob_fvg_overlap(ind, direction)
     mtf_score, score_tags = _calc_mtf_score(
-        ind, bos, direction, confirmations, btc_change_pct, entry_zone
+        ind, bos, direction, confirmations, btc_change_pct, entry_zone, premium
     )
     if mtf_score < MTF_MIN_SCORE:
         return None
@@ -324,6 +358,8 @@ def analyze_coin_smc(candles_15m: dict, candles_1h: dict, symbol: str,
     signals = [f"BOS {bos}", f"Vol {ind['volume_ratio']:.1f}x"] + confirmations
     if entry_zone:
         signals.append(f"Zone:{entry_zone['entry_source']}")
+    if premium:
+        signals.append("💎PREMIUM")
     signals.append(f"MTF {mtf_score}")
 
     # Use zone midpoint as entry price when available
@@ -366,6 +402,8 @@ def analyze_coin_smc(candles_15m: dict, candles_1h: dict, symbol: str,
         "btc_change":       round(btc_change_pct, 2),
         "signals":          signals,
         "mtf_score":        mtf_score,
+        "premium":          premium,
+        "ob_fvg_overlap":   ob_fvg_overlap,
         "score_tags":       score_tags,
         "bullish_score":    mtf_score if direction == "LONG"  else 0,
         "bearish_score":    mtf_score if direction == "SHORT" else 0,

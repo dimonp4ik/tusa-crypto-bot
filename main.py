@@ -1010,6 +1010,21 @@ def webhook():
                         in_work_str += f" ({tp1p} уже взяли TP1)"
                     in_work_str += "\n"
 
+                # Premium 💎 breakdown (only when at least one premium signal exists)
+                prem = s.get("premium", {})
+                prem_str = ""
+                if prem.get("total"):
+                    pr_r = prem["total_r"]
+                    pr_sign = "🟢" if pr_r > 0 else ("🔴" if pr_r < 0 else "⚪")
+                    if prem.get("closed"):
+                        prem_str = (
+                            f"\n💎 Premium: {prem['total']} сд. "
+                            f"({prem['closed']} закр.) → *{prem['win_rate']}%* win  "
+                            f"{pr_sign} {pr_r:+.2f}R\n"
+                        )
+                    else:
+                        prem_str = f"\n💎 Premium: {prem['total']} сд. (ещё в работе)\n"
+
                 return (
                     f"*{label}*\n"
                     f"  Сигналов: {s['total']}  •  Закрыто: {s['closed']}\n"
@@ -1019,6 +1034,7 @@ def webhook():
                     f"  Win rate: *{s['win_rate']}%*  "
                     f"•  TP1 reach: {s['tp1_rate']}%\n"
                     f"{dir_lines}"
+                    f"{prem_str}"
                     f"\n{r_sign} Итого: *{r_str}*  •  {rpt_str} за сделку"
                     f"{streak_str}"
                 )

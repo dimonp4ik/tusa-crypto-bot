@@ -188,8 +188,9 @@ def send_signal(analysis: dict) -> bool:
     event_line   = f"⚠️ {event_warn}\n" if event_warn else ""
 
     lev = lev_info["leverage"]
+    premium_badge = "  💎 *PREMIUM*" if analysis.get("premium") else ""
     message = (
-        f"{arrow} — *{analysis['symbol']}*\n"
+        f"{arrow} — *{analysis['symbol']}*{premium_badge}\n"
         f"━━━━━━━━━━━━━━━━━━━\n"
         f"💰 Вход:        `{_format_price(price)}`\n"
         f"🎯 TP1 (50%):   `{_format_price(tp1)}`  → SL в б/у\n"

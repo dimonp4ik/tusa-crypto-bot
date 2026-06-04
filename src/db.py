@@ -67,7 +67,8 @@ def init_db():
                 entry_source  TEXT,
                 market_price  REAL,
                 mtf_score     INTEGER,
-                mtf_score_max INTEGER
+                mtf_score_max INTEGER,
+                premium       INTEGER DEFAULT 0
             )
         """)
         # Migrate older DBs
@@ -80,6 +81,7 @@ def init_db():
             "market_price":  "REAL",
             "mtf_score":     "INTEGER",
             "mtf_score_max": "INTEGER",
+            "premium":       "INTEGER DEFAULT 0",
         }.items():
             _ensure_column(c, "signals", col, ddl)
 
@@ -219,9 +221,9 @@ def log_signal(analysis: dict, tp1: float, tp2: float, sl: float):
             INSERT INTO signals (
                 symbol, direction, entry_price, tp1, tp2, sl, opened_at, status,
                 confidence, reason, entry_low, entry_high, entry_source, market_price,
-                mtf_score, mtf_score_max
+                mtf_score, mtf_score_max, premium
             )
-            VALUES (?, ?, ?, ?, ?, ?, ?, 'OPEN', ?, ?, ?, ?, ?, ?, ?, ?)
+            VALUES (?, ?, ?, ?, ?, ?, ?, 'OPEN', ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """, (
             analysis["symbol"], analysis["direction"], analysis["current_price"],
             tp1, tp2, sl, time_mod.time(),
@@ -229,6 +231,7 @@ def log_signal(analysis: dict, tp1: float, tp2: float, sl: float):
             analysis.get("entry_low"), analysis.get("entry_high"),
             analysis.get("entry_source"), analysis.get("market_price"),
             analysis.get("mtf_score"), analysis.get("mtf_score"),
+            1 if analysis.get("premium") else 0,
         ))
 
 
@@ -607,7 +610,7 @@ def get_stats(days: int = 7, since_ts: float = None) -> dict:
     cutoff = since_ts if since_ts is not None else time_mod.time() - days * 86400
     with _conn() as c:
         rows = c.execute(
-            "SELECT status, direction, opened_at FROM signals WHERE opened_at >= ?",
+            "SELECT status, direction, opened_at, premium FROM signals WHERE opened_at >= ?",
             (cutoff,)
         ).fetchall()
         # Last 7 closed signals for streak (independent of days filter)
@@ -655,6 +658,19 @@ def get_stats(days: int = 7, since_ts: float = None) -> dict:
             "total_r":  round(dr_r, 2),
         }
 
+    # ── Premium breakdown (💎 OB+FVG overlap + sweep setups) ──────────────────
+    prem_rows   = [r for r in rows if r.get("premium")]
+    prem_closed = [r for r in prem_rows if r["status"] in FINAL_STATUSES]
+    prem_wins   = sum(1 for r in prem_closed if r["status"] in PROFIT_STATUSES)
+    prem_r      = sum(_status_r(r["status"]) for r in prem_closed)
+    premium = {
+        "total":    len(prem_rows),
+        "closed":   len(prem_closed),
+        "wins":     prem_wins,
+        "win_rate": round(prem_wins / len(prem_closed) * 100, 1) if prem_closed else 0.0,
+        "total_r":  round(prem_r, 2),
+    }
+
     # ── Recent streak (last 7 closed, newest first) ───────────────────────────
     streak = []
     for r in streak_rows:
@@ -694,6 +710,7 @@ def get_stats(days: int = 7, since_ts: float = None) -> dict:
         "r_per_trade":      round(r_per_trade, 3),
         "long":             dir_stats.get("LONG",  {}),
         "short":            dir_stats.get("SHORT", {}),
+        "premium":          premium,
         "streak":           streak,
         "current_run":      current_run,
     }
