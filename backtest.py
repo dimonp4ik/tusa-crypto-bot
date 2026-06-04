@@ -309,7 +309,7 @@ def calculate_tp_sl_local(
         else:
             tp1 = price + risk * TP1_R_MULT
 
-        if tp2_level and tp2_level > tp1 * 1.001:
+        if tp2_level and tp2_level > tp1 * 1.001 and (tp2_level - price) >= risk * 1.5:
             tp2 = tp2_level
         else:
             tp2 = price + risk * TP2_R_MULT
@@ -325,7 +325,7 @@ def calculate_tp_sl_local(
         else:
             tp1 = price - risk * TP1_R_MULT
 
-        if tp2_level and tp2_level < tp1 * 0.999:
+        if tp2_level and tp2_level < tp1 * 0.999 and (price - tp2_level) >= risk * 1.5:
             tp2 = tp2_level
         else:
             tp2 = price - risk * TP2_R_MULT
@@ -426,6 +426,36 @@ def gross_r_for_outcome(outcome: str, entry: float, tp1: float, tp2: float, sl: 
     return 0.0
 
 
+def gross_r_for_trailing_exit(entry: float, tp1: float, trail_exit: float, sl: float, direction: str) -> float:
+    risk = abs(entry - sl)
+    if risk <= 0:
+        return 0.0
+    tp1_r = abs(tp1 - entry) / risk
+    if direction == "LONG":
+        trail_r = (trail_exit - entry) / risk
+    else:
+        trail_r = (entry - trail_exit) / risk
+    return 0.5 * tp1_r + 0.5 * max(0.0, trail_r)
+
+
+def execution_fill_price(
+    direction: str,
+    planned_entry: float,
+    candles_15m: dict[str, list],
+    entry_bar: int,
+    delay_bars: int,
+    adverse_bps: float,
+) -> tuple[float, int]:
+    fill_bar = min(max(entry_bar, entry_bar + max(0, delay_bars)), len(candles_15m["close"]) - 1)
+    price = planned_entry if delay_bars <= 0 else float(candles_15m["close"][fill_bar])
+    adverse = adverse_bps / 10_000.0
+    if direction == "LONG":
+        price *= 1.0 + adverse
+    else:
+        price *= 1.0 - adverse
+    return price, fill_bar
+
+
 def estimate_cost_r(entry: float, sl: float, fee_rate: float, slippage_rate: float) -> float:
     risk = abs(entry - sl)
     if entry <= 0 or risk <= 0:
@@ -459,6 +489,11 @@ class TradeRecord:
     adaptive_pack: str = ""
     adaptive_reason: str = ""
     risk_mult: float = 1.0
+    quality_score: float = 0.0
+    trend_score: int = 0
+    volatility_score: int = 0
+    entry_quality_score: int = 0
+    portfolio_risk_score: int = 0
     session: str = ""
     trend_1h: str = ""
     trend_4h: str = ""
@@ -495,9 +530,21 @@ def simulate_trade_direct(
     window: int,
     fee_rate: float,
     slippage_rate: float,
+    execution_delay_bars: int = 0,
+    adverse_entry_bps: float = 0.0,
+    exit_policy: str = "classic",
+    trail_atr_mult: float = 0.75,
 ) -> TradeRecord:
     direction = setup["direction"]
-    entry = float(setup["current_price"])
+    planned_entry = float(setup["current_price"])
+    entry, fill_bar = execution_fill_price(
+        direction,
+        planned_entry,
+        candles_15m,
+        entry_bar,
+        execution_delay_bars,
+        adverse_entry_bps,
+    )
     tp1, tp2, sl = calculate_tp_sl_local(
         entry,
         direction,
@@ -511,13 +558,16 @@ def simulate_trade_direct(
     highs = candles_15m["high"]
     lows = candles_15m["low"]
     times = candles_15m.get("time") or []
-    end = min(entry_bar + window, len(highs))
+    end = min(fill_bar + window, len(highs))
     outcome = "EXPIRED"
     tp1_reached = False
     closed = False
-    exit_bar = max(entry_bar, end - 1)
+    exit_bar = max(fill_bar, end - 1)
+    trailing_stop = entry
+    trail_exit_price = entry
+    best_price = entry
 
-    for j in range(entry_bar, end):
+    for j in range(fill_bar, end):
         h = highs[j]
         l = lows[j]
         if not tp1_reached:
@@ -555,6 +605,15 @@ def simulate_trade_direct(
                     continue
         else:
             if direction == "LONG":
+                if exit_policy == "trail":
+                    best_price = max(best_price, h)
+                    trailing_stop = max(entry, best_price - max(0.0, float(setup.get("atr", 0.0) or 0.0)) * trail_atr_mult)
+                    if l <= trailing_stop:
+                        outcome = "TRAIL"
+                        trail_exit_price = trailing_stop
+                        exit_bar = j
+                        closed = True
+                        break
                 if l <= entry:
                     outcome = "TP1"
                     exit_bar = j
@@ -566,6 +625,15 @@ def simulate_trade_direct(
                     closed = True
                     break
             else:
+                if exit_policy == "trail":
+                    best_price = min(best_price, l)
+                    trailing_stop = min(entry, best_price + max(0.0, float(setup.get("atr", 0.0) or 0.0)) * trail_atr_mult)
+                    if h >= trailing_stop:
+                        outcome = "TRAIL"
+                        trail_exit_price = trailing_stop
+                        exit_bar = j
+                        closed = True
+                        break
                 if h >= entry:
                     outcome = "TP1"
                     exit_bar = j
@@ -578,17 +646,20 @@ def simulate_trade_direct(
                     break
 
     if tp1_reached and outcome == "TP1" and not closed:
-        exit_bar = max(entry_bar, end - 1)
+        exit_bar = max(fill_bar, end - 1)
 
-    gross_r = gross_r_for_outcome(outcome, entry, tp1, tp2, sl)
+    if outcome == "TRAIL":
+        gross_r = gross_r_for_trailing_exit(entry, tp1, trail_exit_price, sl, direction)
+    else:
+        gross_r = gross_r_for_outcome(outcome, entry, tp1, tp2, sl)
     cost_r = estimate_cost_r(entry, sl, fee_rate, slippage_rate)
     net_r = gross_r - cost_r
 
     return TradeRecord(
         symbol=symbol,
-        entry_bar=entry_bar,
+        entry_bar=fill_bar,
         exit_bar=exit_bar,
-        entry_time=times[entry_bar - 1] if 0 <= entry_bar - 1 < len(times) else None,
+        entry_time=times[fill_bar - 1] if 0 <= fill_bar - 1 < len(times) else None,
         exit_time=times[exit_bar] if 0 <= exit_bar < len(times) else None,
         direction=direction,
         outcome=outcome,
@@ -608,6 +679,11 @@ def simulate_trade_direct(
         adaptive_pack=str(setup.get("adaptive_pack", "") or ""),
         adaptive_reason=str(setup.get("adaptive_reason", "") or ""),
         risk_mult=float(setup.get("risk_mult", 1.0) or 1.0),
+        quality_score=float(setup.get("quality_score", 0.0) or 0.0),
+        trend_score=int(setup.get("trend_score", 0) or 0),
+        volatility_score=int(setup.get("volatility_score", 0) or 0),
+        entry_quality_score=int(setup.get("entry_quality_score", 0) or 0),
+        portfolio_risk_score=int(setup.get("portfolio_risk_score", 0) or 0),
         session=str(setup.get("session", "") or ""),
         trend_1h=str(setup.get("trend_1h", "") or ""),
         trend_4h=str(setup.get("trend_4h", "") or ""),
@@ -632,6 +708,10 @@ def backtest_symbol(
     refresh_cache: bool,
     fee_rate: float,
     slippage_rate: float,
+    execution_delay_bars: int,
+    adverse_entry_bps: float,
+    exit_policy: str,
+    trail_atr_mult: float,
 ) -> SymbolResult:
     started = time.perf_counter()
     result = SymbolResult(symbol=symbol)
@@ -688,13 +768,17 @@ def backtest_symbol(
             tp_window,
             fee_rate,
             slippage_rate,
+            execution_delay_bars=execution_delay_bars,
+            adverse_entry_bps=adverse_entry_bps,
+            exit_policy=exit_policy,
+            trail_atr_mult=trail_atr_mult,
         )
         result.trade_records.append(trade)
         result.trades += 1
         result.gross_r += trade.gross_r
         result.net_r += trade.net_r
 
-        if trade.outcome == "TP1":
+        if trade.outcome in ("TP1", "TRAIL"):
             result.tp1 += 1
         elif trade.outcome == "TP2":
             result.tp2 += 1
@@ -758,6 +842,8 @@ def write_trades_csv(path: str, trades: list[TradeRecord]) -> None:
         "gross_r", "net_r", "cost_r", "mtf_score", "volume_ratio",
         "rsi", "eff_ratio", "vol_atr_pct", "vol_ratio_regime",
         "adaptive_pack", "adaptive_reason", "risk_mult",
+        "quality_score", "trend_score", "volatility_score",
+        "entry_quality_score", "portfolio_risk_score",
         "session", "trend_1h", "trend_4h", "entry_source",
         "signals", "score_tags", "premium",
     ]
@@ -791,6 +877,10 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--refresh-cache", action="store_true", help="Ignore cached candle files.")
     p.add_argument("--fee-rate", type=float, default=BACKTEST_FEE_RATE, help="Per-side fee rate for net R estimate.")
     p.add_argument("--slippage-rate", type=float, default=BACKTEST_SLIPPAGE_RATE, help="Per-side slippage rate for net R estimate.")
+    p.add_argument("--execution-delay-bars", type=int, default=0, help="Delay entry by N 15m bars for execution realism.")
+    p.add_argument("--adverse-entry-bps", type=float, default=0.0, help="Extra adverse fill in basis points.")
+    p.add_argument("--exit-policy", choices=["classic", "trail"], default="classic", help="Exit model after TP1.")
+    p.add_argument("--trail-atr-mult", type=float, default=0.75, help="ATR multiple for --exit-policy trail.")
     p.add_argument("--export-trades", default=None, help="Write trade list CSV.")
     return p
 
@@ -825,6 +915,10 @@ def main(argv: list[str] | None = None) -> int:
         refresh_cache=args.refresh_cache,
         fee_rate=args.fee_rate,
         slippage_rate=args.slippage_rate,
+        execution_delay_bars=max(0, args.execution_delay_bars),
+        adverse_entry_bps=max(0.0, args.adverse_entry_bps),
+        exit_policy=args.exit_policy,
+        trail_atr_mult=max(0.0, args.trail_atr_mult),
     )
 
     results: list[SymbolResult] = []

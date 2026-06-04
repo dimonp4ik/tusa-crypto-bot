@@ -16,7 +16,7 @@ from datetime import datetime, timezone
 from statistics import mean, pstdev
 
 
-WIN_OUTCOMES = {"TP1", "TP2"}
+WIN_OUTCOMES = {"TP1", "TP2", "TRAIL"}
 LOSS_OUTCOMES = {"SL"}
 
 
