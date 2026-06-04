@@ -13,6 +13,15 @@ from config import (
     REQUIRE_STRONG_CONFIRM,
     EFF_RATIO_FILTER, EFF_RATIO_MIN,
     REQUIRE_STRICT_HTF,
+    ADAPTIVE_FILTER_PACKS, ADAPTIVE_MIXED_SCORE_BUMP, ADAPTIVE_CHOP_SCORE_BUMP,
+    ADAPTIVE_HOT_SCORE_BUMP, ADAPTIVE_MIXED_EFF_MIN, ADAPTIVE_CHOP_EFF_MIN,
+    ADAPTIVE_HOT_EFF_MIN, ADAPTIVE_CHOP_MIN_VOLUME, ADAPTIVE_HOT_MIN_VOLUME,
+    ADAPTIVE_HOT_VOL_RATIO, ADAPTIVE_EXTREME_VOL_RATIO, ADAPTIVE_EXTREME_ATR_PCT,
+    ADAPTIVE_MIXED_RISK_MULT, ADAPTIVE_CHOP_RISK_MULT, ADAPTIVE_HOT_RISK_MULT,
+    ADAPTIVE_BEAR_SQUEEZE_GUARD, ADAPTIVE_BEAR_SKIP_NEW_YORK,
+    ADAPTIVE_BEAR_VOL_MIN_RATIO, ADAPTIVE_BEAR_VOL_MAX_RATIO,
+    STABILITY_FILTERS_ENABLED, STABILITY_SKIP_PACKS, STABILITY_SKIP_SESSIONS,
+    STABILITY_MIN_EFF_RATIO, STABILITY_MIN_VOLUME_RATIO, STABILITY_MIN_QUALITY_SCORE,
 )
 from src.indicators import get_indicators, get_smc_indicators
 
@@ -192,6 +201,171 @@ def _calc_mtf_score(ind: dict, bos: str, direction: str, confirmations: list,
     return score, tags
 
 
+# ── Adaptive market-regime packs (ported from friend's v2, DEFAULT OFF) ────────
+
+def _has_structural_confirmation(confirmations: list) -> bool:
+    structural = {"FVG", "OB", "LiqSweep", "ChoCH"}
+    return any(c in structural for c in confirmations)
+
+
+def _adaptive_filter_pack(ind: dict, bos: str, direction: str,
+                          confirmations: list, mtf_score: int) -> tuple:
+    """
+    Regime-aware final gate. Requires progressively higher quality as the market
+    regime worsens (clean trend → mixed → choppy) and returns a per-regime
+    risk_mult for position sizing.
+
+    Returns: (allowed, pack_name, reason, risk_mult).
+    """
+    trend_1h = ind.get("trend_1h", "neutral")
+    trend_4h = ind.get("trend_4h", "neutral")
+    eff       = float(ind.get("eff_ratio", 1.0) or 0.0)
+    vol_ratio = float(ind.get("volume_ratio", 0.0) or 0.0)
+    vol_regime = float(ind.get("vol_ratio_regime", 1.0) or 1.0)
+    atr_pct   = float(ind.get("vol_atr_pct", 0.0) or 0.0)
+    structural = _has_structural_confirmation(confirmations)
+    strong_bos = bool(ind.get("bos_body_strong", False))
+    strong_htf = bool(ind.get("trend_1h_strong")) or bool(ind.get("trend_4h_strong"))
+
+    aligned = int(trend_1h == bos) + int(trend_4h == bos)
+    neutral = int(trend_1h == "neutral") + int(trend_4h == "neutral")
+    hot = vol_regime >= ADAPTIVE_HOT_VOL_RATIO
+
+    if ADAPTIVE_BEAR_SQUEEZE_GUARD and direction == "SHORT" and aligned == 2:
+        session = ind.get("session", "OFF_HOURS")
+        if ADAPTIVE_BEAR_SKIP_NEW_YORK and session == "NEW_YORK":
+            return False, "bear_squeeze", "skip full-trend shorts during New York", 0.0
+        if vol_regime < ADAPTIVE_BEAR_VOL_MIN_RATIO or vol_regime >= ADAPTIVE_BEAR_VOL_MAX_RATIO:
+            return False, "bear_squeeze", "skip full-trend shorts outside bear vol corridor", 0.0
+
+    if vol_regime >= ADAPTIVE_EXTREME_VOL_RATIO or atr_pct >= ADAPTIVE_EXTREME_ATR_PCT:
+        need_score = MTF_MIN_SCORE + ADAPTIVE_HOT_SCORE_BUMP + 1
+        if not (aligned == 2 and structural and strong_bos and mtf_score >= need_score):
+            return False, "extreme_vol", "skip extreme volatility", 0.0
+        return True, "extreme_trend", "extreme vol with full trend+structure", ADAPTIVE_HOT_RISK_MULT
+
+    if aligned == 2:
+        pack = "trend_up" if direction == "LONG" else "trend_down"
+        if hot:
+            need_score = MTF_MIN_SCORE + ADAPTIVE_HOT_SCORE_BUMP
+            if mtf_score < need_score:
+                return False, "hot_vol", f"score {mtf_score} < {need_score}", ADAPTIVE_HOT_RISK_MULT
+            if eff < ADAPTIVE_HOT_EFF_MIN:
+                return False, "hot_vol", f"eff {eff:.2f} < {ADAPTIVE_HOT_EFF_MIN:.2f}", ADAPTIVE_HOT_RISK_MULT
+            if vol_ratio < ADAPTIVE_HOT_MIN_VOLUME:
+                return False, "hot_vol", f"volume {vol_ratio:.2f} < {ADAPTIVE_HOT_MIN_VOLUME:.2f}", ADAPTIVE_HOT_RISK_MULT
+            if not (structural and (strong_bos or strong_htf)):
+                return False, "hot_vol", "needs structure and strong BOS/HTF", ADAPTIVE_HOT_RISK_MULT
+            return True, f"{pack}_hot", "aligned trend with hot-vol guard", ADAPTIVE_HOT_RISK_MULT
+        return True, pack, "full HTF alignment", 1.0
+
+    if aligned == 1 and neutral == 1:
+        need_score = MTF_MIN_SCORE + ADAPTIVE_MIXED_SCORE_BUMP
+        if mtf_score < need_score:
+            return False, "mixed", f"score {mtf_score} < {need_score}", ADAPTIVE_MIXED_RISK_MULT
+        if eff < ADAPTIVE_MIXED_EFF_MIN:
+            return False, "mixed", f"eff {eff:.2f} < {ADAPTIVE_MIXED_EFF_MIN:.2f}", ADAPTIVE_MIXED_RISK_MULT
+        if not structural:
+            return False, "mixed", "needs structural confirmation", ADAPTIVE_MIXED_RISK_MULT
+        if hot and (vol_ratio < ADAPTIVE_HOT_MIN_VOLUME or not strong_bos):
+            return False, "mixed_hot", "hot mixed needs volume and strong BOS", ADAPTIVE_HOT_RISK_MULT
+        return True, "mixed", "one HTF aligned, one neutral", ADAPTIVE_MIXED_RISK_MULT
+
+    if neutral == 2:
+        need_score = MTF_MIN_SCORE + ADAPTIVE_CHOP_SCORE_BUMP
+        if mtf_score < need_score:
+            return False, "choppy", f"score {mtf_score} < {need_score}", ADAPTIVE_CHOP_RISK_MULT
+        if eff < ADAPTIVE_CHOP_EFF_MIN:
+            return False, "choppy", f"eff {eff:.2f} < {ADAPTIVE_CHOP_EFF_MIN:.2f}", ADAPTIVE_CHOP_RISK_MULT
+        if vol_ratio < ADAPTIVE_CHOP_MIN_VOLUME:
+            return False, "choppy", f"volume {vol_ratio:.2f} < {ADAPTIVE_CHOP_MIN_VOLUME:.2f}", ADAPTIVE_CHOP_RISK_MULT
+        if not (structural and strong_bos):
+            return False, "choppy", "needs structure and strong BOS", ADAPTIVE_CHOP_RISK_MULT
+        return True, "choppy", "range market top-quality retest", ADAPTIVE_CHOP_RISK_MULT
+
+    return False, "conflict", "HTF conflict", 0.0
+
+
+def _quality_breakdown(ind: dict, bos: str, entry_zone, adaptive_pack: str) -> dict:
+    trend_score = 0
+    if ind.get("trend_1h") == bos:
+        trend_score += 35
+    elif ind.get("trend_1h") == "neutral":
+        trend_score += 15
+    if ind.get("trend_4h") == bos:
+        trend_score += 45
+    elif ind.get("trend_4h") == "neutral":
+        trend_score += 20
+    if ind.get("trend_1h_strong"):
+        trend_score += 10
+    if ind.get("trend_4h_strong"):
+        trend_score += 10
+    trend_score = min(100, trend_score)
+
+    eff = float(ind.get("eff_ratio", 0.0) or 0.0)
+    vol_ratio = float(ind.get("vol_ratio_regime", 1.0) or 1.0)
+    volatility_score = 40 + min(40, eff * 120)
+    if 0.8 <= vol_ratio <= 1.8:
+        volatility_score += 20
+    elif 0.55 <= vol_ratio <= 3.0:
+        volatility_score += 10
+    volatility_score = int(max(0, min(100, volatility_score)))
+
+    entry_score = 35 if entry_zone else 10
+    if entry_zone and entry_zone.get("entry_source") == "OB":
+        entry_score += 25
+    elif entry_zone and entry_zone.get("entry_source") == "FVG":
+        entry_score += 15
+    if ind.get("bos_body_strong"):
+        entry_score += 20
+    if float(ind.get("volume_ratio", 0.0) or 0.0) >= 2.0:
+        entry_score += 20
+    entry_score = min(100, entry_score)
+
+    portfolio_score = 80
+    if adaptive_pack in ("mixed",):
+        portfolio_score -= 10
+    if adaptive_pack in ("choppy", "trend_up_hot", "trend_down_hot", "extreme_trend"):
+        portfolio_score -= 25
+    if adaptive_pack == "bear_squeeze":
+        portfolio_score -= 50
+    portfolio_score = max(0, min(100, portfolio_score))
+
+    total = round(
+        trend_score * 0.35
+        + volatility_score * 0.20
+        + entry_score * 0.30
+        + portfolio_score * 0.15,
+        1,
+    )
+    return {
+        "trend_score": int(trend_score),
+        "volatility_score": int(volatility_score),
+        "entry_quality_score": int(entry_score),
+        "portfolio_risk_score": int(portfolio_score),
+        "quality_score": total,
+    }
+
+
+def _stability_overlay_pass(ind: dict, adaptive_pack: str, quality_score: float = 0.0) -> bool:
+    """Final deterministic cut for regimes/sessions that validated poorly."""
+    if not STABILITY_FILTERS_ENABLED:
+        return True
+    pack = (adaptive_pack or "").lower()
+    session = str(ind.get("session", "") or "").upper()
+    if pack in STABILITY_SKIP_PACKS:
+        return False
+    if session in STABILITY_SKIP_SESSIONS:
+        return False
+    if float(ind.get("eff_ratio", 0.0) or 0.0) < STABILITY_MIN_EFF_RATIO:
+        return False
+    if float(ind.get("volume_ratio", 0.0) or 0.0) < STABILITY_MIN_VOLUME_RATIO:
+        return False
+    if quality_score < STABILITY_MIN_QUALITY_SCORE:
+        return False
+    return True
+
+
 # ── SMC filter ────────────────────────────────────────────────────────────────
 
 def analyze_coin_smc(candles_15m: dict, candles_1h: dict, symbol: str,
@@ -348,6 +522,21 @@ def analyze_coin_smc(candles_15m: dict, candles_1h: dict, symbol: str,
     if mtf_score < MTF_MIN_SCORE:
         return None
 
+    # 8b. Adaptive regime pack gate (DEFAULT OFF — under backtest evaluation).
+    #     Requires higher quality as the regime worsens + sets a per-regime risk_mult.
+    adaptive_pack   = "base"
+    adaptive_reason = "adaptive disabled"
+    risk_mult       = 1.0
+    if ADAPTIVE_FILTER_PACKS:
+        allowed, adaptive_pack, adaptive_reason, risk_mult = _adaptive_filter_pack(
+            ind, bos, direction, confirmations, mtf_score
+        )
+        if not allowed:
+            return None
+    quality = _quality_breakdown(ind, bos, entry_zone, adaptive_pack)
+    if not _stability_overlay_pass(ind, adaptive_pack, quality["quality_score"]):
+        return None
+
     # Bonus signals for context
     session = ind.get("session", "OFF_HOURS")
     if session in ("LONDON", "NEW_YORK", "OVERLAP"):
@@ -361,6 +550,13 @@ def analyze_coin_smc(candles_15m: dict, candles_1h: dict, symbol: str,
     if premium:
         signals.append("💎PREMIUM")
     signals.append(f"MTF {mtf_score}")
+    if ADAPTIVE_FILTER_PACKS:
+        signals.append(f"Q {quality['quality_score']:.1f}")
+        signals.append(f"Pack:{adaptive_pack}")
+        if abs(risk_mult - 1.0) > 1e-9:
+            signals.append(f"Risk x{risk_mult:.2f}")
+        score_tags.append(f"Pack:{adaptive_pack}")
+        score_tags.append(f"RiskMult:{risk_mult:.2f}")
 
     # Use zone midpoint as entry price when available
     price_payload = entry_zone or {
@@ -389,6 +585,17 @@ def analyze_coin_smc(candles_15m: dict, candles_1h: dict, symbol: str,
         "divergence":       div,
         "wick_rejection":   wicks.get("rejection"),
         "atr":              ind["atr"],
+        "eff_ratio":        ind.get("eff_ratio"),
+        "vol_atr_pct":      ind.get("vol_atr_pct"),
+        "vol_ratio_regime": ind.get("vol_ratio_regime"),
+        "adaptive_pack":    adaptive_pack,
+        "adaptive_reason":  adaptive_reason,
+        "risk_mult":        round(float(risk_mult), 4),
+        "quality_score":    quality["quality_score"],
+        "trend_score":      quality["trend_score"],
+        "volatility_score": quality["volatility_score"],
+        "entry_quality_score": quality["entry_quality_score"],
+        "portfolio_risk_score": quality["portfolio_risk_score"],
         "volume_ratio":     ind["volume_ratio"],
         "current_price":    price_payload["entry_price"],
         "market_price":     price_payload["market_price"],

@@ -48,8 +48,8 @@ TP_WINDOW    = 192            # 48h forward simulation (matches live SIGNAL_EXPI
 MAX_WORKERS  = min(4, (os.cpu_count() or 2))
 
 RETEST_CONFIGS = [
-    ("SWEEP only",       "sweep"),
-    ("PREMIUM (+sweep)", "premium"),
+    ("CURRENT (adaptive off)", "current"),
+    ("ADAPTIVE packs",         "adaptive"),
 ]
 
 
@@ -157,10 +157,14 @@ def simulate_trade(setup: dict, future: dict) -> str:
 def backtest_symbol_week(symbol: str, end_ts: int, mode: str) -> dict:
     """Run signal scan + trade sim on one symbol, one historical week.
 
-    mode='overlap' counts setups where OB+FVG zones overlap (no sweep required).
-    mode='premium' counts only OB+FVG overlap + liquidity sweep (strict triple).
+    mode='current'  → our current fixed MTF gate (adaptive packs OFF).
+    mode='adaptive' → friend's regime-aware adaptive pack gate ON.
     """
+    import src.signal_filter as _sf
     from src.signal_filter import analyze_coin_smc
+
+    # Toggle the adaptive regime-pack gate at module level for this config.
+    _sf.ADAPTIVE_FILTER_PACKS = (mode == "adaptive")
 
     try:
         c15 = fetch_hist(symbol, "15min", 15*60,  CANDLES_15M, end_ts)
@@ -191,12 +195,6 @@ def backtest_symbol_week(symbol: str, end_ts: int, mode: str) -> dict:
 
         setup = analyze_coin_smc(snap_15, snap_1h, symbol, snap_4h, btc_change_pct=0.0)
         if not setup:
-            continue
-        if mode == "premium" and not setup.get("premium"):
-            continue
-        if mode == "overlap" and not setup.get("ob_fvg_overlap"):
-            continue
-        if mode == "sweep" and not setup.get("liq_sweep"):
             continue
 
         future  = {k: v[i:i + TP_WINDOW] for k, v in c15.items()}
