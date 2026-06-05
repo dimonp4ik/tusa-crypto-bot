@@ -997,12 +997,10 @@ def webhook():
     if text == "/start":
         _send_persistent_menu(chat_id, is_admin=(is_dm and _is_admin(user_id)))
 
-    # 🛠 Кнопка "Админ панель" → инлайн-панель (только ЛС)
+    # 🛠 Кнопка "Админ панель" → инлайн-панель
     elif text == "🛠 админ панель":
-        if is_dm and _is_admin(user_id):
+        if _is_admin(user_id):
             _send_keyboard(chat_id, "🛠 *TUSA Admin Panel*\nВыбери раздел:")
-        elif not is_dm:
-            pass  # silence in group chats
         else:
             _reply(chat_id, "Нет доступа.")
 
@@ -1143,12 +1141,10 @@ def webhook():
                "*Win rate* — % прибыльных от закрытых.\n"
                "Норма для SMC стратегии: 35–45% при высоком R\\:R.")
 
-    # /admin — запасной вариант текстом (только ЛС)
-    elif text in ("/admin", "/панель"):
-        if is_dm and _is_admin(user_id):
+    # /admin works in groups too; group privacy mode still delivers commands.
+    elif text.startswith("/admin") or text in ("admin", "admin panel", "panel"):
+        if _is_admin(user_id):
             _send_keyboard(chat_id, "🛠 *TUSA Admin Panel*\nВыбери раздел:")
-        elif not is_dm:
-            pass
         else:
             _reply(chat_id, "Нет доступа.")
 

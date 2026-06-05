@@ -8,16 +8,18 @@ import sys
 import os
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from config import CRYPTOPANIC_API_KEY, NEWS_BLOCK_KEYWORDS
+from config import CRYPTOPANIC_API_KEY, NEWS_BLOCK_KEYWORDS, QUOTE_ASSET
 
 
 def check_news_sentiment(symbol: str) -> dict:
     """
     Fetch recent news for the coin and check for bad-news keywords.
     Returns {'safe': bool, 'reason': str}.
-    `symbol` is in KuCoin format like 'BTC-USDT' — we strip to 'BTC'.
+    `symbol` can be Bybit format like BTCUSDT or legacy BTC-USDT; strip to BTC.
     """
-    coin = symbol.replace("-USDT", "")
+    coin = str(symbol or "").upper().replace("-", "").replace("/", "").replace("_", "")
+    if coin.endswith(QUOTE_ASSET):
+        coin = coin[:-len(QUOTE_ASSET)]
 
     try:
         params = {"currencies": coin, "public": "true", "filter": "hot"}

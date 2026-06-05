@@ -37,11 +37,13 @@ BYBIT_HOSTS = [
 ]
 _working_host = {"url": None}
 
-# Map KuCoin timeframe strings to Bybit interval param
+# Map legacy KuCoin-style timeframe strings to Bybit interval params.
 TIMEFRAME_MAP = {
     "15min": "15",
     "1h": "60",
+    "1hour": "60",
     "4h": "240",
+    "4hour": "240",
 }
 BYBIT_INTERVAL_15M = TIMEFRAME_MAP.get(TIMEFRAME_KUCOIN, "15")
 BYBIT_INTERVAL_1H = TIMEFRAME_MAP.get(TIMEFRAME_1H_KUCOIN, "60")
@@ -57,12 +59,13 @@ def _bybit_get(path: str, params: dict, timeout: int = 15):
     Raises the last error if every attempt fails.
     """
     # Re-read proxy from env each call — handles cases where env is set after module import
+    proxy_base = (os.getenv("BYBIT_PROXY_BASE", "").strip().rstrip("/") or _PROXY_BASE)
     https_proxy = os.getenv("BYBIT_HTTPS_PROXY", "").strip() or _HTTPS_PROXY
     proxies = {"http": https_proxy, "https": https_proxy} if https_proxy else None
 
     # Proxy-base override: single endpoint, no host rotation needed.
-    if _PROXY_BASE:
-        resp = requests.get(f"{_PROXY_BASE}{path}", params=params,
+    if proxy_base:
+        resp = requests.get(f"{proxy_base}{path}", params=params,
                             timeout=timeout, proxies=proxies)
         resp.raise_for_status()
         return resp

@@ -19,7 +19,8 @@ KLINES_LIMIT = 200         # 200 × 15m = ~50 hours of data for SMC
 
 # --- Symbol quality filter ---
 # ALLOWED_SYMBOLS="" (default) → auto top-volume mode, top 45 by 24h USDT volume.
-# Set ALLOWED_SYMBOLS=BTC-USDT,ETH-USDT,... in .env for strict whitelist.
+# Bybit uses BTCUSDT format. BTC-USDT / BTC_USDT / BTC/USDT env values are
+# accepted too and normalized at startup.
 MIN_24H_QUOTE_VOLUME_USDT = float(os.getenv("MIN_24H_QUOTE_VOLUME_USDT", "5000000"))
 MAX_SPREAD_PCT            = float(os.getenv("MAX_SPREAD_PCT", "0.20"))
 
@@ -28,8 +29,11 @@ def _parse_symbol_list(value, default=None):
         return list(default or [])
     return [s.strip().upper() for s in value.split(",") if s.strip()]
 
-ALLOWED_SYMBOLS = _parse_symbol_list(os.getenv("ALLOWED_SYMBOLS", ""))
-BLOCKED_SYMBOLS = _parse_symbol_list(os.getenv("BLOCKED_SYMBOLS", ""))
+def _normalize_market_symbol(symbol: str) -> str:
+    return str(symbol or "").upper().replace("-", "").replace("_", "").replace("/", "")
+
+ALLOWED_SYMBOLS = [_normalize_market_symbol(s) for s in _parse_symbol_list(os.getenv("ALLOWED_SYMBOLS", ""))]
+BLOCKED_SYMBOLS = [_normalize_market_symbol(s) for s in _parse_symbol_list(os.getenv("BLOCKED_SYMBOLS", ""))]
 
 # Stablecoins and fiat pairs — no trading signals
 BLOCK_STABLE_BASES = {
