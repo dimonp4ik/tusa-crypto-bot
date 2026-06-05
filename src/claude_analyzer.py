@@ -48,6 +48,10 @@ WHAT THE SCORES MEAN
 - V: volume ratio vs recent average. >1.5x = conviction; <1.0x = weak.
 - F: funding rate. Strongly positive = crowded longs (squeeze risk for LONGs); strongly negative = crowded shorts.
 - Sess: trading session at candle time. LONDON/NEW_YORK/OVERLAP = prime liquidity. OFF_HOURS = thinner market (tolerable with strong confluence). DEAD_ZONE (19-24 UTC) = low participation, be stricter.
+- ER (Efficiency Ratio): Kaufman ER, 0–1. ~1.0 = clean directional trend. ~0.0 = choppy range (lots of noise, BOS often false). Already filtered ER>=0.15 upstream. ER<0.25 = marginal, ER>0.45 = clean.
+- 💎PREM: Premium triple-confluence (OB+FVG zones overlap + liquidity sweep). Statistically highest-WR setup in backtests. Favor HIGH confidence when trend and zone also align.
+- Confs: additional confirmations beyond FVG/OB/SW — ChoCH (Change of Character, micro-structure shift), RSI_Div (RSI divergence), MACD_Div, Engulfing, BullWick/BearWick (rejection wick pressure), StochCross (stochastic momentum cross). More = stronger.
+- PRE-FILTERS ALREADY APPLIED: upstream code removed: ER<0.15 (chop), RSI exhaustion, bear-trend hot-vol (overcrowded shorts), BOS-without-RSI-midline (momentum gap). What you see has already passed a strict quality stack.
 
 HOW TO DECIDE
 1. Confirm the suggested side only. If you would not take that exact side, return NO TRADE.
@@ -58,6 +62,8 @@ HOW TO DECIDE
 6. Respect crowded funding: avoid LONGs into strongly positive funding and SHORTs into strongly negative.
 7. Volume below average (V<1.0x) on a breakout setup is a red flag — move lacks conviction.
 8. News overrides structure: BEARISH news → no LONGs; BULLISH news → no SHORTs. Major event live → prefer NO TRADE.
+9. Premium setups (💎PREM) already have OB+FVG overlap + sweep — treat as FVG+OB+SW all effectively confirmed. Lean HIGH confidence when trend and zone also agree.
+10. Low ER (0.15–0.25) with both HTFs neutral = marginal chop even with BOS. Demand sweep confirmation or return NO TRADE.
 
 RISK SCORE (0–10): how dangerous is this trade RIGHT NOW. 0–3 = clean, trend-aligned, well-located. 4–7 = tradeable with a real concern. 8–10 = serious problem (chasing, fighting trend, crowded funding, hostile news, far from zone). High risk_score should almost always pair with NO TRADE — be honest.
 
@@ -134,17 +140,27 @@ def _setup_line(i: int, s: dict) -> str:
     funding = s.get("funding_rate")
     fund_s  = f"{funding*100:+.3f}%" if funding is not None else "n/a"
     zone    = f"{s.get('entry_source','?')}:{s.get('entry_low',0):.4g}-{s.get('entry_high',0):.4g}"
+    er      = s.get("eff_ratio")
+    er_s    = f" ER={er:.2f}" if er is not None else ""
+    prem    = " 💎PREM" if s.get("premium") else ""
+    # Extra confirmations beyond FVG/OB/SW (ChoCH, RSI_Div, MACD_Div, wicks, stoch)
+    _STANDARD = {"FVG", "OB", "LiqSweep"}
+    _SKIP_PFX = ("Session:", "StrongTrend")
+    confs = [c for c in (s.get("confirmations") or [])
+             if c not in _STANDARD and not any(c.startswith(p) for p in _SKIP_PFX)]
+    confs_s = f" Confs=[{','.join(confs)}]" if confs else ""
     return (
         f"{i} {s['symbol']} {s['direction']} "
         f"S={s.get('mtf_score','?')} "
         f"4h={s.get('trend_4h','?')} 1h={s.get('trend_1h','?')} "
         f"FVG={fvg} OB={ob} SW={sweep} "
         f"Z={zone} RSI={s['rsi']} V={s['volume_ratio']}x F={fund_s}"
+        f"{er_s}{prem}{confs_s}"
     )
 
 
 def _setup_line_heavy(i: int, s: dict) -> str:
-    """Extended setup line for HEAVY analysis — adds session, tags, HTF strength."""
+    """Extended setup line for HEAVY analysis — adds session, tags, HTF strength, stoch, div."""
     base    = _setup_line(i, s)
     session = s.get("session", "")
     tags    = s.get("mtf_score_tags", "")
@@ -155,6 +171,11 @@ def _setup_line_heavy(i: int, s: dict) -> str:
     if session:          extras.append(f"Sess={session}")
     if htf:              extras.append(f"HTF={'+'.join(htf)}")
     if tags:             extras.append(f"Tags=[{tags}]")
+    sk, sd = s.get("stoch_k"), s.get("stoch_d")
+    if sk is not None and sd is not None:
+        extras.append(f"Stoch={sk:.0f}/{sd:.0f}")
+    div = s.get("divergence")
+    if div:              extras.append(f"RSIDivDir={div}")
     return base + (" " + " ".join(extras) if extras else "")
 
 
@@ -340,7 +361,7 @@ def _memory_block(history: list) -> str:
 
 
 _THINKING_BETA = "interleaved-thinking-2025-05-14"
-_THINKING_BUDGET = 3000  # tokens for internal reasoning scratch-pad
+_THINKING_BUDGET = 5000  # tokens for internal reasoning scratch-pad
 
 
 def analyze_heavy(setup: dict, news_context: dict = None, history: list = None) -> dict:

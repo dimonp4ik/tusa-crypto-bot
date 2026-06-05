@@ -643,6 +643,7 @@ def analyze_coin_smc(candles_15m: dict, candles_1h: dict, symbol: str,
         "score_tags":       score_tags,
         "bullish_score":    mtf_score if direction == "LONG"  else 0,
         "bearish_score":    mtf_score if direction == "SHORT" else 0,
+        "confirmations":    confirmations,
     }
 
 
