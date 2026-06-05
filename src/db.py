@@ -705,11 +705,14 @@ def get_stats(days: int = 7, since_ts: float = None) -> dict:
             streak.append("❌")
         else:
             streak.append("➖")
-    # Count current run (consecutive same outcome from newest)
+    # Count current run (consecutive same OUTCOME GROUP from newest).
+    # ✅ and 🏆 are both "win" — mix of them still counts as a streak.
+    def _grp(icon): return "win" if icon in ("✅", "🏆") else ("loss" if icon == "❌" else "neutral")
     current_run = 1
     if len(streak) >= 2:
+        g0 = _grp(streak[0])
         for i in range(1, len(streak)):
-            if streak[i] == streak[0]:
+            if _grp(streak[i]) == g0:
                 current_run += 1
             else:
                 break
