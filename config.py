@@ -139,6 +139,31 @@ EFF_RATIO_MIN      = float(os.getenv("EFF_RATIO_MIN", "0.15"))
 #    half of baseline. Cutting counter-trend also cut winners. Flag kept for experiments.
 REQUIRE_STRICT_HTF = os.getenv("REQUIRE_STRICT_HTF", "0") != "0"
 
+# --- Asymmetric bear-squeeze guard (DEFAULT ON) --------------------------------
+# In crypto, full-HTF bearish shorts (BOS + 1h + 4h all bearish) with overheated
+# volume attract crowded late entries → market-makers squeeze them upward.
+# Skip SHORT when: bos=bearish AND trend_1h=bearish AND trend_4h=bearish AND
+# vol_ratio_regime >= threshold (2.5 = 2.5× normal volume = overheated).
+# Also skip "LONDON" session for full-bearish shorts (expansion attracts latecomers,
+# then NYSE open reverses them).
+# A/B backtest, 20 symbols, 8640×15m (~3 months), trail exit:
+#   base:  2646tr  38.1% WR  +0.118R/tr  DD -68.17R
+#   guard: 2344tr  39.6% WR  +0.150R/tr  DD -47.36R  (+27% R/tr, -31% DD)
+BEAR_TREND_HOT_VOL_GUARD     = os.getenv("BEAR_TREND_HOT_VOL_GUARD", "1") != "0"
+BEAR_TREND_HOT_VOL_MIN_RATIO = float(os.getenv("BEAR_TREND_HOT_VOL_MIN_RATIO", "2.5"))
+BEAR_TREND_SKIP_SESSIONS     = set(_parse_symbol_list(os.getenv("BEAR_TREND_SKIP_SESSIONS", "LONDON")))
+
+# --- Directional RSI midline confirmation (DEFAULT ON) ------------------------
+# A BOS without RSI reclaiming the 50 midline (LONG) or dropping below 40
+# (SHORT) = structural break without momentum confirmation → higher false-break
+# rate. Distinct from the overextension caps (SMC_RSI_LONG_MAX / SHORT_MIN).
+# A/B backtest, on top of bear-trend guard, same 20 symbols × 8640×15m:
+#   guard:    2344tr  39.6% WR  +0.150R/tr  DD -47.36R
+#   +RSI mid: 2117tr  40.1% WR  +0.175R/tr  DD -37.38R  (+17% R/tr, -21% DD)
+DIRECTIONAL_RSI_MIDLINE_FILTER = os.getenv("DIRECTIONAL_RSI_MIDLINE_FILTER", "1") != "0"
+RSI_LONG_MIN_MIDLINE           = float(os.getenv("RSI_LONG_MIN_MIDLINE", "50"))
+RSI_SHORT_MAX_MIDLINE          = float(os.getenv("RSI_SHORT_MAX_MIDLINE", "40"))
+
 # --- Adaptive market-regime filter packs (from friend's v2 — DEFAULT OFF) ------
 # Graduated quality gate: requires progressively higher MTF score + structure as
 # the regime worsens (clean trend → mixed → choppy), and returns a per-regime

@@ -20,6 +20,8 @@ from config import (
     ADAPTIVE_MIXED_RISK_MULT, ADAPTIVE_CHOP_RISK_MULT, ADAPTIVE_HOT_RISK_MULT,
     ADAPTIVE_BEAR_SQUEEZE_GUARD, ADAPTIVE_BEAR_SKIP_NEW_YORK,
     ADAPTIVE_BEAR_VOL_MIN_RATIO, ADAPTIVE_BEAR_VOL_MAX_RATIO,
+    BEAR_TREND_HOT_VOL_GUARD, BEAR_TREND_HOT_VOL_MIN_RATIO, BEAR_TREND_SKIP_SESSIONS,
+    DIRECTIONAL_RSI_MIDLINE_FILTER, RSI_LONG_MIN_MIDLINE, RSI_SHORT_MAX_MIDLINE,
     STABILITY_FILTERS_ENABLED, STABILITY_SKIP_PACKS, STABILITY_SKIP_SESSIONS,
     STABILITY_MIN_EFF_RATIO, STABILITY_MIN_VOLUME_RATIO, STABILITY_MIN_QUALITY_SCORE,
 )
@@ -423,6 +425,25 @@ def analyze_coin_smc(candles_15m: dict, candles_1h: dict, symbol: str,
         if v_ratio < VOL_MIN_RATIO or v_ratio > VOL_MAX_RATIO:
             return None
 
+    # 2d. Asymmetric bear-squeeze guard.
+    #     Full bearish HTF shorts with hot volume = crowded late entries → squeeze.
+    if (
+        BEAR_TREND_HOT_VOL_GUARD
+        and bos == "bearish"
+        and trend_1h == "bearish"
+        and trend_4h == "bearish"
+        and float(ind.get("vol_ratio_regime", 1.0) or 1.0) >= BEAR_TREND_HOT_VOL_MIN_RATIO
+    ):
+        return None
+    if (
+        BEAR_TREND_SKIP_SESSIONS
+        and bos == "bearish"
+        and trend_1h == "bearish"
+        and trend_4h == "bearish"
+        and str(ind.get("session", "") or "").upper() in BEAR_TREND_SKIP_SESSIONS
+    ):
+        return None
+
     # 3. Volume on BOS context
     if ind["volume_ratio"] < SMC_BOS_MIN_VOLUME:
         return None
@@ -447,6 +468,14 @@ def analyze_coin_smc(candles_15m: dict, candles_1h: dict, symbol: str,
         return None
     if bos == "bearish" and rsi < SMC_RSI_SHORT_MIN:
         return None
+
+    # 5b. Directional RSI midline — BOS without momentum = higher false-break rate.
+    #     LONG needs RSI ≥ 50 (midline reclaimed), SHORT needs RSI < 40.
+    if DIRECTIONAL_RSI_MIDLINE_FILTER:
+        if bos == "bullish" and rsi < RSI_LONG_MIN_MIDLINE:
+            return None
+        if bos == "bearish" and rsi >= RSI_SHORT_MAX_MIDLINE:
+            return None
 
     # 6. Build confirmations
     wicks  = ind.get("wicks", {})
