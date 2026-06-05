@@ -10,7 +10,6 @@ Flow every N minutes:
 """
 
 import logging
-import json
 import os
 import time
 import threading
@@ -69,6 +68,7 @@ def _is_super_admin(user_id: int) -> bool:
 # State: super-admin is typing a new admin's Telegram ID.
 # { chat_id: True } — cleared on next message regardless of content.
 _pending_add_admin: dict = {}
+_photo_panel_messages: set = set()
 
 # ── Logging ──────────────────────────────────────────────────────────────────
 logging.basicConfig(
@@ -155,6 +155,98 @@ def _send_persistent_menu(chat_id: int, is_admin: bool = False):
         log.warning(f"_send_persistent_menu failed: {e}")
 
 
+def _panel_message_key(chat_id: int, message_id: int):
+    if chat_id is None or message_id is None:
+        return None
+    try:
+        return (str(chat_id), int(message_id))
+    except (TypeError, ValueError):
+        return None
+
+
+def _mark_photo_panel_message(chat_id: int, message_id: int):
+    key = _panel_message_key(chat_id, message_id)
+    if key:
+        _photo_panel_messages.add(key)
+
+
+def _send_admin_text(chat_id: int, text: str, reply_markup: dict):
+    return _requests.post(
+        f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage",
+        json={
+            "chat_id": chat_id,
+            "text": text,
+            "parse_mode": "Markdown",
+            "reply_markup": reply_markup,
+        },
+        timeout=10,
+    )
+
+
+def _clear_inline_keyboard(chat_id: int, message_id: int):
+    try:
+        _requests.post(
+            f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/editMessageReplyMarkup",
+            json={
+                "chat_id": chat_id,
+                "message_id": message_id,
+                "reply_markup": {"inline_keyboard": []},
+            },
+            timeout=5,
+        )
+    except Exception as e:
+        log.warning(f"_clear_inline_keyboard failed: {e}")
+
+
+def _telegram_error(resp) -> str:
+    try:
+        return str(resp.json().get("description", ""))
+    except Exception:
+        return getattr(resp, "text", "") or ""
+
+
+def _should_send_replacement(desc: str) -> bool:
+    desc = (desc or "").lower()
+    return (
+        "no text in the message" in desc
+        or "message is not a text message" in desc
+        or "message can't be edited" in desc
+        or "message to edit not found" in desc
+    )
+
+
+def _edit_admin_text(chat_id: int, message_id: int, text: str, reply_markup: dict):
+    key = _panel_message_key(chat_id, message_id)
+    if key in _photo_panel_messages:
+        _clear_inline_keyboard(chat_id, message_id)
+        return _send_admin_text(chat_id, text, reply_markup)
+
+    resp = _requests.post(
+        f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/editMessageText",
+        json={
+            "chat_id": chat_id,
+            "message_id": message_id,
+            "text": text,
+            "parse_mode": "Markdown",
+            "reply_markup": reply_markup,
+        },
+        timeout=10,
+    )
+    if resp.status_code == 200:
+        return resp
+
+    desc = _telegram_error(resp)
+    if "message is not modified" in desc.lower():
+        return resp
+
+    if _should_send_replacement(desc):
+        _clear_inline_keyboard(chat_id, message_id)
+        return _send_admin_text(chat_id, text, reply_markup)
+
+    log.warning(f"_edit_admin_text failed: {resp.status_code} {desc}")
+    return resp
+
+
 def _send_keyboard(chat_id: int, text: str):
     """Send message with admin inline keyboard."""
     try:
@@ -162,27 +254,14 @@ def _send_keyboard(chat_id: int, text: str):
             with open(ADMIN_PANEL_IMAGE_PATH, "rb") as photo:
                 resp = _requests.post(
                     f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendPhoto",
-                    data={
-                        "chat_id": chat_id,
-                        "caption": text,
-                        "parse_mode": "Markdown",
-                        "reply_markup": json.dumps(_ADMIN_KEYBOARD),
-                    },
+                    data={"chat_id": chat_id},
                     files={"photo": photo},
                     timeout=10,
                 )
-            if resp.status_code == 200:
-                return
+            if resp.status_code != 200:
+                log.warning(f"admin banner send failed: {resp.status_code} {_telegram_error(resp)}")
 
-        _requests.post(
-            f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage",
-            json={
-                "chat_id": chat_id, "text": text,
-                "parse_mode": "Markdown",
-                "reply_markup": _ADMIN_KEYBOARD,
-            },
-            timeout=10,
-        )
+        _send_admin_text(chat_id, text, _ADMIN_KEYBOARD)
     except Exception as e:
         log.warning(f"_send_keyboard failed: {e}")
 
@@ -243,15 +322,7 @@ _DEAL_STATUS_ICON = {
 def _edit_with_keyboard(chat_id: int, message_id: int, text: str, kb_rows: list):
     """Edit a message with a custom inline keyboard (Markdown)."""
     try:
-        _requests.post(
-            f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/editMessageText",
-            json={
-                "chat_id": chat_id, "message_id": message_id,
-                "text": text, "parse_mode": "Markdown",
-                "reply_markup": {"inline_keyboard": kb_rows},
-            },
-            timeout=10,
-        )
+        _edit_admin_text(chat_id, message_id, text, {"inline_keyboard": kb_rows})
     except Exception as e:
         log.warning(f"_edit_with_keyboard failed: {e}")
 
@@ -329,15 +400,7 @@ def _render_deals_symbol_picker(chat_id: int, message_id: int):
 def _edit_message(chat_id: int, message_id: int, text: str):
     """Edit an existing message and re-attach the keyboard."""
     try:
-        _requests.post(
-            f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/editMessageText",
-            json={
-                "chat_id": chat_id, "message_id": message_id,
-                "text": text, "parse_mode": "Markdown",
-                "reply_markup": _ADMIN_KEYBOARD,
-            },
-            timeout=10,
-        )
+        _edit_admin_text(chat_id, message_id, text, _ADMIN_KEYBOARD)
     except Exception as e:
         log.warning(f"_edit_message failed: {e}")
 
@@ -411,18 +474,7 @@ def _handle_admin_callback(callback_id: str, chat_id: int,
                 keyboard_rows.append([
                     {"text": "« Назад", "callback_data": "adm_back"}
                 ])
-                try:
-                    _requests.post(
-                        f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/editMessageText",
-                        json={
-                            "chat_id": chat_id, "message_id": message_id,
-                            "text": "\n".join(lines), "parse_mode": "Markdown",
-                            "reply_markup": {"inline_keyboard": keyboard_rows},
-                        },
-                        timeout=10,
-                    )
-                except Exception as e:
-                    log.warning(f"blocks keyboard failed: {e}")
+                _edit_with_keyboard(chat_id, message_id, "\n".join(lines), keyboard_rows)
         except Exception as e:
             _edit_message(chat_id, message_id, f"Ошибка: {e}")
 
@@ -520,18 +572,7 @@ def _handle_admin_callback(callback_id: str, chat_id: int,
                     "callback_data": "adm_add_admin",
                 }])
             kb_rows.append([{"text": "« Назад", "callback_data": "adm_back"}])
-            try:
-                _requests.post(
-                    f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/editMessageText",
-                    json={
-                        "chat_id": chat_id, "message_id": message_id,
-                        "text": "\n".join(lines), "parse_mode": "Markdown",
-                        "reply_markup": {"inline_keyboard": kb_rows},
-                    },
-                    timeout=10,
-                )
-            except Exception as e:
-                log.warning(f"adm_admins keyboard failed: {e}")
+            _edit_with_keyboard(chat_id, message_id, "\n".join(lines), kb_rows)
         except Exception as e:
             _edit_message(chat_id, message_id, f"Ошибка: {e}")
 
@@ -893,6 +934,8 @@ def webhook():
         message_id = cb.get("message", {}).get("message_id")
         cb_data    = cb.get("data", "")
         cb_id      = cb.get("id")
+        if cb.get("message", {}).get("photo"):
+            _mark_photo_panel_message(chat_id, message_id)
         if _is_admin(user_id):
             _handle_admin_callback(cb_id, chat_id, message_id, cb_data, user_id)
         else:
