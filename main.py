@@ -1051,20 +1051,6 @@ def webhook():
                         return f"  {icon} {name}: {d['total']} сд. → {wr}% win  {dr_s}\n"
                     dir_lines = "\n" + _dir(lo, "LONG") + _dir(sh, "SHORT")
 
-                # Streak
-                streak_str = ""
-                if s["streak"]:
-                    icons = " ".join(s["streak"])
-                    run   = s["current_run"]
-                    first = s["streak"][0]
-                    if first == "❌" and run >= 2:
-                        run_txt = f"  ⚠️ {run} SL подряд"
-                    elif first in ("✅", "🏆") and run >= 2:
-                        run_txt = f"  🔥 {run} в прибыли подряд"
-                    else:
-                        run_txt = ""
-                    streak_str = f"\n🕐 Последние: {icons}{run_txt}\n"
-
                 in_work = s["open"] + s["tp1_partial_open"]
                 in_work_str = ""
                 if in_work:
@@ -1100,11 +1086,25 @@ def webhook():
                     f"{dir_lines}"
                     f"{prem_str}"
                     f"\n{r_sign} Итого: *{r_str}*  •  {rpt_str} за сделку"
-                    f"{streak_str}"
                 )
+
+            def _fmt_streak(s: dict) -> str:
+                if not s.get("streak"):
+                    return ""
+                icons = " ".join(s["streak"])
+                run   = s["current_run"]
+                first = s["streak"][0]
+                if first == "❌" and run >= 2:
+                    run_txt = f"  ⚠️ {run} SL подряд"
+                elif first in ("✅", "🏆") and run >= 2:
+                    run_txt = f"  🔥 {run} в прибыли подряд"
+                else:
+                    run_txt = ""
+                return f"🕐 *Последние:* {icons}{run_txt}\n\n"
 
             text_out = (
                 "📈 *Результаты бота*\n\n"
+                + _fmt_streak(s30)
                 + _fmt_stats(sd,  "Сегодня")
                 + "\n\n"
                 + _fmt_stats(s7,  "За 7 дней")
