@@ -43,7 +43,7 @@ from config import EVENT_WARN_HOURS
 from src.db import (
     init_db, get_open_signals, update_signal_status, get_stats,
     auto_block_bad_symbols, is_symbol_auto_blocked, get_active_symbol_blocks,
-    get_recent_outcomes, unblock_symbol, get_symbols_performance,
+    get_recent_outcomes, unblock_symbol, set_symbol_block, get_symbols_performance,
     upsert_user, get_user_by_id, get_all_users,
     add_dynamic_admin, remove_dynamic_admin, get_dynamic_admins, is_dynamic_admin,
     delete_signal, get_recent_signals,
@@ -68,6 +68,9 @@ def _is_super_admin(user_id: int) -> bool:
 # State: super-admin is typing a new admin's Telegram ID.
 # { chat_id: True } — cleared on next message regardless of content.
 _pending_add_admin: dict = {}
+# State: admin is typing a symbol name to manually block.
+# { chat_id: block_days } — cleared on next message.
+_pending_block_chat: dict = {}
 _photo_panel_messages: set = set()
 
 # ── Logging ──────────────────────────────────────────────────────────────────
@@ -135,6 +138,8 @@ _ADMIN_KEYBOARD = {
     ], [
         {"text": "🗑 Управление сделками", "callback_data": "adm_deals"},
         {"text": "💰 Бюджет Claude",       "callback_data": "adm_budget"},
+    ], [
+        {"text": "🔒 Блок монет",          "callback_data": "adm_manblock"},
     ]]
 }
 
@@ -397,6 +402,51 @@ def _render_deals_symbol_picker(chat_id: int, message_id: int):
     )
 
 
+def _render_manual_block_panel(chat_id: int, message_id: int):
+    """Show manual block/unblock panel: active blocks + recently traded symbols."""
+    _RIGA = _riga_tz()
+    import time as _t
+
+    # Active blocks (auto + manual)
+    blocks = get_active_symbol_blocks()
+
+    # Recently traded symbols (last 30 signals) — candidates to block
+    recent_syms = get_distinct_signal_symbols()[:20]
+    blocked_syms = {b["symbol"] for b in blocks}
+
+    lines = ["🔒 *Ручная блокировка монет*\n"]
+    kb_rows = []
+
+    if blocks:
+        lines.append("*Заблокированы сейчас:*")
+        for b in blocks:
+            until = datetime.fromtimestamp(b["blocked_until"], tz=_RIGA).strftime("%d.%m %H:%M")
+            lines.append(f"• *{b['symbol']}* до {until}")
+            kb_rows.append([{
+                "text": f"✅ Разблок {b['symbol']}",
+                "callback_data": f"adm_mb_unblock_{b['symbol']}",
+            }])
+    else:
+        lines.append("_Нет активных блоков._")
+
+    # Symbols not currently blocked → show as block buttons (3 per row)
+    free_syms = [s for s in recent_syms if s not in blocked_syms]
+    if free_syms:
+        lines.append("\n*Монеты из журнала:*")
+        row = []
+        for sym in free_syms:
+            row.append({"text": f"🚫 {sym}", "callback_data": f"adm_mb_block_{sym}"})
+            if len(row) == 3:
+                kb_rows.append(row); row = []
+        if row:
+            kb_rows.append(row)
+
+    kb_rows.append([{"text": "✏️ Ввести символ вручную", "callback_data": "adm_mb_input"}])
+    kb_rows.append([{"text": "« Назад", "callback_data": "adm_back"}])
+
+    _edit_with_keyboard(chat_id, message_id, "\n".join(lines), kb_rows)
+
+
 def _edit_message(chat_id: int, message_id: int, text: str):
     """Edit an existing message and re-attach the keyboard."""
     try:
@@ -637,6 +687,45 @@ def _handle_admin_callback(callback_id: str, chat_id: int,
             log.warning(f"delete signal failed: {e}")
         # Refresh the deals list so the deleted row disappears in place
         _render_deals_page(chat_id, message_id, 0)
+
+    elif data == "adm_manblock":
+        _render_manual_block_panel(chat_id, message_id)
+
+    elif data.startswith("adm_mb_block_"):
+        symbol = data[len("adm_mb_block_"):]
+        try:
+            set_symbol_block(symbol, days=1, reason="Manual block by admin")
+            txt = f"🚫 *{symbol}* заблокирована на 24ч."
+        except Exception as e:
+            txt = f"Ошибка блокировки: {e}"
+        _render_manual_block_panel(chat_id, message_id)
+
+    elif data.startswith("adm_mb_unblock_"):
+        symbol = data[len("adm_mb_unblock_"):]
+        try:
+            unblock_symbol(symbol)
+            txt = f"✅ *{symbol}* разблокирована."
+        except Exception as e:
+            txt = f"Ошибка разблокировки: {e}"
+        _render_manual_block_panel(chat_id, message_id)
+
+    elif data == "adm_mb_input":
+        _pending_block_chat[chat_id] = 1  # days
+        try:
+            _requests.post(
+                f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage",
+                json={
+                    "chat_id": chat_id,
+                    "text": (
+                        "Введи символ монеты для блокировки на 24ч.\n"
+                        "Пример: `BTCUSDT` или `BTC`"
+                    ),
+                    "parse_mode": "Markdown",
+                },
+                timeout=10,
+            )
+        except Exception as e:
+            log.warning(f"adm_mb_input prompt failed: {e}")
 
     elif data == "adm_budget":
         try:
@@ -991,6 +1080,19 @@ def webhook():
                    f"Ему нужно написать /start чтобы получить панель.")
         else:
             _reply(chat_id, "❌ Не похоже на Telegram ID. Нужно число, например `123456789`.")
+        return "ok", 200
+
+    # ── Pending "manual block" state — admin typed a symbol to block ──────────
+    if is_dm and _is_admin(user_id) and chat_id in _pending_block_chat:
+        days = _pending_block_chat.pop(chat_id)
+        raw_sym = text_raw.strip().upper().replace("-", "").replace("/", "").replace("_", "")
+        if not raw_sym.endswith("USDT"):
+            raw_sym = raw_sym + "USDT"
+        try:
+            set_symbol_block(raw_sym, days=days, reason="Manual block by admin")
+            _reply(chat_id, f"🚫 *{raw_sym}* заблокирована на {days}ч (24ч).\nОткрой 🔒 Блок монет чтобы проверить.")
+        except Exception as e:
+            _reply(chat_id, f"Ошибка: {e}")
         return "ok", 200
 
     # /start → постоянное меню (у админов расширенное, только в ЛС)
