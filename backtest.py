@@ -32,8 +32,7 @@ from concurrent.futures import ProcessPoolExecutor, as_completed
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Iterable
-from urllib.parse import urlencode
-from urllib.request import Request, urlopen
+from urllib.parse import urlencode  # noqa: F401 (kept for potential future use)
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
@@ -52,11 +51,11 @@ from config import (  # noqa: E402
     BACKTEST_TP_WINDOW,
     BLOCKED_SYMBOLS,
     BLOCK_STABLE_BASES,
-    KUCOIN_BASE_URL,
     KLINES_1H_INTERVAL_SEC,
     KLINES_4H_INTERVAL_SEC,
     KLINES_INTERVAL_SEC,
     LEVERAGED_TOKEN_SUFFIXES,
+    QUOTE_ASSET,
     RISK_MAX_PCT,
     RISK_MIN_PCT,
     SL_ATR_BUFFER,
@@ -67,6 +66,7 @@ from config import (  # noqa: E402
     TIMEFRAME_KUCOIN,
     TP1_R_MULT,
     TP2_R_MULT,
+    MIN_24H_QUOTE_VOLUME_USDT,
 )
 from src.signal_filter import analyze_coin_smc  # noqa: E402
 
@@ -74,19 +74,29 @@ from src.signal_filter import analyze_coin_smc  # noqa: E402
 PROJECT_DIR = Path(__file__).resolve().parent
 CACHE_DIR = PROJECT_DIR / "backtest_cache"
 CACHE_TTL_SEC = 2 * 3600
-KUCOIN_CANDLE_PAGE_LIMIT = 1400
+
+# Bybit API — same source as live bot.
+# Supports BYBIT_PROXY_BASE / BYBIT_HTTPS_PROXY env vars (same as main bot).
+BYBIT_HOSTS = ["https://api.bybit.com", "https://api.bytick.com"]
+BYBIT_PAGE_LIMIT = 1000   # Bybit max candles per request
+
+# Bybit interval strings
+BYBIT_INTERVAL_MAP = {
+    "15min": "15", "1hour": "60", "4hour": "240",
+    "15": "15", "60": "60", "240": "240",
+}
 
 WINDOW_15M = 300
 WINDOW_1H = 90
 WINDOW_4H = 50
 DEFAULT_WARMUP = 50
 
-# Fixed symbol set: reproducible A/B runs.
+# Fixed symbol set: reproducible A/B runs. Bybit format (no dashes).
 BACKTEST_SYMBOLS = [
-    "BTC-USDT", "ETH-USDT", "XRP-USDT", "SOL-USDT", "XMR-USDT",
-    "DOT-USDT", "XLM-USDT", "LINK-USDT", "SUI-USDT", "HYPE-USDT",
-    "ZEC-USDT", "SEI-USDT", "AAVE-USDT", "TAO-USDT", "NEAR-USDT",
-    "TON-USDT", "BILL-USDT", "LAB-USDT", "PIEVERSE-USDT", "NEX-USDT",
+    "BTCUSDT", "ETHUSDT", "XRPUSDT", "SOLUSDT", "XMRUSDT",
+    "DOTUSDT", "XLMUSDT", "LINKUSDT", "SUIUSDT", "HYPEUSDT",
+    "ZECUSDT", "SEIUSDT", "AAVEUSDT", "TAOUSDT", "NEARUSDT",
+    "TONUSDT", "BILLUSDT", "LABUSDT", "PIVERSEUSDT", "NEXUSDT",
 ]
 
 
@@ -142,38 +152,54 @@ def parse_symbols(value: str | None) -> list[str]:
     return list(BACKTEST_SYMBOLS)
 
 
-def fetch_top_symbols(limit: int) -> list[str]:
-    """Fetch current top KuCoin USDT pairs by 24h quoted volume."""
+def _bybit_get_bt(path: str, params: dict, timeout: int = 20):
+    """Bybit GET for backtest — supports BYBIT_PROXY_BASE and BYBIT_HTTPS_PROXY."""
+    import requests as _req
+    proxy_base  = os.getenv("BYBIT_PROXY_BASE", "").strip().rstrip("/")
+    https_proxy = os.getenv("BYBIT_HTTPS_PROXY", "").strip()
+    proxies = {"http": https_proxy, "https": https_proxy} if https_proxy else None
 
-    url = f"{KUCOIN_BASE_URL}/api/v1/market/allTickers"
-    req = Request(url, headers={"User-Agent": "tusa-fast-backtest/1.0"})
-    with urlopen(req, timeout=20) as resp:
-        payload = json.loads(resp.read().decode("utf-8"))
+    if proxy_base:
+        r = _req.get(f"{proxy_base}{path}", params=params, timeout=timeout, proxies=proxies)
+        r.raise_for_status()
+        return r
 
-    if payload.get("code") not in (None, "200000"):
-        raise RuntimeError(f"KuCoin tickers error: {payload}")
-
-    rows = []
-    blocked = set(BLOCKED_SYMBOLS or [])
-    for item in (payload.get("data") or {}).get("ticker", []):
-        symbol = str(item.get("symbol", "")).upper()
-        if not symbol.endswith("-USDT") or symbol in blocked:
+    for host in BYBIT_HOSTS:
+        try:
+            r = _req.get(f"{host}{path}", params=params, timeout=timeout, proxies=proxies)
+            r.raise_for_status()
+            return r
+        except Exception:
             continue
-        base = symbol[:-5]
+    raise RuntimeError(f"All Bybit hosts failed for {path}")
+
+
+def fetch_top_symbols(limit: int) -> list[str]:
+    """Fetch current top Bybit linear USDT pairs by 24h USDT volume."""
+    resp = _bybit_get_bt("/v5/market/tickers", {"category": "linear"})
+    tickers = resp.json().get("result", {}).get("list", [])
+    blocked = set(BLOCKED_SYMBOLS or [])
+    rows = []
+    for t in tickers:
+        symbol = str(t.get("symbol", "")).upper()
+        if not symbol.endswith(QUOTE_ASSET):
+            continue
+        if symbol in blocked:
+            continue
+        base = symbol[: -len(QUOTE_ASSET)]
         if base in BLOCK_STABLE_BASES:
             continue
-        if any(base.endswith(suffix) for suffix in LEVERAGED_TOKEN_SUFFIXES):
+        if any(base.endswith(s) for s in LEVERAGED_TOKEN_SUFFIXES):
             continue
         try:
-            vol_value = float(item.get("volValue") or 0.0)
+            vol = float(t.get("turnover24h") or 0.0)
         except (TypeError, ValueError):
-            vol_value = 0.0
-        if vol_value <= 0:
+            vol = 0.0
+        if vol < MIN_24H_QUOTE_VOLUME_USDT:
             continue
-        rows.append((vol_value, symbol))
-
+        rows.append((vol, symbol))
     rows.sort(reverse=True)
-    return [symbol for _, symbol in rows[:limit]]
+    return [s for _, s in rows[:limit]]
 
 
 def choose_workers(symbol_count: int, candles: int, stride: int) -> int:
@@ -215,8 +241,12 @@ def fetch_history(
     *,
     refresh_cache: bool = False,
 ) -> dict[str, list]:
-    """Fetch historical KuCoin candles with a small local pickle cache."""
+    """Fetch historical Bybit candles with a local pickle cache.
 
+    Bybit kline format: [timestamp_ms, open, high, low, close, volume, turnover]
+    Returns newest-first from API — we reverse to oldest-first.
+    Paginates backwards via `end` param to collect `count` candles.
+    """
     path = cache_path(symbol, interval, count)
     if not refresh_cache and path.exists():
         age = time.time() - path.stat().st_mtime
@@ -229,52 +259,49 @@ def fetch_history(
             except Exception:
                 pass
 
-    now = int(time.time())
-    start_at = now - count * interval_sec
-    end_at = now
+    bybit_interval = BYBIT_INTERVAL_MAP.get(str(interval), "15")
+    now_ms  = int(time.time() * 1000)
+    end_ms  = now_ms
     by_time: dict[int, list] = {}
 
-    while end_at > start_at and len(by_time) < count:
-        query = urlencode({
-            "symbol": symbol,
-            "type": interval,
-            "startAt": start_at,
-            "endAt": end_at,
-        })
-        url = f"{KUCOIN_BASE_URL}/api/v1/market/candles?{query}"
-        req = Request(url, headers={"User-Agent": "tusa-fast-backtest/1.0"})
-
-        with urlopen(req, timeout=20) as resp:
-            payload = json.loads(resp.read().decode("utf-8"))
-
-        if payload.get("code") not in (None, "200000"):
-            raise RuntimeError(f"KuCoin error for {symbol} {interval}: {payload}")
-
-        raw = payload.get("data") or []
+    while len(by_time) < count:
+        resp = _bybit_get_bt(
+            "/v5/market/kline",
+            {
+                "category": "linear",
+                "symbol":   symbol,
+                "interval": bybit_interval,
+                "limit":    BYBIT_PAGE_LIMIT,
+                "end":      str(end_ms),
+            },
+        )
+        raw = resp.json().get("result", {}).get("list", [])
         if not raw:
             break
 
-        batch = sorted(raw, key=lambda c: int(float(c[0])))
-        for c in batch:
-            ts = int(float(c[0]))
-            if start_at <= ts <= end_at:
-                by_time[ts] = c
+        for c in raw:
+            ts_ms = int(c[0])
+            ts_s  = ts_ms // 1000
+            if ts_s not in by_time:
+                by_time[ts_s] = c
 
-        oldest_ts = int(float(batch[0][0]))
-        if len(batch) < KUCOIN_CANDLE_PAGE_LIMIT or oldest_ts <= start_at:
+        oldest_ts_ms = int(raw[-1][0])
+        cutoff_ms    = now_ms - count * interval_sec * 1000
+        if len(raw) < BYBIT_PAGE_LIMIT or oldest_ts_ms <= cutoff_ms:
             break
-        end_at = oldest_ts - interval_sec
+        end_ms = oldest_ts_ms - 1
 
     candles = [by_time[ts] for ts in sorted(by_time)][-count:]
     if not candles:
-        raise ValueError(f"No data for {symbol} {interval}")
+        raise ValueError(f"No Bybit data for {symbol} {interval}")
 
+    # Bybit columns: [ts_ms, open, high, low, close, volume, turnover]
     data = {
-        "time":   [int(float(c[0])) for c in candles],
+        "time":   [int(c[0]) // 1000 for c in candles],
         "open":   [float(c[1]) for c in candles],
-        "high":   [float(c[3]) for c in candles],
-        "low":    [float(c[4]) for c in candles],
-        "close":  [float(c[2]) for c in candles],
+        "high":   [float(c[2]) for c in candles],
+        "low":    [float(c[3]) for c in candles],
+        "close":  [float(c[4]) for c in candles],
         "volume": [float(c[5]) for c in candles],
     }
 

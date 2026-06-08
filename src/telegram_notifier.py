@@ -187,29 +187,25 @@ def send_signal(analysis: dict) -> bool:
     event_warn   = analysis.get("event_warning", "")
     event_line   = f"⚠️ {event_warn}\n" if event_warn else ""
 
-    # Entry zone range (FVG/OB low–high) + market price drift warning
-    entry_source = analysis.get("entry_source", "MARKET")
-    entry_low    = analysis.get("entry_low",  price)
-    entry_high   = analysis.get("entry_high", price)
-    market_px    = analysis.get("market_price", price)
+    # Entry zone range (FVG/OB low–high) + zone reference when live price used
+    entry_source   = analysis.get("entry_source", "MARKET")
+    entry_low      = analysis.get("entry_low",  price)
+    entry_high     = analysis.get("entry_high", price)
+    zone_entry_px  = analysis.get("zone_entry_price")   # original zone midpoint (set by main.py)
     zone_range_line = ""
     drift_line      = ""
     if entry_source in ("FVG", "OB") and entry_low and entry_high and entry_low != entry_high:
         zone_range_line = (
             f"📐 Зона {entry_source}:  `{_format_price(entry_low)}` – `{_format_price(entry_high)}`\n"
         )
-    if market_px and price and price > 0:
-        drift_pct = (market_px - price) / price * 100
+    if zone_entry_px and price and price > 0:
+        drift_pct = (price - zone_entry_px) / zone_entry_px * 100
         if abs(drift_pct) >= 0.3:
             arrow_d = "📈" if drift_pct > 0 else "📉"
             drift_line = (
-                f"{arrow_d} Рынок: `{_format_price(market_px)}`  "
-                f"({'+'if drift_pct>0 else ''}{drift_pct:.2f}% от зоны)\n"
+                f"{arrow_d} Центр зоны: `{_format_price(zone_entry_px)}`  "
+                f"({'+'if drift_pct>0 else ''}{drift_pct:.2f}% от текущей)\n"
             )
-            if drift_pct > 0.5 and decision == "LONG":
-                drift_line += "_⚠️ Цена выше зоны — ждите ретеста или входите рыночной_\n"
-            elif drift_pct < -0.5 and decision == "SHORT":
-                drift_line += "_⚠️ Цена ниже зоны — ждите ретеста или входите рыночной_\n"
 
     lev = lev_info["leverage"]
     premium_badge = "  💎 *PREMIUM*" if analysis.get("premium") else ""

@@ -1883,6 +1883,32 @@ def run_scan():
                     if sent_count >= MAX_SIGNALS_PER_SCAN:
                         log.info(f"  Skip {analysis['symbol']} — scan cap {MAX_SIGNALS_PER_SCAN} reached")
                         continue
+
+                    # Snapshot live Bybit price at publish moment.
+                    # This is the price a trader sees when the signal arrives —
+                    # use it as the actual entry price, not the stale candle close.
+                    try:
+                        live_px = get_current_price(analysis["symbol"])
+                        if live_px and live_px > 0:
+                            zone_px = float(analysis.get("current_price") or live_px)
+                            drift   = abs(live_px - zone_px) / zone_px if zone_px else 0
+                            # Only use live price if within 3% of zone (sanity guard)
+                            if drift <= 0.03:
+                                analysis["zone_entry_price"] = zone_px   # keep zone for reference
+                                analysis["current_price"]    = round(live_px, 8)
+                                analysis["market_price"]     = round(live_px, 8)
+                                log.info(
+                                    f"  Entry price updated to live: {live_px} "
+                                    f"(zone was {zone_px}, drift {drift*100:.2f}%)"
+                                )
+                            else:
+                                log.warning(
+                                    f"  Live price {live_px} vs zone {zone_px}: "
+                                    f"drift {drift*100:.1f}% > 3% — keeping zone price"
+                                )
+                    except Exception as e:
+                        log.warning(f"  Live price fetch failed for {analysis['symbol']}: {e}")
+
                     if send_signal(analysis):
                         _cache_signal(analysis["symbol"], direction)
                         sent_count += 1
