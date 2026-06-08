@@ -44,7 +44,7 @@ from src.db import (
     init_db, get_open_signals, update_signal_status, get_stats,
     auto_block_bad_symbols, is_symbol_auto_blocked, get_active_symbol_blocks,
     get_recent_outcomes, unblock_symbol, set_symbol_block, get_symbols_performance,
-    upsert_user, get_user_by_id, get_all_users,
+    upsert_user, get_user_by_id, get_all_users, get_users_count,
     add_dynamic_admin, remove_dynamic_admin, get_dynamic_admins, is_dynamic_admin,
     delete_signal, get_recent_signals,
     get_signals_count, get_signals_page, get_distinct_signal_symbols,
@@ -66,12 +66,17 @@ def _is_super_admin(user_id: int) -> bool:
 
 
 # State: super-admin is typing a new admin's Telegram ID.
-# { chat_id: True } — cleared on next message regardless of content.
 _pending_add_admin: dict = {}
 # State: admin is typing a symbol name to manually block.
-# { chat_id: block_days } — cleared on next message.
 _pending_block_chat: dict = {}
+# State: admin is typing a user search query.
+_pending_users_search: dict = {}
 _photo_panel_messages: set = set()
+
+# Last scan summary — populated by run_scan(), shown in 📊 Фильтры panel.
+_last_scan_stats: dict = {
+    "coins": 0, "setups": 0, "fresh": 0, "enriched": 0, "sent": 0, "ts": 0.0
+}
 
 # ── Logging ──────────────────────────────────────────────────────────────────
 logging.basicConfig(
@@ -139,7 +144,8 @@ _ADMIN_KEYBOARD = {
         {"text": "🗑 Управление сделками", "callback_data": "adm_deals"},
         {"text": "💰 Бюджет Claude",       "callback_data": "adm_budget"},
     ], [
-        {"text": "🔒 Блок монет",          "callback_data": "adm_manblock"},
+        {"text": "🔒 Блок монет",   "callback_data": "adm_manblock"},
+        {"text": "📊 Фильтры",      "callback_data": "adm_filters"},
     ]]
 }
 
@@ -455,10 +461,50 @@ def _edit_message(chat_id: int, message_id: int, text: str):
         log.warning(f"_edit_message failed: {e}")
 
 
+_USERS_PER_PAGE = 10
+
+
+def _render_users_page(chat_id: int, message_id: int, page: int, query: str = ""):
+    """Render paginated users list with search support."""
+    total = get_users_count(query)
+    pages = max(1, (total + _USERS_PER_PAGE - 1) // _USERS_PER_PAGE)
+    page  = max(0, min(page, pages - 1))
+    users = get_all_users(limit=_USERS_PER_PAGE, offset=page * _USERS_PER_PAGE, query=query)
+
+    title = f"👥 *Пользователи*" + (f" — поиск: `{query}`" if query else "")
+    lines = [f"{title}  ({total} чел., стр. {page + 1}/{pages})\n"]
+    for u in users:
+        fn    = u.get("first_name") or ""
+        ln    = u.get("last_name") or ""
+        name  = (fn + (" " + ln if ln else "")).strip() or "—"
+        uname = f"@{u['username']}" if u.get("username") else f"`{u['user_id']}`"
+        last  = datetime.fromtimestamp(u["last_seen"], tz=_riga_tz()).strftime("%d.%m %H:%M")
+        lines.append(f"• {name} {uname} — {last} ({u.get('message_count', 1)} сообщ.)")
+
+    kb_rows = []
+    # Pagination nav
+    def _ucb(p, q): return f"adm_users_q_{q}_p{p}" if q else f"adm_users_p{p}"
+    nav = []
+    if page > 0:
+        nav.append({"text": "◀️", "callback_data": _ucb(page - 1, query)})
+    nav.append({"text": "🔍 Поиск", "callback_data": "adm_users_search"})
+    if page < pages - 1:
+        nav.append({"text": "▶️", "callback_data": _ucb(page + 1, query)})
+    if nav:
+        kb_rows.append(nav)
+    if query:
+        kb_rows.append([{"text": "❌ Сбросить поиск", "callback_data": "adm_users_p0"}])
+    kb_rows.append([{"text": "« Назад", "callback_data": "adm_back"}])
+    _edit_with_keyboard(chat_id, message_id, "\n".join(lines), kb_rows)
+
+
 def _handle_admin_callback(callback_id: str, chat_id: int,
                            message_id: int, data: str, user_id: int = 0):
     """Dispatch inline-button presses for the admin panel."""
-    _answer_callback(callback_id)
+    # Block/unblock use delayed answer with confirmation text — skip default here
+    _silent_cb = data.startswith("adm_mb_block_") or data.startswith("adm_mb_unblock_")
+    if not _silent_cb:
+        _answer_callback(callback_id)
 
     if data == "adm_stats":
         try:
@@ -537,61 +583,104 @@ def _handle_admin_callback(callback_id: str, chat_id: int,
             txt = f"Ошибка разблокировки: {e}"
         _edit_message(chat_id, message_id, txt)
 
-    elif data == "adm_top":
+    elif data == "adm_top" or data.startswith("adm_top_d"):
         try:
-            perfs = get_symbols_performance(days=30)
+            _now_riga = datetime.now(_riga_tz())
+            _midnight = _now_riga.replace(hour=0, minute=0, second=0, microsecond=0).timestamp()
+            period_map = {
+                "adm_top":    (30, None,      "30д"),
+                "adm_top_d0": (30, _midnight, "сегодня"),
+                "adm_top_d7": (7,  None,      "7д"),
+                "adm_top_d30":(30, None,      "30д"),
+            }
+            days, since_ts, label = period_map.get(data, (30, None, "30д"))
+            perfs = get_symbols_performance(days=days, since_ts=since_ts)
             top = [p for p in perfs if p["total_r"] > 0][:8]
             if not top:
-                txt = "🏆 *Топ монет (30д)*\n\nНет прибыльных монет с данными."
+                txt = f"🏆 *Топ монет ({label})*\n\nНет прибыльных монет с данными."
             else:
-                lines = ["🏆 *Топ монет (30д)*\n"]
+                lines = [f"🏆 *Топ монет ({label})*\n"]
                 for i, p in enumerate(top, 1):
                     lines.append(
                         f"{i}. *{p['symbol']}*  {p['total_r']:+.2f}R  "
                         f"win {p['win_rate']}%  ({p['trades']} сд)"
                     )
                 txt = "\n".join(lines)
+            period_kb = [[
+                {"text": "📅 Сегодня", "callback_data": "adm_top_d0"},
+                {"text": "📅 7 дней",  "callback_data": "adm_top_d7"},
+                {"text": "📅 30 дней", "callback_data": "adm_top_d30"},
+            ], [{"text": "« Назад", "callback_data": "adm_back"}]]
+            _edit_with_keyboard(chat_id, message_id, txt, period_kb)
         except Exception as e:
-            txt = f"Ошибка: {e}"
-        _edit_message(chat_id, message_id, txt)
+            _edit_message(chat_id, message_id, f"Ошибка: {e}")
 
-    elif data == "adm_worst":
+    elif data == "adm_worst" or data.startswith("adm_worst_d"):
         try:
-            perfs = get_symbols_performance(days=30)
-            worst = [p for p in reversed(perfs) if p["trades"] >= 2 and p["total_r"] < 0][:8]
+            _now_riga = datetime.now(_riga_tz())
+            _midnight = _now_riga.replace(hour=0, minute=0, second=0, microsecond=0).timestamp()
+            period_map = {
+                "adm_worst":    (30, None,      "30д"),
+                "adm_worst_d0": (30, _midnight, "сегодня"),
+                "adm_worst_d7": (7,  None,      "7д"),
+                "adm_worst_d30":(30, None,      "30д"),
+            }
+            days, since_ts, label = period_map.get(data, (30, None, "30д"))
+            perfs = get_symbols_performance(days=days, since_ts=since_ts)
+            worst = [p for p in reversed(perfs) if p["trades"] >= 1 and p["total_r"] < 0][:8]
             if not worst:
-                txt = "💀 *Худшие монеты (30д)*\n\nНедостаточно данных."
+                txt = f"💀 *Худшие монеты ({label})*\n\nНедостаточно данных или убытков нет."
             else:
-                lines = ["💀 *Худшие монеты (30д)*\n"]
+                lines = [f"💀 *Худшие монеты ({label})*\n"]
                 for i, p in enumerate(worst, 1):
                     lines.append(
                         f"{i}. *{p['symbol']}*  {p['total_r']:+.2f}R  "
                         f"win {p['win_rate']}%  ({p['trades']} сд)"
                     )
                 txt = "\n".join(lines)
+            period_kb = [[
+                {"text": "📅 Сегодня", "callback_data": "adm_worst_d0"},
+                {"text": "📅 7 дней",  "callback_data": "adm_worst_d7"},
+                {"text": "📅 30 дней", "callback_data": "adm_worst_d30"},
+            ], [{"text": "« Назад", "callback_data": "adm_back"}]]
+            _edit_with_keyboard(chat_id, message_id, txt, period_kb)
         except Exception as e:
-            txt = f"Ошибка: {e}"
-        _edit_message(chat_id, message_id, txt)
+            _edit_message(chat_id, message_id, f"Ошибка: {e}")
 
-    elif data == "adm_users":
+    elif data == "adm_users" or data == "adm_users_p0":
+        _render_users_page(chat_id, message_id, 0)
+
+    elif data.startswith("adm_users_p"):
         try:
-            users = get_all_users(limit=50)
-            if not users:
-                txt = "👥 *Пользователи*\n\nНикто ещё не писал боту."
-            else:
-                lines = [f"👥 *Пользователи* — {len(users)} чел.\n"]
-                for u in users:
-                    parts = []
-                    fn = u.get("first_name") or ""
-                    ln = u.get("last_name") or ""
-                    name = (fn + (" " + ln if ln else "")).strip() or "—"
-                    uname = f"@{u['username']}" if u.get("username") else f"`{u['user_id']}`"
-                    last = datetime.fromtimestamp(u["last_seen"], tz=_riga_tz()).strftime("%d.%m %H:%M")
-                    lines.append(f"• {name} {uname} — {last} ({u.get('message_count', 1)} сообщ.)")
-                txt = "\n".join(lines)
+            page = int(data[len("adm_users_p"):])
+        except ValueError:
+            page = 0
+        _render_users_page(chat_id, message_id, page)
+
+    elif data.startswith("adm_users_q_"):
+        # Format: adm_users_q_{query}_p{N}
+        rest = data[len("adm_users_q_"):]
+        try:
+            q_part, p_part = rest.rsplit("_p", 1)
+            page = int(p_part)
+        except ValueError:
+            q_part, page = rest, 0
+        _render_users_page(chat_id, message_id, page, query=q_part)
+
+    elif data == "adm_users_search":
+        _pending_users_search[chat_id] = True
+        try:
+            _requests.post(
+                f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage",
+                json={
+                    "chat_id": chat_id,
+                    "text": "🔍 Введи @ник или Telegram ID для поиска:",
+                    "parse_mode": "Markdown",
+                },
+                timeout=10,
+            )
         except Exception as e:
-            txt = f"Ошибка: {e}"
-        _edit_message(chat_id, message_id, txt)
+            log.warning(f"users_search prompt failed: {e}")
 
     elif data == "adm_admins":
         try:
@@ -695,18 +784,18 @@ def _handle_admin_callback(callback_id: str, chat_id: int,
         symbol = data[len("adm_mb_block_"):]
         try:
             set_symbol_block(symbol, days=1, reason="Manual block by admin")
-            txt = f"🚫 *{symbol}* заблокирована на 24ч."
+            _answer_callback(callback_id, f"🚫 {symbol} заблокирована на 24ч")
         except Exception as e:
-            txt = f"Ошибка блокировки: {e}"
+            _answer_callback(callback_id, f"Ошибка: {e}")
         _render_manual_block_panel(chat_id, message_id)
 
     elif data.startswith("adm_mb_unblock_"):
         symbol = data[len("adm_mb_unblock_"):]
         try:
             unblock_symbol(symbol)
-            txt = f"✅ *{symbol}* разблокирована."
+            _answer_callback(callback_id, f"✅ {symbol} разблокирована")
         except Exception as e:
-            txt = f"Ошибка разблокировки: {e}"
+            _answer_callback(callback_id, f"Ошибка: {e}")
         _render_manual_block_panel(chat_id, message_id)
 
     elif data == "adm_mb_input":
@@ -743,6 +832,85 @@ def _handle_admin_callback(callback_id: str, chat_id: int,
                 f"*За сегодня:* {s['today_calls']} вызовов · ${s['today_usd']:.4f}\n"
                 f"*За 7 дней:* {s['week_calls']} вызовов · ${s['week_usd']:.4f}\n"
                 f"*Всего:* {s['total_calls']} вызовов · ${s['total_usd']:.4f}"
+            )
+        except Exception as e:
+            txt = f"Ошибка: {e}"
+        _edit_message(chat_id, message_id, txt)
+
+    elif data == "adm_filters":
+        try:
+            from config import (
+                EFF_RATIO_FILTER, EFF_RATIO_MIN,
+                BEAR_TREND_HOT_VOL_GUARD, BEAR_TREND_HOT_VOL_MIN_RATIO,
+                BEAR_TREND_SKIP_SESSIONS,
+                DIRECTIONAL_RSI_MIDLINE_FILTER, RSI_LONG_MIN_MIDLINE, RSI_SHORT_MAX_MIDLINE,
+                OVERLAP_BEARISH_1H_GUARD, MACD_CHOCH_NOISE_FILTER,
+                VOL_REGIME_FILTER, VOL_MIN_ATR_PCT, VOL_MIN_RATIO,
+                SOURCE_EDGE_FILTER, LOW_EDGE_FVG_SYMBOLS,
+                SYMBOL_EDGE_FILTER, LOW_EDGE_SYMBOLS,
+                DIRECTION_EDGE_FILTER, LOW_EDGE_SHORT_SYMBOLS,
+                LONG_RELATIVE_WEAKNESS_FILTER, LONG_RELATIVE_WEAKNESS_MAX_PCT,
+                LONG_NY_COIN_MOMENTUM_FILTER,
+                SHORT_FVG_COIN_MOMENTUM_FILTER,
+                FVG_LONDON_BTC_UP_FILTER, FVG_LONDON_BTC_UP_MIN_PCT,
+                QUALITY_RISK_OVERLAY, QUALITY_RISK_MULT,
+                REL_STRENGTH_RISK_UP, REL_STRENGTH_RISK_UP_MULT,
+                TREND_PAIR_RISK_UP, TREND_PAIR_RISK_UP_MULT,
+                TRAIL_RUNNER_ENABLED, TRAIL_ATR_MULT,
+                AUTO_BLOCK_ENABLED, AUTO_BLOCK_MIN_TRADES,
+                AUTO_BLOCK_MAX_PROFIT_FACTOR, AUTO_BLOCK_MAX_WIN_RATE,
+                ADAPTIVE_FILTER_PACKS, REQUIRE_STRICT_HTF,
+                MTF_MIN_SCORE, SCAN_INTERVAL_MINUTES,
+            )
+            import time as _t
+            stats = _last_scan_stats
+            if stats["ts"] > 0:
+                age_min = int((_t.time() - stats["ts"]) / 60)
+                scan_line = (
+                    f"🕐 Последний скан: {age_min} мин назад\n"
+                    f"  Монет в пуле: {stats['coins']}  →  "
+                    f"SMC: {stats['setups']}  →  "
+                    f"Claude: {stats['enriched']}  →  "
+                    f"Отправлено: {stats['sent']}\n\n"
+                )
+            else:
+                scan_line = "🕐 Скан ещё не запускался\n\n"
+
+            def _f(on, label): return f"{'✅' if on else '⬜'} {label}"
+            fvg_skip = ", ".join(LOW_EDGE_FVG_SYMBOLS[:3]) or "нет"
+            sym_skip = ", ".join(LOW_EDGE_SYMBOLS[:3]) or "нет"
+            dir_skip = ", ".join(LOW_EDGE_SHORT_SYMBOLS[:3]) or "нет"
+            sess_skip = ", ".join(BEAR_TREND_SKIP_SESSIONS) if BEAR_TREND_SKIP_SESSIONS else "нет"
+            txt = (
+                f"📊 *Мониторинг фильтров*\n\n"
+                f"{scan_line}"
+                f"*Фильтры сигналов:*\n"
+                f"{_f(EFF_RATIO_FILTER, f'EFF\\_RATIO порог {EFF_RATIO_MIN}')}\n"
+                f"{_f(VOL_REGIME_FILTER, f'VOL\\_REGIME ATR≥{VOL_MIN_ATR_PCT} vol≥{VOL_MIN_RATIO}x')}\n"
+                f"{_f(BEAR_TREND_HOT_VOL_GUARD, f'BEAR\\_SQUEEZE vol≥{BEAR_TREND_HOT_VOL_MIN_RATIO}x')}\n"
+                f"{_f(bool(BEAR_TREND_SKIP_SESSIONS), f'BEAR\\_SKIP\\_SESS: {sess_skip}')}\n"
+                f"{_f(DIRECTIONAL_RSI_MIDLINE_FILTER, f'RSI\\_MIDLINE LONG≥{RSI_LONG_MIN_MIDLINE} SHORT<{RSI_SHORT_MAX_MIDLINE}')}\n"
+                f"{_f(OVERLAP_BEARISH_1H_GUARD, 'OVERLAP\\_BEARISH\\_1H\\_GUARD')}\n"
+                f"{_f(MACD_CHOCH_NOISE_FILTER, 'MACD\\_CHOCH\\_NOISE')}\n"
+                f"\n*Контекстный моментум:*\n"
+                f"{_f(LONG_RELATIVE_WEAKNESS_FILTER, f'LONG\\_REL\\_WEAKNESS ≤{LONG_RELATIVE_WEAKNESS_MAX_PCT}%')}\n"
+                f"{_f(LONG_NY_COIN_MOMENTUM_FILTER, 'LONG\\_NY\\_COIN\\_MOMENTUM')}\n"
+                f"{_f(SHORT_FVG_COIN_MOMENTUM_FILTER, 'SHORT\\_FVG\\_COIN\\_MOMENTUM')}\n"
+                f"{_f(FVG_LONDON_BTC_UP_FILTER, f'FVG\\_LONDON\\_BTC\\_UP ≥{FVG_LONDON_BTC_UP_MIN_PCT}%')}\n"
+                f"\n*Edge-фильтры монет:*\n"
+                f"{_f(SYMBOL_EDGE_FILTER, f'SYMBOL\\_EDGE: {sym_skip}')}\n"
+                f"{_f(SOURCE_EDGE_FILTER, f'SOURCE\\_EDGE FVG: {fvg_skip}')}\n"
+                f"{_f(DIRECTION_EDGE_FILTER, f'DIRECTION\\_EDGE SHORT: {dir_skip}')}\n"
+                f"\n*Risk-оверлеи (x{QUALITY_RISK_MULT}):*\n"
+                f"{_f(QUALITY_RISK_OVERLAY, 'QUALITY\\_RISK OB/RSI/vol/symbol')}\n"
+                f"{_f(REL_STRENGTH_RISK_UP, f'REL\\_STRENGTH\\_RISK x{REL_STRENGTH_RISK_UP_MULT}')}\n"
+                f"{_f(TREND_PAIR_RISK_UP, f'TREND\\_PAIR\\_RISK x{TREND_PAIR_RISK_UP_MULT}')}\n"
+                f"\n*Прочее:*\n"
+                f"{_f(TRAIL_RUNNER_ENABLED, f'TRAIL\\_RUNNER ATR×{TRAIL_ATR_MULT}')}\n"
+                f"{_f(AUTO_BLOCK_ENABLED, f'AUTO\\_BLOCK ≥{AUTO_BLOCK_MIN_TRADES}сд PF≤{AUTO_BLOCK_MAX_PROFIT_FACTOR} WR≤{AUTO_BLOCK_MAX_WIN_RATE}%')}\n"
+                f"⬜ ADAPTIVE\\_FILTER\\_PACKS {'✅' if ADAPTIVE_FILTER_PACKS else '(выкл.)'}\n"
+                f"⬜ STRICT\\_HTF {'✅' if REQUIRE_STRICT_HTF else '(выкл.)'}\n"
+                f"\n📐 MTF\\_MIN\\_SCORE: {MTF_MIN_SCORE}  🕐 Скан каждые {SCAN_INTERVAL_MINUTES} мин"
             )
         except Exception as e:
             txt = f"Ошибка: {e}"
@@ -1080,6 +1248,29 @@ def webhook():
                    f"Ему нужно написать /start чтобы получить панель.")
         else:
             _reply(chat_id, "❌ Не похоже на Telegram ID. Нужно число, например `123456789`.")
+        return "ok", 200
+
+    # ── Pending "users search" state — admin typed a search query ────────────
+    if is_dm and _is_admin(user_id) and _pending_users_search.pop(chat_id, False):
+        query = text_raw.strip().lstrip("@")
+        _reply(chat_id, f"🔍 Ищу: `{query}`...")
+        # We need a message_id to edit — just send a new message with results
+        try:
+            total = get_users_count(query)
+            users = get_all_users(limit=_USERS_PER_PAGE, offset=0, query=query)
+            if not users:
+                _reply(chat_id, f"👥 *Поиск `{query}`*\n\nНикто не найден.")
+            else:
+                lines = [f"👥 *Поиск `{query}`* — {total} чел.\n"]
+                for u in users:
+                    fn    = u.get("first_name") or ""
+                    name  = fn.strip() or "—"
+                    uname = f"@{u['username']}" if u.get("username") else f"`{u['user_id']}`"
+                    last  = datetime.fromtimestamp(u["last_seen"], tz=_riga_tz()).strftime("%d.%m %H:%M")
+                    lines.append(f"• {name} {uname} `{u['user_id']}` — {last}")
+                _reply(chat_id, "\n".join(lines))
+        except Exception as e:
+            _reply(chat_id, f"Ошибка поиска: {e}")
         return "ok", 200
 
     # ── Pending "manual block" state — admin typed a symbol to block ──────────
@@ -1560,6 +1751,9 @@ def run_scan():
                 log.warning(f"  Skip {symbol}: {e}")
 
         log.info(f"SMC filter: {len(setups)} setups from {len(coins)} coins")
+        _last_scan_stats["coins"]  = len(coins)
+        _last_scan_stats["setups"] = len(setups)
+        _last_scan_stats["ts"]     = time.time()
 
         # Step 3: remove duplicates
         # Also block any symbol that already has an OPEN or TP1_PARTIAL position in DB.
@@ -1574,6 +1768,7 @@ def run_scan():
             return _is_duplicate(sym, s["direction"])
         fresh = [s for s in setups if not _blocked(s)]
         log.info(f"After dedup: {len(fresh)} fresh setups")
+        _last_scan_stats["fresh"] = len(fresh)
 
         # Step 3b: news + funding enrichment
         enriched = []
@@ -1602,6 +1797,7 @@ def run_scan():
             enriched = enriched[:MAX_SETUPS_TO_CLAUDE]
 
         log.info(f"After news/funding/ranking: {len(enriched)} setups → sending to Claude")
+        _last_scan_stats["enriched"] = len(enriched)
 
         if not enriched:
             log.info("=== Scan complete — 0 signal(s) sent ===\n")
@@ -1694,6 +1890,7 @@ def run_scan():
             except Exception as e:
                 log.error(f"  Error sending {analysis.get('symbol','?')}: {e}")
 
+        _last_scan_stats["sent"] = sent_count
         log.info(f"=== Scan complete — {sent_count} signal(s) sent ===\n")
 
     except Exception as e:

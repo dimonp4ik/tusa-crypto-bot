@@ -435,13 +435,36 @@ def get_user_by_id(user_id: int) -> dict | None:
         return dict(row) if row else None
 
 
-def get_all_users(limit: int = 100) -> list:
-    """Return up to `limit` users sorted by most recent interaction."""
+def get_all_users(limit: int = 20, offset: int = 0, query: str = "") -> list:
+    """Return users sorted by most recent interaction. Supports pagination + search."""
     with _conn() as c:
-        rows = c.execute(
-            "SELECT * FROM users ORDER BY last_seen DESC LIMIT ?", (limit,)
-        ).fetchall()
+        if query:
+            q = f"%{query.lower()}%"
+            rows = c.execute(
+                "SELECT * FROM users WHERE LOWER(username) LIKE ? OR CAST(user_id AS TEXT) LIKE ? "
+                "ORDER BY last_seen DESC LIMIT ? OFFSET ?",
+                (q, q, limit, offset),
+            ).fetchall()
+        else:
+            rows = c.execute(
+                "SELECT * FROM users ORDER BY last_seen DESC LIMIT ? OFFSET ?",
+                (limit, offset),
+            ).fetchall()
         return [dict(r) for r in rows]
+
+
+def get_users_count(query: str = "") -> int:
+    """Total user count (optionally filtered by search query)."""
+    with _conn() as c:
+        if query:
+            q = f"%{query.lower()}%"
+            row = c.execute(
+                "SELECT COUNT(*) FROM users WHERE LOWER(username) LIKE ? OR CAST(user_id AS TEXT) LIKE ?",
+                (q, q),
+            ).fetchone()
+        else:
+            row = c.execute("SELECT COUNT(*) FROM users").fetchone()
+        return row[0] if row else 0
 
 
 # ── Dynamic admin management ──────────────────────────────────────────────────
@@ -561,12 +584,12 @@ def get_claude_spend_stats() -> dict:
     }
 
 
-def get_symbols_performance(days: int = 30) -> list:
+def get_symbols_performance(days: int = 30, since_ts: float = None) -> list:
     """
-    Per-symbol closed-signal performance over `days` days.
+    Per-symbol closed-signal performance over `days` days (or since_ts epoch).
     Returns list of dicts sorted by total_r descending.
     """
-    cutoff = time_mod.time() - days * 86400
+    cutoff = since_ts if since_ts is not None else (time_mod.time() - days * 86400)
     placeholders = ",".join("?" for _ in FINAL_STATUSES)
     with _conn() as c:
         rows = c.execute(
