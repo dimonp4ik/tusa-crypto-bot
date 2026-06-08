@@ -216,7 +216,6 @@ def send_signal(analysis: dict) -> bool:
         f"{zone_range_line}"
         f"{drift_line}"
         f"🎯 TP1 (50%):   `{_format_price(tp1)}`  → SL в б/у\n"
-        f"🔄 Трейлинг:    `{_format_price(round(atr * 0.75, 8) if atr else 0)}`  _(ATR×0.75, остаток 50%)_\n"
         f"🎯 TP2 (50%):   `{_format_price(tp2)}`\n"
         f"❌ Стоп лосс:   `{_format_price(sl)}`\n"
         f"━━━━━━━━━━━━━━━━━━━\n"
@@ -278,11 +277,18 @@ def send_signal_update(sig: dict, new_status: str, exit_price: float) -> bool:
     if new_status == "TP1_PARTIAL":
         icon  = "✅"
         title = "TP1 ДОСТИГНУТ"
+        atr_val   = float(sig.get("atr") or 0.0)
+        trail_val = round(atr_val * 0.75, 8) if atr_val > 0 else 0.0
+        trail_line = (
+            f"\n🔄 *Трейлинг-стоп на остаток 50%:* `{_format_price(trail_val)}`\n"
+            f"   _Выставь на Bybit: Позиция → Трейлинг-стоп → {_format_price(trail_val)}_"
+        ) if trail_val > 0 else ""
         body  = (
             f"Закрыто 50% по `{_format_price(exit_price)}`\n"
             f"Движение: `{sign}{move_pct:.2f}%`  (x{lev}: `{sign}{lev_profit:.0f}%`)\n"
-            f"🔄 SL перенесён в безубыток: `{_format_price(entry)}`\n"
-            f"Ждём TP2: `{_format_price(tp2)}`"
+            f"🛡 SL перенесён в безубыток: `{_format_price(entry)}`\n"
+            f"{trail_line}\n"
+            f"Остаток идёт к TP2: `{_format_price(tp2)}`"
         )
     elif new_status == "TP2_HIT":
         icon  = "🎯"
