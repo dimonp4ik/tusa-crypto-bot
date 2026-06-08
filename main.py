@@ -919,6 +919,10 @@ def _handle_admin_callback(callback_id: str, chat_id: int,
     elif data == "adm_back":
         _edit_message(chat_id, message_id, "🛠 *TUSA Admin Panel*\nВыбери раздел:")
 
+    elif data == "adm_open_new":
+        # Sent after user-search results (new message, no message_id to edit) — open fresh panel
+        _send_keyboard(chat_id, "🛠 *TUSA Admin Panel*\nВыбери раздел:")
+
 
 def _num(s):
     """Parse FF numeric string ('0.3%', '187K', '<0.1') → float or None."""
@@ -1254,12 +1258,12 @@ def webhook():
     if is_dm and _is_admin(user_id) and _pending_users_search.pop(chat_id, False):
         query = text_raw.strip().lstrip("@")
         _reply(chat_id, f"🔍 Ищу: `{query}`...")
-        # We need a message_id to edit — just send a new message with results
+        _back_kb = {"inline_keyboard": [[{"text": "« К панели", "callback_data": "adm_open_new"}]]}
         try:
             total = get_users_count(query)
             users = get_all_users(limit=_USERS_PER_PAGE, offset=0, query=query)
             if not users:
-                _reply(chat_id, f"👥 *Поиск `{query}`*\n\nНикто не найден.")
+                _send_admin_text(chat_id, f"👥 *Поиск `{query}`*\n\nНикто не найден.", _back_kb)
             else:
                 lines = [f"👥 *Поиск `{query}`* — {total} чел.\n"]
                 for u in users:
@@ -1268,9 +1272,9 @@ def webhook():
                     uname = f"@{u['username']}" if u.get("username") else f"`{u['user_id']}`"
                     last  = datetime.fromtimestamp(u["last_seen"], tz=_riga_tz()).strftime("%d.%m %H:%M")
                     lines.append(f"• {name} {uname} `{u['user_id']}` — {last}")
-                _reply(chat_id, "\n".join(lines))
+                _send_admin_text(chat_id, "\n".join(lines), _back_kb)
         except Exception as e:
-            _reply(chat_id, f"Ошибка поиска: {e}")
+            _send_admin_text(chat_id, f"Ошибка поиска: {e}", _back_kb)
         return "ok", 200
 
     # ── Pending "manual block" state — admin typed a symbol to block ──────────
@@ -1457,7 +1461,7 @@ def webhook():
                f"✅ Работает\n"
                f"⏱ Интервал: {SCAN_INTERVAL_MINUTES} мин\n"
                f"📊 Сигналов в кэше: {len(_signal_cache)}\n"
-               f"💾 Данные: KuCoin\n"
+               f"💾 Данные: Bybit\n"
                f"🧠 AI: Claude Sonnet")
 
     # /stats — статистика побед/поражений
