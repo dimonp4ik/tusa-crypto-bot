@@ -187,12 +187,38 @@ def send_signal(analysis: dict) -> bool:
     event_warn   = analysis.get("event_warning", "")
     event_line   = f"⚠️ {event_warn}\n" if event_warn else ""
 
+    # Entry zone range (FVG/OB low–high) + market price drift warning
+    entry_source = analysis.get("entry_source", "MARKET")
+    entry_low    = analysis.get("entry_low",  price)
+    entry_high   = analysis.get("entry_high", price)
+    market_px    = analysis.get("market_price", price)
+    zone_range_line = ""
+    drift_line      = ""
+    if entry_source in ("FVG", "OB") and entry_low and entry_high and entry_low != entry_high:
+        zone_range_line = (
+            f"📐 Зона {entry_source}:  `{_format_price(entry_low)}` – `{_format_price(entry_high)}`\n"
+        )
+    if market_px and price and price > 0:
+        drift_pct = (market_px - price) / price * 100
+        if abs(drift_pct) >= 0.3:
+            arrow_d = "📈" if drift_pct > 0 else "📉"
+            drift_line = (
+                f"{arrow_d} Рынок: `{_format_price(market_px)}`  "
+                f"({'+'if drift_pct>0 else ''}{drift_pct:.2f}% от зоны)\n"
+            )
+            if drift_pct > 0.5 and decision == "LONG":
+                drift_line += "_⚠️ Цена выше зоны — ждите ретеста или входите рыночной_\n"
+            elif drift_pct < -0.5 and decision == "SHORT":
+                drift_line += "_⚠️ Цена ниже зоны — ждите ретеста или входите рыночной_\n"
+
     lev = lev_info["leverage"]
     premium_badge = "  💎 *PREMIUM*" if analysis.get("premium") else ""
     message = (
         f"{arrow} — *{analysis['symbol']}*{premium_badge}\n"
         f"━━━━━━━━━━━━━━━━━━━\n"
         f"💰 Вход:        `{_format_price(price)}`\n"
+        f"{zone_range_line}"
+        f"{drift_line}"
         f"🎯 TP1 (50%):   `{_format_price(tp1)}`  → SL в б/у\n"
         f"🎯 TP2 (50%):   `{_format_price(tp2)}`\n"
         f"❌ Стоп лосс:   `{_format_price(sl)}`\n"
