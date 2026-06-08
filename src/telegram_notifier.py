@@ -216,6 +216,7 @@ def send_signal(analysis: dict) -> bool:
         f"{zone_range_line}"
         f"{drift_line}"
         f"🎯 TP1 (50%):   `{_format_price(tp1)}`  → SL в б/у\n"
+        f"🔄 Трейлинг:    `{_format_price(round(atr * 0.75, 8) if atr else 0)}`  _(ATR×0.75, остаток 50%)_\n"
         f"🎯 TP2 (50%):   `{_format_price(tp2)}`\n"
         f"❌ Стоп лосс:   `{_format_price(sl)}`\n"
         f"━━━━━━━━━━━━━━━━━━━\n"
