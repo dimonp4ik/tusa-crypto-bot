@@ -103,13 +103,10 @@ RETEST_MAX_DIST_PCT = float(os.getenv("RETEST_MAX_DIST_PCT", "0.015"))  # within
 MTF_MIN_SCORE = int(os.getenv("MTF_MIN_SCORE", "10"))  # raised 9→10: fewer but stronger setups reach Claude
 
 # --- Signal-quality filters (backtested on a PINNED 20-coin / ~21-day set) ---
-# All three were A/B-tested apples-to-apples and DEFAULT OFF — none beat baseline:
-# №1 Volatility regime: lower bound cut only ~3 dead trades → +0.11R vs +0.11R
-#    (zero net effect). Upper ceiling actively hurt (cut TP2 runners). Off.
-#    NOTE: an earlier "+0.13R" win was a measurement artifact — the live
-#    get_top_coins() list reshuffled between runs (SUI drifting in/out). Fixed
-#    by pinning BACKTEST_SYMBOLS in backtest.py.
-VOL_REGIME_FILTER = os.getenv("VOL_REGIME_FILTER", "0") != "0"
+# №1 Volatility regime — DEFAULT ON after re-test 2026-06-05 on full context
+#    momentum stack: +1.60R net, non-negative on all monthly slices, better MC p05.
+#    Upper ceiling still OFF (hurt R in backtest — cuts TP2 runners).
+VOL_REGIME_FILTER = os.getenv("VOL_REGIME_FILTER", "1") != "0"
 VOL_MIN_ATR_PCT   = float(os.getenv("VOL_MIN_ATR_PCT", "0.0015"))  # <0.15% range = too dead
 VOL_MIN_RATIO     = float(os.getenv("VOL_MIN_RATIO", "0.55"))      # cur/median below = collapsed
 VOL_MAX_RATIO     = float(os.getenv("VOL_MAX_RATIO", "99"))        # ceiling OFF (hurt R in backtest)
@@ -121,7 +118,11 @@ VOL_REGIME_LOOKBACK = int(os.getenv("VOL_REGIME_LOOKBACK", "50"))
 # structural-only cut valid reversals. Flags kept for experimentation.
 REQUIRE_STRONG_BOS = os.getenv("REQUIRE_STRONG_BOS", "0") != "0"
 STRONG_BOS_VOL_MULT = float(os.getenv("STRONG_BOS_VOL_MULT", "1.3"))  # x SMC_BOS_MIN_VOLUME
-REQUIRE_STRONG_CONFIRM = os.getenv("REQUIRE_STRONG_CONFIRM", "0") != "0"
+REQUIRE_STRONG_CONFIRM  = os.getenv("REQUIRE_STRONG_CONFIRM", "0") != "0"
+MACD_CHOCH_NOISE_FILTER = os.getenv("MACD_CHOCH_NOISE_FILTER", "0") != "0"
+# 2026-06-05 A/B, 8640×15m: +9.39R net, +0.5pp WR, better portfolio guard and Monte Carlo.
+# Skips only overlap-session setups when 1h trend is bearish (latecomers get squeezed at NYC open).
+OVERLAP_BEARISH_1H_GUARD = os.getenv("OVERLAP_BEARISH_1H_GUARD", "1") != "0"
 
 # №A Efficiency-Ratio chop filter — DEFAULT ON (backtest-proven winner).
 #    Kaufman ER over EFF_RATIO_LOOKBACK bars: ER~1 = clean trend, ER~0 = chop.
@@ -163,6 +164,69 @@ BEAR_TREND_SKIP_SESSIONS     = set(_parse_symbol_list(os.getenv("BEAR_TREND_SKIP
 DIRECTIONAL_RSI_MIDLINE_FILTER = os.getenv("DIRECTIONAL_RSI_MIDLINE_FILTER", "1") != "0"
 RSI_LONG_MIN_MIDLINE           = float(os.getenv("RSI_LONG_MIN_MIDLINE", "50"))
 RSI_SHORT_MAX_MIDLINE          = float(os.getenv("RSI_SHORT_MAX_MIDLINE", "40"))
+
+# --- Per-symbol / per-source / per-direction edge filters (DEFAULT ON) ----------
+# Populated from loss_taxonomy analysis. Skip instruments/direction combos that
+# repeatedly showed poor edge after enough backtest data.
+SYMBOL_EDGE_FILTER  = os.getenv("SYMBOL_EDGE_FILTER", "1") != "0"
+LOW_EDGE_SYMBOLS    = _parse_symbol_list(os.getenv("LOW_EDGE_SYMBOLS", "XMR-USDT,XMRUSDT"))
+
+# 2026-06-05 A/B, 8640×15m: skipping NEAR FVG entries improved raw net (+9.99R),
+# WR/R-trade, and Monte Carlo while keeping trade count high.
+SOURCE_EDGE_FILTER     = os.getenv("SOURCE_EDGE_FILTER", "1") != "0"
+LOW_EDGE_FVG_SYMBOLS   = _parse_symbol_list(os.getenv("LOW_EDGE_FVG_SYMBOLS", "NEAR-USDT,NEARUSDT"))
+LOW_EDGE_OB_SYMBOLS    = _parse_symbol_list(os.getenv("LOW_EDGE_OB_SYMBOLS", ""))
+
+DIRECTION_EDGE_FILTER  = os.getenv("DIRECTION_EDGE_FILTER", "1") != "0"
+LOW_EDGE_LONG_SYMBOLS  = _parse_symbol_list(os.getenv("LOW_EDGE_LONG_SYMBOLS", ""))
+LOW_EDGE_SHORT_SYMBOLS = _parse_symbol_list(os.getenv("LOW_EDGE_SHORT_SYMBOLS", "AAVE-USDT,AAVEUSDT"))
+
+# --- Context momentum pack (DEFAULT ON, validated together 2026-06-05) ----------
+# Weak relative strength and session-momentum mismatches → higher SL rate.
+# All four proven together on 8640×15m across all monthly slices.
+RELATIVE_STRENGTH_LOOKBACK_HOURS      = int(os.getenv("RELATIVE_STRENGTH_LOOKBACK_HOURS", "1"))
+LONG_RELATIVE_WEAKNESS_FILTER         = os.getenv("LONG_RELATIVE_WEAKNESS_FILTER", "1") != "0"
+LONG_RELATIVE_WEAKNESS_MAX_PCT        = float(os.getenv("LONG_RELATIVE_WEAKNESS_MAX_PCT", "-1.60"))
+
+BULL_NEUTRAL_LONG_NARROW_ZONE_FILTER  = os.getenv("BULL_NEUTRAL_LONG_NARROW_ZONE_FILTER", "1") != "0"
+BULL_NEUTRAL_LONG_MAX_ZONE_WIDTH_PCT  = float(os.getenv("BULL_NEUTRAL_LONG_MAX_ZONE_WIDTH_PCT", "0.00173509"))
+
+LONG_NY_COIN_MOMENTUM_FILTER          = os.getenv("LONG_NY_COIN_MOMENTUM_FILTER", "1") != "0"
+LONG_NY_MIN_COIN_CHANGE_1H            = float(os.getenv("LONG_NY_MIN_COIN_CHANGE_1H", "0.0"))
+
+SHORT_FVG_COIN_MOMENTUM_FILTER        = os.getenv("SHORT_FVG_COIN_MOMENTUM_FILTER", "1") != "0"
+SHORT_FVG_MAX_COIN_CHANGE_1H          = float(os.getenv("SHORT_FVG_MAX_COIN_CHANGE_1H", "0.0"))
+
+# Small edge on top of context momentum pack: improves aggregate/MC/DD.
+FVG_LONDON_BTC_UP_FILTER  = os.getenv("FVG_LONDON_BTC_UP_FILTER", "1") != "0"
+FVG_LONDON_BTC_UP_MIN_PCT = float(os.getenv("FVG_LONDON_BTC_UP_MIN_PCT", "0.29"))
+
+# --- Risk sizing overlays (DEFAULT ON) -----------------------------------------
+# Does not filter trades. Raises risk_mult for contexts that repeatedly showed
+# stronger R/trade: OB entries, optimal RSI/vol, strong relative coin momentum.
+QUALITY_RISK_OVERLAY    = os.getenv("QUALITY_RISK_OVERLAY", "1") != "0"
+QUALITY_RISK_MULT       = float(os.getenv("QUALITY_RISK_MULT", "1.15"))
+QUALITY_RISK_MAX_MULT   = float(os.getenv("QUALITY_RISK_MAX_MULT", "1.15"))
+QUALITY_RISK_VOL_MIN    = float(os.getenv("QUALITY_RISK_VOL_MIN", "0.8"))
+QUALITY_RISK_VOL_MAX    = float(os.getenv("QUALITY_RISK_VOL_MAX", "1.2"))
+QUALITY_RISK_RSI_MIN    = float(os.getenv("QUALITY_RISK_RSI_MIN", "50"))
+QUALITY_RISK_RSI_MAX    = float(os.getenv("QUALITY_RISK_RSI_MAX", "60"))
+HIGH_EDGE_RISK_SYMBOLS  = _parse_symbol_list(
+    os.getenv(
+        "HIGH_EDGE_RISK_SYMBOLS",
+        "SUI-USDT,SUIUSDT,SOL-USDT,SOLUSDT,TON-USDT,TONUSDT,HYPE-USDT,HYPEUSDT,AAVE-USDT,AAVEUSDT",
+    )
+)
+REL_STRENGTH_RISK_UP          = os.getenv("REL_STRENGTH_RISK_UP", "1") != "0"
+REL_STRENGTH_RISK_UP_MIN_PCT  = float(os.getenv("REL_STRENGTH_RISK_UP_MIN_PCT", "0.5"))
+REL_STRENGTH_RISK_UP_MAX_PCT  = float(os.getenv("REL_STRENGTH_RISK_UP_MAX_PCT", "2.0"))
+REL_STRENGTH_RISK_UP_MULT     = float(os.getenv("REL_STRENGTH_RISK_UP_MULT", "1.15"))
+REL_STRENGTH_RISK_UP_MAX_MULT = float(os.getenv("REL_STRENGTH_RISK_UP_MAX_MULT", "1.25"))
+TREND_PAIR_RISK_UP            = os.getenv("TREND_PAIR_RISK_UP", "1") != "0"
+TREND_PAIR_RISK_UP_1H         = os.getenv("TREND_PAIR_RISK_UP_1H", "bullish").lower()
+TREND_PAIR_RISK_UP_4H         = os.getenv("TREND_PAIR_RISK_UP_4H", "bullish").lower()
+TREND_PAIR_RISK_UP_MULT       = float(os.getenv("TREND_PAIR_RISK_UP_MULT", "1.15"))
+TREND_PAIR_RISK_UP_MAX_MULT   = float(os.getenv("TREND_PAIR_RISK_UP_MAX_MULT", "1.25"))
 
 # --- Adaptive market-regime filter packs (from friend's v2 — DEFAULT OFF) ------
 # Graduated quality gate: requires progressively higher MTF score + structure as

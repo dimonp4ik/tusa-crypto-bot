@@ -11,6 +11,7 @@ from config import (
     VOL_REGIME_FILTER, VOL_MIN_ATR_PCT, VOL_MIN_RATIO, VOL_MAX_RATIO,
     REQUIRE_STRONG_BOS, STRONG_BOS_VOL_MULT,
     REQUIRE_STRONG_CONFIRM,
+    MACD_CHOCH_NOISE_FILTER, OVERLAP_BEARISH_1H_GUARD,
     EFF_RATIO_FILTER, EFF_RATIO_MIN,
     REQUIRE_STRICT_HTF,
     ADAPTIVE_FILTER_PACKS, ADAPTIVE_MIXED_SCORE_BUMP, ADAPTIVE_CHOP_SCORE_BUMP,
@@ -22,10 +23,111 @@ from config import (
     ADAPTIVE_BEAR_VOL_MIN_RATIO, ADAPTIVE_BEAR_VOL_MAX_RATIO,
     BEAR_TREND_HOT_VOL_GUARD, BEAR_TREND_HOT_VOL_MIN_RATIO, BEAR_TREND_SKIP_SESSIONS,
     DIRECTIONAL_RSI_MIDLINE_FILTER, RSI_LONG_MIN_MIDLINE, RSI_SHORT_MAX_MIDLINE,
+    SYMBOL_EDGE_FILTER, LOW_EDGE_SYMBOLS,
+    SOURCE_EDGE_FILTER, LOW_EDGE_FVG_SYMBOLS, LOW_EDGE_OB_SYMBOLS,
+    DIRECTION_EDGE_FILTER, LOW_EDGE_LONG_SYMBOLS, LOW_EDGE_SHORT_SYMBOLS,
+    RELATIVE_STRENGTH_LOOKBACK_HOURS,
+    LONG_RELATIVE_WEAKNESS_FILTER, LONG_RELATIVE_WEAKNESS_MAX_PCT,
+    BULL_NEUTRAL_LONG_NARROW_ZONE_FILTER, BULL_NEUTRAL_LONG_MAX_ZONE_WIDTH_PCT,
+    LONG_NY_COIN_MOMENTUM_FILTER, LONG_NY_MIN_COIN_CHANGE_1H,
+    SHORT_FVG_COIN_MOMENTUM_FILTER, SHORT_FVG_MAX_COIN_CHANGE_1H,
+    FVG_LONDON_BTC_UP_FILTER, FVG_LONDON_BTC_UP_MIN_PCT,
+    QUALITY_RISK_OVERLAY, QUALITY_RISK_MULT, QUALITY_RISK_MAX_MULT,
+    QUALITY_RISK_VOL_MIN, QUALITY_RISK_VOL_MAX,
+    QUALITY_RISK_RSI_MIN, QUALITY_RISK_RSI_MAX, HIGH_EDGE_RISK_SYMBOLS,
+    REL_STRENGTH_RISK_UP, REL_STRENGTH_RISK_UP_MIN_PCT, REL_STRENGTH_RISK_UP_MAX_PCT,
+    REL_STRENGTH_RISK_UP_MULT, REL_STRENGTH_RISK_UP_MAX_MULT,
+    TREND_PAIR_RISK_UP, TREND_PAIR_RISK_UP_1H, TREND_PAIR_RISK_UP_4H,
+    TREND_PAIR_RISK_UP_MULT, TREND_PAIR_RISK_UP_MAX_MULT,
     STABILITY_FILTERS_ENABLED, STABILITY_SKIP_PACKS, STABILITY_SKIP_SESSIONS,
     STABILITY_MIN_EFF_RATIO, STABILITY_MIN_VOLUME_RATIO, STABILITY_MIN_QUALITY_SCORE,
 )
 from src.indicators import get_indicators, get_smc_indicators
+
+
+def _norm_symbol(symbol: str) -> str:
+    return str(symbol or "").upper().replace("-", "").replace("/", "").replace("_", "")
+
+
+_LOW_EDGE_SYMBOLS_NORM       = {_norm_symbol(s) for s in LOW_EDGE_SYMBOLS}
+_LOW_EDGE_FVG_SYMBOLS_NORM   = {_norm_symbol(s) for s in LOW_EDGE_FVG_SYMBOLS}
+_LOW_EDGE_OB_SYMBOLS_NORM    = {_norm_symbol(s) for s in LOW_EDGE_OB_SYMBOLS}
+_LOW_EDGE_LONG_SYMBOLS_NORM  = {_norm_symbol(s) for s in LOW_EDGE_LONG_SYMBOLS}
+_LOW_EDGE_SHORT_SYMBOLS_NORM = {_norm_symbol(s) for s in LOW_EDGE_SHORT_SYMBOLS}
+_HIGH_EDGE_RISK_SYMBOLS_NORM = {_norm_symbol(s) for s in HIGH_EDGE_RISK_SYMBOLS}
+
+
+def _change_pct_from_1h(candles_1h: dict, lookback_hours: int = 1) -> float:
+    """Coin % change over the last lookback_hours 1h candles."""
+    closes  = candles_1h.get("close", []) if candles_1h else []
+    lookback = max(1, int(lookback_hours or 1))
+    if len(closes) <= lookback:
+        return 0.0
+    prev = float(closes[-1 - lookback])
+    cur  = float(closes[-1])
+    if prev <= 0:
+        return 0.0
+    return (cur - prev) / prev * 100.0
+
+
+def _apply_quality_risk_overlay(
+    risk_mult: float,
+    *,
+    symbol: str,
+    entry_source: str,
+    vol_ratio_regime: float,
+    rsi: float,
+) -> tuple[float, str]:
+    """Boost risk_mult by x1.15 for OB entries / optimal vol-RSI / high-edge symbols."""
+    if not QUALITY_RISK_OVERLAY:
+        return risk_mult, ""
+    quality_context = (
+        entry_source == "OB"
+        or QUALITY_RISK_VOL_MIN <= vol_ratio_regime <= QUALITY_RISK_VOL_MAX
+        or QUALITY_RISK_RSI_MIN <= rsi < QUALITY_RISK_RSI_MAX
+        or _norm_symbol(symbol) in _HIGH_EDGE_RISK_SYMBOLS_NORM
+    )
+    if not quality_context:
+        return risk_mult, ""
+    boosted = min(float(QUALITY_RISK_MAX_MULT), float(risk_mult) * float(QUALITY_RISK_MULT))
+    if boosted <= risk_mult:
+        return risk_mult, ""
+    return boosted, f"QualityRisk:{boosted:.2f}"
+
+
+def _apply_relative_strength_risk_overlay(
+    risk_mult: float,
+    *,
+    rel_strength: float,
+) -> tuple[float, str]:
+    """Boost risk_mult when coin outperforms BTC by 0.5–2% (strong relative momentum)."""
+    if not REL_STRENGTH_RISK_UP:
+        return risk_mult, ""
+    if not (REL_STRENGTH_RISK_UP_MIN_PCT < rel_strength <= REL_STRENGTH_RISK_UP_MAX_PCT):
+        return risk_mult, ""
+    boosted = min(float(REL_STRENGTH_RISK_UP_MAX_MULT), float(risk_mult) * float(REL_STRENGTH_RISK_UP_MULT))
+    if boosted <= risk_mult:
+        return risk_mult, ""
+    return boosted, f"RelStrengthRisk:{boosted:.2f}"
+
+
+def _apply_trend_pair_risk_overlay(
+    risk_mult: float,
+    *,
+    trend_1h: str,
+    trend_4h: str,
+) -> tuple[float, str]:
+    """Boost risk_mult when both 1h and 4h trends are fully bullish."""
+    if not TREND_PAIR_RISK_UP:
+        return risk_mult, ""
+    if str(trend_1h or "").lower() != TREND_PAIR_RISK_UP_1H:
+        return risk_mult, ""
+    if str(trend_4h or "").lower() != TREND_PAIR_RISK_UP_4H:
+        return risk_mult, ""
+    boosted = min(float(TREND_PAIR_RISK_UP_MAX_MULT), float(risk_mult) * float(TREND_PAIR_RISK_UP_MULT))
+    if boosted <= risk_mult:
+        return risk_mult, ""
+    return boosted, f"TrendPairRisk:{boosted:.2f}"
 
 
 # ── Entry zone helpers ────────────────────────────────────────────────────────
@@ -41,19 +143,22 @@ def _zones_overlap(z1, z2, buffer_pct: float = 0.005) -> bool:
     return l2 <= h1_b and h2 >= l1_b
 
 
-def _zone_payload(zone, source: str, current: float):
+def _zone_payload(zone, source: str, current: float, age=None):
     """Normalize a (low, high) zone tuple into entry dict form."""
     if not zone:
         return None
     low, high = sorted([float(zone[0]), float(zone[1])])
     if low <= 0 or high <= 0 or high <= low:
         return None
+    mid = (low + high) / 2
     return {
-        "entry_low":    round(low, 8),
-        "entry_high":   round(high, 8),
-        "entry_price":  round((low + high) / 2, 8),
-        "entry_source": source,
-        "market_price": round(current, 8),
+        "entry_low":     round(low, 8),
+        "entry_high":    round(high, 8),
+        "entry_price":   round(mid, 8),
+        "entry_source":  source,
+        "market_price":  round(current, 8),
+        "zone_age_bars": int(age) if age is not None else -1,
+        "zone_width_pct": round((high - low) / mid, 8) if mid > 0 else 0.0,
     }
 
 
@@ -85,16 +190,16 @@ def _fvg_fresh(zone, current: float, direction: str) -> bool:
 
 
 def _select_entry_zone(ind: dict, direction: str):
-    """Prefer OB zone, then FVG zone. Skip FVG if > 60% already filled."""
+    """Prefer OB zone, then FVG zone. Skip FVG if > 80% already filled."""
     current = ind["current_close"]
     if direction == "LONG":
-        ob_z  = _zone_payload(ind.get("bull_ob_zone"), "OB", current)
+        ob_z  = _zone_payload(ind.get("bull_ob_zone"), "OB", current, ind.get("bull_ob_age"))
         fvg_z = ind.get("bullish_fvg_zone")
-        fvg_p = _zone_payload(fvg_z, "FVG", current) if _fvg_fresh(fvg_z, current, "LONG") else None
+        fvg_p = _zone_payload(fvg_z, "FVG", current, ind.get("bullish_fvg_age")) if _fvg_fresh(fvg_z, current, "LONG") else None
         return ob_z or fvg_p
-    ob_z  = _zone_payload(ind.get("bear_ob_zone"), "OB", current)
+    ob_z  = _zone_payload(ind.get("bear_ob_zone"), "OB", current, ind.get("bear_ob_age"))
     fvg_z = ind.get("bearish_fvg_zone")
-    fvg_p = _zone_payload(fvg_z, "FVG", current) if _fvg_fresh(fvg_z, current, "SHORT") else None
+    fvg_p = _zone_payload(fvg_z, "FVG", current, ind.get("bearish_fvg_age")) if _fvg_fresh(fvg_z, current, "SHORT") else None
     return ob_z or fvg_p
 
 
@@ -387,6 +492,9 @@ def analyze_coin_smc(candles_15m: dict, candles_1h: dict, symbol: str,
     """
     if len(candles_15m.get("close", [])) < 30:
         return None
+    if SYMBOL_EDGE_FILTER and _norm_symbol(symbol) in _LOW_EDGE_SYMBOLS_NORM:
+        return None
+    symbol_norm = _norm_symbol(symbol)
 
     ind = get_smc_indicators(candles_15m, candles_1h, candles_4h)
 
@@ -513,6 +621,31 @@ def analyze_coin_smc(candles_15m: dict, candles_1h: dict, symbol: str,
     else:
         return None
 
+    # 6a. Direction edge filter — skip symbol/direction combos with proven poor edge.
+    if DIRECTION_EDGE_FILTER:
+        if direction == "LONG" and symbol_norm in _LOW_EDGE_LONG_SYMBOLS_NORM:
+            return None
+        if direction == "SHORT" and symbol_norm in _LOW_EDGE_SHORT_SYMBOLS_NORM:
+            return None
+
+    # 6a-1. Context momentum filters — coin relative to BTC + session momentum.
+    coin_change_1h = _change_pct_from_1h(candles_1h or {}, RELATIVE_STRENGTH_LOOKBACK_HOURS)
+    rel_strength   = coin_change_1h - float(btc_change_pct or 0.0)
+
+    if (
+        LONG_RELATIVE_WEAKNESS_FILTER
+        and direction == "LONG"
+        and rel_strength <= LONG_RELATIVE_WEAKNESS_MAX_PCT
+    ):
+        return None
+    if (
+        LONG_NY_COIN_MOMENTUM_FILTER
+        and direction == "LONG"
+        and ind.get("session") == "NEW_YORK"
+        and coin_change_1h <= LONG_NY_MIN_COIN_CHANGE_1H
+    ):
+        return None
+
     if len(confirmations) < SMC_MIN_CONFIRMATIONS:
         return None
 
@@ -523,12 +656,63 @@ def analyze_coin_smc(candles_15m: dict, candles_1h: dict, symbol: str,
         if not any(c in _STRUCTURAL for c in confirmations):
             return None
 
+    # 6c. MACD+ChoCH noise — both on same bar = double-counted signal, not added confluence.
+    if MACD_CHOCH_NOISE_FILTER and "MACD_Div" in confirmations and "ChoCH" in confirmations:
+        return None
+
+    # 6d. Overlap-session bearish 1h guard — A/B 8640×15m: +9.39R net, +0.5pp WR.
+    #     Expansion session + bearish 1h = latecomers get squeezed at NYSE open.
+    if OVERLAP_BEARISH_1H_GUARD and ind.get("session") == "OVERLAP" and trend_1h == "bearish":
+        return None
+
     # 7. Entry zone
     entry_zone = _select_entry_zone(ind, direction)
     if REQUIRE_ENTRY_ZONE and not entry_zone:
         return None
 
-    # 7b. Retest — price must currently be at/near the zone (true retest, not chase)
+    # 7a. Source edge filter — skip entry sources with proven poor edge per symbol.
+    if SOURCE_EDGE_FILTER and entry_zone:
+        _src = str(entry_zone.get("entry_source") or "").upper()
+        if _src == "FVG" and symbol_norm in _LOW_EDGE_FVG_SYMBOLS_NORM:
+            return None
+        if _src == "OB" and symbol_norm in _LOW_EDGE_OB_SYMBOLS_NORM:
+            return None
+
+    # 7b-1. Bull/neutral LONG narrow-zone filter — mixed-trend LONGs into tight zones
+    #       wicked through and reversed to SL in backtest.
+    if (
+        BULL_NEUTRAL_LONG_NARROW_ZONE_FILTER
+        and direction == "LONG"
+        and trend_1h == "bullish"
+        and trend_4h == "neutral"
+        and entry_zone
+        and float(entry_zone.get("zone_width_pct", 0.0) or 0.0) <= BULL_NEUTRAL_LONG_MAX_ZONE_WIDTH_PCT
+    ):
+        return None
+
+    # 7b-2. Short FVG coin-momentum filter — coin still trending up fills FVG as support
+    #       before the SHORT move materialises.
+    if (
+        SHORT_FVG_COIN_MOMENTUM_FILTER
+        and direction == "SHORT"
+        and entry_zone
+        and str(entry_zone.get("entry_source") or "").upper() == "FVG"
+        and coin_change_1h >= SHORT_FVG_MAX_COIN_CHANGE_1H
+    ):
+        return None
+
+    # 7b-3. FVG London BTC-up filter — FVG LONGs in London when BTC already up >0.29%
+    #       are late entries; expansion stalls then reverses at NYC open.
+    if (
+        FVG_LONDON_BTC_UP_FILTER
+        and entry_zone
+        and str(entry_zone.get("entry_source") or "").upper() == "FVG"
+        and ind.get("session") == "LONDON"
+        and btc_change_pct >= FVG_LONDON_BTC_UP_MIN_PCT
+    ):
+        return None
+
+    # 7c. Retest — price must currently be at/near the zone (true retest, not chase)
     if REQUIRE_RETEST and entry_zone:
         cur    = ind["current_close"]
         z_low  = entry_zone["entry_low"]
@@ -538,7 +722,7 @@ def analyze_coin_smc(candles_15m: dict, candles_1h: dict, symbol: str,
         elif cur > z_high:
             dist = (cur - z_high) / cur
         else:
-            dist = 0.0  # price inside the zone
+            dist = 0.0
         if dist > RETEST_MAX_DIST_PCT:
             return None
 
@@ -566,6 +750,24 @@ def analyze_coin_smc(candles_15m: dict, candles_1h: dict, symbol: str,
     if not _stability_overlay_pass(ind, adaptive_pack, quality["quality_score"]):
         return None
 
+    # Risk multiplier overlays — boost size on statistically stronger setups (no filtering).
+    risk_mult, quality_risk_tag = _apply_quality_risk_overlay(
+        risk_mult,
+        symbol=symbol,
+        entry_source=entry_zone["entry_source"] if entry_zone else "MARKET",
+        vol_ratio_regime=float(ind.get("vol_ratio_regime", 1.0) or 1.0),
+        rsi=float(rsi),
+    )
+    risk_mult, trend_pair_risk_tag = _apply_trend_pair_risk_overlay(
+        risk_mult,
+        trend_1h=trend_1h,
+        trend_4h=trend_4h,
+    )
+    risk_mult, rel_strength_risk_tag = _apply_relative_strength_risk_overlay(
+        risk_mult,
+        rel_strength=round(float(rel_strength), 2),
+    )
+
     # Bonus signals for context
     session = ind.get("session", "OFF_HOURS")
     if session in ("LONDON", "NEW_YORK", "OVERLAP"):
@@ -586,14 +788,24 @@ def analyze_coin_smc(candles_15m: dict, candles_1h: dict, symbol: str,
             signals.append(f"Risk x{risk_mult:.2f}")
         score_tags.append(f"Pack:{adaptive_pack}")
         score_tags.append(f"RiskMult:{risk_mult:.2f}")
+    elif quality_risk_tag or trend_pair_risk_tag or rel_strength_risk_tag:
+        signals.append(f"Risk x{risk_mult:.2f}")
+    if quality_risk_tag:
+        score_tags.append(quality_risk_tag)
+    if trend_pair_risk_tag:
+        score_tags.append(trend_pair_risk_tag)
+    if rel_strength_risk_tag:
+        score_tags.append(rel_strength_risk_tag)
 
     # Use zone midpoint as entry price when available
     price_payload = entry_zone or {
-        "entry_low":    round(ind["current_close"], 8),
-        "entry_high":   round(ind["current_close"], 8),
-        "entry_price":  round(ind["current_close"], 8),
-        "entry_source": "MARKET",
-        "market_price": round(ind["current_close"], 8),
+        "entry_low":     round(ind["current_close"], 8),
+        "entry_high":    round(ind["current_close"], 8),
+        "entry_price":   round(ind["current_close"], 8),
+        "entry_source":  "MARKET",
+        "market_price":  round(ind["current_close"], 8),
+        "zone_age_bars": -1,
+        "zone_width_pct": 0.0,
     }
 
     return {
@@ -623,7 +835,7 @@ def analyze_coin_smc(candles_15m: dict, candles_1h: dict, symbol: str,
         "quality_score":    quality["quality_score"],
         "trend_score":      quality["trend_score"],
         "volatility_score": quality["volatility_score"],
-        "entry_quality_score": quality["entry_quality_score"],
+        "entry_quality_score":  quality["entry_quality_score"],
         "portfolio_risk_score": quality["portfolio_risk_score"],
         "volume_ratio":     ind["volume_ratio"],
         "current_price":    price_payload["entry_price"],
@@ -631,11 +843,15 @@ def analyze_coin_smc(candles_15m: dict, candles_1h: dict, symbol: str,
         "entry_low":        price_payload["entry_low"],
         "entry_high":       price_payload["entry_high"],
         "entry_source":     price_payload["entry_source"],
+        "zone_age_bars":    price_payload.get("zone_age_bars", -1),
+        "zone_width_pct":   price_payload.get("zone_width_pct", 0.0),
         "recent_high":      round(ind["recent_high"], 8),
         "recent_low":       round(ind["recent_low"], 8),
         "tp1_level":        ind.get("bull_tp1") if direction == "LONG" else ind.get("bear_tp1"),
         "tp2_level":        ind.get("bull_tp2") if direction == "LONG" else ind.get("bear_tp2"),
         "btc_change":       round(btc_change_pct, 2),
+        "coin_change_1h":   round(coin_change_1h, 2),
+        "rel_strength":     round(rel_strength, 2),
         "signals":          signals,
         "mtf_score":        mtf_score,
         "premium":          premium,
