@@ -16,6 +16,7 @@ from config import (
     KLINES_LIMIT, TIMEFRAME_KUCOIN, KLINES_INTERVAL_SEC,
     TIMEFRAME_1H_KUCOIN, KLINES_1H_LIMIT, KLINES_1H_INTERVAL_SEC,
     TIMEFRAME_4H_KUCOIN, KLINES_4H_LIMIT, KLINES_4H_INTERVAL_SEC,
+    TIMEFRAME_1D_KUCOIN, KLINES_1D_LIMIT, KLINES_1D_INTERVAL_SEC,
 )
 
 # Bybit geoblocks US cloud IPs (e.g. Render) with HTTP 403 on every domain.
@@ -44,6 +45,8 @@ TIMEFRAME_MAP = {
     "1hour": "60",
     "4h": "240",
     "4hour": "240",
+    "1d": "D",
+    "1day": "D",
 }
 BYBIT_INTERVAL_15M = TIMEFRAME_MAP.get(TIMEFRAME_KUCOIN, "15")
 BYBIT_INTERVAL_1H = TIMEFRAME_MAP.get(TIMEFRAME_1H_KUCOIN, "60")
@@ -245,6 +248,29 @@ def get_klines_4h(symbol):
         interval_sec=KLINES_4H_INTERVAL_SEC,
         closed_only=True,
     )
+
+
+def get_klines_1d(symbol):
+    """Fetch closed daily candles for macro trend direction."""
+    return get_klines(
+        symbol,
+        interval=TIMEFRAME_1D_KUCOIN,
+        limit=KLINES_1D_LIMIT,
+        interval_sec=KLINES_1D_INTERVAL_SEC,
+        closed_only=True,
+    )
+
+
+def get_btc_change_1d() -> float:
+    """Return BTC price change over the last closed day (%)."""
+    try:
+        candles = get_klines_1d("BTCUSDT")
+        closes = candles["close"]
+        if len(closes) < 2:
+            return 0.0
+        return (closes[-1] - closes[-2]) / closes[-2] * 100.0
+    except Exception:
+        return 0.0
 
 
 def get_btc_change_1h() -> float:

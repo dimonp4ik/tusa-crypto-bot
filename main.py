@@ -28,7 +28,7 @@ from config import (
     TRAIL_RUNNER_ENABLED, TRAIL_ATR_MULT,
 )
 from src.binance_client import (
-    get_top_coins, get_klines, get_klines_1h, get_klines_4h,
+    get_top_coins, get_klines, get_klines_1h, get_klines_4h, get_klines_1d,
     get_btc_change_1h, get_funding_rate, get_current_price,
 )
 from src.signal_filter import analyze_coin_smc
@@ -845,6 +845,7 @@ def _handle_admin_callback(callback_id: str, chat_id: int,
                 BEAR_TREND_SKIP_SESSIONS,
                 DIRECTIONAL_RSI_MIDLINE_FILTER, RSI_LONG_MIN_MIDLINE, RSI_SHORT_MAX_MIDLINE,
                 OVERLAP_BEARISH_1H_GUARD, MACD_CHOCH_NOISE_FILTER,
+                DAILY_TREND_FILTER, DOUBLE_NEUTRAL_LONG_FILTER,
                 VOL_REGIME_FILTER, VOL_MIN_ATR_PCT, VOL_MIN_RATIO,
                 SOURCE_EDGE_FILTER, LOW_EDGE_FVG_SYMBOLS,
                 SYMBOL_EDGE_FILTER, LOW_EDGE_SYMBOLS,
@@ -892,6 +893,8 @@ def _handle_admin_callback(callback_id: str, chat_id: int,
                 f"{_f(DIRECTIONAL_RSI_MIDLINE_FILTER, f'RSI\\_MIDLINE LONG≥{RSI_LONG_MIN_MIDLINE} SHORT<{RSI_SHORT_MAX_MIDLINE}')}\n"
                 f"{_f(OVERLAP_BEARISH_1H_GUARD, 'OVERLAP\\_BEARISH\\_1H\\_GUARD')}\n"
                 f"{_f(MACD_CHOCH_NOISE_FILTER, 'MACD\\_CHOCH\\_NOISE')}\n"
+                f"{_f(DAILY_TREND_FILTER, 'DAILY\\_TREND (LONG пропуск при bearish 1D)')}\n"
+                f"{_f(DOUBLE_NEUTRAL_LONG_FILTER, 'DOUBLE\\_NEUTRAL\\_LONG (4h+1D нейтрал = скип)')}\n"
                 f"\n*Контекстный моментум:*\n"
                 f"{_f(LONG_RELATIVE_WEAKNESS_FILTER, f'LONG\\_REL\\_WEAKNESS ≤{LONG_RELATIVE_WEAKNESS_MAX_PCT}%')}\n"
                 f"{_f(LONG_NY_COIN_MOMENTUM_FILTER, 'LONG\\_NY\\_COIN\\_MOMENTUM')}\n"
@@ -1742,11 +1745,12 @@ def run_scan():
                 df_15m = get_klines(symbol)
                 df_1h  = get_klines_1h(symbol)
                 df_4h  = get_klines_4h(symbol)
-                setup  = analyze_coin_smc(df_15m, df_1h, symbol, df_4h, btc_change)
+                df_1d  = get_klines_1d(symbol)
+                setup  = analyze_coin_smc(df_15m, df_1h, symbol, df_4h, btc_change, df_1d)
                 if setup:
                     log.info(
                         f"  SMC setup: {symbol:12s}  {setup['direction']}  "
-                        f"4h={setup['trend_4h']} 1h={setup['trend_1h']}  "
+                        f"1d={setup.get('trend_1d','?')} 4h={setup['trend_4h']} 1h={setup['trend_1h']}  "
                         f"signals={setup['signals']}"
                     )
                     setups.append(setup)

@@ -12,6 +12,7 @@ from config import (
     REQUIRE_STRONG_BOS, STRONG_BOS_VOL_MULT,
     REQUIRE_STRONG_CONFIRM,
     MACD_CHOCH_NOISE_FILTER, OVERLAP_BEARISH_1H_GUARD,
+    DAILY_TREND_FILTER, DOUBLE_NEUTRAL_LONG_FILTER,
     EFF_RATIO_FILTER, EFF_RATIO_MIN,
     REQUIRE_STRICT_HTF,
     ADAPTIVE_FILTER_PACKS, ADAPTIVE_MIXED_SCORE_BUMP, ADAPTIVE_CHOP_SCORE_BUMP,
@@ -47,6 +48,30 @@ from src.indicators import get_indicators, get_smc_indicators
 
 def _norm_symbol(symbol: str) -> str:
     return str(symbol or "").upper().replace("-", "").replace("/", "").replace("_", "")
+
+
+def _daily_trend(candles_1d: dict) -> str:
+    """
+    Macro trend from daily candles (3-day momentum).
+    Returns 'bullish' / 'bearish' / 'neutral'.
+    Uses 3-day close change to avoid single-candle noise.
+    Threshold ±1% — neutral band absorbs normal daily noise.
+    """
+    if not candles_1d:
+        return "neutral"
+    closes = candles_1d.get("close", [])
+    if len(closes) < 3:
+        return "neutral"
+    c_old = closes[-3]
+    c_new = closes[-1]
+    if not c_old or c_old == 0:
+        return "neutral"
+    change_pct = (c_new - c_old) / c_old * 100.0
+    if change_pct > 1.0:
+        return "bullish"
+    if change_pct < -1.0:
+        return "bearish"
+    return "neutral"
 
 
 _LOW_EDGE_SYMBOLS_NORM       = {_norm_symbol(s) for s in LOW_EDGE_SYMBOLS}
@@ -476,7 +501,8 @@ def _stability_overlay_pass(ind: dict, adaptive_pack: str, quality_score: float 
 # ── SMC filter ────────────────────────────────────────────────────────────────
 
 def analyze_coin_smc(candles_15m: dict, candles_1h: dict, symbol: str,
-                     candles_4h: dict = None, btc_change_pct: float = 0.0) -> dict | None:
+                     candles_4h: dict = None, btc_change_pct: float = 0.0,
+                     candles_1d: dict = None) -> dict | None:
     """
     SMC-based setup detector with MTF score and zone entry.
 
@@ -501,9 +527,20 @@ def analyze_coin_smc(candles_15m: dict, candles_1h: dict, symbol: str,
     bos      = ind["bos"]
     trend_1h = ind["trend_1h"]
     trend_4h = ind["trend_4h"]
+    trend_1d = _daily_trend(candles_1d)
 
     # 1. Must have BOS
     if not bos:
+        return None
+
+    # 1b. Macro daily trend filter (LONG only).
+    #     Skip LONG when daily trend is bearish — price is in a day-scale downtrend.
+    if DAILY_TREND_FILTER and bos == "bullish" and trend_1d == "bearish":
+        return None
+
+    # 1c. Double-neutral LONG block.
+    #     4h neutral + 1D neutral = full macro chop; longs get range-swept.
+    if DOUBLE_NEUTRAL_LONG_FILTER and bos == "bullish" and trend_4h == "neutral" and trend_1d == "neutral":
         return None
 
     # 2. Trend must match (neutral OK)
@@ -813,6 +850,7 @@ def analyze_coin_smc(candles_15m: dict, candles_1h: dict, symbol: str,
         "direction":        direction,
         "trend_1h":         trend_1h,
         "trend_4h":         ind["trend_4h"],
+        "trend_1d":         trend_1d,
         "trend_1h_strong":  ind.get("trend_1h_strong", False),
         "session":          session,
         "bos":              bos,

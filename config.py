@@ -71,6 +71,11 @@ TIMEFRAME_4H_KUCOIN = "4hour"
 KLINES_4H_LIMIT = 30
 KLINES_4H_INTERVAL_SEC = 4 * 3600
 
+# --- 1D candles for macro trend ---
+TIMEFRAME_1D_KUCOIN = "1d"
+KLINES_1D_LIMIT = 5
+KLINES_1D_INTERVAL_SEC = 86400
+
 # --- Trading hours filter (UTC) ---
 TRADING_HOURS_START = 7    # 07:00 UTC — London open
 TRADING_HOURS_END   = 23   # 23:00 UTC — NY close
@@ -123,6 +128,14 @@ MACD_CHOCH_NOISE_FILTER = os.getenv("MACD_CHOCH_NOISE_FILTER", "0") != "0"
 # 2026-06-05 A/B, 8640×15m: +9.39R net, +0.5pp WR, better portfolio guard and Monte Carlo.
 # Skips only overlap-session setups when 1h trend is bearish (latecomers get squeezed at NYC open).
 OVERLAP_BEARISH_1H_GUARD = os.getenv("OVERLAP_BEARISH_1H_GUARD", "1") != "0"
+
+# 1D macro trend filter — skip LONG when daily candle trend is BEARISH.
+# Prevents buying into a day-scale downtrend (as happened with sideways/red daily days).
+DAILY_TREND_FILTER = os.getenv("DAILY_TREND_FILTER", "1") != "0"
+
+# Double-neutral LONG block — skip LONG when BOTH 4h AND 1D are NEUTRAL.
+# Two-TF neutrals = sideways/chop at macro level; longs get chopped out by range boundaries.
+DOUBLE_NEUTRAL_LONG_FILTER = os.getenv("DOUBLE_NEUTRAL_LONG_FILTER", "1") != "0"
 
 # №A Efficiency-Ratio chop filter — DEFAULT ON (backtest-proven winner).
 #    Kaufman ER over EFF_RATIO_LOOKBACK bars: ER~1 = clean trend, ER~0 = chop.
