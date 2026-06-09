@@ -38,7 +38,8 @@ _SYSTEM_RULES = """You are a senior Smart Money Concepts (SMC) crypto trade vali
 
 WHAT THE SCORES MEAN
 - mtf_score (S): multi-timeframe confluence score, 0–20+. S>=12 is strong, 9–11 acceptable, below 9 rarely passes. Tags show which signals fired (FVG, OB, LiqSweep, RSI_Div, BullWick, etc.).
-- 4h / 1h: higher-timeframe trend bias (bull / bear / neutral). Suggested side should agree. Both neutral = chop, treat with suspicion.
+- 1d / 4h / 1h: timeframe trend bias (bull / bear / neutral). 1d = macro daily trend (3-day momentum). Suggested side should agree with all three. 1d=bearish → very cautious on LONGs. Both 4h and 1d neutral = full macro chop.
+- ZoneAge: bars since the FVG/OB zone formed. <5 bars = fresh (strong). 10-20 bars = aging. >30 bars = stale, less reliable.
 - HTF=1h_strong / 4h_strong: EMA stack fully aligned on that timeframe — meaningful extra confirmation.
 - FVG: unfilled Fair Value Gap near entry — imbalance price tends to revisit.
 - OB: Order Block (last opposing candle before impulsive move) near entry.
@@ -149,12 +150,14 @@ def _setup_line(i: int, s: dict) -> str:
     confs = [c for c in (s.get("confirmations") or [])
              if c not in _STANDARD and not any(c.startswith(p) for p in _SKIP_PFX)]
     confs_s = f" Confs=[{','.join(confs)}]" if confs else ""
+    age = s.get("zone_age_bars")
+    age_s = f" ZoneAge={age}bars" if age is not None else ""
     return (
         f"{i} {s['symbol']} {s['direction']} "
         f"S={s.get('mtf_score','?')} "
-        f"4h={s.get('trend_4h','?')} 1h={s.get('trend_1h','?')} "
+        f"1d={s.get('trend_1d','?')} 4h={s.get('trend_4h','?')} 1h={s.get('trend_1h','?')} "
         f"FVG={fvg} OB={ob} SW={sweep} "
-        f"Z={zone} RSI={s['rsi']} V={s['volume_ratio']}x F={fund_s}"
+        f"Z={zone}{age_s} RSI={s['rsi']} V={s['volume_ratio']}x F={fund_s}"
         f"{er_s}{prem}{confs_s}"
     )
 
@@ -402,15 +405,17 @@ def analyze_heavy(setup: dict, news_context: dict = None, history: list = None) 
     client = _get_client()
 
     # Try extended thinking first (gives Sonnet a reasoning scratch-pad).
-    # Falls back to standard call if the beta is unavailable.
+    # NOTE: tool_choice must be {"type":"any"} (not forced "tool") when thinking
+    # is enabled — Anthropic API rejects forced tool_choice + thinking together.
+    # "any" still guarantees a tool call while allowing the thinking block.
     try:
         message = client.messages.create(
             model=CLAUDE_HEAVY_MODEL,
-            max_tokens=_THINKING_BUDGET + 800,
+            max_tokens=_THINKING_BUDGET + 1200,
             thinking={"type": "enabled", "budget_tokens": _THINKING_BUDGET},
             system=_system_param(),
             tools=[_verdict_tool()],
-            tool_choice={"type": "tool", "name": "submit_verdict"},
+            tool_choice={"type": "any"},
             messages=[{"role": "user", "content": user_text}],
             extra_headers={"anthropic-beta": f"{_CACHE_BETA},{_THINKING_BETA}"},
         )
@@ -419,7 +424,7 @@ def analyze_heavy(setup: dict, news_context: dict = None, history: list = None) 
         _log.warning(f"HEAVY thinking mode unavailable ({e_think}), falling back to standard")
         message = client.messages.create(
             model=CLAUDE_HEAVY_MODEL,
-            max_tokens=800,
+            max_tokens=1200,
             system=_system_param(),
             tools=[_verdict_tool()],
             tool_choice={"type": "tool", "name": "submit_verdict"},
