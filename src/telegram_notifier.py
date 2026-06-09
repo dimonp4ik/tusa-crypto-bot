@@ -19,6 +19,13 @@ from config import (
 TELEGRAM_API = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}"
 
 
+def _esc(text: str) -> str:
+    """Escape Markdown v1 special chars in dynamic (LLM-generated) text.
+    Prevents Telegram 400 when Claude returns things like RSI_Div or *strong*.
+    """
+    return (text or "").replace("_", "\\_").replace("*", "\\*").replace("`", "\\`").replace("[", "\\[")
+
+
 def calculate_tp_sl(price: float, direction: str, atr: float = 0.0,
                     recent_high: float = 0.0, recent_low: float = 0.0,
                     tp1_level: float = None, tp2_level: float = None):
@@ -183,9 +190,9 @@ def send_signal(analysis: dict) -> bool:
     news_sent    = analysis.get("news_sentiment", "")
     news_summary = analysis.get("news_summary", "")
     news_icon    = {"BULLISH": "📰🟢", "BEARISH": "📰🔴"}.get(news_sent, "")
-    news_line    = f"{news_icon} _{news_summary}_\n" if news_sent and news_summary and news_sent != "NEUTRAL" else ""
+    news_line    = f"{news_icon} _{_esc(news_summary)}_\n" if news_sent and news_summary and news_sent != "NEUTRAL" else ""
     event_warn   = analysis.get("event_warning", "")
-    event_line   = f"⚠️ {event_warn}\n" if event_warn else ""
+    event_line   = f"⚠️ {_esc(event_warn)}\n" if event_warn else ""
 
     # Entry zone range (FVG/OB low–high) + zone reference when live price used
     entry_source   = analysis.get("entry_source", "MARKET")
@@ -229,7 +236,7 @@ def send_signal(analysis: dict) -> bool:
         f"{event_line}"
         f"\n*Сигналы:*\n{signals_text}\n\n"
         f"{conf_icon} Уверенность: *{conf_ru}*\n"
-        f"📝 _{analysis.get('reason', '')}_\n\n"
+        f"📝 _{_esc(analysis.get('reason', ''))}_\n\n"
         f"🕐 {session_str}  ⏰ {timestamp}"
     )
 
