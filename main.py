@@ -845,7 +845,7 @@ def _handle_admin_callback(callback_id: str, chat_id: int,
                 BEAR_TREND_SKIP_SESSIONS,
                 DIRECTIONAL_RSI_MIDLINE_FILTER, RSI_LONG_MIN_MIDLINE, RSI_SHORT_MAX_MIDLINE,
                 OVERLAP_BEARISH_1H_GUARD, MACD_CHOCH_NOISE_FILTER,
-                DAILY_TREND_FILTER, DOUBLE_NEUTRAL_LONG_FILTER,
+                DAILY_TREND_FILTER, DOUBLE_NEUTRAL_LONG_FILTER, DAILY_TREND_SHORT_FILTER,
                 VOL_REGIME_FILTER, VOL_MIN_ATR_PCT, VOL_MIN_RATIO,
                 SOURCE_EDGE_FILTER, LOW_EDGE_FVG_SYMBOLS,
                 SYMBOL_EDGE_FILTER, LOW_EDGE_SYMBOLS,
@@ -894,7 +894,8 @@ def _handle_admin_callback(callback_id: str, chat_id: int,
                 f"{_f(EFF_RATIO_FILTER, 'Мин. балл сетапа', f'нужно ≥{MTF_MIN_SCORE} подтверждений из разных таймфреймов')}\n"
 
                 f"\n*📅 Тренд и направление*\n"
-                f"{_f(DAILY_TREND_FILTER, 'Дневной тренд', 'лонг запрещён если дневная свеча медвежья — не покупаем против дня')}\n"
+                f"{_f(DAILY_TREND_FILTER, 'Дневной тренд (лонг)', 'лонг запрещён если дневная свеча медвежья — не покупаем против дня')}\n"
+                f"{_f(DAILY_TREND_SHORT_FILTER, 'Дневной тренд (шорт)', 'шорт запрещён если дневная свеча бычья — не шортим против дня')}\n"
                 f"{_f(DOUBLE_NEUTRAL_LONG_FILTER, 'Двойной боковик', '4h + дневка оба нейтральны = полный боковик, лонги пропускаем')}\n"
                 f"{_f(OVERLAP_BEARISH_1H_GUARD, 'Защита Overlap-сессии', 'лонг в перекрытие Лондон+Нью-Йорк при медвежьем 1h — пропускаем (опоздавшие входы давят цену)')}\n"
                 f"{_f(BEAR_TREND_HOT_VOL_GUARD, 'Защита шорт-сквиза', f'медвежий тренд + объём ≥{BEAR_TREND_HOT_VOL_MIN_RATIO}x = переполненный шорт, пропускаем')}\n"

@@ -34,6 +34,9 @@ def _normalize_market_symbol(symbol: str) -> str:
 
 ALLOWED_SYMBOLS = [_normalize_market_symbol(s) for s in _parse_symbol_list(os.getenv("ALLOWED_SYMBOLS", ""))]
 BLOCKED_SYMBOLS = [_normalize_market_symbol(s) for s in _parse_symbol_list(os.getenv("BLOCKED_SYMBOLS", ""))]
+# Always block commodity derivatives — metals/indices follow macro drivers, not crypto SMC
+_ALWAYS_BLOCKED = {"XAUUSDT", "XAGUSDT", "XAUTUSDT", "XBTUSDT"}
+BLOCKED_SYMBOLS = list(set(BLOCKED_SYMBOLS) | _ALWAYS_BLOCKED)
 
 # Stablecoins and fiat pairs — no trading signals
 BLOCK_STABLE_BASES = {
@@ -136,6 +139,10 @@ DAILY_TREND_FILTER = os.getenv("DAILY_TREND_FILTER", "1") != "0"
 # Double-neutral LONG block — skip LONG when BOTH 4h AND 1D are NEUTRAL.
 # Two-TF neutrals = sideways/chop at macro level; longs get chopped out by range boundaries.
 DOUBLE_NEUTRAL_LONG_FILTER = os.getenv("DOUBLE_NEUTRAL_LONG_FILTER", "1") != "0"
+
+# Daily SHORT guard — mirror of DAILY_TREND_FILTER for shorts.
+# Skip SHORT when daily trend is BULLISH — don't short into a day-scale uptrend.
+DAILY_TREND_SHORT_FILTER = os.getenv("DAILY_TREND_SHORT_FILTER", "1") != "0"
 
 # №A Efficiency-Ratio chop filter — DEFAULT ON (backtest-proven winner).
 #    Kaufman ER over EFF_RATIO_LOOKBACK bars: ER~1 = clean trend, ER~0 = chop.

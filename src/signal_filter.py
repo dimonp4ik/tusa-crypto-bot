@@ -12,7 +12,7 @@ from config import (
     REQUIRE_STRONG_BOS, STRONG_BOS_VOL_MULT,
     REQUIRE_STRONG_CONFIRM,
     MACD_CHOCH_NOISE_FILTER, OVERLAP_BEARISH_1H_GUARD,
-    DAILY_TREND_FILTER, DOUBLE_NEUTRAL_LONG_FILTER,
+    DAILY_TREND_FILTER, DOUBLE_NEUTRAL_LONG_FILTER, DAILY_TREND_SHORT_FILTER,
     EFF_RATIO_FILTER, EFF_RATIO_MIN,
     REQUIRE_STRICT_HTF,
     ADAPTIVE_FILTER_PACKS, ADAPTIVE_MIXED_SCORE_BUMP, ADAPTIVE_CHOP_SCORE_BUMP,
@@ -541,6 +541,10 @@ def analyze_coin_smc(candles_15m: dict, candles_1h: dict, symbol: str,
     # 1c. Double-neutral LONG block.
     #     4h neutral + 1D neutral = full macro chop; longs get range-swept.
     if DOUBLE_NEUTRAL_LONG_FILTER and bos == "bullish" and trend_4h == "neutral" and trend_1d == "neutral":
+        return None
+
+    # 1d. Daily SHORT guard — don't short into a bullish daily trend.
+    if DAILY_TREND_SHORT_FILTER and bos == "bearish" and trend_1d == "bullish":
         return None
 
     # 2. Trend must match (neutral OK)
