@@ -937,11 +937,10 @@ def _handle_admin_callback(callback_id: str, chat_id: int,
         date_str = datetime.now(_riga).strftime("%d.%m.%Y")
         rows = get_setups_by_date(date_str)
         txt = _format_setups_page(rows, date_str)
-        kb = {"inline_keyboard": [[
+        _edit_with_keyboard(chat_id, message_id, txt, [[
             {"text": "📅 Другая дата", "callback_data": "adm_setups_date"},
             {"text": "« Назад",        "callback_data": "adm_back"},
-        ]]}
-        _edit_message(chat_id, message_id, txt, reply_markup=kb)
+        ]])
 
     elif data == "adm_setups_date":
         _pending_setups_date[chat_id] = message_id
@@ -1372,16 +1371,15 @@ def webhook():
         if rows is None or (not rows and date_input):
             _send_admin_text(
                 chat_id,
-                f"📅 Нет сетапов за *{date_input}* или неверный формат даты\\.\nФормат: `10\\.06` или `10\\.06\\.2026`",
+                f"📅 Нет сетапов за *{date_input}* или неверный формат.\nФормат: `10.06` или `10.06.2026`",
                 {"inline_keyboard": [[{"text": "« К панели", "callback_data": "adm_open_new"}]]},
             )
         else:
             txt = _format_setups_page(rows, date_input)
-            kb = {"inline_keyboard": [[
+            _send_admin_text(chat_id, txt, {"inline_keyboard": [[
                 {"text": "📅 Другая дата", "callback_data": "adm_setups_date"},
                 {"text": "« К панели",     "callback_data": "adm_open_new"},
-            ]]}
-            _send_admin_text(chat_id, txt, kb)
+            ]]})
         return "ok", 200
 
     # ── Pending "manual block" state — admin typed a symbol to block ──────────
