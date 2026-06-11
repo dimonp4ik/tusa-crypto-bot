@@ -108,7 +108,9 @@ REQUIRE_RETEST      = os.getenv("REQUIRE_RETEST", "1") != "0"
 RETEST_MAX_DIST_PCT = float(os.getenv("RETEST_MAX_DIST_PCT", "0.015"))  # within 1.5% of zone edge
 
 # --- Multi-timeframe score gate (max ~15) ---
-MTF_MIN_SCORE = int(os.getenv("MTF_MIN_SCORE", "10"))  # raised 9→10: fewer but stronger setups reach Claude
+# 2026-06-11 A/B (20 sym, 2880+5760×15m, trail): scores 12-13 = WR ~20%, -6.3R.
+# Raising 10→14 cut those: WR 48.9→50.7%, R/tr +17%, DD -25% on both windows.
+MTF_MIN_SCORE = int(os.getenv("MTF_MIN_SCORE", "14"))
 
 # --- Signal-quality filters (backtested on a PINNED 20-coin / ~21-day set) ---
 # №1 Volatility regime — DEFAULT ON after re-test 2026-06-05 on full context
@@ -281,9 +283,11 @@ ADAPTIVE_BEAR_VOL_MIN_RATIO = float(os.getenv("ADAPTIVE_BEAR_VOL_MIN_RATIO", "0.
 ADAPTIVE_BEAR_VOL_MAX_RATIO = float(os.getenv("ADAPTIVE_BEAR_VOL_MAX_RATIO", "1.8"))
 
 # --- Stability overlay: deterministic kill-switch for poorly-validated regimes -
-STABILITY_FILTERS_ENABLED   = os.getenv("STABILITY_FILTERS_ENABLED", "0") != "0"
+# 2026-06-11 A/B: OVERLAP session (London+NY overlap) = WR 32%, -6.3R over 19tr.
+# Skipping it: +5R total, DD -20%. Both sessions fight at overlap = chop hour.
+STABILITY_FILTERS_ENABLED   = os.getenv("STABILITY_FILTERS_ENABLED", "1") != "0"
 STABILITY_SKIP_PACKS        = {s.lower() for s in _parse_symbol_list(os.getenv("STABILITY_SKIP_PACKS", ""))}
-STABILITY_SKIP_SESSIONS     = set(_parse_symbol_list(os.getenv("STABILITY_SKIP_SESSIONS", "")))
+STABILITY_SKIP_SESSIONS     = set(_parse_symbol_list(os.getenv("STABILITY_SKIP_SESSIONS", "OVERLAP")))
 STABILITY_MIN_EFF_RATIO     = float(os.getenv("STABILITY_MIN_EFF_RATIO", "0.0"))
 STABILITY_MIN_VOLUME_RATIO  = float(os.getenv("STABILITY_MIN_VOLUME_RATIO", "0.0"))
 STABILITY_MIN_QUALITY_SCORE = float(os.getenv("STABILITY_MIN_QUALITY_SCORE", "0.0"))

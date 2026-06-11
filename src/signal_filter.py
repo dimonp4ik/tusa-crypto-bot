@@ -547,6 +547,24 @@ def analyze_coin_smc(candles_15m: dict, candles_1h: dict, symbol: str,
     if DAILY_TREND_SHORT_FILTER and bos == "bearish" and trend_1d == "bullish":
         return None
 
+    # 1e. Premium/discount dealing-range filter — TESTED AND DROPPED (default off).
+    #     2026-06-11 A/B: strategy enters on structure breaks (price at range edge
+    #     by design), so PD cut kills working entries: 0.5→3tr, 0.8→+25R, 0.9→+38R
+    #     vs +71R baseline. Kept env-gated for re-testing on other entry models.
+    if os.getenv("PD_RANGE_FILTER", "0") != "0":
+        _pd_look = int(os.getenv("PD_RANGE_LOOKBACK", "96"))  # 96×15m = 24h
+        _highs = candles_15m.get("high", [])[-_pd_look:]
+        _lows  = candles_15m.get("low",  [])[-_pd_look:]
+        if _highs and _lows:
+            _rng_hi, _rng_lo = max(_highs), min(_lows)
+            if _rng_hi > _rng_lo:
+                _pos = (ind["current_close"] - _rng_lo) / (_rng_hi - _rng_lo)
+                _pd_max = float(os.getenv("PD_RANGE_MAX", "0.5"))
+                if bos == "bullish" and _pos > _pd_max:
+                    return None
+                if bos == "bearish" and _pos < (1.0 - _pd_max):
+                    return None
+
     # 2. Trend must match (neutral OK)
     if trend_1h != "neutral" and trend_1h != bos:
         return None
