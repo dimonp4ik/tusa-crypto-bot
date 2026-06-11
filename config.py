@@ -80,8 +80,8 @@ KLINES_1D_LIMIT = 5
 KLINES_1D_INTERVAL_SEC = 86400
 
 # --- Trading hours filter (UTC) ---
-TRADING_HOURS_START = 7    # 07:00 UTC — London open
-TRADING_HOURS_END   = 23   # 23:00 UTC — NY close
+TRADING_HOURS_START = 7    # 07:00 UTC = 10:00 Riga
+TRADING_HOURS_END   = 21   # 21:00 UTC = 00:00 Riga
 TRADE_WEEKENDS      = False
 
 # --- SMC settings ---
@@ -330,9 +330,11 @@ TRAIL_ATR_MULT       = float(os.getenv("TRAIL_ATR_MULT", "0.5"))  # 0.75→0.5: 
 # --- Research-validated setup cuts (2026-06-11, 20 sym, 30/60/90d backtests) ---
 # RSI_Div confirmations: WR 23%, -0.21R/tr over 22tr — divergence in 15m chop = noise.
 SKIP_RSI_DIV_SETUPS = os.getenv("SKIP_RSI_DIV_SETUPS", "1") != "0"
-# Monday (weekday 0) ~0R/tr over 53tr; 18-20 UTC ~+0.09R/tr over 38tr — dead zones.
-SKIP_UTC_HOURS = {h for h in os.getenv("SKIP_UTC_HOURS", "18,19,20").split(",") if h.strip()}
-SKIP_WEEKDAYS  = {d for d in os.getenv("SKIP_WEEKDAYS", "0").split(",") if d.strip()}
+# Hour/weekday cuts — OFF by user choice (Mon-Fri 07-21 UTC full window).
+# Backtest note: Monday ~0R/tr (53tr), 18-20 UTC ~+0.09R/tr (38tr) — re-enable
+# via env SKIP_WEEKDAYS=0 / SKIP_UTC_HOURS=18,19,20 if WR needs a boost.
+SKIP_UTC_HOURS = {h for h in os.getenv("SKIP_UTC_HOURS", "").split(",") if h.strip()}
+SKIP_WEEKDAYS  = {d for d in os.getenv("SKIP_WEEKDAYS", "").split(",") if d.strip()}
 
 # --- BTC correlation filter ---
 BTC_BLOCK_THRESHOLD_PCT = 1.0
