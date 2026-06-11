@@ -147,6 +147,25 @@ def init_db():
             )
         """)
 
+        # ── Setup log (all setups sent to Claude, approved or rejected) ──────
+        c.execute("""
+            CREATE TABLE IF NOT EXISTS setup_log (
+                id          INTEGER PRIMARY KEY AUTOINCREMENT,
+                ts          REAL NOT NULL,
+                symbol      TEXT NOT NULL,
+                direction   TEXT NOT NULL,
+                entry_price REAL,
+                tp1         REAL,
+                tp2         REAL,
+                mtf_score   INTEGER,
+                decision    TEXT,
+                confidence  TEXT,
+                risk_score  INTEGER,
+                reason      TEXT,
+                sent        INTEGER NOT NULL DEFAULT 0
+            )
+        """)
+
 
 def get_bot_state(key: str) -> str | None:
     """Read a persistent bot state value. Returns None if key not set."""
@@ -762,3 +781,64 @@ def get_stats(days: int = 7, since_ts: float = None) -> dict:
         "streak":           streak,
         "current_run":      current_run,
     }
+
+
+# ── Setup log ─────────────────────────────────────────────────────────────────
+
+def log_setup_candidate(analysis: dict) -> int:
+    """Log a setup that reached Claude (before/after verdict). Returns row id."""
+    with _conn() as c:
+        cur = c.execute("""
+            INSERT INTO setup_log
+                (ts, symbol, direction, entry_price, tp1, tp2,
+                 mtf_score, decision, confidence, risk_score, reason, sent)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0)
+        """, (
+            time_mod.time(),
+            analysis.get("symbol", ""),
+            analysis.get("direction", ""),
+            analysis.get("current_price"),
+            analysis.get("tp1_level"),
+            analysis.get("tp2_level"),
+            analysis.get("mtf_score"),
+            analysis.get("decision", "NO TRADE"),
+            analysis.get("confidence", ""),
+            analysis.get("risk_score"),
+            analysis.get("reason", ""),
+        ))
+        return cur.lastrowid
+
+
+def mark_setup_sent(setup_log_id: int) -> None:
+    """Mark a setup as actually sent to the channel."""
+    if not setup_log_id:
+        return
+    with _conn() as c:
+        c.execute("UPDATE setup_log SET sent=1 WHERE id=?", (setup_log_id,))
+
+
+def get_setups_by_date(date_str: str) -> list:
+    """Return all setups for a given date. Accepts DD.MM, DD.MM.YYYY, YYYY-MM-DD.
+    Timestamps stored as UTC, displayed in caller's chosen tz."""
+    from datetime import datetime, timezone as _tz
+    date_str = date_str.strip()
+    dt = None
+    for fmt in ("%d.%m.%Y", "%d.%m", "%Y-%m-%d"):
+        try:
+            parsed = datetime.strptime(date_str, fmt)
+            if fmt == "%d.%m":
+                parsed = parsed.replace(year=datetime.now().year)
+            dt = parsed.replace(tzinfo=_tz.utc)
+            break
+        except ValueError:
+            continue
+    if dt is None:
+        return []
+    start_ts = dt.timestamp()
+    end_ts   = start_ts + 86400
+    with _conn() as c:
+        rows = c.execute(
+            "SELECT * FROM setup_log WHERE ts >= ? AND ts < ? ORDER BY ts ASC",
+            (start_ts, end_ts),
+        ).fetchall()
+    return [dict(r) for r in rows]

@@ -50,6 +50,7 @@ from src.db import (
     get_signals_count, get_signals_page, get_distinct_signal_symbols,
     get_claude_spend_stats,
     get_bot_state, set_bot_state,
+    log_setup_candidate, mark_setup_sent, get_setups_by_date,
 )
 from config import ADMIN_IDS
 
@@ -71,6 +72,8 @@ _pending_add_admin: dict = {}
 _pending_block_chat: dict = {}
 # State: admin is typing a user search query.
 _pending_users_search: dict = {}
+# State: admin is typing a date to view setup history.
+_pending_setups_date: dict = {}
 _photo_panel_messages: set = set()
 
 # Last scan summary — populated by run_scan(), shown in 📊 Фильтры panel.
@@ -146,6 +149,8 @@ _ADMIN_KEYBOARD = {
     ], [
         {"text": "🔒 Блок монет",   "callback_data": "adm_manblock"},
         {"text": "📊 Фильтры",      "callback_data": "adm_filters"},
+    ], [
+        {"text": "🔍 История сетапов", "callback_data": "adm_setups"},
     ]]
 }
 
@@ -927,12 +932,83 @@ def _handle_admin_callback(callback_id: str, chat_id: int,
             txt = f"Ошибка: {e}"
         _edit_message(chat_id, message_id, txt)
 
+    elif data in ("adm_setups", "adm_setups_today"):
+        _riga = _riga_tz()
+        date_str = datetime.now(_riga).strftime("%d.%m.%Y")
+        rows = get_setups_by_date(date_str)
+        txt = _format_setups_page(rows, date_str)
+        kb = {"inline_keyboard": [[
+            {"text": "📅 Другая дата", "callback_data": "adm_setups_date"},
+            {"text": "« Назад",        "callback_data": "adm_back"},
+        ]]}
+        _edit_message(chat_id, message_id, txt, reply_markup=kb)
+
+    elif data == "adm_setups_date":
+        _pending_setups_date[chat_id] = message_id
+        try:
+            _requests.post(
+                f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage",
+                json={
+                    "chat_id": chat_id,
+                    "text": "📅 Введи дату в формате ДД.ММ или ДД.ММ.ГГГГ\nПример: `10.06` или `10.06.2026`",
+                    "parse_mode": "Markdown",
+                },
+                timeout=10,
+            )
+        except Exception as e:
+            log.warning(f"setups_date prompt failed: {e}")
+
     elif data == "adm_back":
         _edit_message(chat_id, message_id, "🛠 *TUSA Admin Panel*\nВыбери раздел:")
 
     elif data == "adm_open_new":
         # Sent after user-search results (new message, no message_id to edit) — open fresh panel
         _send_keyboard(chat_id, "🛠 *TUSA Admin Panel*\nВыбери раздел:")
+
+
+def _format_setups_page(rows: list, date_str: str) -> str:
+    """Render setup_log rows as a Telegram-friendly admin message."""
+    _riga = _riga_tz()
+    if not rows:
+        return f"🔍 *История сетапов за {date_str}*\n\nНет сетапов за эту дату."
+
+    lines = [f"🔍 *История сетапов за {date_str}* — {len(rows)} шт.\n"]
+    for r in rows:
+        ts_str = datetime.fromtimestamp(r["ts"], tz=_riga).strftime("%H:%M")
+        sym    = r.get("symbol", "?")
+        direct = r.get("direction", "?")
+        entry  = r.get("entry_price")
+        tp1    = r.get("tp1")
+        tp2    = r.get("tp2")
+        dec    = r.get("decision") or "NO TRADE"
+        conf   = r.get("confidence") or ""
+        risk   = r.get("risk_score")
+        reason = r.get("reason") or ""
+        sent   = r.get("sent", 0)
+
+        dir_icon = "📈" if direct == "LONG" else "📉"
+        dec_icon = "✅" if dec in ("LONG", "SHORT") else "❌"
+        sent_icon = "📤 отправлен" if sent else "🚫 отклонён"
+
+        entry_s = f"{entry:.4g}" if entry else "?"
+        tp1_s   = f"{tp1:.4g}" if tp1 else "?"
+        tp2_s   = f"{tp2:.4g}" if tp2 else "?"
+        risk_s  = f" R{risk}" if risk is not None else ""
+        conf_s  = f" {conf}" if conf else ""
+        reason_short = reason[:60] + "…" if len(reason) > 60 else reason
+
+        lines.append(
+            f"{ts_str} {dir_icon} *{sym}* {direct}\n"
+            f"  Вход: `{entry_s}` · TP1: `{tp1_s}` · TP2: `{tp2_s}`\n"
+            f"  {dec_icon} Клод: {dec}{conf_s}{risk_s} — {sent_icon}\n"
+            + (f"  _{reason_short}_\n" if reason_short else "")
+        )
+
+    # Telegram message limit ~4096 chars — truncate if huge
+    text = "\n".join(lines)
+    if len(text) > 3800:
+        text = text[:3800] + f"\n\n_...и ещё {len(rows)} сетапов (обрезано)_"
+    return text
 
 
 def _num(s):
@@ -1286,6 +1362,26 @@ def webhook():
                 _send_admin_text(chat_id, "\n".join(lines), _back_kb)
         except Exception as e:
             _send_admin_text(chat_id, f"Ошибка поиска: {e}", _back_kb)
+        return "ok", 200
+
+    # ── Pending "setups date" state — admin typed a date ─────────────────────
+    if is_dm and _is_admin(user_id) and chat_id in _pending_setups_date:
+        orig_msg_id = _pending_setups_date.pop(chat_id)
+        date_input = text_raw.strip()
+        rows = get_setups_by_date(date_input)
+        if rows is None or (not rows and date_input):
+            _send_admin_text(
+                chat_id,
+                f"📅 Нет сетапов за *{date_input}* или неверный формат даты\\.\nФормат: `10\\.06` или `10\\.06\\.2026`",
+                {"inline_keyboard": [[{"text": "« К панели", "callback_data": "adm_open_new"}]]},
+            )
+        else:
+            txt = _format_setups_page(rows, date_input)
+            kb = {"inline_keyboard": [[
+                {"text": "📅 Другая дата", "callback_data": "adm_setups_date"},
+                {"text": "« К панели",     "callback_data": "adm_open_new"},
+            ]]}
+            _send_admin_text(chat_id, txt, kb)
         return "ok", 200
 
     # ── Pending "manual block" state — admin typed a symbol to block ──────────
@@ -1857,6 +1953,13 @@ def run_scan():
                 except Exception as e:
                     log.warning(f"  HEAVY check failed {analysis.get('symbol','?')}: {e}")
 
+        # Log all Claude-evaluated setups (approved and rejected) for admin history
+        for _a in analyses:
+            try:
+                _a["_setup_log_id"] = log_setup_candidate(_a)
+            except Exception as _e:
+                log.debug(f"setup_log insert failed: {_e}")
+
         # Upcoming high-impact macro events (CPI/FOMC/NFP) — warn on signals
         event_warning = ""
         try:
@@ -1933,6 +2036,10 @@ def run_scan():
                         _cache_signal(analysis["symbol"], direction)
                         sent_count += 1
                         log.info(f"  Signal sent: {analysis['symbol']} {direction}")
+                        try:
+                            mark_setup_sent(analysis.get("_setup_log_id"))
+                        except Exception:
+                            pass
             except Exception as e:
                 log.error(f"  Error sending {analysis.get('symbol','?')}: {e}")
 
