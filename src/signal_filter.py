@@ -42,6 +42,7 @@ from config import (
     TREND_PAIR_RISK_UP_MULT, TREND_PAIR_RISK_UP_MAX_MULT,
     STABILITY_FILTERS_ENABLED, STABILITY_SKIP_PACKS, STABILITY_SKIP_SESSIONS,
     STABILITY_MIN_EFF_RATIO, STABILITY_MIN_VOLUME_RATIO, STABILITY_MIN_QUALITY_SCORE,
+    SKIP_RSI_DIV_SETUPS, SKIP_UTC_HOURS, SKIP_WEEKDAYS,
 )
 from src.indicators import get_indicators, get_smc_indicators
 
@@ -679,6 +680,21 @@ def analyze_coin_smc(candles_15m: dict, candles_1h: dict, symbol: str,
         direction = "SHORT"
     else:
         return None
+
+    # 6-exp. Research-validated cuts (2026-06-11 A/B, 30/60/90d windows).
+    #   RSI_Div setups: WR 23%, -0.21R/tr — 15m divergence in chop = noise.
+    #   Monday + 18-20 UTC: near-zero R segments, cutting lifts WR ~2pp.
+    if SKIP_RSI_DIV_SETUPS and "RSI_Div" in confirmations:
+        return None
+    if SKIP_UTC_HOURS or SKIP_WEEKDAYS:
+        _ts = (candles_15m.get("time") or [None])[-1]
+        if _ts:
+            from datetime import datetime as _dt, timezone as _tzz
+            _d = _dt.fromtimestamp(int(_ts), tz=_tzz.utc)
+            if str(_d.hour) in SKIP_UTC_HOURS:
+                return None
+            if str(_d.weekday()) in SKIP_WEEKDAYS:
+                return None
 
     # 6a. Direction edge filter — skip symbol/direction combos with proven poor edge.
     if DIRECTION_EDGE_FILTER:

@@ -66,6 +66,7 @@ from config import (  # noqa: E402
     TIMEFRAME_KUCOIN,
     TP1_R_MULT,
     TP2_R_MULT,
+    TRAIL_ATR_MULT,
     MIN_24H_QUOTE_VOLUME_USDT,
 )
 from src.signal_filter import analyze_coin_smc  # noqa: E402
@@ -84,6 +85,7 @@ BYBIT_PAGE_LIMIT = 1000   # Bybit max candles per request
 BYBIT_INTERVAL_MAP = {
     "15min": "15", "1hour": "60", "4hour": "240",
     "15": "15", "60": "60", "240": "240",
+    "1d": "D", "D": "D",
 }
 
 WINDOW_15M = 300
@@ -759,6 +761,14 @@ def backtest_symbol(
             max(10, math.ceil(candles / 16) + 4),
             refresh_cache=refresh_cache,
         )
+        try:
+            c1d = fetch_history(
+                symbol, "1d", 86400,
+                max(8, math.ceil(candles / 96) + 4),
+                refresh_cache=refresh_cache,
+            )
+        except Exception:
+            c1d = {}
     except Exception as exc:
         result.error = str(exc)
         result.elapsed_sec = time.perf_counter() - started
@@ -781,9 +791,11 @@ def backtest_symbol(
         t_cur = c15["time"][i - 1] if c15.get("time") and i > 0 else None
         snap_1h = aligned_slice_by_time(c1h, t_cur, window_1h, max(1, i // 4))
         snap_4h = aligned_slice_by_time(c4h, t_cur, window_4h, max(1, i // 16))
+        snap_1d = aligned_slice_by_time(c1d, t_cur, 8, max(1, i // 96)) if c1d else None
 
         result.analyzed += 1
-        setup = analyze_coin_smc(snap_15, snap_1h, symbol, snap_4h, btc_change_pct=0.0)
+        setup = analyze_coin_smc(snap_15, snap_1h, symbol, snap_4h, btc_change_pct=0.0,
+                                 candles_1d=snap_1d)
         if not setup:
             continue
 
@@ -906,8 +918,8 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--slippage-rate", type=float, default=BACKTEST_SLIPPAGE_RATE, help="Per-side slippage rate for net R estimate.")
     p.add_argument("--execution-delay-bars", type=int, default=0, help="Delay entry by N 15m bars for execution realism.")
     p.add_argument("--adverse-entry-bps", type=float, default=0.0, help="Extra adverse fill in basis points.")
-    p.add_argument("--exit-policy", choices=["classic", "trail"], default="classic", help="Exit model after TP1.")
-    p.add_argument("--trail-atr-mult", type=float, default=0.75, help="ATR multiple for --exit-policy trail.")
+    p.add_argument("--exit-policy", choices=["classic", "trail"], default="trail", help="Exit model after TP1 (default mirrors live TRAIL_RUNNER_ENABLED).")
+    p.add_argument("--trail-atr-mult", type=float, default=TRAIL_ATR_MULT, help="ATR multiple for --exit-policy trail (default mirrors live config).")
     p.add_argument("--export-trades", default=None, help="Write trade list CSV.")
     return p
 

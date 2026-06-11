@@ -316,14 +316,23 @@ ATR_PERIOD    = 14
 SL_ATR_BUFFER = float(os.getenv("SL_ATR_BUFFER", "0.5"))   # buffer beyond swing, in ATR
 RISK_MIN_PCT  = float(os.getenv("RISK_MIN_PCT", "0.012"))  # min SL distance = 1.2%
 RISK_MAX_PCT  = float(os.getenv("RISK_MAX_PCT", "0.03"))   # max SL distance = 3.0% (20x safe)
-TP1_R_MULT    = float(os.getenv("TP1_R_MULT", "1.5"))      # TP1 = entry ± risk * 1.5
+# 2026-06-11 TP1 sweep (20 sym, 90d×15m, trail 0.5): TP1=1.0R beats 1.5R on WR
+# (+13-16pp, 65-76% across 30/60/90d) at equal-or-better total R and half the DD.
+TP1_R_MULT    = float(os.getenv("TP1_R_MULT", "1.0"))      # TP1 = entry ± risk * 1.0
 TP2_R_MULT    = float(os.getenv("TP2_R_MULT", "2.0"))      # TP2 = entry ± risk * 2.0 (was 3.0 — unreachable)
 
 # Runner exit after TP1: trail the remaining 50% by ATR instead of fixed TP2.
 # Backtest (10 sym, 2880x15m): +21% net R, -27% max drawdown, same win rate vs
 # fixed TP2. Trailing stop = peak ∓ TRAIL_ATR_MULT×ATR, floored at breakeven.
 TRAIL_RUNNER_ENABLED = os.getenv("TRAIL_RUNNER_ENABLED", "1") != "0"
-TRAIL_ATR_MULT       = float(os.getenv("TRAIL_ATR_MULT", "0.75"))
+TRAIL_ATR_MULT       = float(os.getenv("TRAIL_ATR_MULT", "0.5"))  # 0.75→0.5: tighter lock, +6% R (90d A/B)
+
+# --- Research-validated setup cuts (2026-06-11, 20 sym, 30/60/90d backtests) ---
+# RSI_Div confirmations: WR 23%, -0.21R/tr over 22tr — divergence in 15m chop = noise.
+SKIP_RSI_DIV_SETUPS = os.getenv("SKIP_RSI_DIV_SETUPS", "1") != "0"
+# Monday (weekday 0) ~0R/tr over 53tr; 18-20 UTC ~+0.09R/tr over 38tr — dead zones.
+SKIP_UTC_HOURS = {h for h in os.getenv("SKIP_UTC_HOURS", "18,19,20").split(",") if h.strip()}
+SKIP_WEEKDAYS  = {d for d in os.getenv("SKIP_WEEKDAYS", "0").split(",") if d.strip()}
 
 # --- BTC correlation filter ---
 BTC_BLOCK_THRESHOLD_PCT = 1.0

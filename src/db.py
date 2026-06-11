@@ -640,17 +640,17 @@ def get_symbols_performance(days: int = 30, since_ts: float = None) -> list:
 
 
 def _status_r(status: str) -> float:
-    """R value of a closed trade outcome (fixed R model, TP1=1.5R TP2=2.0R SL=1R).
+    """R value of a closed trade outcome (fixed R model, TP1=1.0R TP2=2.0R SL=1R).
 
     NOTE: for TP1_TRAIL the real R is variable and stored in the realized_r column;
     this fixed value is only a fallback when realized_r is missing.
     """
-    # TP2: 50% closed at TP1 (0.75R) + 50% at TP2 (1.0R) = 1.75R
-    if status == "TP2_HIT":    return  1.75
+    # TP2: 50% closed at TP1 (0.5R) + 50% at TP2 (1.0R) = 1.5R
+    if status == "TP2_HIT":    return  1.50
     # Trailed runner — fallback estimate (real value comes from realized_r)
-    if status == "TP1_TRAIL":  return  1.00
-    # TP1 only outcomes: 50% at TP1 = 0.75R
-    if status in ("TP1_HIT", "BREAKEVEN", "TP1_EXPIRED"): return 0.75
+    if status == "TP1_TRAIL":  return  0.75
+    # TP1 only outcomes: 50% at TP1 = 0.5R
+    if status in ("TP1_HIT", "BREAKEVEN", "TP1_EXPIRED"): return 0.5
     # Full SL before TP1
     if status == "SL_HIT":     return -1.00
     # Expired before any TP — no profit, small fee drag (treat as 0)
