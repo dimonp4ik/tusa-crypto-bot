@@ -131,28 +131,44 @@ _ADMIN_KB = {
     "is_persistent":   True,
 }
 
-# Inline keyboard shown inside the panel message.
+# Inline keyboard shown inside the panel message — 4 section buttons.
 _ADMIN_KEYBOARD = {
     "inline_keyboard": [[
-        {"text": "📊 Статистика",       "callback_data": "adm_stats"},
-        {"text": "📋 Открытые сделки",  "callback_data": "adm_open"},
+        {"text": "📈 Торговля",   "callback_data": "adm_sec_trading"},
+        {"text": "🔧 Настройки", "callback_data": "adm_sec_settings"},
     ], [
-        {"text": "🚫 Авто-блок",        "callback_data": "adm_blocks"},
-        {"text": "🏆 Топ монет",        "callback_data": "adm_top"},
-        {"text": "💀 Худшие монеты",    "callback_data": "adm_worst"},
-    ], [
-        {"text": "👥 Пользователи",     "callback_data": "adm_users"},
-        {"text": "👮 Админы",           "callback_data": "adm_admins"},
-    ], [
-        {"text": "🗑 Управление сделками", "callback_data": "adm_deals"},
-        {"text": "💰 Бюджет Claude",       "callback_data": "adm_budget"},
-    ], [
-        {"text": "🔒 Блок монет",   "callback_data": "adm_manblock"},
-        {"text": "📊 Фильтры",      "callback_data": "adm_filters"},
-    ], [
-        {"text": "🔍 История сетапов", "callback_data": "adm_setups"},
+        {"text": "📊 Аналитика", "callback_data": "adm_sec_analytics"},
+        {"text": "👥 Люди",      "callback_data": "adm_sec_people"},
     ]]
 }
+
+_BACK_ROW = [{"text": "« Назад", "callback_data": "adm_back"}]
+
+_KB_TRADING = {"inline_keyboard": [[
+    {"text": "📊 Статистика",      "callback_data": "adm_stats"},
+    {"text": "📋 Открытые сделки", "callback_data": "adm_open"},
+], [
+    {"text": "🗑 Управление",      "callback_data": "adm_deals"},
+    {"text": "🔍 История сетапов", "callback_data": "adm_setups"},
+], [_BACK_ROW[0]]]}
+
+_KB_SETTINGS = {"inline_keyboard": [[
+    {"text": "📊 Фильтры",       "callback_data": "adm_filters"},
+    {"text": "🔒 Блок монет",    "callback_data": "adm_manblock"},
+], [
+    {"text": "🚫 Авто-блок",     "callback_data": "adm_blocks"},
+    {"text": "💰 Бюджет Claude", "callback_data": "adm_budget"},
+], [_BACK_ROW[0]]]}
+
+_KB_ANALYTICS = {"inline_keyboard": [[
+    {"text": "🏆 Топ монет",     "callback_data": "adm_top"},
+    {"text": "💀 Худшие монеты", "callback_data": "adm_worst"},
+], [_BACK_ROW[0]]]}
+
+_KB_PEOPLE = {"inline_keyboard": [[
+    {"text": "👥 Пользователи", "callback_data": "adm_users"},
+    {"text": "👮 Админы",       "callback_data": "adm_admins"},
+], [_BACK_ROW[0]]]}
 
 
 def _send_persistent_menu(chat_id: int, is_admin: bool = False):
@@ -511,7 +527,19 @@ def _handle_admin_callback(callback_id: str, chat_id: int,
     if not _silent_cb:
         _answer_callback(callback_id)
 
-    if data == "adm_stats":
+    if data == "adm_sec_trading":
+        _edit_admin_text(chat_id, message_id, "📈 *Торговля*\nВыбери раздел:", _KB_TRADING)
+
+    elif data == "adm_sec_settings":
+        _edit_admin_text(chat_id, message_id, "🔧 *Настройки*\nВыбери раздел:", _KB_SETTINGS)
+
+    elif data == "adm_sec_analytics":
+        _edit_admin_text(chat_id, message_id, "📊 *Аналитика*\nВыбери раздел:", _KB_ANALYTICS)
+
+    elif data == "adm_sec_people":
+        _edit_admin_text(chat_id, message_id, "👥 *Люди*\nВыбери раздел:", _KB_PEOPLE)
+
+    elif data == "adm_stats":
         try:
             _now_riga      = datetime.now(_riga_tz())
             _riga_midnight = _now_riga.replace(hour=0, minute=0, second=0, microsecond=0).timestamp()
