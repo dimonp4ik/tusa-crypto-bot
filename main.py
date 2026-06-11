@@ -29,7 +29,7 @@ from config import (
 )
 from src.binance_client import (
     get_top_coins, get_klines, get_klines_1h, get_klines_4h, get_klines_1d,
-    get_btc_change_1h, get_funding_rate, get_current_price,
+    get_btc_change_1h, get_btc_change_1d, get_funding_rate, get_current_price,
 )
 from src.signal_filter import analyze_coin_smc
 from src.claude_analyzer import analyze_batch_with_claude, analyze_heavy
@@ -1727,9 +1727,10 @@ def run_scan():
         except Exception as e:
             log.warning(f"Major event check failed: {e}")
 
-        # Step 0b: BTC 1h change for correlation filter
+        # Step 0b: BTC 1h change for correlation filter + 1D for Claude macro context
         btc_change = get_btc_change_1h()
-        log.info(f"BTC 1h change: {btc_change:+.2f}%")
+        btc_change_1d = get_btc_change_1d()
+        log.info(f"BTC change: {btc_change:+.2f}% 1h, {btc_change_1d:+.2f}% 1D")
 
         # Auto-block symbols with consistently bad stats (local DB, no API calls)
         new_blocks = auto_block_bad_symbols()
@@ -1819,9 +1820,12 @@ def run_scan():
             log.info("=== Scan complete — 0 signal(s) sent ===\n")
             return
 
-        # Step 4: LIGHT tier — ONE batch call to Claude Haiku (cached rules + news)
+        # Step 4: LIGHT tier — ONE batch call to Claude (cached rules + news + BTC macro)
+        claude_ctx = dict(news or {})
+        claude_ctx["btc_1h"] = btc_change
+        claude_ctx["btc_1d"] = btc_change_1d
         try:
-            analyses = analyze_batch_with_claude(enriched, news_context=news)
+            analyses = analyze_batch_with_claude(enriched, news_context=claude_ctx)
         except Exception as e:
             log.error(f"Claude LIGHT batch call failed: {e}")
             return
@@ -1840,7 +1844,7 @@ def run_scan():
             if decision in ("LONG", "SHORT") and conf != "LOW" and score >= CLAUDE_HEAVY_MIN_SCORE:
                 try:
                     history = get_recent_outcomes(analysis["symbol"], limit=CLAUDE_MEMORY_LIMIT)
-                    heavy = analyze_heavy(analysis, news_context=news, history=history)
+                    heavy = analyze_heavy(analysis, news_context=claude_ctx, history=history)
                     for k in ("decision", "confidence", "risk_score", "trend_strength", "reason", "counter"):
                         if k in heavy:
                             analysis[k] = heavy[k]

@@ -185,14 +185,26 @@ def _setup_line_heavy(i: int, s: dict) -> str:
 def _news_block(news_context: dict) -> str:
     if not news_context:
         return ""
+    parts = []
+    btc_1d = news_context.get("btc_1d")
+    btc_1h = news_context.get("btc_1h")
+    if btc_1d is not None or btc_1h is not None:
+        d = f"{btc_1d:+.2f}% 1D" if btc_1d is not None else ""
+        h = f"{btc_1h:+.2f}% 1h" if btc_1h is not None else ""
+        sep = ", " if d and h else ""
+        parts.append(
+            f"\nBTC MARKET: {d}{sep}{h}\n"
+            f"Rule: strong BTC up-day → altcoin SHORTs fight the macro tide; "
+            f"strong BTC down-day → altcoin LONGs fight it.\n"
+        )
     sent = news_context.get("sentiment", "NEUTRAL")
     summ = news_context.get("summary", "")
     if sent != "NEUTRAL" and summ:
-        return (
+        parts.append(
             f"\nNEWS CONTEXT: {sent} — {summ}\n"
             f"Rule: BEARISH news → avoid LONG; BULLISH news → avoid SHORT.\n"
         )
-    return ""
+    return "".join(parts)
 
 
 def _system_param() -> list:
