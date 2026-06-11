@@ -989,12 +989,17 @@ def _format_setups_page(rows: list, date_str: str) -> str:
         dec_icon = "✅" if dec in ("LONG", "SHORT") else "❌"
         sent_icon = "📤 отправлен" if sent else "🚫 отклонён"
 
-        entry_s = f"{entry:.4g}" if entry else "?"
-        tp1_s   = f"{tp1:.4g}" if tp1 else "?"
-        tp2_s   = f"{tp2:.4g}" if tp2 else "?"
+        def _px(v):
+            if v is None: return "?"
+            return f"{v:,.0f}" if v >= 100 else f"{v:.4g}"
+
+        entry_s = _px(entry)
+        tp1_s   = _px(tp1)
+        tp2_s   = _px(tp2)
         risk_s  = f" R{risk}" if risk is not None else ""
         conf_s  = f" {conf}" if conf else ""
-        reason_short = reason[:60] + "…" if len(reason) > 60 else reason
+        reason_safe  = reason.replace("_", "\\_").replace("*", "\\*")[:60]
+        reason_short = (reason_safe + "…") if len(reason) > 60 else reason_safe
 
         lines.append(
             f"{ts_str} {dir_icon} *{sym}* {direct}\n"
