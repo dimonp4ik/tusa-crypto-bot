@@ -70,6 +70,7 @@ from config import (  # noqa: E402
     MIN_24H_QUOTE_VOLUME_USDT,
 )
 from src.signal_filter import analyze_coin_smc  # noqa: E402
+from src.knn_analog import knn_direction_score  # noqa: E402
 
 
 PROJECT_DIR = Path(__file__).resolve().parent
@@ -530,6 +531,7 @@ class TradeRecord:
     signals: str = ""
     score_tags: str = ""
     premium: int = 0
+    knn_score: float = -1.0
 
 
 @dataclass
@@ -720,6 +722,7 @@ def simulate_trade_direct(
         signals=" | ".join(setup.get("signals", [])),
         score_tags=" | ".join(setup.get("score_tags", [])),
         premium=int(bool(setup.get("premium"))),
+        knn_score=float(setup.get("_knn_score", -1.0)),
     )
 
 
@@ -798,6 +801,15 @@ def backtest_symbol(
                                  candles_1d=snap_1d)
         if not setup:
             continue
+
+        # k-NN price-shape analog score (research column, no look-ahead).
+        # KNN_MAXHIST env caps the analog pool to test required live candle depth.
+        _mh = os.getenv("KNN_MAXHIST", "").strip()
+        knn = knn_direction_score(
+            c15, i, setup["direction"],
+            max_history=int(_mh) if _mh else None,
+        )
+        setup["_knn_score"] = -1.0 if knn is None else knn
 
         trade = simulate_trade_direct(
             symbol,
@@ -884,7 +896,7 @@ def write_trades_csv(path: str, trades: list[TradeRecord]) -> None:
         "quality_score", "trend_score", "volatility_score",
         "entry_quality_score", "portfolio_risk_score",
         "session", "trend_1h", "trend_4h", "entry_source",
-        "signals", "score_tags", "premium",
+        "signals", "score_tags", "premium", "knn_score",
     ]
     with open(path, "w", newline="", encoding="utf-8") as f:
         writer = csv.DictWriter(f, fieldnames=fields)

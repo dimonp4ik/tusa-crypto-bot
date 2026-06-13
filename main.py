@@ -26,12 +26,16 @@ from config import (
     MAX_SETUPS_TO_CLAUDE, ALLOWED_SYMBOLS, KLINES_INTERVAL_SEC, SIGNAL_EXPIRY_HOURS,
     CLAUDE_HEAVY_MIN_SCORE, CLAUDE_HEAVY_MAX_PER_SCAN, CLAUDE_MEMORY_LIMIT,
     TRAIL_RUNNER_ENABLED, TRAIL_ATR_MULT,
+    KNN_RISK_OVERLAY, KNN_DEEP_CANDLES, KNN_MAX_HISTORY, KNN_SHAPE_LEN,
+    KNN_HORIZON, KNN_K, KNN_MIN_HISTORY, KNN_HIGH_SCORE, KNN_HIGH_MULT,
+    KNN_LOW_SCORE, KNN_LOW_MULT, KNN_RISK_MAX_MULT, KNN_RISK_MIN_MULT,
 )
 from src.binance_client import (
     get_top_coins, get_klines, get_klines_1h, get_klines_4h, get_klines_1d,
     get_btc_change_1h, get_btc_change_1d, get_funding_rate, get_current_price,
 )
 from src.signal_filter import analyze_coin_smc
+from src.knn_analog import knn_direction_score, knn_risk_mult
 from src.claude_analyzer import analyze_batch_with_claude, analyze_heavy
 from src.telegram_notifier import send_signal, send_status, send_news_alert, send_signal_update, calculate_tp_sl, send_morning_digest
 from src.news_filter import check_news_sentiment
@@ -1690,6 +1694,47 @@ def _cache_signal(symbol: str, direction: str):
     _signal_cache[symbol] = (direction, time.time())
 
 
+def _apply_knn_overlay(setup: dict, symbol: str) -> None:
+    """
+    k-NN price-shape analog risk overlay (Kronos-inspired, CPU-only).
+
+    Deep-fetches a ~1000-candle 15m series (1 Bybit page) for this already-
+    qualified setup, scores how often the symbol's most-similar past windows
+    moved in the trade direction, and folds the result into setup['risk_mult']
+    as a position-size suggestion. Size up on strong analogs (≥0.55), down on
+    weak ones (<0.50). Never gates — a failure leaves the setup untouched.
+    """
+    setup["knn_score"] = None
+    if not KNN_RISK_OVERLAY:
+        return
+    try:
+        deep = get_klines(symbol, limit=KNN_DEEP_CANDLES)
+        n = len(deep.get("close", []))
+        score = knn_direction_score(
+            deep, n, setup["direction"],
+            shape_len=KNN_SHAPE_LEN, horizon=KNN_HORIZON, k=KNN_K,
+            min_history=KNN_MIN_HISTORY, max_history=KNN_MAX_HISTORY,
+        )
+        setup["knn_score"] = score
+        mult, tag = knn_risk_mult(
+            score,
+            high_score=KNN_HIGH_SCORE, high_mult=KNN_HIGH_MULT,
+            low_score=KNN_LOW_SCORE, low_mult=KNN_LOW_MULT,
+        )
+        if mult != 1.0:
+            base = float(setup.get("risk_mult", 1.0) or 1.0)
+            new  = max(KNN_RISK_MIN_MULT, min(KNN_RISK_MAX_MULT, base * mult))
+            setup["risk_mult"] = round(new, 4)
+            if tag:
+                setup.setdefault("score_tags", []).append(tag)
+                # Refresh the (display-only) "Risk x.." chip rather than duplicate it.
+                sigs = [s for s in setup.get("signals", []) if not str(s).startswith("Risk x")]
+                sigs.append(f"Risk x{new:.2f}")
+                setup["signals"] = sigs
+    except Exception as e:
+        log.warning(f"  kNN overlay skipped {symbol}: {e}")
+
+
 def _setup_rank(setup: dict) -> tuple:
     """Rank setups before Claude so only the strongest spend LLM tokens."""
     mtf_score    = int(setup.get("mtf_score", 0) or 0)
@@ -1884,6 +1929,7 @@ def run_scan():
                 df_1d  = get_klines_1d(symbol)
                 setup  = analyze_coin_smc(df_15m, df_1h, symbol, df_4h, btc_change, df_1d)
                 if setup:
+                    _apply_knn_overlay(setup, symbol)
                     log.info(
                         f"  SMC setup: {symbol:12s}  {setup['direction']}  "
                         f"1d={setup.get('trend_1d','?')} 4h={setup['trend_4h']} 1h={setup['trend_1h']}  "

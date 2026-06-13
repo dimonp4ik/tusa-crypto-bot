@@ -327,6 +327,28 @@ TP2_R_MULT    = float(os.getenv("TP2_R_MULT", "2.0"))      # TP2 = entry ± risk
 TRAIL_RUNNER_ENABLED = os.getenv("TRAIL_RUNNER_ENABLED", "1") != "0"
 TRAIL_ATR_MULT       = float(os.getenv("TRAIL_ATR_MULT", "0.5"))  # 0.75→0.5: tighter lock, +6% R (90d A/B)
 
+# --- k-NN price-shape analog risk overlay (Kronos-inspired, CPU-only) ----------
+# After a setup passes, fetch a deep 15m series and match the recent price shape
+# against the symbol's own past (nearest-neighbour). Score = fraction of the K
+# most-similar past windows whose forward move favoured the trade direction.
+# Backtest (2026-06-13, 90d, live-like 800-bar pool): score>=0.55 → WR ~68%,
+# score<0.50 → WR ~59%. Used as a size multiplier (no gating) → +6% total R,
+# trade frequency unchanged. Edge needs a deep pool, so a ~1000-candle fetch is
+# done ONLY for symbols that already produced a setup (rare → cheap).
+KNN_RISK_OVERLAY   = os.getenv("KNN_RISK_OVERLAY", "1") != "0"
+KNN_DEEP_CANDLES   = int(os.getenv("KNN_DEEP_CANDLES", "1000"))   # 1 Bybit page
+KNN_MAX_HISTORY    = int(os.getenv("KNN_MAX_HISTORY", "800"))     # analog pool cap
+KNN_SHAPE_LEN      = int(os.getenv("KNN_SHAPE_LEN", "12"))        # query window (3h)
+KNN_HORIZON        = int(os.getenv("KNN_HORIZON", "16"))          # forward bars (4h)
+KNN_K              = int(os.getenv("KNN_K", "40"))                # neighbours
+KNN_MIN_HISTORY    = int(os.getenv("KNN_MIN_HISTORY", "120"))     # min bars to score
+KNN_HIGH_SCORE     = float(os.getenv("KNN_HIGH_SCORE", "0.55"))   # size-up threshold
+KNN_HIGH_MULT      = float(os.getenv("KNN_HIGH_MULT", "1.20"))    # size-up multiplier
+KNN_LOW_SCORE      = float(os.getenv("KNN_LOW_SCORE", "0.50"))    # size-down threshold
+KNN_LOW_MULT       = float(os.getenv("KNN_LOW_MULT", "0.80"))     # size-down multiplier
+KNN_RISK_MAX_MULT  = float(os.getenv("KNN_RISK_MAX_MULT", "1.50"))  # cap after overlays
+KNN_RISK_MIN_MULT  = float(os.getenv("KNN_RISK_MIN_MULT", "0.50"))  # floor after overlays
+
 # --- Research-validated setup cuts (2026-06-11, 20 sym, 30/60/90d backtests) ---
 # RSI_Div confirmations: WR 23%, -0.21R/tr over 22tr — divergence in 15m chop = noise.
 SKIP_RSI_DIV_SETUPS = os.getenv("SKIP_RSI_DIV_SETUPS", "1") != "0"
