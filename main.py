@@ -78,7 +78,16 @@ _pending_block_chat: dict = {}
 _pending_users_search: dict = {}
 # State: admin is typing a date to view setup history.
 _pending_setups_date: dict = {}
+# State: which admin sub-section each chat is currently in, so detail-view
+# "« Назад" returns to that section menu instead of the top-level panel.
+_admin_section: dict = {}
 _photo_panel_messages: set = set()
+
+
+def _sec_back_cb(chat_id) -> str:
+    """Callback for a detail-view back button: the chat's current section,
+    or the top-level panel if no section is tracked."""
+    return _admin_section.get(chat_id, "adm_back")
 
 # Last scan summary — populated by run_scan(), shown in 📊 Фильтры panel.
 _last_scan_stats: dict = {
@@ -207,7 +216,7 @@ def _mark_photo_panel_message(chat_id: int, message_id: int):
 
 
 def _send_admin_text(chat_id: int, text: str, reply_markup: dict):
-    return _requests.post(
+    resp = _requests.post(
         f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage",
         json={
             "chat_id": chat_id,
@@ -217,6 +226,16 @@ def _send_admin_text(chat_id: int, text: str, reply_markup: dict):
         },
         timeout=10,
     )
+    # Markdown parse failures return 400 and silently drop the message. Retry as
+    # plain text so the admin always gets a reply (e.g. a setup reason with an
+    # unbalanced `*`/`_`/backtick that slipped past escaping).
+    if resp.status_code != 200 and "parse" in _telegram_error(resp).lower():
+        resp = _requests.post(
+            f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage",
+            json={"chat_id": chat_id, "text": text, "reply_markup": reply_markup},
+            timeout=10,
+        )
+    return resp
 
 
 def _clear_inline_keyboard(chat_id: int, message_id: int):
@@ -407,7 +426,7 @@ def _render_deals_page(chat_id: int, message_id: int, page: int, symbol: str = N
 
     if symbol:
         kb_rows.append([{"text": "📋 Все сделки", "callback_data": "adm_deals_p0"}])
-    kb_rows.append([{"text": "« Назад", "callback_data": "adm_back"}])
+    kb_rows.append([{"text": "« Назад", "callback_data": _sec_back_cb(chat_id)}])
 
     _edit_with_keyboard(chat_id, message_id, "\n".join(lines), kb_rows)
 
@@ -473,15 +492,17 @@ def _render_manual_block_panel(chat_id: int, message_id: int):
             kb_rows.append(row)
 
     kb_rows.append([{"text": "✏️ Ввести символ вручную", "callback_data": "adm_mb_input"}])
-    kb_rows.append([{"text": "« Назад", "callback_data": "adm_back"}])
+    kb_rows.append([{"text": "« Назад", "callback_data": _sec_back_cb(chat_id)}])
 
     _edit_with_keyboard(chat_id, message_id, "\n".join(lines), kb_rows)
 
 
 def _edit_message(chat_id: int, message_id: int, text: str):
-    """Edit an existing message and re-attach the keyboard."""
+    """Edit a detail view and attach a back button to the chat's current
+    section (not the top-level panel), so the admin stays where they were."""
     try:
-        _edit_admin_text(chat_id, message_id, text, _ADMIN_KEYBOARD)
+        back = {"inline_keyboard": [[{"text": "« Назад", "callback_data": _sec_back_cb(chat_id)}]]}
+        _edit_admin_text(chat_id, message_id, text, back)
     except Exception as e:
         log.warning(f"_edit_message failed: {e}")
 
@@ -519,7 +540,7 @@ def _render_users_page(chat_id: int, message_id: int, page: int, query: str = ""
         kb_rows.append(nav)
     if query:
         kb_rows.append([{"text": "❌ Сбросить поиск", "callback_data": "adm_users_p0"}])
-    kb_rows.append([{"text": "« Назад", "callback_data": "adm_back"}])
+    kb_rows.append([{"text": "« Назад", "callback_data": _sec_back_cb(chat_id)}])
     _edit_with_keyboard(chat_id, message_id, "\n".join(lines), kb_rows)
 
 
@@ -530,6 +551,9 @@ def _handle_admin_callback(callback_id: str, chat_id: int,
     _silent_cb = data.startswith("adm_mb_block_") or data.startswith("adm_mb_unblock_")
     if not _silent_cb:
         _answer_callback(callback_id)
+
+    if data in ("adm_sec_trading", "adm_sec_settings", "adm_sec_analytics", "adm_sec_people"):
+        _admin_section[chat_id] = data
 
     if data == "adm_sec_trading":
         _edit_admin_text(chat_id, message_id, "📈 *Торговля*\nВыбери раздел:", _KB_TRADING)
@@ -605,7 +629,7 @@ def _handle_admin_callback(callback_id: str, chat_id: int,
                     }])
                 # add back-row with main buttons
                 keyboard_rows.append([
-                    {"text": "« Назад", "callback_data": "adm_back"}
+                    {"text": "« Назад", "callback_data": _sec_back_cb(chat_id)}
                 ])
                 _edit_with_keyboard(chat_id, message_id, "\n".join(lines), keyboard_rows)
         except Exception as e:
@@ -647,7 +671,7 @@ def _handle_admin_callback(callback_id: str, chat_id: int,
                 {"text": "📅 Сегодня", "callback_data": "adm_top_d0"},
                 {"text": "📅 7 дней",  "callback_data": "adm_top_d7"},
                 {"text": "📅 30 дней", "callback_data": "adm_top_d30"},
-            ], [{"text": "« Назад", "callback_data": "adm_back"}]]
+            ], [{"text": "« Назад", "callback_data": _sec_back_cb(chat_id)}]]
             _edit_with_keyboard(chat_id, message_id, txt, period_kb)
         except Exception as e:
             _edit_message(chat_id, message_id, f"Ошибка: {e}")
@@ -679,7 +703,7 @@ def _handle_admin_callback(callback_id: str, chat_id: int,
                 {"text": "📅 Сегодня", "callback_data": "adm_worst_d0"},
                 {"text": "📅 7 дней",  "callback_data": "adm_worst_d7"},
                 {"text": "📅 30 дней", "callback_data": "adm_worst_d30"},
-            ], [{"text": "« Назад", "callback_data": "adm_back"}]]
+            ], [{"text": "« Назад", "callback_data": _sec_back_cb(chat_id)}]]
             _edit_with_keyboard(chat_id, message_id, txt, period_kb)
         except Exception as e:
             _edit_message(chat_id, message_id, f"Ошибка: {e}")
@@ -747,7 +771,7 @@ def _handle_admin_callback(callback_id: str, chat_id: int,
                     "text": "➕ Добавить администратора",
                     "callback_data": "adm_add_admin",
                 }])
-            kb_rows.append([{"text": "« Назад", "callback_data": "adm_back"}])
+            kb_rows.append([{"text": "« Назад", "callback_data": _sec_back_cb(chat_id)}])
             _edit_with_keyboard(chat_id, message_id, "\n".join(lines), kb_rows)
         except Exception as e:
             _edit_message(chat_id, message_id, f"Ошибка: {e}")
@@ -971,7 +995,7 @@ def _handle_admin_callback(callback_id: str, chat_id: int,
         txt = _format_setups_page(rows, date_str)
         _edit_with_keyboard(chat_id, message_id, txt, [[
             {"text": "📅 Другая дата", "callback_data": "adm_setups_date"},
-            {"text": "« Назад",        "callback_data": "adm_back"},
+            {"text": "« Назад",        "callback_data": _sec_back_cb(chat_id)},
         ]])
 
     elif data == "adm_setups_date":
@@ -990,7 +1014,8 @@ def _handle_admin_callback(callback_id: str, chat_id: int,
             log.warning(f"setups_date prompt failed: {e}")
 
     elif data == "adm_back":
-        _edit_message(chat_id, message_id, "🛠 *TUSA Admin Panel*\nВыбери раздел:")
+        _admin_section.pop(chat_id, None)
+        _edit_admin_text(chat_id, message_id, "🛠 *TUSA Admin Panel*\nВыбери раздел:", _ADMIN_KEYBOARD)
 
     elif data == "adm_open_new":
         # Sent after user-search results (new message, no message_id to edit) — open fresh panel
@@ -1402,21 +1427,25 @@ def webhook():
 
     # ── Pending "setups date" state — admin typed a date ─────────────────────
     if is_dm and _is_admin(user_id) and chat_id in _pending_setups_date:
-        orig_msg_id = _pending_setups_date.pop(chat_id)
+        _pending_setups_date.pop(chat_id)
         date_input = text_raw.strip()
-        rows = get_setups_by_date(date_input)
-        if rows is None or (not rows and date_input):
-            _send_admin_text(
-                chat_id,
-                f"📅 Нет сетапов за *{date_input}* или неверный формат.\nФормат: `10.06` или `10.06.2026`",
-                {"inline_keyboard": [[{"text": "« К панели", "callback_data": "adm_open_new"}]]},
-            )
-        else:
-            txt = _format_setups_page(rows, date_input)
-            _send_admin_text(chat_id, txt, {"inline_keyboard": [[
-                {"text": "📅 Другая дата", "callback_data": "adm_setups_date"},
-                {"text": "« К панели",     "callback_data": "adm_open_new"},
-            ]]})
+        back_kb = {"inline_keyboard": [[
+            {"text": "📅 Другая дата", "callback_data": "adm_setups_date"},
+            {"text": "« Назад",        "callback_data": _sec_back_cb(chat_id)},
+        ]]}
+        try:
+            rows = get_setups_by_date(date_input)
+            if rows is None or (not rows and date_input):
+                _send_admin_text(
+                    chat_id,
+                    f"📅 Нет сетапов за *{date_input}* или неверный формат.\nФормат: `10.06` или `10.06.2026`",
+                    back_kb,
+                )
+            else:
+                _send_admin_text(chat_id, _format_setups_page(rows, date_input), back_kb)
+        except Exception as e:
+            log.warning(f"setups date '{date_input}' failed: {e}")
+            _send_admin_text(chat_id, f"Ошибка при загрузке сетапов за {date_input}.", back_kb)
         return "ok", 200
 
     # ── Pending "manual block" state — admin typed a symbol to block ──────────
