@@ -11,6 +11,7 @@ Flow every N minutes:
 
 import logging
 import os
+import re
 import time
 import threading
 from datetime import datetime, timezone
@@ -88,6 +89,33 @@ def _sec_back_cb(chat_id) -> str:
     """Callback for a detail-view back button: the chat's current section,
     or the top-level panel if no section is tracked."""
     return _admin_section.get(chat_id, "adm_back")
+
+
+# A bare date like "11.06" or "11.06.2026" typed by an admin in DM is treated
+# as a setup-history lookup — no need to press "Другая дата" first.
+_DATE_RE = re.compile(r"^\d{1,2}\.\d{1,2}(?:\.\d{2,4})?$")
+
+
+def _send_setups_for_date(chat_id, date_input: str):
+    """Look up setup history for date_input and send it (with a plain-text
+    Markdown fallback inside _send_admin_text). Always replies."""
+    back_kb = {"inline_keyboard": [[
+        {"text": "📅 Другая дата", "callback_data": "adm_setups_date"},
+        {"text": "« Назад",        "callback_data": _sec_back_cb(chat_id)},
+    ]]}
+    try:
+        rows = get_setups_by_date(date_input)
+        if rows is None or (not rows and date_input):
+            _send_admin_text(
+                chat_id,
+                f"📅 Нет сетапов за *{date_input}* или неверный формат.\nФормат: `10.06` или `10.06.2026`",
+                back_kb,
+            )
+        else:
+            _send_admin_text(chat_id, _format_setups_page(rows, date_input), back_kb)
+    except Exception as e:
+        log.warning(f"setups date '{date_input}' failed: {e}")
+        _send_admin_text(chat_id, f"Ошибка при загрузке сетапов за {date_input}.", back_kb)
 
 # Last scan summary — populated by run_scan(), shown in 📊 Фильтры panel.
 _last_scan_stats: dict = {
@@ -1425,27 +1453,13 @@ def webhook():
             _send_admin_text(chat_id, f"Ошибка поиска: {e}", _back_kb)
         return "ok", 200
 
-    # ── Pending "setups date" state — admin typed a date ─────────────────────
-    if is_dm and _is_admin(user_id) and chat_id in _pending_setups_date:
-        _pending_setups_date.pop(chat_id)
-        date_input = text_raw.strip()
-        back_kb = {"inline_keyboard": [[
-            {"text": "📅 Другая дата", "callback_data": "adm_setups_date"},
-            {"text": "« Назад",        "callback_data": _sec_back_cb(chat_id)},
-        ]]}
-        try:
-            rows = get_setups_by_date(date_input)
-            if rows is None or (not rows and date_input):
-                _send_admin_text(
-                    chat_id,
-                    f"📅 Нет сетапов за *{date_input}* или неверный формат.\nФормат: `10.06` или `10.06.2026`",
-                    back_kb,
-                )
-            else:
-                _send_admin_text(chat_id, _format_setups_page(rows, date_input), back_kb)
-        except Exception as e:
-            log.warning(f"setups date '{date_input}' failed: {e}")
-            _send_admin_text(chat_id, f"Ошибка при загрузке сетапов за {date_input}.", back_kb)
+    # ── Setup-history date — armed via "Другая дата" OR a bare typed date ─────
+    # Admins can just type "11.06" while in the panel; the button is optional.
+    if is_dm and _is_admin(user_id) and (
+        chat_id in _pending_setups_date or _DATE_RE.match(text_raw.strip())
+    ):
+        _pending_setups_date.pop(chat_id, None)
+        _send_setups_for_date(chat_id, text_raw.strip())
         return "ok", 200
 
     # ── Pending "manual block" state — admin typed a symbol to block ──────────
