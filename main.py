@@ -11,7 +11,6 @@ Flow every N minutes:
 
 import logging
 import os
-import re
 import time
 import threading
 from datetime import datetime, timezone
@@ -89,11 +88,6 @@ def _sec_back_cb(chat_id) -> str:
     """Callback for a detail-view back button: the chat's current section,
     or the top-level panel if no section is tracked."""
     return _admin_section.get(chat_id, "adm_back")
-
-
-# A bare date like "11.06" or "11.06.2026" typed by an admin in DM is treated
-# as a setup-history lookup — no need to press "Другая дата" first.
-_DATE_RE = re.compile(r"^\d{1,2}\.\d{1,2}(?:\.\d{2,4})?$")
 
 
 def _send_setups_for_date(chat_id, date_input: str):
@@ -1453,12 +1447,10 @@ def webhook():
             _send_admin_text(chat_id, f"Ошибка поиска: {e}", _back_kb)
         return "ok", 200
 
-    # ── Setup-history date — armed via "Другая дата" OR a bare typed date ─────
-    # Admins can just type "11.06"; the button is optional. Works in DM and in
-    # the signal group (no is_dm gate) — only the chat_id sign differs there.
-    if _is_admin(user_id) and (
-        chat_id in _pending_setups_date or _DATE_RE.match(text_raw.strip())
-    ):
+    # ── Setup-history date — only after pressing "Другая дата" (armed state) ──
+    # Works in DM and in the signal group (no is_dm gate); a bare date typed
+    # without arming the button is intentionally ignored.
+    if _is_admin(user_id) and chat_id in _pending_setups_date:
         _pending_setups_date.pop(chat_id, None)
         _send_setups_for_date(chat_id, text_raw.strip())
         return "ok", 200
