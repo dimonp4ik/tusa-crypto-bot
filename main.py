@@ -1454,8 +1454,9 @@ def webhook():
         return "ok", 200
 
     # ── Setup-history date — armed via "Другая дата" OR a bare typed date ─────
-    # Admins can just type "11.06" while in the panel; the button is optional.
-    if is_dm and _is_admin(user_id) and (
+    # Admins can just type "11.06"; the button is optional. Works in DM and in
+    # the signal group (no is_dm gate) — only the chat_id sign differs there.
+    if _is_admin(user_id) and (
         chat_id in _pending_setups_date or _DATE_RE.match(text_raw.strip())
     ):
         _pending_setups_date.pop(chat_id, None)
