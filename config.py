@@ -158,6 +158,12 @@ DAILY_TREND_SHORT_FILTER = os.getenv("DAILY_TREND_SHORT_FILTER", "1") != "0"
 EFF_RATIO_FILTER   = os.getenv("EFF_RATIO_FILTER", "1") != "0"
 EFF_RATIO_LOOKBACK = int(os.getenv("EFF_RATIO_LOOKBACK", "20"))
 EFF_RATIO_MIN      = float(os.getenv("EFF_RATIO_MIN", "0.15"))
+# Premium/Discount structure gate — "discount" only counts as a buy signal inside
+# a bullish/neutral dealing range, "premium" only inside a bearish/neutral one. In
+# a clean lower-high+lower-low down-structure, price below the range midpoint is
+# mid-decline, not cheap — without this a LONG into descending swings wrongly got
+# a "Discount" confirmation (the 16.06 XRP loss). Set PD_TREND_GATE=0 to disable.
+PD_TREND_GATE      = os.getenv("PD_TREND_GATE", "1") != "0"
 # №B Strict HTF alignment — DROPPED (default off). Backtested: 232tr +0.04R/+8R,
 #    half of baseline. Cutting counter-trend also cut winners. Flag kept for experiments.
 REQUIRE_STRICT_HTF = os.getenv("REQUIRE_STRICT_HTF", "0") != "0"

@@ -6,7 +6,7 @@ No pandas, no numpy — works on any Python version.
 import sys
 import os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from config import SMC_SWING_LOOKBACK, SMC_FVG_MIN_PCT, SMC_OB_LOOKBACK, ATR_PERIOD, EFF_RATIO_LOOKBACK
+from config import SMC_SWING_LOOKBACK, SMC_FVG_MIN_PCT, SMC_OB_LOOKBACK, ATR_PERIOD, EFF_RATIO_LOOKBACK, PD_TREND_GATE
 
 
 # ── Basic indicators ──────────────────────────────────────────────────────────
@@ -558,6 +558,13 @@ def get_premium_discount(swing_highs: list, swing_lows: list,
 
     Below 50% of the swing range = Discount (cheaper, prefer LONG entries).
     Above 50% of the swing range = Premium (expensive, prefer SHORT entries).
+
+    Structure gate (PD_TREND_GATE, default on): "discount" is only a buy signal
+    inside a bullish/neutral dealing range. In a clear down-structure (lower-high
+    AND lower-low) the whole range is a bear retracement — price below midpoint is
+    NOT cheap, it is mid-decline. Likewise "premium" is meaningless in a clean
+    up-structure. Without this gate a LONG into a lower-high sequence wrongly
+    earned a "Discount" confirmation (the 16.06 XRP loss).
     """
     if not swing_highs or not swing_lows or not closes:
         return {"in_discount": False, "in_premium": False, "midpoint": closes[-1] if closes else 0}
@@ -567,9 +574,20 @@ def get_premium_discount(swing_highs: list, swing_lows: list,
         return {"in_discount": False, "in_premium": False, "midpoint": closes[-1]}
     mid     = (hi + lo) / 2
     current = closes[-1]
+    in_discount = current < mid
+    in_premium  = current > mid
+
+    if PD_TREND_GATE and len(swing_highs) >= 2 and len(swing_lows) >= 2:
+        bear = swing_highs[-1][1] < swing_highs[-2][1] and swing_lows[-1][1] < swing_lows[-2][1]
+        bull = swing_highs[-1][1] > swing_highs[-2][1] and swing_lows[-1][1] > swing_lows[-2][1]
+        if bear:   # down-structure: "discount" is just mid-decline, not cheap
+            in_discount = False
+        if bull:   # up-structure: "premium" is just mid-rally, not expensive
+            in_premium = False
+
     return {
-        "in_discount": current < mid,
-        "in_premium":  current > mid,
+        "in_discount": in_discount,
+        "in_premium":  in_premium,
         "midpoint":    round(mid, 8),
     }
 
