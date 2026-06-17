@@ -56,7 +56,8 @@ WHAT THE SCORES MEAN
 - 💎PREM: Premium triple-confluence (OB+FVG zones overlap + liquidity sweep). Statistically highest-WR setup in backtests. Favor HIGH confidence when trend and zone also align.
 - Confs: additional confirmations beyond FVG/OB/SW — ChoCH (Change of Character, micro-structure shift), RSI_Div (RSI divergence), MACD_Div, Engulfing, BullWick/BearWick (rejection wick pressure), StochCross (stochastic momentum cross). More = stronger.
 - PRE-FILTERS ALREADY APPLIED: upstream code removed: ER<0.15 (chop), RSI exhaustion, bear-trend hot-vol (overcrowded shorts), BOS-without-RSI-midline (momentum gap). What you see has already passed a strict quality stack.
-- Hist[...]: YOUR OWN track record on similar past setups (same direction + same symbol or nearby score), measured by what actually happened. "rejected 8->5 hitTP1" means of 8 similar setups you returned NO TRADE on, 5 still reached TP1 — evidence you were too strict on this type. "sent 4->3 hitTP1" is the baseline hit-rate for ones you approved. Use it to calibrate: if rejected-similar reach TP1 nearly as often as sent-similar, lean toward taking this one; if similar setups mostly failed (low hitTP1, high implied SL), stay cautious. Small samples are weak evidence — weigh accordingly. Absent = not enough resolved history yet.
+- Str: 15m swing structure at signal time. bull = higher-high + higher-low sequence. bear = lower-high + lower-low. range = neither. Use this to gauge whether entry is WITH or AGAINST the short-term structure. A LONG in Str=bear is counter-structure (extra caution); a LONG in Str=bull is structure-aligned (minor confirmation).
+- Hist[...]: YOUR OWN track record on similar past setups (same direction + same symbol or nearby score), measured by what actually happened. "rejected 8->5 hitTP1" means of 8 similar setups you returned NO TRADE on, 5 still reached TP1 — evidence you were too strict on this type. "sent 4->3 hitTP1" is the baseline hit-rate for ones you approved. When multiple 15m structures exist in the history, a breakdown is shown in parentheses: "(bull:4/4, bear:0/3)" — this tells you the setup works in bull structure but not in bear. Cross-reference with the current Str= field. Small samples are weak evidence — weigh accordingly. Absent = not enough resolved history yet.
 
 HOW TO DECIDE
 1. Confirm the suggested side only. If you would not take that exact side, return NO TRADE.
@@ -69,7 +70,7 @@ HOW TO DECIDE
 8. News overrides structure: BEARISH news → no LONGs; BULLISH news → no SHORTs. Major event live → prefer NO TRADE.
 9. Premium setups (💎PREM) already have OB+FVG overlap + sweep — treat as FVG+OB+SW all effectively confirmed. Lean HIGH confidence when trend and zone also agree.
 10. Low ER (0.15–0.25) with both HTFs neutral = marginal chop even with BOS. Demand sweep confirmation or return NO TRADE.
-11. Learn from Hist[...] when present: a strong rejected-similar TP1 rate is a signal you have been over-rejecting this setup type — give the borderline ones the benefit of the doubt. A weak one confirms caution. Never let it override a hard red flag (counter-trend, RSI exhaustion, hostile news); it breaks ties, it does not justify a bad trade.
+11. Learn from Hist[...] when present: a strong rejected-similar TP1 rate is a signal you have been over-rejecting this setup type — give the borderline ones the benefit of the doubt. A weak one confirms caution. When Hist shows a trend breakdown (bull:X/N, bear:X/N), prioritize the bucket matching the current Str= field — e.g. if Hist shows bear:0/4 and current Str=bear, that is a direct warning. Never let it override a hard red flag (counter-trend, RSI exhaustion, hostile news); it breaks ties, it does not justify a bad trade.
 
 RISK SCORE (0–10): how dangerous is this trade RIGHT NOW. 0–3 = clean, trend-aligned, well-located. 4–7 = tradeable with a real concern. 8–10 = serious problem (chasing, fighting trend, crowded funding, hostile news, far from zone). High risk_score should almost always pair with NO TRADE — be honest.
 
@@ -146,6 +147,10 @@ def _self_feedback(s: dict) -> str:
     went on to hit TP1, it has been too strict; if similar ones kept hitting SL, it
     should stay cautious. Pure past outcomes (no look-ahead). Returns "" until
     enough resolved history exists (cold start) or on any DB error.
+
+    When resolved setups span multiple 15m structures (bull/bear/range), shows a
+    per-trend breakdown so Claude can learn that the same setup type works in some
+    structures but not others.
     """
     try:
         rows = get_similar_resolved_setups(
@@ -156,15 +161,34 @@ def _self_feedback(s: dict) -> str:
         return ""
     if len(rows) < _SELF_FEEDBACK_MIN:
         return ""
+
+    def _fmt(subset: list) -> str:
+        tp1_total = sum(1 for r in subset if r.get("reached_tp1"))
+        base = f"{len(subset)}->{tp1_total} hitTP1"
+        # Trend breakdown only when 2+ distinct trends present (otherwise redundant)
+        by_trend: dict = {}
+        for r in subset:
+            t = r.get("trend") or ""
+            if not t:
+                continue
+            by_trend.setdefault(t, [0, 0])
+            by_trend[t][1] += 1
+            if r.get("reached_tp1"):
+                by_trend[t][0] += 1
+        if len(by_trend) >= 2:
+            bd = ", ".join(
+                f"{t}:{hits}/{n}" for t, (hits, n) in sorted(by_trend.items())
+            )
+            base += f" ({bd})"
+        return base
+
     rej = [r for r in rows if not r.get("sent")]
     snt = [r for r in rows if r.get("sent")]
-    rej_tp1 = sum(1 for r in rej if r.get("reached_tp1"))
-    snt_tp1 = sum(1 for r in snt if r.get("reached_tp1"))
     parts = []
     if rej:
-        parts.append(f"rejected {len(rej)}->{rej_tp1} hitTP1")
+        parts.append(f"rejected {_fmt(rej)}")
     if snt:
-        parts.append(f"sent {len(snt)}->{snt_tp1} hitTP1")
+        parts.append(f"sent {_fmt(snt)}")
     return f" Hist[{'; '.join(parts)}]" if parts else ""
 
 
@@ -186,10 +210,12 @@ def _setup_line(i: int, s: dict) -> str:
     confs_s = f" Confs=[{','.join(confs)}]" if confs else ""
     age = s.get("zone_age_bars")
     age_s = f" ZoneAge={age}bars" if age is not None else ""
+    str15 = s.get("swing_trend") or ""
+    str15_s = f" Str={str15}" if str15 else ""
     return (
         f"{i} {s['symbol']} {s['direction']} "
         f"S={s.get('mtf_score','?')} "
-        f"1d={s.get('trend_1d','?')} 4h={s.get('trend_4h','?')} 1h={s.get('trend_1h','?')} "
+        f"1d={s.get('trend_1d','?')} 4h={s.get('trend_4h','?')} 1h={s.get('trend_1h','?')}{str15_s} "
         f"FVG={fvg} OB={ob} SW={sweep} "
         f"Z={zone}{age_s} RSI={s['rsi']} V={s['volume_ratio']}x F={fund_s}"
         f"{er_s}{prem}{confs_s}{_self_feedback(s)}"

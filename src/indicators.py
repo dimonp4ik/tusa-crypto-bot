@@ -748,6 +748,16 @@ def get_smc_indicators(candles_15m: dict, candles_1h: dict = None,
     bear_tp1 = _bear_tps[0] if _bear_tps else None
     bear_tp2 = _bear_tps[1] if len(_bear_tps) > 1 else None
 
+    # 15m swing structure trend (HH+HL = bull, LH+LL = bear, else range)
+    _swing_trend = "range"
+    if len(swing_highs) >= 2 and len(swing_lows) >= 2:
+        _s_bull = swing_highs[-1][1] > swing_highs[-2][1] and swing_lows[-1][1] > swing_lows[-2][1]
+        _s_bear = swing_highs[-1][1] < swing_highs[-2][1] and swing_lows[-1][1] < swing_lows[-2][1]
+        if _s_bull:
+            _swing_trend = "bull"
+        elif _s_bear:
+            _swing_trend = "bear"
+
     # Use 1h swing levels as TP2 fallback when 15m only has one level
     if candles_1h and len(candles_1h.get("high", [])) >= 10:
         sh_1h, sl_1h = find_swing_points(
@@ -806,6 +816,7 @@ def get_smc_indicators(candles_15m: dict, candles_1h: dict = None,
         "bull_tp2":         bull_tp2,
         "bear_tp1":         bear_tp1,
         "bear_tp2":         bear_tp2,
+        "swing_trend":      _swing_trend,
     }
 
 

@@ -170,7 +170,8 @@ def init_db():
                 reached_tp1 INTEGER NOT NULL DEFAULT 0,
                 reached_tp2 INTEGER NOT NULL DEFAULT 0,
                 resolved    INTEGER NOT NULL DEFAULT 0,
-                resolved_ts REAL
+                resolved_ts REAL,
+                trend       TEXT
             )
         """)
         # Migrate older setup_log DBs: outcome-tracking columns (shadow tracker).
@@ -183,6 +184,7 @@ def init_db():
             "reached_tp2":  "INTEGER NOT NULL DEFAULT 0",
             "resolved":     "INTEGER NOT NULL DEFAULT 0",
             "resolved_ts":  "REAL",
+            "trend":        "TEXT",
         }.items():
             _ensure_column(c, "setup_log", col, ddl)
 
@@ -833,8 +835,8 @@ def log_setup_candidate(analysis: dict) -> int:
             INSERT INTO setup_log
                 (ts, symbol, direction, entry_price, tp1, tp2, sl,
                  mtf_score, decision, confidence, risk_score, reason, sent,
-                 session, entry_source)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?, ?)
+                 session, entry_source, trend)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?, ?, ?)
         """, (
             time_mod.time(),
             analysis.get("symbol", ""),
@@ -850,6 +852,7 @@ def log_setup_candidate(analysis: dict) -> int:
             analysis.get("reason", ""),
             analysis.get("session", ""),
             analysis.get("entry_source", ""),
+            analysis.get("swing_trend", ""),
         ))
         return cur.lastrowid
 
@@ -937,7 +940,7 @@ def get_similar_resolved_setups(symbol: str, direction: str, mtf_score,
     with _conn() as c:
         rows = c.execute(
             """SELECT symbol, direction, mtf_score, session, entry_source,
-                      decision, sent, outcome, reached_tp1, reached_tp2, ts
+                      decision, sent, outcome, reached_tp1, reached_tp2, ts, trend
                FROM setup_log
                WHERE resolved=1 AND ts >= ? AND direction=?
                  AND (symbol=? OR ABS(COALESCE(mtf_score,0) - ?) <= 2)
