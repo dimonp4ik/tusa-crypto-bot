@@ -108,7 +108,9 @@ def _send_setups_for_date(chat_id, date_input: str):
                 back_kb,
             )
         else:
-            _send_admin_text(chat_id, _format_setups_page(rows, date_input), back_kb)
+            text, total_pages = _format_setups_page(rows, date_input, 0)
+            kb = {"inline_keyboard": _setups_kb(chat_id, date_input, 0, total_pages)}
+            _send_admin_text(chat_id, text, kb)
     except Exception as e:
         log.warning(f"setups date '{date_input}' failed: {e}")
         _send_admin_text(chat_id, f"Ошибка при загрузке сетапов за {date_input}.", back_kb)
@@ -1059,11 +1061,21 @@ def _handle_admin_callback(callback_id: str, chat_id: int,
         _riga = _riga_tz()
         date_str = datetime.now(_riga).strftime("%d.%m.%Y")
         rows = get_setups_by_date(date_str)
-        txt = _format_setups_page(rows, date_str)
-        _edit_with_keyboard(chat_id, message_id, txt, [[
-            {"text": "📅 Другая дата", "callback_data": "adm_setups_date"},
-            {"text": "« Назад",        "callback_data": _sec_back_cb(chat_id)},
-        ]])
+        txt, total_pages = _format_setups_page(rows, date_str, 0)
+        _edit_with_keyboard(chat_id, message_id, txt,
+                            _setups_kb(chat_id, date_str, 0, total_pages))
+
+    elif data.startswith("adm_setups_pg_"):
+        payload = data[len("adm_setups_pg_"):]
+        date_str, _, page_s = payload.rpartition("_")
+        try:
+            page = int(page_s)
+        except ValueError:
+            page = 0
+        rows = get_setups_by_date(date_str)
+        txt, total_pages = _format_setups_page(rows, date_str, page)
+        _edit_with_keyboard(chat_id, message_id, txt,
+                            _setups_kb(chat_id, date_str, page, total_pages))
 
     elif data == "adm_setups_date":
         _pending_setups_date[chat_id] = message_id
@@ -1089,14 +1101,41 @@ def _handle_admin_callback(callback_id: str, chat_id: int,
         _send_keyboard(chat_id, "🛠 *TUSA Admin Panel*\nВыбери раздел:")
 
 
-def _format_setups_page(rows: list, date_str: str) -> str:
-    """Render setup_log rows as a Telegram-friendly admin message."""
+_SETUPS_PER_PAGE = 10
+
+
+def _setups_kb(chat_id, date_str: str, page: int, total_pages: int) -> list:
+    """Nav keyboard for the paginated setup history."""
+    nav = []
+    if page > 0:
+        nav.append({"text": "◀️", "callback_data": f"adm_setups_pg_{date_str}_{page - 1}"})
+    if page < total_pages - 1:
+        nav.append({"text": "▶️", "callback_data": f"adm_setups_pg_{date_str}_{page + 1}"})
+    kb_rows = []
+    if nav:
+        kb_rows.append(nav)
+    kb_rows.append([
+        {"text": "📅 Другая дата", "callback_data": "adm_setups_date"},
+        {"text": "« Назад",        "callback_data": _sec_back_cb(chat_id)},
+    ])
+    return kb_rows
+
+
+def _format_setups_page(rows: list, date_str: str, page: int = 0,
+                        per: int = _SETUPS_PER_PAGE) -> tuple:
+    """Render one page of setup_log rows. Returns (text, total_pages)."""
     _riga = _riga_tz()
     if not rows:
-        return f"🔍 *История сетапов за {date_str}*\n\nНет сетапов за эту дату."
+        return f"🔍 *История сетапов за {date_str}*\n\nНет сетапов за эту дату.", 1
 
-    lines = [f"🔍 *История сетапов за {date_str}* — {len(rows)} шт.\n"]
-    for r in rows:
+    total = len(rows)
+    total_pages = (total + per - 1) // per
+    page = max(0, min(page, total_pages - 1))
+    page_rows = rows[page * per:(page + 1) * per]
+
+    lines = [f"🔍 *История сетапов за {date_str}* — {total} шт. "
+             f"(стр. {page + 1}/{total_pages})\n"]
+    for r in page_rows:
         ts_str = datetime.fromtimestamp(r["ts"], tz=_riga).strftime("%H:%M")
         sym    = r.get("symbol", "?")
         direct = r.get("direction", "?")
@@ -1132,11 +1171,7 @@ def _format_setups_page(rows: list, date_str: str) -> str:
             + (f"  _{reason_short}_\n" if reason_short else "")
         )
 
-    # Telegram message limit ~4096 chars — truncate if huge
-    text = "\n".join(lines)
-    if len(text) > 3800:
-        text = text[:3800] + f"\n\n_...и ещё {len(rows)} сетапов (обрезано)_"
-    return text
+    return "\n".join(lines), total_pages
 
 
 def _num(s):
