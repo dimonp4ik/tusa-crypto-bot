@@ -9,7 +9,10 @@ from config import (
     CLAUDE_MAX_RISK_SCORE, CLAUDE_CACHE_TTL, CLAUDE_MEMORY_LIMIT,
     CLAUDE_DAILY_BUDGET_USD, CLAUDE_BUDGET_RESERVE_USD,
 )
-from src.db import log_claude_call, get_claude_spend_today
+from src.db import log_claude_call, get_claude_spend_today, get_similar_resolved_setups
+
+# Minimum resolved similar setups before self-feedback is shown (avoid noise).
+_SELF_FEEDBACK_MIN = 6
 
 _log = logging.getLogger(__name__)
 
@@ -53,6 +56,7 @@ WHAT THE SCORES MEAN
 - 💎PREM: Premium triple-confluence (OB+FVG zones overlap + liquidity sweep). Statistically highest-WR setup in backtests. Favor HIGH confidence when trend and zone also align.
 - Confs: additional confirmations beyond FVG/OB/SW — ChoCH (Change of Character, micro-structure shift), RSI_Div (RSI divergence), MACD_Div, Engulfing, BullWick/BearWick (rejection wick pressure), StochCross (stochastic momentum cross). More = stronger.
 - PRE-FILTERS ALREADY APPLIED: upstream code removed: ER<0.15 (chop), RSI exhaustion, bear-trend hot-vol (overcrowded shorts), BOS-without-RSI-midline (momentum gap). What you see has already passed a strict quality stack.
+- Hist[...]: YOUR OWN track record on similar past setups (same direction + same symbol or nearby score), measured by what actually happened. "rejected 8->5 hitTP1" means of 8 similar setups you returned NO TRADE on, 5 still reached TP1 — evidence you were too strict on this type. "sent 4->3 hitTP1" is the baseline hit-rate for ones you approved. Use it to calibrate: if rejected-similar reach TP1 nearly as often as sent-similar, lean toward taking this one; if similar setups mostly failed (low hitTP1, high implied SL), stay cautious. Small samples are weak evidence — weigh accordingly. Absent = not enough resolved history yet.
 
 HOW TO DECIDE
 1. Confirm the suggested side only. If you would not take that exact side, return NO TRADE.
@@ -65,6 +69,7 @@ HOW TO DECIDE
 8. News overrides structure: BEARISH news → no LONGs; BULLISH news → no SHORTs. Major event live → prefer NO TRADE.
 9. Premium setups (💎PREM) already have OB+FVG overlap + sweep — treat as FVG+OB+SW all effectively confirmed. Lean HIGH confidence when trend and zone also agree.
 10. Low ER (0.15–0.25) with both HTFs neutral = marginal chop even with BOS. Demand sweep confirmation or return NO TRADE.
+11. Learn from Hist[...] when present: a strong rejected-similar TP1 rate is a signal you have been over-rejecting this setup type — give the borderline ones the benefit of the doubt. A weak one confirms caution. Never let it override a hard red flag (counter-trend, RSI exhaustion, hostile news); it breaks ties, it does not justify a bad trade.
 
 RISK SCORE (0–10): how dangerous is this trade RIGHT NOW. 0–3 = clean, trend-aligned, well-located. 4–7 = tradeable with a real concern. 8–10 = serious problem (chasing, fighting trend, crowded funding, hostile news, far from zone). High risk_score should almost always pair with NO TRADE — be honest.
 
@@ -134,6 +139,35 @@ def _verdict_tool() -> dict:
     }
 
 
+def _self_feedback(s: dict) -> str:
+    """Compact track-record of how SIMILAR past setups actually resolved.
+
+    Lets Claude self-correct: if setups like this one were repeatedly rejected yet
+    went on to hit TP1, it has been too strict; if similar ones kept hitting SL, it
+    should stay cautious. Pure past outcomes (no look-ahead). Returns "" until
+    enough resolved history exists (cold start) or on any DB error.
+    """
+    try:
+        rows = get_similar_resolved_setups(
+            s.get("symbol", ""), s.get("direction", ""), s.get("mtf_score"),
+            session=s.get("session", ""),
+        )
+    except Exception:
+        return ""
+    if len(rows) < _SELF_FEEDBACK_MIN:
+        return ""
+    rej = [r for r in rows if not r.get("sent")]
+    snt = [r for r in rows if r.get("sent")]
+    rej_tp1 = sum(1 for r in rej if r.get("reached_tp1"))
+    snt_tp1 = sum(1 for r in snt if r.get("reached_tp1"))
+    parts = []
+    if rej:
+        parts.append(f"rejected {len(rej)}->{rej_tp1} hitTP1")
+    if snt:
+        parts.append(f"sent {len(snt)}->{snt_tp1} hitTP1")
+    return f" Hist[{'; '.join(parts)}]" if parts else ""
+
+
 def _setup_line(i: int, s: dict) -> str:
     fvg     = "Y" if s.get("fvg")         else "N"
     ob      = "Y" if s.get("order_block") else "N"
@@ -158,7 +192,7 @@ def _setup_line(i: int, s: dict) -> str:
         f"1d={s.get('trend_1d','?')} 4h={s.get('trend_4h','?')} 1h={s.get('trend_1h','?')} "
         f"FVG={fvg} OB={ob} SW={sweep} "
         f"Z={zone}{age_s} RSI={s['rsi']} V={s['volume_ratio']}x F={fund_s}"
-        f"{er_s}{prem}{confs_s}"
+        f"{er_s}{prem}{confs_s}{_self_feedback(s)}"
     )
 
 

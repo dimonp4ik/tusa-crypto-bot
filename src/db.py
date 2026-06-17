@@ -157,14 +157,34 @@ def init_db():
                 entry_price REAL,
                 tp1         REAL,
                 tp2         REAL,
+                sl          REAL,
                 mtf_score   INTEGER,
                 decision    TEXT,
                 confidence  TEXT,
                 risk_score  INTEGER,
                 reason      TEXT,
-                sent        INTEGER NOT NULL DEFAULT 0
+                sent        INTEGER NOT NULL DEFAULT 0,
+                session     TEXT,
+                entry_source TEXT,
+                outcome     TEXT,
+                reached_tp1 INTEGER NOT NULL DEFAULT 0,
+                reached_tp2 INTEGER NOT NULL DEFAULT 0,
+                resolved    INTEGER NOT NULL DEFAULT 0,
+                resolved_ts REAL
             )
         """)
+        # Migrate older setup_log DBs: outcome-tracking columns (shadow tracker).
+        for col, ddl in {
+            "sl":           "REAL",
+            "session":      "TEXT",
+            "entry_source": "TEXT",
+            "outcome":      "TEXT",
+            "reached_tp1":  "INTEGER NOT NULL DEFAULT 0",
+            "reached_tp2":  "INTEGER NOT NULL DEFAULT 0",
+            "resolved":     "INTEGER NOT NULL DEFAULT 0",
+            "resolved_ts":  "REAL",
+        }.items():
+            _ensure_column(c, "setup_log", col, ddl)
 
 
 def get_bot_state(key: str) -> str | None:
@@ -786,25 +806,50 @@ def get_stats(days: int = 7, since_ts: float = None) -> dict:
 # ── Setup log ─────────────────────────────────────────────────────────────────
 
 def log_setup_candidate(analysis: dict) -> int:
-    """Log a setup that reached Claude (before/after verdict). Returns row id."""
+    """Log a setup that reached Claude (before/after verdict). Returns row id.
+
+    Stores the SAME final TP1/TP2/SL bracket a live trade would use (not the raw
+    zone levels) so the shadow tracker can resolve every setup — sent or rejected
+    — on one consistent basis. Errors in bracket calc fall back to zone levels.
+    """
+    price = analysis.get("current_price") or 0.0
+    tp1 = analysis.get("tp1_level")
+    tp2 = analysis.get("tp2_level")
+    sl  = None
+    try:
+        from src.telegram_notifier import calculate_tp_sl  # local: avoid circular import
+        tp1, tp2, sl = calculate_tp_sl(
+            float(price), analysis.get("direction", ""),
+            atr=float(analysis.get("atr", 0.0) or 0.0),
+            recent_high=float(analysis.get("recent_high", 0.0) or 0.0),
+            recent_low=float(analysis.get("recent_low", 0.0) or 0.0),
+            tp1_level=analysis.get("tp1_level"),
+            tp2_level=analysis.get("tp2_level"),
+        )
+    except Exception:
+        pass
     with _conn() as c:
         cur = c.execute("""
             INSERT INTO setup_log
-                (ts, symbol, direction, entry_price, tp1, tp2,
-                 mtf_score, decision, confidence, risk_score, reason, sent)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0)
+                (ts, symbol, direction, entry_price, tp1, tp2, sl,
+                 mtf_score, decision, confidence, risk_score, reason, sent,
+                 session, entry_source)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?, ?)
         """, (
             time_mod.time(),
             analysis.get("symbol", ""),
             analysis.get("direction", ""),
-            analysis.get("current_price"),
-            analysis.get("tp1_level"),
-            analysis.get("tp2_level"),
+            price,
+            tp1,
+            tp2,
+            sl,
             analysis.get("mtf_score"),
             analysis.get("decision", "NO TRADE"),
             analysis.get("confidence", ""),
             analysis.get("risk_score"),
             analysis.get("reason", ""),
+            analysis.get("session", ""),
+            analysis.get("entry_source", ""),
         ))
         return cur.lastrowid
 
@@ -815,6 +860,91 @@ def mark_setup_sent(setup_log_id: int) -> None:
         return
     with _conn() as c:
         c.execute("UPDATE setup_log SET sent=1 WHERE id=?", (setup_log_id,))
+
+
+def get_unresolved_setups(max_age_sec: float, limit: int = 80) -> list:
+    """Setups whose shadow outcome is not yet known.
+
+    resolved=0 with a usable bracket (sl present), old enough to have at least
+    one forward candle, and not older than max_age_sec (past that the window has
+    expired and a final pass will mark them EXPIRED). Oldest first.
+    """
+    now = time_mod.time()
+    with _conn() as c:
+        rows = c.execute(
+            """SELECT * FROM setup_log
+               WHERE resolved=0 AND sl IS NOT NULL
+                 AND ts <= ? AND ts >= ?
+               ORDER BY ts ASC LIMIT ?""",
+            (now - 900, now - max_age_sec, limit),
+        ).fetchall()
+        return [dict(r) for r in rows]
+
+
+def mark_setup_resolved(setup_id: int, outcome: str,
+                        reached_tp1: int, reached_tp2: int) -> None:
+    """Record the shadow outcome of a tracked setup."""
+    with _conn() as c:
+        c.execute(
+            """UPDATE setup_log
+               SET outcome=?, reached_tp1=?, reached_tp2=?, resolved=1, resolved_ts=?
+               WHERE id=?""",
+            (outcome, int(reached_tp1), int(reached_tp2), time_mod.time(), setup_id),
+        )
+
+
+def get_setup_accuracy(since_ts: float) -> dict:
+    """Aggregate resolved-setup outcomes since since_ts, split by sent vs rejected.
+
+    Returns counts and rates so the admin can see whether Claude's gate (the
+    rejected bucket) actually has a worse outcome than what it let through.
+    """
+    out = {"sent": {}, "rejected": {}}
+    with _conn() as c:
+        for sent_val, key in ((1, "sent"), (0, "rejected")):
+            rows = c.execute(
+                """SELECT outcome, reached_tp1, reached_tp2 FROM setup_log
+                   WHERE resolved=1 AND ts >= ? AND sent=?""",
+                (since_ts, sent_val),
+            ).fetchall()
+            n = len(rows)
+            tp1 = sum(1 for r in rows if r["reached_tp1"])
+            tp2 = sum(1 for r in rows if r["reached_tp2"])
+            sl  = sum(1 for r in rows if r["outcome"] == "SL")
+            exp = sum(1 for r in rows if r["outcome"] == "EXPIRED")
+            out[key] = {
+                "n": n, "reached_tp1": tp1, "reached_tp2": tp2, "sl": sl, "expired": exp,
+                "tp1_pct": (tp1 / n * 100) if n else 0.0,
+                "sl_pct":  (sl / n * 100) if n else 0.0,
+            }
+    return out
+
+
+def get_similar_resolved_setups(symbol: str, direction: str, mtf_score,
+                                session: str = "", lookback_days: int = 30,
+                                limit: int = 40) -> list:
+    """Resolved past setups similar to the one being judged, for AI self-feedback.
+
+    Coarse similarity (kept deliberately broad to avoid overfitting to noise):
+    same direction, and either the same symbol OR a nearby mtf_score band. Only
+    resolved rows from the last lookback_days. Newest first.
+    """
+    since = time_mod.time() - lookback_days * 86400
+    try:
+        score = int(mtf_score or 0)
+    except (TypeError, ValueError):
+        score = 0
+    with _conn() as c:
+        rows = c.execute(
+            """SELECT symbol, direction, mtf_score, session, entry_source,
+                      decision, sent, outcome, reached_tp1, reached_tp2, ts
+               FROM setup_log
+               WHERE resolved=1 AND ts >= ? AND direction=?
+                 AND (symbol=? OR ABS(COALESCE(mtf_score,0) - ?) <= 2)
+               ORDER BY ts DESC LIMIT ?""",
+            (since, direction, symbol, score, limit),
+        ).fetchall()
+        return [dict(r) for r in rows]
 
 
 def get_setups_by_date(date_str: str) -> list:

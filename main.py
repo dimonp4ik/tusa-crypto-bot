@@ -55,6 +55,8 @@ from src.db import (
     get_claude_spend_stats,
     get_bot_state, set_bot_state,
     log_setup_candidate, mark_setup_sent, get_setups_by_date,
+    get_unresolved_setups, mark_setup_resolved, get_setup_accuracy,
+    get_similar_resolved_setups,
 )
 from config import ADMIN_IDS
 
@@ -198,6 +200,8 @@ _KB_SETTINGS = {"inline_keyboard": [[
 _KB_ANALYTICS = {"inline_keyboard": [[
     {"text": "🏆 Топ монет",     "callback_data": "adm_top"},
     {"text": "💀 Худшие монеты", "callback_data": "adm_worst"},
+], [
+    {"text": "🎯 Точность ИИ",   "callback_data": "adm_ai_acc"},
 ], [_BACK_ROW[0]]]}
 
 _KB_PEOPLE = {"inline_keyboard": [[
@@ -613,6 +617,47 @@ def _handle_admin_callback(callback_id: str, chat_id: int,
                 f"  TP1: {s30['tp1_hit']} ({s30['tp1_rate']}%)  TP2: {s30['tp2_hit']}\n"
                 f"  BE: {s30['breakeven']}  SL: {s30['sl_hit']}  Expired: {s30['expired']}\n"
                 f"  Win rate: *{s30['win_rate']}%*"
+            )
+        except Exception as e:
+            txt = f"Ошибка: {e}"
+        _edit_message(chat_id, message_id, txt)
+
+    elif data == "adm_ai_acc":
+        try:
+            since7  = time.time() - 7 * 86400
+            since30 = time.time() - 30 * 86400
+
+            def _acc_block(label, since):
+                a = get_setup_accuracy(since)
+                s, r = a["sent"], a["rejected"]
+                lines = [f"*{label}:*"]
+                lines.append(
+                    f"  📤 Отправлено: {s['n']}"
+                    + (f" · TP1 {s['tp1_pct']:.0f}% · SL {s['sl_pct']:.0f}%" if s['n'] else " · нет данных")
+                )
+                lines.append(
+                    f"  🚫 Отклонено: {r['n']}"
+                    + (f" · TP1 {r['tp1_pct']:.0f}% · SL {r['sl_pct']:.0f}%" if r['n'] else " · нет данных")
+                )
+                # Verdict: is the rejected bucket actually worse?
+                if s['n'] >= 10 and r['n'] >= 10:
+                    gap = s['tp1_pct'] - r['tp1_pct']
+                    if gap >= 8:
+                        lines.append(f"  ✅ ИИ режет хуже на {gap:.0f}пп TP1 — фильтр работает")
+                    elif gap <= -8:
+                        lines.append(f"  ⚠️ Отклонённые доходят до TP1 на {-gap:.0f}пп *чаще* — ИИ слишком строг")
+                    else:
+                        lines.append(f"  ➖ Разница {gap:+.0f}пп — ИИ почти не отделяет")
+                return "\n".join(lines)
+
+            txt = (
+                "🎯 *ТОЧНОСТЬ ИИ*\n"
+                "_Сравнение исхода отправленных vs отклонённых сетапов "
+                "(теневой трекинг по реальным котировкам)._\n\n"
+                f"{_acc_block('За 7 дней', since7)}\n\n"
+                f"{_acc_block('За 30 дней', since30)}\n\n"
+                "_TP1% = доля дошедших до первого тейка. Данные копятся "
+                "с момента запуска трекера._"
             )
         except Exception as e:
             txt = f"Ошибка: {e}"
@@ -1891,6 +1936,89 @@ def _check_open_signals():
             log.warning(f"  Could not check signal #{sig['id']}: {e}")
 
 
+# ── Shadow-outcome tracker (rejected + sent setups) ───────────────────────────
+def _simulate_setup_outcome(direction: str, entry: float, tp1: float, tp2: float,
+                            sl: float, highs: list, lows: list) -> tuple:
+    """Replay a setup's bracket over forward candles (same order as the validated
+    backtest: SL → TP2 → TP1 each bar). Returns (outcome|None, reached_tp1,
+    reached_tp2). outcome is None while still live (no TP1/SL hit yet).
+
+    After TP1 the stop moves to breakeven (mirrors live TP1=50%→SL-to-BE); the
+    runner either reaches TP2 or exits flat at BE. We only need the categorical
+    result (SL / TP1 / TP2) for the learning signal, not the runner's exact R.
+    """
+    tp1_reached = False
+    risk = abs(entry - sl)
+    if risk <= 0:
+        return None, 0, 0
+    for h, l in zip(highs, lows):
+        if not tp1_reached:
+            if direction == "LONG":
+                if l <= sl:   return "SL", 0, 0
+                if h >= tp2:  return "TP2", 1, 1
+                if h >= tp1:  tp1_reached = True
+            else:
+                if h >= sl:   return "SL", 0, 0
+                if l <= tp2:  return "TP2", 1, 1
+                if l <= tp1:  tp1_reached = True
+        else:
+            if direction == "LONG":
+                if h >= tp2:  return "TP2", 1, 1
+                if l <= entry: return "TP1", 1, 0   # breakeven exit after TP1
+            else:
+                if l <= tp2:  return "TP2", 1, 1
+                if h >= entry: return "TP1", 1, 0
+    # No terminal hit within the candles seen so far.
+    return (None, 1, 0) if tp1_reached else (None, 0, 0)
+
+
+def _track_setup_outcomes():
+    """Resolve shadow outcomes for logged setups (sent AND rejected) so the bot
+    can later learn whether Claude's verdicts matched reality. Runs every 15 min.
+    """
+    try:
+        max_age = SIGNAL_EXPIRY_HOURS * 3600
+        pending = get_unresolved_setups(max_age_sec=max_age, limit=80)
+        if not pending:
+            return
+        # Fetch each symbol's candles once per cycle.
+        by_symbol: dict = {}
+        for s in pending:
+            by_symbol.setdefault(s["symbol"], []).append(s)
+
+        resolved = 0
+        for symbol, rows in by_symbol.items():
+            try:
+                df_all = get_klines(symbol, limit=220)
+            except Exception as e:
+                log.debug(f"  shadow: klines failed {symbol}: {e}")
+                continue
+            if not df_all.get("time"):
+                continue
+            for s in rows:
+                df = _slice_candles_from_open(df_all, float(s["ts"]))
+                highs = [float(x) for x in df.get("high", [])]
+                lows  = [float(x) for x in df.get("low", [])]
+                outcome, r1, r2 = _simulate_setup_outcome(
+                    s["direction"], float(s["entry_price"]),
+                    float(s["tp1"]), float(s["tp2"]), float(s["sl"]),
+                    highs, lows,
+                )
+                age_h = (time.time() - float(s["ts"])) / 3600
+                if outcome is None:
+                    # No terminal hit yet — finalise only once the window expired.
+                    if age_h > SIGNAL_EXPIRY_HOURS:
+                        outcome = "TP1" if r1 else "EXPIRED"
+                    else:
+                        continue   # still live, re-check next cycle
+                mark_setup_resolved(s["id"], outcome, r1, r2)
+                resolved += 1
+        if resolved:
+            log.info(f"Shadow tracker: resolved {resolved} setup outcome(s)")
+    except Exception as e:
+        log.warning(f"Shadow tracker failed: {e}")
+
+
 # ── Main scanning function ────────────────────────────────────────────────────
 def run_scan():
     now_utc = datetime.now(timezone.utc)
@@ -2234,6 +2362,14 @@ def _monitor_open_signals():
         log.warning(f"Open-signal monitor failed: {e}")
 
 
+def _shadow_tracker_job():
+    """15-min job: resolve would-be outcomes of rejected + sent setups."""
+    try:
+        _track_setup_outcomes()
+    except Exception as e:
+        log.warning(f"Shadow tracker job failed: {e}")
+
+
 def start_bot():
     log.info("Starting Crypto Signal Bot...")
     # Proxy diagnostics — shows in Railway logs so we can verify env vars loaded
@@ -2281,6 +2417,14 @@ def start_bot():
     scheduler.add_job(
         _monitor_open_signals, "cron",
         minute="*",
+        timezone="UTC",
+    )
+
+    # Shadow-outcome tracker — every 15 min, resolves rejected+sent setup results
+    # so the bot can learn whether Claude's verdicts matched reality.
+    scheduler.add_job(
+        _shadow_tracker_job, "cron",
+        minute="3,18,33,48",
         timezone="UTC",
     )
 
