@@ -57,7 +57,7 @@ WHAT THE SCORES MEAN
 - Confs: additional confirmations beyond FVG/OB/SW — ChoCH (Change of Character, micro-structure shift), RSI_Div (RSI divergence), MACD_Div, Engulfing, BullWick/BearWick (rejection wick pressure), StochCross (stochastic momentum cross). More = stronger.
 - PRE-FILTERS ALREADY APPLIED: upstream code removed: ER<0.15 (chop), RSI exhaustion, bear-trend hot-vol (overcrowded shorts), BOS-without-RSI-midline (momentum gap). What you see has already passed a strict quality stack.
 - Str: 15m swing structure at signal time. bull = higher-high + higher-low sequence. bear = lower-high + lower-low. range = neither. Use this to gauge whether entry is WITH or AGAINST the short-term structure. A LONG in Str=bear is counter-structure (extra caution); a LONG in Str=bull is structure-aligned (minor confirmation).
-- Hist[...]: YOUR OWN track record on similar past setups (same direction + same symbol or nearby score), measured by what actually happened. "rejected 8->5 hitTP1" means of 8 similar setups you returned NO TRADE on, 5 still reached TP1 — evidence you were too strict on this type. "sent 4->3 hitTP1" is the baseline hit-rate for ones you approved. When multiple 15m structures exist in the history, a breakdown is shown in parentheses: "(bull:4/4, bear:0/3)" — this tells you the setup works in bull structure but not in bear. Cross-reference with the current Str= field. Small samples are weak evidence — weigh accordingly. Absent = not enough resolved history yet.
+- Hist[...]: YOUR OWN track record on similar past setups (same direction + same symbol or nearby score), measured by what actually happened. Format per bucket: "rejected 8: 5W(2TP2) 2SL 1exp" = of 8 similar setups you returned NO TRADE on, 5 would have won (reached TP1, of which 2 ran to full TP2), 2 would have hit SL, 1 expired flat. W = wins you missed (over-rejection evidence); SL = losses you correctly dodged (caution validated); exp = harmless no-ops. "sent 6: 4W 2SL" is the realised quality of ones you approved — your live baseline. Compare buckets: if rejected-W rate ≈ sent-W rate you are leaving good trades on the table; if rejected is mostly SL you are filtering correctly. When 2+ 15m structures exist, a per-trend breakdown follows in brackets: "[bear:0W/3SL, bull:4W/0SL]" — same setup wins in bull structure, only stops out in bear. Cross-reference with the current Str= field. Small samples are weak evidence — weigh accordingly. Absent = not enough resolved history yet.
 
 HOW TO DECIDE
 1. Confirm the suggested side only. If you would not take that exact side, return NO TRADE.
@@ -162,25 +162,37 @@ def _self_feedback(s: dict) -> str:
     if len(rows) < _SELF_FEEDBACK_MIN:
         return ""
 
+    def _counts(subset: list) -> tuple:
+        """(wins, sl, expired) — win = reached TP1 or TP2; mutually exclusive."""
+        w = sum(1 for r in subset if r.get("reached_tp1"))
+        sl = sum(1 for r in subset if (r.get("outcome") or "") == "SL")
+        exp = sum(1 for r in subset if (r.get("outcome") or "") == "EXPIRED")
+        return w, sl, exp
+
     def _fmt(subset: list) -> str:
-        tp1_total = sum(1 for r in subset if r.get("reached_tp1"))
-        base = f"{len(subset)}->{tp1_total} hitTP1"
-        # Trend breakdown only when 2+ distinct trends present (otherwise redundant)
+        n = len(subset)
+        w, sl, exp = _counts(subset)
+        tp2 = sum(1 for r in subset if (r.get("outcome") or "") == "TP2")
+        seg = f"{n}: {w}W"
+        if tp2:
+            seg += f"({tp2}TP2)"
+        seg += f" {sl}SL"
+        if exp:
+            seg += f" {exp}exp"
+        # Per-trend W/SL breakdown only when 2+ distinct structures present.
         by_trend: dict = {}
         for r in subset:
             t = r.get("trend") or ""
             if not t:
                 continue
-            by_trend.setdefault(t, [0, 0])
-            by_trend[t][1] += 1
-            if r.get("reached_tp1"):
-                by_trend[t][0] += 1
+            by_trend.setdefault(t, []).append(r)
         if len(by_trend) >= 2:
             bd = ", ".join(
-                f"{t}:{hits}/{n}" for t, (hits, n) in sorted(by_trend.items())
+                f"{t}:{_counts(rs)[0]}W/{_counts(rs)[1]}SL"
+                for t, rs in sorted(by_trend.items())
             )
-            base += f" ({bd})"
-        return base
+            seg += f" [{bd}]"
+        return seg
 
     rej = [r for r in rows if not r.get("sent")]
     snt = [r for r in rows if r.get("sent")]
