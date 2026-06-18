@@ -2,6 +2,7 @@ import requests
 from datetime import datetime, timezone
 import sys
 import os
+import logging
 
 try:
     from zoneinfo import ZoneInfo
@@ -17,6 +18,7 @@ from config import (
 )
 
 TELEGRAM_API = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}"
+_log = logging.getLogger(__name__)
 
 
 def _esc(text: str) -> str:
@@ -541,8 +543,10 @@ def _send_message(text: str) -> bool:
             timeout=15,
         )
         if resp.status_code != 200:
-            print(f"[Telegram] HTTP {resp.status_code}: {resp.text[:200]}")
+            _log.error(
+                f"[Telegram] HTTP {resp.status_code}: {resp.text[:300]}"
+            )
         return resp.status_code == 200
     except Exception as e:
-        print(f"[Telegram] Ошибка отправки: {e}")
+        _log.error(f"[Telegram] send failed: {e}")
         return False

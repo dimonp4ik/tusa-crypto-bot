@@ -2387,6 +2387,11 @@ def run_scan():
                             mark_setup_sent(analysis.get("_setup_log_id"))
                         except Exception:
                             pass
+                    else:
+                        log.warning(
+                            f"  Signal NOT sent: {analysis['symbol']} {direction} "
+                            f"({analysis.get('confidence','?')}) — send_signal returned False"
+                        )
             except Exception as e:
                 log.error(f"  Error sending {analysis.get('symbol','?')}: {e}")
 
