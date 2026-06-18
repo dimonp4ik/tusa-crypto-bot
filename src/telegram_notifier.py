@@ -184,7 +184,7 @@ def send_signal(analysis: dict) -> bool:
         "OFF_HOURS": "🌙 Off-hours",
     }
     session_str  = session_icons.get(analysis.get("session", ""), "")
-    signals_text = "\n".join(f"  • {s}" for s in analysis["signals"])
+    signals_text = "\n".join(f"  • {_esc(s)}" for s in analysis["signals"])
     timestamp    = datetime.now(_RIGA).strftime("%d.%m.%Y %H:%M (Рига)")
 
     btc_change   = analysis.get("btc_change", 0)
