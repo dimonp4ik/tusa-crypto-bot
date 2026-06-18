@@ -41,7 +41,7 @@ from src.binance_client import (
 from src.signal_filter import analyze_coin_smc
 from src.knn_analog import knn_direction_score, knn_risk_mult
 from src.claude_analyzer import analyze_batch_with_claude, analyze_heavy
-from src.telegram_notifier import send_signal, send_status, send_news_alert, send_signal_update, calculate_tp_sl, send_morning_digest, send_weekly_digest
+from src.telegram_notifier import send_signal, send_status, send_news_alert, send_signal_update, calculate_tp_sl, send_morning_digest, send_weekly_digest, send_daily_prayer, send_commandments
 from src.news_filter import check_news_sentiment
 from src.news_agent import (
     get_market_news, detect_major_events, fetch_recent_headlines,
@@ -1453,7 +1453,10 @@ def webhook():
         cb_id      = cb.get("id")
         if cb.get("message", {}).get("photo"):
             _mark_photo_panel_message(chat_id, message_id)
-        if _is_admin(user_id):
+        if cb_data == "prayer_commandments":
+            _answer_callback(cb_id)
+            send_commandments(chat_id)
+        elif _is_admin(user_id):
             _handle_admin_callback(cb_id, chat_id, message_id, cb_data, user_id)
         else:
             _answer_callback(cb_id, "Нет доступа.")
@@ -2417,6 +2420,17 @@ def run_morning_digest():
         log.error(f"Morning digest failed: {e}")
 
 
+# ── Daily prayer (Mon–Fri 08:00 Riga) ────────────────────────────────────────
+def run_daily_prayer():
+    """Send the morning Dimoslav prayer with commandments button."""
+    log.info("=== Daily prayer started ===")
+    try:
+        ok = send_daily_prayer()
+        log.info(f"Daily prayer {'sent' if ok else 'FAILED'}")
+    except Exception as e:
+        log.error(f"Daily prayer failed: {e}")
+
+
 # ── Weekly digest (Sunday 22:00 Riga = 19:00 UTC summer) ─────────────────────
 def run_weekly_digest():
     """Collect 7-day trade stats, generate Groq commentary, send to Telegram."""
@@ -2558,6 +2572,13 @@ def start_bot():
     scheduler.add_job(
         run_morning_digest, "cron",
         day_of_week="mon-fri", hour=10, minute=0,
+        timezone="Europe/Riga",
+    )
+
+    # Morning prayer — Mon–Fri 08:00 Riga
+    scheduler.add_job(
+        run_daily_prayer, "cron",
+        day_of_week="mon-fri", hour=8, minute=0,
         timezone="Europe/Riga",
     )
 
