@@ -383,6 +383,80 @@ def get_market_news() -> dict:
     }
 
 
+def generate_weekly_commentary(stats: dict) -> str:
+    """Send weekly trade stats to Groq Llama 3.3-70b, get Russian narrative commentary."""
+    if not GROQ_API_KEY:
+        return ""
+
+    top3_str = ", ".join(
+        f"{s}({w}W/{sl}SL)" for s, w, sl in stats.get("top3", [])
+    ) or "нет данных"
+    trend_str = " | ".join(
+        f"{t}: {int(wr)}% WR" for t, wr in stats.get("trend_wr", {}).items()
+    ) or "мало данных"
+    best  = stats.get("best_trade")
+    worst = stats.get("worst_trade")
+    n_sent = stats.get("n_sent", 0)
+    n_rej  = stats.get("n_rejected", 0)
+    sent_tp1_rate = stats.get("sent_tp1_rate", 0)
+    rej_tp1_rate  = stats.get("rej_tp1_rate", 0)
+    best_str  = f"{best['symbol']} {best['r']:+.2f}R"  if best  else "нет"
+    worst_str = f"{worst['symbol']} {worst['r']:+.2f}R" if worst else "нет"
+    n_total   = stats.get("n_total", 0)
+    wr        = stats.get("wr", 0)
+    total_r   = stats.get("total_r", 0)
+    n_tp2     = stats.get("n_tp2", 0)
+    n_sl      = stats.get("n_sl", 0)
+    n_exp     = stats.get("n_exp", 0)
+
+    ai_verdict = ""
+    if n_rej >= 5:
+        if rej_tp1_rate > sent_tp1_rate + 10:
+            ai_verdict = f"ИИ СЛИШКОМ СТРОГ — {rej_tp1_rate}% отклонённых сделок всё равно дошли до TP1."
+        elif rej_tp1_rate < sent_tp1_rate - 10:
+            ai_verdict = f"ИИ фильтрует хорошо — отклонённые дошли до TP1 только в {rej_tp1_rate}% против {sent_tp1_rate}% у одобренных."
+        else:
+            ai_verdict = f"ИИ работает нейтрально — отклонённые ({rej_tp1_rate}%) vs одобренные ({sent_tp1_rate}%) TP1 схожи."
+
+    prompt = f"""Ты аналитик крипто-трейдинга. Вот статистика автоматического торгового бота за последние 7 дней.
+
+ТОРГОВЛЯ:
+- Завершённых сделок: {n_total}
+- Win rate: {wr}%
+- Чистый R за неделю: {total_r:+.1f}R
+- TP2 достигнуто: {n_tp2} | SL: {n_sl} | Истекло: {n_exp}
+- Лучшая сделка: {best_str}
+- Худшая сделка: {worst_str}
+- Топ монеты: {top3_str}
+- По структуре тренда: {trend_str}
+
+AI ФИЛЬТР:
+- Одобрено: {n_sent} сделок (TP1 дошло {sent_tp1_rate}%)
+- Отклонено: {n_rej} сетапов (TP1 дошло бы {rej_tp1_rate}%)
+- Вывод: {ai_verdict}
+
+Напиши разбор недели на РУССКОМ. Максимум 5 предложений. Без воды. Что сработало, что нет, на что смотреть на следующей неделе."""
+
+    try:
+        resp = _req.post(
+            "https://api.groq.com/openai/v1/chat/completions",
+            headers={
+                "Authorization": f"Bearer {GROQ_API_KEY}",
+                "Content-Type":  "application/json",
+            },
+            json={
+                "model":       "llama-3.3-70b-versatile",
+                "messages":    [{"role": "user", "content": prompt}],
+                "max_tokens":  350,
+                "temperature": 0.4,
+            },
+            timeout=25,
+        )
+        return resp.json()["choices"][0]["message"]["content"].strip()
+    except Exception as e:
+        return f"(комментарий недоступен: {e})"
+
+
 # ── Economic calendar (ForexFactory weekly XML — free, no key) ─────────────────
 
 _FF_CALENDAR_URL = "https://nfs.faireconomy.media/ff_calendar_thisweek.xml"

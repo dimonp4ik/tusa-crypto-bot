@@ -41,11 +41,12 @@ from src.binance_client import (
 from src.signal_filter import analyze_coin_smc
 from src.knn_analog import knn_direction_score, knn_risk_mult
 from src.claude_analyzer import analyze_batch_with_claude, analyze_heavy
-from src.telegram_notifier import send_signal, send_status, send_news_alert, send_signal_update, calculate_tp_sl, send_morning_digest
+from src.telegram_notifier import send_signal, send_status, send_news_alert, send_signal_update, calculate_tp_sl, send_morning_digest, send_weekly_digest
 from src.news_filter import check_news_sentiment
 from src.news_agent import (
     get_market_news, detect_major_events, fetch_recent_headlines,
     get_daily_digest, get_upcoming_high_impact_events, get_day_events,
+    generate_weekly_commentary,
 )
 from config import EVENT_WARN_HOURS
 from src.db import (
@@ -61,6 +62,7 @@ from src.db import (
     log_setup_candidate, mark_setup_sent, get_setups_by_date,
     get_unresolved_setups, mark_setup_resolved, get_setup_accuracy,
     get_similar_resolved_setups,
+    get_weekly_stats,
 )
 from config import ADMIN_IDS
 
@@ -2410,6 +2412,22 @@ def run_morning_digest():
         log.error(f"Morning digest failed: {e}")
 
 
+# ── Weekly digest (Sunday 22:00 Riga = 19:00 UTC summer) ─────────────────────
+def run_weekly_digest():
+    """Collect 7-day trade stats, generate Groq commentary, send to Telegram."""
+    log.info("=== Weekly digest started ===")
+    try:
+        stats = get_weekly_stats()
+        commentary = generate_weekly_commentary(stats)
+        send_weekly_digest(stats, commentary)
+        log.info(
+            f"Weekly digest sent — {stats['n_total']} trades, "
+            f"WR={stats['wr']}%, R={stats['total_r']:+.2f}"
+        )
+    except Exception as e:
+        log.error(f"Weekly digest failed: {e}")
+
+
 # ── Self-ping (keeps Render free tier awake) ──────────────────────────────────
 def _app_url() -> str:
     """Return the public URL of this deployment from any known env var."""
@@ -2535,6 +2553,13 @@ def start_bot():
     scheduler.add_job(
         run_morning_digest, "cron",
         day_of_week="mon-fri", hour=10, minute=0,
+        timezone="Europe/Riga",
+    )
+
+    # Weekly digest — Sunday 22:00 Riga (19:00 UTC summer / 20:00 UTC winter, DST auto)
+    scheduler.add_job(
+        run_weekly_digest, "cron",
+        day_of_week="sun", hour=22, minute=0,
         timezone="Europe/Riga",
     )
     scheduler.start()

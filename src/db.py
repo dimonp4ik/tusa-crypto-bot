@@ -956,6 +956,90 @@ def get_similar_resolved_setups(symbol: str, direction: str, mtf_score,
         return [dict(r) for r in rows]
 
 
+def get_weekly_stats() -> dict:
+    """Aggregate trade + AI accuracy stats for the past 7 days."""
+    from collections import defaultdict
+    since = time_mod.time() - 7 * 86400
+    with _conn() as c:
+        sig_rows = c.execute(
+            "SELECT symbol, direction, status, realized_r, trend FROM signals "
+            "WHERE opened_at >= ? AND status IN ({})".format(
+                ",".join("?" * len(FINAL_STATUSES))
+            ),
+            [since, *FINAL_STATUSES],
+        ).fetchall()
+        setup_rows = c.execute(
+            "SELECT sent, resolved, reached_tp1, trend FROM setup_log "
+            "WHERE ts >= ? AND resolved = 1",
+            (since,),
+        ).fetchall()
+
+    trades = [dict(r) for r in sig_rows]
+    n_total = len(trades)
+    n_tp2   = sum(1 for t in trades if t["status"] == "TP2_HIT")
+    n_sl    = sum(1 for t in trades if t["status"] == "SL_HIT")
+    n_exp   = sum(1 for t in trades if t["status"] in ("EXPIRED", "TP1_EXPIRED"))
+    n_win   = sum(1 for t in trades if t["status"] in PROFIT_STATUSES)
+    wr      = round(n_win / n_total * 100, 1) if n_total else 0.0
+    total_r = round(sum(
+        float(t.get("realized_r") or 0) if t.get("realized_r") is not None
+        else _status_to_r(t["status"])
+        for t in trades
+    ), 2)
+
+    sym_w: dict = defaultdict(int)
+    sym_sl: dict = defaultdict(int)
+    for t in trades:
+        s = t["symbol"]
+        if t["status"] in PROFIT_STATUSES: sym_w[s] += 1
+        elif t["status"] == "SL_HIT": sym_sl[s] += 1
+    all_syms = set(sym_w) | set(sym_sl)
+    top3 = sorted(all_syms, key=lambda s: sym_w.get(s, 0) - sym_sl.get(s, 0), reverse=True)[:3]
+    top3_data = [(s, sym_w.get(s, 0), sym_sl.get(s, 0)) for s in top3]
+
+    best  = max(trades, key=lambda t: float(t.get("realized_r") or 0), default=None)
+    worst = min(trades, key=lambda t: float(t.get("realized_r") or 0), default=None)
+
+    trend_w: dict = defaultdict(int)
+    trend_sl: dict = defaultdict(int)
+    trend_n: dict = defaultdict(int)
+    for t in trades:
+        tr = (t.get("trend") or "").strip()
+        if not tr:
+            continue
+        trend_n[tr] += 1
+        if t["status"] in PROFIT_STATUSES: trend_w[tr] += 1
+        elif t["status"] == "SL_HIT": trend_sl[tr] += 1
+    trend_wr = {
+        tr: round(trend_w[tr] / trend_n[tr] * 100, 0)
+        for tr in trend_n if trend_n[tr] >= 3
+    }
+
+    setups = [dict(r) for r in setup_rows]
+    sent_s = [s for s in setups if s["sent"] == 1]
+    rej_s  = [s for s in setups if s["sent"] == 0]
+    sent_tp1 = sum(1 for s in sent_s if s["reached_tp1"])
+    rej_tp1  = sum(1 for s in rej_s  if s["reached_tp1"])
+
+    return {
+        "n_total":        n_total,
+        "n_win":          n_win,
+        "n_tp2":          n_tp2,
+        "n_sl":           n_sl,
+        "n_exp":          n_exp,
+        "wr":             wr,
+        "total_r":        total_r,
+        "top3":           top3_data,
+        "best_trade":     {"symbol": best["symbol"],  "r": float(best.get("realized_r")  or _status_to_r(best["status"]))}  if best  else None,
+        "worst_trade":    {"symbol": worst["symbol"], "r": float(worst.get("realized_r") or _status_to_r(worst["status"]))} if worst else None,
+        "n_sent":         len(sent_s),
+        "n_rejected":     len(rej_s),
+        "sent_tp1_rate":  round(sent_tp1 / len(sent_s) * 100, 1) if sent_s else 0.0,
+        "rej_tp1_rate":   round(rej_tp1  / len(rej_s)  * 100, 1) if rej_s  else 0.0,
+        "trend_wr":       trend_wr,
+    }
+
+
 def get_setups_by_date(date_str: str) -> list:
     """Return all setups for a given date. Accepts DD.MM, DD.MM.YYYY, YYYY-MM-DD.
     Timestamps stored as UTC, displayed in caller's chosen tz."""

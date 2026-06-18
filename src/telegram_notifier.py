@@ -448,6 +448,87 @@ def send_morning_digest(digest: dict) -> bool:
     return _send_message("\n".join(lines))
 
 
+def send_weekly_digest(stats: dict, commentary: str) -> bool:
+    """Format and send the Sunday weekly digest."""
+    _RU_MONTHS = ["янв","фев","мар","апр","май","июн","июл","авг","сен","окт","ноя","дек"]
+    now_riga = datetime.now(_RIGA)
+    # week range: last 7 days
+    from datetime import timedelta
+    week_start = now_riga - timedelta(days=6)
+    date_range = (
+        f"{week_start.day} {_RU_MONTHS[week_start.month-1]} — "
+        f"{now_riga.day} {_RU_MONTHS[now_riga.month-1]}"
+    )
+
+    n_total = stats.get("n_total", 0)
+    wr      = stats.get("wr", 0.0)
+    total_r = stats.get("total_r", 0.0)
+    n_tp2   = stats.get("n_tp2", 0)
+    n_sl    = stats.get("n_sl", 0)
+    n_exp   = stats.get("n_exp", 0)
+    best    = stats.get("best_trade")
+    worst   = stats.get("worst_trade")
+    top3    = stats.get("top3", [])
+    n_sent  = stats.get("n_sent", 0)
+    n_rej   = stats.get("n_rejected", 0)
+    sent_tp1 = stats.get("sent_tp1_rate", 0.0)
+    rej_tp1  = stats.get("rej_tp1_rate", 0.0)
+    trend_wr = stats.get("trend_wr", {})
+
+    r_sign = "+" if total_r >= 0 else ""
+    wr_icon = "🟢" if wr >= 60 else ("🟡" if wr >= 50 else "🔴")
+
+    lines = [
+        f"📊 *ИТОГИ НЕДЕЛИ* — {date_range}",
+        "━━━━━━━━━━━━━━━━━━━",
+    ]
+
+    if n_total == 0:
+        lines.append("_Сделок за неделю не было._")
+    else:
+        lines += [
+            f"Сделок: *{n_total}* | WR: {wr_icon} *{wr}%* | R: *{r_sign}{total_r}R*",
+            f"TP2: {n_tp2} | SL: {n_sl} | Истекло: {n_exp}",
+        ]
+        if best:
+            lines.append(f"Лучшая: *{best['symbol']}* {best['r']:+.2f}R")
+        if worst:
+            lines.append(f"Худшая: *{worst['symbol']}* {worst['r']:+.2f}R")
+        if top3:
+            top3_str = "  ".join(f"{s}({w}W/{sl}SL)" for s, w, sl in top3)
+            lines.append(f"Топ монеты: _{top3_str}_")
+
+    if trend_wr:
+        lines.append("")
+        lines.append("📐 *По структуре тренда*")
+        for tr, wr_pct in sorted(trend_wr.items()):
+            icon = "🟢" if wr_pct >= 65 else ("🟡" if wr_pct >= 55 else "🔴")
+            lines.append(f"  {icon} {tr}: {int(wr_pct)}% WR")
+
+    if n_sent + n_rej > 0:
+        lines += [
+            "",
+            "🤖 *Точность ИИ*",
+            f"Одобрил: {n_sent} → TP1 дошло {sent_tp1}%",
+            f"Отклонил: {n_rej} → TP1 бы дошло {rej_tp1}%",
+        ]
+        if n_rej >= 5:
+            if rej_tp1 > sent_tp1 + 10:
+                lines.append("⚠️ _ИИ слишком строгий — много хороших сделок отклонено_")
+            elif rej_tp1 < sent_tp1 - 10:
+                lines.append("✅ _ИИ фильтрует хорошо_")
+
+    if commentary:
+        lines += [
+            "",
+            "💬 *Разбор недели \\(Llama 3\\.3\\)*",
+            _esc(commentary),
+        ]
+
+    lines.append("━━━━━━━━━━━━━━━━━━━")
+    return _send_message("\n".join(lines))
+
+
 def send_status(text: str) -> bool:
     return _send_message(text)
 
