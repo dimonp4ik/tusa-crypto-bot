@@ -26,6 +26,10 @@ from config import (
     MAX_SETUPS_TO_CLAUDE, ALLOWED_SYMBOLS, KLINES_INTERVAL_SEC, SIGNAL_EXPIRY_HOURS,
     CLAUDE_HEAVY_MIN_SCORE, CLAUDE_HEAVY_MAX_PER_SCAN, CLAUDE_MEMORY_LIMIT,
     TRAIL_RUNNER_ENABLED, TRAIL_ATR_MULT,
+    TP1_CLOSE_FRAC, EXIT_PROFILE,
+    POST_TP1_STRONG_TRAIL_ATR_MULT, POST_TP1_WEAK_TRAIL_ATR_MULT,
+    POST_TP1_STRONG_CLOSE_PROGRESS, POST_TP1_STRONG_WICK_PROGRESS,
+    POST_TP1_WEAK_CLOSE_PROGRESS,
     KNN_RISK_OVERLAY, KNN_DEEP_CANDLES, KNN_MAX_HISTORY, KNN_SHAPE_LEN,
     KNN_HORIZON, KNN_K, KNN_MIN_HISTORY, KNN_HIGH_SCORE, KNN_HIGH_MULT,
     KNN_LOW_SCORE, KNN_LOW_MULT, KNN_RISK_MAX_MULT, KNN_RISK_MIN_MULT,
@@ -1867,6 +1871,36 @@ def _slice_candles_from_open(candles: dict, after_ts: float) -> dict:
     return {k: [v[i] for i in idxs] for k, v in candles.items()}
 
 
+def _post_tp1_trail_mult(direction: str, entry: float, tp1: float, tp2: float,
+                         high: float, low: float, close: float) -> float:
+    """Context-aware runner trail chosen from the TP1-acceptance candle (post_tp1_v2).
+
+    Strong follow-through past TP1 (close or wick well into the TP1→TP2 leg) → trail
+    WIDE so the winner can run. Weak/rejected acceptance (closed back below TP1) →
+    trail TIGHT to lock the gain. Falls back to the flat TRAIL_ATR_MULT for other
+    exit profiles. Validated: lets winners run while bounding give-back.
+    """
+    base = max(0.0, float(TRAIL_ATR_MULT))
+    if str(EXIT_PROFILE).lower() != "post_tp1_v2":
+        return base
+    leg = abs(float(tp2) - float(tp1))
+    if leg <= 0:
+        return base
+    if str(direction).upper() == "LONG":
+        close_progress = (float(close) - float(tp1)) / leg
+        wick_progress  = (float(high) - float(tp1)) / leg
+        failed_close   = float(close) < float(tp1)
+    else:
+        close_progress = (float(tp1) - float(close)) / leg
+        wick_progress  = (float(tp1) - float(low)) / leg
+        failed_close   = float(close) > float(tp1)
+    if close_progress >= POST_TP1_STRONG_CLOSE_PROGRESS or wick_progress >= POST_TP1_STRONG_WICK_PROGRESS:
+        return max(base, float(POST_TP1_STRONG_TRAIL_ATR_MULT))
+    if failed_close or close_progress <= POST_TP1_WEAK_CLOSE_PROGRESS:
+        return min(base, float(POST_TP1_WEAK_TRAIL_ATR_MULT))
+    return base
+
+
 def _check_open_signals():
     """For each OPEN signal in DB, fetch current price and update status."""
     active_signals = get_open_signals()
@@ -1899,14 +1933,29 @@ def _check_open_signals():
 
             new_status   = None
             realized_r   = None
+            runner_trail_atr_mult = None   # frozen at TP1 candle, reused next cycles
             exit_px      = df_all["close"][-1] if df_all.get("close") else entry
 
-            # Trailing-runner setup (after TP1): peak ∓ TRAIL_ATR_MULT×ATR, floored at BE.
+            # Runner exit after TP1 (post_tp1_v2): keep TP1_CLOSE_FRAC of the position
+            # closed at TP1, trail the rest by a context-chosen ATR multiple.
             atr        = float(sig.get("atr") or 0.0)
             risk       = abs(entry - sl)
             tp1_r      = (abs(tp1 - entry) / risk) if risk > 0 else 0.0
+            tp2_r      = (abs(tp2 - entry) / risk) if risk > 0 else 0.0
+            tp1_close_frac = max(0.0, min(1.0, float(TP1_CLOSE_FRAC)))
+            runner_frac    = 1.0 - tp1_close_frac
             use_trail  = TRAIL_RUNNER_ENABLED and atr > 0 and risk > 0
             best_price = entry   # running peak since TP1
+            # Trail multiple: reuse the one frozen at the TP1 candle; legacy rows
+            # without it fall back to the flat base and recompute on first bar below.
+            stored_trail_mult = sig.get("runner_trail_atr_mult")
+            if stored_trail_mult not in (None, ""):
+                try:
+                    trail_atr_mult = max(0.0, float(stored_trail_mult))
+                except (TypeError, ValueError):
+                    trail_atr_mult = max(0.0, float(TRAIL_ATR_MULT))
+            else:
+                trail_atr_mult = max(0.0, float(TRAIL_ATR_MULT))
 
             for i in range(len(df.get("close", []))):
                 high  = float(df["high"][i])
@@ -1916,51 +1965,71 @@ def _check_open_signals():
 
                 if status == "OPEN":
                     if direction == "LONG":
-                        if low <= sl:             new_status, exit_px = "SL_HIT",     sl;  break
-                        if high >= tp2:           new_status, exit_px = "TP2_HIT",    tp2; break
-                        if high >= tp1:           new_status, exit_px = "TP1_PARTIAL", tp1; break
+                        if low <= sl:             realized_r = -1.0; new_status, exit_px = "SL_HIT", sl;  break
+                        if high >= tp2:
+                            realized_r = round(tp1_close_frac * tp1_r + runner_frac * tp2_r, 4)
+                            new_status, exit_px = "TP2_HIT", tp2; break
+                        if high >= tp1:
+                            runner_trail_atr_mult = _post_tp1_trail_mult(direction, entry, tp1, tp2, high, low, close)
+                            new_status, exit_px = "TP1_PARTIAL", tp1; break
                     else:
-                        if high >= sl:            new_status, exit_px = "SL_HIT",     sl;  break
-                        if low <= tp2:            new_status, exit_px = "TP2_HIT",    tp2; break
-                        if low <= tp1:            new_status, exit_px = "TP1_PARTIAL", tp1; break
+                        if high >= sl:            realized_r = -1.0; new_status, exit_px = "SL_HIT", sl;  break
+                        if low <= tp2:
+                            realized_r = round(tp1_close_frac * tp1_r + runner_frac * tp2_r, 4)
+                            new_status, exit_px = "TP2_HIT", tp2; break
+                        if low <= tp1:
+                            runner_trail_atr_mult = _post_tp1_trail_mult(direction, entry, tp1, tp2, high, low, close)
+                            new_status, exit_px = "TP1_PARTIAL", tp1; break
 
                 elif status == "TP1_PARTIAL":
                     if use_trail:
-                        # Trail the remaining 50% by ATR; stop never below breakeven.
+                        # Recompute the trail on the first bar for legacy rows missing it.
+                        if i == 0 and stored_trail_mult in (None, ""):
+                            trail_atr_mult = _post_tp1_trail_mult(direction, entry, tp1, tp2, high, low, close)
                         if direction == "LONG":
                             best_price = max(best_price, high)
-                            trail_stop = max(entry, best_price - atr * TRAIL_ATR_MULT)
+                            trail_stop = max(entry, best_price - atr * trail_atr_mult)
                             if low <= trail_stop:
                                 runner_r   = max(0.0, (trail_stop - entry) / risk)
-                                realized_r = round(0.5 * tp1_r + 0.5 * runner_r, 4)
+                                realized_r = round(tp1_close_frac * tp1_r + runner_frac * runner_r, 4)
                                 new_status, exit_px = "TP1_TRAIL", trail_stop; break
                             if high >= tp2:
-                                realized_r = round(0.5 * tp1_r + 0.5 * (abs(tp2 - entry) / risk), 4)
+                                realized_r = round(tp1_close_frac * tp1_r + runner_frac * tp2_r, 4)
                                 new_status, exit_px = "TP2_HIT", tp2; break
                         else:
                             best_price = min(best_price, low)
-                            trail_stop = min(entry, best_price + atr * TRAIL_ATR_MULT)
+                            trail_stop = min(entry, best_price + atr * trail_atr_mult)
                             if high >= trail_stop:
                                 runner_r   = max(0.0, (entry - trail_stop) / risk)
-                                realized_r = round(0.5 * tp1_r + 0.5 * runner_r, 4)
+                                realized_r = round(tp1_close_frac * tp1_r + runner_frac * runner_r, 4)
                                 new_status, exit_px = "TP1_TRAIL", trail_stop; break
                             if low <= tp2:
-                                realized_r = round(0.5 * tp1_r + 0.5 * (abs(entry - tp2) / risk), 4)
+                                realized_r = round(tp1_close_frac * tp1_r + runner_frac * tp2_r, 4)
                                 new_status, exit_px = "TP2_HIT", tp2; break
                     else:
                         # Legacy: SL moved to breakeven, fixed TP2 (no stored ATR).
                         if direction == "LONG":
-                            if low <= entry:      new_status, exit_px = "BREAKEVEN", entry; break
-                            if high >= tp2:       new_status, exit_px = "TP2_HIT",   tp2;   break
+                            if low <= entry:
+                                realized_r = round(tp1_close_frac * tp1_r, 4)
+                                new_status, exit_px = "BREAKEVEN", entry; break
+                            if high >= tp2:
+                                realized_r = round(tp1_close_frac * tp1_r + runner_frac * tp2_r, 4)
+                                new_status, exit_px = "TP2_HIT", tp2; break
                         else:
-                            if high >= entry:     new_status, exit_px = "BREAKEVEN", entry; break
-                            if low <= tp2:        new_status, exit_px = "TP2_HIT",   tp2;   break
+                            if high >= entry:
+                                realized_r = round(tp1_close_frac * tp1_r, 4)
+                                new_status, exit_px = "BREAKEVEN", entry; break
+                            if low <= tp2:
+                                realized_r = round(tp1_close_frac * tp1_r + runner_frac * tp2_r, 4)
+                                new_status, exit_px = "TP2_HIT", tp2; break
 
             if new_status is None and age_hours > SIGNAL_EXPIRY_HOURS:
                 new_status = "TP1_EXPIRED" if status == "TP1_PARTIAL" else "EXPIRED"
+                realized_r = round(tp1_close_frac * tp1_r, 4) if status == "TP1_PARTIAL" else 0.0
 
             if new_status:
-                update_signal_status(sig["id"], new_status, exit_px, realized_r=realized_r)
+                update_signal_status(sig["id"], new_status, exit_px, realized_r=realized_r,
+                                     runner_trail_atr_mult=runner_trail_atr_mult)
                 log.info(f"  Signal #{sig['id']} {sig['symbol']} → {new_status}")
                 try:
                     send_signal_update(sig, new_status, exit_px)

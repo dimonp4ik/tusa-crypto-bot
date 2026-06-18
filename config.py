@@ -331,7 +331,21 @@ TP2_R_MULT    = float(os.getenv("TP2_R_MULT", "2.0"))      # TP2 = entry ± risk
 # Backtest (10 sym, 2880x15m): +21% net R, -27% max drawdown, same win rate vs
 # fixed TP2. Trailing stop = peak ∓ TRAIL_ATR_MULT×ATR, floored at breakeven.
 TRAIL_RUNNER_ENABLED = os.getenv("TRAIL_RUNNER_ENABLED", "1") != "0"
-TRAIL_ATR_MULT       = float(os.getenv("TRAIL_ATR_MULT", "0.5"))  # 0.75→0.5: tighter lock, +6% R (90d A/B)
+TRAIL_ATR_MULT       = float(os.getenv("TRAIL_ATR_MULT", "0.25"))  # base trail; post_tp1_v2 overrides per-context
+
+# Exit profile: "post_tp1_v2" keeps the FULL position past TP1 (TP1_CLOSE_FRAC=0)
+# and trails by an ATR multiple chosen from the TP1-acceptance candle — strong
+# follow-through trails wide (let it run), weak/rejected trails tight (lock).
+# Validated 3 windows on our cache (90/180/365d): net R +80/+91/+124% with LOWER
+# drawdown, win rate / trades / SL count UNCHANGED — it only changes how winners
+# are harvested, never which trades are taken. "fixed" = legacy 50%-at-TP1 + BE.
+TP1_CLOSE_FRAC = max(0.0, min(1.0, float(os.getenv("TP1_CLOSE_FRAC", "0.0"))))
+EXIT_PROFILE   = os.getenv("EXIT_PROFILE", "post_tp1_v2").strip().lower()
+POST_TP1_STRONG_TRAIL_ATR_MULT = float(os.getenv("POST_TP1_STRONG_TRAIL_ATR_MULT", "0.35"))
+POST_TP1_WEAK_TRAIL_ATR_MULT   = float(os.getenv("POST_TP1_WEAK_TRAIL_ATR_MULT", "0.15"))
+POST_TP1_STRONG_CLOSE_PROGRESS = float(os.getenv("POST_TP1_STRONG_CLOSE_PROGRESS", "0.25"))
+POST_TP1_STRONG_WICK_PROGRESS  = float(os.getenv("POST_TP1_STRONG_WICK_PROGRESS", "0.55"))
+POST_TP1_WEAK_CLOSE_PROGRESS   = float(os.getenv("POST_TP1_WEAK_CLOSE_PROGRESS", "-0.10"))
 
 # --- k-NN price-shape analog risk overlay (Kronos-inspired, CPU-only) ----------
 # After a setup passes, fetch a deep 15m series and match the recent price shape

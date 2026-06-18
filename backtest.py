@@ -67,6 +67,13 @@ from config import (  # noqa: E402
     TP1_R_MULT,
     TP2_R_MULT,
     TRAIL_ATR_MULT,
+    TP1_CLOSE_FRAC,
+    EXIT_PROFILE,
+    POST_TP1_STRONG_TRAIL_ATR_MULT,
+    POST_TP1_WEAK_TRAIL_ATR_MULT,
+    POST_TP1_STRONG_CLOSE_PROGRESS,
+    POST_TP1_STRONG_WICK_PROGRESS,
+    POST_TP1_WEAK_CLOSE_PROGRESS,
     MIN_24H_QUOTE_VOLUME_USDT,
 )
 from src.signal_filter import analyze_coin_smc  # noqa: E402
@@ -439,6 +446,34 @@ def aligned_slice_by_time(
     return candle_slice(candles, start, end)
 
 
+_TP1_CLOSE_FRAC = max(0.0, min(1.0, float(TP1_CLOSE_FRAC)))
+_RUNNER_FRAC = 1.0 - _TP1_CLOSE_FRAC
+
+
+def _post_tp1_trail_mult_bt(direction: str, entry: float, tp1: float, tp2: float,
+                            high: float, low: float, close: float) -> float:
+    """Context-aware runner trail from the TP1 candle (mirrors live _post_tp1_trail_mult)."""
+    base = max(0.0, float(TRAIL_ATR_MULT))
+    if str(EXIT_PROFILE).lower() != "post_tp1_v2":
+        return base
+    leg = abs(float(tp2) - float(tp1))
+    if leg <= 0:
+        return base
+    if str(direction).upper() == "LONG":
+        close_progress = (float(close) - float(tp1)) / leg
+        wick_progress = (float(high) - float(tp1)) / leg
+        failed_close = float(close) < float(tp1)
+    else:
+        close_progress = (float(tp1) - float(close)) / leg
+        wick_progress = (float(tp1) - float(low)) / leg
+        failed_close = float(close) > float(tp1)
+    if close_progress >= POST_TP1_STRONG_CLOSE_PROGRESS or wick_progress >= POST_TP1_STRONG_WICK_PROGRESS:
+        return max(base, float(POST_TP1_STRONG_TRAIL_ATR_MULT))
+    if failed_close or close_progress <= POST_TP1_WEAK_CLOSE_PROGRESS:
+        return min(base, float(POST_TP1_WEAK_TRAIL_ATR_MULT))
+    return base
+
+
 def gross_r_for_outcome(outcome: str, entry: float, tp1: float, tp2: float, sl: float) -> float:
     risk = abs(entry - sl)
     if risk <= 0:
@@ -448,9 +483,9 @@ def gross_r_for_outcome(outcome: str, entry: float, tp1: float, tp2: float, sl: 
     tp2_r = abs(tp2 - entry) / risk
 
     if outcome == "TP2":
-        return 0.5 * tp1_r + 0.5 * tp2_r
+        return _TP1_CLOSE_FRAC * tp1_r + _RUNNER_FRAC * tp2_r
     if outcome == "TP1":
-        return 0.5 * tp1_r
+        return _TP1_CLOSE_FRAC * tp1_r
     if outcome == "SL":
         return -1.0
     return 0.0
@@ -465,7 +500,7 @@ def gross_r_for_trailing_exit(entry: float, tp1: float, trail_exit: float, sl: f
         trail_r = (trail_exit - entry) / risk
     else:
         trail_r = (entry - trail_exit) / risk
-    return 0.5 * tp1_r + 0.5 * max(0.0, trail_r)
+    return _TP1_CLOSE_FRAC * tp1_r + _RUNNER_FRAC * max(0.0, trail_r)
 
 
 def execution_fill_price(
@@ -588,6 +623,7 @@ def simulate_trade_direct(
 
     highs = candles_15m["high"]
     lows = candles_15m["low"]
+    closes = candles_15m["close"]
     times = candles_15m.get("time") or []
     end = min(fill_bar + window, len(highs))
     outcome = "EXPIRED"
@@ -597,6 +633,7 @@ def simulate_trade_direct(
     trailing_stop = entry
     trail_exit_price = entry
     best_price = entry
+    trail_mult_eff = max(0.0, float(trail_atr_mult))  # context-frozen at TP1 candle
 
     for j in range(fill_bar, end):
         h = highs[j]
@@ -617,6 +654,7 @@ def simulate_trade_direct(
                     outcome = "TP1"
                     tp1_reached = True
                     exit_bar = j
+                    trail_mult_eff = _post_tp1_trail_mult_bt(direction, entry, tp1, tp2, h, l, closes[j])
                     continue
             else:
                 if h >= sl:
@@ -633,12 +671,13 @@ def simulate_trade_direct(
                     outcome = "TP1"
                     tp1_reached = True
                     exit_bar = j
+                    trail_mult_eff = _post_tp1_trail_mult_bt(direction, entry, tp1, tp2, h, l, closes[j])
                     continue
         else:
             if direction == "LONG":
                 if exit_policy == "trail":
                     best_price = max(best_price, h)
-                    trailing_stop = max(entry, best_price - max(0.0, float(setup.get("atr", 0.0) or 0.0)) * trail_atr_mult)
+                    trailing_stop = max(entry, best_price - max(0.0, float(setup.get("atr", 0.0) or 0.0)) * trail_mult_eff)
                     if l <= trailing_stop:
                         outcome = "TRAIL"
                         trail_exit_price = trailing_stop
@@ -658,7 +697,7 @@ def simulate_trade_direct(
             else:
                 if exit_policy == "trail":
                     best_price = min(best_price, l)
-                    trailing_stop = min(entry, best_price + max(0.0, float(setup.get("atr", 0.0) or 0.0)) * trail_atr_mult)
+                    trailing_stop = min(entry, best_price + max(0.0, float(setup.get("atr", 0.0) or 0.0)) * trail_mult_eff)
                     if h >= trailing_stop:
                         outcome = "TRAIL"
                         trail_exit_price = trailing_stop

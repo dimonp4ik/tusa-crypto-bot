@@ -70,7 +70,8 @@ def init_db():
                 mtf_score_max INTEGER,
                 premium       INTEGER DEFAULT 0,
                 atr           REAL,
-                realized_r    REAL
+                realized_r    REAL,
+                runner_trail_atr_mult REAL
             )
         """)
         # Migrate older DBs
@@ -86,6 +87,7 @@ def init_db():
             "premium":       "INTEGER DEFAULT 0",
             "atr":           "REAL",
             "realized_r":    "REAL",
+            "runner_trail_atr_mult": "REAL",
         }.items():
             _ensure_column(c, "signals", col, ddl)
 
@@ -292,21 +294,25 @@ def get_open_signals() -> list:
         return [dict(r) for r in rows]
 
 
-def update_signal_status(signal_id: int, status: str, exit_price=None, realized_r=None):
+def update_signal_status(signal_id: int, status: str, exit_price=None, realized_r=None,
+                         runner_trail_atr_mult=None):
     """
     Update signal lifecycle.
     TP1_PARTIAL records TP1 but keeps signal active for TP2/BE monitoring.
     All other statuses close the signal.
     `realized_r` (optional) stores the actual R for variable-exit closes (trailing).
+    `runner_trail_atr_mult` (optional) freezes the context-aware trail chosen at the
+    TP1 candle so later monitor cycles reuse it instead of recomputing (post_tp1_v2).
     """
     now = time_mod.time()
     with _conn() as c:
         if status == "TP1_PARTIAL":
             c.execute("""
                 UPDATE signals
-                SET status = 'TP1_PARTIAL', tp1_hit_at = ?, tp1_exit_price = ?
+                SET status = 'TP1_PARTIAL', tp1_hit_at = ?, tp1_exit_price = ?,
+                    runner_trail_atr_mult = ?
                 WHERE id = ? AND status = 'OPEN'
-            """, (now, exit_price, signal_id))
+            """, (now, exit_price, runner_trail_atr_mult, signal_id))
         else:
             c.execute("""
                 UPDATE signals SET status = ?, closed_at = ?, exit_price = ?, realized_r = ?
