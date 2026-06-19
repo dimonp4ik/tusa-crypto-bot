@@ -503,7 +503,7 @@ def _stability_overlay_pass(ind: dict, adaptive_pack: str, quality_score: float 
 
 def analyze_coin_smc(candles_15m: dict, candles_1h: dict, symbol: str,
                      candles_4h: dict = None, btc_change_pct: float = 0.0,
-                     candles_1d: dict = None) -> dict | None:
+                     candles_1d: dict = None, diag: dict = None) -> dict | None:
     """
     SMC-based setup detector with MTF score and zone entry.
 
@@ -807,7 +807,17 @@ def analyze_coin_smc(candles_15m: dict, candles_1h: dict, symbol: str,
     mtf_score, score_tags = _calc_mtf_score(
         ind, bos, direction, confirmations, btc_change_pct, entry_zone, premium
     )
+    # Diagnostics: this coin survived ALL structural gates and got scored.
+    # Lets run_scan log how many of N coins reach scoring + the best score,
+    # so we can tell "strict gate" (close misses) from "no structure" (0 reach).
+    if diag is not None:
+        diag["reached_score"] = diag.get("reached_score", 0) + 1
+        if mtf_score > diag.get("best_score", -1):
+            diag["best_score"]  = mtf_score
+            diag["best_symbol"] = symbol
     if mtf_score < MTF_MIN_SCORE:
+        if diag is not None:
+            diag["score_fail"] = diag.get("score_fail", 0) + 1
         return None
 
     # 8b. Adaptive regime pack gate (DEFAULT OFF — under backtest evaluation).

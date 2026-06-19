@@ -2195,6 +2195,7 @@ def run_scan():
         log.info(f"Fetched {len(coins)} coins ({mode})")
 
         setups = []
+        smc_diag = {}  # funnel diagnostics: how many coins reached scoring + best score
 
         # Step 2: SMC filter — BOS + confirmation + 1h/4h trend + BTC correlation
         for symbol in coins:
@@ -2203,7 +2204,7 @@ def run_scan():
                 df_1h  = get_klines_1h(symbol)
                 df_4h  = get_klines_4h(symbol)
                 df_1d  = get_klines_1d(symbol)
-                setup  = analyze_coin_smc(df_15m, df_1h, symbol, df_4h, btc_change, df_1d)
+                setup  = analyze_coin_smc(df_15m, df_1h, symbol, df_4h, btc_change, df_1d, diag=smc_diag)
                 if setup:
                     _apply_knn_overlay(setup, symbol)
                     log.info(
@@ -2217,6 +2218,16 @@ def run_scan():
                 log.warning(f"  Skip {symbol}: {e}")
 
         log.info(f"SMC filter: {len(setups)} setups from {len(coins)} coins")
+        # Funnel: how many coins survived ALL structural gates to reach scoring,
+        # and the best score seen — distinguishes "strict gate" (close miss) from
+        # "no structure today" (0 reach). best vs MTF_MIN_SCORE shows the gap.
+        from config import MTF_MIN_SCORE as _MTF_MIN
+        log.info(
+            f"  SMC funnel: {smc_diag.get('reached_score', 0)}/{len(coins)} reached scoring · "
+            f"best score {smc_diag.get('best_score', 0)}/{_MTF_MIN} needed "
+            f"({smc_diag.get('best_symbol', '-')}) · "
+            f"{smc_diag.get('score_fail', 0)} missed score gate"
+        )
         _last_scan_stats["coins"]  = len(coins)
         _last_scan_stats["setups"] = len(setups)
         _last_scan_stats["ts"]     = time.time()
