@@ -9,10 +9,18 @@ from config import (
     CLAUDE_MAX_RISK_SCORE, CLAUDE_CACHE_TTL, CLAUDE_MEMORY_LIMIT,
     CLAUDE_DAILY_BUDGET_USD, CLAUDE_BUDGET_RESERVE_USD,
 )
-from src.db import log_claude_call, get_claude_spend_today, get_similar_resolved_setups
+from src.db import (
+    log_claude_call, get_claude_spend_today, get_similar_resolved_setups,
+    get_setup_accuracy,
+)
 
 # Minimum resolved similar setups before self-feedback is shown (avoid noise).
 _SELF_FEEDBACK_MIN = 6
+
+# Global calibration: min resolved REJECTED setups before the macro skew line is
+# injected, and the min TP1% gap (rejected − sent) that counts as "too strict".
+_GLOBAL_FEEDBACK_MIN_REJ = 15
+_GLOBAL_FEEDBACK_MIN_GAP  = 8.0
 
 _log = logging.getLogger(__name__)
 
@@ -204,6 +212,37 @@ def _self_feedback(s: dict) -> str:
     return f" Hist[{'; '.join(parts)}]" if parts else ""
 
 
+def _global_feedback() -> str:
+    """One-shot macro calibration line for the batch prompt.
+
+    Unlike _self_feedback (per-setup, needs ≥6 SIMILAR resolved rows and so stays
+    cold for weeks), this looks at the WHOLE last-30d shadow ledger: if the setups
+    Claude rejected are reaching TP1 meaningfully MORE often than the ones it
+    approved, Claude has been globally too strict — tell it so immediately. Empty
+    until enough rejected samples exist or when there's no meaningful skew.
+    """
+    try:
+        import time as _t
+        acc = get_setup_accuracy(_t.time() - 30 * 86400)
+    except Exception:
+        return ""
+    snt, rej = acc.get("sent", {}), acc.get("rejected", {})
+    if rej.get("n", 0) < _GLOBAL_FEEDBACK_MIN_REJ:
+        return ""
+    gap = rej.get("tp1_pct", 0.0) - snt.get("tp1_pct", 0.0)  # >0 = rejected won more
+    if gap < _GLOBAL_FEEDBACK_MIN_GAP:
+        return ""
+    return (
+        f"\nCALIBRATION — last 30d shadow outcomes of your own verdicts: you REJECTED "
+        f"{rej['n']} setups and {rej['tp1_pct']:.0f}% of them still reached TP1; you "
+        f"APPROVED {snt.get('n', 0)} and only {snt.get('tp1_pct', 0.0):.0f}% reached TP1. "
+        f"The setups you rejected are hitting TP1 ~{gap:.0f}pp MORE often than the ones "
+        f"you approved — you have been TOO STRICT. Every candidate below already passed "
+        f"a strict rule-filter with proven edge. Bias toward CONFIRMING the suggested "
+        f"side; return NO TRADE only on a clear, specific red flag (not vague caution).\n"
+    )
+
+
 def _setup_line(i: int, s: dict) -> str:
     fvg     = "Y" if s.get("fvg")         else "N"
     ob      = "Y" if s.get("order_block") else "N"
@@ -376,6 +415,7 @@ def analyze_batch_with_claude(setups: list, news_context: dict = None) -> list:
     coins_text = "\n".join(_setup_line(i, s) for i, s in enumerate(setups, 1))
     user_text = (
         f"{_news_block(news_context)}"
+        f"{_global_feedback()}"
         f"Validate these {len(setups)} setups. Return exactly {len(setups)} verdicts "
         f"(one per index) via submit_verdicts:\n{coins_text}"
     )
@@ -469,6 +509,7 @@ def analyze_heavy(setup: dict, news_context: dict = None, history: list = None) 
 
     user_text = (
         f"{_news_block(news_context)}"
+        f"{_global_feedback()}"
         f"{_memory_block(history)}\n"
         f"Setup to analyze:\n{setup_line}\n\n"
         f"Work through these questions before submitting your verdict:\n"
