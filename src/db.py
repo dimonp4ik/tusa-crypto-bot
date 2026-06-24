@@ -187,6 +187,10 @@ def init_db():
             "resolved":     "INTEGER NOT NULL DEFAULT 0",
             "resolved_ts":  "REAL",
             "trend":        "TEXT",
+            # Open Interest shadow feature (logged, not yet acted on).
+            "oi_delta_pct": "REAL",
+            "oi_regime":    "TEXT",
+            "oi_confirms":  "INTEGER",
         }.items():
             _ensure_column(c, "setup_log", col, ddl)
 
@@ -841,8 +845,9 @@ def log_setup_candidate(analysis: dict) -> int:
             INSERT INTO setup_log
                 (ts, symbol, direction, entry_price, tp1, tp2, sl,
                  mtf_score, decision, confidence, risk_score, reason, sent,
-                 session, entry_source, trend)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?, ?, ?)
+                 session, entry_source, trend,
+                 oi_delta_pct, oi_regime, oi_confirms)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?, ?, ?, ?, ?, ?)
         """, (
             time_mod.time(),
             analysis.get("symbol", ""),
@@ -859,6 +864,9 @@ def log_setup_candidate(analysis: dict) -> int:
             analysis.get("session", ""),
             analysis.get("entry_source", ""),
             analysis.get("swing_trend", ""),
+            analysis.get("oi_delta_pct"),
+            analysis.get("oi_regime"),
+            analysis.get("oi_confirms"),
         ))
         return cur.lastrowid
 

@@ -37,6 +37,7 @@ from config import (
 from src.binance_client import (
     get_top_coins, get_klines, get_klines_1h, get_klines_4h, get_klines_1d,
     get_btc_change_1h, get_btc_change_1d, get_funding_rate, get_current_price,
+    get_open_interest,
 )
 from src.signal_filter import analyze_coin_smc
 from src.knn_analog import knn_direction_score, knn_risk_mult
@@ -2151,6 +2152,35 @@ def _track_setup_outcomes():
 
 
 # ── Main scanning function ────────────────────────────────────────────────────
+_OI_MIN_DELTA_PCT = 0.3  # ignore OI moves below this (noise floor)
+
+
+def _attach_oi(setup: dict) -> None:
+    """Shadow feature: tag a setup with its Open-Interest regime. NO trade impact —
+    written to setup_log so we can later correlate OI with reached_tp1.
+
+    OI is paired with the setup's price direction (the BOS):
+      rising OI  = new money behind the break → CONFIRMS the setup
+      falling OI = positions unwinding (short-cover / long-liq) → WARNS
+    Regime label differs by side for readability; oi_confirms is the learning bit.
+    """
+    series = get_open_interest(setup["symbol"])
+    if len(series) < 2 or not series[0]:
+        return
+    delta = (series[-1] - series[0]) / series[0] * 100.0
+    setup["oi_delta_pct"] = round(delta, 3)
+    direction = setup.get("direction", "")
+    if abs(delta) < _OI_MIN_DELTA_PCT:
+        setup["oi_regime"], setup["oi_confirms"] = "flat", 0
+        return
+    if direction == "LONG":
+        regime = "real_up" if delta > 0 else "short_cover"
+    else:  # SHORT
+        regime = "real_down" if delta > 0 else "long_liq"
+    setup["oi_regime"]   = regime
+    setup["oi_confirms"] = 1 if regime in ("real_up", "real_down") else 0
+
+
 def run_scan():
     now_utc = datetime.now(timezone.utc)
 
@@ -2294,6 +2324,14 @@ def run_scan():
 
         log.info(f"After news/funding/ranking: {len(enriched)} setups → sending to Claude")
         _last_scan_stats["enriched"] = len(enriched)
+
+        # OI shadow feature — tag only the ≤7 setups that go to Claude (cheap).
+        # Decision is NOT affected; we log oi_regime/oi_confirms to learn its edge.
+        for _s in enriched:
+            try:
+                _attach_oi(_s)
+            except Exception as _e:
+                log.debug(f"  OI attach failed {_s.get('symbol','?')}: {_e}")
 
         if not enriched:
             log.info("=== Scan complete — 0 signal(s) sent ===\n")

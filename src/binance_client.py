@@ -312,6 +312,30 @@ def get_current_price(symbol: str):
     return None
 
 
+def get_open_interest(symbol: str, interval: str = "15min", limit: int = 5):
+    """Open Interest series from Bybit (oldest→newest list of floats).
+
+    Bybit returns newest-first; we reverse. Used as a SHADOW feature: rising OI
+    with a same-direction price move = real money behind the break; falling OI =
+    short-cover / long-liquidation (weak move). Returns [] on any failure.
+    """
+    try:
+        params = {
+            "category":     "linear",
+            "symbol":       symbol,
+            "intervalTime": interval,
+            "limit":        limit,
+        }
+        resp = _bybit_get("/v5/market/open-interest", params, timeout=10)
+        lst  = resp.json().get("result", {}).get("list", [])
+        vals = [float(x["openInterest"]) for x in reversed(lst)
+                if x.get("openInterest") not in (None, "")]
+        return vals
+    except Exception as e:
+        _logger.debug(f"get_open_interest failed for {symbol}: {e}")
+        return []
+
+
 def get_funding_rate(symbol: str):
     """Get current funding rate from Bybit futures. Returns None if unavailable."""
     # Convert BTCUSDT to BTCUSDT (already correct format for Bybit)
