@@ -328,6 +328,24 @@ def _edit_admin_text(chat_id: int, message_id: int, text: str, reply_markup: dic
     if "message is not modified" in desc.lower():
         return resp
 
+    # Markdown parse failure on edit (e.g. a setup reason with an unbalanced
+    # `/[/_/* that slipped past escaping) — retry the SAME edit as plain text so
+    # the button never appears dead. Without this the panel silently stops working.
+    if "parse" in desc.lower():
+        resp = _requests.post(
+            f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/editMessageText",
+            json={
+                "chat_id": chat_id,
+                "message_id": message_id,
+                "text": text,
+                "reply_markup": reply_markup,
+            },
+            timeout=10,
+        )
+        if resp.status_code == 200:
+            return resp
+        desc = _telegram_error(resp)
+
     if _should_send_replacement(desc):
         _clear_inline_keyboard(chat_id, message_id)
         return _send_admin_text(chat_id, text, reply_markup)
@@ -1167,7 +1185,8 @@ def _format_setups_page(rows: list, date_str: str, page: int = 0,
         tp2_s   = _px(tp2)
         risk_s  = f" R{risk}" if risk is not None else ""
         conf_s  = f" {conf}" if conf else ""
-        reason_safe  = reason.replace("_", "\\_").replace("*", "\\*")[:60]
+        reason_safe  = (reason.replace("_", "\\_").replace("*", "\\*")
+                              .replace("`", "\\`").replace("[", "\\["))[:60]
         reason_short = (reason_safe + "…") if len(reason) > 60 else reason_safe
 
         lines.append(
