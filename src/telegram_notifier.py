@@ -256,14 +256,8 @@ def send_signal_update(sig: dict, new_status: str, exit_price: float) -> bool:
     if direction == "SHORT":
         move_pct = -move_pct
 
-    # Estimate leverage from SL distance (mirrors recommend_leverage logic)
-    sl_pct = abs(entry - sl) / entry if entry > 0 else 0.02
-    if sl_pct > 0:
-        raw = int(0.70 / sl_pct)
-        tiers = [5, 10, 15, 20, 25, 30, 40, 50]
-        lev = max(t for t in tiers if t <= max(5, raw))
-    else:
-        lev = 10
+    # Fixed 10x — mirrors recommend_leverage (OKX EU X-Perps retail cap)
+    lev = 10
     lev_profit = round(move_pct * lev, 0)
 
     arrow = "🟢" if direction == "LONG" else "🔴"
@@ -277,7 +271,7 @@ def send_signal_update(sig: dict, new_status: str, exit_price: float) -> bool:
         trail_val = round(atr_val * 0.75, 8) if atr_val > 0 else 0.0
         trail_line = (
             f"\n🔄 *Трейлинг-стоп на остаток 50%:* `{_format_price(trail_val)}`\n"
-            f"   _Выставь на Bybit: Позиция → Трейлинг-стоп → {_format_price(trail_val)}_"
+            f"   _Выставь на OKX: Позиция → Трейлинг-стоп → {_format_price(trail_val)}_"
         ) if trail_val > 0 else ""
         body  = (
             f"Закрыто 50% по `{_format_price(exit_price)}`\n"

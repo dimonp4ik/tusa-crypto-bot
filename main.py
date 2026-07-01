@@ -402,7 +402,7 @@ def _format_open_signal(s: dict) -> str:
     nearest_label = "TP2" if s["status"] == "TP1_PARTIAL" else "TP1"
 
     # Live price: use cached value from last 1-min monitor run (no extra API call).
-    # Falls back to a fresh Bybit request only if cache is empty (bot just started).
+    # Falls back to a fresh OKX request only if cache is empty (bot just started).
     cur = _last_prices.get(s["symbol"]) or get_current_price(s["symbol"])
     if cur and entry:
         pct   = (cur - entry) / entry * 100
