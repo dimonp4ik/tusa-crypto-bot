@@ -101,49 +101,36 @@ def _format_price(price: float) -> str:
 def recommend_leverage(price: float, sl: float, tp1: float, tp2: float,
                        direction: str, mtf_score: int) -> dict:
     """
-    Recommend Bybit leverage based on SL distance and setup quality.
+    Fixed 10x leverage — OKX EU X-Perps retail cap (MiFID). Always 10, never less
+    (user's call: with 1.2–3% stops, liquidation at ~9% is far beyond any SL).
 
-    Logic:
-      max_safe_lev = 70% / sl_pct  (SL stays above liquidation with safety buffer)
-      quality_mult  from MTF score (50–100% of max_safe)
-      Rounds down to nearest Bybit tier [5,10,15,20,25,30,40,50]
-
-    Returns leverage, liquidation price, and profit/loss % at that leverage.
+    Rating still reflects setup quality (MTF score); profit/loss % computed at 10x.
     """
+    LEV = 10
+    if mtf_score >= 13:
+        rating = "ИДЕАЛ 🔥"
+    elif mtf_score >= 11:
+        rating = "СИЛЬНЫЙ ⚡"
+    else:
+        rating = "ХОРОШИЙ ✅"
+
     if price <= 0:
-        return {"leverage": 10, "max_safe": 10, "rating": "ХОРОШИЙ ✅",
+        return {"leverage": LEV, "max_safe": LEV, "rating": rating,
                 "liq": 0.0, "tp1_profit": 0.0, "tp2_profit": 0.0, "sl_loss": 0.0}
 
-    sl_pct = abs(price - sl) / price
-    if sl_pct <= 0:
-        sl_pct = 0.03
-
-    max_safe = min(50, max(5, int(0.70 / sl_pct)))
-
-    if mtf_score >= 13:
-        quality = 1.00; rating = "ИДЕАЛ 🔥"
-    elif mtf_score >= 11:
-        quality = 0.75; rating = "СИЛЬНЫЙ ⚡"
-    else:
-        quality = 0.50; rating = "ХОРОШИЙ ✅"
-
-    rec = max(5, int(max_safe * quality))
-    tiers = [5, 10, 15, 20, 25, 30, 40, 50]
-    final = max(t for t in tiers if t <= rec)
-
-    # Liquidation price at recommended leverage (Bybit isolated, ~0.9/lev distance)
+    # Liquidation at 10x isolated: ~0.9/lev = 9% from entry
     if direction == "LONG":
-        liq = price * (1 - 0.9 / final)
+        liq = price * (1 - 0.9 / LEV)
     else:
-        liq = price * (1 + 0.9 / final)
+        liq = price * (1 + 0.9 / LEV)
 
-    tp1_profit = abs(tp1 - price) / price * final * 100
-    tp2_profit = abs(tp2 - price) / price * final * 100
-    sl_loss    = abs(sl  - price) / price * final * 100
+    tp1_profit = abs(tp1 - price) / price * LEV * 100
+    tp2_profit = abs(tp2 - price) / price * LEV * 100
+    sl_loss    = abs(sl  - price) / price * LEV * 100
 
     return {
-        "leverage":   final,
-        "max_safe":   max_safe,
+        "leverage":   LEV,
+        "max_safe":   LEV,
         "rating":     rating,
         "liq":        round(liq, 8),
         "tp1_profit": round(tp1_profit, 0),
@@ -228,7 +215,7 @@ def send_signal(analysis: dict) -> bool:
         f"🎯 TP2 (50%):   `{_format_price(tp2)}`\n"
         f"❌ Стоп лосс:   `{_format_price(sl)}`\n"
         f"━━━━━━━━━━━━━━━━━━━\n"
-        f"⚡ Плечо: *{lev}x*  ({lev_info['rating']})\n"
+        f"⚡ Плечо: *{lev}x*  ({lev_info['rating']})  🏦 OKX\n"
         f"   TP1 `+{lev_info['tp1_profit']:.0f}%`  TP2 `+{lev_info['tp2_profit']:.0f}%`  SL `-{lev_info['sl_loss']:.0f}%`\n"
         f"   Ликвидация x{lev}: `{_format_price(lev_info['liq'])}`\n"
         f"━━━━━━━━━━━━━━━━━━━\n"

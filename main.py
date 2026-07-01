@@ -37,7 +37,7 @@ from config import (
 from src.binance_client import (
     get_top_coins, get_klines, get_klines_1h, get_klines_4h, get_klines_1d,
     get_btc_change_1h, get_btc_change_1d, get_funding_rate, get_current_price,
-    get_open_interest,
+    get_open_interest, get_xperp_instruments, get_xperp_price, get_klines_xperp,
 )
 from src.signal_filter import analyze_coin_smc
 from src.knn_analog import knn_direction_score, knn_risk_mult
@@ -1751,7 +1751,7 @@ def webhook():
                f"✅ Работает\n"
                f"⏱ Интервал: {SCAN_INTERVAL_MINUTES} мин\n"
                f"📊 Сигналов в кэше: {len(_signal_cache)}\n"
-               f"💾 Данные: Bybit\n"
+               f"💾 Данные: OKX\n"
                f"🧠 AI: Claude Sonnet")
 
     # /stats — статистика побед/поражений
@@ -1846,7 +1846,7 @@ def _apply_knn_overlay(setup: dict, symbol: str) -> None:
     """
     k-NN price-shape analog risk overlay (Kronos-inspired, CPU-only).
 
-    Deep-fetches a ~1000-candle 15m series (1 Bybit page) for this already-
+    Deep-fetches a ~1000-candle 15m series (paginated OKX) for this already-
     qualified setup, scores how often the symbol's most-similar past windows
     moved in the trade direction, and folds the result into setup['risk_mult']
     as a position-size suggestion. Size up on strong analogs (≥0.55), down on
@@ -1943,7 +1943,10 @@ def _check_open_signals():
             age_hours  = (now - opened_at) / 3600
             # 15m candles = 4 per hour; fetch enough to cover the signal's age
             candle_lim = max(8, min(220, int(age_hours * 4) + 6))
-            df_all     = get_klines(sig["symbol"], limit=candle_lim)
+            # Judge TP/SL on the X-Perp (user's actual market) — its wicks are
+            # what the user's position really experiences. Global feed = fallback.
+            df_all     = get_klines_xperp(sig["symbol"], limit=candle_lim) \
+                         or get_klines(sig["symbol"], limit=candle_lim)
 
             # Cache last close price — used by "open trades" display (no extra API call)
             if df_all.get("close"):
@@ -2240,6 +2243,16 @@ def run_scan():
         coins = [s for s in coins if not is_symbol_auto_blocked(s)]
         if len(coins) != before_blocks:
             log.info(f"Auto-block: skipped {before_blocks - len(coins)} blocked symbol(s)")
+
+        # OKX EU tradability gate: keep only coins with a live X-Perp contract —
+        # a signal on a coin the user can't open (no X-Perp) is useless.
+        xperp_bases = set(get_xperp_instruments())
+        if xperp_bases:
+            before_xp = len(coins)
+            coins = [s for s in coins if s[:-len("USDT")] in xperp_bases]
+            if len(coins) != before_xp:
+                log.info(f"X-Perp gate: {before_xp} → {len(coins)} coins tradable on OKX EU")
+
         mode = "whitelist" if ALLOWED_SYMBOLS else "auto top-volume"
         log.info(f"Fetched {len(coins)} coins ({mode})")
 
@@ -2428,11 +2441,13 @@ def run_scan():
                         log.info(f"  Skip {analysis['symbol']} — scan cap {MAX_SIGNALS_PER_SCAN} reached")
                         continue
 
-                    # Snapshot live Bybit price at publish moment.
-                    # This is the price a trader sees when the signal arrives —
-                    # use it as the actual entry price, not the stale candle close.
+                    # Snapshot the live X-Perp price (the instrument the user
+                    # actually trades on OKX EU) at publish moment — signal
+                    # levels re-anchor to it so entry/TP/SL match the user's
+                    # chart. Falls back to the analysis feed price if X-Perp
+                    # ticker is unavailable.
                     try:
-                        live_px = get_current_price(analysis["symbol"])
+                        live_px = get_xperp_price(analysis["symbol"]) or get_current_price(analysis["symbol"])
                         if live_px and live_px > 0:
                             zone_px = float(analysis.get("current_price") or live_px)
                             drift   = abs(live_px - zone_px) / zone_px if zone_px else 0
@@ -2595,10 +2610,9 @@ def _shadow_tracker_job():
 
 def start_bot():
     log.info("Starting Crypto Signal Bot...")
-    # Proxy diagnostics — shows in Railway logs so we can verify env vars loaded
-    _prx = os.environ.get("BYBIT_HTTPS_PROXY", "")
-    _prx_base = os.environ.get("BYBIT_PROXY_BASE", "")
-    log.info(f"Bybit proxy: HTTPS_PROXY={'SET ('+_prx[:30]+'...)' if _prx else 'NOT SET'} PROXY_BASE={'SET' if _prx_base else 'NOT SET'}")
+    # Data source diagnostics — OKX public API (EU region: no geoblock, no proxy)
+    _okx_base = os.environ.get("OKX_BASE_URL", "")
+    log.info(f"Data source: OKX{' via '+_okx_base if _okx_base else ' (default hosts)'}")
 
     # Initialise signal-tracking DB
     try:

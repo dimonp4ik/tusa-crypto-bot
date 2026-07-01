@@ -1,12 +1,23 @@
 """
-Market data via Bybit API.
-Bybit symbol format: BTCUSDT (no dash).
-Bybit candle columns: [timestamp, open, high, low, close, volume, ...]
+Market data via OKX API (v5, public endpoints — no key needed).
+
+Analysis feed:  OKX global USDT perpetuals (deep liquidity, long history),
+                instId format "BTC-USDT-SWAP".
+Execution ref:  OKX EU X-Perps ("BTC-USD_UM_XPERP-<expiry>") — signal levels are
+                re-anchored to the X-Perp price at publish time in main.py.
+
+Internal symbol format stays Bybit-style "BTCUSDT" (no dash) everywhere — DB,
+Claude memory and setup history keep full continuity across the migration.
+
+OKX candle columns: [ts_ms, open, high, low, close, vol(contracts),
+                     volCcy(base), volCcyQuote(quote), confirm]
+OKX returns candles newest-first; we reverse to oldest-first.
 """
 import time
 import requests
 import sys
 import os
+import logging as _log
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from config import (
@@ -19,98 +30,72 @@ from config import (
     TIMEFRAME_1D_KUCOIN, KLINES_1D_LIMIT, KLINES_1D_INTERVAL_SEC,
 )
 
-# Bybit geoblocks US cloud IPs (e.g. Render) with HTTP 403 on every domain.
-# Workaround: route requests through a non-US proxy.
-#
-# BYBIT_PROXY_BASE — full base URL of a proxy that forwards to Bybit, e.g. a
-#   Cloudflare Worker "https://bybit-proxy.xxx.workers.dev". When set, it
-#   REPLACES the Bybit host (path + params are appended unchanged).
-# BYBIT_HTTPS_PROXY — standard HTTP(S) proxy URL, e.g. "http://user:pass@ip:port".
-#   When set, requests are tunnelled through it to the real Bybit host.
-_PROXY_BASE  = os.getenv("BYBIT_PROXY_BASE", "").strip().rstrip("/")
-_HTTPS_PROXY = os.getenv("BYBIT_HTTPS_PROXY", "").strip()
+_logger = _log.getLogger(__name__)
 
-# Host candidates (used when no BYBIT_PROXY_BASE override). api.bytick.com is
-# Bybit's mirror; both share the same geoblock but kept as a cheap fallback.
-BYBIT_HOSTS = [
-    "https://api.bybit.com",
-    "https://api.bytick.com",
+# OKX host candidates. OKX_BASE_URL env overrides (e.g. a proxy), otherwise
+# main host with the AWS mirror as fallback. Railway EU region (Amsterdam)
+# reaches both directly — no geoblock workaround needed.
+OKX_HOSTS = [
+    "https://www.okx.com",
+    "https://aws.okx.com",
 ]
 _working_host = {"url": None}
 
-# Map legacy KuCoin-style timeframe strings to Bybit interval params.
+# Map legacy timeframe strings (KuCoin-era, used across config) to OKX bars.
+# NOTE: OKX 1D default is UTC+8 aligned — "1Dutc" keeps daily candles on UTC
+# boundaries (same as the old Bybit feed, so the daily trend filter is unmoved).
 TIMEFRAME_MAP = {
-    "15min": "15",
-    "1h": "60",
-    "1hour": "60",
-    "4h": "240",
-    "4hour": "240",
-    "1d": "D",
-    "1day": "D",
+    "15min": "15m",
+    "1h":    "1H",
+    "1hour": "1H",
+    "4h":    "4H",
+    "4hour": "4H",
+    "1d":    "1Dutc",
+    "1day":  "1Dutc",
 }
-BYBIT_INTERVAL_15M = TIMEFRAME_MAP.get(TIMEFRAME_KUCOIN, "15")
-BYBIT_INTERVAL_1H = TIMEFRAME_MAP.get(TIMEFRAME_1H_KUCOIN, "60")
-BYBIT_INTERVAL_4H = TIMEFRAME_MAP.get(TIMEFRAME_4H_KUCOIN, "240")
 
 
-def _bybit_get(path: str, params: dict, timeout: int = 15):
-    """
-    GET a Bybit endpoint with geoblock workarounds:
-      1. If BYBIT_PROXY_BASE set → hit that URL directly (proxy forwards to Bybit).
-      2. Else try each Bybit host, optionally tunnelled via BYBIT_HTTPS_PROXY.
+def _okx_get(path: str, params: dict, timeout: int = 15):
+    """GET an OKX public endpoint with host fallback.
+
+    OKX_BASE_URL env (re-read each call) overrides the host list entirely.
     Caches the first working host so later calls hit it directly.
-    Raises the last error if every attempt fails.
+    OKX wraps errors in HTTP 200 + {"code": "..."} — raise on non-zero code.
     """
-    # Re-read proxy from env each call — handles cases where env is set after module import
-    proxy_base = (os.getenv("BYBIT_PROXY_BASE", "").strip().rstrip("/") or _PROXY_BASE)
-    https_proxy = os.getenv("BYBIT_HTTPS_PROXY", "").strip() or _HTTPS_PROXY
-    proxies = {"http": https_proxy, "https": https_proxy} if https_proxy else None
-
-    # Proxy-base override: single endpoint, no host rotation needed.
-    if proxy_base:
-        resp = requests.get(f"{proxy_base}{path}", params=params,
-                            timeout=timeout, proxies=proxies)
-        resp.raise_for_status()
-        return resp
-
-    # Order hosts so the last known-good one is tried first.
-    hosts = list(BYBIT_HOSTS)
-    if _working_host["url"] in hosts:
+    base_override = os.getenv("OKX_BASE_URL", "").strip().rstrip("/")
+    hosts = [base_override] if base_override else list(OKX_HOSTS)
+    if not base_override and _working_host["url"] in hosts:
         hosts.remove(_working_host["url"])
         hosts.insert(0, _working_host["url"])
-
-    import logging as _log
-    _logger = _log.getLogger(__name__)
 
     last_err = None
     for base in hosts:
         try:
-            resp = requests.get(f"{base}{path}", params=params,
-                                timeout=timeout, proxies=proxies)
+            resp = requests.get(f"{base}{path}", params=params, timeout=timeout)
             resp.raise_for_status()
+            body = resp.json()
+            if str(body.get("code", "0")) != "0":
+                raise ValueError(f"OKX error {body.get('code')}: {body.get('msg', '')}")
             _working_host["url"] = base
-            return resp
+            return body
         except Exception as e:
-            _logger.warning(f"Bybit FAIL {base}: {e}")
+            _logger.warning(f"OKX FAIL {base}{path}: {e}")
             last_err = e
             continue
     raise last_err
 
 
-def _drop_unclosed_candle(candles: list, interval_sec: int, now_ts: int) -> list:
-    """
-    KuCoin can return the currently forming candle. For signal logic we only want
-    fully closed candles to avoid repaint / mid-candle fake BOS or volume spikes.
-    """
-    if not candles:
-        return candles
-    try:
-        last_open_ts = int(float(candles[-1][0]))
-    except (TypeError, ValueError, IndexError):
-        return candles[:-1] if len(candles) > 1 else candles
-    if now_ts < last_open_ts + interval_sec:
-        return candles[:-1]
-    return candles
+# ── Symbol conversion (internal "BTCUSDT" ↔ OKX instIds) ─────────────────────
+
+def _base_of(symbol: str) -> str:
+    """Internal 'BTCUSDT' → base asset 'BTC'."""
+    s = symbol.upper()
+    return s[:-len(QUOTE_ASSET)] if s.endswith(QUOTE_ASSET) else s
+
+
+def _swap_inst_id(symbol: str) -> str:
+    """Internal 'BTCUSDT' → OKX analysis feed 'BTC-USDT-SWAP'."""
+    return f"{_base_of(symbol)}-{QUOTE_ASSET}-SWAP"
 
 
 def _safe_float(value, default: float = 0.0) -> float:
@@ -123,7 +108,6 @@ def _safe_float(value, default: float = 0.0) -> float:
 def _is_bad_symbol(symbol: str) -> bool:
     """Return True for synthetic/stable/blocked pairs that create noisy signals."""
     symbol = symbol.upper()
-    # Bybit format: BTCUSDT → base = BTC
     base = symbol.replace(QUOTE_ASSET, "")
     if ALLOWED_SYMBOLS and symbol not in ALLOWED_SYMBOLS:
         return True
@@ -136,96 +120,206 @@ def _is_bad_symbol(symbol: str) -> bool:
     return False
 
 
-def _ticker_spread_pct(ticker: dict):
-    """Return bid/ask spread in percent when KuCoin provides buy/sell quotes."""
-    bid = _safe_float(ticker.get("buy"), 0.0)
-    ask = _safe_float(ticker.get("sell"), 0.0)
-    if bid <= 0 or ask <= 0 or ask < bid:
-        return None
-    mid = (ask + bid) / 2
-    return ((ask - bid) / mid) * 100
+# ── X-Perps universe (what the user can actually trade on OKX EU) ────────────
+
+_xperp_cache = {"at": 0.0, "by_base": {}}
+_XPERP_TTL = 24 * 3600  # instrument list changes only on listings/rollover
+
+
+def get_xperp_instruments() -> dict:
+    """Map base asset → current X-Perp instId, e.g. {"BTC": "BTC-USD_UM_XPERP-310404"}.
+
+    Cached 24h. The expiry date embedded in the instId changes on rollover
+    (a new far-dated contract is auto-generated) — dynamic resolution here
+    means rollover never breaks the bot. Returns last good cache on API failure.
+    """
+    now = time.time()
+    if now - _xperp_cache["at"] < _XPERP_TTL and _xperp_cache["by_base"]:
+        return _xperp_cache["by_base"]
+    try:
+        body = _okx_get("/api/v5/public/instruments",
+                        {"instType": "FUTURES", "ruleType": "xperp"})
+        by_base = {}
+        for inst in body.get("data", []):
+            inst_id = str(inst.get("instId", ""))
+            if "_UM_XPERP-" not in inst_id or inst.get("state") != "live":
+                continue
+            base = inst_id.split("-")[0]
+            # Keep the farthest-dated contract per base (rollover overlap window)
+            if base not in by_base or inst_id > by_base[base]:
+                by_base[base] = inst_id
+        if by_base:
+            _xperp_cache["by_base"] = by_base
+            _xperp_cache["at"] = now
+    except Exception as e:
+        _logger.warning(f"get_xperp_instruments failed (using stale cache): {e}")
+    return _xperp_cache["by_base"]
+
+
+def get_xperp_price(symbol: str):
+    """Live X-Perp price for an internal symbol ('BTCUSDT' → BTC X-Perp last).
+    This is the price the user actually trades on OKX EU. None if unavailable.
+    """
+    try:
+        inst_id = get_xperp_instruments().get(_base_of(symbol))
+        if not inst_id:
+            return None
+        body = _okx_get("/api/v5/market/ticker", {"instId": inst_id}, timeout=8)
+        lst = body.get("data", [])
+        if lst:
+            px = _safe_float(lst[0].get("last"))
+            return px if px > 0 else None
+    except Exception as e:
+        _logger.warning(f"get_xperp_price failed for {symbol}: {e}")
+    return None
+
+
+# ── Market data (analysis feed: OKX global USDT swaps) ───────────────────────
+
+_crypto_swaps_cache = {"at": 0.0, "ids": set()}
+
+
+def _crypto_swap_ids() -> set:
+    """instIds of CRYPTO swaps only. OKX also lists stock/commodity-tracking
+    swaps (MU, SNDK, SPCX… instCategory="3") as plain USDT swaps — they follow
+    stock-market hours (dead candles overnight) and would poison SMC signals.
+    Crypto = instCategory "1". Cached 24h; stale cache returned on API failure.
+    """
+    now = time.time()
+    if now - _crypto_swaps_cache["at"] < _XPERP_TTL and _crypto_swaps_cache["ids"]:
+        return _crypto_swaps_cache["ids"]
+    try:
+        body = _okx_get("/api/v5/public/instruments", {"instType": "SWAP"})
+        ids = {
+            str(i.get("instId", "")) for i in body.get("data", [])
+            if str(i.get("instCategory", "1")) == "1" and i.get("state") == "live"
+        }
+        if ids:
+            _crypto_swaps_cache["ids"] = ids
+            _crypto_swaps_cache["at"] = now
+    except Exception as e:
+        _logger.warning(f"_crypto_swap_ids failed (using stale cache): {e}")
+    return _crypto_swaps_cache["ids"]
 
 
 def get_top_coins():
-    """Fetch top liquid USDT pairs ranked by 24h USDT volume.
-    Filters out no-name, leveraged, stablecoin, and low-volume pairs before
-    any candle downloads or Claude calls are made.
+    """Top liquid CRYPTO pairs by 24h USD turnover, as internal 'BTCUSDT' names.
+    Filters stock-tracking swaps, no-name/leveraged/stablecoin/low-volume/
+    wide-spread pairs first.
     """
-    response = _bybit_get("/v5/market/tickers", {"category": "linear"})
-    data = response.json()
+    body = _okx_get("/api/v5/market/tickers", {"instType": "SWAP"})
+    rows = []
+    suffix = f"-{QUOTE_ASSET}-SWAP"
+    crypto_ids = _crypto_swap_ids()
 
-    tickers = data.get("result", {}).get("list", [])
-    filtered = []
-
-    for t in tickers:
-        symbol = str(t.get("symbol", "")).upper()
-        if not symbol.endswith(QUOTE_ASSET):
+    for t in body.get("data", []):
+        inst_id = str(t.get("instId", ""))
+        if not inst_id.endswith(suffix):
             continue
+        if crypto_ids and inst_id not in crypto_ids:
+            continue  # stock/commodity-tracking swap — not a crypto market
+        symbol = inst_id.replace(suffix, "") + QUOTE_ASSET  # BTC-USDT-SWAP → BTCUSDT
         if _is_bad_symbol(symbol):
             continue
-        # Bybit uses turnover24h (quote volume)
-        quote_volume = _safe_float(t.get("turnover24h", "0"))
-        if quote_volume < MIN_24H_QUOTE_VOLUME_USDT:
+        last = _safe_float(t.get("last"))
+        # volCcy24h is base-currency volume → × last = quote (USD) turnover
+        turnover = _safe_float(t.get("volCcy24h")) * last
+        if turnover < MIN_24H_QUOTE_VOLUME_USDT:
             continue
-        bid = _safe_float(t.get("bid1Price", "0"))
-        ask = _safe_float(t.get("ask1Price", "0"))
+        bid = _safe_float(t.get("bidPx"))
+        ask = _safe_float(t.get("askPx"))
         if bid > 0 and ask > 0 and ask > bid:
             mid = (ask + bid) / 2
-            spread = ((ask - bid) / mid) * 100
-            if spread > MAX_SPREAD_PCT:
+            if ((ask - bid) / mid) * 100 > MAX_SPREAD_PCT:
                 continue
-        filtered.append(t)
+        rows.append((symbol, turnover))
 
-    filtered.sort(key=lambda x: _safe_float(x.get("turnover24h", "0"), 0.0), reverse=True)
-    return [t["symbol"] for t in filtered[:TOP_COINS_COUNT]]
+    rows.sort(key=lambda r: r[1], reverse=True)
+    return [sym for sym, _ in rows[:TOP_COINS_COUNT]]
 
 
 def get_klines(symbol, interval=TIMEFRAME_KUCOIN, limit=KLINES_LIMIT,
                interval_sec=KLINES_INTERVAL_SEC, closed_only: bool = True):
     """
-    Fetch OHLCV data from Bybit.
+    Fetch OHLCV from the OKX analysis feed (global USDT swap).
     Returns plain dict of lists (oldest → newest):
     {"time": [...], "open": [...], "high": [...], "low": [...], "close": [...], "volume": [...]}
 
-    closed_only=True removes the currently forming candle to avoid mid-candle
-    fake BOS, volume spikes, and indicator repainting.
-
-    Bybit candle format: [timestamp (ms), open, high, low, close, volume, turnover]
+    closed_only=True drops the forming candle using OKX's own confirm flag
+    (index 8: "1" = closed) — no repaint / mid-candle fake BOS.
     """
-    # Map interval (e.g. "15min") to Bybit format ("15")
-    bybit_interval = TIMEFRAME_MAP.get(interval, "15")
+    bar = TIMEFRAME_MAP.get(interval, "15m")
+    inst_id = _swap_inst_id(symbol)
+    want = limit + 2  # extra covers the forming candle drop
 
-    params = {
-        "category": "linear",
-        "symbol":   symbol,
-        "interval": bybit_interval,
-        "limit":    limit + 1,  # Fetch one extra; closed_only may drop it
-    }
+    # OKX caps /market/candles at 300 per request — paginate backwards with
+    # "after" (= return records older than ts) for deep fetches (e.g. kNN's 1000).
+    raw: list = []
+    after = None
+    while len(raw) < want:
+        params = {"instId": inst_id, "bar": bar, "limit": min(want - len(raw), 300)}
+        if after is not None:
+            params["after"] = after
+        page = _okx_get("/api/v5/market/candles", params).get("data", [])
+        if not page:
+            break
+        raw.extend(page)  # newest-first within and across pages
+        if len(page) < 300 and len(raw) < want:
+            break  # feed exhausted
+        after = page[-1][0]  # oldest ts of this page → next page is older
 
-    response = _bybit_get("/v5/market/kline", params)
-    data = response.json()
-
-    # Bybit returns newest-first — reverse to oldest-first so index[-1] = latest
-    candles = list(reversed(data.get("result", {}).get("list", [])))
+    # Collected newest-first — reverse to oldest-first so index[-1] = latest
+    candles = list(reversed(raw))
     if not candles:
         raise ValueError(f"No candle data for {symbol}")
 
-    now = int(time.time())
     if closed_only:
-        candles = _drop_unclosed_candle(candles, interval_sec, now)
+        candles = [c for c in candles if len(c) > 8 and c[8] == "1"]
     candles = candles[-limit:]
 
     if not candles:
         raise ValueError(f"No closed candle data for {symbol}")
 
     return {
-        "time":   [int(float(c[0])) // 1000 for c in candles],  # Bybit in ms, convert to seconds
+        "time":   [int(float(c[0])) // 1000 for c in candles],  # ms → seconds
         "open":   [float(c[1]) for c in candles],
         "high":   [float(c[2]) for c in candles],
         "low":    [float(c[3]) for c in candles],
         "close":  [float(c[4]) for c in candles],
-        "volume": [float(c[5]) for c in candles],
+        "volume": [float(c[6]) for c in candles],  # volCcy = base-currency volume
     }
+
+
+def get_klines_xperp(symbol, limit=60):
+    """Closed 15m candles of the X-Perp contract (the user's actual market).
+
+    Used by the open-position monitor so TP/SL hits are judged on the prices
+    the user's position actually experiences (X-Perp wicks can differ slightly
+    from the global feed). Returns None on any failure — caller falls back to
+    the global analysis feed.
+    """
+    try:
+        inst_id = get_xperp_instruments().get(_base_of(symbol))
+        if not inst_id:
+            return None
+        raw = _okx_get("/api/v5/market/candles",
+                       {"instId": inst_id, "bar": "15m",
+                        "limit": min(limit + 2, 300)}).get("data", [])
+        candles = [c for c in reversed(raw) if len(c) > 8 and c[8] == "1"]
+        candles = candles[-limit:]
+        if not candles:
+            return None
+        return {
+            "time":   [int(float(c[0])) // 1000 for c in candles],
+            "open":   [float(c[1]) for c in candles],
+            "high":   [float(c[2]) for c in candles],
+            "low":    [float(c[3]) for c in candles],
+            "close":  [float(c[4]) for c in candles],
+            "volume": [float(c[6]) for c in candles],
+        }
+    except Exception as e:
+        _logger.debug(f"get_klines_xperp failed for {symbol}: {e}")
+        return None
 
 
 def get_klines_1h(symbol):
@@ -251,7 +345,7 @@ def get_klines_4h(symbol):
 
 
 def get_klines_1d(symbol):
-    """Fetch closed daily candles for macro trend direction."""
+    """Fetch closed daily candles (UTC-aligned) for macro trend direction."""
     return get_klines(
         symbol,
         interval=TIMEFRAME_1D_KUCOIN,
@@ -286,23 +380,21 @@ def get_btc_change_1h() -> float:
 
 
 def get_current_price(symbol: str):
-    """Fetch last traded price from Bybit linear ticker.
-    Falls back to last kline close if ticker endpoint fails.
+    """Last traded price from the OKX analysis feed (global swap).
+    Falls back to last kline close if the ticker endpoint fails.
     Returns None only if both attempts fail.
     """
-    import logging as _log
-    _logger = _log.getLogger(__name__)
     try:
-        resp = _bybit_get("/v5/market/tickers", {"category": "linear", "symbol": symbol}, timeout=8)
-        lst  = resp.json().get("result", {}).get("list", [])
+        body = _okx_get("/api/v5/market/ticker",
+                        {"instId": _swap_inst_id(symbol)}, timeout=8)
+        lst = body.get("data", [])
         if lst:
-            price = float(lst[0].get("lastPrice", 0))
+            price = _safe_float(lst[0].get("last"))
             if price > 0:
                 return price
         _logger.warning(f"get_current_price: empty/zero result for {symbol}")
     except Exception as e:
         _logger.warning(f"get_current_price ticker failed for {symbol}: {e}")
-    # Fallback: use last closed candle close price
     try:
         klines = get_klines(symbol, limit=2)
         close = klines["close"][-1]
@@ -313,23 +405,26 @@ def get_current_price(symbol: str):
 
 
 def get_open_interest(symbol: str, interval: str = "15min", limit: int = 5):
-    """Open Interest series from Bybit (oldest→newest list of floats).
+    """Open Interest series from OKX (oldest→newest list of floats, USD terms).
 
-    Bybit returns newest-first; we reverse. Used as a SHADOW feature: rising OI
-    with a same-direction price move = real money behind the break; falling OI =
-    short-cover / long-liquidation (weak move). Returns [] on any failure.
+    SHADOW feature: rising OI with a same-direction price move = real money
+    behind the break; falling OI = short-cover / long-liquidation (weak move).
+    Uses the global swap (same instrument as the analysis feed).
+    Returns [] on any failure.
     """
     try:
-        params = {
-            "category":     "linear",
-            "symbol":       symbol,
-            "intervalTime": interval,
-            "limit":        limit,
-        }
-        resp = _bybit_get("/v5/market/open-interest", params, timeout=10)
-        lst  = resp.json().get("result", {}).get("list", [])
-        vals = [float(x["openInterest"]) for x in reversed(lst)
-                if x.get("openInterest") not in (None, "")]
+        body = _okx_get(
+            "/api/v5/rubik/stat/contracts/open-interest-history",
+            {
+                "instId": _swap_inst_id(symbol),
+                "period": "15m" if interval == "15min" else interval,
+                "limit":  limit,
+            },
+            timeout=10,
+        )
+        # Rows: [ts_ms, oi_contracts, oi_base, oi_usd] — newest-first, reverse.
+        vals = [float(r[3]) for r in reversed(body.get("data", []))
+                if len(r) > 3 and r[3] not in (None, "")]
         return vals
     except Exception as e:
         _logger.debug(f"get_open_interest failed for {symbol}: {e}")
@@ -337,19 +432,14 @@ def get_open_interest(symbol: str, interval: str = "15min", limit: int = 5):
 
 
 def get_funding_rate(symbol: str):
-    """Get current funding rate from Bybit futures. Returns None if unavailable."""
-    # Convert BTCUSDT to BTCUSDT (already correct format for Bybit)
+    """Current funding rate from OKX swap. Returns None if unavailable."""
     try:
-        params = {
-            "category": "linear",
-            "symbol":   symbol,
-            "limit":    1,
-        }
-        resp = _bybit_get("/v5/market/funding/history", params, timeout=10)
-        data = resp.json().get("result", {}).get("list", [])
+        body = _okx_get("/api/v5/public/funding-rate",
+                        {"instId": _swap_inst_id(symbol)}, timeout=10)
+        data = body.get("data", [])
         if not data:
             return None
         rate = data[0].get("fundingRate")
-        return float(rate) if rate is not None else None
+        return float(rate) if rate not in (None, "") else None
     except Exception:
         return None
