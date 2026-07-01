@@ -191,6 +191,9 @@ def init_db():
             "oi_delta_pct": "REAL",
             "oi_regime":    "TEXT",
             "oi_confirms":  "INTEGER",
+            # 'live' = judged by Claude in production; 'backtest' = seeded
+            # historical outcome (Claude memory prior, excluded from stats).
+            "source":       "TEXT NOT NULL DEFAULT 'live'",
         }.items():
             _ensure_column(c, "setup_log", col, ddl)
 
@@ -921,7 +924,8 @@ def get_setup_accuracy(since_ts: float) -> dict:
         for sent_val, key in ((1, "sent"), (0, "rejected")):
             rows = c.execute(
                 """SELECT outcome, reached_tp1, reached_tp2 FROM setup_log
-                   WHERE resolved=1 AND ts >= ? AND sent=?""",
+                   WHERE resolved=1 AND ts >= ? AND sent=?
+                     AND COALESCE(source,'live')='live'""",
                 (since_ts, sent_val),
             ).fetchall()
             n = len(rows)
@@ -939,12 +943,20 @@ def get_setup_accuracy(since_ts: float) -> dict:
 
 def get_similar_resolved_setups(symbol: str, direction: str, mtf_score,
                                 session: str = "", lookback_days: int = 30,
-                                limit: int = 40) -> list:
+                                limit: int = 40, bt_limit: int = 60) -> list:
     """Resolved past setups similar to the one being judged, for AI self-feedback.
 
+    Two tiers:
+      live     — Claude-judged production setups from the last lookback_days
+                 (recency matters: they reflect the current market regime);
+      backtest — seeded historical outcomes (2024+) with NO time window: they
+                 are priors ("how did entries like this behave historically"),
+                 age is the point, not a defect.
+
     Coarse similarity (kept deliberately broad to avoid overfitting to noise):
-    same direction, and either the same symbol OR a nearby mtf_score band. Only
-    resolved rows from the last lookback_days. Newest first.
+    same direction, and either the same symbol OR a nearby mtf_score band.
+    Newest first within each tier; каждый row carries `source` so the prompt
+    builder can label live vs backtest separately.
     """
     since = time_mod.time() - lookback_days * 86400
     try:
@@ -952,16 +964,79 @@ def get_similar_resolved_setups(symbol: str, direction: str, mtf_score,
     except (TypeError, ValueError):
         score = 0
     with _conn() as c:
-        rows = c.execute(
+        live = c.execute(
             """SELECT symbol, direction, mtf_score, session, entry_source,
-                      decision, sent, outcome, reached_tp1, reached_tp2, ts, trend
+                      decision, sent, outcome, reached_tp1, reached_tp2, ts, trend,
+                      COALESCE(source,'live') AS source
                FROM setup_log
                WHERE resolved=1 AND ts >= ? AND direction=?
+                 AND COALESCE(source,'live')='live'
                  AND (symbol=? OR ABS(COALESCE(mtf_score,0) - ?) <= 2)
                ORDER BY ts DESC LIMIT ?""",
             (since, direction, symbol, score, limit),
         ).fetchall()
-        return [dict(r) for r in rows]
+        bt = c.execute(
+            """SELECT symbol, direction, mtf_score, session, entry_source,
+                      decision, sent, outcome, reached_tp1, reached_tp2, ts, trend,
+                      source
+               FROM setup_log
+               WHERE resolved=1 AND direction=? AND source='backtest'
+                 AND (symbol=? OR ABS(COALESCE(mtf_score,0) - ?) <= 1)
+               ORDER BY ts DESC LIMIT ?""",
+            (direction, symbol, score, bt_limit),
+        ).fetchall()
+        return [dict(r) for r in live] + [dict(r) for r in bt]
+
+
+def seed_backtest_outcomes(rows: list) -> int:
+    """Bulk-insert historical backtest trades as resolved setup_log rows
+    (source='backtest'). These are Claude memory PRIORS — every stats consumer
+    filters them out; only get_similar_resolved_setups reads them back.
+    Returns inserted count. Caller gates one-shot execution via bot_state.
+    """
+    ins = 0
+    with _conn() as c:
+        for r in rows:
+            try:
+                outcome = str(r.get("outcome") or "")
+                # TRAIL = post-TP1 trailed runner exit → TP1-class win for memory
+                out_norm = "TP1" if outcome == "TRAIL" else outcome
+                reached_tp1 = 1 if outcome in ("TP1", "TP2", "TRAIL") else 0
+                reached_tp2 = 1 if outcome == "TP2" else 0
+                ts = float(r.get("entry_time") or 0)
+                if ts <= 0 or not r.get("symbol") or not r.get("direction"):
+                    continue
+                c.execute("""
+                    INSERT INTO setup_log
+                        (ts, symbol, direction, entry_price, tp1, tp2, sl,
+                         mtf_score, decision, confidence, risk_score, reason, sent,
+                         session, entry_source, trend,
+                         outcome, reached_tp1, reached_tp2, resolved, resolved_ts,
+                         source)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'BACKTEST', NULL, '', 1,
+                            ?, ?, ?, ?, ?, ?, 1, ?, 'backtest')
+                """, (
+                    ts,
+                    str(r["symbol"]),
+                    str(r["direction"]),
+                    float(r.get("entry") or 0) or None,
+                    float(r.get("tp1") or 0) or None,
+                    float(r.get("tp2") or 0) or None,
+                    float(r.get("sl") or 0) or None,
+                    int(float(r.get("mtf_score") or 0)) or None,
+                    str(r["direction"]),          # decision = filter's side
+                    str(r.get("session") or ""),
+                    str(r.get("entry_source") or ""),
+                    str(r.get("swing_trend") or ""),
+                    out_norm,
+                    reached_tp1,
+                    reached_tp2,
+                    float(r.get("exit_time") or 0) or None,
+                ))
+                ins += 1
+            except Exception:
+                continue
+    return ins
 
 
 def get_weekly_stats() -> dict:
@@ -978,7 +1053,7 @@ def get_weekly_stats() -> dict:
         ).fetchall()
         setup_rows = c.execute(
             "SELECT sent, resolved, reached_tp1, trend FROM setup_log "
-            "WHERE ts >= ? AND resolved = 1",
+            "WHERE ts >= ? AND resolved = 1 AND COALESCE(source,'live')='live'",
             (since,),
         ).fetchall()
 
@@ -1069,7 +1144,8 @@ def get_setups_by_date(date_str: str) -> list:
     end_ts   = start_ts + 86400
     with _conn() as c:
         rows = c.execute(
-            "SELECT * FROM setup_log WHERE ts >= ? AND ts < ? ORDER BY ts ASC",
+            "SELECT * FROM setup_log WHERE ts >= ? AND ts < ? "
+            "AND COALESCE(source,'live')='live' ORDER BY ts ASC",
             (start_ts, end_ts),
         ).fetchall()
     return [dict(r) for r in rows]

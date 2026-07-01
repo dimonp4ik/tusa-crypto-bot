@@ -62,7 +62,7 @@ from src.db import (
     get_bot_state, set_bot_state,
     log_setup_candidate, mark_setup_sent, get_setups_by_date,
     get_unresolved_setups, mark_setup_resolved, get_setup_accuracy,
-    get_similar_resolved_setups,
+    get_similar_resolved_setups, seed_backtest_outcomes,
     get_weekly_stats,
 )
 from config import ADMIN_IDS
@@ -2608,6 +2608,31 @@ def _shadow_tracker_job():
         log.warning(f"Shadow tracker job failed: {e}")
 
 
+_BT_SEED_CSV  = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                             "backtest_seed_2024.csv")
+_BT_SEED_FLAG = "bt_seed_2024_done"
+
+
+def maybe_seed_backtest():
+    """One-shot: load 2024+ backtest trades into setup_log as Claude memory
+    priors (source='backtest'). Gated by bot_state so redeploys never re-seed.
+    """
+    try:
+        if get_bot_state(_BT_SEED_FLAG):
+            return
+        if not os.path.exists(_BT_SEED_CSV):
+            log.info("Backtest seed CSV not found — skipping memory seeding")
+            return
+        import csv as _csv
+        with open(_BT_SEED_CSV, newline="", encoding="utf-8") as f:
+            rows = list(_csv.DictReader(f))
+        n = seed_backtest_outcomes(rows)
+        set_bot_state(_BT_SEED_FLAG, str(n))
+        log.info(f"Claude memory seeded: {n} backtest trades (2024+) → setup_log[source=backtest]")
+    except Exception as e:
+        log.warning(f"Backtest seeding failed (will retry next boot): {e}")
+
+
 def start_bot():
     log.info("Starting Crypto Signal Bot...")
     # Data source diagnostics — OKX public API (EU region: no geoblock, no proxy)
@@ -2620,6 +2645,9 @@ def start_bot():
         log.info("Database initialised")
     except Exception as e:
         log.warning(f"DB init failed: {e}")
+
+    # One-shot Claude memory seeding from historical backtest (2024+)
+    maybe_seed_backtest()
 
     # Dedup guard: only send once per 60s per container (prevents
     # double-message during Render zero-downtime deploys where old + new

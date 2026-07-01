@@ -567,6 +567,7 @@ class TradeRecord:
     score_tags: str = ""
     premium: int = 0
     knn_score: float = -1.0
+    swing_trend: str = ""  # 15m structure (bull/bear/range) — feeds Claude memory seeding
 
 
 @dataclass
@@ -762,6 +763,7 @@ def simulate_trade_direct(
         score_tags=" | ".join(setup.get("score_tags", [])),
         premium=int(bool(setup.get("premium"))),
         knn_score=float(setup.get("_knn_score", -1.0)),
+        swing_trend=str(setup.get("swing_trend", "") or ""),
     )
 
 
@@ -935,7 +937,7 @@ def write_trades_csv(path: str, trades: list[TradeRecord]) -> None:
         "quality_score", "trend_score", "volatility_score",
         "entry_quality_score", "portfolio_risk_score",
         "session", "trend_1h", "trend_4h", "entry_source",
-        "signals", "score_tags", "premium", "knn_score",
+        "signals", "score_tags", "premium", "knn_score", "swing_trend",
     ]
     with open(path, "w", newline="", encoding="utf-8") as f:
         writer = csv.DictWriter(f, fieldnames=fields)
