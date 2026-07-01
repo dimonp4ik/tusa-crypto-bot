@@ -42,7 +42,7 @@ from src.binance_client import (
 from src.signal_filter import analyze_coin_smc
 from src.knn_analog import knn_direction_score, knn_risk_mult
 from src.claude_analyzer import analyze_batch_with_claude, analyze_heavy
-from src.telegram_notifier import send_signal, send_status, send_news_alert, send_signal_update, calculate_tp_sl, send_morning_digest, send_weekly_digest, send_daily_prayer, send_commandments, send_evening_prayer, send_evening_ritual
+from src.telegram_notifier import send_signal, send_status, send_news_alert, send_signal_update, calculate_tp_sl, send_morning_digest, send_weekly_digest, send_daily_prayer, send_commandments, send_evening_prayer, send_evening_ritual, _disp_sym
 from src.news_filter import check_news_sentiment
 from src.news_agent import (
     get_market_news, detect_major_events, fetch_recent_headlines,
@@ -414,7 +414,7 @@ def _format_open_signal(s: dict) -> str:
     else:
         price_line = f"   🎯 {nearest_label}: `{nearest_tp}` | 🛑 SL: `{sl}`"
 
-    header = f"{icon} *{s['symbol']}* {direction} @ `{entry}`  _{age_h}ч_"
+    header = f"{icon} *{_disp_sym(s['symbol'])}* {direction} @ `{entry}`  _{age_h}ч_"
     return f"{header}\n{price_line}"
 
 

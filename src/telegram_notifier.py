@@ -28,6 +28,14 @@ def _esc(text: str) -> str:
     return (text or "").replace("_", "\\_").replace("*", "\\*").replace("`", "\\`").replace("[", "\\[")
 
 
+def _disp_sym(symbol: str) -> str:
+    """Display-only symbol conversion: internal 'BTCUSDT' → 'BTCUSDC' (the user's
+    OKX EU market is USD/USDC-margined). DB and analysis keep the internal format.
+    """
+    s = str(symbol or "")
+    return s[:-4] + "USDC" if s.endswith("USDT") else s
+
+
 def calculate_tp_sl(price: float, direction: str, atr: float = 0.0,
                     recent_high: float = 0.0, recent_low: float = 0.0,
                     tp1_level: float = None, tp2_level: float = None):
@@ -206,7 +214,7 @@ def send_signal(analysis: dict) -> bool:
     lev = lev_info["leverage"]
     premium_badge = "  💎 *PREMIUM*" if analysis.get("premium") else ""
     message = (
-        f"{arrow} — *{analysis['symbol']}*{premium_badge}\n"
+        f"{arrow} — *{_disp_sym(analysis['symbol'])}*{premium_badge}\n"
         f"━━━━━━━━━━━━━━━━━━━\n"
         f"💰 Вход:        `{_format_price(price)}`\n"
         f"{zone_range_line}"
@@ -326,7 +334,7 @@ def send_signal_update(sig: dict, new_status: str, exit_price: float) -> bool:
         return False
 
     message = (
-        f"{icon} *{title}* — {arrow} *{symbol}*\n"
+        f"{icon} *{title}* — {arrow} *{_disp_sym(symbol)}*\n"
         f"━━━━━━━━━━━━━━━━━━━\n"
         f"Вход: `{_format_price(entry)}`\n"
         f"{body}\n"
@@ -474,11 +482,11 @@ def send_weekly_digest(stats: dict, commentary: str) -> bool:
             f"TP2: {n_tp2} | SL: {n_sl} | Истекло: {n_exp}",
         ]
         if best:
-            lines.append(f"Лучшая: *{best['symbol']}* {best['r']:+.2f}R")
+            lines.append(f"Лучшая: *{_disp_sym(best['symbol'])}* {best['r']:+.2f}R")
         if worst:
-            lines.append(f"Худшая: *{worst['symbol']}* {worst['r']:+.2f}R")
+            lines.append(f"Худшая: *{_disp_sym(worst['symbol'])}* {worst['r']:+.2f}R")
         if top3:
-            top3_str = "  ".join(f"{s}({w}W/{sl}SL)" for s, w, sl in top3)
+            top3_str = "  ".join(f"{_disp_sym(s)}({w}W/{sl}SL)" for s, w, sl in top3)
             lines.append(f"Топ монеты: _{top3_str}_")
 
     if trend_wr:
