@@ -440,7 +440,7 @@ def _render_deals_page(chat_id: int, message_id: int, page: int, symbol: str = N
     per   = _DEALS_PER_PAGE
     total = get_signals_count(symbol)
     if total == 0:
-        msg = (f"🗑 *Сделки по {symbol}*\n\nНет сделок." if symbol
+        msg = (f"🗑 *Сделки по {_disp_sym(symbol)}*\n\nНет сделок." if symbol
                else "🗑 *Управление сделками*\n\nСделок в базе нет.")
         _edit_message(chat_id, message_id, msg)
         return
@@ -451,18 +451,18 @@ def _render_deals_page(chat_id: int, message_id: int, page: int, symbol: str = N
     sigs   = get_signals_page(per, offset, symbol)
     _RIGA  = _riga_tz()
 
-    title = f"🗑 *Сделки по {symbol}*" if symbol else "🗑 *Управление сделками*"
+    title = f"🗑 *Сделки по {_disp_sym(symbol)}*" if symbol else "🗑 *Управление сделками*"
     lines = [f"{title}  (стр. {page + 1}/{pages}, всего {total})\n"]
     kb_rows = []
     for s in sigs:
         icon   = _DEAL_STATUS_ICON.get(s["status"], "•")
         opened = datetime.fromtimestamp(s["opened_at"], tz=_RIGA).strftime("%d.%m %H:%M")
         lines.append(
-            f"{icon} `#{s['id']}` *{s['symbol']}* {s['direction']} "
+            f"{icon} `#{s['id']}` *{_disp_sym(s['symbol'])}* {s['direction']} "
             f"@ {s['entry_price']}  [{s['status']}]  {opened}"
         )
         kb_rows.append([{
-            "text": f"🗑 Удалить #{s['id']} {s['symbol']} {s['direction']}",
+            "text": f"🗑 Удалить #{s['id']} {_disp_sym(s['symbol'])} {s['direction']}",
             "callback_data": f"adm_del_sig_{s['id']}",
         }])
 
@@ -492,7 +492,7 @@ def _render_deals_symbol_picker(chat_id: int, message_id: int):
         return
     kb_rows, row = [], []
     for sym in symbols:
-        row.append({"text": sym, "callback_data": f"adm_dsym_{sym}_p0"})
+        row.append({"text": _disp_sym(sym), "callback_data": f"adm_dsym_{sym}_p0"})
         if len(row) == 3:
             kb_rows.append(row); row = []
     if row:
@@ -524,9 +524,9 @@ def _render_manual_block_panel(chat_id: int, message_id: int):
         lines.append("*Заблокированы сейчас:*")
         for b in blocks:
             until = datetime.fromtimestamp(b["blocked_until"], tz=_RIGA).strftime("%d.%m %H:%M")
-            lines.append(f"• *{b['symbol']}* до {until}")
+            lines.append(f"• *{_disp_sym(b['symbol'])}* до {until}")
             kb_rows.append([{
-                "text": f"✅ Разблок {b['symbol']}",
+                "text": f"✅ Разблок {_disp_sym(b['symbol'])}",
                 "callback_data": f"adm_mb_unblock_{b['symbol']}",
             }])
     else:
@@ -538,7 +538,7 @@ def _render_manual_block_panel(chat_id: int, message_id: int):
         lines.append("\n*Монеты из журнала:*")
         row = []
         for sym in free_syms:
-            row.append({"text": f"🚫 {sym}", "callback_data": f"adm_mb_block_{sym}"})
+            row.append({"text": f"🚫 {_disp_sym(sym)}", "callback_data": f"adm_mb_block_{sym}"})
             if len(row) == 3:
                 kb_rows.append(row); row = []
         if row:
@@ -716,9 +716,9 @@ def _handle_admin_callback(callback_id: str, chat_id: int,
                 keyboard_rows = []
                 for b in blocks:
                     until = datetime.fromtimestamp(b["blocked_until"], tz=_riga_tz()).strftime("%d.%m %H:%M")
-                    lines.append(f"• *{b['symbol']}* до {until}\n  _{b['reason']}_")
+                    lines.append(f"• *{_disp_sym(b['symbol'])}* до {until}\n  _{b['reason']}_")
                     keyboard_rows.append([{
-                        "text": f"✅ Разблокировать {b['symbol']}",
+                        "text": f"✅ Разблокировать {_disp_sym(b['symbol'])}",
                         "callback_data": f"adm_unblock_{b['symbol']}",
                     }])
                 # add back-row with main buttons
@@ -733,7 +733,7 @@ def _handle_admin_callback(callback_id: str, chat_id: int,
         symbol = data[len("adm_unblock_"):]
         try:
             unblock_symbol(symbol)
-            txt = f"✅ *{symbol}* разблокирована.\n\nНажми 🚫 Авто-блок чтобы обновить список."
+            txt = f"✅ *{_disp_sym(symbol)}* разблокирована.\n\nНажми 🚫 Авто-блок чтобы обновить список."
         except Exception as e:
             txt = f"Ошибка разблокировки: {e}"
         _edit_message(chat_id, message_id, txt)
@@ -757,7 +757,7 @@ def _handle_admin_callback(callback_id: str, chat_id: int,
                 lines = [f"🏆 *Топ монет ({label})*\n"]
                 for i, p in enumerate(top, 1):
                     lines.append(
-                        f"{i}. *{p['symbol']}*  {p['total_r']:+.2f}R  "
+                        f"{i}. *{_disp_sym(p['symbol'])}*  {p['total_r']:+.2f}R  "
                         f"win {p['win_rate']}%  ({p['trades']} сд)"
                     )
                 txt = "\n".join(lines)
@@ -789,7 +789,7 @@ def _handle_admin_callback(callback_id: str, chat_id: int,
                 lines = [f"💀 *Худшие монеты ({label})*\n"]
                 for i, p in enumerate(worst, 1):
                     lines.append(
-                        f"{i}. *{p['symbol']}*  {p['total_r']:+.2f}R  "
+                        f"{i}. *{_disp_sym(p['symbol'])}*  {p['total_r']:+.2f}R  "
                         f"win {p['win_rate']}%  ({p['trades']} сд)"
                     )
                 txt = "\n".join(lines)
@@ -939,7 +939,7 @@ def _handle_admin_callback(callback_id: str, chat_id: int,
         symbol = data[len("adm_mb_block_"):]
         try:
             set_symbol_block(symbol, days=1, reason="Manual block by admin")
-            _answer_callback(callback_id, f"🚫 {symbol} заблокирована на 24ч")
+            _answer_callback(callback_id, f"🚫 {_disp_sym(symbol)} заблокирована на 24ч")
         except Exception as e:
             _answer_callback(callback_id, f"Ошибка: {e}")
         _render_manual_block_panel(chat_id, message_id)
@@ -948,7 +948,7 @@ def _handle_admin_callback(callback_id: str, chat_id: int,
         symbol = data[len("adm_mb_unblock_"):]
         try:
             unblock_symbol(symbol)
-            _answer_callback(callback_id, f"✅ {symbol} разблокирована")
+            _answer_callback(callback_id, f"✅ {_disp_sym(symbol)} разблокирована")
         except Exception as e:
             _answer_callback(callback_id, f"Ошибка: {e}")
         _render_manual_block_panel(chat_id, message_id)
@@ -962,7 +962,7 @@ def _handle_admin_callback(callback_id: str, chat_id: int,
                     "chat_id": chat_id,
                     "text": (
                         "Введи символ монеты для блокировки на 24ч.\n"
-                        "Пример: `BTCUSDT` или `BTC`"
+                        "Пример: `BTCUSDC` или `BTC`"
                     ),
                     "parse_mode": "Markdown",
                 },
@@ -1191,7 +1191,7 @@ def _format_setups_page(rows: list, date_str: str, page: int = 0,
         reason_short = (reason_safe + "…") if len(reason) > 60 else reason_safe
 
         lines.append(
-            f"{ts_str} {dir_icon} *{sym}* {direct}\n"
+            f"{ts_str} {dir_icon} *{_disp_sym(sym)}* {direct}\n"
             f"  Вход: `{entry_s}` · TP1: `{tp1_s}` · TP2: `{tp2_s}`\n"
             f"  {dec_icon} Клод: {dec}{conf_s}{risk_s} — {sent_icon}\n"
             + (f"  _{reason_short}_\n" if reason_short else "")
@@ -1571,11 +1571,15 @@ def webhook():
     if is_dm and _is_admin(user_id) and chat_id in _pending_block_chat:
         days = _pending_block_chat.pop(chat_id)
         raw_sym = text_raw.strip().upper().replace("-", "").replace("/", "").replace("_", "")
-        if not raw_sym.endswith("USDT"):
-            raw_sym = raw_sym + "USDT"
+        # Normalize any quote (USDC display / USDT internal / bare base) → internal USDT
+        for q in ("USDC", "USDT"):
+            if raw_sym.endswith(q):
+                raw_sym = raw_sym[:-len(q)]
+                break
+        raw_sym = raw_sym + "USDT"
         try:
             set_symbol_block(raw_sym, days=days, reason="Manual block by admin")
-            _reply(chat_id, f"🚫 *{raw_sym}* заблокирована на {days}ч (24ч).\nОткрой 🔒 Блок монет чтобы проверить.")
+            _reply(chat_id, f"🚫 *{_disp_sym(raw_sym)}* заблокирована на {days}ч (24ч).\nОткрой 🔒 Блок монет чтобы проверить.")
         except Exception as e:
             _reply(chat_id, f"Ошибка: {e}")
         return "ok", 200
@@ -2608,29 +2612,37 @@ def _shadow_tracker_job():
         log.warning(f"Shadow tracker job failed: {e}")
 
 
-_BT_SEED_CSV  = os.path.join(os.path.dirname(os.path.abspath(__file__)),
-                             "backtest_seed_2024.csv")
-_BT_SEED_FLAG = "bt_seed_2024_done"
+# Each (csv, flag) seeds once. Add new batches as new tuples — already-seeded
+# batches skip via their own bot_state flag, so redeploys never re-seed and new
+# batches load independently of old ones.
+_BT_SEED_DIR = os.path.dirname(os.path.abspath(__file__))
+_BT_SEED_BATCHES = [
+    ("backtest_seed_2024.csv",   "bt_seed_2024_done"),   # first 18 symbols
+    ("backtest_seed_2024_b.csv", "bt_seed_2024b_done"),  # remaining X-Perp universe
+]
 
 
 def maybe_seed_backtest():
-    """One-shot: load 2024+ backtest trades into setup_log as Claude memory
-    priors (source='backtest'). Gated by bot_state so redeploys never re-seed.
+    """One-shot per batch: load backtest trades into setup_log as Claude memory
+    priors (source='backtest'). Each batch gated by its own bot_state flag so
+    redeploys never re-seed and new batches load on top of old ones.
     """
-    try:
-        if get_bot_state(_BT_SEED_FLAG):
-            return
-        if not os.path.exists(_BT_SEED_CSV):
-            log.info("Backtest seed CSV not found — skipping memory seeding")
-            return
-        import csv as _csv
-        with open(_BT_SEED_CSV, newline="", encoding="utf-8") as f:
-            rows = list(_csv.DictReader(f))
-        n = seed_backtest_outcomes(rows)
-        set_bot_state(_BT_SEED_FLAG, str(n))
-        log.info(f"Claude memory seeded: {n} backtest trades (2024+) → setup_log[source=backtest]")
-    except Exception as e:
-        log.warning(f"Backtest seeding failed (will retry next boot): {e}")
+    import csv as _csv
+    for fname, flag in _BT_SEED_BATCHES:
+        try:
+            if get_bot_state(flag):
+                continue
+            path = os.path.join(_BT_SEED_DIR, fname)
+            if not os.path.exists(path):
+                log.info(f"Seed CSV {fname} not found — skipping")
+                continue
+            with open(path, newline="", encoding="utf-8") as f:
+                rows = list(_csv.DictReader(f))
+            n = seed_backtest_outcomes(rows)
+            set_bot_state(flag, str(n))
+            log.info(f"Claude memory seeded: {n} trades from {fname} → setup_log[source=backtest]")
+        except Exception as e:
+            log.warning(f"Backtest seeding {fname} failed (will retry next boot): {e}")
 
 
 def start_bot():
