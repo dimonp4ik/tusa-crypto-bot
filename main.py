@@ -2740,8 +2740,14 @@ def start_bot():
     # First scan immediately
     threading.Thread(target=run_scan, daemon=True).start()
 
-    # Self-ping to keep Render awake
-    threading.Thread(target=_self_ping, daemon=True).start()
+    # Self-ping — only needed on hosts that idle-sleep (e.g. Render free tier).
+    # Off by default: Railway runs the container 24/7, so it's pointless there.
+    # Set SELF_PING_ENABLED=1 to re-enable if moving back to a sleeping host.
+    if os.getenv("SELF_PING_ENABLED", "0") != "0":
+        threading.Thread(target=_self_ping, daemon=True).start()
+        log.info("Self-ping enabled")
+    else:
+        log.info("Self-ping disabled (Railway does not idle-sleep)")
 
 
 start_bot()  # runs at module load — works with gunicorn
