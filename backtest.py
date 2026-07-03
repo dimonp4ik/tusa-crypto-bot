@@ -225,10 +225,11 @@ def choose_workers(symbol_count: int, candles: int, stride: int) -> int:
     return max(1, min(8, cpu, symbol_count))
 
 
-def cache_path(symbol: str, interval: str, count: int) -> Path:
+def cache_path(symbol: str, interval: str, count: int, end_date_ms: int | None = None) -> Path:
     CACHE_DIR.mkdir(parents=True, exist_ok=True)
     safe = symbol.replace("/", "_").replace("-", "_")
-    return CACHE_DIR / f"{safe}_{interval}_{count}.pkl"
+    suffix = f"_end{end_date_ms}" if end_date_ms else ""
+    return CACHE_DIR / f"{safe}_{interval}_{count}{suffix}.pkl"
 
 
 def _normalize_cached_candles(obj) -> dict[str, list] | None:
@@ -250,14 +251,20 @@ def fetch_history(
     count: int,
     *,
     refresh_cache: bool = False,
+    end_date_ms: int | None = None,
 ) -> dict[str, list]:
     """Fetch historical Bybit candles with a local pickle cache.
 
     Bybit kline format: [timestamp_ms, open, high, low, close, volume, turnover]
     Returns newest-first from API — we reverse to oldest-first.
     Paginates backwards via `end` param to collect `count` candles.
+
+    end_date_ms anchors the window's newest candle to a specific past moment
+    instead of "now" — lets a seed batch target an exact historical range
+    (e.g. 2022-2024) without re-downloading the overlap already covered by an
+    earlier "last N candles from now" batch.
     """
-    path = cache_path(symbol, interval, count)
+    path = cache_path(symbol, interval, count, end_date_ms)
     if not refresh_cache and path.exists():
         age = time.time() - path.stat().st_mtime
         if age < CACHE_TTL_SEC:
@@ -270,8 +277,8 @@ def fetch_history(
                 pass
 
     bybit_interval = BYBIT_INTERVAL_MAP.get(str(interval), "15")
-    now_ms  = int(time.time() * 1000)
-    end_ms  = now_ms
+    anchor_ms = int(end_date_ms) if end_date_ms else int(time.time() * 1000)
+    end_ms  = anchor_ms
     by_time: dict[int, list] = {}
 
     while len(by_time) < count:
@@ -296,7 +303,7 @@ def fetch_history(
                 by_time[ts_s] = c
 
         oldest_ts_ms = int(raw[-1][0])
-        cutoff_ms    = now_ms - count * interval_sec * 1000
+        cutoff_ms    = anchor_ms - count * interval_sec * 1000
         if len(raw) < BYBIT_PAGE_LIMIT or oldest_ts_ms <= cutoff_ms:
             break
         end_ms = oldest_ts_ms - 1
@@ -785,18 +792,21 @@ def backtest_symbol(
     adverse_entry_bps: float,
     exit_policy: str,
     trail_atr_mult: float,
+    end_date_ms: int | None = None,
 ) -> SymbolResult:
     started = time.perf_counter()
     result = SymbolResult(symbol=symbol)
 
     try:
-        c15 = fetch_history(symbol, TIMEFRAME_KUCOIN, KLINES_INTERVAL_SEC, candles, refresh_cache=refresh_cache)
+        c15 = fetch_history(symbol, TIMEFRAME_KUCOIN, KLINES_INTERVAL_SEC, candles,
+                            refresh_cache=refresh_cache, end_date_ms=end_date_ms)
         c1h = fetch_history(
             symbol,
             TIMEFRAME_1H_KUCOIN,
             KLINES_1H_INTERVAL_SEC,
             max(10, math.ceil(candles / 4) + 4),
             refresh_cache=refresh_cache,
+            end_date_ms=end_date_ms,
         )
         c4h = fetch_history(
             symbol,
@@ -804,12 +814,14 @@ def backtest_symbol(
             KLINES_4H_INTERVAL_SEC,
             max(10, math.ceil(candles / 16) + 4),
             refresh_cache=refresh_cache,
+            end_date_ms=end_date_ms,
         )
         try:
             c1d = fetch_history(
                 symbol, "1d", 86400,
                 max(8, math.ceil(candles / 96) + 4),
                 refresh_cache=refresh_cache,
+                end_date_ms=end_date_ms,
             )
         except Exception:
             c1d = {}
@@ -967,6 +979,11 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--window-4h", type=int, default=WINDOW_4H, help="4h lookback window passed to strategy.")
     p.add_argument("--no-prefilter", action="store_true", help="Disable exact BOS/volume early reject.")
     p.add_argument("--refresh-cache", action="store_true", help="Ignore cached candle files.")
+    p.add_argument("--end-date", default=None,
+                   help="ISO date (YYYY-MM-DD, UTC) to anchor the candle window's newest "
+                        "bar to, instead of now. Lets --candles target an exact past range "
+                        "(e.g. --end-date 2024-01-01 --candles 70080 = 2022-01-01..2024-01-01) "
+                        "without re-downloading a range already covered by another batch.")
     p.add_argument("--fee-rate", type=float, default=BACKTEST_FEE_RATE, help="Per-side fee rate for net R estimate.")
     p.add_argument("--slippage-rate", type=float, default=BACKTEST_SLIPPAGE_RATE, help="Per-side slippage rate for net R estimate.")
     p.add_argument("--execution-delay-bars", type=int, default=0, help="Delay entry by N 15m bars for execution realism.")
@@ -979,6 +996,11 @@ def build_parser() -> argparse.ArgumentParser:
 
 def main(argv: list[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
+    end_date_ms = None
+    if args.end_date:
+        from datetime import datetime as _dt, timezone as _tz
+        end_date_ms = int(_dt.strptime(args.end_date, "%Y-%m-%d")
+                          .replace(tzinfo=_tz.utc).timestamp() * 1000)
     if args.symbols:
         symbols = parse_symbols(args.symbols)
     elif args.top > 0:
@@ -1011,6 +1033,7 @@ def main(argv: list[str] | None = None) -> int:
         adverse_entry_bps=max(0.0, args.adverse_entry_bps),
         exit_policy=args.exit_policy,
         trail_atr_mult=max(0.0, args.trail_atr_mult),
+        end_date_ms=end_date_ms,
     )
 
     results: list[SymbolResult] = []
