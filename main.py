@@ -2619,6 +2619,7 @@ _BT_SEED_DIR = os.path.dirname(os.path.abspath(__file__))
 _BT_SEED_BATCHES = [
     ("backtest_seed_2024.csv",   "bt_seed_2024_done"),   # first 18 symbols
     ("backtest_seed_2024_b.csv", "bt_seed_2024b_done"),  # remaining X-Perp universe
+    ("backtest_seed_2022.csv",   "bt_seed_2022_done"),   # 2022-2023 bear/crash regime
 ]
 
 
