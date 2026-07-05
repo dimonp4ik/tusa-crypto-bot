@@ -965,7 +965,7 @@ def _handle_admin_callback(callback_id: str, chat_id: int,
                    f"остаются на бирже — управлять ими бот больше не будет.")
             try:
                 autotrader._dm(rm_id, "🤖 Автотрейдинг отключён администратором. "
-                                      f"Вопросы — {AUTOTRADE_CONTACT}.")
+                                      f"Вопросы — `{AUTOTRADE_CONTACT}`.")
             except Exception:
                 pass
         except Exception as e:
@@ -1652,7 +1652,7 @@ def _at_handle_text(chat_id: int, user_id: int, text_raw: str, message_id: int) 
         except Exception as e:
             _at_onboarding.pop(chat_id, None)
             log.warning(f"at_set_keys failed for {user_id}: {e}")
-            _reply(chat_id, f"❌ Ошибка сохранения ключей. Напиши {AUTOTRADE_CONTACT}.")
+            _reply(chat_id, f"❌ Ошибка сохранения ключей. Напиши `{AUTOTRADE_CONTACT}`.")
             return True
         st["data"] = {}
         _reply(chat_id, "✅ Ключи работают и сохранены (в зашифрованном виде).")
@@ -1939,9 +1939,9 @@ def webhook():
             if not u or not u.get("allowed"):
                 _reply(chat_id,
                        f"⛔ У тебя нет права доступа к автотрейдингу.\n"
-                       f"Чтобы подключиться — напиши {AUTOTRADE_CONTACT}.")
+                       f"Чтобы подключиться — напиши `{AUTOTRADE_CONTACT}`.")
             elif not keystore_ready():
-                _reply(chat_id, f"⚠️ Автотрейдинг временно недоступен (техническая настройка). Напиши {AUTOTRADE_CONTACT}.")
+                _reply(chat_id, f"⚠️ Автотрейдинг временно недоступен (техническая настройка). Напиши `{AUTOTRADE_CONTACT}`.")
             elif u.get("api_key_enc") and u.get("size_mode"):
                 _at_show_menu(chat_id, u)
             else:
@@ -2145,13 +2145,20 @@ def webhook():
 
 
 def _reply(chat_id: int, text: str):
-    """Send a reply to a specific chat."""
+    """Send a reply to a specific chat. Falls back to plain text when Telegram
+    rejects the Markdown (e.g. an unbalanced `_` from a @username)."""
     try:
-        _requests.post(
+        resp = _requests.post(
             f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage",
             json={"chat_id": chat_id, "text": text, "parse_mode": "Markdown"},
             timeout=10,
         )
+        if resp.status_code != 200 and "parse" in _telegram_error(resp).lower():
+            _requests.post(
+                f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage",
+                json={"chat_id": chat_id, "text": text},
+                timeout=10,
+            )
     except Exception as e:
         log.warning(f"Reply failed: {e}")
 

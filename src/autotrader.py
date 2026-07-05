@@ -55,11 +55,19 @@ _CLOSE_STATUSES = ("TP2_HIT", "TP1_TRAIL", "SL_HIT", "BREAKEVEN",
 
 def _dm(user_id: int, text: str) -> None:
     try:
-        requests.post(
+        resp = requests.post(
             f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage",
             json={"chat_id": user_id, "text": text, "parse_mode": "Markdown"},
             timeout=10,
         )
+        # Markdown parse failure (unbalanced _ / * in an error string or
+        # username) silently drops the message — retry as plain text.
+        if resp.status_code != 200:
+            requests.post(
+                f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage",
+                json={"chat_id": user_id, "text": text},
+                timeout=10,
+            )
     except Exception as e:
         log.warning(f"autotrade DM to {user_id} failed: {e}")
 
@@ -159,7 +167,7 @@ def _open_for_user(u: dict, sig: dict, inst_id: str, disp: str) -> None:
     ok, ord_id = okx.place_market_entry(creds, inst_id, sig["direction"], sz)
     if not ok:
         log.warning(f"autotrade entry failed for {uid} {inst_id}: {ord_id}")
-        _dm(uid, f"❌ Автотрейдинг: не смог открыть {disp} {sig['direction']}.\n`{ord_id}`\nЕсли не понимаешь причину — напиши {AUTOTRADE_CONTACT}.")
+        _dm(uid, f"❌ Автотрейдинг: не смог открыть {disp} {sig['direction']}.\n`{ord_id}`\nЕсли не понимаешь причину — напиши `{AUTOTRADE_CONTACT}`.")
         return
 
     tick  = (spec or {}).get("tickSz", 0)
