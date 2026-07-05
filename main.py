@@ -188,6 +188,16 @@ _ADMIN_KB = {
     "resize_keyboard": True,
     "is_persistent":   True,
 }
+# Group chats get no autotrade button — it's a DM-only feature.
+_GROUP_KB = {
+    "keyboard": [
+        [{"text": "📋 Открытые сделки"}, {"text": "📈 Результаты"}],
+        [{"text": "📰 Новости на сегодня"}],
+        [{"text": "❓ Помощь"}],
+    ],
+    "resize_keyboard": True,
+    "is_persistent":   True,
+}
 
 # Inline keyboard shown inside the panel message — 4 section buttons.
 _ADMIN_KEYBOARD = {
@@ -233,9 +243,10 @@ _KB_PEOPLE = {"inline_keyboard": [[
 ], [_BACK_ROW[0]]]}
 
 
-def _send_persistent_menu(chat_id: int, is_admin: bool = False):
-    """Send the persistent bottom-bar keyboard. Admins get extra admin button."""
-    kb   = _ADMIN_KB if is_admin else _USER_KB
+def _send_persistent_menu(chat_id: int, is_admin: bool = False, is_dm: bool = True):
+    """Send the persistent bottom-bar keyboard. Admins get extra admin button;
+    groups get the keyboard without the DM-only autotrade button."""
+    kb = (_ADMIN_KB if is_admin else _USER_KB) if is_dm else _GROUP_KB
     text = ("✅ Меню активировано.\n🛠 Админ панель доступна."
             if is_admin else
             "✅ Меню активировано. Кнопки внизу всегда доступны.")
@@ -1921,7 +1932,7 @@ def webhook():
 
     # /start → постоянное меню (у админов расширенное, только в ЛС)
     if text == "/start":
-        _send_persistent_menu(chat_id, is_admin=(is_dm and _is_admin(user_id)))
+        _send_persistent_menu(chat_id, is_admin=(is_dm and _is_admin(user_id)), is_dm=is_dm)
 
     # 🛠 Кнопка "Админ панель" → инлайн-панель
     elif text == "🛠 админ панель":
