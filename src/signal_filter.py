@@ -592,7 +592,7 @@ def analyze_coin_smc(candles_15m: dict, candles_1h: dict, symbol: str,
         if _ext_atr is not None and _ext_atr > _max_ext:
             return None
 
-    # 1g. Fully-aligned bullish HTF guard — VALIDATED, default ON (2026-07-18).
+    # 1g. Fully-aligned bullish HTF guard — VALIDATED, default OFF (2026-07-18).
     #     When BOTH 1h and 4h have already flipped bullish, the move has
     #     typically already run on every timeframe — the same "chasing an
     #     exhausted move" pattern as BOS staleness (1f), but at the HTF-
@@ -603,10 +603,17 @@ def analyze_coin_smc(candles_15m: dict, candles_1h: dict, symbol: str,
     #       1h=bull & 4h=bull LONG:    WR 61.4%, SL% 20.4%, netR/tr +0.376
     #       1h=neutral & 4h=bull LONG: WR 70.2%, SL% 10.5%, netR/tr +0.660
     #     Cutting the fully-aligned bucket: WR 63.4%→66.0%, netR/tr
-    #     +0.440→+0.523, maxDD -22.28R→-17.79R (fewer but cleaner LONGs).
+    #     +0.440→+0.523, maxDD -22.28R→-17.79R (fewer but cleaner LONGs) —
+    #     but total net R drops ~43% (+1929.7R→+1102.6R, trades 4383→2123)
+    #     since this bucket is most of all LONG volume. Verified live-code
+    #     backtest with guard OFF: 4383 trades, WR 63.0%, netR/tr +0.440,
+    #     netR +1929.69, maxDD -22.24R — essentially the pre-guard baseline
+    #     drawdown, but ~75% more total profit. User chose profit over the
+    #     smaller drawdown (2026-07-18) — default flipped OFF. Set
+    #     HTF_ALIGNED_LONG_GUARD=1 to re-enable the quality/lower-DD variant.
     #     Bearish side is NOT symmetric — 1h=bear&4h=bear is a strong bucket
     #     (see TREND_PAIR_RISK_UP), so this guard is LONG-only.
-    if os.getenv("HTF_ALIGNED_LONG_GUARD", "1") != "0":
+    if os.getenv("HTF_ALIGNED_LONG_GUARD", "0") != "0":
         if bos == "bullish" and trend_1h == "bullish" and trend_4h == "bullish":
             return None
 
