@@ -566,6 +566,27 @@ def analyze_coin_smc(candles_15m: dict, candles_1h: dict, symbol: str,
                 if bos == "bearish" and _pos < (1.0 - _pd_max):
                     return None
 
+    # 1f. BOS staleness/extension filter — VALIDATED, default ON (2026-07-16,
+    #     in response to a chop cluster of stops chasing already-extended
+    #     BOS). detect_bos scans a 10-candle window and returns a break
+    #     anywhere in it — the signal can fire several candles after the
+    #     actual break, after price has already run the move and is closer
+    #     to exhaustion than continuation. Cuts entries that are either too
+    #     old (candles_ago > max) or already extended too far past the break
+    #     level (extension_atr > max). Backtest (2 independent windows):
+    #       12d/20sym: WR 55.4%→57.7%, R/tr 0.488→0.638, maxDD -4.48R→-2.66R
+    #       30d/20sym: WR 56.0%→62.3%, R/tr 0.405→0.537, maxDD -28.5R→-17.9R
+    #     Trade count roughly halves both times — fewer, cleaner entries.
+    if os.getenv("BOS_STALENESS_FILTER", "1") != "0":
+        _candles_ago = ind.get("bos_candles_ago")
+        _ext_atr = ind.get("bos_extension_atr")
+        _max_age = int(os.getenv("BOS_MAX_CANDLES_AGO", "3"))
+        _max_ext = float(os.getenv("BOS_MAX_EXTENSION_ATR", "2.0"))
+        if _candles_ago is not None and _candles_ago > _max_age:
+            return None
+        if _ext_atr is not None and _ext_atr > _max_ext:
+            return None
+
     # 2. Trend must match (neutral OK)
     if trend_1h != "neutral" and trend_1h != bos:
         return None
@@ -680,6 +701,20 @@ def analyze_coin_smc(candles_15m: dict, candles_1h: dict, symbol: str,
         direction = "SHORT"
     else:
         return None
+
+    # 6a. Entry-candle wick-exhaustion gate — TESTED AND DROPPED (default off,
+    #     2026-07-16). Hypothesis: an entry candle with an OPPOSING pin-bar
+    #     wick (sellers hitting highs on a LONG / buyers defending lows on a
+    #     SHORT) signals exhaustion, should be blocked. Backtest disagreed —
+    #     hurt on every metric, 12d/20sym: WR 55.4%→50.0%, R/tr 0.488→0.303,
+    #     maxDD unchanged. Combined with the (good) staleness filter above it
+    #     also dragged that one down (0.638→0.381 R/tr). Kept env-gated for
+    #     re-testing against a different entry model, same as PD_RANGE_FILTER.
+    if os.getenv("WICK_EXHAUSTION_FILTER", "0") != "0":
+        if bos == "bullish" and wicks.get("rejection") == "bearish":
+            return None
+        if bos == "bearish" and wicks.get("rejection") == "bullish":
+            return None
 
     # 6-exp. Research-validated cuts (2026-06-11 A/B, 30/60/90d windows).
     #   RSI_Div setups: WR 23%, -0.21R/tr — 15m divergence in chop = noise.
