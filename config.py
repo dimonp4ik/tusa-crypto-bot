@@ -251,8 +251,13 @@ REL_STRENGTH_RISK_UP_MAX_PCT  = float(os.getenv("REL_STRENGTH_RISK_UP_MAX_PCT", 
 REL_STRENGTH_RISK_UP_MULT     = float(os.getenv("REL_STRENGTH_RISK_UP_MULT", "1.15"))
 REL_STRENGTH_RISK_UP_MAX_MULT = float(os.getenv("REL_STRENGTH_RISK_UP_MAX_MULT", "1.25"))
 TREND_PAIR_RISK_UP            = os.getenv("TREND_PAIR_RISK_UP", "1") != "0"
-TREND_PAIR_RISK_UP_1H         = os.getenv("TREND_PAIR_RISK_UP_1H", "bullish").lower()
-TREND_PAIR_RISK_UP_4H         = os.getenv("TREND_PAIR_RISK_UP_4H", "bullish").lower()
+# Flipped bullish->bearish 2026-07-18: 365d backtest showed 1h=bull&4h=bull is
+# the WEAKEST major bucket (WR 61.4%, SL% 20.4%, netR/tr +0.376 — an already-
+# extended move, not a fresh one), while 1h=bear&4h=bear is genuinely strong
+# (WR 66.0%, SL% 14.6%, netR/tr +0.511). Sizing up into the bullish pair was
+# boosting risk on the bot's own worst-performing setup type.
+TREND_PAIR_RISK_UP_1H         = os.getenv("TREND_PAIR_RISK_UP_1H", "bearish").lower()
+TREND_PAIR_RISK_UP_4H         = os.getenv("TREND_PAIR_RISK_UP_4H", "bearish").lower()
 TREND_PAIR_RISK_UP_MULT       = float(os.getenv("TREND_PAIR_RISK_UP_MULT", "1.15"))
 TREND_PAIR_RISK_UP_MAX_MULT   = float(os.getenv("TREND_PAIR_RISK_UP_MAX_MULT", "1.25"))
 

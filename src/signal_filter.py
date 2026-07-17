@@ -573,18 +573,41 @@ def analyze_coin_smc(candles_15m: dict, candles_1h: dict, symbol: str,
     #     actual break, after price has already run the move and is closer
     #     to exhaustion than continuation. Cuts entries that are either too
     #     old (candles_ago > max) or already extended too far past the break
-    #     level (extension_atr > max). Backtest (2 independent windows):
-    #       12d/20sym: WR 55.4%→57.7%, R/tr 0.488→0.638, maxDD -4.48R→-2.66R
-    #       30d/20sym: WR 56.0%→62.3%, R/tr 0.405→0.537, maxDD -28.5R→-17.9R
-    #     Trade count roughly halves both times — fewer, cleaner entries.
+    #     level (extension_atr > max).
+    #     Thresholds WIDENED 2026-07-18: full-year backtest (365d/20sym) showed
+    #     the extension_atr metric is NOT monotonic — the 2-3 ATR bucket
+    #     (previously cut by the old 2.0 threshold) actually outperformed the
+    #     passing 1-2 ATR bucket (netR/tr +0.473 vs +0.443); the real cliff is
+    #     at 3+ ATR (WR craters to 50.3%). candles_ago degrades smoothly, no
+    #     cliff before 8-9. Widening age 3→6 and extension 2.0→3.0 recovers
+    #     ~1600 trades/yr at unchanged quality (WR 63.1% vs 63.4%, netR/tr
+    #     +0.441 vs +0.440) — total net R +1932 vs +1229 (+57%).
     if os.getenv("BOS_STALENESS_FILTER", "1") != "0":
         _candles_ago = ind.get("bos_candles_ago")
         _ext_atr = ind.get("bos_extension_atr")
-        _max_age = int(os.getenv("BOS_MAX_CANDLES_AGO", "3"))
-        _max_ext = float(os.getenv("BOS_MAX_EXTENSION_ATR", "2.0"))
+        _max_age = int(os.getenv("BOS_MAX_CANDLES_AGO", "6"))
+        _max_ext = float(os.getenv("BOS_MAX_EXTENSION_ATR", "3.0"))
         if _candles_ago is not None and _candles_ago > _max_age:
             return None
         if _ext_atr is not None and _ext_atr > _max_ext:
+            return None
+
+    # 1g. Fully-aligned bullish HTF guard — VALIDATED, default ON (2026-07-18).
+    #     When BOTH 1h and 4h have already flipped bullish, the move has
+    #     typically already run on every timeframe — the same "chasing an
+    #     exhausted move" pattern as BOS staleness (1f), but at the HTF-
+    #     structure level instead of the single-candle level. A LONG where 1h
+    #     is still neutral (4h leading, 1h hasn't caught up) is meaningfully
+    #     fresher. Backtest (365d/20sym, combined with the widened BOS
+    #     threshold above):
+    #       1h=bull & 4h=bull LONG:    WR 61.4%, SL% 20.4%, netR/tr +0.376
+    #       1h=neutral & 4h=bull LONG: WR 70.2%, SL% 10.5%, netR/tr +0.660
+    #     Cutting the fully-aligned bucket: WR 63.4%→66.0%, netR/tr
+    #     +0.440→+0.523, maxDD -22.28R→-17.79R (fewer but cleaner LONGs).
+    #     Bearish side is NOT symmetric — 1h=bear&4h=bear is a strong bucket
+    #     (see TREND_PAIR_RISK_UP), so this guard is LONG-only.
+    if os.getenv("HTF_ALIGNED_LONG_GUARD", "1") != "0":
+        if bos == "bullish" and trend_1h == "bullish" and trend_4h == "bullish":
             return None
 
     # 2. Trend must match (neutral OK)
