@@ -412,7 +412,13 @@ DB_PATH = os.getenv("DB_PATH", "signals.db")  # Railway: set DB_PATH=/data/signa
 
 # --- Backtest ---
 BACKTEST_CANDLES        = int(os.getenv("BACKTEST_CANDLES", "1152"))  # 1152 × 15m ≈ 12 days
-BACKTEST_TP_WINDOW      = int(os.getenv("BACKTEST_TP_WINDOW", "48"))
+# 192 × 15m = 48h, matching live SIGNAL_EXPIRY_HOURS. Was "48" (=12h, 4x too
+# short) since the project's early days — drifted silently from live's expiry
+# as SIGNAL_EXPIRY_HOURS was tuned over time and this wasn't updated alongside
+# it. Fixed 2026-07-18: the wrong window was inflating EXPIRED-outcome trades
+# and understating both win rate (63.0%→72.7% corrected) and true drawdown
+# (-22.24R→-32.15R corrected) in every backtest run before this fix.
+BACKTEST_TP_WINDOW      = int(os.getenv("BACKTEST_TP_WINDOW", "192"))
 BACKTEST_TOP_COINS      = int(os.getenv("BACKTEST_TOP_COINS", "20"))
 BACKTEST_FEE_RATE       = float(os.getenv("BACKTEST_FEE_RATE", "0.001"))
 BACKTEST_SLIPPAGE_RATE  = float(os.getenv("BACKTEST_SLIPPAGE_RATE", "0.0005"))
