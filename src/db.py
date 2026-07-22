@@ -21,6 +21,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from config import (
     DB_PATH, AUTO_BLOCK_ENABLED, AUTO_BLOCK_LOOKBACK_TRADES, AUTO_BLOCK_MIN_TRADES,
     AUTO_BLOCK_MAX_PROFIT_FACTOR, AUTO_BLOCK_MAX_WIN_RATE, AUTO_BLOCK_DAYS,
+    TP1_R_MULT,
 )
 
 ACTIVE_STATUSES = ("OPEN", "TP1_PARTIAL")
@@ -1025,10 +1026,12 @@ def get_setup_accuracy(since_ts: float) -> dict:
                 "sl_pct":  (sl / n * 100) if n else 0.0,
             }
             if key == "rejected":
-                # Mirror: original SL → win (+1R), original reached-TP1 → loss (-0.7R)
+                # Mirror: original SL → win (+1R), original reached-TP1 → loss
+                # (-TP1_R_MULT R, read from config so this stays correct if the
+                # live TP1 target distance ever changes).
                 m_win, m_loss = sl, tp1
                 m_dec = m_win + m_loss
-                m_r = m_win * 1.0 - m_loss * 0.7
+                m_r = m_win * 1.0 - m_loss * float(TP1_R_MULT)
                 out[key].update({
                     "mirror_wins":   m_win,
                     "mirror_losses": m_loss,
