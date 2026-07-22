@@ -329,7 +329,15 @@ RISK_MIN_PCT  = float(os.getenv("RISK_MIN_PCT", "0.012"))  # min SL distance = 1
 RISK_MAX_PCT  = float(os.getenv("RISK_MAX_PCT", "0.03"))   # max SL distance = 3.0% (20x safe)
 # 2026-06-11 TP1 sweep (20 sym, 90d×15m, trail 0.5): TP1=1.0R beats 1.5R on WR
 # (+13-16pp, 65-76% across 30/60/90d) at equal-or-better total R and half the DD.
-TP1_R_MULT    = float(os.getenv("TP1_R_MULT", "1.0"))      # TP1 = entry ± risk * 1.0
+# 2026-07-22 follow-up sweep (365d/20sym, corrected 192 window): closer STILL
+# better on risk-adjusted return — TP1=0.7R vs 1.0R lifts WR 72.7→79.6%, cuts
+# stops -25% and maxDD -32.15R→-21.02R (-35%) for only -7% total net R (each
+# win banks smaller; breakeven protection arms sooner so fewer full -1R losses).
+# Validated on an independent recent 6mo window (WR 72.4→80.7%, DD -29.7→-18.6R,
+# profit only -2.7% there). User chose 0.7 (drawdown/survival > absolute profit,
+# esp. at 10x leverage). Wider runner trail does NOT recover the lost profit
+# (tested, worse). Set TP1_R_MULT=1.0 to revert to the max-absolute-profit variant.
+TP1_R_MULT    = float(os.getenv("TP1_R_MULT", "0.7"))      # TP1 = entry ± risk * 0.7
 TP2_R_MULT    = float(os.getenv("TP2_R_MULT", "2.0"))      # TP2 = entry ± risk * 2.0 (was 3.0 — unreachable)
 
 # Runner exit after TP1: trail the remaining 50% by ATR instead of fixed TP2.
