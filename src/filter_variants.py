@@ -66,8 +66,9 @@ def _v_d(s):   # looser score gate — measurable via the shadow batch (see modu
     return _f(s, "mtf_score") >= 12
 
 
-def _v_e(s):   # strong volume only
-    return _f(s, "volume_ratio") >= 2.0
+def _v_e(s):   # stricter trend-quality floor (Kaufman eff_ratio) — 2026-07 WF sweep,
+               # didn't survive OOS in backtest; live already gates at 0.15, this tests 0.25
+    return _f(s, "eff_ratio", 1.0) >= 0.25
 
 
 def _v_f(s):   # RSI ceiling for LONGs
@@ -76,8 +77,9 @@ def _v_f(s):   # RSI ceiling for LONGs
     return _f(s, "rsi", 50.0) <= 65.0
 
 
-def _v_g(s):   # SHORT only
-    return s.get("direction") == "SHORT"
+def _v_g(s):   # skip overheated volatility regime, any direction (live only guards
+               # bear+SHORT+hot-vol via BEAR_TREND_HOT_VOL_GUARD — this is the broader form)
+    return _f(s, "vol_ratio_regime", 1.0) < 2.0
 
 
 def _v_h(s):   # "fresh trend": 4h leads, 1h hasn't caught up yet
@@ -99,9 +101,9 @@ VARIANTS = {
     "B": ("HTF-гейт LONG вкл",               _v_b, True),
     "C": ("Строгий score ≥16",               _v_c, True),
     "D": ("Мягкий score ≥12 (shadow)",       _v_d, True),
-    "E": ("Только объём ≥2x",                _v_e, True),
+    "E": ("Eff.ratio ≥0.25",                 _v_e, True),
     "F": ("RSI≤65 для LONG",                 _v_f, True),
-    "G": ("Только SHORT",                    _v_g, True),
+    "G": ("Vol-regime <2.0x",                _v_g, True),
     "H": ("Свежий тренд (mixed)",            _v_h, True),
     "I": ("Строгий BOS ≤3 свечей",           _v_i, True),
 }
