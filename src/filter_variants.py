@@ -19,13 +19,17 @@ Why not run 5-9 separate Claude calls per scan:
 Single-verdict replay keeps arms on identical verdicts, so the only difference
 between them is the filter rule itself.
 
-IMPORTANT INTERPRETATION LIMIT: variants can only ever be a SUBSET of what the
-live filter already admits (we can't conjure setups the live filter rejected —
-Claude never saw them, and they were never logged with a verdict). So a LOOSER
-variant (D: lower score gate) can't actually show its extra setups here; it will
-look identical to A. Only variants STRICTER than live are truly measurable.
-Variants marked measurable=False are recorded for completeness but will not
-produce a differentiated arm under the current live config.
+INTERPRETATION LIMIT (mostly): variants can only be a SUBSET of what the live
+filter already admits (Claude never saw setups the live filter rejected, so
+they're never logged with a verdict). Only variants STRICTER than live are
+directly comparable to real-signal outcomes.
+
+Exception — variant D (2026-07-25): near-miss setups (score in
+[SHADOW_MIN_SCORE, MTF_MIN_SCORE)) are built + sent to Claude by run_scan as a
+SEPARATE shadow-only batch (see main.py), tagged and logged the same way, but
+never become a real signal. This makes D a genuine extra population, not a
+mirror of A. See config.py SHADOW_MIN_SCORE and signal_filter.py's
+_shadow_only flag.
 """
 
 # code -> (label, predicate, measurable-under-current-live-config)
@@ -58,7 +62,7 @@ def _v_c(s):   # stricter score gate
     return _f(s, "mtf_score") >= 16
 
 
-def _v_d(s):   # looser score gate — see interpretation limit above (not measurable)
+def _v_d(s):   # looser score gate — measurable via the shadow batch (see module docstring)
     return _f(s, "mtf_score") >= 12
 
 
@@ -94,7 +98,7 @@ VARIANTS = {
     "A": ("Текущий (контроль)",              _v_a, True),
     "B": ("HTF-гейт LONG вкл",               _v_b, True),
     "C": ("Строгий score ≥16",               _v_c, True),
-    "D": ("Мягкий score ≥12 (не измерим)",   _v_d, False),
+    "D": ("Мягкий score ≥12 (shadow)",       _v_d, True),
     "E": ("Только объём ≥2x",                _v_e, True),
     "F": ("RSI≤65 для LONG",                 _v_f, True),
     "G": ("Только SHORT",                    _v_g, True),

@@ -112,6 +112,13 @@ RETEST_MAX_DIST_PCT = float(os.getenv("RETEST_MAX_DIST_PCT", "0.015"))  # within
 # Raising 10→14 cut those: WR 48.9→50.7%, R/tr +17%, DD -25% on both windows.
 MTF_MIN_SCORE = int(os.getenv("MTF_MIN_SCORE", "14"))
 
+# 2026-07-25: filter-variant experiment only (src/filter_variants.py variant D).
+# Setups scoring [SHADOW_MIN_SCORE, MTF_MIN_SCORE) are NOT real signals (never
+# sent, never traded — see _shadow_only flag in signal_filter.py) but ARE sent
+# to Claude + logged, so variant D (soft score>=12) gets real verdicts instead
+# of mirroring variant A. Real signal gate (MTF_MIN_SCORE) is untouched.
+SHADOW_MIN_SCORE = int(os.getenv("SHADOW_MIN_SCORE", "12"))
+
 # --- Signal-quality filters (backtested on a PINNED 20-coin / ~21-day set) ---
 # №1 Volatility regime — DEFAULT ON after re-test 2026-06-05 on full context
 #    momentum stack: +1.60R net, non-negative on all monthly slices, better MC p05.

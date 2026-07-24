@@ -5,7 +5,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from config import (
     RSI_OVERSOLD, RSI_OVERBOUGHT, VOLUME_SPIKE_MULTIPLIER, MIN_SIGNALS_TO_PASS,
     SMC_MIN_CONFIRMATIONS, SMC_BOS_MIN_VOLUME, BTC_BLOCK_THRESHOLD_PCT,
-    SMC_RSI_LONG_MAX, SMC_RSI_SHORT_MIN, MTF_MIN_SCORE,
+    SMC_RSI_LONG_MAX, SMC_RSI_SHORT_MIN, MTF_MIN_SCORE, SHADOW_MIN_SCORE,
     REQUIRE_ENTRY_ZONE, ENTRY_ZONE_SL_BUFFER_ATR,
     REQUIRE_HTF_TREND, REQUIRE_RETEST, RETEST_MAX_DIST_PCT,
     VOL_REGIME_FILTER, VOL_MIN_ATR_PCT, VOL_MIN_RATIO, VOL_MAX_RATIO,
@@ -503,7 +503,8 @@ def _stability_overlay_pass(ind: dict, adaptive_pack: str, quality_score: float 
 
 def analyze_coin_smc(candles_15m: dict, candles_1h: dict, symbol: str,
                      candles_4h: dict = None, btc_change_pct: float = 0.0,
-                     candles_1d: dict = None, diag: dict = None) -> dict | None:
+                     candles_1d: dict = None, diag: dict = None,
+                     include_shadow: bool = False) -> dict | None:
     """
     SMC-based setup detector with MTF score and zone entry.
 
@@ -880,10 +881,20 @@ def analyze_coin_smc(candles_15m: dict, candles_1h: dict, symbol: str,
         if mtf_score > diag.get("best_score", -1):
             diag["best_score"]  = mtf_score
             diag["best_symbol"] = symbol
+    shadow_only = False
     if mtf_score < MTF_MIN_SCORE:
         if diag is not None:
             diag["score_fail"] = diag.get("score_fail", 0) + 1
-        return None
+        # Filter-variant experiment (variant D): near-misses in
+        # [SHADOW_MIN_SCORE, MTF_MIN_SCORE) still get built + returned, but
+        # flagged shadow-only — run_scan must route these to Claude/logging
+        # ONLY, never to a real signal. Real gate above is unchanged.
+        # include_shadow defaults False so backtest.py/backtest_historical.py
+        # (which never pass it) are byte-for-byte unaffected — only main.py's
+        # live run_scan opts in explicitly.
+        if not (include_shadow and mtf_score >= SHADOW_MIN_SCORE):
+            return None
+        shadow_only = True
 
     # 8b. Adaptive regime pack gate (DEFAULT OFF — under backtest evaluation).
     #     Requires higher quality as the regime worsens + sets a per-regime risk_mult.
@@ -1014,6 +1025,7 @@ def analyze_coin_smc(candles_15m: dict, candles_1h: dict, symbol: str,
         "bullish_score":    mtf_score if direction == "LONG"  else 0,
         "bearish_score":    mtf_score if direction == "SHORT" else 0,
         "confirmations":    confirmations,
+        "_shadow_only":     shadow_only,
     }
 
 

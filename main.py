@@ -2956,6 +2956,7 @@ def run_scan():
         log.info(f"Fetched {len(coins)} coins ({mode})")
 
         setups = []
+        shadow_setups = []  # filter-variant D only — never real signals, see below
         smc_diag = {}  # funnel diagnostics: how many coins reached scoring + best score
 
         # Step 2: SMC filter — BOS + confirmation + 1h/4h trend + BTC correlation
@@ -2965,8 +2966,11 @@ def run_scan():
                 df_1h  = get_klines_1h(symbol)
                 df_4h  = get_klines_4h(symbol)
                 df_1d  = get_klines_1d(symbol)
-                setup  = analyze_coin_smc(df_15m, df_1h, symbol, df_4h, btc_change, df_1d, diag=smc_diag)
-                if setup:
+                setup  = analyze_coin_smc(df_15m, df_1h, symbol, df_4h, btc_change, df_1d,
+                                          diag=smc_diag, include_shadow=True)
+                if setup and setup.get("_shadow_only"):
+                    shadow_setups.append(setup)
+                elif setup:
                     _apply_knn_overlay(setup, symbol)
                     log.info(
                         f"  SMC setup: {symbol:12s}  {setup['direction']}  "
@@ -3047,6 +3051,29 @@ def run_scan():
                 _attach_oi(_s)
             except Exception as _e:
                 log.debug(f"  OI attach failed {_s.get('symbol','?')}: {_e}")
+
+        # Filter-variant experiment (variant D) — shadow-only near-misses
+        # (score in [SHADOW_MIN_SCORE, MTF_MIN_SCORE)). NEVER a real signal:
+        # separate list, capped, own Claude call (shares the LIGHT daily budget
+        # cap — can't blow past it), logged with sent=0. Does not touch dedup,
+        # _is_reject_cooled, enriched, or anything downstream of enriched.
+        if shadow_setups:
+            try:
+                shadow_setups.sort(key=_setup_rank, reverse=True)
+                shadow_batch = shadow_setups[:3]
+                shadow_ctx = dict(news or {})
+                shadow_ctx["btc_1h"] = btc_change
+                shadow_ctx["btc_1d"] = btc_change_1d
+                shadow_analyses = analyze_batch_with_claude(shadow_batch, news_context=shadow_ctx)
+                for _sa in shadow_analyses:
+                    try:
+                        _sa["variants"] = compute_variants(_sa)
+                        log_setup_candidate(_sa)
+                    except Exception as _sve:
+                        log.debug(f"shadow variant log failed: {_sve}")
+                log.info(f"Shadow variant-D: {len(shadow_analyses)} logged (no real signal)")
+            except Exception as _se:
+                log.warning(f"Shadow variant-D batch failed: {_se}")
 
         if not enriched:
             log.info("=== Scan complete — 0 signal(s) sent ===\n")
