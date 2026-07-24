@@ -966,6 +966,8 @@ def analyze_coin_smc(candles_15m: dict, candles_1h: dict, symbol: str,
         "trend_1d":         trend_1d,
         "trend_1h_strong":  ind.get("trend_1h_strong", False),
         "swing_trend":      ind.get("swing_trend", ""),
+        # Exposed for the filter-variant A/B experiment (variant I gate).
+        "bos_candles_ago":  ind.get("bos_candles_ago"),
         "session":          session,
         "bos":              bos,
         "bos_body_strong":  ind.get("bos_body_strong", False),

@@ -1,0 +1,115 @@
+"""
+Filter-variant A/B experiment (2026-07-24).
+
+Question this answers: which filter configuration does Claude work BEST with?
+The backtest can't answer it — it never calls Claude at all. So we measure live.
+
+Design (single-verdict replay, not parallel Claude calls):
+  Every setup that reaches Claude is judged ONCE. We tag it with the list of
+  variant codes whose filter settings would ALSO have admitted it. Later, each
+  variant's performance = its own subset of setups, replayed against the SAME
+  Claude verdicts and the SAME shadow-tracked outcomes.
+
+Why not run 5-9 separate Claude calls per scan:
+  - Claude is non-deterministic — separate calls would judge different setups,
+    confounding "variant B is better" with "Claude rolled differently".
+  - It would split an already-thin signal stream (~27 calls/week) across arms,
+    leaving each arm statistically useless.
+  - Cost multiplies for no added information.
+Single-verdict replay keeps arms on identical verdicts, so the only difference
+between them is the filter rule itself.
+
+IMPORTANT INTERPRETATION LIMIT: variants can only ever be a SUBSET of what the
+live filter already admits (we can't conjure setups the live filter rejected —
+Claude never saw them, and they were never logged with a verdict). So a LOOSER
+variant (D: lower score gate) can't actually show its extra setups here; it will
+look identical to A. Only variants STRICTER than live are truly measurable.
+Variants marked measurable=False are recorded for completeness but will not
+produce a differentiated arm under the current live config.
+"""
+
+# code -> (label, predicate, measurable-under-current-live-config)
+# predicate(setup: dict) -> bool : would THIS variant's filters admit the setup?
+
+
+def _f(setup, key, default=0.0):
+    v = setup.get(key)
+    try:
+        return float(v)
+    except (TypeError, ValueError):
+        return default
+
+
+def _bos_of(setup):
+    return "bullish" if setup.get("direction") == "LONG" else "bearish"
+
+
+def _v_a(s):   # control: everything the live filter already passed
+    return True
+
+
+def _v_b(s):   # HTF_ALIGNED_LONG_GUARD=1 — cut LONGs where 1h AND 4h already bullish
+    if s.get("direction") != "LONG":
+        return True
+    return not (s.get("trend_1h") == "bullish" and s.get("trend_4h") == "bullish")
+
+
+def _v_c(s):   # stricter score gate
+    return _f(s, "mtf_score") >= 16
+
+
+def _v_d(s):   # looser score gate — see interpretation limit above (not measurable)
+    return _f(s, "mtf_score") >= 12
+
+
+def _v_e(s):   # strong volume only
+    return _f(s, "volume_ratio") >= 2.0
+
+
+def _v_f(s):   # RSI ceiling for LONGs
+    if s.get("direction") != "LONG":
+        return True
+    return _f(s, "rsi", 50.0) <= 65.0
+
+
+def _v_g(s):   # SHORT only
+    return s.get("direction") == "SHORT"
+
+
+def _v_h(s):   # "fresh trend": 4h leads, 1h hasn't caught up yet
+    bos = _bos_of(s)
+    aligned = int(s.get("trend_1h") == bos) + int(s.get("trend_4h") == bos)
+    neutral = int(s.get("trend_1h") == "neutral") + int(s.get("trend_4h") == "neutral")
+    return aligned == 1 and neutral == 1
+
+
+def _v_i(s):   # stricter BOS staleness (pre-2026-07-18 setting)
+    ago = s.get("bos_candles_ago")
+    if ago is None:
+        return True
+    return _f(s, "bos_candles_ago", 0.0) <= 3
+
+
+VARIANTS = {
+    "A": ("Текущий (контроль)",              _v_a, True),
+    "B": ("HTF-гейт LONG вкл",               _v_b, True),
+    "C": ("Строгий score ≥16",               _v_c, True),
+    "D": ("Мягкий score ≥12 (не измерим)",   _v_d, False),
+    "E": ("Только объём ≥2x",                _v_e, True),
+    "F": ("RSI≤65 для LONG",                 _v_f, True),
+    "G": ("Только SHORT",                    _v_g, True),
+    "H": ("Свежий тренд (mixed)",            _v_h, True),
+    "I": ("Строгий BOS ≤3 свечей",           _v_i, True),
+}
+
+
+def compute_variants(setup: dict) -> str:
+    """Comma-separated codes of variants that would admit this setup."""
+    out = []
+    for code, (_label, pred, _measurable) in VARIANTS.items():
+        try:
+            if pred(setup):
+                out.append(code)
+        except Exception:
+            continue
+    return ",".join(out)

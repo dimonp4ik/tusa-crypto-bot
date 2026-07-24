@@ -40,6 +40,7 @@ from src.binance_client import (
     get_open_interest, get_xperp_instruments, get_xperp_price, get_klines_xperp,
 )
 from src.signal_filter import analyze_coin_smc
+from src.filter_variants import VARIANTS, compute_variants
 from src.knn_analog import knn_direction_score, knn_risk_mult
 from src.claude_analyzer import analyze_batch_with_claude, analyze_heavy
 from src.telegram_notifier import send_signal, send_status, send_news_alert, send_signal_update, calculate_tp_sl, send_morning_digest, send_weekly_digest, send_daily_prayer, send_commandments, send_evening_prayer, send_evening_ritual, _disp_sym
@@ -52,7 +53,7 @@ from src.news_agent import (
 from config import EVENT_WARN_HOURS
 from src.db import (
     init_db, get_open_signals, update_signal_status, get_stats,
-    set_sl_xperp_only, get_sl_wick_stats,
+    set_sl_xperp_only, get_sl_wick_stats, get_variant_rows,
     auto_block_bad_symbols, is_symbol_auto_blocked, get_active_symbol_blocks,
     get_recent_outcomes, unblock_symbol, set_symbol_block, get_symbols_performance,
     upsert_user, get_user_by_id, get_all_users, get_users_count,
@@ -279,6 +280,8 @@ _KB_ANALYTICS = {"inline_keyboard": [[
     {"text": "💀 Худшие монеты", "callback_data": "adm_worst"},
 ], [
     {"text": "🎯 Точность ИИ",   "callback_data": "adm_ai_acc"},
+], [
+    {"text": "🧪 Тест фильтров", "callback_data": "adm_variants"},
 ], [_BACK_ROW[0]]]}
 
 _KB_PEOPLE = {"inline_keyboard": [[
@@ -798,6 +801,79 @@ def _handle_admin_callback(callback_id: str, chat_id: int,
         except Exception as e:
             txt = f"Ошибка: {e}"
         _edit_message(chat_id, message_id, txt)
+
+    elif data == "adm_variants":
+        try:
+            since30 = time.time() - 30 * 86400
+            rows = get_variant_rows(since30)
+            if not rows:
+                _edit_message(chat_id, message_id,
+                              "🧪 *Тест фильтров*\n\nДанных пока нет — теги вариантов "
+                              "пишутся только на новых сетапах с момента деплоя. "
+                              "Дай пару дней накопиться.")
+                return
+
+            def _arm_stats(code):
+                sub = [r for r in rows if code in (r.get("variants") or "").split(",")]
+                n = len(sub)
+                if not n:
+                    return None
+                sent = [r for r in sub if r.get("sent")]
+                rej  = [r for r in sub if not r.get("sent")]
+                def _tp1(x): return sum(1 for r in x if r.get("reached_tp1"))
+                s_tp1 = (_tp1(sent) / len(sent) * 100) if sent else 0.0
+                r_tp1 = (_tp1(rej) / len(rej) * 100) if rej else 0.0
+                # separation = does Claude sort better inside this arm
+                gap = s_tp1 - r_tp1 if (sent and rej) else None
+                return {"n": n, "n_sent": len(sent), "n_rej": len(rej),
+                        "sent_tp1": s_tp1, "rej_tp1": r_tp1, "gap": gap}
+
+            lines = ["🧪 *ТЕСТ ФИЛЬТРОВ* (30 дней)",
+                     "_Один вердикт Клода переигрывается на каждом варианте фильтра — "
+                     "сравнение честное, без лишних вызовов._\n"]
+            scored = []
+            for code, (label, _pred, measurable) in VARIANTS.items():
+                st = _arm_stats(code)
+                if not st:
+                    continue
+                tag = "" if measurable else " ⚠️"
+                gap_s = f"{st['gap']:+.0f}пп" if st["gap"] is not None else "—"
+                lines.append(
+                    f"*{code}. {label}*{tag}\n"
+                    f"  n={st['n']} (📤{st['n_sent']}/🚫{st['n_rej']}) · "
+                    f"отпр TP1 {st['sent_tp1']:.0f}% · откл TP1 {st['rej_tp1']:.0f}% · "
+                    f"разрыв {gap_s}"
+                )
+                if st["gap"] is not None and st["n_sent"] >= 5:
+                    scored.append((st["gap"], code, label))
+            if scored:
+                scored.sort(reverse=True)
+                g, c, l = scored[0]
+                lines.append(f"\n🥇 Лучшее разделение: *{c}* ({l}) — {g:+.0f}пп")
+            lines.append("\n_⚠️ = вариант мягче текущего фильтра, его лишние сетапы "
+                         "физически не попали в лог → выглядит как контроль._")
+            lines.append("_Разрыв = отправленные TP1% минус отклонённые TP1%. "
+                         "Больше = Клод лучше отделяет на этом наборе фильтров._")
+            _edit_message(chat_id, message_id, "\n".join(lines))
+
+            # Full CSV dump for offline analysis
+            try:
+                import csv as _csv, io as _io
+                buf = _io.StringIO()
+                w = _csv.DictWriter(buf, fieldnames=list(rows[0].keys()))
+                w.writeheader()
+                w.writerows(rows)
+                _requests.post(
+                    f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendDocument",
+                    data={"chat_id": chat_id,
+                          "caption": f"🧪 Сырые данные теста фильтров ({len(rows)} сетапов, 30д)"},
+                    files={"document": ("filter_variants.csv", buf.getvalue().encode("utf-8"))},
+                    timeout=30,
+                )
+            except Exception as _fe:
+                log.warning(f"variant CSV export failed: {_fe}")
+        except Exception as e:
+            _edit_message(chat_id, message_id, f"Ошибка: {e}")
 
     elif data == "adm_open":
         try:
@@ -3015,6 +3091,12 @@ def run_scan():
 
         # Log all Claude-evaluated setups (approved and rejected) for admin history
         for _a in analyses:
+            try:
+                # Filter-variant A/B: tag which variants would admit this setup,
+                # so each arm can later be replayed against the same verdict.
+                _a["variants"] = compute_variants(_a)
+            except Exception as _ve:
+                log.debug(f"variant tagging failed: {_ve}")
             try:
                 _a["_setup_log_id"] = log_setup_candidate(_a)
             except Exception as _e:

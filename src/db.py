@@ -203,6 +203,12 @@ def init_db():
             # 'live' = judged by Claude in production; 'backtest' = seeded
             # historical outcome (Claude memory prior, excluded from stats).
             "source":       "TEXT NOT NULL DEFAULT 'live'",
+            # Filter-variant A/B experiment (2026-07-24): comma-separated list of
+            # variant codes whose filter settings WOULD have admitted this setup
+            # (e.g. "A,C,E"). Claude judges each setup ONCE; the verdict is then
+            # replayed per-variant, so variants are compared on identical verdicts
+            # (no Claude non-determinism between arms) and no extra API cost.
+            "variants":     "TEXT",
             # Realised R of the trade (backtest: real net_r incl. trailed
             # runner; live: left NULL, derived from bracket at read time).
             # Powers expectancy (avg R) in Claude's self-feedback block.
@@ -955,8 +961,8 @@ def log_setup_candidate(analysis: dict) -> int:
                 (ts, symbol, direction, entry_price, tp1, tp2, sl,
                  mtf_score, decision, confidence, risk_score, reason, sent,
                  session, entry_source, trend,
-                 oi_delta_pct, oi_regime, oi_confirms, counter)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?, ?, ?, ?, ?, ?, ?)
+                 oi_delta_pct, oi_regime, oi_confirms, counter, variants)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?, ?, ?, ?, ?, ?, ?, ?)
         """, (
             time_mod.time(),
             analysis.get("symbol", ""),
@@ -977,6 +983,7 @@ def log_setup_candidate(analysis: dict) -> int:
             analysis.get("oi_regime"),
             analysis.get("oi_confirms"),
             analysis.get("counter", ""),
+            analysis.get("variants", ""),
         ))
         return cur.lastrowid
 
@@ -1072,6 +1079,22 @@ def get_setup_accuracy(since_ts: float) -> dict:
                     "mirror_r_avg":  round(m_r / m_dec, 3) if m_dec else 0.0,
                 })
     return out
+
+
+def get_variant_rows(since_ts: float) -> list:
+    """Resolved live setups carrying variant tags, for the filter A/B report."""
+    with _conn() as c:
+        rows = c.execute(
+            """SELECT ts, symbol, direction, mtf_score, decision, confidence,
+                      risk_score, sent, outcome, reached_tp1, reached_tp2,
+                      trend, session, entry_source, variants
+               FROM setup_log
+               WHERE resolved=1 AND ts >= ? AND COALESCE(source,'live')='live'
+                 AND variants IS NOT NULL AND variants != ''
+               ORDER BY ts ASC""",
+            (since_ts,),
+        ).fetchall()
+        return [dict(r) for r in rows]
 
 
 def get_similar_resolved_setups(symbol: str, direction: str, mtf_score,
