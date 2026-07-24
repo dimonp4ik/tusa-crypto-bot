@@ -882,6 +882,7 @@ def analyze_coin_smc(candles_15m: dict, candles_1h: dict, symbol: str,
             diag["best_score"]  = mtf_score
             diag["best_symbol"] = symbol
     shadow_only = False
+    shadow_reason = ""
     if mtf_score < MTF_MIN_SCORE:
         if diag is not None:
             diag["score_fail"] = diag.get("score_fail", 0) + 1
@@ -895,6 +896,7 @@ def analyze_coin_smc(candles_15m: dict, candles_1h: dict, symbol: str,
         if not (include_shadow and mtf_score >= SHADOW_MIN_SCORE):
             return None
         shadow_only = True
+        shadow_reason = "score"
 
     # 8b. Adaptive regime pack gate (DEFAULT OFF — under backtest evaluation).
     #     Requires higher quality as the regime worsens + sets a per-regime risk_mult.
@@ -1026,6 +1028,7 @@ def analyze_coin_smc(candles_15m: dict, candles_1h: dict, symbol: str,
         "bearish_score":    mtf_score if direction == "SHORT" else 0,
         "confirmations":    confirmations,
         "_shadow_only":     shadow_only,
+        "_shadow_reason":   shadow_reason,
     }
 
 

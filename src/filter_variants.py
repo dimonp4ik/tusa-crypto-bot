@@ -48,30 +48,50 @@ def _bos_of(setup):
     return "bullish" if setup.get("direction") == "LONG" else "bearish"
 
 
+def _live_ok(s):
+    """True only for setups the LIVE filter actually admitted.
+
+    Shadow setups (soft-failed a live gate, see signal_filter.py _shadow_only)
+    would NOT exist under any config at least as strict as live, so every
+    variant except the one deliberately relaxing that gate must exclude them —
+    otherwise the control arm gets polluted with setups live rejected.
+    """
+    return not s.get("_shadow_only")
+
+
+def _relaxes(s, reason):
+    """True if s is live-admitted, OR is a shadow setup of exactly this kind."""
+    return _live_ok(s) or s.get("_shadow_reason") == reason
+
+
 def _v_a(s):   # control: everything the live filter already passed
-    return True
+    return _live_ok(s)
 
 
 def _v_b(s):   # HTF_ALIGNED_LONG_GUARD=1 — cut LONGs where 1h AND 4h already bullish
+    if not _live_ok(s):
+        return False
     if s.get("direction") != "LONG":
         return True
     return not (s.get("trend_1h") == "bullish" and s.get("trend_4h") == "bullish")
 
 
 def _v_c(s):   # stricter score gate
-    return _f(s, "mtf_score") >= 16
+    return _live_ok(s) and _f(s, "mtf_score") >= 16
 
 
-def _v_d(s):   # looser score gate — measurable via the shadow batch (see module docstring)
-    return _f(s, "mtf_score") >= 12
+def _v_d(s):   # looser score gate — fed by the score-shadow batch (see module docstring)
+    return _relaxes(s, "score") and _f(s, "mtf_score") >= 12
 
 
 def _v_e(s):   # stricter trend-quality floor (Kaufman eff_ratio) — 2026-07 WF sweep,
                # didn't survive OOS in backtest; live already gates at 0.15, this tests 0.25
-    return _f(s, "eff_ratio", 1.0) >= 0.25
+    return _live_ok(s) and _f(s, "eff_ratio", 1.0) >= 0.25
 
 
 def _v_f(s):   # RSI ceiling for LONGs
+    if not _live_ok(s):
+        return False
     if s.get("direction") != "LONG":
         return True
     return _f(s, "rsi", 50.0) <= 65.0
@@ -79,10 +99,12 @@ def _v_f(s):   # RSI ceiling for LONGs
 
 def _v_g(s):   # skip overheated volatility regime, any direction (live only guards
                # bear+SHORT+hot-vol via BEAR_TREND_HOT_VOL_GUARD — this is the broader form)
-    return _f(s, "vol_ratio_regime", 1.0) < 2.0
+    return _live_ok(s) and _f(s, "vol_ratio_regime", 1.0) < 2.0
 
 
 def _v_h(s):   # "fresh trend": 4h leads, 1h hasn't caught up yet
+    if not _live_ok(s):
+        return False
     bos = _bos_of(s)
     aligned = int(s.get("trend_1h") == bos) + int(s.get("trend_4h") == bos)
     neutral = int(s.get("trend_1h") == "neutral") + int(s.get("trend_4h") == "neutral")
@@ -90,6 +112,8 @@ def _v_h(s):   # "fresh trend": 4h leads, 1h hasn't caught up yet
 
 
 def _v_i(s):   # stricter BOS staleness (pre-2026-07-18 setting)
+    if not _live_ok(s):
+        return False
     ago = s.get("bos_candles_ago")
     if ago is None:
         return True
