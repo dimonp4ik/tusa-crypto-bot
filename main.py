@@ -3077,11 +3077,12 @@ def run_scan():
                 shadow_setups.sort(key=_setup_rank, reverse=True)
                 # Per-reason quota: each soft-failed gate feeds its OWN variant
                 # arm, so a frequently-firing gate (rsi_mid) must not crowd the
-                # rarer ones out of the batch. Best 2 per reason, 5 total.
+                # rarer ones out of the batch. Best 2 per reason, 8 total (4
+                # reasons live: double_neutral/score/ctxmom/rsi_mid).
                 _per_reason, shadow_batch = {}, []
                 for _sh in shadow_setups:
                     _r = _sh.get("_shadow_reason", "")
-                    if _per_reason.get(_r, 0) >= 2 or len(shadow_batch) >= 5:
+                    if _per_reason.get(_r, 0) >= 2 or len(shadow_batch) >= 8:
                         continue
                     _per_reason[_r] = _per_reason.get(_r, 0) + 1
                     shadow_batch.append(_sh)

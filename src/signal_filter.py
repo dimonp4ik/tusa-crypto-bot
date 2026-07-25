@@ -561,10 +561,11 @@ def analyze_coin_smc(candles_15m: dict, candles_1h: dict, symbol: str,
     if DAILY_TREND_FILTER and bos == "bullish" and trend_1d == "bearish":
         return None
 
-    # 1c. Double-neutral LONG block.
+    # 1c. Double-neutral LONG block. Soft-failable: variant C measures it OFF.
     #     4h neutral + 1D neutral = full macro chop; longs get range-swept.
     if DOUBLE_NEUTRAL_LONG_FILTER and bos == "bullish" and trend_4h == "neutral" and trend_1d == "neutral":
-        return None
+        if _soft_fail("double_neutral"):
+            return None
 
     # 1d. Daily SHORT guard — don't short into a bullish daily trend.
     if DAILY_TREND_SHORT_FILTER and bos == "bearish" and trend_1d == "bullish":

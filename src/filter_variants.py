@@ -19,23 +19,26 @@ Why not run 5-9 separate Claude calls per scan:
 Single-verdict replay keeps arms on identical verdicts, so the only difference
 between them is the filter rule itself.
 
-STRICTER arms (B/C/E/G/H) are a plain subset of what live already admits, so
+STRICTER arms (B/E/G/H) are a plain subset of what live already admits, so
 they replay directly against real-signal outcomes.
 
-LOOSER arms (D/F/I) need setups the live filter REJECTED — which Claude would
-never see and nothing would ever log. The shadow mechanism (2026-07-25) closes
-that gap: signal_filter.analyze_coin_smc() takes include_shadow=True (live only;
-the backtests never pass it) and routes selected gates through _soft_fail().
-A soft-failed setup is still built and returned, flagged _shadow_only with the
-_shadow_reason naming the gate it missed. run_scan sends those to Claude as a
-SEPARATE capped batch and logs them with source='shadow' — they never become a
-real signal, never enter dedup/autotrade, and every pre-existing analytic keeps
-filtering source='live' so the numbers the admin panel reports are unchanged.
+LOOSER arms (C/D/F/I) need setups the live filter REJECTED — which Claude
+would never see and nothing would ever log. The shadow mechanism (2026-07-25)
+closes that gap: signal_filter.analyze_coin_smc() takes include_shadow=True
+(live only; the backtests never pass it) and routes selected gates through
+_soft_fail(). A soft-failed setup is still built and returned, flagged
+_shadow_only with the _shadow_reason naming the gate it missed. run_scan
+sends those to Claude as a SEPARATE capped batch (after the real LIGHT call
+has already claimed its budget) and logs them with source='shadow' — they
+never become a real signal, never enter dedup/autotrade, and every
+pre-existing analytic keeps filtering source='live' so the numbers the admin
+panel reports are unchanged.
 
 Current soft-failable gates and the arm each one feeds:
-    "score"   -> D  (mtf_score in [SHADOW_MIN_SCORE, MTF_MIN_SCORE))
-    "ctxmom"  -> F  (the five narrow "context momentum pack" gates)
-    "rsi_mid" -> I  (DIRECTIONAL_RSI_MIDLINE_FILTER)
+    "double_neutral" -> C  (DOUBLE_NEUTRAL_LONG_FILTER: 4h+1D both neutral)
+    "score"          -> D  (mtf_score in [SHADOW_MIN_SCORE, MTF_MIN_SCORE))
+    "ctxmom"         -> F  (the five narrow "context momentum pack" gates)
+    "rsi_mid"        -> I  (DIRECTIONAL_RSI_MIDLINE_FILTER)
 
 A setup that soft-fails TWO different gates is dropped outright: no single
 variant would have admitted it, so it belongs to no arm. And every arm that
@@ -88,8 +91,9 @@ def _v_b(s):   # HTF_ALIGNED_LONG_GUARD=1 — cut LONGs where 1h AND 4h already 
     return not (s.get("trend_1h") == "bullish" and s.get("trend_4h") == "bullish")
 
 
-def _v_c(s):   # stricter score gate
-    return _live_ok(s) and _f(s, "mtf_score") >= 16
+def _v_c(s):   # DOUBLE_NEUTRAL_LONG_FILTER OFF — allow LONG when 4h AND 1D are
+               # both neutral (full macro chop, currently blocked outright).
+    return _relaxes(s, "double_neutral")
 
 
 def _v_d(s):   # looser score gate — fed by the score-shadow batch (see module docstring)
@@ -132,7 +136,7 @@ def _v_i(s):   # DIRECTIONAL_RSI_MIDLINE_FILTER OFF — drop the "LONG needs RSI
 VARIANTS = {
     "A": ("Текущий (контроль)",              _v_a, True),
     "B": ("HTF-гейт LONG вкл",               _v_b, True),
-    "C": ("Строгий score ≥16",               _v_c, True),
+    "C": ("Double-neutral LONG ВЫКЛ",        _v_c, True),
     "D": ("Мягкий score ≥12 (shadow)",       _v_d, True),
     "E": ("Eff.ratio ≥0.25",                 _v_e, True),
     "F": ("Контекст-моментум ВЫКЛ",          _v_f, True),
