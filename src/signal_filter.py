@@ -524,6 +524,27 @@ def analyze_coin_smc(candles_15m: dict, candles_1h: dict, symbol: str,
         return None
     symbol_norm = _norm_symbol(symbol)
 
+    # Filter-variant experiment plumbing (see src/filter_variants.py).
+    # A gate wired through _soft_fail() does not drop the setup outright when
+    # include_shadow is on — it marks it shadow-only, so the variant that
+    # relaxes exactly THAT gate can be measured live. Shadow setups are never
+    # real signals (main.py routes them to Claude + setup_log only).
+    # Soft-failing a SECOND, different gate drops the setup: no single variant
+    # would have admitted it, so it belongs to no arm.
+    shadow_only = False
+    shadow_reason = ""
+
+    def _soft_fail(reason: str) -> bool:
+        """True = caller must return None. False = continue as shadow-only."""
+        nonlocal shadow_only, shadow_reason
+        if not include_shadow:
+            return True
+        if shadow_only and shadow_reason != reason:
+            return True
+        shadow_only = True
+        shadow_reason = reason
+        return False
+
     ind = get_smc_indicators(candles_15m, candles_1h, candles_4h)
 
     bos      = ind["bos"]
@@ -691,11 +712,14 @@ def analyze_coin_smc(candles_15m: dict, candles_1h: dict, symbol: str,
 
     # 5b. Directional RSI midline — BOS without momentum = higher false-break rate.
     #     LONG needs RSI ≥ 50 (midline reclaimed), SHORT needs RSI < 40.
+    #     Soft-failable: variant I measures this gate switched OFF.
     if DIRECTIONAL_RSI_MIDLINE_FILTER:
         if bos == "bullish" and rsi < RSI_LONG_MIN_MIDLINE:
-            return None
+            if _soft_fail("rsi_mid"):
+                return None
         if bos == "bearish" and rsi >= RSI_SHORT_MAX_MIDLINE:
-            return None
+            if _soft_fail("rsi_mid"):
+                return None
 
     # 6. Build confirmations
     wicks  = ind.get("wicks", {})
@@ -773,19 +797,25 @@ def analyze_coin_smc(candles_15m: dict, candles_1h: dict, symbol: str,
     coin_change_1h = _change_pct_from_1h(candles_1h or {}, RELATIVE_STRENGTH_LOOKBACK_HOURS)
     rel_strength   = coin_change_1h - float(btc_change_pct or 0.0)
 
+    #     All five "context momentum pack" gates (here + 7b-1/7b-2/7b-3 below) are
+    #     soft-failable under the shared "ctxmom" reason — variant F measures the
+    #     whole pack switched OFF, since they were validated together on a single
+    #     window and never walk-forward tested.
     if (
         LONG_RELATIVE_WEAKNESS_FILTER
         and direction == "LONG"
         and rel_strength <= LONG_RELATIVE_WEAKNESS_MAX_PCT
     ):
-        return None
+        if _soft_fail("ctxmom"):
+            return None
     if (
         LONG_NY_COIN_MOMENTUM_FILTER
         and direction == "LONG"
         and ind.get("session") == "NEW_YORK"
         and coin_change_1h <= LONG_NY_MIN_COIN_CHANGE_1H
     ):
-        return None
+        if _soft_fail("ctxmom"):
+            return None
 
     if len(confirmations) < SMC_MIN_CONFIRMATIONS:
         return None
@@ -829,7 +859,8 @@ def analyze_coin_smc(candles_15m: dict, candles_1h: dict, symbol: str,
         and entry_zone
         and float(entry_zone.get("zone_width_pct", 0.0) or 0.0) <= BULL_NEUTRAL_LONG_MAX_ZONE_WIDTH_PCT
     ):
-        return None
+        if _soft_fail("ctxmom"):
+            return None
 
     # 7b-2. Short FVG coin-momentum filter — coin still trending up fills FVG as support
     #       before the SHORT move materialises.
@@ -840,7 +871,8 @@ def analyze_coin_smc(candles_15m: dict, candles_1h: dict, symbol: str,
         and str(entry_zone.get("entry_source") or "").upper() == "FVG"
         and coin_change_1h >= SHORT_FVG_MAX_COIN_CHANGE_1H
     ):
-        return None
+        if _soft_fail("ctxmom"):
+            return None
 
     # 7b-3. FVG London BTC-up filter — FVG LONGs in London when BTC already up >0.29%
     #       are late entries; expansion stalls then reverses at NYC open.
@@ -851,7 +883,8 @@ def analyze_coin_smc(candles_15m: dict, candles_1h: dict, symbol: str,
         and ind.get("session") == "LONDON"
         and btc_change_pct >= FVG_LONDON_BTC_UP_MIN_PCT
     ):
-        return None
+        if _soft_fail("ctxmom"):
+            return None
 
     # 7c. Retest — price must currently be at/near the zone (true retest, not chase)
     if REQUIRE_RETEST and entry_zone:
@@ -881,22 +914,13 @@ def analyze_coin_smc(candles_15m: dict, candles_1h: dict, symbol: str,
         if mtf_score > diag.get("best_score", -1):
             diag["best_score"]  = mtf_score
             diag["best_symbol"] = symbol
-    shadow_only = False
-    shadow_reason = ""
     if mtf_score < MTF_MIN_SCORE:
         if diag is not None:
             diag["score_fail"] = diag.get("score_fail", 0) + 1
-        # Filter-variant experiment (variant D): near-misses in
-        # [SHADOW_MIN_SCORE, MTF_MIN_SCORE) still get built + returned, but
-        # flagged shadow-only — run_scan must route these to Claude/logging
-        # ONLY, never to a real signal. Real gate above is unchanged.
-        # include_shadow defaults False so backtest.py/backtest_historical.py
-        # (which never pass it) are byte-for-byte unaffected — only main.py's
-        # live run_scan opts in explicitly.
-        if not (include_shadow and mtf_score >= SHADOW_MIN_SCORE):
+        # Variant D: near-misses in [SHADOW_MIN_SCORE, MTF_MIN_SCORE) survive as
+        # shadow-only. Anything below SHADOW_MIN_SCORE is dropped outright.
+        if mtf_score < SHADOW_MIN_SCORE or _soft_fail("score"):
             return None
-        shadow_only = True
-        shadow_reason = "score"
 
     # 8b. Adaptive regime pack gate (DEFAULT OFF — under backtest evaluation).
     #     Requires higher quality as the regime worsens + sets a per-regime risk_mult.

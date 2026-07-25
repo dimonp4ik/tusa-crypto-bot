@@ -19,17 +19,29 @@ Why not run 5-9 separate Claude calls per scan:
 Single-verdict replay keeps arms on identical verdicts, so the only difference
 between them is the filter rule itself.
 
-INTERPRETATION LIMIT (mostly): variants can only be a SUBSET of what the live
-filter already admits (Claude never saw setups the live filter rejected, so
-they're never logged with a verdict). Only variants STRICTER than live are
-directly comparable to real-signal outcomes.
+STRICTER arms (B/C/E/G/H) are a plain subset of what live already admits, so
+they replay directly against real-signal outcomes.
 
-Exception — variant D (2026-07-25): near-miss setups (score in
-[SHADOW_MIN_SCORE, MTF_MIN_SCORE)) are built + sent to Claude by run_scan as a
-SEPARATE shadow-only batch (see main.py), tagged and logged the same way, but
-never become a real signal. This makes D a genuine extra population, not a
-mirror of A. See config.py SHADOW_MIN_SCORE and signal_filter.py's
-_shadow_only flag.
+LOOSER arms (D/F/I) need setups the live filter REJECTED — which Claude would
+never see and nothing would ever log. The shadow mechanism (2026-07-25) closes
+that gap: signal_filter.analyze_coin_smc() takes include_shadow=True (live only;
+the backtests never pass it) and routes selected gates through _soft_fail().
+A soft-failed setup is still built and returned, flagged _shadow_only with the
+_shadow_reason naming the gate it missed. run_scan sends those to Claude as a
+SEPARATE capped batch and logs them with source='shadow' — they never become a
+real signal, never enter dedup/autotrade, and every pre-existing analytic keeps
+filtering source='live' so the numbers the admin panel reports are unchanged.
+
+Current soft-failable gates and the arm each one feeds:
+    "score"   -> D  (mtf_score in [SHADOW_MIN_SCORE, MTF_MIN_SCORE))
+    "ctxmom"  -> F  (the five narrow "context momentum pack" gates)
+    "rsi_mid" -> I  (DIRECTIONAL_RSI_MIDLINE_FILTER)
+
+A setup that soft-fails TWO different gates is dropped outright: no single
+variant would have admitted it, so it belongs to no arm. And every arm that
+does NOT relax a given gate must exclude its shadow setups — that's _live_ok();
+without it, shadow setups leak into the control arm A and the whole comparison
+is measured against a polluted baseline.
 """
 
 # code -> (label, predicate, measurable-under-current-live-config)
@@ -89,12 +101,12 @@ def _v_e(s):   # stricter trend-quality floor (Kaufman eff_ratio) — 2026-07 WF
     return _live_ok(s) and _f(s, "eff_ratio", 1.0) >= 0.25
 
 
-def _v_f(s):   # RSI ceiling for LONGs
-    if not _live_ok(s):
-        return False
-    if s.get("direction") != "LONG":
-        return True
-    return _f(s, "rsi", 50.0) <= 65.0
+def _v_f(s):   # "context momentum pack" OFF — the 5 narrow segment gates
+               # (rel-weakness / narrow-zone / NY-momentum / SHORT-FVG-momentum /
+               # FVG-London-BTC). All validated TOGETHER on one window 2026-06-05,
+               # never walk-forward tested; BULL_NEUTRAL_LONG_MAX_ZONE_WIDTH_PCT is
+               # tuned to 8 significant digits (0.00173509) — overfit smell.
+    return _relaxes(s, "ctxmom")
 
 
 def _v_g(s):   # skip overheated volatility regime, any direction (live only guards
@@ -111,13 +123,10 @@ def _v_h(s):   # "fresh trend": 4h leads, 1h hasn't caught up yet
     return aligned == 1 and neutral == 1
 
 
-def _v_i(s):   # stricter BOS staleness (pre-2026-07-18 setting)
-    if not _live_ok(s):
-        return False
-    ago = s.get("bos_candles_ago")
-    if ago is None:
-        return True
-    return _f(s, "bos_candles_ago", 0.0) <= 3
+def _v_i(s):   # DIRECTIONAL_RSI_MIDLINE_FILTER OFF — drop the "LONG needs RSI>=50,
+               # SHORT needs RSI<40" momentum confirmation. Broad gate, fires often,
+               # sits on top of the existing RSI exhaustion caps.
+    return _relaxes(s, "rsi_mid")
 
 
 VARIANTS = {
@@ -126,10 +135,10 @@ VARIANTS = {
     "C": ("Строгий score ≥16",               _v_c, True),
     "D": ("Мягкий score ≥12 (shadow)",       _v_d, True),
     "E": ("Eff.ratio ≥0.25",                 _v_e, True),
-    "F": ("RSI≤65 для LONG",                 _v_f, True),
+    "F": ("Контекст-моментум ВЫКЛ",          _v_f, True),
     "G": ("Vol-regime <2.0x",                _v_g, True),
     "H": ("Свежий тренд (mixed)",            _v_h, True),
-    "I": ("Строгий BOS ≤3 свечей",           _v_i, True),
+    "I": ("RSI midline ВЫКЛ",                _v_i, True),
 }
 
 

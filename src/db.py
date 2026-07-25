@@ -961,8 +961,8 @@ def log_setup_candidate(analysis: dict) -> int:
                 (ts, symbol, direction, entry_price, tp1, tp2, sl,
                  mtf_score, decision, confidence, risk_score, reason, sent,
                  session, entry_source, trend,
-                 oi_delta_pct, oi_regime, oi_confirms, counter, variants)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?, ?, ?, ?, ?, ?, ?, ?)
+                 oi_delta_pct, oi_regime, oi_confirms, counter, variants, source)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """, (
             time_mod.time(),
             analysis.get("symbol", ""),
@@ -984,6 +984,13 @@ def log_setup_candidate(analysis: dict) -> int:
             analysis.get("oi_confirms"),
             analysis.get("counter", ""),
             analysis.get("variants", ""),
+            # Shadow setups (filter-variant experiment) are logged as source
+            # 'shadow' so every pre-existing analytic — AI accuracy, the mirror
+            # experiment, Claude's per-coin memory — keeps filtering on
+            # source='live' and stays measured on real signals only. The shadow
+            # tracker (get_unresolved_setups) has no source filter, so their
+            # outcomes still get resolved for the variant arms.
+            analysis.get("source") or "live",
         ))
         return cur.lastrowid
 
@@ -1082,14 +1089,21 @@ def get_setup_accuracy(since_ts: float) -> dict:
 
 
 def get_variant_rows(since_ts: float) -> list:
-    """Resolved live setups carrying variant tags, for the filter A/B report."""
+    """Resolved setups carrying variant tags, for the filter A/B report.
+
+    Unlike every other analytic here this reads BOTH source='live' and
+    source='shadow': the shadow rows are the whole point of the looser arms
+    (D/F/I), and compute_variants() already keeps them out of the arms that
+    don't relax the gate they soft-failed.
+    """
     with _conn() as c:
         rows = c.execute(
             """SELECT ts, symbol, direction, mtf_score, decision, confidence,
                       risk_score, sent, outcome, reached_tp1, reached_tp2,
-                      trend, session, entry_source, variants
+                      trend, session, entry_source, variants, source
                FROM setup_log
-               WHERE resolved=1 AND ts >= ? AND COALESCE(source,'live')='live'
+               WHERE resolved=1 AND ts >= ?
+                 AND COALESCE(source,'live') IN ('live','shadow')
                  AND variants IS NOT NULL AND variants != ''
                ORDER BY ts ASC""",
             (since_ts,),

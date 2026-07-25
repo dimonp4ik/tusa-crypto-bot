@@ -818,14 +818,22 @@ def _handle_admin_callback(callback_id: str, chat_id: int,
                 n = len(sub)
                 if not n:
                     return None
-                sent = [r for r in sub if r.get("sent")]
-                rej  = [r for r in sub if not r.get("sent")]
+                # Split by Claude's VERDICT, not the sent flag. Shadow setups
+                # (the looser arms D/F/I) are never sent by construction, so a
+                # sent-based split would file every Claude-APPROVED shadow setup
+                # into the rejected bucket and make those arms look bad for a
+                # purely mechanical reason.
+                def _ok(r):
+                    return str(r.get("decision") or "").upper() in ("LONG", "SHORT")
+                sent = [r for r in sub if _ok(r)]
+                rej  = [r for r in sub if not _ok(r)]
                 def _tp1(x): return sum(1 for r in x if r.get("reached_tp1"))
                 s_tp1 = (_tp1(sent) / len(sent) * 100) if sent else 0.0
                 r_tp1 = (_tp1(rej) / len(rej) * 100) if rej else 0.0
                 # separation = does Claude sort better inside this arm
                 gap = s_tp1 - r_tp1 if (sent and rej) else None
                 return {"n": n, "n_sent": len(sent), "n_rej": len(rej),
+                        "n_shadow": sum(1 for r in sub if r.get("source") == "shadow"),
                         "sent_tp1": s_tp1, "rej_tp1": r_tp1, "gap": gap}
 
             lines = ["🧪 *ТЕСТ ФИЛЬТРОВ* (30 дней)",
@@ -838,10 +846,12 @@ def _handle_admin_callback(callback_id: str, chat_id: int,
                     continue
                 tag = "" if measurable else " ⚠️"
                 gap_s = f"{st['gap']:+.0f}пп" if st["gap"] is not None else "—"
+                # Shadow count = setups this arm has that live trading never took.
+                sh_s = f" +{st['n_shadow']}👻" if st["n_shadow"] else ""
                 lines.append(
                     f"*{code}. {label}*{tag}\n"
-                    f"  n={st['n']} (📤{st['n_sent']}/🚫{st['n_rej']}) · "
-                    f"отпр TP1 {st['sent_tp1']:.0f}% · откл TP1 {st['rej_tp1']:.0f}% · "
+                    f"  n={st['n']}{sh_s} (✅{st['n_sent']}/🚫{st['n_rej']}) · "
+                    f"одобр TP1 {st['sent_tp1']:.0f}% · откл TP1 {st['rej_tp1']:.0f}% · "
                     f"разрыв {gap_s}"
                 )
                 if st["gap"] is not None and st["n_sent"] >= 5:
@@ -850,9 +860,9 @@ def _handle_admin_callback(callback_id: str, chat_id: int,
                 scored.sort(reverse=True)
                 g, c, l = scored[0]
                 lines.append(f"\n🥇 Лучшее разделение: *{c}* ({l}) — {g:+.0f}пп")
-            lines.append("\n_⚠️ = вариант мягче текущего фильтра, его лишние сетапы "
-                         "физически не попали в лог → выглядит как контроль._")
-            lines.append("_Разрыв = отправленные TP1% минус отклонённые TP1%. "
+            lines.append("\n_👻 = сетапы, которые живой фильтр отбросил, а этот "
+                         "вариант бы взял. В реальную торговлю не шли._")
+            lines.append("_Разрыв = TP1% одобренных минус TP1% отклонённых Клодом. "
                          "Больше = Клод лучше отделяет на этом наборе фильтров._")
             _edit_message(chat_id, message_id, "\n".join(lines))
 
@@ -3060,7 +3070,16 @@ def run_scan():
         if shadow_setups:
             try:
                 shadow_setups.sort(key=_setup_rank, reverse=True)
-                shadow_batch = shadow_setups[:3]
+                # Per-reason quota: each soft-failed gate feeds its OWN variant
+                # arm, so a frequently-firing gate (rsi_mid) must not crowd the
+                # rarer ones out of the batch. Best 2 per reason, 5 total.
+                _per_reason, shadow_batch = {}, []
+                for _sh in shadow_setups:
+                    _r = _sh.get("_shadow_reason", "")
+                    if _per_reason.get(_r, 0) >= 2 or len(shadow_batch) >= 5:
+                        continue
+                    _per_reason[_r] = _per_reason.get(_r, 0) + 1
+                    shadow_batch.append(_sh)
                 shadow_ctx = dict(news or {})
                 shadow_ctx["btc_1h"] = btc_change
                 shadow_ctx["btc_1d"] = btc_change_1d
@@ -3068,6 +3087,9 @@ def run_scan():
                 for _sa in shadow_analyses:
                     try:
                         _sa["variants"] = compute_variants(_sa)
+                        # Keeps these out of AI-accuracy / mirror / Claude memory,
+                        # which all filter source='live'. See log_setup_candidate.
+                        _sa["source"] = "shadow"
                         log_setup_candidate(_sa)
                     except Exception as _sve:
                         log.debug(f"shadow variant log failed: {_sve}")
