@@ -3062,12 +3062,17 @@ def run_scan():
             except Exception as _e:
                 log.debug(f"  OI attach failed {_s.get('symbol','?')}: {_e}")
 
-        # Filter-variant experiment (variant D) — shadow-only near-misses
-        # (score in [SHADOW_MIN_SCORE, MTF_MIN_SCORE)). NEVER a real signal:
-        # separate list, capped, own Claude call (shares the LIGHT daily budget
-        # cap — can't blow past it), logged with sent=0. Does not touch dedup,
-        # _is_reject_cooled, enriched, or anything downstream of enriched.
-        if shadow_setups:
+        # Filter-variant experiment (variants D/F/I) — shadow-only setups that
+        # soft-failed exactly one relaxable gate (score/ctxmom/rsi_mid, see
+        # signal_filter.py _soft_fail). NEVER a real signal: separate list,
+        # capped, own Claude call, logged with sent=0/source='shadow'. Does not
+        # touch dedup, _is_reject_cooled, enriched, or anything downstream of it.
+        # Run AFTER the real LIGHT call below (see call site) so a live setup
+        # always gets first claim on the shared daily budget cap — the
+        # experiment must never be able to starve real trading of its verdict.
+        def _run_shadow_batch():
+            if not shadow_setups:
+                return
             try:
                 shadow_setups.sort(key=_setup_rank, reverse=True)
                 # Per-reason quota: each soft-failed gate feeds its OWN variant
@@ -3093,11 +3098,13 @@ def run_scan():
                         log_setup_candidate(_sa)
                     except Exception as _sve:
                         log.debug(f"shadow variant log failed: {_sve}")
-                log.info(f"Shadow variant-D: {len(shadow_analyses)} logged (no real signal)")
+                log.info(f"Shadow (D/F/I): {len(shadow_analyses)} logged (no real signal)")
             except Exception as _se:
-                log.warning(f"Shadow variant-D batch failed: {_se}")
+                log.warning(f"Shadow D/F/I batch failed: {_se}")
 
         if not enriched:
+            # No real setups to prioritize budget for — safe to run shadow now.
+            _run_shadow_batch()
             log.info("=== Scan complete — 0 signal(s) sent ===\n")
             return
 
@@ -3110,6 +3117,9 @@ def run_scan():
         except Exception as e:
             log.error(f"Claude LIGHT batch call failed: {e}")
             return
+
+        # Real LIGHT call already claimed its budget above — shadow runs now.
+        _run_shadow_batch()
 
         # Step 4b: HEAVY tier — Sonnet second opinion on the strongest survivors.
         # Only setups the LIGHT gate approved (LONG/SHORT, not LOW) with a high
