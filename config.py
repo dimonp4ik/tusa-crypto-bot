@@ -426,12 +426,25 @@ STOP_EXCHANGE_BACKSTOP_R = float(os.getenv("STOP_EXCHANGE_BACKSTOP_R", "2.0"))
 # --- Concurrent same-direction exposure cap (2026-07-26) ------------------------
 # Nothing capped total open positions before this: only per-symbol dedup and
 # MAX_SIGNALS_PER_SCAN=3, while signals live up to SIGNAL_EXPIRY_HOURS=48, so
-# same-side positions accumulate. Alts run ~0.7-0.9 correlated to BTC with beta
-# above 1, so N same-direction alt positions are not N independent trades —
-# one BTC move resolves them together, and 3 stops in a row trip the kill
-# switch for the rest of the Riga day. NOT backtestable (the backtest is
-# single-position by construction), so this is a risk cap, not a tuned edge.
-MAX_SAME_DIRECTION_POSITIONS = int(os.getenv("MAX_SAME_DIRECTION_POSITIONS", "4"))
+# same-side positions accumulate — portfolio_sim.py measured a peak of TWENTY
+# open in one direction. Alts run ~0.7-0.9 correlated to BTC with beta above 1,
+# so those are not 20 independent trades: one BTC move resolves them together.
+#
+# Set to 8 (not 4) after measuring it — see portfolio_sim.py, which replays
+# backtest trades on one shared account with the live guardrails applied:
+#   cap off : w1 +597.4R / DD -11.17R   w2 +480.1R / DD -8.46R
+#   cap 4   : w1 +521.6R / DD -10.41R   w2 +410.2R / DD -5.85R
+#   cap 8   : w1 +595.1R / DD -11.17R   w2 +479.1R / DD -8.46R
+# A tight cap costs 12-15% of profit for a drawdown benefit that is wildly
+# inconsistent between windows (-6.8% vs -31%), and caps of 5-6 came out WORSE
+# than no cap at all on w1 — i.e. the drawdown effect is mostly noise. Worse,
+# the trades a tight cap removes are BETTER than average (0.632R vs the 0.491R
+# mean on w1; same direction on w2): a crowded book forms in a strong trend,
+# and trend trades win more, so the cap bites exactly where the edge is.
+# 8 costs 0.2-0.4% and still bounds the disaster case. It is deliberately
+# dormant in normal markets — its job is the crash that is NOT in this data,
+# which is precisely why the cap level cannot be tuned on it.
+MAX_SAME_DIRECTION_POSITIONS = int(os.getenv("MAX_SAME_DIRECTION_POSITIONS", "8"))
 
 # --- News filter (per-coin keywords) ---
 CRYPTOPANIC_API_KEY = os.getenv("CRYPTOPANIC_API_KEY", "")

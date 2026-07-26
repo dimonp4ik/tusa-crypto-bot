@@ -399,25 +399,28 @@ def _portfolio_block() -> str:
         f"-{'L' if str(s.get('direction', '')).upper() == 'LONG' else 'S'}"
         for s in sigs[:12]
     )
-    # Skew warning is ratio-based, not "zero on the other side": 4 LONG vs
-    # 1 SHORT is still a concentrated directional book, the single hedge
-    # offsets very little of it.
+    # Deliberately NOT "be more sceptical when the book is crowded". Measured
+    # 2026-07-26 with portfolio_sim.py: trades removed by a tight same-direction
+    # cap were BETTER than average (0.632R vs the 0.491R mean), because a
+    # crowded book forms in a strong trend and trend trades win more. Telling
+    # Claude to demand extra justification there would suppress the good ones.
+    # So this states exposure and flags only a genuinely extreme skew.
     skew = ""
-    if nl >= 3 and nl >= 2 * ns:
-        skew = (f" WARNING: book is {nl} LONG vs {ns} SHORT. That is close to one "
-                f"leveraged bet on BTC not dropping, repeated {nl} times - a single "
-                f"adverse BTC move resolves them together, and 3 stops in a row halt "
-                f"trading for the rest of the day.")
-    elif ns >= 3 and ns >= 2 * nl:
-        skew = (f" WARNING: book is {ns} SHORT vs {nl} LONG. That is close to one "
-                f"leveraged bet on BTC not squeezing, repeated {ns} times.")
+    if nl >= 6 and nl >= 2 * ns:
+        skew = (f" NOTE: {nl} LONG vs {ns} SHORT is an unusually one-sided book - "
+                f"near the point where a single adverse BTC move resolves most of "
+                f"it at once.")
+    elif ns >= 6 and ns >= 2 * nl:
+        skew = (f" NOTE: {ns} SHORT vs {nl} LONG is an unusually one-sided book - "
+                f"near the point where a single BTC squeeze resolves most of it "
+                f"at once.")
     return (
         f"\nOPEN POSITIONS ({n}): {syms}. Direction split: {nl} LONG / {ns} SHORT.{skew}\n"
-        f"Rule: correlated crypto positions in the SAME direction do not diversify, "
-        f"they concentrate - alts run ~0.7-0.9 correlated to BTC with beta above 1. "
-        f"The more already open on one side, the stronger the setup-specific reason "
-        f"must be to add another on that side; prefer a setup that balances the book "
-        f"or is genuinely idiosyncratic. This describes exposure, it is not a ban.\n"
+        f"Context only: same-direction crypto positions are correlated (alts run "
+        f"~0.7-0.9 with BTC, beta above 1), so the book is less diversified than "
+        f"the position count suggests. Judge this setup on its own merits - a "
+        f"crowded book is NOT by itself a reason to reject, and a hard cap already "
+        f"bounds total same-side exposure.\n"
     )
 
 
