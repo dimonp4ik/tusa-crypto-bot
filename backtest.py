@@ -481,6 +481,29 @@ def _post_tp1_trail_mult_bt(direction: str, entry: float, tp1: float, tp2: float
     return base
 
 
+# Close-confirmed stop — mirrors the live setting so backtest and live stay in
+# parity (config already applies the STOP_CLOSE_CONFIRM env override). Set
+# STOP_CLOSE_CONFIRM=0 to measure the old wick-touch stop as a baseline.
+# A time-stop ("scratch the trade if it hasn't moved after N bars") was tested
+# here on 2026-07-26 and REJECTED: 32 bars gave WR 80.8%→71.1% and netR
+# +904→+850 on the 6-month window — it scratches trades that would have won.
+from config import STOP_CLOSE_CONFIRM as _STOP_CLOSE_CONFIRM
+
+
+def _r_from_price(entry: float, exit_px: float, sl: float, direction: str) -> float:
+    """Actual R of an exit at an arbitrary price (pre-TP1, full position open).
+
+    Needed because gross_r_for_outcome() hardcodes SL = -1.0R, which is only
+    true when the exit really happens AT the stop level. A close-confirmed stop
+    exits at the candle CLOSE, which can be well beyond the level — counting
+    that as -1.0R would invent an edge that does not exist.
+    """
+    risk = abs(entry - sl)
+    if risk <= 0:
+        return 0.0
+    return ((exit_px - entry) if direction == "LONG" else (entry - exit_px)) / risk
+
+
 def gross_r_for_outcome(outcome: str, entry: float, tp1: float, tp2: float, sl: float) -> float:
     risk = abs(entry - sl)
     if risk <= 0:
@@ -643,13 +666,16 @@ def simulate_trade_direct(
     best_price = entry
     trail_mult_eff = max(0.0, float(trail_atr_mult))  # context-frozen at TP1 candle
 
+    stop_exit_price = None  # set when we exit at a price other than the SL level
     for j in range(fill_bar, end):
         h = highs[j]
         l = lows[j]
         if not tp1_reached:
             if direction == "LONG":
-                if l <= sl:
+                if (closes[j] <= sl) if _STOP_CLOSE_CONFIRM else (l <= sl):
                     outcome = "SL"
+                    if _STOP_CLOSE_CONFIRM:
+                        stop_exit_price = closes[j]
                     exit_bar = j
                     closed = True
                     break
@@ -665,8 +691,10 @@ def simulate_trade_direct(
                     trail_mult_eff = _post_tp1_trail_mult_bt(direction, entry, tp1, tp2, h, l, closes[j])
                     continue
             else:
-                if h >= sl:
+                if (closes[j] >= sl) if _STOP_CLOSE_CONFIRM else (h >= sl):
                     outcome = "SL"
+                    if _STOP_CLOSE_CONFIRM:
+                        stop_exit_price = closes[j]
                     exit_bar = j
                     closed = True
                     break
@@ -728,6 +756,11 @@ def simulate_trade_direct(
 
     if outcome == "TRAIL":
         gross_r = gross_r_for_trailing_exit(entry, tp1, trail_exit_price, sl, direction)
+    elif stop_exit_price is not None:
+        # Close-confirmed stop or time-stop: full position still open, so R is
+        # the real move to the exit price — NOT the -1.0R that a level-touch
+        # stop would have booked. Can be worse than -1R (gap through the level).
+        gross_r = _r_from_price(entry, stop_exit_price, sl, direction)
     else:
         gross_r = gross_r_for_outcome(outcome, entry, tp1, tp2, sl)
     cost_r = estimate_cost_r(entry, sl, fee_rate, slippage_rate)

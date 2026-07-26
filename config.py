@@ -401,6 +401,38 @@ SKIP_WEEKDAYS  = {d for d in os.getenv("SKIP_WEEKDAYS", "").split(",") if d.stri
 # --- BTC correlation filter ---
 BTC_BLOCK_THRESHOLD_PCT = 1.0
 
+# --- Close-confirmed stop (VALIDATED 2026-07-26, default ON) --------------------
+# A stop that fires on a WICK touching the level exits trades that never really
+# broke — the classic stop-hunt. Requiring the 15m candle to CLOSE beyond the
+# level instead keeps those trades alive. Backtested honestly: the surviving
+# stops exit at the candle CLOSE, which is worse than the level (avg ~-1.13R,
+# never beyond -2.0R across ~3600 trades), so the gain is real, not accounting.
+#   window 1 (2026-01→07, 1841tr): WR 80.8→82.8%, SL 347→304, netR +904→+945
+#   window 2 (2025-08→2026-01, 1764tr): WR 78.0→80.6%, SL 377→326, netR +720→+762
+#                                       maxDD -20.19R → -17.21R
+# Holds on both independent windows on WR, profit AND (window 2) drawdown.
+# Live effect should be LARGER than backtest: the backtest runs on the deep
+# global feed, while the user trades the thin X-Perp where false wicks are more
+# common (this is the same phenomenon the SL-wick diagnostic was built to log).
+STOP_CLOSE_CONFIRM = os.getenv("STOP_CLOSE_CONFIRM", "1") != "0"
+# The exchange-side stop stays in place as a DISASTER backstop, just widened to
+# this multiple of R. It is what protects the position when the bot itself is
+# down (deploy, restart, network) — without it a close-confirmed stop would
+# leave the position naked and 10x leverage liquidates ~9% away. At 2.0R it
+# would not have fired once in either backtest window, so it costs nothing in
+# normal operation and caps the tail at -2R instead of a liquidation.
+STOP_EXCHANGE_BACKSTOP_R = float(os.getenv("STOP_EXCHANGE_BACKSTOP_R", "2.0"))
+
+# --- Concurrent same-direction exposure cap (2026-07-26) ------------------------
+# Nothing capped total open positions before this: only per-symbol dedup and
+# MAX_SIGNALS_PER_SCAN=3, while signals live up to SIGNAL_EXPIRY_HOURS=48, so
+# same-side positions accumulate. Alts run ~0.7-0.9 correlated to BTC with beta
+# above 1, so N same-direction alt positions are not N independent trades —
+# one BTC move resolves them together, and 3 stops in a row trip the kill
+# switch for the rest of the Riga day. NOT backtestable (the backtest is
+# single-position by construction), so this is a risk cap, not a tuned edge.
+MAX_SAME_DIRECTION_POSITIONS = int(os.getenv("MAX_SAME_DIRECTION_POSITIONS", "4"))
+
 # --- News filter (per-coin keywords) ---
 CRYPTOPANIC_API_KEY = os.getenv("CRYPTOPANIC_API_KEY", "")
 NEWS_BLOCK_KEYWORDS = ["hack", "exploit", "scam", "lawsuit", "sec ", "ban", "delist", "rug"]

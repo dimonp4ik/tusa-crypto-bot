@@ -26,6 +26,7 @@ from config import (
     MAX_SETUPS_TO_CLAUDE, ALLOWED_SYMBOLS, KLINES_INTERVAL_SEC, SIGNAL_EXPIRY_HOURS,
     CLAUDE_HEAVY_MIN_SCORE, CLAUDE_HEAVY_MAX_PER_SCAN, CLAUDE_MEMORY_LIMIT,
     TRAIL_RUNNER_ENABLED, TRAIL_ATR_MULT,
+    STOP_CLOSE_CONFIRM, MAX_SAME_DIRECTION_POSITIONS,
     TP1_CLOSE_FRAC, EXIT_PROFILE,
     POST_TP1_STRONG_TRAIL_ATR_MULT, POST_TP1_WEAK_TRAIL_ATR_MULT,
     POST_TP1_STRONG_CLOSE_PROGRESS, POST_TP1_STRONG_WICK_PROGRESS,
@@ -2647,15 +2648,38 @@ def _check_open_signals():
             else:
                 trail_atr_mult = max(0.0, float(TRAIL_ATR_MULT))
 
+            _conf_flags = df.get("confirmed") or []
             for i in range(len(df.get("close", []))):
                 high  = float(df["high"][i])
                 low   = float(df["low"][i])
                 close = float(df["close"][i])
                 exit_px = close
+                # Close-confirmed stop: the level must be breached by a CLOSED
+                # candle's close, not by a wick. Unconfirmed (still-forming)
+                # candles can never trigger it — their "close" is just the
+                # current price, which is exactly the intrabar touch we mean to
+                # ignore. Falls back to wick-touch when the feed carries no
+                # confirmed flags (global-feed fallback path).
+                _is_confirmed = bool(_conf_flags[i]) if i < len(_conf_flags) else True
+                if STOP_CLOSE_CONFIRM:
+                    _sl_breached = _is_confirmed and (
+                        close <= sl if direction == "LONG" else close >= sl
+                    )
+                else:
+                    _sl_breached = low <= sl if direction == "LONG" else high >= sl
+                # Exit price is the real close when we confirmed on a close —
+                # booking it at the SL level would understate the loss.
+                _sl_exit_px = close if STOP_CLOSE_CONFIRM else sl
+                _sl_r = -1.0
+                if STOP_CLOSE_CONFIRM and risk > 0:
+                    _sl_r = round(
+                        ((_sl_exit_px - entry) if direction == "LONG" else (entry - _sl_exit_px)) / risk,
+                        4,
+                    )
 
                 if status == "OPEN":
                     if direction == "LONG":
-                        if low <= sl:             realized_r = -1.0; new_status, exit_px = "SL_HIT", sl;  break
+                        if _sl_breached:          realized_r = _sl_r; new_status, exit_px = "SL_HIT", _sl_exit_px;  break
                         if high >= tp2:
                             realized_r = round(tp1_close_frac * tp1_r + runner_frac * tp2_r, 4)
                             new_status, exit_px = "TP2_HIT", tp2; break
@@ -2663,7 +2687,7 @@ def _check_open_signals():
                             runner_trail_atr_mult = _post_tp1_trail_mult(direction, entry, tp1, tp2, high, low, close)
                             new_status, exit_px = "TP1_PARTIAL", tp1; break
                     else:
-                        if high >= sl:            realized_r = -1.0; new_status, exit_px = "SL_HIT", sl;  break
+                        if _sl_breached:          realized_r = _sl_r; new_status, exit_px = "SL_HIT", _sl_exit_px;  break
                         if low <= tp2:
                             realized_r = round(tp1_close_frac * tp1_r + runner_frac * tp2_r, 4)
                             new_status, exit_px = "TP2_HIT", tp2; break
@@ -2729,7 +2753,17 @@ def _check_open_signals():
                     try:
                         g = get_klines(sig["symbol"], limit=candle_lim)  # global BTC-USDT-SWAP feed
                         gd = _slice_candles_from_open(g, monitor_from)
-                        if direction == "LONG":
+                        # Compare like with like: under a close-confirmed stop
+                        # the X-Perp side triggered on a CLOSE, so asking the
+                        # deep feed only for a wick touch would answer a
+                        # different (and near-always-yes) question.
+                        if STOP_CLOSE_CONFIRM:
+                            _gk = "close"
+                            g_breached = any(
+                                (float(x) <= sl) if direction == "LONG" else (float(x) >= sl)
+                                for x in gd.get(_gk, [])
+                            )
+                        elif direction == "LONG":
                             g_breached = any(float(x) <= sl for x in gd.get("low", []))
                         else:
                             g_breached = any(float(x) >= sl for x in gd.get("high", []))
@@ -3187,6 +3221,15 @@ def run_scan():
         # Step 5: Send signals to Telegram (hard cap: max 3 per scan)
         MAX_SIGNALS_PER_SCAN = 3
         sent_count = 0
+        # Concurrent same-direction exposure. Correlated alts in one direction
+        # do not diversify, they concentrate: one BTC move resolves them all the
+        # same way and 3 stops in a row halt trading for the rest of the day.
+        # Counts positions ALREADY open plus ones published earlier in this scan.
+        _dir_open = {"LONG": 0, "SHORT": 0}
+        for _s in get_open_signals():
+            _d = str(_s.get("direction", "")).upper()
+            if _d in _dir_open:
+                _dir_open[_d] += 1
         for analysis in analyses:
             try:
                 # Attach news context to each analysis for Telegram message
@@ -3215,6 +3258,14 @@ def run_scan():
                 if decision != "NO TRADE":
                     if sent_count >= MAX_SIGNALS_PER_SCAN:
                         log.info(f"  Skip {analysis['symbol']} — scan cap {MAX_SIGNALS_PER_SCAN} reached")
+                        continue
+
+                    if (MAX_SAME_DIRECTION_POSITIONS > 0
+                            and _dir_open.get(decision, 0) >= MAX_SAME_DIRECTION_POSITIONS):
+                        log.info(
+                            f"  Skip {analysis['symbol']} — {_dir_open[decision]} {decision} "
+                            f"already open, correlation cap {MAX_SAME_DIRECTION_POSITIONS} reached"
+                        )
                         continue
 
                     # Snapshot the live X-Perp price (the instrument the user
@@ -3247,6 +3298,8 @@ def run_scan():
                     if send_signal(analysis):
                         _cache_signal(analysis["symbol"], direction)
                         sent_count += 1
+                        if direction in _dir_open:
+                            _dir_open[direction] += 1
                         log.info(f"  Signal sent: {analysis['symbol']} {direction}")
                         try:
                             mark_setup_sent(analysis.get("_setup_log_id"))
