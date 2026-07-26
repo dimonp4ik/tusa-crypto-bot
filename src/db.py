@@ -1466,6 +1466,25 @@ def get_weekly_stats() -> dict:
     }
 
 
+def get_all_setups_since(since_ts: float) -> list:
+    """Every logged setup since a cutoff, raw — for the full-report CSV dump."""
+    with _conn() as c:
+        rows = c.execute(
+            "SELECT * FROM setup_log WHERE ts >= ? ORDER BY ts ASC", (since_ts,)
+        ).fetchall()
+    return [dict(r) for r in rows]
+
+
+def get_all_signals_since(since_ts: float) -> list:
+    """Every published signal since a cutoff, raw — for the full-report CSV dump."""
+    with _conn() as c:
+        rows = c.execute(
+            "SELECT * FROM signals WHERE opened_at >= ? ORDER BY opened_at ASC",
+            (since_ts,),
+        ).fetchall()
+    return [dict(r) for r in rows]
+
+
 def get_setups_by_date(date_str: str) -> list:
     """Return all setups for a given date. Accepts DD.MM, DD.MM.YYYY, YYYY-MM-DD.
     Timestamps stored as UTC, displayed in caller's chosen tz."""

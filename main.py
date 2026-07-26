@@ -26,7 +26,8 @@ from config import (
     MAX_SETUPS_TO_CLAUDE, ALLOWED_SYMBOLS, KLINES_INTERVAL_SEC, SIGNAL_EXPIRY_HOURS,
     CLAUDE_HEAVY_MIN_SCORE, CLAUDE_HEAVY_MAX_PER_SCAN, CLAUDE_MEMORY_LIMIT,
     TRAIL_RUNNER_ENABLED, TRAIL_ATR_MULT,
-    STOP_CLOSE_CONFIRM, MAX_SAME_DIRECTION_POSITIONS,
+    STOP_CLOSE_CONFIRM, MAX_SAME_DIRECTION_POSITIONS, STOP_EXCHANGE_BACKSTOP_R,
+    MTF_MIN_SCORE, SHADOW_MIN_SCORE, TP1_R_MULT,
     TP1_CLOSE_FRAC, EXIT_PROFILE,
     POST_TP1_STRONG_TRAIL_ATR_MULT, POST_TP1_WEAK_TRAIL_ATR_MULT,
     POST_TP1_STRONG_CLOSE_PROGRESS, POST_TP1_STRONG_WICK_PROGRESS,
@@ -56,6 +57,7 @@ from src.db import (
     init_db, get_open_signals, update_signal_status, get_stats,
     set_sl_xperp_only, get_sl_wick_stats, get_variant_rows,
     mark_setup_blocked, get_cap_impact_stats, get_skew_response_stats,
+    get_all_setups_since, get_all_signals_since,
     auto_block_bad_symbols, is_symbol_auto_blocked, get_active_symbol_blocks,
     get_recent_outcomes, unblock_symbol, set_symbol_block, get_symbols_performance,
     upsert_user, get_user_by_id, get_all_users, get_users_count,
@@ -286,6 +288,8 @@ _KB_ANALYTICS = {"inline_keyboard": [[
     {"text": "🧪 Тест фильтров", "callback_data": "adm_variants"},
 ], [
     {"text": "🔗 Кап корреляции", "callback_data": "adm_cap"},
+], [
+    {"text": "📦 Полный отчёт", "callback_data": "adm_fullreport"},
 ], [_BACK_ROW[0]]]}
 
 _KB_PEOPLE = {"inline_keyboard": [[
@@ -805,6 +809,156 @@ def _handle_admin_callback(callback_id: str, chat_id: int,
         except Exception as e:
             txt = f"Ошибка: {e}"
         _edit_message(chat_id, message_id, txt)
+
+    elif data == "adm_fullreport":
+        try:
+            _answer_callback(callback_id, "Собираю отчёт…")
+            _rz = _riga_tz()
+            since30 = time.time() - 30 * 86400
+            since7  = time.time() - 7 * 86400
+            L = []
+            A = L.append
+            A("# ПОЛНЫЙ ОТЧЁТ БОТА")
+            A(f"Сформирован: {datetime.now(_rz).strftime('%Y-%m-%d %H:%M')} Riga")
+            A("")
+            A("Прогноз модели (portfolio_sim.py, 2 независимых окна по ~6 мес,")
+            A("текущий конфиг, все живые ограничители):")
+            A("  окно 1: 1211 сделок, WR 81.8%, +0.491R/сделка, maxDD -11.17R")
+            A("  окно 2: 1128 сделок, WR 80.2%, +0.425R/сделка, maxDD  -8.46R")
+            A("ВАЖНО: в модели НЕТ Клода — она измеряет только фильтр правил.")
+            A("")
+
+            # 1. Live results
+            for label, d in (("7 дней", 7), ("30 дней", 30)):
+                s = get_stats(days=d)
+                A(f"## ЖИВЫЕ РЕЗУЛЬТАТЫ — {label}")
+                A(f"  сигналов: {s['total']}  закрыто: {s['closed']}  "
+                  f"открыто: {s['open']}+{s['tp1_partial_open']}")
+                A(f"  винрейт: {s['win_rate']}%   (модель: ~81%)")
+                A(f"  TP1: {s['tp1_hit']} ({s['tp1_rate']}%)  TP2: {s['tp2_hit']}  "
+                  f"SL: {s['sl_hit']}  истекло: {s['expired']}")
+                A(f"  итог: {s['total_r']}R  ({s['r_per_trade']}R/сделка)")
+                _l, _sh = s.get("long") or {}, s.get("short") or {}
+                A(f"  LONG  n={_l.get('total', 0)} WR={_l.get('win_rate', 0)}% R={_l.get('total_r', 0)}")
+                A(f"  SHORT n={_sh.get('total', 0)} WR={_sh.get('win_rate', 0)}% R={_sh.get('total_r', 0)}")
+                A("")
+
+            # 2. Claude approval rate + accuracy
+            A("## КЛОД: ТОЧНОСТЬ И ДОЛЯ ОДОБРЕНИЙ (30д)")
+            acc = get_setup_accuracy(since30)
+            _s, _r = acc.get("sent") or {}, acc.get("rejected") or {}
+            _tot = (_s.get("n") or 0) + (_r.get("n") or 0)
+            if _tot:
+                A(f"  одобрил и отправлено: {_s.get('n', 0)}  "
+                  f"отклонил: {_r.get('n', 0)}  "
+                  f"доля одобрений: {(_s.get('n', 0) / _tot * 100):.0f}%")
+                A(f"  TP1 у отправленных: {_s.get('tp1_rate', 0)}%")
+                A(f"  TP1 у отклонённых: {_r.get('tp1_rate', 0)}%")
+                A(f"  разрыв (чем больше, тем лучше он отбирает): "
+                  f"{(_s.get('tp1_rate', 0) - _r.get('tp1_rate', 0)):+.0f}пп")
+                A(f"  зеркало отклонённых: {_r.get('mirror_r', 0):+.1f}R "
+                  f"(n={_r.get('n', 0)})")
+            else:
+                A("  данных нет")
+            A("")
+
+            # 3. Stop nature
+            A("## ПРИРОДА СТОПОВ (X-Perp фитиль vs реальный разворот)")
+            A("  Ключевая проверка: close-стоп включён 2026-07-26.")
+            for label, since in (("7 дней", since7), ("30 дней", since30)):
+                w = get_sl_wick_stats(since)
+                if w["n"]:
+                    A(f"  {label}: стопов {w['n']}  "
+                      f"X-Perp шум {w['xperp_only']} ({w['xperp_only_pct']:.0f}%)  "
+                      f"реальный разворот {w['confirmed']}")
+                else:
+                    A(f"  {label}: данных нет")
+            A("")
+
+            # 4. Caps
+            A("## ВЛИЯНИЕ ЛИМИТОВ (30д)")
+            _caps = get_cap_impact_stats(since30) or {}
+            for code, title in (("dir_cap", f"лимит одной стороны ({MAX_SAME_DIRECTION_POSITIONS})"),
+                                ("scan_cap", "лимит 3 за скан")):
+                st = _caps.get(code) or {}
+                if st.get("n"):
+                    A(f"  {title}: срезано {st['n']}  "
+                      f"дошли бы до TP1 {st['reached_tp1']} ({st['tp1_pct']:.0f}%)  "
+                      f"в стоп {st['sl']} ({st['sl_pct']:.0f}%)  "
+                      f"итог {st['saved_r']:+.1f}R")
+                else:
+                    A(f"  {title}: не срабатывал")
+            A("")
+            A("## РЕАКЦИЯ КЛОДА НА ПЕРЕКОС КНИГИ (30д)")
+            sk = get_skew_response_stats(since30)
+            if sk:
+                for b in sk:
+                    A(f"  открыто {b['bucket']}: одобрил {b['approve_pct']:.0f}% "
+                      f"из {b['n']}  (TP1 {b['tp1_pct']:.0f}%, закрыто {b['resolved']})")
+            else:
+                A("  данных нет")
+            A("")
+
+            # 5. Filter variants
+            A("## ТЕСТ ФИЛЬТРОВ — 9 ВАРИАНТОВ (30д)")
+            vrows = get_variant_rows(since30)
+            if vrows:
+                A(f"  всего размеченных сетапов: {len(vrows)} "
+                  f"(из них shadow: {sum(1 for r in vrows if r.get('source') == 'shadow')})")
+                for code, (lbl, _p, _m) in VARIANTS.items():
+                    sub = [r for r in vrows if code in (r.get("variants") or "").split(",")]
+                    if not sub:
+                        continue
+                    def _appr(r):
+                        return str(r.get("decision") or "").upper() in ("LONG", "SHORT")
+                    ok  = [r for r in sub if _appr(r)]
+                    rej = [r for r in sub if not _appr(r)]
+                    def _t(x):
+                        return (sum(1 for r in x if r.get("reached_tp1")) / len(x) * 100) if x else 0.0
+                    gap = (_t(ok) - _t(rej)) if (ok and rej) else None
+                    A(f"  {code} {lbl}: n={len(sub)} "
+                      f"(одобр {len(ok)} TP1 {_t(ok):.0f}% / откл {len(rej)} TP1 {_t(rej):.0f}%)"
+                      + (f" разрыв {gap:+.0f}пп" if gap is not None else ""))
+            else:
+                A("  данных нет")
+            A("")
+            A("## КОНФИГ НА МОМЕНТ ОТЧЁТА")
+            A(f"  MTF_MIN_SCORE={MTF_MIN_SCORE}  SHADOW_MIN_SCORE={SHADOW_MIN_SCORE}")
+            A(f"  STOP_CLOSE_CONFIRM={STOP_CLOSE_CONFIRM}  "
+              f"BACKSTOP_R={STOP_EXCHANGE_BACKSTOP_R}")
+            A(f"  MAX_SAME_DIRECTION_POSITIONS={MAX_SAME_DIRECTION_POSITIONS}  "
+              f"TP1_R_MULT={TP1_R_MULT}")
+
+            report = "\n".join(L)
+            _edit_admin_text(chat_id, message_id,
+                             "📦 *Полный отчёт*\nОтправляю файлы — перешли их Клоду.",
+                             _KB_ANALYTICS)
+
+            import csv as _csv, io as _io
+            _stamp = datetime.now(_rz).strftime("%Y%m%d")
+            _files = [("report", f"bot_report_{_stamp}.txt", report.encode("utf-8"))]
+            for _name, _rows in (("setups", get_all_setups_since(since30)),
+                                 ("signals", get_all_signals_since(since30))):
+                if not _rows:
+                    continue
+                _buf = _io.StringIO()
+                _w = _csv.DictWriter(_buf, fieldnames=list(_rows[0].keys()))
+                _w.writeheader()
+                _w.writerows(_rows)
+                _files.append((_name, f"{_name}_{_stamp}.csv",
+                               _buf.getvalue().encode("utf-8")))
+            for _lbl, _fn, _blob in _files:
+                try:
+                    _requests.post(
+                        f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendDocument",
+                        data={"chat_id": chat_id, "caption": f"📦 {_lbl}"},
+                        files={"document": (_fn, _blob)}, timeout=45,
+                    )
+                except Exception as _fe:
+                    log.warning(f"full report send failed ({_lbl}): {_fe}")
+        except Exception as e:
+            log.warning(f"adm_fullreport failed: {e}")
+            _edit_admin_text(chat_id, message_id, f"❌ Ошибка: {e}", _KB_ANALYTICS)
 
     elif data == "adm_cap":
         try:
