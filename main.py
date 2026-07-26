@@ -135,11 +135,14 @@ _pending_users_search: dict = {}
 _pending_setups_date: dict = {}
 _pending_report_date: dict = {}
 
-# Date the close-confirmed stop, the direction cap and the softened Claude
-# portfolio block went live. Results before and after it were produced by
-# different configs and must not be pooled — offered as a report preset.
-_CONFIG_CHANGE_LABEL = "26.07"
-_CONFIG_CHANGE_TS = datetime(2026, 7, 26, tzinfo=timezone.utc).timestamp()
+# Exact deploy moment of the close-confirmed stop + direction cap (commit
+# 43e0cd9, 2026-07-26 13:38 Riga) — the point where signal outcomes started
+# being produced by a different config. Deliberately the real commit timestamp,
+# not midnight: the changes went out mid-day, so a midnight cutoff would pool
+# ~13h of old-config results into the "new filters" window, which is the exact
+# mistake this preset exists to prevent.
+_CONFIG_CHANGE_LABEL = "26.07 13:38"
+_CONFIG_CHANGE_TS = 1785062315.0
 # State: admin is typing a user ID to allow autotrading.
 _pending_add_autotrade: dict = {}
 # State: user is inside the autotrade onboarding dialog.
