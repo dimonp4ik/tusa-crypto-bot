@@ -12,7 +12,7 @@ from config import (
 )
 from src.db import (
     log_claude_call, get_claude_spend_today, get_similar_resolved_setups,
-    get_setup_accuracy, get_calibration_rows,
+    get_setup_accuracy, get_calibration_rows, get_open_signals,
 )
 
 # Minimum resolved similar setups before self-feedback is shown (avoid noise).
@@ -371,6 +371,56 @@ def _scorecard_feedback() -> str:
     )
 
 
+def _portfolio_block() -> str:
+    """What is ALREADY open — the one thing the rule filter cannot see.
+
+    The filter dedups per symbol and caps signals per scan, but nothing caps
+    total concurrent exposure and nothing knows about correlation. Five alt
+    LONGs are not five independent trades: alts run ~0.7-0.9 correlated to BTC
+    with beta > 1, so one BTC move resolves them all the same way, and three
+    consecutive stops trip the kill switch for the rest of the day.
+
+    This block gives Claude the portfolio view so it can demand a stronger
+    reason for the Nth copy of the same directional bet. Descriptive — it
+    states the exposure, it does not hard-block anything.
+    """
+    try:
+        sigs = get_open_signals()
+    except Exception:
+        return ""
+    if not sigs:
+        return ""
+    longs  = [s for s in sigs if str(s.get("direction", "")).upper() == "LONG"]
+    shorts = [s for s in sigs if str(s.get("direction", "")).upper() == "SHORT"]
+    n, nl, ns = len(sigs), len(longs), len(shorts)
+    # ASCII only — this string can reach logs on any console encoding.
+    syms = ", ".join(
+        f"{str(s.get('symbol', '?')).replace('USDT', '')}"
+        f"-{'L' if str(s.get('direction', '')).upper() == 'LONG' else 'S'}"
+        for s in sigs[:12]
+    )
+    # Skew warning is ratio-based, not "zero on the other side": 4 LONG vs
+    # 1 SHORT is still a concentrated directional book, the single hedge
+    # offsets very little of it.
+    skew = ""
+    if nl >= 3 and nl >= 2 * ns:
+        skew = (f" WARNING: book is {nl} LONG vs {ns} SHORT. That is close to one "
+                f"leveraged bet on BTC not dropping, repeated {nl} times - a single "
+                f"adverse BTC move resolves them together, and 3 stops in a row halt "
+                f"trading for the rest of the day.")
+    elif ns >= 3 and ns >= 2 * nl:
+        skew = (f" WARNING: book is {ns} SHORT vs {nl} LONG. That is close to one "
+                f"leveraged bet on BTC not squeezing, repeated {ns} times.")
+    return (
+        f"\nOPEN POSITIONS ({n}): {syms}. Direction split: {nl} LONG / {ns} SHORT.{skew}\n"
+        f"Rule: correlated crypto positions in the SAME direction do not diversify, "
+        f"they concentrate - alts run ~0.7-0.9 correlated to BTC with beta above 1. "
+        f"The more already open on one side, the stronger the setup-specific reason "
+        f"must be to add another on that side; prefer a setup that balances the book "
+        f"or is genuinely idiosyncratic. This describes exposure, it is not a ban.\n"
+    )
+
+
 def _setup_line(i: int, s: dict) -> str:
     fvg     = "Y" if s.get("fvg")         else "N"
     ob      = "Y" if s.get("order_block") else "N"
@@ -543,6 +593,7 @@ def analyze_batch_with_claude(setups: list, news_context: dict = None) -> list:
     coins_text = "\n".join(_setup_line(i, s) for i, s in enumerate(setups, 1))
     user_text = (
         f"{_news_block(news_context)}"
+        f"{_portfolio_block()}"
         f"{_global_feedback()}"
         f"{_scorecard_feedback()}"
         f"Validate these {len(setups)} setups. Return exactly {len(setups)} verdicts "
@@ -665,6 +716,7 @@ def analyze_heavy(setup: dict, news_context: dict = None, history: list = None) 
 
     user_text = (
         f"{_news_block(news_context)}"
+        f"{_portfolio_block()}"
         f"{_global_feedback()}"
         f"{_scorecard_feedback()}"
         f"{_memory_block(history)}\n"
