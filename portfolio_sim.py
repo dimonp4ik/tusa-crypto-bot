@@ -93,6 +93,7 @@ def simulate(trades: list, *, max_same_dir: int, max_per_scan: int,
     taken = skipped = 0
     skip_reasons = {"symbol_busy": 0, "dir_cap": 0, "scan_cap": 0, "kill_switch": 0}
 
+    taken_outcomes = []
     sl_streak = 0
     streak_day = None
     halted_day = None
@@ -160,13 +161,19 @@ def simulate(trades: list, *, max_same_dir: int, max_per_scan: int,
             per_scan[bucket] = per_scan.get(bucket, 0) + 1
 
         open_pos.append(dict(t))
+        taken_outcomes.append(t["outcome"])
         taken += 1
 
     close_due(float("inf"))
 
+    wins = sum(1 for o in taken_outcomes if o not in ("SL", "EXPIRED"))
     return {
         "taken": taken, "skipped": skipped, "skip_reasons": skip_reasons,
         "net_r": equity, "max_dd": max_dd, "worst_moment": worst_moment,
+        "wins": wins,
+        "win_rate": (wins / taken * 100) if taken else 0.0,
+        "r_per_trade": (equity / taken) if taken else 0.0,
+        "sl": sum(1 for o in taken_outcomes if o == "SL"),
     }
 
 
@@ -231,7 +238,9 @@ def main():
             for k, v in r["skip_reasons"].items():
                 if v:
                     print(f"      {k}: {v}")
-        print(f"  net R        : {r['net_r']:+.2f}R")
+        print(f"  win rate     : {r['win_rate']:.1f}%  "
+              f"({r['wins']} won / {r['sl']} stopped)")
+        print(f"  net R        : {r['net_r']:+.2f}R  ({r['r_per_trade']:+.3f}R/trade)")
         print(f"  maxDD        : {r['max_dd']:+.2f}R")
         w = r["worst_moment"]
         if w["ts"]:
