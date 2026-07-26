@@ -55,6 +55,7 @@ from config import EVENT_WARN_HOURS
 from src.db import (
     init_db, get_open_signals, update_signal_status, get_stats,
     set_sl_xperp_only, get_sl_wick_stats, get_variant_rows,
+    mark_setup_blocked, get_cap_impact_stats, get_skew_response_stats,
     auto_block_bad_symbols, is_symbol_auto_blocked, get_active_symbol_blocks,
     get_recent_outcomes, unblock_symbol, set_symbol_block, get_symbols_performance,
     upsert_user, get_user_by_id, get_all_users, get_users_count,
@@ -283,6 +284,8 @@ _KB_ANALYTICS = {"inline_keyboard": [[
     {"text": "🎯 Точность ИИ",   "callback_data": "adm_ai_acc"},
 ], [
     {"text": "🧪 Тест фильтров", "callback_data": "adm_variants"},
+], [
+    {"text": "🔗 Кап корреляции", "callback_data": "adm_cap"},
 ], [_BACK_ROW[0]]]}
 
 _KB_PEOPLE = {"inline_keyboard": [[
@@ -802,6 +805,59 @@ def _handle_admin_callback(callback_id: str, chat_id: int,
         except Exception as e:
             txt = f"Ошибка: {e}"
         _edit_message(chat_id, message_id, txt)
+
+    elif data == "adm_cap":
+        try:
+            since30 = time.time() - 30 * 86400
+            caps = get_cap_impact_stats(since30)
+            skew = get_skew_response_stats(since30)
+
+            lines = ["🔗 *КАП КОРРЕЛЯЦИИ* (30 дней)",
+                     "_Сетапы, которые Клод одобрил, а лимит не пропустил. "
+                     "Теневой трекер знает их реальный исход — значит видно, "
+                     "спас лимит деньги или отнял._\n"]
+
+            _titles = {"dir_cap": f"Лимит одной стороны ({MAX_SAME_DIRECTION_POSITIONS})",
+                       "scan_cap": "Лимит 3 за скан"}
+            _any = False
+            for code, title in _titles.items():
+                st = caps.get(code) or {}
+                if not st.get("n"):
+                    lines.append(f"*{title}:* никого не срезал")
+                    continue
+                _any = True
+                verdict = ("спас" if st["saved_r"] > 0
+                           else "отнял" if st["saved_r"] < 0 else "в ноль")
+                lines.append(
+                    f"*{title}:* срезано {st['n']}\n"
+                    f"  ушли бы в TP1: {st['reached_tp1']} ({st['tp1_pct']:.0f}%) · "
+                    f"в стоп: {st['sl']} ({st['sl_pct']:.0f}%)\n"
+                    f"  итог: *{st['saved_r']:+.1f}R* — лимит {verdict}"
+                )
+
+            if skew:
+                lines.append("\n━━━━━━━━━\n📐 *Реакция Клода на перекос книги*")
+                for b in skew:
+                    lines.append(
+                        f"  уже открыто {b['bucket']}: одобрил "
+                        f"{b['approve_pct']:.0f}% из {b['n']}"
+                        + (f" · TP1 {b['tp1_pct']:.0f}% ({b['resolved']} закрыто)"
+                           if b["resolved"] else "")
+                    )
+                lines.append("_Если доля одобренных падает с ростом книги — "
+                             "Клод реально учитывает перекос, а не только жёсткий лимит._")
+            else:
+                lines.append("\n📐 *Реакция Клода:* данных пока нет.")
+
+            if not _any:
+                lines.append("\n_Пока лимиты ни разу не сработали — "
+                             "либо мало сигналов, либо книга не набиралась._")
+            lines.append("\n_+R = лимит спас (срезал будущие стопы). "
+                         "−R = отнял прибыль. Нужно 20-30 срезанных, прежде чем верить._")
+            _edit_admin_text(chat_id, message_id, "\n".join(lines), _KB_ANALYTICS)
+        except Exception as e:
+            log.warning(f"adm_cap failed: {e}")
+            _edit_admin_text(chat_id, message_id, f"❌ Ошибка: {e}", _KB_ANALYTICS)
 
     elif data == "adm_variants":
         try:
@@ -3183,6 +3239,16 @@ def run_scan():
                 except Exception as e:
                     log.warning(f"  HEAVY check failed {analysis.get('symbol','?')}: {e}")
 
+        # Book state at judgment time — how many positions in each direction were
+        # already open when Claude saw these setups. Snapshotted once here so the
+        # logged value is what Claude actually reasoned against, and reused as the
+        # starting count for the correlation cap in the send loop below.
+        _dir_open = {"LONG": 0, "SHORT": 0}
+        for _s in get_open_signals():
+            _d = str(_s.get("direction", "")).upper()
+            if _d in _dir_open:
+                _dir_open[_d] += 1
+
         # Log all Claude-evaluated setups (approved and rejected) for admin history
         for _a in analyses:
             try:
@@ -3191,6 +3257,9 @@ def run_scan():
                 _a["variants"] = compute_variants(_a)
             except Exception as _ve:
                 log.debug(f"variant tagging failed: {_ve}")
+            _a["open_same_dir"] = _dir_open.get(
+                str(_a.get("direction", "")).upper(), 0
+            )
             try:
                 _a["_setup_log_id"] = log_setup_candidate(_a)
             except Exception as _e:
@@ -3224,12 +3293,8 @@ def run_scan():
         # Concurrent same-direction exposure. Correlated alts in one direction
         # do not diversify, they concentrate: one BTC move resolves them all the
         # same way and 3 stops in a row halt trading for the rest of the day.
-        # Counts positions ALREADY open plus ones published earlier in this scan.
-        _dir_open = {"LONG": 0, "SHORT": 0}
-        for _s in get_open_signals():
-            _d = str(_s.get("direction", "")).upper()
-            if _d in _dir_open:
-                _dir_open[_d] += 1
+        # _dir_open was seeded above from the open book and grows as this scan
+        # publishes, so the cap counts already-open plus published-this-scan.
         for analysis in analyses:
             try:
                 # Attach news context to each analysis for Telegram message
@@ -3256,8 +3321,15 @@ def run_scan():
                     continue
 
                 if decision != "NO TRADE":
+                    # Both caps withhold a setup Claude APPROVED. Tag why, so it
+                    # is not later counted as one of Claude's rejections and can
+                    # be judged on its own realised outcome (get_cap_impact_stats).
                     if sent_count >= MAX_SIGNALS_PER_SCAN:
                         log.info(f"  Skip {analysis['symbol']} — scan cap {MAX_SIGNALS_PER_SCAN} reached")
+                        try:
+                            mark_setup_blocked(analysis.get("_setup_log_id"), "scan_cap")
+                        except Exception:
+                            pass
                         continue
 
                     if (MAX_SAME_DIRECTION_POSITIONS > 0
@@ -3266,6 +3338,10 @@ def run_scan():
                             f"  Skip {analysis['symbol']} — {_dir_open[decision]} {decision} "
                             f"already open, correlation cap {MAX_SAME_DIRECTION_POSITIONS} reached"
                         )
+                        try:
+                            mark_setup_blocked(analysis.get("_setup_log_id"), "dir_cap")
+                        except Exception:
+                            pass
                         continue
 
                     # Snapshot the live X-Perp price (the instrument the user
