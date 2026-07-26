@@ -1490,12 +1490,16 @@ def _handle_admin_callback(callback_id: str, chat_id: int,
                 QUALITY_RISK_OVERLAY, QUALITY_RISK_MULT,
                 REL_STRENGTH_RISK_UP, REL_STRENGTH_RISK_UP_MULT,
                 TREND_PAIR_RISK_UP, TREND_PAIR_RISK_UP_MULT,
-                TRAIL_RUNNER_ENABLED, TRAIL_ATR_MULT,
                 AUTO_BLOCK_ENABLED, AUTO_BLOCK_MIN_TRADES,
                 AUTO_BLOCK_MAX_PROFIT_FACTOR, AUTO_BLOCK_MAX_WIN_RATE,
                 ADAPTIVE_FILTER_PACKS, REQUIRE_STRICT_HTF,
-                MTF_MIN_SCORE, SCAN_INTERVAL_MINUTES,
             )
+            # MTF_MIN_SCORE / SCAN_INTERVAL_MINUTES / TRAIL_RUNNER_ENABLED /
+            # TRAIL_ATR_MULT are imported at module level and MUST NOT be
+            # re-imported here: a name bound anywhere inside this function is
+            # local to ALL of it, so any branch that reads one of them BEFORE
+            # this line raises UnboundLocalError. That is exactly what the
+            # full-report branch hit.
             import time as _t
             stats = _last_scan_stats
             if stats["ts"] > 0:
