@@ -220,6 +220,15 @@ def init_db():
             # when Claude judged it. Lets us ask whether Claude's own rejection
             # rate responds to a skewed book, separately from the hard cap.
             "open_same_dir": "INTEGER",
+            # FK to signals.id once this setup is actually sent. Found
+            # 2026-07-31 (live data, AAVEUSDT): a sent setup was independently
+            # shadow-tracked on the GLOBAL feed AND separately monitored for
+            # real on the X-Perp feed — these can (and did) disagree, e.g. the
+            # shadow sim said TP1 while the real position hit SL_HIT at -1.17R.
+            # A setup with a real position has an authoritative outcome; it
+            # must not run a second, independent simulation that can contradict
+            # it. See link_setup_to_signal() / resolve_sent_setups_from_signals().
+            "signal_id":    "INTEGER",
             # Realised R of the trade (backtest: real net_r incl. trailed
             # runner; live: left NULL, derived from bracket at read time).
             # Powers expectancy (avg R) in Claude's self-feedback block.
@@ -1100,12 +1109,17 @@ def get_unresolved_setups(max_age_sec: float, limit: int = 80) -> list:
     resolved=0 with a usable bracket (sl present), old enough to have at least
     one forward candle, and not older than max_age_sec (past that the window has
     expired and a final pass will mark them EXPIRED). Oldest first.
+
+    Excludes signal_id IS NOT NULL: those are backed by a real position and are
+    resolved from its actual result by resolve_sent_setups_from_signals()
+    instead — running the shadow simulation on them too would give a sent
+    setup two independent, sometimes-contradicting outcomes (found 2026-07-31).
     """
     now = time_mod.time()
     with _conn() as c:
         rows = c.execute(
             """SELECT * FROM setup_log
-               WHERE resolved=0 AND sl IS NOT NULL
+               WHERE resolved=0 AND sl IS NOT NULL AND signal_id IS NULL
                  AND ts <= ? AND ts >= ?
                ORDER BY ts ASC LIMIT ?""",
             (now - 900, now - max_age_sec, limit),
@@ -1114,15 +1128,122 @@ def get_unresolved_setups(max_age_sec: float, limit: int = 80) -> list:
 
 
 def mark_setup_resolved(setup_id: int, outcome: str,
-                        reached_tp1: int, reached_tp2: int) -> None:
-    """Record the shadow outcome of a tracked setup."""
+                        reached_tp1: int, reached_tp2: int,
+                        net_r: float = None) -> None:
+    """Record the outcome of a tracked setup (shadow-simulated, or copied from
+    a real signal — see resolve_sent_setups_from_signals). net_r is optional:
+    the shadow tracker's simplified model doesn't compute one, real signals do.
+    """
     with _conn() as c:
         c.execute(
             """UPDATE setup_log
-               SET outcome=?, reached_tp1=?, reached_tp2=?, resolved=1, resolved_ts=?
+               SET outcome=?, reached_tp1=?, reached_tp2=?, resolved=1, resolved_ts=?,
+                   net_r=COALESCE(?, net_r)
                WHERE id=?""",
-            (outcome, int(reached_tp1), int(reached_tp2), time_mod.time(), setup_id),
+            (outcome, int(reached_tp1), int(reached_tp2), time_mod.time(), net_r, setup_id),
         )
+
+
+def link_setup_to_signal(setup_log_id: int, signal_id: int) -> None:
+    """Mark a setup_log row as backed by a real position (signals.id).
+
+    From here its outcome comes from the real position via
+    resolve_sent_setups_from_signals() — get_unresolved_setups() excludes
+    linked rows so the shadow tracker's independent simulation never runs on
+    (and never contradicts) a setup that has a real, authoritative result.
+
+    Always resets resolved=0: the normal call site links a fresh row (already
+    resolved=0, this is a no-op for it), but if a row was ever resolved BEFORE
+    it got linked — the exact bug this fix addresses — forcing resolved=0
+    makes resolve_sent_setups_from_signals() pick it up and overwrite the
+    stale, possibly-wrong shadow-simulated outcome on the next tick. Cheap and
+    safe either way: a not-yet-final signal is simply left pending again.
+    """
+    if not setup_log_id or not signal_id:
+        return
+    with _conn() as c:
+        c.execute(
+            "UPDATE setup_log SET signal_id=?, resolved=0 WHERE id=?",
+            (signal_id, setup_log_id),
+        )
+
+
+# Real signal status -> (outcome, reached_tp1, reached_tp2). Mirrors the
+# shadow tracker's own SL/TP1/TP2/EXPIRED vocabulary (see
+# _simulate_setup_outcome in main.py) so get_setup_accuracy's counting logic
+# doesn't need to know the difference between a real and a shadow-derived row.
+_SIGNAL_STATUS_TO_OUTCOME = {
+    "SL_HIT":      ("SL", 0, 0),
+    "TP2_HIT":     ("TP2", 1, 1),
+    "TP1_TRAIL":   ("TP1", 1, 0),   # ran past TP1, trailed exit short of TP2
+    "BREAKEVEN":   ("TP1", 1, 0),   # reached TP1, runner gave back to flat
+    "TP1_EXPIRED": ("TP1", 1, 0),   # reached TP1, window expired before TP2
+    "EXPIRED":     ("EXPIRED", 0, 0),
+}
+
+
+def backfill_setup_signal_links(window_sec: float = 300) -> int:
+    """One-shot, idempotent: link any already-sent setup_log row that predates
+    signal_id (2026-07-31 fix) to its real signals row, matched by symbol +
+    direction + opened_at within window_sec of the setup's ts.
+
+    Self-limiting by construction (only rows with sent=1 AND signal_id IS NULL
+    ever match — every setup sent after this fix gets linked at publish time),
+    so it's cheap to run on every boot with no version-flag gating needed.
+    Rows it links may already be resolved with a WRONG shadow-simulated
+    outcome (the AAVEUSDT case this fix was found from); the caller should run
+    resolve_sent_setups_from_signals() right after to correct them, which is
+    safe to do unconditionally since it always overwrites from the real result.
+    """
+    n = 0
+    with _conn() as c:
+        rows = c.execute(
+            "SELECT id, symbol, direction, ts FROM setup_log "
+            "WHERE sent=1 AND signal_id IS NULL"
+        ).fetchall()
+        for r in rows:
+            sig = c.execute(
+                """SELECT id FROM signals
+                   WHERE symbol=? AND direction=?
+                     AND opened_at BETWEEN ? AND ?
+                   ORDER BY ABS(opened_at - ?) ASC LIMIT 1""",
+                (r["symbol"], r["direction"],
+                 r["ts"] - window_sec, r["ts"] + window_sec, r["ts"]),
+            ).fetchone()
+            if sig:
+                c.execute(
+                    "UPDATE setup_log SET signal_id=?, resolved=0 WHERE id=?",
+                    (sig["id"], r["id"]),
+                )
+                n += 1
+    return n
+
+
+def resolve_sent_setups_from_signals(limit: int = 80) -> int:
+    """Copy the REAL outcome onto setup_log rows linked to a closed signal.
+
+    This is the authoritative counterpart to the shadow tracker: any setup_log
+    row with signal_id set has a real position, so its outcome must come from
+    that position's actual close, not an independent re-simulation. Returns
+    the number of rows resolved.
+    """
+    n = 0
+    with _conn() as c:
+        rows = c.execute(
+            """SELECT sl.id AS setup_id, s.status, s.realized_r
+               FROM setup_log sl JOIN signals s ON s.id = sl.signal_id
+               WHERE sl.resolved=0 AND sl.signal_id IS NOT NULL
+               LIMIT ?""",
+            (limit,),
+        ).fetchall()
+        for r in rows:
+            mapped = _SIGNAL_STATUS_TO_OUTCOME.get(r["status"])
+            if mapped is None:
+                continue  # still OPEN/TP1_PARTIAL — not final yet
+            outcome, r1, r2 = mapped
+            mark_setup_resolved(r["setup_id"], outcome, r1, r2, net_r=r["realized_r"])
+            n += 1
+    return n
 
 
 def get_setup_accuracy(since_ts: float) -> dict:

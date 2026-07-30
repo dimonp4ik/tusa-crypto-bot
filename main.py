@@ -69,6 +69,7 @@ from src.db import (
     get_bot_state, set_bot_state,
     log_setup_candidate, mark_setup_sent, get_setups_by_date,
     get_unresolved_setups, mark_setup_resolved, get_setup_accuracy,
+    link_setup_to_signal, resolve_sent_setups_from_signals, backfill_setup_signal_links,
     get_similar_resolved_setups, seed_backtest_outcomes, backfill_backtest_net_r,
     get_today_sl_streak,
     get_weekly_stats,
@@ -3656,10 +3657,26 @@ def run_scan():
                             mark_setup_sent(analysis.get("_setup_log_id"))
                         except Exception:
                             pass
+                        # Fetch the just-written signal row once, shared by the
+                        # link below and the autotrade hook further down.
+                        _sig_row = None
+                        try:
+                            _sig_row = get_latest_open_signal(analysis["symbol"])
+                        except Exception as _ge:
+                            log.warning(f"  Could not fetch new signal row: {_ge}")
+                        # Link this setup_log row to its real position: from
+                        # here its outcome comes from the real signal's close,
+                        # not an independent shadow simulation on a different
+                        # feed (found 2026-07-31 — the two disagreed on a real
+                        # trade: shadow said TP1, the real position hit SL).
+                        try:
+                            if _sig_row:
+                                link_setup_to_signal(analysis.get("_setup_log_id"), _sig_row["id"])
+                        except Exception:
+                            pass
                         # Autotrade: mirror the just-published signal into real
                         # OKX positions for onboarded users (async, fail-safe).
                         try:
-                            _sig_row = get_latest_open_signal(analysis["symbol"])
                             autotrader.open_positions_for_signal(_sig_row)
                         except Exception as _ae:
                             log.warning(f"  Autotrade open hook failed: {_ae}")
@@ -3806,11 +3823,26 @@ def _monitor_open_signals():
 
 
 def _shadow_tracker_job():
-    """15-min job: resolve would-be outcomes of rejected + sent setups."""
+    """15-min job: resolve outcomes for logged setups.
+
+    Two disjoint populations, two different sources of truth:
+      - rejected/shadow setups have no real position, so _track_setup_outcomes()
+        simulates their outcome on the deep global feed (the only data available).
+      - sent setups have a REAL position; resolve_sent_setups_from_signals()
+        copies its actual close instead of simulating a second, independent
+        outcome that could contradict it (see get_unresolved_setups' exclusion
+        of signal_id rows and link_setup_to_signal in the send loop).
+    """
     try:
         _track_setup_outcomes()
     except Exception as e:
         log.warning(f"Shadow tracker job failed: {e}")
+    try:
+        n = resolve_sent_setups_from_signals()
+        if n:
+            log.info(f"Shadow tracker: resolved {n} sent setup(s) from real signal outcomes")
+    except Exception as e:
+        log.warning(f"Sent-setup resolution failed: {e}")
 
 
 # Each (csv, flag) seeds once. Add new batches as new tuples — already-seeded
@@ -3881,6 +3913,18 @@ def start_bot():
 
     # One-shot Claude memory seeding from historical backtest (2024+)
     maybe_seed_backtest()
+
+    # Self-healing backfill (2026-07-31 fix): link any sent setup_log rows from
+    # before this fix to their real signal, so their outcome gets corrected
+    # from real data on the next shadow-tracker tick instead of keeping a
+    # possibly-wrong independently-simulated one. Cheap and idempotent — only
+    # ever matches sent=1 rows still missing signal_id.
+    try:
+        _n = backfill_setup_signal_links()
+        if _n:
+            log.info(f"Linked {_n} pre-fix sent setup(s) to their real signal")
+    except Exception as e:
+        log.warning(f"Setup-signal backfill failed: {e}")
 
     # Dedup guard: only send once per 60s per container (prevents
     # double-message during Render zero-downtime deploys where old + new
