@@ -2907,12 +2907,29 @@ def _entry_is_stale(analysis: dict, live_px: float, direction: str) -> tuple:
 
 
 def _setup_rank(setup: dict) -> tuple:
-    """Rank setups before Claude so only the strongest spend LLM tokens."""
-    mtf_score    = int(setup.get("mtf_score", 0) or 0)
-    confirmations = sum(1 for k in ("fvg", "order_block", "liq_sweep") if setup.get(k))
-    volume_score  = float(setup.get("volume_ratio", 0.0))
+    """Rank setups before Claude so only the strongest spend LLM tokens.
+
+    Ordered by what actually predicts the outcome, measured 2026-07-31 on two
+    independent ~6-month backtest windows (3605 trades):
+
+      volume_ratio  PREDICTS, consistently on both windows:
+        1.5-2.5x -> WR 81.5% / 79.8%      >2.5x -> WR 85.2% / 81.8%
+      mtf_score     does NOT predict above the entry gate:
+        w1: score14 83.7%, 16 82.4%, 18 79.5%, 19 75.0%  (mildly NEGATIVE)
+        w2: score14 79.3%, 16 83.5%, 18 78.5%            (no trend)
+
+    mtf_score was the PRIMARY key and volume the last tiebreak, i.e. selection
+    was driven by a non-predictive feature while the predictive one was ignored.
+    Swapped. Note this says nothing about the MTF_MIN_SCORE>=14 GATE, which is
+    separately validated — only that ABOVE the gate a higher score is not better.
+    Impact is bounded: the ranking only binds when a single scan produces more
+    than MAX_SETUPS_TO_CLAUDE candidates, which is uncommon.
+    """
+    volume_score  = float(setup.get("volume_ratio", 0.0) or 0.0)
     zone_bonus    = 1 if setup.get("entry_source") in ("OB", "FVG") else 0
-    return (mtf_score, zone_bonus, confirmations, volume_score)
+    confirmations = sum(1 for k in ("fvg", "order_block", "liq_sweep") if setup.get(k))
+    mtf_score     = int(setup.get("mtf_score", 0) or 0)
+    return (volume_score, zone_bonus, confirmations, mtf_score)
 
 
 # ── Open-signal monitor (updates TP/SL hits in DB) ────────────────────────────
