@@ -238,6 +238,44 @@ def get_top_coins():
     return [sym for sym, _ in rows[:TOP_COINS_COUNT]]
 
 
+# Bar-aware candle cache (2026-07-31). The scanner runs every SCAN_INTERVAL_
+# MINUTES (5) but closed candles only change when a new bar closes, so a 4h
+# series was being re-downloaded ~48 times per bar and a 1d series ~288 times,
+# for byte-identical data. Measured cost per symbol before this: 15m 869ms +
+# 1h 410ms + 4h 391ms + 1d 369ms ~= 2.0s, times 25 symbols ~= 56s of pure
+# waiting per scan — the bulk of the publish latency that lets price drift out
+# of the setup zone (see the stale-entry guard in main.py).
+#
+# An entry stays valid until the CURRENTLY-FORMING bar closes, i.e. until
+# newest_closed_open_time + 2*interval. A few seconds of grace past that avoids
+# hammering the API at the exact boundary before the exchange has published the
+# new candle; _MIN_REFETCH_SEC stops a retry storm if it is late.
+_kl_cache: dict = {}
+_KL_CACHE_MAX = 400          # 25 symbols x 4 timeframes leaves plenty of room
+_KL_BOUNDARY_GRACE = 3       # seconds past the expected close before refetching
+_MIN_REFETCH_SEC = 10        # never re-hit the API faster than this per key
+
+
+def _kl_cache_get(key, interval_sec: int):
+    e = _kl_cache.get(key)
+    if not e:
+        return None
+    now = time.time()
+    if now - e["fetched_at"] < _MIN_REFETCH_SEC:
+        return e["data"]
+    if now < e["t_newest"] + 2 * interval_sec + _KL_BOUNDARY_GRACE:
+        return e["data"]
+    return None
+
+
+def _kl_cache_put(key, data: dict):
+    if len(_kl_cache) >= _KL_CACHE_MAX:
+        oldest = min(_kl_cache, key=lambda k: _kl_cache[k]["fetched_at"])
+        _kl_cache.pop(oldest, None)
+    times = data.get("time") or [0]
+    _kl_cache[key] = {"data": data, "t_newest": int(times[-1]), "fetched_at": time.time()}
+
+
 def get_klines(symbol, interval=TIMEFRAME_KUCOIN, limit=KLINES_LIMIT,
                interval_sec=KLINES_INTERVAL_SEC, closed_only: bool = True):
     """
@@ -247,7 +285,17 @@ def get_klines(symbol, interval=TIMEFRAME_KUCOIN, limit=KLINES_LIMIT,
 
     closed_only=True drops the forming candle using OKX's own confirm flag
     (index 8: "1" = closed) — no repaint / mid-candle fake BOS.
+
+    Closed-candle results are cached until the next bar actually closes (see
+    _kl_cache above). closed_only=False is never cached — that caller wants the
+    live forming bar.
     """
+    _ck = (symbol, interval, limit) if closed_only else None
+    if _ck is not None:
+        _hit = _kl_cache_get(_ck, interval_sec)
+        if _hit is not None:
+            return _hit
+
     bar = TIMEFRAME_MAP.get(interval, "15m")
     inst_id = _swap_inst_id(symbol)
     want = limit + 2  # extra covers the forming candle drop
@@ -280,7 +328,7 @@ def get_klines(symbol, interval=TIMEFRAME_KUCOIN, limit=KLINES_LIMIT,
     if not candles:
         raise ValueError(f"No closed candle data for {symbol}")
 
-    return {
+    out = {
         "time":   [int(float(c[0])) // 1000 for c in candles],  # ms → seconds
         "open":   [float(c[1]) for c in candles],
         "high":   [float(c[2]) for c in candles],
@@ -288,6 +336,9 @@ def get_klines(symbol, interval=TIMEFRAME_KUCOIN, limit=KLINES_LIMIT,
         "close":  [float(c[4]) for c in candles],
         "volume": [float(c[6]) for c in candles],  # volCcy = base-currency volume
     }
+    if _ck is not None:
+        _kl_cache_put(_ck, out)
+    return out
 
 
 def get_klines_xperp(symbol, limit=60, include_forming=False):
