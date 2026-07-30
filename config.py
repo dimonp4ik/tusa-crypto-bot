@@ -96,7 +96,10 @@ KLINES_4H_INTERVAL_SEC = 4 * 3600
 
 # --- 1D candles for macro trend ---
 TIMEFRAME_1D_KUCOIN = "1d"
-KLINES_1D_LIMIT = 5
+# 5 -> 8 to match the backtest's daily slice (aligned_slice_by_time(c1d,...,8)).
+# _daily_trend only needs 3 closes so both sides already behaved the same, but
+# matching removes one more place where the two can silently drift apart.
+KLINES_1D_LIMIT = 8
 KLINES_1D_INTERVAL_SEC = 86400
 
 # --- Trading hours filter (UTC) — 24/7 since 2026-07-31 ------------------------

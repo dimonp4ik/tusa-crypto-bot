@@ -858,6 +858,22 @@ def backtest_symbol(
             )
         except Exception:
             c1d = {}
+        # BTC 1h series, so btc_change_pct can be REAL instead of a constant 0.0.
+        # Passing 0.0 (as this did until 2026-07-31) silently handed every single
+        # backtest trade the maximum BTC score bonus — `0.0 >= 0` and `0.0 <= 0`
+        # are both true, so BTC+2 fired on 100% of trades and the BTCok+1 branch
+        # never ran — while also disabling two live filters outright
+        # (BTC_BLOCK_THRESHOLD_PCT and FVG_LONDON_BTC_UP_FILTER can never trigger
+        # at 0.0) and feeding a wrong rel_strength to the momentum pack.
+        try:
+            btc_1h = fetch_history(
+                "BTCUSDT", TIMEFRAME_1H_KUCOIN, KLINES_1H_INTERVAL_SEC,
+                max(10, math.ceil(candles / 4) + 4),
+                refresh_cache=refresh_cache,
+                end_date_ms=end_date_ms,
+            )
+        except Exception:
+            btc_1h = {}
     except Exception as exc:
         result.error = str(exc)
         result.elapsed_sec = time.perf_counter() - started
@@ -882,8 +898,18 @@ def backtest_symbol(
         snap_4h = aligned_slice_by_time(c4h, t_cur, window_4h, max(1, i // 16))
         snap_1d = aligned_slice_by_time(c1d, t_cur, 8, max(1, i // 96)) if c1d else None
 
+        # Same definition the live bot uses (get_btc_change_1h): pct move of the
+        # last CLOSED 1h BTC candle vs the one before it, as of this scan bar.
+        _btc_chg = 0.0
+        if btc_1h:
+            _bsnap = aligned_slice_by_time(btc_1h, t_cur, 3, max(1, i // 4))
+            _bc = (_bsnap or {}).get("close") or []
+            if len(_bc) >= 2 and _bc[-2]:
+                _btc_chg = (_bc[-1] - _bc[-2]) / _bc[-2] * 100.0
+
         result.analyzed += 1
-        setup = analyze_coin_smc(snap_15, snap_1h, symbol, snap_4h, btc_change_pct=0.0,
+        setup = analyze_coin_smc(snap_15, snap_1h, symbol, snap_4h,
+                                 btc_change_pct=_btc_chg,
                                  candles_1d=snap_1d)
         if not setup:
             continue
