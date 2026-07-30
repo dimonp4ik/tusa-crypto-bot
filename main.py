@@ -30,7 +30,7 @@ from config import (
     STOP_CLOSE_CONFIRM, MAX_SAME_DIRECTION_POSITIONS, STOP_EXCHANGE_BACKSTOP_R,
     MTF_MIN_SCORE, SHADOW_MIN_SCORE, TP1_R_MULT,
     STALE_ENTRY_GUARD, STALE_ENTRY_ZONE_TOLERANCE, STALE_ENTRY_MAX_RISK_FRAC,
-    RISK_MIN_PCT, RISK_MAX_PCT, SL_ATR_BUFFER,
+    RISK_MIN_PCT, RISK_MAX_PCT, SL_ATR_BUFFER, TOP_COINS_COUNT,
     TP1_CLOSE_FRAC, EXIT_PROFILE,
     POST_TP1_STRONG_TRAIL_ATR_MULT, POST_TP1_WEAK_TRAIL_ATR_MULT,
     POST_TP1_STRONG_CLOSE_PROGRESS, POST_TP1_STRONG_WICK_PROGRESS,
@@ -204,12 +204,16 @@ def _build_and_send_report(chat_id: int, message_id: int,
         else:
             A("  всё, что есть в базе")
         A("")
-        A("Прогноз модели (portfolio_sim.py, 2 независимых окна по ~6 мес,")
-        A("конфиг от 2026-07-26, все живые ограничители):")
-        A("  окно 1: 1211 сделок, WR 81.8%, +0.491R/сделка, maxDD -11.17R")
-        A("  окно 2: 1128 сделок, WR 80.2%, +0.425R/сделка, maxDD  -8.46R")
-        A("ВАЖНО: в модели НЕТ Клода — она измеряет только фильтр правил,")
-        A("и заметно завышает И прибыль, И просадку против реальности.")
+        A("Прогноз модели (backtest.py на данных OKX = та же биржа, что торгуем;")
+        A("реальный BTC, окна истории совпадают с живыми; конфиг от 2026-07-31):")
+        A("  окно 1 (01..07.26): 1622 сделок, WR 82.5%, +0.494R/сделка, maxDD -21.3R")
+        A("  окно 2 (08.25..01): 1418 сделок, WR 81.5%, +0.441R/сделка, maxDD -18.2R")
+        A("ВАЖНО: в модели НЕТ Клода — она измеряет только фильтр правил, поэтому")
+        A("живых сделок будет СИЛЬНО меньше. Сравнивать нужно ВИНРЕЙТ, не количество.")
+        A("")
+        A("ОТСЧЁТ С 31.07.2026 — в этот день фильтр реально изменился (заработал")
+        A("Strong1h, окна истории, круглосуточный режим, гейт устаревшего входа).")
+        A("Живые результаты ДО этой даты с прогнозом несопоставимы.")
         A("")
 
         # 1. Live results — chosen window, plus 7d for recency
@@ -221,7 +225,7 @@ def _build_and_send_report(chat_id: int, message_id: int,
             A(f"## ЖИВЫЕ РЕЗУЛЬТАТЫ — {label}")
             A(f"  сигналов: {s['total']}  закрыто: {s['closed']}  "
               f"открыто: {s['open']}+{s['tp1_partial_open']}")
-            A(f"  винрейт: {s['win_rate']}%   (модель: ~81%)")
+            A(f"  винрейт: {s['win_rate']}%   (модель: ~82%)")
             A(f"  TP1: {s['tp1_hit']} ({s['tp1_rate']}%)  TP2: {s['tp2_hit']}  "
               f"SL: {s['sl_hit']}  истекло: {s['expired']}")
             A(f"  итог: {s['total_r']}R  ({s['r_per_trade']}R/сделка)")
@@ -4108,10 +4112,18 @@ def start_bot():
                 skip = True
         if not skip:
             open(_flag, "w").close()
+            # Hours are derived from config, not hardcoded — they were stale
+            # ("Пн-Пт, 10:00–02:00") for a while after the switch to 24/7.
+            if TRADE_WEEKENDS and TRADING_HOURS_START == 0 and TRADING_HOURS_END >= 24:
+                _sched = "круглосуточно, без выходных"
+            else:
+                _days = "ежедневно" if TRADE_WEEKENDS else "Пн-Пт"
+                _sched = (f"{_days}, {TRADING_HOURS_START:02d}:00–"
+                          f"{TRADING_HOURS_END % 24:02d}:00 UTC")
             send_status(
                 "🤖 *Crypto Signal Bot Online*\n"
-                f"Сканирую топ-25 монет каждые {SCAN_INTERVAL_MINUTES} мин "
-                f"(Пн-Пт, 10:00–02:00 по Риге)."
+                f"Сканирую топ-{TOP_COINS_COUNT} монет каждые "
+                f"{SCAN_INTERVAL_MINUTES} мин ({_sched})."
             )
     except Exception as e:
         log.warning(f"Could not send startup message: {e}")
