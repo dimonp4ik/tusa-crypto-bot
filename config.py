@@ -79,10 +79,29 @@ TIMEFRAME_1D_KUCOIN = "1d"
 KLINES_1D_LIMIT = 5
 KLINES_1D_INTERVAL_SEC = 86400
 
-# --- Trading hours filter (UTC) ---
-TRADING_HOURS_START = 7    # 07:00 UTC = 10:00 Riga
-TRADING_HOURS_END   = 21   # 21:00 UTC = 00:00 Riga
-TRADE_WEEKENDS      = False
+# --- Trading hours filter (UTC) — 24/7 since 2026-07-31 ------------------------
+# Was Mon-Fri 07:00-21:00 UTC, i.e. only 70 of 168 hours (42% of the week), while
+# backtest.py scans every bar. So 63% of every backtest figure came from hours
+# the live bot never traded — and those hours turned out to be slightly BETTER,
+# not worse. Measured with portfolio_sim.py on ONE shared account with all live
+# guardrails applied, two independent ~6-month windows:
+#   window 1  hours-only: 479tr  WR 81.6%  +221.6R  maxDD  -6.69R  (R/DD 33)
+#   window 1       24/7: 1211tr  WR 81.8%  +595.1R  maxDD -11.17R  (R/DD 53)
+#   window 2  hours-only: 452tr  WR 79.2%  +194.1R  maxDD -12.41R  (R/DD 16)
+#   window 2       24/7: 1128tr  WR 80.2%  +479.1R  maxDD  -8.46R  (R/DD 57)
+# Win rate is unchanged; profit is 2.5-2.7x, and on window 2 drawdown actually
+# IMPROVED — more trades spread losses over more time, diluting the clusters.
+# Better risk-adjusted on both windows, same direction, so not a single-window
+# artefact.
+# Checked before flipping: the X-Perp basis does NOT decouple off-hours
+# (-0.111% vs -0.115%, same spread), so prices stay trustworthy. X-Perp VOLUME
+# does roughly halve (BTC 19->9, ETH 193->116, SOL 1308->645 median), which the
+# backtest cannot model — its slippage is a constant. Doubling off-hours
+# slippage would eat only ~10% of the gain, so the conclusion holds.
+# Env-overridable to revert without a redeploy.
+TRADING_HOURS_START = int(os.getenv("TRADING_HOURS_START", "0"))
+TRADING_HOURS_END   = int(os.getenv("TRADING_HOURS_END", "24"))
+TRADE_WEEKENDS      = os.getenv("TRADE_WEEKENDS", "1") != "0"
 
 # --- SMC settings ---
 SMC_SWING_LOOKBACK    = 5

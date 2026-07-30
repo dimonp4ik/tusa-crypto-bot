@@ -3678,8 +3678,52 @@ def run_scan():
                     # ticker is unavailable.
                     _stale = False
                     try:
-                        live_px = get_xperp_price(analysis["symbol"]) or get_current_price(analysis["symbol"])
+                        _xp_px = get_xperp_price(analysis["symbol"])
+                        live_px = _xp_px or get_current_price(analysis["symbol"])
                         if live_px and live_px > 0:
+                            # Structure (zone bounds, recent high/low, structural
+                            # TP levels, ATR) is measured on the DEEP GLOBAL feed,
+                            # but the position is opened and monitored on the
+                            # X-Perp, which trades at a small persistent discount
+                            # (measured 2026-07-31: -0.11%..-0.18%, stdev only
+                            # 0.01-0.04pp, stable day and night). Mixing the two
+                            # puts the stop ~0.15% off the traded market's real
+                            # structure — on a ~2% stop that is ~8% of the whole
+                            # stop distance, always in the same direction. Rescale
+                            # the global-derived levels into X-Perp space so every
+                            # level and the entry live in one price space.
+                            _basis = 1.0
+                            if _xp_px:
+                                try:
+                                    _gp = get_current_price(analysis["symbol"])
+                                    if _gp and _gp > 0:
+                                        _b = _xp_px / _gp
+                                        # Sanity-bound: a real basis is fractions of
+                                        # a percent. Anything beyond 1% means one of
+                                        # the feeds is stale/wrong — skip rescaling
+                                        # rather than corrupt every level.
+                                        if 0.99 <= _b <= 1.01:
+                                            _basis = _b
+                                        else:
+                                            log.warning(
+                                                f"  {analysis['symbol']}: implausible X-Perp basis "
+                                                f"{(_b-1)*100:+.2f}% — levels left unscaled"
+                                            )
+                                except Exception as _be:
+                                    log.debug(f"  basis calc failed {analysis['symbol']}: {_be}")
+                            if _basis != 1.0:
+                                for _k in ("recent_high", "recent_low", "tp1_level",
+                                           "tp2_level", "entry_low", "entry_high", "atr"):
+                                    try:
+                                        _v = analysis.get(_k)
+                                        if _v:
+                                            analysis[_k] = float(_v) * _basis
+                                    except (TypeError, ValueError):
+                                        continue
+                                log.info(
+                                    f"  Levels rescaled to X-Perp space "
+                                    f"(basis {(_basis-1)*100:+.3f}%)"
+                                )
                             zone_px = float(analysis.get("current_price") or live_px)
                             drift   = abs(live_px - zone_px) / zone_px if zone_px else 0
                             _stale, _why = _entry_is_stale(analysis, live_px, direction)
