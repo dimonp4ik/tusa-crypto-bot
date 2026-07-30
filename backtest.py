@@ -84,24 +84,35 @@ PROJECT_DIR = Path(__file__).resolve().parent
 CACHE_DIR = PROJECT_DIR / "backtest_cache"
 CACHE_TTL_SEC = 2 * 3600
 
-# Bybit API — same source as live bot.
-# Supports BYBIT_PROXY_BASE / BYBIT_HTTPS_PROXY env vars (same as main bot).
-BYBIT_HOSTS = ["https://api.bybit.com", "https://api.bytick.com"]
-BYBIT_PAGE_LIMIT = 1000   # Bybit max candles per request
+# OKX history — the SAME venue the live bot reads (2026-07-31). This used to
+# pull Bybit candles while production ran on OKX: same asset, different order
+# book, so the filter was being validated on data it never actually sees. The
+# last structural live-vs-backtest divergence left after that day's parity work.
+# Depth is not a constraint: probed back to 2022-07 on BTC-USDT-SWAP.
+OKX_HOSTS = ["https://www.okx.com", "https://aws.okx.com"]
+OKX_PAGE_LIMIT = 300   # OKX max candles per history-candles request
 
-# Bybit interval strings
-BYBIT_INTERVAL_MAP = {
-    "15min": "15", "1hour": "60", "4hour": "240",
-    "15": "15", "60": "60", "240": "240",
-    "1d": "D", "D": "D",
+# internal interval → OKX bar string (mirrors src.binance_client.TIMEFRAME_MAP)
+OKX_INTERVAL_MAP = {
+    "15min": "15m", "1hour": "1H", "4hour": "4H",
+    "15m": "15m", "1H": "1H", "4H": "4H",
+    "1d": "1Dutc", "1Dutc": "1Dutc",
 }
+
+
+def _inst_id(symbol: str) -> str:
+    """Internal 'BTCUSDT' → OKX analysis-feed instId 'BTC-USDT-SWAP'."""
+    s = symbol.upper()
+    base = s[:-len("USDT")] if s.endswith("USDT") else s
+    return f"{base}-USDT-SWAP"
 
 WINDOW_15M = 300
 WINDOW_1H = 90
 WINDOW_4H = 50
 DEFAULT_WARMUP = 50
 
-# Fixed symbol set: reproducible A/B runs. Bybit format (no dashes).
+# Fixed symbol set: reproducible A/B runs. Internal format (no dashes) —
+# resolved to '<BASE>-USDT-SWAP' instIds for the OKX feed by _inst_id().
 BACKTEST_SYMBOLS = [
     "BTCUSDT", "ETHUSDT", "XRPUSDT", "SOLUSDT", "XMRUSDT",
     "DOTUSDT", "XLMUSDT", "LINKUSDT", "SUIUSDT", "HYPEUSDT",
@@ -162,47 +173,51 @@ def parse_symbols(value: str | None) -> list[str]:
     return list(BACKTEST_SYMBOLS)
 
 
-def _bybit_get_bt(path: str, params: dict, timeout: int = 20):
-    """Bybit GET for backtest — supports BYBIT_PROXY_BASE and BYBIT_HTTPS_PROXY."""
+def _okx_get_bt(path: str, params: dict, timeout: int = 20, retries: int = 4):
+    """OKX GET for backtest — host fallback + exponential backoff.
+
+    Deep pagination across many symbols trips OKX rate limits and transient DNS
+    failures; retrying with backoff makes a cold-cache prefetch reliable.
+    """
     import requests as _req
-    proxy_base  = os.getenv("BYBIT_PROXY_BASE", "").strip().rstrip("/")
-    https_proxy = os.getenv("BYBIT_HTTPS_PROXY", "").strip()
-    proxies = {"http": https_proxy, "https": https_proxy} if https_proxy else None
-
-    if proxy_base:
-        r = _req.get(f"{proxy_base}{path}", params=params, timeout=timeout, proxies=proxies)
-        r.raise_for_status()
-        return r
-
-    for host in BYBIT_HOSTS:
-        try:
-            r = _req.get(f"{host}{path}", params=params, timeout=timeout, proxies=proxies)
-            r.raise_for_status()
-            return r
-        except Exception:
-            continue
-    raise RuntimeError(f"All Bybit hosts failed for {path}")
+    base = os.getenv("OKX_BASE_URL", "").strip().rstrip("/")
+    hosts = [base] if base else OKX_HOSTS
+    last_exc = None
+    for attempt in range(retries):
+        for host in hosts:
+            try:
+                r = _req.get(f"{host}{path}", params=params, timeout=timeout)
+                r.raise_for_status()
+                return r
+            except Exception as e:
+                last_exc = e
+                continue
+        time.sleep(1.5 * (attempt + 1))  # 1.5s, 3s, 4.5s backoff
+    raise RuntimeError(f"All OKX hosts failed for {path}: {last_exc}")
 
 
 def fetch_top_symbols(limit: int) -> list[str]:
-    """Fetch current top Bybit linear USDT pairs by 24h USDT volume."""
-    resp = _bybit_get_bt("/v5/market/tickers", {"category": "linear"})
-    tickers = resp.json().get("result", {}).get("list", [])
+    """Top OKX USDT swaps by 24h quote volume — same venue as the live bot.
+
+    instId 'BTC-USDT-SWAP' is converted back to the internal 'BTCUSDT' format
+    the rest of the pipeline (and the DB) uses.
+    """
+    resp = _okx_get_bt("/api/v5/market/tickers", {"instType": "SWAP"})
+    tickers = resp.json().get("data", [])
     blocked = set(BLOCKED_SYMBOLS or [])
     rows = []
     for t in tickers:
-        symbol = str(t.get("symbol", "")).upper()
-        if not symbol.endswith(QUOTE_ASSET):
+        inst = str(t.get("instId", "")).upper()
+        if not inst.endswith(f"-{QUOTE_ASSET}-SWAP"):
             continue
-        if symbol in blocked:
-            continue
-        base = symbol[: -len(QUOTE_ASSET)]
-        if base in BLOCK_STABLE_BASES:
+        base = inst.split("-")[0]
+        symbol = f"{base}{QUOTE_ASSET}"
+        if symbol in blocked or base in BLOCK_STABLE_BASES:
             continue
         if any(base.endswith(s) for s in LEVERAGED_TOKEN_SUFFIXES):
             continue
         try:
-            vol = float(t.get("turnover24h") or 0.0)
+            vol = float(t.get("volCcyQuote") or 0.0)  # 24h turnover in quote ccy
         except (TypeError, ValueError):
             vol = 0.0
         if vol < MIN_24H_QUOTE_VOLUME_USDT:
@@ -253,11 +268,11 @@ def fetch_history(
     refresh_cache: bool = False,
     end_date_ms: int | None = None,
 ) -> dict[str, list]:
-    """Fetch historical Bybit candles with a local pickle cache.
+    """Fetch historical OKX candles with a local pickle cache.
 
-    Bybit kline format: [timestamp_ms, open, high, low, close, volume, turnover]
-    Returns newest-first from API — we reverse to oldest-first.
-    Paginates backwards via `end` param to collect `count` candles.
+    Same venue the live bot reads. Only closed candles (confirm == "1") are
+    kept. OKX returns newest-first; we sort to oldest-first and paginate
+    backwards via `after` (records strictly older than that ts).
 
     end_date_ms anchors the window's newest candle to a specific past moment
     instead of "now" — lets a seed batch target an exact historical range
@@ -276,50 +291,47 @@ def fetch_history(
             except Exception:
                 pass
 
-    bybit_interval = BYBIT_INTERVAL_MAP.get(str(interval), "15")
-    anchor_ms = int(end_date_ms) if end_date_ms else int(time.time() * 1000)
-    end_ms  = anchor_ms
+    okx_bar = OKX_INTERVAL_MAP.get(str(interval), "15m")
+    inst_id = _inst_id(symbol)
+    anchor_ms = int(end_date_ms) if end_date_ms else None
+    after = anchor_ms  # OKX 'after' = records strictly older than this ts
     by_time: dict[int, list] = {}
+    cutoff_ms = (anchor_ms or int(time.time() * 1000)) - count * interval_sec * 1000
 
     while len(by_time) < count:
-        resp = _bybit_get_bt(
-            "/v5/market/kline",
-            {
-                "category": "linear",
-                "symbol":   symbol,
-                "interval": bybit_interval,
-                "limit":    BYBIT_PAGE_LIMIT,
-                "end":      str(end_ms),
-            },
-        )
-        raw = resp.json().get("result", {}).get("list", [])
+        params = {"instId": inst_id, "bar": okx_bar, "limit": OKX_PAGE_LIMIT}
+        if after is not None:
+            params["after"] = str(after)
+        resp = _okx_get_bt("/api/v5/market/history-candles", params)
+        raw = resp.json().get("data", [])
         if not raw:
             break
 
         for c in raw:
-            ts_ms = int(c[0])
-            ts_s  = ts_ms // 1000
+            if len(c) > 8 and c[8] != "1":
+                continue  # unclosed candle — skip (no repaint)
+            ts_s = int(float(c[0])) // 1000
             if ts_s not in by_time:
                 by_time[ts_s] = c
 
-        oldest_ts_ms = int(raw[-1][0])
-        cutoff_ms    = anchor_ms - count * interval_sec * 1000
-        if len(raw) < BYBIT_PAGE_LIMIT or oldest_ts_ms <= cutoff_ms:
+        oldest_ts_ms = int(float(raw[-1][0]))
+        if len(raw) < OKX_PAGE_LIMIT or oldest_ts_ms <= cutoff_ms:
             break
-        end_ms = oldest_ts_ms - 1
+        after = oldest_ts_ms  # next page = strictly older
 
     candles = [by_time[ts] for ts in sorted(by_time)][-count:]
     if not candles:
-        raise ValueError(f"No Bybit data for {symbol} {interval}")
+        raise ValueError(f"No OKX data for {inst_id} {interval}")
 
-    # Bybit columns: [ts_ms, open, high, low, close, volume, turnover]
+    # OKX columns: [ts_ms, o, h, l, c, vol(contracts), volCcy(base),
+    # volCcyQuote, confirm]. volCcy (index 6) matches the live client exactly.
     data = {
-        "time":   [int(c[0]) // 1000 for c in candles],
+        "time":   [int(float(c[0])) // 1000 for c in candles],
         "open":   [float(c[1]) for c in candles],
         "high":   [float(c[2]) for c in candles],
         "low":    [float(c[3]) for c in candles],
         "close":  [float(c[4]) for c in candles],
-        "volume": [float(c[5]) for c in candles],
+        "volume": [float(c[6]) for c in candles],
     }
 
     with path.open("wb") as f:
