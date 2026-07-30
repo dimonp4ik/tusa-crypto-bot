@@ -3923,6 +3923,12 @@ def start_bot():
         _n = backfill_setup_signal_links()
         if _n:
             log.info(f"Linked {_n} pre-fix sent setup(s) to their real signal")
+        # Resolve immediately rather than waiting for the 15-min tick, so a
+        # freshly-linked row is corrected from real data at boot instead of
+        # sitting stale (or, before the 2026-07-31 follow-up, invisible).
+        _r = resolve_sent_setups_from_signals()
+        if _r:
+            log.info(f"Corrected {_r} sent setup outcome(s) from real signals at boot")
     except Exception as e:
         log.warning(f"Setup-signal backfill failed: {e}")
 

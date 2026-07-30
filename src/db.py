@@ -1152,20 +1152,17 @@ def link_setup_to_signal(setup_log_id: int, signal_id: int) -> None:
     linked rows so the shadow tracker's independent simulation never runs on
     (and never contradicts) a setup that has a real, authoritative result.
 
-    Always resets resolved=0: the normal call site links a fresh row (already
-    resolved=0, this is a no-op for it), but if a row was ever resolved BEFORE
-    it got linked — the exact bug this fix addresses — forcing resolved=0
-    makes resolve_sent_setups_from_signals() pick it up and overwrite the
-    stale, possibly-wrong shadow-simulated outcome on the next tick. Cheap and
-    safe either way: a not-yet-final signal is simply left pending again.
+    Deliberately does NOT touch `resolved`: resolve_sent_setups_from_signals()
+    re-checks every linked row against its signal and corrects any that
+    disagree, so a stale row never has to be un-resolved first. Un-resolving
+    would make it vanish from get_setup_accuracy until the next tick succeeds —
+    and if that tick ever failed, permanently (hit in production 2026-07-31,
+    the sent bucket read 0).
     """
     if not setup_log_id or not signal_id:
         return
     with _conn() as c:
-        c.execute(
-            "UPDATE setup_log SET signal_id=?, resolved=0 WHERE id=?",
-            (signal_id, setup_log_id),
-        )
+        c.execute("UPDATE setup_log SET signal_id=? WHERE id=?", (signal_id, setup_log_id))
 
 
 # Real signal status -> (outcome, reached_tp1, reached_tp2). Mirrors the
@@ -1190,10 +1187,8 @@ def backfill_setup_signal_links(window_sec: float = 300) -> int:
     Self-limiting by construction (only rows with sent=1 AND signal_id IS NULL
     ever match — every setup sent after this fix gets linked at publish time),
     so it's cheap to run on every boot with no version-flag gating needed.
-    Rows it links may already be resolved with a WRONG shadow-simulated
-    outcome (the AAVEUSDT case this fix was found from); the caller should run
-    resolve_sent_setups_from_signals() right after to correct them, which is
-    safe to do unconditionally since it always overwrites from the real result.
+    Only sets signal_id; correcting a stale outcome is
+    resolve_sent_setups_from_signals()'s job and needs no un-resolving.
     """
     n = 0
     with _conn() as c:
@@ -1211,10 +1206,7 @@ def backfill_setup_signal_links(window_sec: float = 300) -> int:
                  r["ts"] - window_sec, r["ts"] + window_sec, r["ts"]),
             ).fetchone()
             if sig:
-                c.execute(
-                    "UPDATE setup_log SET signal_id=?, resolved=0 WHERE id=?",
-                    (sig["id"], r["id"]),
-                )
+                c.execute("UPDATE setup_log SET signal_id=? WHERE id=?", (sig["id"], r["id"]))
                 n += 1
     return n
 
@@ -1229,19 +1221,39 @@ def resolve_sent_setups_from_signals(limit: int = 80) -> int:
     """
     n = 0
     with _conn() as c:
+        # Every linked row whose signal is FINAL — not just resolved=0 ones.
+        # A row already resolved with a wrong (shadow-simulated) outcome must
+        # be corrected too, and doing it this way means nothing ever has to be
+        # un-resolved first: rows are never made invisible to
+        # get_setup_accuracy while waiting to be fixed.
         rows = c.execute(
-            """SELECT sl.id AS setup_id, s.status, s.realized_r
+            """SELECT sl.id AS setup_id, sl.resolved, sl.outcome AS cur_outcome,
+                      s.status, s.realized_r
                FROM setup_log sl JOIN signals s ON s.id = sl.signal_id
-               WHERE sl.resolved=0 AND sl.signal_id IS NOT NULL
-               LIMIT ?""",
+               WHERE sl.signal_id IS NOT NULL
+               ORDER BY sl.ts DESC LIMIT ?""",
             (limit,),
         ).fetchall()
+        # Write on THIS connection, not via mark_setup_resolved(): that opens a
+        # SECOND connection to the same SQLite file while this one still holds
+        # the read transaction from the SELECT above, which can raise "database
+        # is locked". The caller swallows exceptions, so the failure would be
+        # silent. Found 2026-07-31 in production.
+        now = time_mod.time()
         for r in rows:
             mapped = _SIGNAL_STATUS_TO_OUTCOME.get(r["status"])
             if mapped is None:
                 continue  # still OPEN/TP1_PARTIAL — not final yet
             outcome, r1, r2 = mapped
-            mark_setup_resolved(r["setup_id"], outcome, r1, r2, net_r=r["realized_r"])
+            if r["resolved"] and r["cur_outcome"] == outcome:
+                continue  # already correct, nothing to do
+            c.execute(
+                """UPDATE setup_log
+                   SET outcome=?, reached_tp1=?, reached_tp2=?, resolved=1,
+                       resolved_ts=?, net_r=COALESCE(?, net_r)
+                   WHERE id=?""",
+                (outcome, int(r1), int(r2), now, r["realized_r"], r["setup_id"]),
+            )
             n += 1
     return n
 
