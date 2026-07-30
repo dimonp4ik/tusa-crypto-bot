@@ -1038,7 +1038,7 @@ def get_cap_impact_stats(since_ts: float) -> dict:
     """
     out = {}
     with _conn() as c:
-        for reason in ("dir_cap", "scan_cap", "send_failed"):
+        for reason in ("dir_cap", "scan_cap", "send_failed", "stale_entry"):
             rows = c.execute(
                 """SELECT outcome, reached_tp1 FROM setup_log
                    WHERE resolved=1 AND ts >= ? AND block_reason=?

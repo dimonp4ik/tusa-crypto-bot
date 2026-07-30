@@ -28,6 +28,8 @@ from config import (
     TRAIL_RUNNER_ENABLED, TRAIL_ATR_MULT,
     STOP_CLOSE_CONFIRM, MAX_SAME_DIRECTION_POSITIONS, STOP_EXCHANGE_BACKSTOP_R,
     MTF_MIN_SCORE, SHADOW_MIN_SCORE, TP1_R_MULT,
+    STALE_ENTRY_GUARD, STALE_ENTRY_ZONE_TOLERANCE, STALE_ENTRY_MAX_RISK_FRAC,
+    RISK_MIN_PCT, RISK_MAX_PCT, SL_ATR_BUFFER,
     TP1_CLOSE_FRAC, EXIT_PROFILE,
     POST_TP1_STRONG_TRAIL_ATR_MULT, POST_TP1_WEAK_TRAIL_ATR_MULT,
     POST_TP1_STRONG_CLOSE_PROGRESS, POST_TP1_STRONG_WICK_PROGRESS,
@@ -262,7 +264,8 @@ def _build_and_send_report(chat_id: int, message_id: int,
         _caps = get_cap_impact_stats(since_ts) or {}
         for code, title in (("dir_cap", f"лимит одной стороны ({MAX_SAME_DIRECTION_POSITIONS})"),
                             ("scan_cap", "лимит 3 за скан"),
-                            ("send_failed", "⚠️ СБОЙ ОТПРАВКИ (баг, не лимит — должно быть 0)")):
+                            ("send_failed", "⚠️ СБОЙ ОТПРАВКИ (баг, не лимит — должно быть 0)"),
+                            ("stale_entry", "🏃 цена ушла из зоны до публикации")):
             st = _caps.get(code) or {}
             if st.get("n"):
                 A(f"  {title}: срезано {st['n']}  "
@@ -1056,7 +1059,8 @@ def _handle_admin_callback(callback_id: str, chat_id: int,
 
             _titles = {"dir_cap": f"Лимит одной стороны ({MAX_SAME_DIRECTION_POSITIONS})",
                        "scan_cap": "Лимит 3 за скан",
-                       "send_failed": "⚠️ Сбой отправки в Telegram"}
+                       "send_failed": "⚠️ Сбой отправки в Telegram",
+                       "stale_entry": "🏃 Цена ушла из зоны (погоня)"}
             _any = False
             for code, title in _titles.items():
                 st = caps.get(code) or {}
@@ -2855,6 +2859,53 @@ def _apply_knn_overlay(setup: dict, symbol: str) -> None:
         log.warning(f"  kNN overlay skipped {symbol}: {e}")
 
 
+def _entry_is_stale(analysis: dict, live_px: float, direction: str) -> tuple:
+    """Has price left the setup's entry zone before we could publish?
+
+    The edge is entering AT the FVG/OB retest zone; backtest.py fills there by
+    construction. Live, price keeps moving between analysis and publish, and
+    the old guard only capped the distance from the zone MIDPOINT at a flat 3%
+    — so a signal could be published well past the zone edge. Measured cost of
+    that chase is severe (config.py STALE_ENTRY_GUARD has the table: 0.85%
+    adverse entry takes WR 82.8% -> 61.1% and profit to roughly zero).
+
+    Returns (is_stale, reason). Only ADVERSE drift counts: for a LONG, price
+    below the zone is a better fill, not a stale setup.
+    """
+    if not STALE_ENTRY_GUARD:
+        return False, ""
+    lo = analysis.get("entry_low")
+    hi = analysis.get("entry_high")
+    src = str(analysis.get("entry_source") or "").upper()
+    try:
+        lo, hi = float(lo), float(hi)
+    except (TypeError, ValueError):
+        lo = hi = None
+
+    if src in ("FVG", "OB") and lo and hi and hi > lo:
+        width = hi - lo
+        tol = width * max(0.0, STALE_ENTRY_ZONE_TOLERANCE)
+        if direction == "LONG" and live_px > hi + tol:
+            return True, f"price {live_px} above zone high {hi} (+tol {tol:.8g})"
+        if direction == "SHORT" and live_px < lo - tol:
+            return True, f"price {live_px} below zone low {lo} (-tol {tol:.8g})"
+        return False, ""
+
+    # No usable zone (MARKET entry): fall back to bounding how much of the
+    # trade's own risk distance the adverse move has already eaten.
+    zone_px = float(analysis.get("current_price") or live_px)
+    atr = float(analysis.get("atr", 0.0) or 0.0)
+    risk = max(zone_px * RISK_MIN_PCT, min(zone_px * RISK_MAX_PCT, atr * SL_ATR_BUFFER)) \
+        if atr > 0 else zone_px * RISK_MAX_PCT
+    if risk <= 0:
+        return False, ""
+    adverse = (live_px - zone_px) if direction == "LONG" else (zone_px - live_px)
+    if adverse > risk * max(0.0, STALE_ENTRY_MAX_RISK_FRAC):
+        return True, (f"adverse move {adverse / risk * 100:.0f}% of risk "
+                      f"> {STALE_ENTRY_MAX_RISK_FRAC * 100:.0f}%")
+    return False, ""
+
+
 def _setup_rank(setup: dict) -> tuple:
     """Rank setups before Claude so only the strongest spend LLM tokens."""
     mtf_score    = int(setup.get("mtf_score", 0) or 0)
@@ -3625,13 +3676,19 @@ def run_scan():
                     # levels re-anchor to it so entry/TP/SL match the user's
                     # chart. Falls back to the analysis feed price if X-Perp
                     # ticker is unavailable.
+                    _stale = False
                     try:
                         live_px = get_xperp_price(analysis["symbol"]) or get_current_price(analysis["symbol"])
                         if live_px and live_px > 0:
                             zone_px = float(analysis.get("current_price") or live_px)
                             drift   = abs(live_px - zone_px) / zone_px if zone_px else 0
-                            # Only use live price if within 3% of zone (sanity guard)
-                            if drift <= 0.03:
+                            _stale, _why = _entry_is_stale(analysis, live_px, direction)
+                            if _stale:
+                                log.warning(
+                                    f"  Skip {analysis['symbol']} — stale entry: {_why} "
+                                    f"(live {live_px}, zone {zone_px}, drift {drift*100:.2f}%)"
+                                )
+                            else:
                                 analysis["zone_entry_price"] = zone_px   # keep zone for reference
                                 analysis["current_price"]    = round(live_px, 8)
                                 analysis["market_price"]     = round(live_px, 8)
@@ -3639,13 +3696,20 @@ def run_scan():
                                     f"  Entry price updated to live: {live_px} "
                                     f"(zone was {zone_px}, drift {drift*100:.2f}%)"
                                 )
-                            else:
-                                log.warning(
-                                    f"  Live price {live_px} vs zone {zone_px}: "
-                                    f"drift {drift*100:.1f}% > 3% — keeping zone price"
-                                )
                     except Exception as e:
                         log.warning(f"  Live price fetch failed for {analysis['symbol']}: {e}")
+
+                    if _stale:
+                        # Claude approved it; the setup just went stale before we
+                        # could publish. Tag like the caps so it is not counted
+                        # as one of Claude's rejections, and so the frequency of
+                        # this is measurable (it is NOT observable in backtest —
+                        # that always fills at the zone).
+                        try:
+                            mark_setup_blocked(analysis.get("_setup_log_id"), "stale_entry")
+                        except Exception:
+                            pass
+                        continue
 
                     if send_signal(analysis):
                         _cache_signal(analysis["symbol"], direction)

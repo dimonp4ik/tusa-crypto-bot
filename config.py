@@ -398,6 +398,34 @@ SKIP_RSI_DIV_SETUPS = os.getenv("SKIP_RSI_DIV_SETUPS", "1") != "0"
 SKIP_UTC_HOURS = {h for h in os.getenv("SKIP_UTC_HOURS", "").split(",") if h.strip()}
 SKIP_WEEKDAYS  = {d for d in os.getenv("SKIP_WEEKDAYS", "").split(",") if d.strip()}
 
+# --- Stale-entry guard (VALIDATED 2026-07-31, default ON) ----------------------
+# The strategy's edge lives in entering AT the FVG/OB retest zone. The backtest
+# always fills there by construction, but live the bot re-anchors the entry to
+# the current price at publish time — so if price has already left the zone, it
+# published a chase entry the backtest never modelled. Measured cost of that
+# adverse entry (17000 candles, 20 symbols, same config, only entry shifted):
+#   0.00%: WR 82.8%  netR +945R  maxDD  -16R
+#   0.25%: WR 76.0%  netR +590R  maxDD  -39R
+#   0.50%: WR 71.2%  netR +379R  maxDD  -58R
+#   0.85%: WR 61.1%  netR  +25R  maxDD -108R   <- a real live signal (AAVEUSDT)
+#   1.50%: WR 49.1%  netR -387R  maxDD -421R
+# Brutal sensitivity, because the stop sits only ~2% away: a 0.85% adverse entry
+# burns ~42% of the stop distance before the trade even starts. The old guard
+# allowed 3% drift — deep inside the loss-making region.
+#
+# Guard: if the setup has a real FVG/OB zone, the live price must still be
+# INSIDE it (plus a tolerance as a fraction of the zone's own width). Outside
+# the zone the retest premise is void, so the signal is skipped rather than
+# published as a chase. Adverse entry is then bounded by half the zone width
+# (~0.3% typical) instead of the old flat 3%.
+STALE_ENTRY_GUARD = os.getenv("STALE_ENTRY_GUARD", "1") != "0"
+# Extra tolerance beyond the zone edge, as a fraction of the zone width.
+STALE_ENTRY_ZONE_TOLERANCE = float(os.getenv("STALE_ENTRY_ZONE_TOLERANCE", "0.25"))
+# Hard numeric backstop for setups with no usable zone (entry_source=MARKET),
+# expressed as a fraction of the trade's own risk distance — a principled cap
+# on "how much of the stop may be burned on entry" rather than a flat percent.
+STALE_ENTRY_MAX_RISK_FRAC = float(os.getenv("STALE_ENTRY_MAX_RISK_FRAC", "0.25"))
+
 # --- BTC correlation filter ---
 BTC_BLOCK_THRESHOLD_PCT = 1.0
 
