@@ -15,7 +15,10 @@ ADMIN_IDS = {671071896}  # super-admin only; others added via bot → DB
 SCAN_INTERVAL_MINUTES = int(os.getenv("SCAN_INTERVAL_MINUTES", "5"))
 TOP_COINS_COUNT = int(os.getenv("TOP_COINS_COUNT", "25"))
 TIMEFRAME = "15m"          # 15m candle → swing signals, hold 2-8h
-KLINES_LIMIT = 200         # 200 × 15m = ~50 hours of data for SMC
+# Lookback windows MUST match backtest.py's WINDOW_15M/WINDOW_1H/WINDOW_4H
+# (300/90/50) — see the KLINES_1H_LIMIT note below for what happened when they
+# did not. Same number of API requests either way (OKX caps at 300/request).
+KLINES_LIMIT = 300         # 300 × 15m = ~75 hours of data for SMC (= WINDOW_15M)
 
 # --- Symbol quality filter ---
 # ALLOWED_SYMBOLS="" (default) → auto top-volume mode, top 45 by 24h USDT volume.
@@ -66,12 +69,29 @@ KLINES_INTERVAL_SEC = 15 * 60
 
 # --- 1h candles for trend direction ---
 TIMEFRAME_1H_KUCOIN = "1hour"
-KLINES_1H_LIMIT = 50
+# 50 -> 90 (= backtest WINDOW_1H) on 2026-07-31. get_1h_trend() computes its
+# "strong" flag (EMA9>EMA21>EMA50) only when len(closes) >= 51 — at 50 candles
+# that branch NEVER RAN LIVE, so trend_1h_strong was permanently False in
+# production while the backtest (90 candles) computed it for real. Consequences
+# measured on two windows: 87.6% / 89.3% of ALL backtest trades carried the
+# resulting Strong1h+1 mtf_score bonus that live could never award, and 238 /
+# 233 of them sat exactly on the MTF_MIN_SCORE=14 gate — i.e. ~13% of backtest
+# trades scored 13 live and were rejected outright. Live was effectively
+# running a one-point stricter filter than every figure ever measured for it,
+# and also never emitted the "StrongTrend1h" confirmation toward
+# SMC_MIN_CONFIRMATIONS.
+KLINES_1H_LIMIT = 90
 KLINES_1H_INTERVAL_SEC = 3600
 
 # --- 4h candles for higher timeframe bias ---
 TIMEFRAME_4H_KUCOIN = "4hour"
-KLINES_4H_LIMIT = 30
+# 30 -> 50 (= backtest WINDOW_4H). NB: 50 < 51, so trend_4h_strong stays False
+# on BOTH sides — consistent, and confirmed dead in the data (Strong4h+1 appears
+# on 0.0% of backtest trades in both windows). Deliberately matched rather than
+# raised: going past 51 would enable a bonus live that the backtest still would
+# not award, recreating the exact mismatch this change fixes. Enabling it is a
+# strategy change and needs its own backtest, not a parity fix.
+KLINES_4H_LIMIT = 50
 KLINES_4H_INTERVAL_SEC = 4 * 3600
 
 # --- 1D candles for macro trend ---
