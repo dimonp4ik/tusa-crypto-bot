@@ -113,11 +113,15 @@ DEFAULT_WARMUP = 50
 
 # Fixed symbol set: reproducible A/B runs. Internal format (no dashes) —
 # resolved to '<BASE>-USDT-SWAP' instIds for the OKX feed by _inst_id().
+# XMRUSDT and TONUSDT dropped 2026-07-31: neither exists as an OKX USDT swap,
+# so the live bot can never trade them either. They were only ever testable
+# because the backtest used to read Bybit. Removing them is a parity fix, not a
+# loss — the pinned set now equals the universe production can actually reach.
 BACKTEST_SYMBOLS = [
-    "BTCUSDT", "ETHUSDT", "XRPUSDT", "SOLUSDT", "XMRUSDT",
+    "BTCUSDT", "ETHUSDT", "XRPUSDT", "SOLUSDT",
     "DOTUSDT", "XLMUSDT", "LINKUSDT", "SUIUSDT", "HYPEUSDT",
     "ZECUSDT", "SEIUSDT", "AAVEUSDT", "TAOUSDT", "NEARUSDT",
-    "TONUSDT", "BILLUSDT", "LABUSDT", "ADAUSDT", "AVAXUSDT",
+    "BILLUSDT", "LABUSDT", "ADAUSDT", "AVAXUSDT",
 ]
 
 
