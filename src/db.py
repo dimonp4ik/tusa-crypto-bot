@@ -1017,17 +1017,19 @@ def mark_setup_blocked(setup_log_id: int, reason: str) -> None:
 
 
 def get_cap_impact_stats(since_ts: float) -> dict:
-    """Outcomes of setups Claude approved but a cap withheld.
+    """Outcomes of setups Claude approved but never sent.
 
-    This is the direct answer to "did the correlation cap save money or cost
-    it": the shadow tracker resolves these rows regardless of whether a trade
-    was ever opened, so their realised outcomes are known. A blocked setup that
-    would have hit TP1 is opportunity cost; one that would have hit SL is a
-    save. Reported per cap so the correlation cap can be judged on its own.
+    This is the direct answer to "did withholding this setup save money or
+    cost it": the shadow tracker resolves these rows regardless of whether a
+    trade was ever opened, so their realised outcomes are known. A blocked
+    setup that would have hit TP1 is opportunity cost; one that would have hit
+    SL is a save. Reported per reason so each can be judged on its own — the
+    two caps are deliberate risk controls, 'send_failed' is a delivery bug
+    (Telegram API failure) and should ideally always read near-zero n.
     """
     out = {}
     with _conn() as c:
-        for reason in ("dir_cap", "scan_cap"):
+        for reason in ("dir_cap", "scan_cap", "send_failed"):
             rows = c.execute(
                 """SELECT outcome, reached_tp1 FROM setup_log
                    WHERE resolved=1 AND ts >= ? AND block_reason=?

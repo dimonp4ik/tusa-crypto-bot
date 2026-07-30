@@ -260,7 +260,8 @@ def _build_and_send_report(chat_id: int, message_id: int,
         A(f"## ВЛИЯНИЕ ЛИМИТОВ ({window_label})")
         _caps = get_cap_impact_stats(since_ts) or {}
         for code, title in (("dir_cap", f"лимит одной стороны ({MAX_SAME_DIRECTION_POSITIONS})"),
-                            ("scan_cap", "лимит 3 за скан")):
+                            ("scan_cap", "лимит 3 за скан"),
+                            ("send_failed", "⚠️ СБОЙ ОТПРАВКИ (баг, не лимит — должно быть 0)")):
             st = _caps.get(code) or {}
             if st.get("n"):
                 A(f"  {title}: срезано {st['n']}  "
@@ -1048,12 +1049,13 @@ def _handle_admin_callback(callback_id: str, chat_id: int,
             skew = get_skew_response_stats(since30)
 
             lines = ["🔗 *КАП КОРРЕЛЯЦИИ* (30 дней)",
-                     "_Сетапы, которые Клод одобрил, а лимит не пропустил. "
+                     "_Сетапы, которые Клод одобрил, а что-то не пропустило. "
                      "Теневой трекер знает их реальный исход — значит видно, "
-                     "спас лимит деньги или отнял._\n"]
+                     "спасло это деньги или отняло._\n"]
 
             _titles = {"dir_cap": f"Лимит одной стороны ({MAX_SAME_DIRECTION_POSITIONS})",
-                       "scan_cap": "Лимит 3 за скан"}
+                       "scan_cap": "Лимит 3 за скан",
+                       "send_failed": "⚠️ Сбой отправки в Telegram"}
             _any = False
             for code, title in _titles.items():
                 st = caps.get(code) or {}
@@ -1063,11 +1065,15 @@ def _handle_admin_callback(callback_id: str, chat_id: int,
                 _any = True
                 verdict = ("спас" if st["saved_r"] > 0
                            else "отнял" if st["saved_r"] < 0 else "в ноль")
+                extra = ""
+                if code == "send_failed":
+                    extra = ("\n  _Это баг, не намеренный лимит — Клод одобрил, "
+                             "а сообщение не дошло. Должно быть 0._")
                 lines.append(
                     f"*{title}:* срезано {st['n']}\n"
                     f"  ушли бы в TP1: {st['reached_tp1']} ({st['tp1_pct']:.0f}%) · "
                     f"в стоп: {st['sl']} ({st['sl_pct']:.0f}%)\n"
-                    f"  итог: *{st['saved_r']:+.1f}R* — лимит {verdict}"
+                    f"  итог: *{st['saved_r']:+.1f}R* — лимит {verdict}{extra}"
                 )
 
             if skew:
@@ -3662,6 +3668,17 @@ def run_scan():
                             f"  Signal NOT sent: {analysis['symbol']} {direction} "
                             f"({analysis.get('confidence','?')}) — send_signal returned False"
                         )
+                        # Same accounting gap as the two caps above: a setup
+                        # Claude APPROVED that failed to send (Telegram API
+                        # error, now retried once — see _send_message) sits at
+                        # sent=0 with no block_reason, silently counted as a
+                        # Claude rejection. Found 2026-07-30 from a real setup
+                        # (PUMPUSDT) that reached TP2 and was approved 3
+                        # consecutive scans, never sent, never tagged.
+                        try:
+                            mark_setup_blocked(analysis.get("_setup_log_id"), "send_failed")
+                        except Exception:
+                            pass
             except Exception as e:
                 log.error(f"  Error sending {analysis.get('symbol','?')}: {e}")
 

@@ -672,17 +672,53 @@ def send_status(text: str) -> bool:
 
 
 def _send_message(text: str) -> bool:
+    """POST a signal message. Two independent failure modes get a fallback:
+
+    1. Markdown parse error (an unescaped char slipped past _esc(), the same
+       class of bug that broke the setup-history admin button earlier) — retry
+       the SAME text with no parse_mode. Real content still reaches the user
+       instead of a signal silently vanishing.
+    2. Any other failure (network blip, Telegram 5xx/429) — one bare retry
+       after a short pause. There was previously no retry at all: a single
+       transient hiccup permanently dropped that scan's signal, and the setup
+       would only resurface on the NEXT scan if the price zone was still valid
+       (found 2026-07-30 via a live setup that reached TP2 but was never sent —
+       3 consecutive scans, same failure, before Claude finally moved on).
+    """
+    def _post(parse_mode: bool) -> "requests.Response":
+        payload = {"chat_id": TELEGRAM_CHAT_ID, "text": text}
+        if parse_mode:
+            payload["parse_mode"] = "Markdown"
+        return requests.post(f"{TELEGRAM_API}/sendMessage", json=payload, timeout=15)
+
     try:
-        resp = requests.post(
-            f"{TELEGRAM_API}/sendMessage",
-            json={"chat_id": TELEGRAM_CHAT_ID, "text": text, "parse_mode": "Markdown"},
-            timeout=15,
-        )
-        if resp.status_code != 200:
-            _log.error(
-                f"[Telegram] HTTP {resp.status_code}: {resp.text[:300]}"
-            )
-        return resp.status_code == 200
+        resp = _post(True)
+        if resp.status_code == 200:
+            return True
+
+        desc = ""
+        try:
+            desc = str(resp.json().get("description", ""))
+        except Exception:
+            desc = resp.text[:300]
+        _log.error(f"[Telegram] HTTP {resp.status_code}: {desc[:300]}")
+
+        if "parse" in desc.lower():
+            resp2 = _post(False)
+            if resp2.status_code == 200:
+                _log.warning("[Telegram] sent as plain text after a Markdown parse failure")
+                return True
+            _log.error(f"[Telegram] plain-text retry also failed: HTTP {resp2.status_code}: {resp2.text[:300]}")
+            return False
+
+        import time as _time
+        _time.sleep(2)
+        resp3 = _post(True)
+        if resp3.status_code == 200:
+            _log.warning("[Telegram] sent on retry after a transient failure")
+            return True
+        _log.error(f"[Telegram] retry also failed: HTTP {resp3.status_code}: {resp3.text[:300]}")
+        return False
     except Exception as e:
         _log.error(f"[Telegram] send failed: {e}")
         return False
