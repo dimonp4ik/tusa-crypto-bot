@@ -13,6 +13,7 @@ import logging
 import os
 import time
 import threading
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime, timezone
 
 from flask import Flask, request as flask_request
@@ -3404,12 +3405,35 @@ def run_scan():
         smc_diag = {}  # funnel diagnostics: how many coins reached scoring + best score
 
         # Step 2: SMC filter — BOS + confirmation + 1h/4h trend + BTC correlation
+        # Candles are fetched CONCURRENTLY (was serial + a 0.2s sleep per coin,
+        # ~56s for 25 coins — the bulk of publish latency, which is what lets
+        # price drift out of the entry zone before the signal goes out). Only
+        # the network wait overlaps; analysis stays on this thread so setups
+        # keep a deterministic order and the diag counters need no locking.
+        # Most scans now hit the candle cache and do no network work at all;
+        # this bounds the cost of the scans that follow a bar close.
+        _SCAN_FETCH_WORKERS = 6      # well under OKX public rate limits
+
+        def _fetch_all(sym):
+            return sym, (get_klines(sym), get_klines_1h(sym),
+                         get_klines_4h(sym), get_klines_1d(sym))
+
+        _t0 = time.time()
+        _fetched = {}
+        with ThreadPoolExecutor(max_workers=_SCAN_FETCH_WORKERS) as _ex:
+            for _fut in as_completed([_ex.submit(_fetch_all, s) for s in coins]):
+                try:
+                    _sym, _dfs = _fut.result()
+                    _fetched[_sym] = _dfs
+                except Exception as e:
+                    log.warning(f"  Fetch failed: {e}")
+        log.info(f"Candles: {len(_fetched)}/{len(coins)} symbols in {time.time()-_t0:.1f}s")
+
         for symbol in coins:
+            if symbol not in _fetched:
+                continue
             try:
-                df_15m = get_klines(symbol)
-                df_1h  = get_klines_1h(symbol)
-                df_4h  = get_klines_4h(symbol)
-                df_1d  = get_klines_1d(symbol)
+                df_15m, df_1h, df_4h, df_1d = _fetched[symbol]
                 setup  = analyze_coin_smc(df_15m, df_1h, symbol, df_4h, btc_change, df_1d,
                                           diag=smc_diag, include_shadow=True)
                 if setup and setup.get("_shadow_only"):
@@ -3422,7 +3446,6 @@ def run_scan():
                         f"signals={setup['signals']}"
                     )
                     setups.append(setup)
-                time.sleep(0.2)  # 2 API calls per coin — small delay
             except Exception as e:
                 log.warning(f"  Skip {symbol}: {e}")
 
@@ -3560,28 +3583,45 @@ def run_scan():
         # Only setups the LIGHT gate approved (LONG/SHORT, not LOW) with a high
         # mtf_score qualify; capped per scan to protect the budget. Coin memory
         # (recent outcomes) is injected so Sonnet learns from this symbol's past.
-        heavy_done = 0
+        # Run the eligible HEAVY checks CONCURRENTLY. They were sequential, so
+        # up to CLAUDE_HEAVY_MAX_PER_SCAN Sonnet round-trips stacked end to end
+        # — the largest remaining block of publish latency once candle fetching
+        # was cached. The calls are independent, and the cap bounds concurrency,
+        # so this is a straight latency win. Every setup still gets exactly one
+        # HEAVY call; only the waiting overlaps.
+        _heavy_targets = []
         for analysis in analyses:
-            if heavy_done >= CLAUDE_HEAVY_MAX_PER_SCAN:
+            if len(_heavy_targets) >= CLAUDE_HEAVY_MAX_PER_SCAN:
                 break
             decision = analysis.get("decision", "NO TRADE")
             conf     = analysis.get("confidence", "LOW").upper()
             score    = int(analysis.get("mtf_score", 0) or 0)
             if decision in ("LONG", "SHORT") and conf != "LOW" and score >= CLAUDE_HEAVY_MIN_SCORE:
-                try:
-                    history = get_recent_outcomes(analysis["symbol"], limit=CLAUDE_MEMORY_LIMIT)
-                    heavy = analyze_heavy(analysis, news_context=claude_ctx, history=history)
-                    for k in ("decision", "confidence", "risk_score", "trend_strength", "reason", "counter"):
+                _heavy_targets.append(analysis)
+
+        def _run_heavy(a):
+            history = get_recent_outcomes(a["symbol"], limit=CLAUDE_MEMORY_LIMIT)
+            return a, analyze_heavy(a, news_context=claude_ctx, history=history)
+
+        if _heavy_targets:
+            _t0 = time.time()
+            with ThreadPoolExecutor(max_workers=len(_heavy_targets)) as _ex:
+                for _fut in as_completed([_ex.submit(_run_heavy, a) for a in _heavy_targets]):
+                    try:
+                        a, heavy = _fut.result()
+                    except Exception as e:
+                        log.warning(f"  HEAVY check failed: {e}")
+                        continue
+                    for k in ("decision", "confidence", "risk_score",
+                              "trend_strength", "reason", "counter"):
                         if k in heavy:
-                            analysis[k] = heavy[k]
-                    heavy_done += 1
+                            a[k] = heavy[k]
                     log.info(
-                        f"  HEAVY: {analysis['symbol']} → {analysis['decision']} "
-                        f"({analysis.get('confidence','?')}) risk={analysis.get('risk_score','?')} "
-                        f"— {analysis.get('reason','')}"
+                        f"  HEAVY: {a['symbol']} → {a['decision']} "
+                        f"({a.get('confidence','?')}) risk={a.get('risk_score','?')} "
+                        f"— {a.get('reason','')}"
                     )
-                except Exception as e:
-                    log.warning(f"  HEAVY check failed {analysis.get('symbol','?')}: {e}")
+            log.info(f"  HEAVY: {len(_heavy_targets)} checks in {time.time()-_t0:.1f}s (parallel)")
 
         # Book state at judgment time — how many positions in each direction were
         # already open when Claude saw these setups. Snapshotted once here so the
