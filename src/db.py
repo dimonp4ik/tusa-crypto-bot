@@ -1399,6 +1399,23 @@ def get_similar_resolved_setups(symbol: str, direction: str, mtf_score,
         return [dict(r) for r in live] + [dict(r) for r in bt]
 
 
+def delete_backtest_seed_rows() -> int:
+    """Wipe all source='backtest' setup_log rows so a corrected batch can be
+    re-seeded without stale priors sitting alongside it. Returns rows deleted.
+
+    Needed 2026-07-31: the original 31,829 priors were generated under the
+    BACKTEST_TP_WINDOW bug (12h instead of 48h), on Bybit data, with
+    btc_change_pct=0.0 and the pre-0.7 TP geometry. Their fingerprint is
+    unmistakable — 6,591 rows (21%) marked EXPIRED, an artifact of the
+    too-short clock — and they showed a 60.0% win rate against the corrected
+    backtest's 82.5%. Because they outnumber live history by ~1000:1 they
+    dominated everything Claude read about its own edge.
+    """
+    with _conn() as c:
+        cur = c.execute("DELETE FROM setup_log WHERE source='backtest'")
+        return cur.rowcount
+
+
 def seed_backtest_outcomes(rows: list) -> int:
     """Bulk-insert historical backtest trades as resolved setup_log rows
     (source='backtest'). These are Claude memory PRIORS — every stats consumer

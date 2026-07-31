@@ -74,6 +74,7 @@ from src.db import (
     get_unresolved_setups, mark_setup_resolved, get_setup_accuracy,
     link_setup_to_signal, resolve_sent_setups_from_signals, backfill_setup_signal_links,
     get_similar_resolved_setups, seed_backtest_outcomes, backfill_backtest_net_r,
+    delete_backtest_seed_rows,
     get_today_sl_streak,
     get_weekly_stats,
     at_add_allowed, at_remove, at_get, at_all_allowed, at_set_keys,
@@ -4019,10 +4020,22 @@ def _shadow_tracker_job():
 # batches load independently of old ones.
 _BT_SEED_DIR = os.path.dirname(os.path.abspath(__file__))
 _BT_SEED_BATCHES = [
-    ("backtest_seed_2024.csv",   "bt_seed_2024_done"),   # first 18 symbols
-    ("backtest_seed_2024_b.csv", "bt_seed_2024b_done"),  # remaining X-Perp universe
-    ("backtest_seed_2022.csv",   "bt_seed_2022_done"),   # 2022-2023 bear/crash regime
+    # Corrected priors, 2026-07-31. The three earlier batches (2022/2024/2024_b,
+    # 31,829 rows) were generated under the BACKTEST_TP_WINDOW bug (12h instead
+    # of 48h), on Bybit data, with btc_change_pct=0.0 and the pre-0.7 TP
+    # geometry. Their fingerprint: 6,591 rows (21%) EXPIRED — pure artifact of
+    # the short clock — and a 60.0% win rate against the corrected backtest's
+    # 82.5%. Outnumbering live history ~1000:1, they dominated everything
+    # Claude read about its own edge, and it had started rejecting nearly every
+    # setup citing that record. Replaced by one batch from the OKX-data runs:
+    # 3,040 trades, 82.0% WR, EXPIRED down to 0.7%.
+    ("backtest_seed_okx_2026.csv", "bt_seed_okx2026_done"),
 ]
+
+# Bumping this purges ALL source='backtest' rows once, then the batches above
+# re-seed. Raise it whenever the priors themselves become invalid (config or
+# data-source change), NOT for ordinary redeploys.
+_BT_SEED_GENERATION = "okx_2026_07_31"
 
 
 def maybe_seed_backtest():
@@ -4031,6 +4044,20 @@ def maybe_seed_backtest():
     redeploys never re-seed and new batches load on top of old ones.
     """
     import csv as _csv
+
+    # Generation guard: wipe stale priors before seeding the corrected set.
+    try:
+        if get_bot_state("bt_seed_generation") != _BT_SEED_GENERATION:
+            _purged = delete_backtest_seed_rows()
+            set_bot_state("bt_seed_generation", _BT_SEED_GENERATION)
+            # Clear the per-batch flags too, so the new batch actually loads.
+            for _f in ("bt_seed_2024_done", "bt_seed_2024b_done",
+                       "bt_seed_2022_done", "bt_seed_okx2026_done"):
+                set_bot_state(_f, "")
+            log.info(f"Claude priors: purged {_purged} stale backtest rows "
+                     f"(generation → {_BT_SEED_GENERATION})")
+    except Exception as e:
+        log.warning(f"Prior purge failed (will retry next boot): {e}")
     for fname, flag in _BT_SEED_BATCHES:
         try:
             if get_bot_state(flag):
