@@ -4027,8 +4027,17 @@ _BT_SEED_BATCHES = [
     # the short clock — and a 60.0% win rate against the corrected backtest's
     # 82.5%. Outnumbering live history ~1000:1, they dominated everything
     # Claude read about its own edge, and it had started rejecting nearly every
-    # setup citing that record. Replaced by one batch from the OKX-data runs:
-    # 3,040 trades, 82.0% WR, EXPIRED down to 0.7%.
+    # setup citing that record. Replaced by one batch rebuilt from eight
+    # sequential OKX windows spanning 2022-08 -> 2026-07: 10,300 trades,
+    # 81.1% WR, EXPIRED down to 0.9%.
+    # Regime coverage is the whole point of priors — win rate by year:
+    #   2022 82.1% (includes the November FTX collapse)   2023 79.9% (bear)
+    #   2024 80.9%   2025 81.2%   2026 82.4%
+    # A 2.5-point spread across four very different markets, which is what
+    # makes these usable as a base rate rather than a bull-run artifact.
+    # NB: run the windows SEQUENTIALLY when regenerating — three concurrent
+    # deep backtests tripped OKX rate limits and silently lost 14 of 18
+    # symbols on the first attempt.
     ("backtest_seed_okx_2026.csv", "bt_seed_okx2026_done"),
 ]
 
