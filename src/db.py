@@ -1357,6 +1357,14 @@ def get_similar_resolved_setups(symbol: str, direction: str, mtf_score,
     same direction, and either the same symbol OR a nearby mtf_score band.
     Newest first within each tier; каждый row carries `source` so the prompt
     builder can label live vs backtest separately.
+
+    block_reason is excluded (fix 2026-07-31): _self_feedback splits these rows
+    into "sent" vs "rejected" by the `sent` flag, but a setup Claude APPROVED
+    and a cap/send-failure withheld also sits at sent=0 — so Claude was being
+    shown his own approvals as if he had rejected them, and learning from a
+    distorted record of his own judgement. Same filter get_setup_accuracy got
+    earlier the same day; this call site was missed, and it is the one that
+    actually feeds the prompt.
     """
     since = time_mod.time() - lookback_days * 86400
     try:
@@ -1372,6 +1380,7 @@ def get_similar_resolved_setups(symbol: str, direction: str, mtf_score,
                FROM setup_log
                WHERE resolved=1 AND ts >= ? AND direction=?
                  AND COALESCE(source,'live')='live'
+                 AND COALESCE(block_reason,'')=''
                  AND (symbol=? OR ABS(COALESCE(mtf_score,0) - ?) <= 2)
                ORDER BY ts DESC LIMIT ?""",
             (since, direction, symbol, score, limit),
@@ -1529,9 +1538,14 @@ def get_weekly_stats() -> dict:
             ),
             [since, *FINAL_STATUSES],
         ).fetchall()
+        # block_reason excluded for the same reason as get_setup_accuracy and
+        # get_similar_resolved_setups: a setup Claude APPROVED but a cap or a
+        # send failure withheld also sits at sent=0, so counting it as a
+        # rejection distorts the weekly AI-accuracy split.
         setup_rows = c.execute(
             "SELECT sent, resolved, reached_tp1, trend FROM setup_log "
-            "WHERE ts >= ? AND resolved = 1 AND COALESCE(source,'live')='live'",
+            "WHERE ts >= ? AND resolved = 1 AND COALESCE(source,'live')='live' "
+            "AND COALESCE(block_reason,'')=''",
             (since,),
         ).fetchall()
 
