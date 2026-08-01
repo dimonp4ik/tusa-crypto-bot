@@ -366,6 +366,18 @@ CLAUDE_CACHE_TTL          = os.getenv("CLAUDE_CACHE_TTL", "1h")              # p
 CLAUDE_DAILY_BUDGET_USD   = float(os.getenv("CLAUDE_DAILY_BUDGET_USD", "1.00"))  # hard daily cap (real Sonnet usage ~$0.3-0.5/day)
 CLAUDE_BUDGET_RESERVE_USD = float(os.getenv("CLAUDE_BUDGET_RESERVE_USD", "0.05")) # stop when remaining < reserve
 
+# Epoch for the LIVE tier of Claude's self-feedback history (unix ts, 0 = off).
+# The live tier looks back 30 days, which on 2026-08-01 still reached into the
+# pre-parity-fix bot: those trades were entered by a filter with a 50-candle 1h
+# lookback (Strong1h could never fire), a 3% entry-drift allowance and a stop
+# that fired on wicks. Their record — 17 sent, 3W/14SL — describes software
+# that no longer exists, yet it dominated every prompt: Claude quoted it in 6
+# of 6 rejections on 31.07, and all 6 of those rejected setups went on to hit
+# TP1 or TP2. Rows before this timestamp are excluded from the live tier only;
+# admin stats and the global over-strictness corrector still see everything.
+# 1785456000 = 2026-07-31 00:00 UTC, the day the parity fixes shipped.
+LIVE_HIST_EPOCH_TS = float(os.getenv("LIVE_HIST_EPOCH_TS", "1785456000"))
+
 # --- Structure-based stops/takes (swing mode, 15m, ~20x leverage) ---
 # SL sits at swing invalidation (recent swing low/high) + ATR buffer, then
 # clamped to safe leverage bounds. TPs are R-multiples for swing-sized moves.
@@ -467,6 +479,16 @@ STALE_ENTRY_ZONE_TOLERANCE = float(os.getenv("STALE_ENTRY_ZONE_TOLERANCE", "0.25
 # expressed as a fraction of the trade's own risk distance — a principled cap
 # on "how much of the stop may be burned on entry" rather than a flat percent.
 STALE_ENTRY_MAX_RISK_FRAC = float(os.getenv("STALE_ENTRY_MAX_RISK_FRAC", "0.25"))
+
+# Absolute floor on that tolerance, as a fraction of price. The table above is
+# measured in PERCENT OF PRICE; the zone-width rule is not, and on a narrow 15m
+# FVG (~0.2-0.4% wide) 0.25 * width lands near 0.05-0.10% — an order of
+# magnitude tighter than anything measured. Observed 2026-08-01: the guard
+# blocked 12 of 12 Claude-approved setups in 32h, i.e. zero signals published.
+# Skipping is not free — at 0.25% adverse the same trades still return +590R at
+# WR 76.0%, versus 0R for a signal never sent — so the guard must only stop the
+# chases the table shows as ruinous (0.85%+), not every tick outside the zone.
+STALE_ENTRY_MAX_ADVERSE_PCT = float(os.getenv("STALE_ENTRY_MAX_ADVERSE_PCT", "0.0025"))
 
 # --- BTC correlation filter ---
 BTC_BLOCK_THRESHOLD_PCT = 1.0

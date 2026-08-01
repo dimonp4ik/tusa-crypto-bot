@@ -21,7 +21,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from config import (
     DB_PATH, AUTO_BLOCK_ENABLED, AUTO_BLOCK_LOOKBACK_TRADES, AUTO_BLOCK_MIN_TRADES,
     AUTO_BLOCK_MAX_PROFIT_FACTOR, AUTO_BLOCK_MAX_WIN_RATE, AUTO_BLOCK_DAYS,
-    TP1_R_MULT,
+    TP1_R_MULT, LIVE_HIST_EPOCH_TS,
 )
 
 ACTIVE_STATUSES = ("OPEN", "TP1_PARTIAL")
@@ -1365,8 +1365,13 @@ def get_similar_resolved_setups(symbol: str, direction: str, mtf_score,
     distorted record of his own judgement. Same filter get_setup_accuracy got
     earlier the same day; this call site was missed, and it is the one that
     actually feeds the prompt.
+
+    The live tier is additionally floored at LIVE_HIST_EPOCH_TS (2026-07-31):
+    rows older than that were produced by a materially different bot and their
+    outcomes are not evidence about the current one. See config.py for the
+    measurement that forced this.
     """
-    since = time_mod.time() - lookback_days * 86400
+    since = max(time_mod.time() - lookback_days * 86400, LIVE_HIST_EPOCH_TS or 0.0)
     try:
         score = int(mtf_score or 0)
     except (TypeError, ValueError):

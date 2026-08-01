@@ -30,6 +30,7 @@ from config import (
     STOP_CLOSE_CONFIRM, MAX_SAME_DIRECTION_POSITIONS, STOP_EXCHANGE_BACKSTOP_R,
     MTF_MIN_SCORE, SHADOW_MIN_SCORE, TP1_R_MULT,
     STALE_ENTRY_GUARD, STALE_ENTRY_ZONE_TOLERANCE, STALE_ENTRY_MAX_RISK_FRAC,
+    STALE_ENTRY_MAX_ADVERSE_PCT,
     RISK_MIN_PCT, RISK_MAX_PCT, SL_ATR_BUFFER, TOP_COINS_COUNT,
     TP1_CLOSE_FRAC, EXIT_PROFILE,
     POST_TP1_STRONG_TRAIL_ATR_MULT, POST_TP1_WEAK_TRAIL_ATR_MULT,
@@ -2890,7 +2891,14 @@ def _entry_is_stale(analysis: dict, live_px: float, direction: str) -> tuple:
 
     if src in ("FVG", "OB") and lo and hi and hi > lo:
         width = hi - lo
-        tol = width * max(0.0, STALE_ENTRY_ZONE_TOLERANCE)
+        # Tolerance is the LOOSER of "a fraction of the zone" and "a fraction of
+        # price". The zone rule alone is measured in the wrong unit: a narrow 15m
+        # FVG makes 0.25*width ≈ 0.05-0.10% of price, far tighter than anything
+        # in the table above, and on 2026-08-01 it blocked 12 of 12 approved
+        # setups in 32h. A skip returns 0R; the same entries at 0.25% adverse
+        # still return +590R at WR 76%, so only the ruinous chases may be cut.
+        tol = max(width * max(0.0, STALE_ENTRY_ZONE_TOLERANCE),
+                  live_px * max(0.0, STALE_ENTRY_MAX_ADVERSE_PCT))
         if direction == "LONG" and live_px > hi + tol:
             return True, f"price {live_px} above zone high {hi} (+tol {tol:.8g})"
         if direction == "SHORT" and live_px < lo - tol:
