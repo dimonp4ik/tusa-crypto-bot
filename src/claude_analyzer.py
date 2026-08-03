@@ -27,6 +27,13 @@ _BUCKET_MIN = int(os.getenv("SELF_FEEDBACK_BUCKET_MIN", "8"))
 # injected, and the min TP1% gap (rejected − sent) that counts as "too strict".
 _GLOBAL_FEEDBACK_MIN_REJ = 15
 _GLOBAL_FEEDBACK_MIN_GAP  = 8.0
+# Min APPROVED samples before the rejected-vs-approved gap is trusted; below
+# this the corrector falls back to the absolute rate of the rejected pool.
+_GLOBAL_FEEDBACK_MIN_SENT = 8
+# Absolute TP1% of the rejected pool that counts as over-rejection on its own.
+# The bracket breaks even near 59% (TP1 pays 0.7R, SL costs 1R), so this is a
+# modest margin above break-even, not a fitted number.
+_GLOBAL_FEEDBACK_MIN_REJ_TP1 = 65.0
 
 _log = logging.getLogger(__name__)
 
@@ -305,17 +312,42 @@ def _global_feedback() -> str:
     snt, rej = acc.get("sent", {}), acc.get("rejected", {})
     if rej.get("n", 0) < _GLOBAL_FEEDBACK_MIN_REJ:
         return ""
-    gap = rej.get("tp1_pct", 0.0) - snt.get("tp1_pct", 0.0)  # >0 = rejected won more
-    if gap < _GLOBAL_FEEDBACK_MIN_GAP:
+
+    # The gap only means something when BOTH sides have samples. There was a
+    # minimum on the rejected side and none on the sent side, so the whole
+    # comparison could rest on 2-3 approved trades — and with the stale-entry
+    # guard withholding most approvals, that is exactly the state it is in.
+    # Two lucky sends read as 100% and silently switch the corrector off at the
+    # moment it is most needed; two unlucky ones fire it on nothing.
+    if snt.get("n", 0) >= _GLOBAL_FEEDBACK_MIN_SENT:
+        gap = rej.get("tp1_pct", 0.0) - snt.get("tp1_pct", 0.0)  # >0 = rejected won more
+        if gap < _GLOBAL_FEEDBACK_MIN_GAP:
+            return ""
+        return (
+            f"\nCALIBRATION — last 30d shadow outcomes of your own verdicts: you REJECTED "
+            f"{rej['n']} setups and {rej['tp1_pct']:.0f}% of them still reached TP1; you "
+            f"APPROVED {snt.get('n', 0)} and only {snt.get('tp1_pct', 0.0):.0f}% reached TP1. "
+            f"The setups you rejected are hitting TP1 ~{gap:.0f}pp MORE often than the ones "
+            f"you approved — you have been TOO STRICT. Every candidate below already passed "
+            f"a strict rule-filter with proven edge. Bias toward CONFIRMING the suggested "
+            f"side; return NO TRADE only on a clear, specific red flag (not vague caution).\n"
+        )
+
+    # Too few approvals to compare against. Fall back to the absolute rate of
+    # the rejected bucket, which needs no second sample: the bracket breaks
+    # even near 59% TP1 (TP1 pays 0.7R, SL costs 1R), so a rejected pool
+    # clearing _GLOBAL_FEEDBACK_MIN_REJ_TP1 is money left on the table
+    # regardless of how the handful of approvals happened to land.
+    if rej.get("tp1_pct", 0.0) < _GLOBAL_FEEDBACK_MIN_REJ_TP1:
         return ""
     return (
         f"\nCALIBRATION — last 30d shadow outcomes of your own verdicts: you REJECTED "
-        f"{rej['n']} setups and {rej['tp1_pct']:.0f}% of them still reached TP1; you "
-        f"APPROVED {snt.get('n', 0)} and only {snt.get('tp1_pct', 0.0):.0f}% reached TP1. "
-        f"The setups you rejected are hitting TP1 ~{gap:.0f}pp MORE often than the ones "
-        f"you approved — you have been TOO STRICT. Every candidate below already passed "
-        f"a strict rule-filter with proven edge. Bias toward CONFIRMING the suggested "
-        f"side; return NO TRADE only on a clear, specific red flag (not vague caution).\n"
+        f"{rej['n']} setups and {rej['tp1_pct']:.0f}% of them still reached TP1. "
+        f"(Too few approvals to compare against, so this is the absolute rate: this "
+        f"bracket breaks even near 59%.) You are rejecting a clearly profitable pool "
+        f"— you have been TOO STRICT. Every candidate below already passed a strict "
+        f"rule-filter with proven edge. Bias toward CONFIRMING the suggested side; "
+        f"return NO TRADE only on a clear, specific red flag (not vague caution).\n"
     )
 
 
@@ -358,16 +390,32 @@ def _scorecard_feedback() -> str:
             except (TypeError, ValueError):
                 continue
         return out
-    rbands = [("risk0-3", _rband(0, 3)), ("risk4-6", _rband(4, 6)), ("risk7-10", _rband(7, 10))]
+    # Four bands, not three. The old 0-3 / 4-6 / 7-10 split straddled the point
+    # where the data actually breaks: measured 2026-08-03 over a week of live
+    # verdicts, risk 4-5 hit TP1 77%, risk 6-7 only 54%, risk 8+ 87% — a U, with
+    # his MIDDLE band the miscalibrated one. Under the old bands the 6 fell into
+    # the low bucket and the 7 into the high one, smearing that U into a smooth
+    # "risk4-6 70% → risk7-10 84%", i.e. "the riskier you call it the better it
+    # does" — the opposite of the actual lesson. Bands stay evenly spaced (not
+    # fitted to the data), just finer.
+    rbands = [("risk0-3", _rband(0, 3)), ("risk4-5", _rband(4, 5)),
+              ("risk6-7", _rband(6, 7)), ("risk8-10", _rband(8, 10))]
     rparts = [f"{name} → {_agg(sub)}" for name, sub in rbands if len(sub) >= _SCORECARD_MIN_BUCKET]
     if len(rparts) >= 2:
         parts.append("; ".join(rparts))
-    # Confidence buckets — only directional verdicts (confidence on a NO TRADE
-    # measures a different thing).
-    conf_rows = [r for r in rows if (r.get("decision") or "") in ("LONG", "SHORT")]
+    # Confidence buckets over ALL evaluated setups, not just directional ones.
+    # Restricting to LONG/SHORT was defensible (confidence on a NO TRADE means
+    # something different) but made the block structurally unable to ever fire:
+    # Claude uses MEDIUM for essentially every directional verdict and LOW for
+    # essentially every rejection, so the directional-only view has ONE bucket
+    # — 35 MEDIUM vs 1 HIGH over the week measured — and the ">= 2 buckets"
+    # guard silently dropped the whole confidence half. It cannot tell him his
+    # confidence scale is noise while requiring him to already use the scale.
+    # Across all verdicts the buckets are populated (LOW 54, MEDIUM 65) and say
+    # exactly that: 70% vs 71% TP1, no discrimination at all.
     cparts = []
-    for cname in ("HIGH", "MEDIUM"):
-        sub = [r for r in conf_rows if (r.get("confidence") or "").upper() == cname]
+    for cname in ("HIGH", "MEDIUM", "LOW"):
+        sub = [r for r in rows if (r.get("confidence") or "").upper() == cname]
         if len(sub) >= _SCORECARD_MIN_BUCKET:
             cparts.append(f"conf{cname} → {_agg(sub)}")
     if len(cparts) >= 2:
@@ -375,7 +423,8 @@ def _scorecard_feedback() -> str:
     if not parts:
         return ""
     return (
-        "\nSCORECARD — how your own scores mapped to reality (last 60d, shadow-resolved): "
+        "\nSCORECARD — how your own scores mapped to reality (last 60d, shadow-resolved, "
+        "across ALL your verdicts including the ones you rejected): "
         + " | ".join(parts)
         + ". Read: if neighboring buckets show the same TP1%/avg R, that scale of yours "
         "is not discriminating — spread your scores more decisively. If low-risk buckets "
