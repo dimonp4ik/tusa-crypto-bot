@@ -150,6 +150,17 @@ _pending_report_date: dict = {}
 # mistake this preset exists to prevent.
 _CONFIG_CHANGE_LABEL = "26.07 13:38"
 _CONFIG_CHANGE_TS = 1785062315.0
+
+# Same idea for the filter-variant experiment, which has its OWN clock: the arm
+# map changed 2026-08-03 (E retired for volume>=2.5x, I re-pointed to
+# vol-regime>=1.3x, C removed). Rows tagged before that carry the same letters
+# for completely different rules, so pooling across this moment does not just
+# dilute the numbers — it silently attributes one hypothesis's outcomes to
+# another. Always the default window for "🧪 Тест фильтров".
+_ARMS_CHANGE_LABEL = "03.08"
+_ARMS_CHANGE_TS = 1785715200.0   # 2026-08-03 00:00 UTC
+# State: admin pressed "Своя дата" on the variant report; value = message_id.
+_pending_variant_date: dict = {}
 # State: admin is typing a user ID to allow autotrading.
 _pending_add_autotrade: dict = {}
 # State: user is inside the autotrade onboarding dialog.
@@ -181,6 +192,98 @@ def _parse_date_to_ts(date_str: str):
         except ValueError:
             continue
     return None
+
+
+def _build_and_send_variant_report(chat_id: int, message_id, since_ts: float,
+                                   window_label: str) -> None:
+    """Filter-variant A/B read-out over an explicit window, + raw CSV.
+
+    Window is caller-chosen for the same reason the full report's is: the arm
+    map itself changes (see _ARMS_CHANGE_TS), and a fixed 30-day look-back would
+    pool rows tagged "E" under two different rules into one number.
+    """
+    try:
+        rows = get_variant_rows(since_ts)
+        if not rows:
+            _edit_message(chat_id, message_id,
+                          f"🧪 *Тест фильтров* ({window_label})\n\nДанных за этот "
+                          "период нет. Теги пишутся только на новых сетапах — "
+                          "дай накопиться.")
+            return
+
+        def _arm_stats(code):
+            sub = [r for r in rows if code in (r.get("variants") or "").split(",")]
+            n = len(sub)
+            if not n:
+                return None
+            # Split by Claude's VERDICT, not the sent flag. Shadow setups (the
+            # looser arms D/F) are never sent by construction, so a sent-based
+            # split would file every Claude-APPROVED shadow setup into the
+            # rejected bucket and make those arms look bad for a purely
+            # mechanical reason.
+            def _ok(r):
+                return str(r.get("decision") or "").upper() in ("LONG", "SHORT")
+            sent = [r for r in sub if _ok(r)]
+            rej  = [r for r in sub if not _ok(r)]
+            def _tp1(x): return sum(1 for r in x if r.get("reached_tp1"))
+            s_tp1 = (_tp1(sent) / len(sent) * 100) if sent else 0.0
+            r_tp1 = (_tp1(rej) / len(rej) * 100) if rej else 0.0
+            gap = s_tp1 - r_tp1 if (sent and rej) else None
+            return {"n": n, "n_sent": len(sent), "n_rej": len(rej),
+                    "n_shadow": sum(1 for r in sub if r.get("source") == "shadow"),
+                    "sent_tp1": s_tp1, "rej_tp1": r_tp1, "gap": gap}
+
+        lines = [f"🧪 *ТЕСТ ФИЛЬТРОВ* ({window_label})",
+                 "_Один вердикт Клода переигрывается на каждом варианте фильтра — "
+                 "сравнение честное, без лишних вызовов._\n"]
+        scored = []
+        for code, (label, _pred, measurable) in VARIANTS.items():
+            st = _arm_stats(code)
+            if not st:
+                continue
+            tag = "" if measurable else " ⚠️"
+            gap_s = f"{st['gap']:+.0f}пп" if st["gap"] is not None else "—"
+            sh_s = f" +{st['n_shadow']}👻" if st["n_shadow"] else ""
+            lines.append(
+                f"*{code}. {label}*{tag}\n"
+                f"  n={st['n']}{sh_s} (✅{st['n_sent']}/🚫{st['n_rej']}) · "
+                f"одобр TP1 {st['sent_tp1']:.0f}% · откл TP1 {st['rej_tp1']:.0f}% · "
+                f"разрыв {gap_s}"
+            )
+            if st["gap"] is not None and st["n_sent"] >= 5:
+                scored.append((st["gap"], code, label))
+        if scored:
+            scored.sort(reverse=True)
+            g, c, l = scored[0]
+            lines.append(f"\n🥇 Лучшее разделение: *{c}* ({l}) — {g:+.0f}пп")
+        if since_ts < _ARMS_CHANGE_TS:
+            lines.append(f"\n⚠️ _Окно захватывает время до {_ARMS_CHANGE_LABEL}, "
+                         "когда у E и I были другие правила. Их цифры здесь "
+                         "смешаны и читать их нельзя._")
+        lines.append("\n_👻 = сетапы, которые живой фильтр отбросил, а этот "
+                     "вариант бы взял. В реальную торговлю не шли._")
+        lines.append("_Разрыв = TP1% одобренных минус TP1% отклонённых Клодом. "
+                     "Больше = Клод лучше отделяет на этом наборе фильтров._")
+        _edit_message(chat_id, message_id, "\n".join(lines))
+
+        try:
+            import csv as _csv, io as _io
+            buf = _io.StringIO()
+            w = _csv.DictWriter(buf, fieldnames=list(rows[0].keys()))
+            w.writeheader()
+            w.writerows(rows)
+            _requests.post(
+                f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendDocument",
+                data={"chat_id": chat_id,
+                      "caption": f"🧪 Сырые данные теста фильтров "
+                                 f"({len(rows)} сетапов, {window_label})"},
+                files={"document": ("filter_variants.csv", buf.getvalue().encode("utf-8"))},
+                timeout=30,
+            )
+        except Exception as _fe:
+            log.warning(f"variant CSV export failed: {_fe}")
+    except Exception as e:
+        _edit_message(chat_id, message_id, f"Ошибка: {e}")
 
 
 def _build_and_send_report(chat_id: int, message_id: int,
@@ -1114,87 +1217,46 @@ def _handle_admin_callback(callback_id: str, chat_id: int,
             _edit_admin_text(chat_id, message_id, f"❌ Ошибка: {e}", _KB_ANALYTICS)
 
     elif data == "adm_variants":
+        _edit_admin_text(
+            chat_id, message_id,
+            "🧪 *Тест фильтров*\n\nС какой даты считать?\n"
+            f"_Состав вариантов менялся {_ARMS_CHANGE_LABEL} — до этой даты буквы "
+            "E и I означали другие правила, смешивать нельзя._",
+            {"inline_keyboard": [
+                [{"text": f"⚙️ С {_ARMS_CHANGE_LABEL} (текущие варианты)",
+                  "callback_data": "adm_var_arms"}],
+                [{"text": "7 дней",  "callback_data": "adm_var_7"},
+                 {"text": "30 дней", "callback_data": "adm_var_30"}],
+                [{"text": "📅 Своя дата", "callback_data": "adm_var_date"},
+                 {"text": "🗄 Всё время",  "callback_data": "adm_var_all"}],
+                [{"text": "« Назад", "callback_data": "adm_sec_analytics"}],
+            ]},
+        )
+
+    elif data == "adm_var_date":
+        _pending_variant_date[chat_id] = message_id
         try:
-            since30 = time.time() - 30 * 86400
-            rows = get_variant_rows(since30)
-            if not rows:
-                _edit_message(chat_id, message_id,
-                              "🧪 *Тест фильтров*\n\nДанных пока нет — теги вариантов "
-                              "пишутся только на новых сетапах с момента деплоя. "
-                              "Дай пару дней накопиться.")
-                return
-
-            def _arm_stats(code):
-                sub = [r for r in rows if code in (r.get("variants") or "").split(",")]
-                n = len(sub)
-                if not n:
-                    return None
-                # Split by Claude's VERDICT, not the sent flag. Shadow setups
-                # (the looser arms D/F/I) are never sent by construction, so a
-                # sent-based split would file every Claude-APPROVED shadow setup
-                # into the rejected bucket and make those arms look bad for a
-                # purely mechanical reason.
-                def _ok(r):
-                    return str(r.get("decision") or "").upper() in ("LONG", "SHORT")
-                sent = [r for r in sub if _ok(r)]
-                rej  = [r for r in sub if not _ok(r)]
-                def _tp1(x): return sum(1 for r in x if r.get("reached_tp1"))
-                s_tp1 = (_tp1(sent) / len(sent) * 100) if sent else 0.0
-                r_tp1 = (_tp1(rej) / len(rej) * 100) if rej else 0.0
-                # separation = does Claude sort better inside this arm
-                gap = s_tp1 - r_tp1 if (sent and rej) else None
-                return {"n": n, "n_sent": len(sent), "n_rej": len(rej),
-                        "n_shadow": sum(1 for r in sub if r.get("source") == "shadow"),
-                        "sent_tp1": s_tp1, "rej_tp1": r_tp1, "gap": gap}
-
-            lines = ["🧪 *ТЕСТ ФИЛЬТРОВ* (30 дней)",
-                     "_Один вердикт Клода переигрывается на каждом варианте фильтра — "
-                     "сравнение честное, без лишних вызовов._\n"]
-            scored = []
-            for code, (label, _pred, measurable) in VARIANTS.items():
-                st = _arm_stats(code)
-                if not st:
-                    continue
-                tag = "" if measurable else " ⚠️"
-                gap_s = f"{st['gap']:+.0f}пп" if st["gap"] is not None else "—"
-                # Shadow count = setups this arm has that live trading never took.
-                sh_s = f" +{st['n_shadow']}👻" if st["n_shadow"] else ""
-                lines.append(
-                    f"*{code}. {label}*{tag}\n"
-                    f"  n={st['n']}{sh_s} (✅{st['n_sent']}/🚫{st['n_rej']}) · "
-                    f"одобр TP1 {st['sent_tp1']:.0f}% · откл TP1 {st['rej_tp1']:.0f}% · "
-                    f"разрыв {gap_s}"
-                )
-                if st["gap"] is not None and st["n_sent"] >= 5:
-                    scored.append((st["gap"], code, label))
-            if scored:
-                scored.sort(reverse=True)
-                g, c, l = scored[0]
-                lines.append(f"\n🥇 Лучшее разделение: *{c}* ({l}) — {g:+.0f}пп")
-            lines.append("\n_👻 = сетапы, которые живой фильтр отбросил, а этот "
-                         "вариант бы взял. В реальную торговлю не шли._")
-            lines.append("_Разрыв = TP1% одобренных минус TP1% отклонённых Клодом. "
-                         "Больше = Клод лучше отделяет на этом наборе фильтров._")
-            _edit_message(chat_id, message_id, "\n".join(lines))
-
-            # Full CSV dump for offline analysis
-            try:
-                import csv as _csv, io as _io
-                buf = _io.StringIO()
-                w = _csv.DictWriter(buf, fieldnames=list(rows[0].keys()))
-                w.writeheader()
-                w.writerows(rows)
-                _requests.post(
-                    f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendDocument",
-                    data={"chat_id": chat_id,
-                          "caption": f"🧪 Сырые данные теста фильтров ({len(rows)} сетапов, 30д)"},
-                    files={"document": ("filter_variants.csv", buf.getvalue().encode("utf-8"))},
-                    timeout=30,
-                )
-            except Exception as _fe:
-                log.warning(f"variant CSV export failed: {_fe}")
+            _requests.post(
+                f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage",
+                json={"chat_id": chat_id,
+                      "text": "📅 С какой даты считать тест фильтров?\n"
+                              "Формат: `03.08` или `03.08.2026`\n"
+                              "Возьму всё, что есть с этой даты по сейчас.",
+                      "parse_mode": "Markdown"},
+                timeout=10,
+            )
         except Exception as e:
-            _edit_message(chat_id, message_id, f"Ошибка: {e}")
+            log.warning(f"variant date prompt failed: {e}")
+
+    elif data in ("adm_var_arms", "adm_var_7", "adm_var_30", "adm_var_all"):
+        _answer_callback(callback_id, "Собираю отчёт…")
+        _since, _label = {
+            "adm_var_arms": (_ARMS_CHANGE_TS, f"с {_ARMS_CHANGE_LABEL} (текущие варианты)"),
+            "adm_var_7":    (time.time() - 7 * 86400,  "последние 7 дней"),
+            "adm_var_30":   (time.time() - 30 * 86400, "последние 30 дней"),
+            "adm_var_all":  (0.0, "всё время"),
+        }[data]
+        _build_and_send_variant_report(chat_id, message_id, _since, _label)
 
     elif data == "adm_open":
         try:
@@ -2483,6 +2545,21 @@ def webhook():
             )
         else:
             _build_and_send_report(chat_id, None, _ts, f"с {_raw}")
+        return "ok", 200
+
+    # ── Variant-report start date — armed by "Своя дата" in 🧪 Тест фильтров ──
+    if _is_admin(user_id) and chat_id in _pending_variant_date:
+        _pending_variant_date.pop(chat_id, None)
+        _raw = text_raw.strip()
+        _ts = _parse_date_to_ts(_raw)
+        if _ts is None:
+            _send_admin_text(
+                chat_id,
+                f"❌ Не понял дату *{_raw}*.\nФормат: `03.08` или `03.08.2026`",
+                _KB_ANALYTICS,
+            )
+        else:
+            _build_and_send_variant_report(chat_id, None, _ts, f"с {_raw}")
         return "ok", 200
 
     # ── Pending "manual block" state — admin typed a symbol to block ──────────
