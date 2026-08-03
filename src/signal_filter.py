@@ -936,23 +936,15 @@ def analyze_coin_smc(candles_15m: dict, candles_1h: dict, symbol: str,
         if not allowed:
             return None
     quality = _quality_breakdown(ind, bos, entry_zone, adaptive_pack)
+    # NOTE: this also blocks 11:00-12:59 UTC outright (STABILITY_SKIP_SESSIONS
+    # = OVERLAP), on the strength of 19 trades measured 2026-06-11 — before the
+    # TP_WINDOW fix, the OKX migration, the Strong1h window fix and the real-BTC
+    # fix, i.e. on a base now known to be wrong. Not one of the 10,300 seed rows
+    # carries session=OVERLAP, so those two hours are a complete blind spot.
+    # Variant C briefly measured them (2026-08-03) and was removed the same day
+    # at the user's request; re-add a soft_fail here if that changes.
     if not _stability_overlay_pass(ind, adaptive_pack, quality["quality_score"]):
-        # The OVERLAP-session cut is soft-failable (variant C, from 2026-08-03):
-        # STABILITY_SKIP_SESSIONS blocks 11:00-12:59 UTC outright on the strength
-        # of 19 trades measured 2026-06-11, before the TP_WINDOW fix, the OKX
-        # migration, the Strong1h window fix and the real-BTC fix — i.e. on a
-        # base now known to be wrong. Verified in the 10,300-trade seed: not one
-        # row carries session=OVERLAP, so we have NO data on those two hours at
-        # all. Everything else the overlay cuts still drops outright.
-        _sess = str(ind.get("session", "") or "").upper()
-        _only_overlap = (
-            STABILITY_FILTERS_ENABLED
-            and _sess in STABILITY_SKIP_SESSIONS
-            and _stability_overlay_pass(
-                {**ind, "session": "OFF_HOURS"}, adaptive_pack, quality["quality_score"])
-        )
-        if not _only_overlap or _soft_fail("overlap"):
-            return None
+        return None
 
     # Risk multiplier overlays — boost size on statistically stronger setups (no filtering).
     risk_mult, quality_risk_tag = _apply_quality_risk_overlay(

@@ -22,7 +22,7 @@ between them is the filter rule itself.
 STRICTER arms (B/E/G/H/I) are a plain subset of what live already admits, so
 they replay directly against real-signal outcomes.
 
-LOOSER arms (C/D/F) need setups the live filter REJECTED — which Claude
+LOOSER arms (D/F) need setups the live filter REJECTED — which Claude
 would never see and nothing would ever log. The shadow mechanism (2026-07-25)
 closes that gap: signal_filter.analyze_coin_smc() takes include_shadow=True
 (live only; the backtests never pass it) and routes selected gates through
@@ -35,9 +35,14 @@ pre-existing analytic keeps filtering source='live' so the numbers the admin
 panel reports are unchanged.
 
 Current soft-failable gates and the arm each one feeds:
-    "overlap"        -> C  (STABILITY_SKIP_SESSIONS: the 11-13 UTC OVERLAP block)
     "score"          -> D  (mtf_score in [SHADOW_MIN_SCORE, MTF_MIN_SCORE))
     "ctxmom"         -> F  (the five narrow "context momentum pack" gates)
+
+Slot C is FREE (2026-08-03). It last held the OVERLAP-session unblock, removed
+the same day at the user's request. Note what that leaves standing: the
+11:00-12:59 UTC block stays in place, justified by 19 trades measured against
+a base later found broken, and no data will ever accumulate to confirm or
+refute it. Re-add a _soft_fail("overlap") in signal_filter.py to revive it.
 
 **Retired 2026-08-03 after the first read-out (54 setups, 27.07-02.08).** The
 arms were judged by the SYMMETRIC DIFFERENCE against control A, not by their
@@ -104,16 +109,6 @@ def _v_b(s):   # HTF_ALIGNED_LONG_GUARD=1 — cut LONGs where 1h AND 4h already 
     return not (s.get("trend_1h") == "bullish" and s.get("trend_4h") == "bullish")
 
 
-def _v_c(s):   # OVERLAP session UNBLOCKED (re-pointed 2026-08-03; was
-               # DOUBLE_NEUTRAL_LONG_FILTER OFF, which bound on 1 setup a week).
-               # STABILITY_SKIP_SESSIONS drops 11:00-12:59 UTC entirely, on 19
-               # trades measured 2026-06-11 against a base later found broken.
-               # Zero of the 10,300 seed rows carry session=OVERLAP, so those
-               # two hours are a total blind spot — this arm is the only way to
-               # learn anything about them.
-    return _relaxes(s, "overlap")
-
-
 def _v_d(s):   # looser score gate — fed by the score-shadow batch (see module docstring)
     return _relaxes(s, "score") and _f(s, "mtf_score") >= 12
 
@@ -166,7 +161,6 @@ def _v_i(s):   # vol_ratio_regime >= 1.3 (re-pointed 2026-08-03; was RSI-midline
 VARIANTS = {
     "A": ("Текущий (контроль)",              _v_a, True),
     "B": ("HTF-гейт LONG вкл",               _v_b, True),
-    "C": ("Сессия OVERLAP разблок. (shadow)", _v_c, True),
     "D": ("Мягкий score ≥12 (shadow)",       _v_d, True),
     "E": ("Объём ≥2.5x",                     _v_e, True),
     "F": ("Контекст-моментум ВЫКЛ",          _v_f, True),
