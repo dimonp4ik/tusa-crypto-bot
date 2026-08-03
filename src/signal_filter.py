@@ -561,11 +561,12 @@ def analyze_coin_smc(candles_15m: dict, candles_1h: dict, symbol: str,
     if DAILY_TREND_FILTER and bos == "bullish" and trend_1d == "bearish":
         return None
 
-    # 1c. Double-neutral LONG block. Soft-failable: variant C measures it OFF.
-    #     4h neutral + 1D neutral = full macro chop; longs get range-swept.
+    # 1c. Double-neutral LONG block. 4h neutral + 1D neutral = full macro chop;
+    #     longs get range-swept. Was soft-failable for variant C until
+    #     2026-08-03: over a week it bound on exactly ONE setup, so the arm was
+    #     measuring nothing and the slot was re-pointed (see filter_variants.py).
     if DOUBLE_NEUTRAL_LONG_FILTER and bos == "bullish" and trend_4h == "neutral" and trend_1d == "neutral":
-        if _soft_fail("double_neutral"):
-            return None
+        return None
 
     # 1d. Daily SHORT guard — don't short into a bullish daily trend.
     if DAILY_TREND_SHORT_FILTER and bos == "bearish" and trend_1d == "bullish":
@@ -713,14 +714,14 @@ def analyze_coin_smc(candles_15m: dict, candles_1h: dict, symbol: str,
 
     # 5b. Directional RSI midline — BOS without momentum = higher false-break rate.
     #     LONG needs RSI ≥ 50 (midline reclaimed), SHORT needs RSI < 40.
-    #     Soft-failable: variant I measures this gate switched OFF.
+    #     Was soft-failable for variant I until 2026-08-03: it bound on only 4
+    #     setups in a week (net -0.6R), too little to ever conclude, so the slot
+    #     was re-pointed (see filter_variants.py).
     if DIRECTIONAL_RSI_MIDLINE_FILTER:
         if bos == "bullish" and rsi < RSI_LONG_MIN_MIDLINE:
-            if _soft_fail("rsi_mid"):
-                return None
+            return None
         if bos == "bearish" and rsi >= RSI_SHORT_MAX_MIDLINE:
-            if _soft_fail("rsi_mid"):
-                return None
+            return None
 
     # 6. Build confirmations
     wicks  = ind.get("wicks", {})
@@ -936,7 +937,22 @@ def analyze_coin_smc(candles_15m: dict, candles_1h: dict, symbol: str,
             return None
     quality = _quality_breakdown(ind, bos, entry_zone, adaptive_pack)
     if not _stability_overlay_pass(ind, adaptive_pack, quality["quality_score"]):
-        return None
+        # The OVERLAP-session cut is soft-failable (variant C, from 2026-08-03):
+        # STABILITY_SKIP_SESSIONS blocks 11:00-12:59 UTC outright on the strength
+        # of 19 trades measured 2026-06-11, before the TP_WINDOW fix, the OKX
+        # migration, the Strong1h window fix and the real-BTC fix — i.e. on a
+        # base now known to be wrong. Verified in the 10,300-trade seed: not one
+        # row carries session=OVERLAP, so we have NO data on those two hours at
+        # all. Everything else the overlay cuts still drops outright.
+        _sess = str(ind.get("session", "") or "").upper()
+        _only_overlap = (
+            STABILITY_FILTERS_ENABLED
+            and _sess in STABILITY_SKIP_SESSIONS
+            and _stability_overlay_pass(
+                {**ind, "session": "OFF_HOURS"}, adaptive_pack, quality["quality_score"])
+        )
+        if not _only_overlap or _soft_fail("overlap"):
+            return None
 
     # Risk multiplier overlays — boost size on statistically stronger setups (no filtering).
     risk_mult, quality_risk_tag = _apply_quality_risk_overlay(

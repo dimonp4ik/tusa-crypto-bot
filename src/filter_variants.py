@@ -19,10 +19,10 @@ Why not run 5-9 separate Claude calls per scan:
 Single-verdict replay keeps arms on identical verdicts, so the only difference
 between them is the filter rule itself.
 
-STRICTER arms (B/E/G/H) are a plain subset of what live already admits, so
+STRICTER arms (B/E/G/H/I) are a plain subset of what live already admits, so
 they replay directly against real-signal outcomes.
 
-LOOSER arms (C/D/F/I) need setups the live filter REJECTED — which Claude
+LOOSER arms (C/D/F) need setups the live filter REJECTED — which Claude
 would never see and nothing would ever log. The shadow mechanism (2026-07-25)
 closes that gap: signal_filter.analyze_coin_smc() takes include_shadow=True
 (live only; the backtests never pass it) and routes selected gates through
@@ -35,10 +35,23 @@ pre-existing analytic keeps filtering source='live' so the numbers the admin
 panel reports are unchanged.
 
 Current soft-failable gates and the arm each one feeds:
-    "double_neutral" -> C  (DOUBLE_NEUTRAL_LONG_FILTER: 4h+1D both neutral)
+    "overlap"        -> C  (STABILITY_SKIP_SESSIONS: the 11-13 UTC OVERLAP block)
     "score"          -> D  (mtf_score in [SHADOW_MIN_SCORE, MTF_MIN_SCORE))
     "ctxmom"         -> F  (the five narrow "context momentum pack" gates)
-    "rsi_mid"        -> I  (DIRECTIONAL_RSI_MIDLINE_FILTER)
+
+**Retired 2026-08-03 after the first read-out (54 setups, 27.07-02.08).** The
+arms were judged by the SYMMETRIC DIFFERENCE against control A, not by their
+own totals — the arms overlap almost entirely, so raw totals (and bootstrap
+percentages built on them) are dominated by shared setups and look far more
+decisive than they are:
+  - E (eff_ratio>=0.25) removed 22 setups averaging +0.93R while A itself
+    averaged +0.85R — it cut BETTER-than-average trades. Retired. Replaced by
+    volume>=2.5x, the best-supported strict rule in the seed.
+  - C (double-neutral OFF) differed from A by exactly ONE setup all week, and
+    I (RSI-midline OFF) by four. Both were measuring nothing; their gates now
+    fail hard again and the slots were re-pointed.
+Read a STRICT arm by the avg R of what it REMOVES: if that exceeds the control's
+own average, the arm destroys value however good its own ratio looks.
 
 A setup that soft-fails TWO different gates is dropped outright: no single
 variant would have admitted it, so it belongs to no arm. And every arm that
@@ -91,18 +104,31 @@ def _v_b(s):   # HTF_ALIGNED_LONG_GUARD=1 — cut LONGs where 1h AND 4h already 
     return not (s.get("trend_1h") == "bullish" and s.get("trend_4h") == "bullish")
 
 
-def _v_c(s):   # DOUBLE_NEUTRAL_LONG_FILTER OFF — allow LONG when 4h AND 1D are
-               # both neutral (full macro chop, currently blocked outright).
-    return _relaxes(s, "double_neutral")
+def _v_c(s):   # OVERLAP session UNBLOCKED (re-pointed 2026-08-03; was
+               # DOUBLE_NEUTRAL_LONG_FILTER OFF, which bound on 1 setup a week).
+               # STABILITY_SKIP_SESSIONS drops 11:00-12:59 UTC entirely, on 19
+               # trades measured 2026-06-11 against a base later found broken.
+               # Zero of the 10,300 seed rows carry session=OVERLAP, so those
+               # two hours are a total blind spot — this arm is the only way to
+               # learn anything about them.
+    return _relaxes(s, "overlap")
 
 
 def _v_d(s):   # looser score gate — fed by the score-shadow batch (see module docstring)
     return _relaxes(s, "score") and _f(s, "mtf_score") >= 12
 
 
-def _v_e(s):   # stricter trend-quality floor (Kaufman eff_ratio) — 2026-07 WF sweep,
-               # didn't survive OOS in backtest; live already gates at 0.15, this tests 0.25
-    return _live_ok(s) and _f(s, "eff_ratio", 1.0) >= 0.25
+def _v_e(s):   # volume_ratio >= 2.5 (re-pointed 2026-08-03; was eff_ratio >= 0.25,
+               # RETIRED — over a week it removed 22 setups averaging +0.93R while
+               # the control itself averaged +0.85R, i.e. it cut BETTER-than-average
+               # trades, and the seed agrees: eff_ratio's top bucket (>=0.45) is its
+               # WORST at +0.398R vs +0.475R for the middle).
+               # The replacement is the best-supported strict rule we have: on the
+               # 10,300-trade seed volume>=2.5x is 39% of setups at WR 82.1% /
+               # +0.493R against 80.5% / +0.441R below it — and volume_ratio was
+               # separately confirmed to predict on two 6-month windows (3605
+               # trades) while mtf_score did not.
+    return _live_ok(s) and _f(s, "volume_ratio") >= 2.5
 
 
 def _v_f(s):   # "context momentum pack" OFF — the 5 narrow segment gates
@@ -127,22 +153,26 @@ def _v_h(s):   # "fresh trend": 4h leads, 1h hasn't caught up yet
     return aligned == 1 and neutral == 1
 
 
-def _v_i(s):   # DIRECTIONAL_RSI_MIDLINE_FILTER OFF — drop the "LONG needs RSI>=50,
-               # SHORT needs RSI<40" momentum confirmation. Broad gate, fires often,
-               # sits on top of the existing RSI exhaustion caps.
-    return _relaxes(s, "rsi_mid")
+def _v_i(s):   # vol_ratio_regime >= 1.3 (re-pointed 2026-08-03; was RSI-midline OFF,
+               # which bound on only 4 setups a week — net -0.6R, unconcludable).
+               # Deliberately the OPPOSITE END of arm G: the seed says the signal
+               # lives at the BOTTOM of the volatility regime, not the top —
+               # <0.8 → WR 76.1%/+0.387R, 0.8-1.3 → 79.5%/+0.425R, but 1.3-2.0 →
+               # 81.9%/+0.475R and >2.0 → 82.6%/+0.496R. G cuts the BEST bucket;
+               # this cuts the worst. Running both falsifies one of them.
+    return _live_ok(s) and _f(s, "vol_ratio_regime", 1.0) >= 1.3
 
 
 VARIANTS = {
     "A": ("Текущий (контроль)",              _v_a, True),
     "B": ("HTF-гейт LONG вкл",               _v_b, True),
-    "C": ("Double-neutral LONG ВЫКЛ",        _v_c, True),
+    "C": ("Сессия OVERLAP разблок. (shadow)", _v_c, True),
     "D": ("Мягкий score ≥12 (shadow)",       _v_d, True),
-    "E": ("Eff.ratio ≥0.25",                 _v_e, True),
+    "E": ("Объём ≥2.5x",                     _v_e, True),
     "F": ("Контекст-моментум ВЫКЛ",          _v_f, True),
     "G": ("Vol-regime <2.0x",                _v_g, True),
     "H": ("Свежий тренд (mixed)",            _v_h, True),
-    "I": ("RSI midline ВЫКЛ",                _v_i, True),
+    "I": ("Vol-regime ≥1.3x",                _v_i, True),
 }
 
 
