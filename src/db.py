@@ -14,8 +14,11 @@ Lifecycle:
 import sqlite3
 import time as time_mod
 import json
+import logging
 import sys
 import os
+
+_log = logging.getLogger(__name__)
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from config import (
@@ -360,10 +363,18 @@ def get_distinct_signal_symbols() -> list:
         return [r["symbol"] for r in rows]
 
 
-def log_signal(analysis: dict, tp1: float, tp2: float, sl: float):
-    """Insert a new signal into DB. Status starts as OPEN."""
+def log_signal(analysis: dict, tp1: float, tp2: float, sl: float) -> int:
+    """Insert a new signal into DB. Status starts as OPEN. Returns its row id.
+
+    The id matters: the send path used to re-find this row with
+    get_latest_open_signal(symbol) — "newest OPEN row for this symbol" — and
+    hand it to both the setup->signal link and the autotrade opener. That is a
+    guess, correct only while at most one setup per symbol exists per scan and
+    symbols with an open position are filtered out. Returning the real id
+    removes the dependency on those invariants.
+    """
     with _conn() as c:
-        c.execute("""
+        cur = c.execute("""
             INSERT INTO signals (
                 symbol, direction, entry_price, tp1, tp2, sl, opened_at, status,
                 confidence, reason, entry_low, entry_high, entry_source, market_price,
@@ -380,6 +391,13 @@ def log_signal(analysis: dict, tp1: float, tp2: float, sl: float):
             1 if analysis.get("premium") else 0,
             analysis.get("atr"),
         ))
+        return cur.lastrowid
+
+
+def get_signal_by_id(signal_id: int) -> dict | None:
+    with _conn() as c:
+        row = c.execute("SELECT * FROM signals WHERE id = ?", (signal_id,)).fetchone()
+        return dict(row) if row else None
 
 
 def get_open_signals() -> list:
@@ -973,8 +991,13 @@ def log_setup_candidate(analysis: dict) -> int:
             tp1_level=analysis.get("tp1_level"),
             tp2_level=analysis.get("tp2_level"),
         )
-    except Exception:
-        pass
+    except Exception as e:
+        # sl stays None → the row can never be shadow-resolved (the tracker
+        # requires a bracket) and sits at resolved=0 forever. Harmless to every
+        # consumer, since they all filter resolved=1, but it means this setup's
+        # outcome is lost from the learning signal — so it must be visible.
+        _log.warning(f"log_setup: bracket calc failed for "
+                     f"{analysis.get('symbol','?')} — outcome will not be tracked: {e}")
     with _conn() as c:
         cur = c.execute("""
             INSERT INTO setup_log
@@ -1114,12 +1137,20 @@ def get_unresolved_setups(max_age_sec: float, limit: int = 80) -> list:
     resolved from its actual result by resolve_sent_setups_from_signals()
     instead — running the shadow simulation on them too would give a sent
     setup two independent, sometimes-contradicting outcomes (found 2026-07-31).
+
+    Excludes sent=1 as well (2026-08-03): linking a setup to its signal is
+    best-effort, so a send whose link failed sits at sent=1 with signal_id
+    NULL and slipped straight back into the shadow path — the same double
+    resolution, just through a narrower hole. A real position's outcome comes
+    from the position or not at all; backfill_setup_signal_links() repairs the
+    link later and resolve_sent_setups_from_signals() then resolves it.
     """
     now = time_mod.time()
     with _conn() as c:
         rows = c.execute(
             """SELECT * FROM setup_log
                WHERE resolved=0 AND sl IS NOT NULL AND signal_id IS NULL
+                 AND COALESCE(sent,0)=0
                  AND ts <= ? AND ts >= ?
                ORDER BY ts ASC LIMIT ?""",
             (now - 900, now - max_age_sec, limit),

@@ -14,6 +14,7 @@ OKX candle columns: [ts_ms, open, high, low, close, vol(contracts),
 OKX returns candles newest-first; we reverse to oldest-first.
 """
 import time
+import threading
 import requests
 import sys
 import os
@@ -256,24 +257,35 @@ _KL_BOUNDARY_GRACE = 3       # seconds past the expected close before refetching
 _MIN_REFETCH_SEC = 10        # never re-hit the API faster than this per key
 
 
+# Candles are fetched 6-wide by the scan's ThreadPoolExecutor, so the eviction
+# below (which iterates the whole dict) can race an insert from another worker
+# and raise "dictionary changed size during iteration" — a hard failure, not
+# just a lost cache entry. One lock over get/put; both are pure dict work,
+# never holding it across a network call.
+_kl_lock = threading.Lock()
+
+
 def _kl_cache_get(key, interval_sec: int):
-    e = _kl_cache.get(key)
-    if not e:
+    with _kl_lock:
+        e = _kl_cache.get(key)
+        if not e:
+            return None
+        now = time.time()
+        if now - e["fetched_at"] < _MIN_REFETCH_SEC:
+            return e["data"]
+        if now < e["t_newest"] + 2 * interval_sec + _KL_BOUNDARY_GRACE:
+            return e["data"]
         return None
-    now = time.time()
-    if now - e["fetched_at"] < _MIN_REFETCH_SEC:
-        return e["data"]
-    if now < e["t_newest"] + 2 * interval_sec + _KL_BOUNDARY_GRACE:
-        return e["data"]
-    return None
 
 
 def _kl_cache_put(key, data: dict):
-    if len(_kl_cache) >= _KL_CACHE_MAX:
-        oldest = min(_kl_cache, key=lambda k: _kl_cache[k]["fetched_at"])
-        _kl_cache.pop(oldest, None)
     times = data.get("time") or [0]
-    _kl_cache[key] = {"data": data, "t_newest": int(times[-1]), "fetched_at": time.time()}
+    entry = {"data": data, "t_newest": int(times[-1]), "fetched_at": time.time()}
+    with _kl_lock:
+        if len(_kl_cache) >= _KL_CACHE_MAX:
+            oldest = min(_kl_cache, key=lambda k: _kl_cache[k]["fetched_at"])
+            _kl_cache.pop(oldest, None)
+        _kl_cache[key] = entry
 
 
 def get_klines(symbol, interval=TIMEFRAME_KUCOIN, limit=KLINES_LIMIT,

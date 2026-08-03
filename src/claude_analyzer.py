@@ -2,6 +2,7 @@ import anthropic
 import logging
 import sys
 import os
+import threading
 import time as _time_mod
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -571,10 +572,45 @@ def _apply_verdict(base: dict, v: dict) -> dict:
 
 # ── Daily budget guard ───────────────────────────────────────────────────────
 
-def _budget_ok(tier: str = "LIGHT") -> bool:
-    """Return False when today's Claude spend is within reserve of the daily cap."""
+# HEAVY calls now run concurrently, so check-call-log is a read-modify-write
+# race: every worker can pass the check before any of them has logged its cost,
+# and the cap overshoots by up to (workers - 1) calls. Serialising just the
+# check closes it — the in-flight reservation below is what the later workers
+# actually see, since the DB row only appears after the call returns.
+_budget_lock = threading.Lock()
+_budget_inflight = {"day": "", "usd": 0.0}
+# Conservative per-call reservation held while a call is in flight (real Sonnet
+# HEAVY runs ~$0.01-0.03); released and replaced by the true cost on log.
+_INFLIGHT_RESERVE_USD = 0.03
+
+
+def _budget_reserve(tier: str) -> bool:
+    """Atomically check the cap and reserve this call's expected cost."""
+    import datetime as _dt
+    today = _dt.datetime.now(_dt.timezone.utc).strftime("%Y-%m-%d")
+    with _budget_lock:
+        if _budget_inflight["day"] != today:
+            _budget_inflight["day"] = today
+            _budget_inflight["usd"] = 0.0
+        if not _budget_ok(tier, extra=_budget_inflight["usd"]):
+            return False
+        _budget_inflight["usd"] += _INFLIGHT_RESERVE_USD
+        return True
+
+
+def _budget_release() -> None:
+    """Drop this call's reservation once its real cost is in the DB."""
+    with _budget_lock:
+        _budget_inflight["usd"] = max(0.0, _budget_inflight["usd"] - _INFLIGHT_RESERVE_USD)
+
+
+def _budget_ok(tier: str = "LIGHT", extra: float = 0.0) -> bool:
+    """Return False when today's Claude spend is within reserve of the daily cap.
+
+    `extra` = cost already committed by calls that are in flight but have not
+    written their row yet."""
     try:
-        spent = get_claude_spend_today()
+        spent = get_claude_spend_today() + extra
         remaining = CLAUDE_DAILY_BUDGET_USD - spent
         ok = remaining >= CLAUDE_BUDGET_RESERVE_USD
         if not ok:
@@ -715,6 +751,21 @@ _THINKING_BUDGET = 5000  # tokens for internal reasoning scratch-pad
 
 
 def analyze_heavy(setup: dict, news_context: dict = None, history: list = None) -> dict:
+    """Budget-reserving wrapper around the HEAVY call.
+
+    Separate from the body so the reservation is released on EVERY exit path,
+    including an API exception — a leaked reservation would make the bot
+    quietly stingier for the rest of the UTC day.
+    """
+    if not _budget_reserve("HEAVY"):
+        return {}
+    try:
+        return _analyze_heavy(setup, news_context, history)
+    finally:
+        _budget_release()
+
+
+def _analyze_heavy(setup: dict, news_context: dict = None, history: list = None) -> dict:
     """
     HEAVY tier. Re-check ONE strong setup with Sonnet + extended thinking.
 
@@ -725,9 +776,6 @@ def analyze_heavy(setup: dict, news_context: dict = None, history: list = None) 
     - Richer setup line: adds session, MTF tags, HTF strength flags
     - Per-coin memory: last 15 outcomes for pattern recognition
     """
-    if not _budget_ok("HEAVY"):
-        return {}
-
     setup_line = _setup_line_heavy(1, setup)
 
     user_text = (

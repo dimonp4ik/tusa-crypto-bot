@@ -9,6 +9,7 @@ Flow every N minutes:
   5. Telegram receives only actionable signals
 """
 
+import json
 import logging
 import os
 import time
@@ -81,7 +82,7 @@ from src.db import (
     at_add_allowed, at_remove, at_get, at_all_allowed, at_set_keys,
     at_set_mode, at_set_active, at_set_balance, at_set_mode_prompt,
     at_set_tp1_close_pct,
-    get_latest_open_signal,
+    get_latest_open_signal, get_signal_by_id,
 )
 from src import autotrader
 from src.keystore import keystore_ready, encrypt_secret
@@ -2776,6 +2777,42 @@ def _is_alert_duplicate(name: str) -> bool:
     return False
 
 
+def _cooldowns_load() -> None:
+    """Restore both cooldown caches from the DB at boot.
+
+    They used to live only in process memory, so every redeploy silently reset
+    SIGNAL_COOLDOWN_HOURS and REJECT_COOLDOWN_HOURS to zero — and this project
+    redeploys often. The open-position guard (get_open_signals) covered the
+    worst case, but a coin whose trade had already CLOSED could be re-signalled
+    immediately after a restart, and a setup Claude had just rejected could be
+    re-asked on the very next scan.
+    """
+    global _signal_cache, _reject_cache
+    try:
+        raw = get_bot_state("cooldown_signals")
+        if raw:
+            _signal_cache = {k: (v[0], float(v[1])) for k, v in json.loads(raw).items()}
+        raw = get_bot_state("cooldown_rejects")
+        if raw:
+            _reject_cache = {tuple(k.split("|", 1)): (float(v[0]), float(v[1]), float(v[2]))
+                             for k, v in json.loads(raw).items()}
+        log.info(f"Cooldowns restored: {len(_signal_cache)} signal, {len(_reject_cache)} reject")
+    except Exception as e:
+        log.warning(f"Cooldown restore failed (starting empty): {e}")
+
+
+def _cooldowns_save() -> None:
+    """Persist both caches. Called after every mutation — they are tiny
+    (bounded by the scanned universe) and a scan is minutes apart."""
+    try:
+        set_bot_state("cooldown_signals", json.dumps(
+            {k: [v[0], v[1]] for k, v in _signal_cache.items()}))
+        set_bot_state("cooldown_rejects", json.dumps(
+            {f"{k[0]}|{k[1]}": [v[0], v[1], v[2]] for k, v in _reject_cache.items()}))
+    except Exception as e:
+        log.warning(f"Cooldown save failed: {e}")
+
+
 def _is_duplicate(symbol: str, direction: str) -> bool:
     if symbol in _signal_cache:
         cached_dir, cached_ts = _signal_cache[symbol]
@@ -2787,6 +2824,7 @@ def _is_duplicate(symbol: str, direction: str) -> bool:
 
 def _cache_signal(symbol: str, direction: str):
     _signal_cache[symbol] = (direction, time.time())
+    _cooldowns_save()
 
 
 # ── Reject cooldown ────────────────────────────────────────────────────────────
@@ -2807,11 +2845,13 @@ def _is_reject_cooled(symbol: str, direction: str, price, atr) -> bool:
     r_price, r_atr, r_ts = ent
     if (time.time() - r_ts) / 3600 >= REJECT_COOLDOWN_HOURS:
         _reject_cache.pop((symbol, direction), None)
+        _cooldowns_save()
         return False
     eff_atr = float(atr or 0) or r_atr
     try:
         if eff_atr > 0 and abs(float(price) - r_price) > eff_atr:
             _reject_cache.pop((symbol, direction), None)   # left the zone
+            _cooldowns_save()
             return False
     except (TypeError, ValueError):
         pass
@@ -2821,6 +2861,7 @@ def _is_reject_cooled(symbol: str, direction: str, price, atr) -> bool:
 def _cache_rejection(symbol: str, direction: str, price, atr) -> None:
     try:
         _reject_cache[(symbol, direction)] = (float(price or 0), float(atr or 0), time.time())
+        _cooldowns_save()
     except (TypeError, ValueError):
         pass
 
@@ -3217,7 +3258,16 @@ def _simulate_setup_outcome(direction: str, entry: float, tp1: float, tp2: float
     risk = abs(entry - sl)
     if risk <= 0:
         return None, 0, 0
-    use_close = STOP_CLOSE_CONFIRM and closes is not None
+    # `closes` is indexed by the zip's position, so it must be at least as long
+    # as the shorter of highs/lows — otherwise an IndexError here is swallowed
+    # by the shadow tracker's per-symbol try and that symbol's setups silently
+    # stop resolving. Falling back to wick-touch is wrong but visible; a
+    # length mismatch means the caller handed us misaligned series.
+    use_close = (STOP_CLOSE_CONFIRM and closes is not None
+                 and len(closes) >= min(len(highs), len(lows)))
+    if STOP_CLOSE_CONFIRM and closes is not None and not use_close:
+        log.warning(f"  shadow: closes shorter than highs/lows "
+                    f"({len(closes)} < {min(len(highs), len(lows))}) — wick stop used")
     for idx, (h, l) in enumerate(zip(highs, lows)):
         if not tp1_reached:
             if direction == "LONG":
@@ -3833,13 +3883,18 @@ def run_scan():
                         log.info(f"  Signal sent: {analysis['symbol']} {direction}")
                         try:
                             mark_setup_sent(analysis.get("_setup_log_id"))
-                        except Exception:
-                            pass
+                        except Exception as _me:
+                            log.warning(f"  mark_setup_sent failed: {_me}")
                         # Fetch the just-written signal row once, shared by the
-                        # link below and the autotrade hook further down.
+                        # link below and the autotrade hook further down. Keyed
+                        # on the id log_signal returned, not "newest OPEN row
+                        # for this symbol" — that was a guess that held only
+                        # while one setup per symbol per scan is generated.
                         _sig_row = None
                         try:
-                            _sig_row = get_latest_open_signal(analysis["symbol"])
+                            _sid = analysis.get("_signal_id")
+                            _sig_row = (get_signal_by_id(_sid) if _sid
+                                        else get_latest_open_signal(analysis["symbol"]))
                         except Exception as _ge:
                             log.warning(f"  Could not fetch new signal row: {_ge}")
                         # Link this setup_log row to its real position: from
@@ -3847,11 +3902,14 @@ def run_scan():
                         # not an independent shadow simulation on a different
                         # feed (found 2026-07-31 — the two disagreed on a real
                         # trade: shadow said TP1, the real position hit SL).
+                        # A failure here must be loud: the row stays sent=1 with
+                        # no signal_id, and is then excluded from BOTH resolvers
+                        # until backfill_setup_signal_links() repairs it.
                         try:
                             if _sig_row:
                                 link_setup_to_signal(analysis.get("_setup_log_id"), _sig_row["id"])
-                        except Exception:
-                            pass
+                        except Exception as _le:
+                            log.warning(f"  link_setup_to_signal failed: {_le}")
                         # Autotrade: mirror the just-published signal into real
                         # OKX positions for onboarded users (async, fail-safe).
                         try:
@@ -4123,6 +4181,9 @@ def start_bot():
         log.info("Database initialised")
     except Exception as e:
         log.warning(f"DB init failed: {e}")
+
+    # Cooldowns survive redeploys (2026-08-03) — must load before the first scan.
+    _cooldowns_load()
 
     # One-shot Claude memory seeding from historical backtest (2024+)
     maybe_seed_backtest()

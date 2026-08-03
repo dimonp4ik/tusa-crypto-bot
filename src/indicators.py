@@ -6,7 +6,7 @@ No pandas, no numpy — works on any Python version.
 import sys
 import os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from config import SMC_SWING_LOOKBACK, SMC_FVG_MIN_PCT, SMC_OB_LOOKBACK, ATR_PERIOD, EFF_RATIO_LOOKBACK, PD_TREND_GATE
+from config import SMC_SWING_LOOKBACK, SMC_FVG_MIN_PCT, SMC_OB_LOOKBACK, ATR_PERIOD, EFF_RATIO_LOOKBACK, PD_TREND_GATE, VOL_REGIME_LOOKBACK
 
 
 # ── Basic indicators ──────────────────────────────────────────────────────────
@@ -705,7 +705,7 @@ def get_smc_indicators(candles_15m: dict, candles_1h: dict = None,
             bos_extension_atr = abs(closes[-1] - bos_break_level) / atr
 
     # Volatility regime (dead vs spike) — quality gate
-    vol_reg = volatility_regime(highs, lows, closes)
+    vol_reg = volatility_regime(highs, lows, closes, VOL_REGIME_LOOKBACK)
 
     # Efficiency ratio (chop vs trend) — quality gate
     eff_ratio = efficiency_ratio(closes, EFF_RATIO_LOOKBACK)

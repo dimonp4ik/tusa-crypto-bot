@@ -61,8 +61,10 @@ SIGNAL_COOLDOWN_HOURS = 3  # 15m swing signals hold 2-8h — 3h cooldown per coi
 # --- Signal expiry (no TP1/SL within this window → EXPIRED) ---
 SIGNAL_EXPIRY_HOURS = int(os.getenv("SIGNAL_EXPIRY_HOURS", "48"))
 
-# --- KuCoin (accessible from cloud/US servers) ---
-KUCOIN_BASE_URL = "https://api.kucoin.com"
+# --- Market data (OKX since 2026-07-02; the _KUCOIN names are legacy labels
+# for the timeframe strings, kept because they are threaded through the whole
+# codebase — the data source itself is OKX). KUCOIN_BASE_URL was removed
+# 2026-08-03: dead since the migration, nothing read it.
 QUOTE_ASSET = "USDT"
 TIMEFRAME_KUCOIN = "15min"
 KLINES_INTERVAL_SEC = 15 * 60
@@ -169,6 +171,9 @@ VOL_REGIME_FILTER = os.getenv("VOL_REGIME_FILTER", "1") != "0"
 VOL_MIN_ATR_PCT   = float(os.getenv("VOL_MIN_ATR_PCT", "0.0015"))  # <0.15% range = too dead
 VOL_MIN_RATIO     = float(os.getenv("VOL_MIN_RATIO", "0.55"))      # cur/median below = collapsed
 VOL_MAX_RATIO     = float(os.getenv("VOL_MAX_RATIO", "99"))        # ceiling OFF (hurt R in backtest)
+# Median window for the vol-regime ratio. Was declared but never passed to
+# volatility_regime(), which silently used its own default — same number, so
+# behaviour is unchanged, but the knob did nothing. Wired 2026-08-03.
 VOL_REGIME_LOOKBACK = int(os.getenv("VOL_REGIME_LOOKBACK", "50"))
 
 # №3 Strong BOS and №4 Structural-only confirmation were BOTH backtested and
@@ -571,10 +576,22 @@ BACKTEST_CANDLES        = int(os.getenv("BACKTEST_CANDLES", "1152"))  # 1152 × 
 # and understating both win rate (63.0%→72.7% corrected) and true drawdown
 # (-22.24R→-32.15R corrected) in every backtest run before this fix.
 BACKTEST_TP_WINDOW      = int(os.getenv("BACKTEST_TP_WINDOW", "192"))
-BACKTEST_TOP_COINS      = int(os.getenv("BACKTEST_TOP_COINS", "20"))
+# BACKTEST_TOP_COINS removed 2026-08-03 — it was dead and actively misleading.
+# `--top` defaults to 0, so the backtest does NOT pick the top-N by volume: it
+# runs the hand-pinned BACKTEST_SYMBOLS list in backtest.py (18 coins), or
+# whatever env BACKTEST_SYMBOLS / --symbols / --top override it with. The
+# pinned list is deliberate — a volume-ranked set would change under us and
+# make runs non-reproducible — but it does mean results carry survivorship
+# bias (coins that mattered in 2022 and died are absent by construction) and
+# do not match the live universe, which scans TOP_COINS_COUNT dynamically.
 BACKTEST_FEE_RATE       = float(os.getenv("BACKTEST_FEE_RATE", "0.001"))
 BACKTEST_SLIPPAGE_RATE  = float(os.getenv("BACKTEST_SLIPPAGE_RATE", "0.0005"))
-BACKTEST_USE_BTC_FILTER = os.getenv("BACKTEST_USE_BTC_FILTER", "1") != "0"
+# BACKTEST_USE_BTC_FILTER removed 2026-08-03 — dead, and it implied the BTC
+# context was optional in backtest. It is not: since the 2026-07-31 fix
+# backtest.py always computes a REAL btc_change_pct per scan bar, exactly as
+# live does. There is no toggle and there should not be one — a backtest that
+# can silently run without the live BTC filters is how the 100%-BTC-bonus bug
+# went unnoticed for the project's whole life.
 
 # --- Autotrading (real OKX EU orders for allow-listed users) ---
 AUTOTRADE_ENABLED           = os.getenv("AUTOTRADE_ENABLED", "1") != "0"

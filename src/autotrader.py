@@ -25,6 +25,7 @@ Fail-safe rules:
 """
 import logging
 import threading
+import time
 
 import requests
 
@@ -58,6 +59,11 @@ _STATUS_RU = {
 # Statuses that require closing whatever is still open on the exchange.
 _CLOSE_STATUSES = ("TP2_HIT", "TP1_TRAIL", "SL_HIT", "BREAKEVEN",
                    "EXPIRED", "TP1_EXPIRED")
+
+# A position younger than this is never declared closed from a zero size read —
+# /account/positions can lag a fresh market fill. One monitor cycle is 60s, so
+# this costs at most one extra cycle of notification latency on a real close.
+_CLOSE_CONFIRM_MIN_AGE_SEC = 90
 
 
 def _dm(user_id: int, text: str) -> None:
@@ -178,6 +184,12 @@ def _open_for_user(u: dict, sig: dict, inst_id: str, disp: str) -> None:
         return
 
     tick  = (spec or {}).get("tickSz", 0)
+    # Anchor the backstop to what was REALLY paid, not to the signal's price.
+    # entry_price is measured on the global feed at scan time; the market order
+    # fills on the X-Perp seconds later, off by the basis (0.11-0.18%) plus
+    # slippage — always in the same direction, so a backstop derived from the
+    # signal price is systematically the wrong distance from the actual risk.
+    _fill_px = okx.get_position_avg_px(creds, inst_id) or float(sig["entry_price"])
     # Close-confirmed stop: the bot closes the position itself when a 15m candle
     # CLOSES beyond the signal's stop, so the exchange stop must NOT sit on that
     # same level or it would fire first on every wick and defeat the whole thing.
@@ -187,11 +199,12 @@ def _open_for_user(u: dict, sig: dict, inst_id: str, disp: str) -> None:
     # touched: they stay anchored to the original 1R risk.
     _sl_level = float(sig["sl"])
     if STOP_CLOSE_CONFIRM:
-        _entry = float(sig["entry_price"])
-        _risk  = abs(_entry - _sl_level)
+        # Risk distance stays the signal's (that is the strategy's 1R); only the
+        # point it is measured FROM moves to the real fill.
+        _risk = abs(float(sig["entry_price"]) - _sl_level)
         if _risk > 0:
             _back = _risk * max(1.0, float(STOP_EXCHANGE_BACKSTOP_R))
-            _sl_level = (_entry - _back) if sig["direction"] == "LONG" else (_entry + _back)
+            _sl_level = (_fill_px - _back) if sig["direction"] == "LONG" else (_fill_px + _back)
     sl_px = okx.round_to_tick(_sl_level, tick)
     tp_px = okx.round_to_tick(float(sig["tp2"]), tick)
     ok, algo_id = okx.place_protection_oco(creds, inst_id, sig["direction"], sl_px, tp_px)
@@ -227,7 +240,9 @@ def _open_for_user(u: dict, sig: dict, inst_id: str, disp: str) -> None:
                 log.warning(f"autotrade TP1 order failed for {uid} {inst_id}: {tp1_result}")
                 tp1_line = "⚠️ Не смог поставить ордер на частичное закрытие TP1 — весь объём пойдёт под трейлинг."
 
-    at_log_position(sig["id"], uid, inst_id, sig["direction"], sz, px, margin,
+    # Record the REAL fill, not the pre-entry quote used for sizing — this is
+    # what "breakeven" is later measured against.
+    at_log_position(sig["id"], uid, inst_id, sig["direction"], sz, _fill_px, margin,
                     algo_id, sl_px, tp1_algo_id=tp1_algo_id, tp1_sz=tp1_sz)
     lev = AUTOTRADE_LEVERAGE
     _dm(uid, (f"🤖 *Сделка открыта: {disp} {sig['direction']}*\n"
@@ -331,7 +346,11 @@ def mirror_transition(sig: dict, new_status: str, exit_px: float) -> None:
                 # entry immediately is always safe, never premature.
                 try:
                     tick = (okx.get_xperp_spec(pos["inst_id"]) or {}).get("tickSz", 0)
-                    be_px = okx.round_to_tick(float(sig["entry_price"]), tick)
+                    # Breakeven means THIS user's breakeven: their real fill,
+                    # not the signal's global-feed entry. Off by the basis
+                    # otherwise, which on a 10x position is not cosmetic.
+                    _be_src = float(pos.get("entry_px") or sig["entry_price"])
+                    be_px = okx.round_to_tick(_be_src, tick)
                     ok, err = okx.amend_protection_sl(creds, pos["inst_id"], pos["sl_algo_id"], be_px)
                     if ok:
                         at_update_position_sl(pos["id"], be_px)
@@ -392,6 +411,22 @@ def poll_exchange_closes() -> None:
                 continue   # transient API error — retry next cycle
             if size > 0:
                 continue   # still open on the exchange, nothing to do
+
+            # A zero read is acted on IRREVERSIBLY below (protection cancelled,
+            # record closed), so it must not be believed on a single sample.
+            # Two ways OKX can report 0 for a position that is really open:
+            # a brand-new entry not yet visible on /account/positions, and a
+            # transient empty payload. Either one would strip the stop off a
+            # live position and stop tracking it — the worst outcome the
+            # autotrader can produce. Hence: ignore young positions, then
+            # require a second, independent read to agree.
+            if time.time() - float(pos.get("opened_at") or 0) < _CLOSE_CONFIRM_MIN_AGE_SEC:
+                continue
+            ok2, size2 = okx.get_position_size(creds, pos["inst_id"])
+            if not ok2 or size2 > 0:
+                log.info(f"autotrade pos#{pos['id']}: flat read not confirmed "
+                         f"(second read ok={ok2} size={size2}) — leaving open")
+                continue
 
             # Exchange is flat but our DB still says OPEN → SL/TP/trail
             # already fired for real. Close out the record and tell the user

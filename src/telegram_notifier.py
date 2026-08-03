@@ -238,10 +238,12 @@ def send_signal(analysis: dict) -> bool:
     )
 
     if _send_message(message):
-        # Log to DB
+        # Log to DB. The new row's id is handed back through `analysis` so the
+        # caller can link the setup and open autotrades against THIS row
+        # instead of re-finding it by symbol (a guess — see log_signal).
         try:
             from src.db import log_signal
-            log_signal(analysis, tp1, tp2, sl)
+            analysis["_signal_id"] = log_signal(analysis, tp1, tp2, sl)
         except Exception as e:
             print(f"[DB] log_signal failed: {e}")
         return True

@@ -197,6 +197,26 @@ def get_position_size(creds: dict, inst_id: str) -> tuple:
         return False, f"position parse failed: {e}"
 
 
+def get_position_avg_px(creds: dict, inst_id: str) -> float | None:
+    """Average fill price of the open position, or None if flat/unavailable.
+
+    The signal's entry_price is measured on the global feed at scan time; the
+    market order actually fills on the X-Perp some seconds later, at a price
+    that differs by the basis (0.11-0.18%) plus slippage. Stops derived from
+    the signal price are therefore off by that gap, always in the same
+    direction. Callers use this to anchor risk to what was really paid.
+    """
+    ok, data = _request(creds, "GET", "/api/v5/account/positions",
+                        params={"instId": inst_id})
+    if not ok or not data:
+        return None
+    try:
+        px = float(data[0].get("avgPx") or 0)
+        return px if px > 0 else None
+    except (TypeError, ValueError, IndexError):
+        return None
+
+
 # ── Orders ────────────────────────────────────────────────────────────────────
 
 def place_market_entry(creds: dict, inst_id: str, direction: str, sz: float) -> tuple:
