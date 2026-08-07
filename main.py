@@ -358,7 +358,9 @@ def _build_and_send_report(chat_id: int, message_id: int,
         if since_ts < since7 - 43200:
             _blocks.append(("последние 7 дней", since7))
         for label, cut in _blocks:
-            s = get_stats(since_ts=cut) if cut > 0 else get_stats(days=36500)
+            # since_ts=0.0 (not days=36500): the days path is epoch-clamped,
+            # and "all time" must genuinely span both eras.
+            s = get_stats(since_ts=cut) if cut > 0 else get_stats(since_ts=0.0)
             A(f"## ЖИВЫЕ РЕЗУЛЬТАТЫ — {label}")
             A(f"  сигналов: {s['total']}  закрыто: {s['closed']}  "
               f"открыто: {s['open']}+{s['tp1_partial_open']}")
@@ -1083,8 +1085,11 @@ def _handle_admin_callback(callback_id: str, chat_id: int,
 
     elif data == "adm_ai_acc":
         try:
-            since7  = time.time() - 7 * 86400
-            since30 = time.time() - 30 * 86400
+            # Clamped to the config change: get_setup_accuracy is deliberately
+            # NOT clamped inside (the full report needs to reach the old era),
+            # so rolling panels clamp at the call site.
+            since7  = max(time.time() - 7 * 86400,  _CONFIG_CHANGE_TS or 0.0)
+            since30 = max(time.time() - 30 * 86400, _CONFIG_CHANGE_TS or 0.0)
 
             def _acc_block(label, since):
                 a = get_setup_accuracy(since)
@@ -1126,7 +1131,7 @@ def _handle_admin_callback(callback_id: str, chat_id: int,
                 "_Сравнение исхода отправленных vs отклонённых сетапов "
                 "(теневой трекинг по реальным котировкам)._\n\n"
                 f"{_acc_block('За 7 дней', since7)}\n\n"
-                f"{_acc_block('За 30 дней', since30)}\n\n"
+                f"{_acc_block(f'За 30 дней (обрезано до {_CONFIG_CHANGE_LABEL})', since30)}\n\n"
                 "_TP1% = доля дошедших до первого тейка._\n"
                 "_🔄 перевёрнутые = эксперимент: если бы зеркалили отклонённые "
                 "(стоп↔тейк). +R = зеркало в плюс. Нужна выборка ≥20-30 и пару "
@@ -1145,7 +1150,7 @@ def _handle_admin_callback(callback_id: str, chat_id: int,
                 "\n\n━━━━━━━━━\n"
                 "🎯 *Природа стопов* (X-Perp фитиль vs реальный разворот)\n"
                 f"{_wick_line('7 дней', since7)}\n"
-                f"{_wick_line('30 дней', since30)}\n"
+                f"{_wick_line(f'30 дней (обрезано до {_CONFIG_CHANGE_LABEL})', since30)}\n"
                 "_🌊 = стоп задело только на тонком X-Perp, глубокий рынок нет "
                 "(шум исполнения). Если доля высокая — стоит расширить буфер стопа._"
             )
@@ -1201,11 +1206,13 @@ def _handle_admin_callback(callback_id: str, chat_id: int,
 
     elif data == "adm_cap":
         try:
-            since30 = time.time() - 30 * 86400
+            # Clamped: the stale-entry / cap counters are only meaningful for
+            # the current bot — the guard itself did not exist before 31.07.
+            since30 = max(time.time() - 30 * 86400, _CONFIG_CHANGE_TS or 0.0)
             caps = get_cap_impact_stats(since30)
             skew = get_skew_response_stats(since30)
 
-            lines = ["🔗 *КАП КОРРЕЛЯЦИИ* (30 дней)",
+            lines = [f"🔗 *КАП КОРРЕЛЯЦИИ* (с {_CONFIG_CHANGE_LABEL})",
                      "_Сетапы, которые Клод одобрил, а что-то не пропустило. "
                      "Теневой трекер знает их реальный исход — значит видно, "
                      "спасло это деньги или отняло._\n"]
@@ -2726,6 +2733,10 @@ def webhook():
                     else:
                         prem_str = f"\n💎 Premium: {prem['total']} сд. (ещё в работе)\n"
 
+                # A clamped window holds less than its label promises — say so,
+                # otherwise "30 дней" silently means "с 31.07".
+                if s.get("clamped"):
+                    label = f"{label} _(с {_CONFIG_CHANGE_LABEL} — раньше был другой бот)_"
                 return (
                     f"*{label}*\n"
                     f"  Сигналов: {s['total']}  •  Закрыто: {s['closed']}\n"

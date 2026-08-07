@@ -501,14 +501,28 @@ def _status_to_r(status: str) -> float:
 
 
 def get_symbol_performance(symbol: str, lookback: int = None) -> dict:
-    """Return recent closed-signal performance for one symbol."""
+    """Return recent closed-signal performance for one symbol.
+
+    Floored at LIVE_HIST_EPOCH_TS (2026-08-07). This feeds auto_block_bad_symbols,
+    which STOPS THE BOT TRADING A SYMBOL — a real decision, not a report — and it
+    had no time window at all, just "the last N closed signals". Checked against
+    live data: BTCUSDT had 8 closed trades at a 25% win rate, every one of them
+    from before the 31.07 parity fixes, against thresholds of 8 trades and 35%.
+    The bot was one profit-factor check away from blocking its most important
+    symbol for a week on the strength of a filter that no longer exists.
+
+    Consequence of the floor: with little post-fix history most symbols now fall
+    under AUTO_BLOCK_MIN_TRADES and nothing gets auto-blocked until real evidence
+    accumulates. That is the correct failure direction — not blocking on unknown
+    is cheaper than blocking on wrong."""
     lookback = lookback or AUTO_BLOCK_LOOKBACK_TRADES
     placeholders = ",".join("?" for _ in FINAL_STATUSES)
     with _conn() as c:
         rows = c.execute(
             f"SELECT status FROM signals WHERE symbol = ? AND status IN ({placeholders})"
+            f" AND opened_at >= ?"
             f" ORDER BY opened_at DESC LIMIT ?",
-            [symbol, *FINAL_STATUSES, lookback],
+            [symbol, *FINAL_STATUSES, LIVE_HIST_EPOCH_TS or 0.0, lookback],
         ).fetchall()
 
     statuses = [r["status"] for r in rows]
@@ -885,10 +899,20 @@ def _row_r(row) -> float:
 def get_stats(days: int = 7, since_ts: float = None) -> dict:
     """Aggregate stats with R-value, direction breakdown and recent streak.
 
-    `days`     — rolling window (last N×24h) when since_ts is None.
-    `since_ts` — explicit epoch cutoff (e.g. Riga midnight for calendar 'today').
+    `days`     — rolling window (last N×24h) when since_ts is None. CLAMPED to
+                 LIVE_HIST_EPOCH_TS: "last 30 days" otherwise reaches into the
+                 pre-parity-fix bot and averages two different systems into one
+                 win rate. Every rolling caller (/stats, the admin panel, the
+                 weekly digest, the evening ritual) gets the clamp for free.
+    `since_ts` — explicit epoch cutoff, NOT clamped: the caller has chosen a
+                 window deliberately (Riga midnight for 'today', a typed date,
+                 or 0.0 for a genuine all-time view that spans both eras).
+    The returned dict carries `since` so a display can say what it really shows.
     """
-    cutoff = since_ts if since_ts is not None else time_mod.time() - days * 86400
+    if since_ts is not None:
+        cutoff = since_ts
+    else:
+        cutoff = max(time_mod.time() - days * 86400, LIVE_HIST_EPOCH_TS or 0.0)
     with _conn() as c:
         rows = c.execute(
             "SELECT status, direction, opened_at, premium, realized_r FROM signals WHERE opened_at >= ?",
@@ -978,6 +1002,13 @@ def get_stats(days: int = 7, since_ts: float = None) -> dict:
 
     return {
         "days":             days,
+        # Effective start actually used, and whether the requested rolling
+        # window was cut short by the epoch clamp — so a caller can label
+        # "30 дней" honestly when it really holds a week.
+        "since":            cutoff,
+        "clamped":          (since_ts is None
+                             and bool(LIVE_HIST_EPOCH_TS)
+                             and cutoff > time_mod.time() - days * 86400 + 1),
         "total":            total,
         "closed":           closed,
         "open":             active_open,
@@ -1628,9 +1659,13 @@ def backfill_backtest_net_r(rows: list) -> int:
 
 
 def get_weekly_stats() -> dict:
-    """Aggregate trade + AI accuracy stats for the past 7 days."""
+    """Aggregate trade + AI accuracy stats for the past 7 days.
+
+    Clamped at LIVE_HIST_EPOCH_TS like every other rolling window: the digest
+    is a verdict on the CURRENT bot, and a week that reaches across 31.07 is a
+    weighted average of two different ones."""
     from collections import defaultdict
-    since = time_mod.time() - 7 * 86400
+    since = max(time_mod.time() - 7 * 86400, LIVE_HIST_EPOCH_TS or 0.0)
     with _conn() as c:
         sig_rows = c.execute(
             "SELECT symbol, direction, status, realized_r, trend FROM signals "
