@@ -322,9 +322,13 @@ def _build_and_send_report(chat_id: int, message_id: int,
         A("Живые результаты ДО этой даты с прогнозом несопоставимы.")
         A("")
 
-        # 1. Live results — chosen window, plus 7d for recency
+        # 1. Live results — chosen window, plus 7d for recency.
+        # The 7d block is skipped when the chosen window IS ~7 days: `since_ts <
+        # since7` was true by microseconds for the 7-day preset (the two are
+        # computed moments apart), so the report printed the identical block
+        # twice under the identical label. Half a day of slack kills that.
         _blocks = [(window_label, since_ts)]
-        if since_ts < since7:
+        if since_ts < since7 - 43200:
             _blocks.append(("последние 7 дней", since7))
         for label, cut in _blocks:
             s = get_stats(since_ts=cut) if cut > 0 else get_stats(days=36500)
@@ -348,10 +352,14 @@ def _build_and_send_report(chat_id: int, message_id: int,
         if _tot:
             A(f"  одобрил и отправлено: {_s.get('n', 0)}  отклонил: {_r.get('n', 0)}  "
               f"доля одобрений: {(_s.get('n', 0) / _tot * 100):.0f}%")
-            A(f"  TP1 у отправленных: {_s.get('tp1_rate', 0)}%")
-            A(f"  TP1 у отклонённых:  {_r.get('tp1_rate', 0)}%")
+            # get_setup_accuracy returns tp1_pct, not tp1_rate — the latter is
+            # get_stats()'s key. Reading the wrong name made all three of these
+            # lines print 0% / 0% / +0пп regardless of the data (seen 2026-08-07
+            # against 21 sent setups of which 18 really reached TP1).
+            A(f"  TP1 у отправленных: {_s.get('tp1_pct', 0):.0f}%")
+            A(f"  TP1 у отклонённых:  {_r.get('tp1_pct', 0):.0f}%")
             A(f"  разрыв (больше = лучше отбирает): "
-              f"{(_s.get('tp1_rate', 0) - _r.get('tp1_rate', 0)):+.0f}пп")
+              f"{(_s.get('tp1_pct', 0) - _r.get('tp1_pct', 0)):+.0f}пп")
             A(f"  зеркало отклонённых: {_r.get('mirror_r', 0):+.1f}R (n={_r.get('n', 0)})")
         else:
             A("  данных нет")
@@ -360,7 +368,10 @@ def _build_and_send_report(chat_id: int, message_id: int,
         # 3. Stop nature — the key test of the close-confirmed stop
         A("## ПРИРОДА СТОПОВ (X-Perp фитиль vs реальный разворот)")
         A("  close-стоп включён 2026-07-26 — сравнивать до/после этой даты.")
-        for label, cut in (("последние 7 дней", since7), (window_label, since_ts)):
+        _wick_blocks = [(window_label, since_ts)]
+        if since_ts < since7 - 43200:      # same duplicate guard as the block above
+            _wick_blocks.insert(0, ("последние 7 дней", since7))
+        for label, cut in _wick_blocks:
             w = get_sl_wick_stats(cut)
             if w["n"]:
                 A(f"  {label}: стопов {w['n']}  "
@@ -396,7 +407,7 @@ def _build_and_send_report(chat_id: int, message_id: int,
         A("")
 
         # 5. Filter variants
-        A(f"## ТЕСТ ФИЛЬТРОВ — 9 ВАРИАНТОВ ({window_label})")
+        A(f"## ТЕСТ ФИЛЬТРОВ — {len(VARIANTS)} ВАРИАНТОВ ({window_label})")
         vrows = get_variant_rows(since_ts)
         if vrows:
             A(f"  всего размеченных сетапов: {len(vrows)} "
