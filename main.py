@@ -29,7 +29,7 @@ from config import (
     CLAUDE_HEAVY_MIN_SCORE, CLAUDE_HEAVY_MAX_PER_SCAN, CLAUDE_MEMORY_LIMIT,
     TRAIL_RUNNER_ENABLED, TRAIL_ATR_MULT,
     STOP_CLOSE_CONFIRM, MAX_SAME_DIRECTION_POSITIONS, STOP_EXCHANGE_BACKSTOP_R,
-    MTF_MIN_SCORE, SHADOW_MIN_SCORE, TP1_R_MULT,
+    MTF_MIN_SCORE, SHADOW_MIN_SCORE, TP1_R_MULT, LIVE_HIST_EPOCH_TS,
     STALE_ENTRY_GUARD, STALE_ENTRY_ZONE_TOLERANCE, STALE_ENTRY_MAX_RISK_FRAC,
     STALE_ENTRY_MAX_ADVERSE_PCT,
     RISK_MIN_PCT, RISK_MAX_PCT, SL_ATR_BUFFER, TOP_COINS_COUNT,
@@ -143,14 +143,30 @@ _pending_users_search: dict = {}
 _pending_setups_date: dict = {}
 _pending_report_date: dict = {}
 
-# Exact deploy moment of the close-confirmed stop + direction cap (commit
-# 43e0cd9, 2026-07-26 13:38 Riga) — the point where signal outcomes started
-# being produced by a different config. Deliberately the real commit timestamp,
-# not midnight: the changes went out mid-day, so a midnight cutoff would pool
-# ~13h of old-config results into the "new filters" window, which is the exact
-# mistake this preset exists to prevent.
-_CONFIG_CHANGE_LABEL = "26.07 13:38"
-_CONFIG_CHANGE_TS = 1785062315.0
+# The point where live signal outcomes started being produced by the CURRENT
+# bot. Was 2026-07-26 13:38 (close-confirmed stop + direction cap, commit
+# 43e0cd9); moved to 2026-07-31 because the parity fixes that landed that day
+# were far larger — Strong1h finally computing, matched history windows, 24/7
+# scanning, the stale-entry guard. Same value as config.LIVE_HIST_EPOCH_TS on
+# purpose: Claude's history and the admin report must draw the line in the
+# same place, or they describe two different bots.
+_CONFIG_CHANGE_LABEL = "31.07"
+_CONFIG_CHANGE_TS = LIVE_HIST_EPOCH_TS
+
+
+def _clamp_window(since_ts: float, label: str, epoch: float, epoch_label: str) -> tuple:
+    """Keep a preset window on THIS side of a config change.
+
+    "Last 30 days" silently spanned two different bots: on 2026-08-07 it
+    reached back to 08.07, three weeks into the pre-parity-fix era, and every
+    rate it printed was an average of the two. Presets are now clamped — and
+    relabelled, because a window that says 30 days while holding 7 is its own
+    kind of lie. "All time" is deliberately NOT clamped: comparing the eras is
+    exactly what it is for.
+    """
+    if epoch and since_ts < epoch:
+        return epoch, f"{label} → обрезано до {epoch_label} (раньше был другой бот)"
+    return since_ts, label
 
 # Same idea for the filter-variant experiment, which has its OWN clock: the arm
 # map changed 2026-08-03 (E retired for volume>=2.5x, I re-pointed to
@@ -299,7 +315,8 @@ def _build_and_send_report(chat_id: int, message_id: int,
     try:
         rz = _riga_tz()
         now = time.time()
-        since7 = now - 7 * 86400
+        # Clamped like the presets: the recency block must not straddle 31.07.
+        since7 = max(now - 7 * 86400, _CONFIG_CHANGE_TS or 0.0)
         L = []
         A = L.append
         A("# ПОЛНЫЙ ОТЧЁТ БОТА")
@@ -321,6 +338,15 @@ def _build_and_send_report(chat_id: int, message_id: int,
         A("ОТСЧЁТ С 31.07.2026 — в этот день фильтр реально изменился (заработал")
         A("Strong1h, окна истории, круглосуточный режим, гейт устаревшего входа).")
         A("Живые результаты ДО этой даты с прогнозом несопоставимы.")
+        if _CONFIG_CHANGE_TS and 0 < since_ts < _CONFIG_CHANGE_TS:
+            A("")
+            A(f"!! ВНИМАНИЕ: выбранное окно начинается ДО {_CONFIG_CHANGE_LABEL}, значит")
+            A("   все цифры ниже — средневзвешенное по ДВУМ разным ботам. Годится")
+            A("   только чтобы сравнить эпохи между собой, не для оценки текущего.")
+        elif since_ts == 0:
+            A("")
+            A(f"!! ВНИМАНИЕ: окно 'всё время' включает эпоху до {_CONFIG_CHANGE_LABEL} —")
+            A("   это смесь двух разных ботов. Для оценки текущего бери 7/30 дней.")
         A("")
 
         # 1. Live results — chosen window, plus 7d for recency.
@@ -1167,6 +1193,10 @@ def _handle_admin_callback(callback_id: str, chat_id: int,
             "adm_rep_30":  (time.time() - 30 * 86400, "последние 30 дней"),
             "adm_rep_all": (0.0, "всё время"),
         }[data]
+        # Rolling presets must not span the 31.07 change; "all time" must.
+        if data in ("adm_rep_7", "adm_rep_30"):
+            _since, _label = _clamp_window(_since, _label,
+                                           _CONFIG_CHANGE_TS, _CONFIG_CHANGE_LABEL)
         _build_and_send_report(chat_id, message_id, _since, _label)
 
     elif data == "adm_cap":
@@ -1268,6 +1298,11 @@ def _handle_admin_callback(callback_id: str, chat_id: int,
             "adm_var_30":   (time.time() - 30 * 86400, "последние 30 дней"),
             "adm_var_all":  (0.0, "всё время"),
         }[data]
+        # Same rule, against the ARM-map clock: before 03.08 the letters E and I
+        # stood for different rules entirely.
+        if data in ("adm_var_7", "adm_var_30"):
+            _since, _label = _clamp_window(_since, _label,
+                                           _ARMS_CHANGE_TS, _ARMS_CHANGE_LABEL)
         _build_and_send_variant_report(chat_id, message_id, _since, _label)
 
     elif data == "adm_open":
