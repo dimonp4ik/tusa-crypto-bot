@@ -189,7 +189,8 @@ def _open_for_user(u: dict, sig: dict, inst_id: str, disp: str) -> None:
     # fills on the X-Perp seconds later, off by the basis (0.11-0.18%) plus
     # slippage — always in the same direction, so a backstop derived from the
     # signal price is systematically the wrong distance from the actual risk.
-    _fill_px = okx.get_position_avg_px(creds, inst_id) or float(sig["entry_price"])
+    _avg_px  = okx.get_position_avg_px(creds, inst_id)
+    _fill_px = _avg_px or float(sig["entry_price"])
     # Close-confirmed stop: the bot closes the position itself when a 15m candle
     # CLOSES beyond the signal's stop, so the exchange stop must NOT sit on that
     # same level or it would fire first on every wick and defeat the whole thing.
@@ -245,9 +246,20 @@ def _open_for_user(u: dict, sig: dict, inst_id: str, disp: str) -> None:
     at_log_position(sig["id"], uid, inst_id, sig["direction"], sz, _fill_px, margin,
                     algo_id, sl_px, tp1_algo_id=tp1_algo_id, tp1_sz=tp1_sz)
     lev = AUTOTRADE_LEVERAGE
+    # Report what was actually BOUGHT, not what was requested. Size is in
+    # contracts and OKX floors to lotSz, so the real notional is
+    # sz * ctVal * fill — a step of ~$1-5 below the target. The old line printed
+    # margin*lev (the request) and the pre-entry quote, so both numbers were
+    # right by construction and could never show a real fill or a rounding gap.
+    _ctval = float((spec or {}).get("ctVal") or 0) or 0.0
+    _real_notional = sz * _ctval * _fill_px if _ctval else margin * lev
+    _real_margin   = _real_notional / lev if lev else margin
+    _px_line = (f"Вход: {okx._fmt_px(_fill_px)}" if _avg_px
+                else f"Вход: ~{px} _(биржа не отдала цену заливки)_")
     _dm(uid, (f"🤖 *Сделка открыта: {disp} {sig['direction']}*\n"
-              f"Объём: {okx._fmt_sz(sz)} контр. (~${margin * lev:.2f} позиция, ${margin:.2f} маржа, {lev}x)\n"
-              f"Вход: ~{px}\nSL: {sl_px}\nTP2: {tp_px}\n"
+              f"Объём: {okx._fmt_sz(sz)} контр. (${_real_notional:.2f} позиция, "
+              f"${_real_margin:.2f} маржа, {lev}x)\n"
+              f"{_px_line}\nSL: {sl_px}\nTP2: {tp_px}\n"
               f"{tp1_line}"))
 
 
