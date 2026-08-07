@@ -22,10 +22,27 @@ _log = logging.getLogger(__name__)
 
 
 def _esc(text: str) -> str:
-    """Escape Markdown v1 special chars in dynamic (LLM-generated) text.
-    Prevents Telegram 400 when Claude returns things like RSI_Div or *strong*.
+    """Neutralise Markdown special chars in dynamic (LLM-generated) text.
+
+    Telegram's LEGACY "Markdown" parse mode — the one this module sends with —
+    has NO backslash escaping; that only exists in MarkdownV2. So the previous
+    implementation, which turned `1h_strong` into `1h\\_strong`, did not protect
+    anything: the backslash rendered literally and the underscore still opened
+    italics. In a reason wrapped in _..._ that left the emphasis unbalanced, the
+    whole message 400'd, and the plain-text fallback in _send_message() sent it
+    with NO formatting at all — which is exactly how it reached the user
+    (reported 2026-08-07: `*BICOUSDC*` and `1h\\_strong` shown raw). TP/SL update
+    messages looked fine only because they carry no LLM text.
+
+    The only way to make arbitrary text safe under legacy Markdown is to remove
+    the characters. `RSI_Div` → `RSI Div` reads fine; a stray backtick becomes a
+    quote. `[` is left alone: unmatched brackets do not break legacy parsing.
     """
-    return (text or "").replace("_", "\\_").replace("*", "\\*").replace("`", "\\`").replace("[", "\\[")
+    return ((text or "")
+            .replace("\\_", " ").replace("\\*", " ")   # undo any pre-escaped input
+            .replace("_", " ")
+            .replace("*", "")
+            .replace("`", "'"))
 
 
 def _disp_sym(symbol: str) -> str:
