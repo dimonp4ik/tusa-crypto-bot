@@ -9,7 +9,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from config import (
     CLAUDE_API_KEY, CLAUDE_LIGHT_MODEL, CLAUDE_HEAVY_MODEL,
     CLAUDE_MAX_RISK_SCORE, CLAUDE_CACHE_TTL, CLAUDE_MEMORY_LIMIT,
-    CLAUDE_DAILY_BUDGET_USD, CLAUDE_BUDGET_RESERVE_USD,
+    CLAUDE_DAILY_BUDGET_USD, CLAUDE_BUDGET_RESERVE_USD, LIVE_HIST_EPOCH_TS,
 )
 from src.db import (
     log_claude_call, get_claude_spend_today, get_similar_resolved_setups,
@@ -307,7 +307,13 @@ def _global_feedback() -> str:
     """
     try:
         import time as _t
-        acc = get_setup_accuracy(_t.time() - 30 * 86400)
+        # Floored at the parity-fix epoch like every other live-history read
+        # feeding this prompt. get_setup_accuracy itself is NOT floored — the
+        # admin report calls it with a user-chosen window and must still be able
+        # to look at the old era — so the floor belongs here, at the call site
+        # that talks to Claude. Without it the 30-day window reached three weeks
+        # back into the pre-fix bot.
+        acc = get_setup_accuracy(max(_t.time() - 30 * 86400, LIVE_HIST_EPOCH_TS or 0.0))
     except Exception:
         return ""
     snt, rej = acc.get("sent", {}), acc.get("rejected", {})

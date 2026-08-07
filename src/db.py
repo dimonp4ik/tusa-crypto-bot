@@ -533,14 +533,22 @@ def get_symbol_performance(symbol: str, lookback: int = None) -> dict:
 def get_recent_outcomes(symbol: str, limit: int = 8) -> list:
     """Recent final outcomes for one symbol — fuel for HEAVY coin memory.
     Includes closed_at so the prompt can show recency (a same-symbol reversal
-    a few hours after a stop is a whipsaw signal Sonnet can't see otherwise)."""
+    a few hours after a stop is a whipsaw signal Sonnet can't see otherwise).
+
+    Floored at LIVE_HIST_EPOCH_TS (added 2026-08-07): this had NO time window
+    at all, so on a rarely-traded symbol the whole "memory" could be trades
+    from the pre-parity-fix bot — a filter with a 50-candle 1h lookback, a 3%
+    entry-drift allowance and a wick stop. Claude was being told "here is how
+    this coin behaved for you" about software that no longer exists. Its only
+    consumer is the HEAVY prompt, so the floor is safe to apply in here."""
     placeholders = ",".join("?" for _ in FINAL_STATUSES)
     with _conn() as c:
         rows = c.execute(
             f"SELECT direction, status, entry_price, exit_price, confidence, mtf_score, closed_at "
             f"FROM signals WHERE symbol = ? AND status IN ({placeholders}) "
+            f"AND opened_at >= ? "
             f"ORDER BY opened_at DESC LIMIT ?",
-            [symbol, *FINAL_STATUSES, limit],
+            [symbol, *FINAL_STATUSES, LIVE_HIST_EPOCH_TS or 0.0, limit],
         ).fetchall()
     return [dict(r) for r in rows]
 
