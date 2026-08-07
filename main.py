@@ -45,6 +45,7 @@ from src.binance_client import (
     get_top_coins, get_klines, get_klines_1h, get_klines_4h, get_klines_1d,
     get_btc_change_1h, get_btc_change_1d, get_funding_rate, get_current_price,
     get_open_interest, get_xperp_instruments, get_xperp_price, get_klines_xperp,
+    get_xperp_book,
 )
 from src.signal_filter import analyze_coin_smc
 from src.filter_variants import VARIANTS, compute_variants
@@ -3431,6 +3432,40 @@ def _track_setup_outcomes():
 _OI_MIN_DELTA_PCT = 0.3  # ignore OI moves below this (noise floor)
 
 
+def _attach_book(setup: dict) -> None:
+    """Shadow feature: X-Perp order-book thinness at decision time. NO trade
+    impact, never shown to Claude — written to setup_log so it can be measured.
+
+    Aimed at a failure mode we have actually observed rather than a guess: a
+    third of the stops in the 2026-08-07 report were "X-Perp only" (the deep
+    global feed never confirmed the break), i.e. the stop came from a thin
+    local book. Spread and depth measure exactly that. Live spread ranges from
+    0.01bp (BTC) to ~25bp (PEPE) — a 2000x spread of "how easy is it to wick
+    this instrument through a level".
+    """
+    b = get_xperp_book(setup["symbol"])
+    if not b:
+        return
+    setup["book_spread_bps"] = b["spread_bps"]
+    setup["book_depth_usd"]  = b["depth_usd"]
+    setup["book_imbalance"]  = b["imbalance"]
+
+
+def _next_event_context() -> tuple:
+    """(hours_until, title) of the next high-impact scheduled macro event, or
+    (None, None). Shadow feature, computed ONCE per scan (the calendar is
+    global, not per-symbol) — genuinely absent from candles by construction."""
+    try:
+        evs = get_upcoming_high_impact_events(within_hours=48.0)
+        if not evs:
+            return None, None
+        e = evs[0]
+        return round(float(e.get("hours_until") or 0.0), 2), str(e.get("title") or "")[:80]
+    except Exception as _e:
+        log.debug(f"event context failed: {_e}")
+        return None, None
+
+
 def _attach_oi(setup: dict) -> None:
     """Shadow feature: tag a setup with its Open-Interest regime. NO trade impact —
     written to setup_log so we can later correlate OI with reached_tp1.
@@ -3662,13 +3697,25 @@ def run_scan():
         log.info(f"After news/funding/ranking: {len(enriched)} setups → sending to Claude")
         _last_scan_stats["enriched"] = len(enriched)
 
-        # OI shadow feature — tag only the ≤7 setups that go to Claude (cheap).
-        # Decision is NOT affected; we log oi_regime/oi_confirms to learn its edge.
+        # Shadow features — tag only the ≤7 setups that go to Claude (cheap).
+        # NONE of these affect the decision and none are shown to Claude; they
+        # are written to setup_log so their edge can be measured before anyone
+        # decides to use them. Added 2026-08-07 after a walk-forward test showed
+        # the price-shaped features cannot predict a stop at all (AUC 0.52 out
+        # of sample), leaving only non-price candidates — none of which exist in
+        # the historical seed, so the clock on them can only start live.
+        _ev_hours, _ev_name = _next_event_context()
         for _s in enriched:
             try:
                 _attach_oi(_s)
             except Exception as _e:
                 log.debug(f"  OI attach failed {_s.get('symbol','?')}: {_e}")
+            try:
+                _attach_book(_s)
+            except Exception as _e:
+                log.debug(f"  book attach failed {_s.get('symbol','?')}: {_e}")
+            _s["hours_to_event"] = _ev_hours
+            _s["next_event"] = _ev_name
 
         # Filter-variant experiment (variants D/F/I) — shadow-only setups that
         # soft-failed exactly one relaxable gate (score/ctxmom/rsi_mid, see

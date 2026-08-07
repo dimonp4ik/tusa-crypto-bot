@@ -123,7 +123,7 @@ def _is_bad_symbol(symbol: str) -> bool:
 
 # ── X-Perps universe (what the user can actually trade on OKX EU) ────────────
 
-_xperp_cache = {"at": 0.0, "by_base": {}}
+_xperp_cache = {"at": 0.0, "by_base": {}, "ctval": {}}
 _XPERP_TTL = 24 * 3600  # instrument list changes only on listings/rollover
 
 
@@ -141,6 +141,7 @@ def get_xperp_instruments() -> dict:
         body = _okx_get("/api/v5/public/instruments",
                         {"instType": "FUTURES", "ruleType": "xperp"})
         by_base = {}
+        _ctval = {}
         for inst in body.get("data", []):
             inst_id = str(inst.get("instId", ""))
             if "_UM_XPERP-" not in inst_id or inst.get("state") != "live":
@@ -149,8 +150,16 @@ def get_xperp_instruments() -> dict:
             # Keep the farthest-dated contract per base (rollover overlap window)
             if base not in by_base or inst_id > by_base[base]:
                 by_base[base] = inst_id
+                # ctVal = units of the base asset per contract. Needed to turn
+                # book sizes (which OKX quotes in CONTRACTS) into notional —
+                # without it PEPE's book reads as $0.16 and BTC's as $1bn.
+                try:
+                    _ctval[inst_id] = float(inst.get("ctVal") or 1.0)
+                except (TypeError, ValueError):
+                    _ctval[inst_id] = 1.0
         if by_base:
             _xperp_cache["by_base"] = by_base
+            _xperp_cache["ctval"] = _ctval
             _xperp_cache["at"] = now
     except Exception as e:
         _logger.warning(f"get_xperp_instruments failed (using stale cache): {e}")
@@ -528,4 +537,49 @@ def get_funding_rate(symbol: str):
         rate = data[0].get("fundingRate")
         return float(rate) if rate not in (None, "") else None
     except Exception:
+        return None
+
+
+def get_xperp_book(symbol: str, levels: int = 20) -> dict | None:
+    """Order-book snapshot of the X-Perp this symbol actually trades on.
+
+    SHADOW feature (2026-08-07): recorded to setup_log, never read by the
+    filter or shown to Claude. It exists because a third of the stops in the
+    2026-08-07 report were "X-Perp only" — the deep global feed never confirmed
+    the break — i.e. the stop came from a thin local book rather than a real
+    move. Depth and spread measure that thinness directly, so this is aimed at
+    a failure mode already observed rather than at a guess.
+
+    Returns {spread_bps, depth_usd, imbalance} or None. Never raises.
+      spread_bps — (ask-bid)/mid in basis points; wide = easy to wick through
+      depth_usd  — notional resting across `levels` on BOTH sides
+      imbalance  — (bid_depth - ask_depth) / total, -1..+1
+    """
+    try:
+        inst_id = get_xperp_instruments().get(_base_of(symbol))
+        if not inst_id:
+            return None
+        data = _okx_get("/api/v5/market/books",
+                        {"instId": inst_id, "sz": levels}, timeout=8).get("data", [])
+        if not data:
+            return None
+        bids = [(float(p), float(s)) for p, s, *_ in data[0].get("bids", [])]
+        asks = [(float(p), float(s)) for p, s, *_ in data[0].get("asks", [])]
+        if not bids or not asks:
+            return None
+        mid = (bids[0][0] + asks[0][0]) / 2.0
+        if mid <= 0:
+            return None
+        # Book sizes are in CONTRACTS; ctVal converts to base units.
+        ctv = _xperp_cache.get("ctval", {}).get(inst_id, 1.0) or 1.0
+        bid_d = sum(p * s * ctv for p, s in bids)
+        ask_d = sum(p * s * ctv for p, s in asks)
+        total = bid_d + ask_d
+        return {
+            "spread_bps": round((asks[0][0] - bids[0][0]) / mid * 1e4, 3),
+            "depth_usd":  round(total, 2),
+            "imbalance":  round((bid_d - ask_d) / total, 4) if total else 0.0,
+        }
+    except Exception as e:
+        _logger.debug(f"get_xperp_book failed for {symbol}: {e}")
         return None

@@ -240,6 +240,30 @@ def init_db():
             # for future counter-argument-vs-outcome analysis (which of its
             # own worries actually materialize).
             "counter":      "TEXT",
+            # ── Shadow features (2026-08-07): collected, NEVER shown to Claude
+            # and NEVER used to filter. Reason for existing: a walk-forward test
+            # that day (train 2022-24, test 2025-26) showed the price-shaped
+            # features cannot predict a stop at all — a model separating them
+            # 23% vs 10% in-sample went flat out-of-sample (17.0% vs 16.8%,
+            # AUC 0.52). So the only candidates left are NON-price, and none of
+            # them exist in the historical seed, which means they can only be
+            # validated by accumulating live. These columns start that clock.
+            # Analyse before adding any of them to the prompt — the OI columns
+            # above are the cautionary tale: their designed signal (oi_confirms)
+            # came out BACKWARDS on 109 live rows.
+            #
+            # Order book of the X-Perp actually traded, sampled at decision time.
+            # Targets a measured failure mode rather than a guess: a third of
+            # the stops in the 2026-08-07 report were "X-Perp only" — the deep
+            # feed never confirmed the break — i.e. thin-book artefacts. Depth
+            # and spread are the direct measure of that thinness.
+            "book_spread_bps":  "REAL",   # (ask-bid)/mid in basis points
+            "book_depth_usd":   "REAL",   # notional across 20 levels, both sides
+            "book_imbalance":   "REAL",   # (bid_depth-ask_depth)/total, -1..+1
+            # Hours until the next high-impact scheduled macro event, and its
+            # title. Genuinely absent from candles by construction.
+            "hours_to_event":   "REAL",
+            "next_event":       "TEXT",
         }.items():
             _ensure_column(c, "setup_log", col, ddl)
 
@@ -1005,8 +1029,11 @@ def log_setup_candidate(analysis: dict) -> int:
                  mtf_score, decision, confidence, risk_score, reason, sent,
                  session, entry_source, trend,
                  oi_delta_pct, oi_regime, oi_confirms, counter, variants, source,
-                 open_same_dir)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                 open_same_dir,
+                 book_spread_bps, book_depth_usd, book_imbalance,
+                 hours_to_event, next_event)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
+                    ?, ?, ?, ?, ?)
         """, (
             time_mod.time(),
             analysis.get("symbol", ""),
@@ -1036,6 +1063,13 @@ def log_setup_candidate(analysis: dict) -> int:
             # outcomes still get resolved for the variant arms.
             analysis.get("source") or "live",
             analysis.get("open_same_dir"),
+            # Shadow features — recorded only, never read by the filter or the
+            # prompt. See the column comments in init_db().
+            analysis.get("book_spread_bps"),
+            analysis.get("book_depth_usd"),
+            analysis.get("book_imbalance"),
+            analysis.get("hours_to_event"),
+            analysis.get("next_event"),
         ))
         return cur.lastrowid
 
