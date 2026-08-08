@@ -10,6 +10,7 @@ from config import (
     CLAUDE_API_KEY, CLAUDE_LIGHT_MODEL, CLAUDE_HEAVY_MODEL,
     CLAUDE_MAX_RISK_SCORE, CLAUDE_CACHE_TTL, CLAUDE_MEMORY_LIMIT,
     CLAUDE_DAILY_BUDGET_USD, CLAUDE_BUDGET_RESERVE_USD, LIVE_HIST_EPOCH_TS,
+    TP1_R_MULT,
 )
 from src.db import (
     log_claude_call, get_claude_spend_today, get_similar_resolved_setups,
@@ -31,9 +32,12 @@ _GLOBAL_FEEDBACK_MIN_GAP  = 8.0
 # this the corrector falls back to the absolute rate of the rejected pool.
 _GLOBAL_FEEDBACK_MIN_SENT = 8
 # Absolute TP1% of the rejected pool that counts as over-rejection on its own.
-# The bracket breaks even near 59% (TP1 pays 0.7R, SL costs 1R), so this is a
-# modest margin above break-even, not a fitted number.
-_GLOBAL_FEEDBACK_MIN_REJ_TP1 = 65.0
+# DERIVED, not hardcoded: TP1 pays TP1_R_MULT and SL costs 1R, so the bracket
+# breaks even at 1/(1+TP1_R_MULT). Plus a modest margin, not a fitted number.
+# It was hardcoded at 65 (correct for TP1=0.7) and would have silently become
+# almost break-even when TP1 moved to 0.6 on 2026-08-09 — hence the derivation.
+_BREAK_EVEN_TP1_PCT = 100.0 / (1.0 + float(TP1_R_MULT))
+_GLOBAL_FEEDBACK_MIN_REJ_TP1 = _BREAK_EVEN_TP1_PCT + 6.0
 
 _log = logging.getLogger(__name__)
 
@@ -341,17 +345,17 @@ def _global_feedback() -> str:
         )
 
     # Too few approvals to compare against. Fall back to the absolute rate of
-    # the rejected bucket, which needs no second sample: the bracket breaks
-    # even near 59% TP1 (TP1 pays 0.7R, SL costs 1R), so a rejected pool
-    # clearing _GLOBAL_FEEDBACK_MIN_REJ_TP1 is money left on the table
-    # regardless of how the handful of approvals happened to land.
+    # the rejected bucket, which needs no second sample: the bracket breaks even
+    # at 1/(1+TP1_R_MULT), so a rejected pool clearing
+    # _GLOBAL_FEEDBACK_MIN_REJ_TP1 is money left on the table regardless of how
+    # the handful of approvals happened to land.
     if rej.get("tp1_pct", 0.0) < _GLOBAL_FEEDBACK_MIN_REJ_TP1:
         return ""
     return (
         f"\nCALIBRATION — last 30d shadow outcomes of your own verdicts: you REJECTED "
         f"{rej['n']} setups and {rej['tp1_pct']:.0f}% of them still reached TP1. "
         f"(Too few approvals to compare against, so this is the absolute rate: this "
-        f"bracket breaks even near 59%.) You are rejecting a clearly profitable pool "
+        f"bracket breaks even near {_BREAK_EVEN_TP1_PCT:.0f}%.) You are rejecting a clearly profitable pool "
         f"— you have been TOO STRICT. Every candidate below already passed a strict "
         f"rule-filter with proven edge. Bias toward CONFIRMING the suggested side; "
         f"return NO TRADE only on a clear, specific red flag (not vague caution).\n"

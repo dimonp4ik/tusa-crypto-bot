@@ -403,7 +403,17 @@ RISK_MAX_PCT  = float(os.getenv("RISK_MAX_PCT", "0.03"))   # max SL distance = 3
 # profit only -2.7% there). User chose 0.7 (drawdown/survival > absolute profit,
 # esp. at 10x leverage). Wider runner trail does NOT recover the lost profit
 # (tested, worse). Set TP1_R_MULT=1.0 to revert to the max-absolute-profit variant.
-TP1_R_MULT    = float(os.getenv("TP1_R_MULT", "0.7"))      # TP1 = entry ± risk * 0.7
+# 0.7 -> 0.6 on 2026-08-09. Measured on TWO independent windows, same sign and
+# similar size on both — profit barely moves, drawdown falls hard:
+#   window 1 (to 09.08.26, 1214tr): 80.6%/+522R/-21.3R  ->  83.4%/+500R/-11.8R
+#   window 2 (to 31.01.26,  924tr): 81.1%/+396R/-18.2R  ->  84.2%/+387R/-12.8R
+#   i.e. win rate +2.8/+3.1pp, profit -4.2%/-2.4%, DRAWDOWN -45%/-30%
+# Profit per unit of drawdown goes 24->42 and 22->30. Giving up ~3% of profit
+# for a third to half the drawdown is worth it here specifically because
+# drawdown is the binding constraint on position size: losses cluster (real DD
+# measured 2.9x worse than any of 5000 shuffles of the same trades), so the
+# size a book can carry is set by the cluster, not by the average.
+TP1_R_MULT    = float(os.getenv("TP1_R_MULT", "0.6"))      # TP1 = entry ± risk * 0.6
 TP2_R_MULT    = float(os.getenv("TP2_R_MULT", "2.0"))      # TP2 = entry ± risk * 2.0 (was 3.0 — unreachable)
 
 # Runner exit after TP1: trail the remaining 50% by ATR instead of fixed TP2.
