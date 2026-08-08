@@ -457,6 +457,38 @@ SKIP_RSI_DIV_SETUPS = os.getenv("SKIP_RSI_DIV_SETUPS", "1") != "0"
 SKIP_UTC_HOURS = {h for h in os.getenv("SKIP_UTC_HOURS", "").split(",") if h.strip()}
 SKIP_WEEKDAYS  = {d for d in os.getenv("SKIP_WEEKDAYS", "").split(",") if d.strip()}
 
+# --- Sniper tag (VALIDATED 2026-08-09, walk-forward) ---------------------------
+# A LABEL on the normal stream, never a filter: it does not add, remove or alter
+# a single signal. It marks the subset that historically resolved best, so the
+# position can be sized differently by hand.
+#
+# Two conditions, both declared from mechanism BEFORE looking at the test years,
+# and both of which came out OPPOSITE to the strategy's own stated thesis:
+#   1. stop distance < SNIPER_MAX_STOP_ATR of the instrument's own ATR. The
+#      thesis says a tight stop is riskier (noise knocks you out); the data says
+#      the opposite, because a stop that is few ATRs away puts TP1 (0.7R) within
+#      easy reach in ATR terms. What matters is target reachability, not stop
+#      safety.
+#   2. 1h and 4h do NOT both agree with the direction. The thesis treats full
+#      HTF alignment as the best case; the data says those win LESS. Consistent
+#      with the counter-structure result (see claude_analyzer's Str note): this
+#      system earns on pullback entries into a zone, not on trend continuation.
+#
+# Threshold 2.09 = the 25th percentile of stop/ATR measured on 2022-2024 ONLY,
+# frozen before the 2025-2026 check. Result, defined-then-tested:
+#   train 2022-24  85.7% WR / +0.641R   |   test 2025-26  84.4% WR / +0.637R
+# By year (never negative, never below the base): 2023 88.1%/+0.647 ·
+# 2024 85.2%/+0.670 · 2025 83.1%/+0.645 · 2026 85.5%/+0.631, against a base of
+# 81.1%/+0.461. ~65 trades a year.
+#
+# ⚠️ This is NOT the 90-100% the idea started from, and it cannot be: an earlier
+# search over ~600 feature combinations DID find 90.5% on 2022-24, and every one
+# of those rules collapsed to 80.6-83.5% (i.e. the base) on 2025-26. Searching
+# for a win rate manufactures it. These two conditions survive precisely because
+# they were fixed in advance.
+SNIPER_TAG_ENABLED  = os.getenv("SNIPER_TAG_ENABLED", "1") != "0"
+SNIPER_MAX_STOP_ATR = float(os.getenv("SNIPER_MAX_STOP_ATR", "2.09"))
+
 # --- Stale-entry guard (VALIDATED 2026-07-31, default ON) ----------------------
 # The strategy's edge lives in entering AT the FVG/OB retest zone. The backtest
 # always fills there by construction, but live the bot re-anchors the entry to

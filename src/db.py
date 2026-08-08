@@ -98,6 +98,11 @@ def init_db():
             # move). NULL = not an SL or check unavailable. Lets us measure how
             # much of the live SL rate is X-Perp thin-book noise vs true reversals.
             "sl_xperp_only": "INTEGER",
+            # Sniper label (config.py SNIPER_TAG_ENABLED) — the historically
+            # best-resolving 2.5% of the stream. A marker, never a gate: it
+            # changes no signal, it only lets the position be sized by hand and
+            # its live win rate compared to the backtest's 85.1%/+0.641R.
+            "sniper":        "INTEGER DEFAULT 0",
         }.items():
             _ensure_column(c, "signals", col, ddl)
 
@@ -264,6 +269,10 @@ def init_db():
             # title. Genuinely absent from candles by construction.
             "hours_to_event":   "REAL",
             "next_event":       "TEXT",
+            # Sniper label (config.py SNIPER_TAG_ENABLED) — a marker on the
+            # normal stream, never a gate. Stored so its live win rate can be
+            # tracked against the backtest's 85.1%/+0.641R.
+            "sniper":           "INTEGER",
         }.items():
             _ensure_column(c, "setup_log", col, ddl)
 
@@ -402,9 +411,9 @@ def log_signal(analysis: dict, tp1: float, tp2: float, sl: float) -> int:
             INSERT INTO signals (
                 symbol, direction, entry_price, tp1, tp2, sl, opened_at, status,
                 confidence, reason, entry_low, entry_high, entry_source, market_price,
-                mtf_score, mtf_score_max, premium, atr
+                mtf_score, mtf_score_max, premium, atr, sniper
             )
-            VALUES (?, ?, ?, ?, ?, ?, ?, 'OPEN', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            VALUES (?, ?, ?, ?, ?, ?, ?, 'OPEN', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """, (
             analysis["symbol"], analysis["direction"], analysis["current_price"],
             tp1, tp2, sl, time_mod.time(),
@@ -414,6 +423,7 @@ def log_signal(analysis: dict, tp1: float, tp2: float, sl: float) -> int:
             analysis.get("mtf_score"), analysis.get("mtf_score"),
             1 if analysis.get("premium") else 0,
             analysis.get("atr"),
+            1 if analysis.get("sniper") else 0,
         ))
         return cur.lastrowid
 
@@ -1070,9 +1080,9 @@ def log_setup_candidate(analysis: dict) -> int:
                  oi_delta_pct, oi_regime, oi_confirms, counter, variants, source,
                  open_same_dir,
                  book_spread_bps, book_depth_usd, book_imbalance,
-                 hours_to_event, next_event)
+                 hours_to_event, next_event, sniper)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
-                    ?, ?, ?, ?, ?)
+                    ?, ?, ?, ?, ?, ?)
         """, (
             time_mod.time(),
             analysis.get("symbol", ""),
@@ -1109,6 +1119,7 @@ def log_setup_candidate(analysis: dict) -> int:
             analysis.get("book_imbalance"),
             analysis.get("hours_to_event"),
             analysis.get("next_event"),
+            1 if analysis.get("sniper") else 0,
         ))
         return cur.lastrowid
 

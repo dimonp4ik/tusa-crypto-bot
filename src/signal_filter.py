@@ -40,6 +40,8 @@ from config import (
     REL_STRENGTH_RISK_UP_MULT, REL_STRENGTH_RISK_UP_MAX_MULT,
     TREND_PAIR_RISK_UP, TREND_PAIR_RISK_UP_1H, TREND_PAIR_RISK_UP_4H,
     TREND_PAIR_RISK_UP_MULT, TREND_PAIR_RISK_UP_MAX_MULT,
+    SNIPER_TAG_ENABLED, SNIPER_MAX_STOP_ATR,
+    RISK_MIN_PCT, RISK_MAX_PCT, SL_ATR_BUFFER,
     STABILITY_FILTERS_ENABLED, STABILITY_SKIP_PACKS, STABILITY_SKIP_SESSIONS,
     STABILITY_MIN_EFF_RATIO, STABILITY_MIN_VOLUME_RATIO, STABILITY_MIN_QUALITY_SCORE,
     SKIP_RSI_DIV_SETUPS, SKIP_UTC_HOURS, SKIP_WEEKDAYS,
@@ -478,6 +480,43 @@ def _quality_breakdown(ind: dict, bos: str, entry_zone, adaptive_pack: str) -> d
         "portfolio_risk_score": int(portfolio_score),
         "quality_score": total,
     }
+
+
+def _is_sniper(ind: dict, price: float, direction: str,
+               trend_1h: str, trend_4h: str) -> bool:
+    """The historically best-resolving subset of setups. A LABEL, not a gate.
+
+    Computed here so live and backtest cannot disagree: both reach this through
+    analyze_coin_smc, and the risk distance is derived with the same clamp
+    calculate_tp_sl() uses, so the flag matches the bracket that will actually
+    be placed. See config.py SNIPER_TAG_ENABLED for the walk-forward evidence
+    and for why both conditions run OPPOSITE to the strategy's stated thesis.
+    """
+    if not SNIPER_TAG_ENABLED:
+        return False
+    try:
+        atr = float(ind.get("atr") or 0.0)
+        atr_pct = float(ind.get("vol_atr_pct") or 0.0)
+        if price <= 0 or atr <= 0 or atr_pct <= 0:
+            return False
+        # Same risk the bracket will use: swing invalidation + ATR buffer,
+        # clamped into [RISK_MIN_PCT, RISK_MAX_PCT] of price.
+        lo, hi = float(ind.get("recent_low") or 0.0), float(ind.get("recent_high") or 0.0)
+        if direction == "LONG":
+            struct = (lo - atr * SL_ATR_BUFFER) if lo > 0 else price * (1 - RISK_MAX_PCT)
+            risk = price - struct
+        else:
+            struct = (hi + atr * SL_ATR_BUFFER) if hi > 0 else price * (1 + RISK_MAX_PCT)
+            risk = struct - price
+        risk = min(max(risk, price * RISK_MIN_PCT), price * RISK_MAX_PCT)
+        if (risk / price) / atr_pct >= SNIPER_MAX_STOP_ATR:
+            return False
+        # Full 1h+4h agreement with the direction resolves WORSE — this system
+        # earns on pullbacks into a zone, not on trend continuation.
+        want = "bullish" if direction == "LONG" else "bearish"
+        return not (trend_1h == want and trend_4h == want)
+    except (TypeError, ValueError, ZeroDivisionError):
+        return False
 
 
 def _stability_overlay_pass(ind: dict, adaptive_pack: str, quality_score: float = 0.0) -> bool:
@@ -1026,6 +1065,9 @@ def analyze_coin_smc(candles_15m: dict, candles_1h: dict, symbol: str,
         "divergence":       div,
         "wick_rejection":   wicks.get("rejection"),
         "atr":              ind["atr"],
+        # Label only — no gate reads this. See config.py SNIPER_TAG_ENABLED.
+        "sniper":           _is_sniper(ind, price_payload["entry_price"], direction,
+                                       trend_1h, trend_4h),
         "eff_ratio":        ind.get("eff_ratio"),
         "vol_atr_pct":      ind.get("vol_atr_pct"),
         "vol_ratio_regime": ind.get("vol_ratio_regime"),
