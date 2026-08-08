@@ -51,7 +51,7 @@ from src.signal_filter import analyze_coin_smc
 from src.filter_variants import VARIANTS, compute_variants
 from src.knn_analog import knn_direction_score, knn_risk_mult
 from src.claude_analyzer import analyze_batch_with_claude, analyze_heavy
-from src.telegram_notifier import send_signal, send_status, send_news_alert, send_signal_update, calculate_tp_sl, send_morning_digest, send_weekly_digest, send_daily_prayer, send_commandments, send_evening_prayer, send_evening_ritual, _disp_sym
+from src.telegram_notifier import send_signal, send_status, send_news_alert, send_signal_update, calculate_tp_sl, send_morning_digest, send_weekly_digest, send_daily_prayer, send_commandments, send_evening_prayer, send_evening_ritual, _disp_sym, _esc
 from src.news_filter import check_news_sentiment
 from src.news_agent import (
     get_market_news, detect_major_events, fetch_recent_headlines,
@@ -1005,8 +1005,14 @@ def _render_users_page(chat_id: int, message_id: int, page: int, query: str = ""
     for u in users:
         fn    = u.get("first_name") or ""
         ln    = u.get("last_name") or ""
-        name  = (fn + (" " + ln if ln else "")).strip() or "—"
-        uname = f"@{u['username']}" if u.get("username") else f"`{u['user_id']}`"
+        # Telegram usernames legally contain underscores and display names are
+        # arbitrary user-controlled text, so both break legacy Markdown when
+        # rendered bare — an odd number of underscores anywhere on the page
+        # unbalances the whole message (see _esc in telegram_notifier).
+        # Username goes in a code span: inside backticks legacy Markdown parses
+        # nothing, so the handle survives verbatim and stays copyable.
+        name  = _esc((fn + (" " + ln if ln else "")).strip()) or "—"
+        uname = f"`@{u['username']}`" if u.get("username") else f"`{u['user_id']}`"
         last  = datetime.fromtimestamp(u["last_seen"], tz=_riga_tz()).strftime("%d.%m %H:%M")
         lines.append(f"• {name} {uname} — {last} ({u.get('message_count', 1)} сообщ.)")
 
@@ -1471,14 +1477,14 @@ def _handle_admin_callback(callback_id: str, chat_id: int,
             if fulls:
                 lines.append("\n➕ *Добавленные админы:*")
                 for a in fulls:
-                    fn   = a.get("first_name") or ""
-                    un   = f" @{a['username']}" if a.get("username") else ""
+                    fn   = _esc(a.get("first_name") or "")
+                    un   = f" `@{a['username']}`" if a.get("username") else ""
                     lines.append(f"  • {fn}{un} `{a['user_id']}`")
             if mods:
                 lines.append("\n🛡 *Модераторы:*")
                 for a in mods:
-                    fn   = a.get("first_name") or ""
-                    un   = f" @{a['username']}" if a.get("username") else ""
+                    fn   = _esc(a.get("first_name") or "")
+                    un   = f" `@{a['username']}`" if a.get("username") else ""
                     lines.append(f"  • {fn}{un} `{a['user_id']}`")
             if not fulls and not mods:
                 lines.append("\n_Добавленных админов/модераторов нет._")
@@ -1543,13 +1549,16 @@ def _handle_admin_callback(callback_id: str, chat_id: int,
             if rows:
                 for r in rows:
                     u_info = get_user_by_id(r["user_id"]) or {}
-                    un = f"@{u_info['username']}" if u_info.get("username") else ""
+                    un = f"`@{u_info['username']}`" if u_info.get("username") else ""
                     st = "🟢 активен" if r.get("active") else ("🟡 ждёт настройки" if r.get("allowed") else "⚪")
                     lines.append(f"• {un} `{r['user_id']}` — {st}")
             else:
                 lines.append("_Никто не добавлен._")
             if not keystore_ready():
-                lines.append("\n⚠️ *AUTOTRADE\\_ENC\\_KEY не настроен* — подключение ключей не заработает.")
+                # Legacy Markdown has no backslash escaping — `AUTOTRADE\_ENC\_KEY`
+                # rendered the backslashes literally. A code span is the correct
+                # way to show an identifier with underscores.
+                lines.append("\n⚠️ `AUTOTRADE_ENC_KEY` *не настроен* — подключение ключей не заработает.")
             kb_rows = []
             for r in rows:
                 if r.get("allowed"):
@@ -1884,8 +1893,9 @@ def _format_setups_page(rows: list, date_str: str, page: int = 0,
         tp2_s   = _px(tp2)
         risk_s  = f" R{risk}" if risk is not None else ""
         conf_s  = f" {conf}" if conf else ""
-        reason_safe  = (reason.replace("_", "\\_").replace("*", "\\*")
-                              .replace("`", "\\`").replace("[", "\\["))[:60]
+        # Second copy of the notifier bug: legacy Markdown ignores backslash
+        # escapes, so this produced visible slashes AND left emphasis unbalanced.
+        reason_safe  = _esc(reason)[:60]
         reason_short = (reason_safe + "…") if len(reason) > 60 else reason_safe
 
         lines.append(
@@ -2568,9 +2578,9 @@ def webhook():
             else:
                 lines = [f"👥 *Поиск `{query}`* — {total} чел.\n"]
                 for u in users:
-                    fn    = u.get("first_name") or ""
+                    fn    = _esc(u.get("first_name") or "")
                     name  = fn.strip() or "—"
-                    uname = f"@{u['username']}" if u.get("username") else f"`{u['user_id']}`"
+                    uname = f"`@{u['username']}`" if u.get("username") else f"`{u['user_id']}`"
                     last  = datetime.fromtimestamp(u["last_seen"], tz=_riga_tz()).strftime("%d.%m %H:%M")
                     lines.append(f"• {name} {uname} `{u['user_id']}` — {last}")
                 _send_admin_text(chat_id, "\n".join(lines), _back_kb)
@@ -2803,8 +2813,8 @@ def webhook():
                "     и никогда не опускается ниже входа\n"
                "  4. Закрывается по трейлингу или при достижении TP2\n\n"
                "*Исходы сделки:*\n"
-               "  ✅ *TP1\\_TRAIL* — TP1 взят, раннер закрыт трейлингом \\(прибыль\\)\n"
-               "  🏆 *TP2\\_HIT* — TP1 + TP2 оба взяты \\(максимум\\)\n"
+               "  ✅ `TP1_TRAIL` — TP1 взят, раннер закрыт трейлингом (прибыль)\n"
+               "  🏆 `TP2_HIT` — TP1 + TP2 оба взяты (максимум)\n"
                "  ⚖️ *BE* — TP1 взят, остаток закрыт в безубыток\n"
                "  ❌ *SL* — убыток \\(до TP1 не дошло\\)\n"
                "  ⏱ *Expired* — время вышло, закрыто без результата\n\n"
