@@ -19,7 +19,7 @@ Why not run 5-9 separate Claude calls per scan:
 Single-verdict replay keeps arms on identical verdicts, so the only difference
 between them is the filter rule itself.
 
-STRICTER arms (B/E/G/H/I) are a plain subset of what live already admits, so
+STRICTER arms (G) are a plain subset of what live already admits, so
 they replay directly against real-signal outcomes.
 
 LOOSER arms (D/F) need setups the live filter REJECTED — which Claude
@@ -43,6 +43,21 @@ the same day at the user's request. Note what that leaves standing: the
 11:00-12:59 UTC block stays in place, justified by 19 trades measured against
 a base later found broken, and no data will ever accumulate to confirm or
 refute it. Re-add a _soft_fail("overlap") in signal_filter.py to revive it.
+
+Slots B, E, H, I are FREE (2026-08-09) — removed on request. Live arms are now
+A (control), D, F, G. Two things this leaves standing, recorded so they do not
+resurface as surprises:
+  - G survives WITHOUT its falsifier. I was deliberately pointed at the
+    opposite end of the same axis (vol-regime >= 1.3 against G's < 2.0), and
+    the 10,300-trade seed says the edge sits at the TOP of that axis, not the
+    bottom: <0.8 -> 76.1%/+0.387R, 0.8-1.3 -> 79.5%/+0.425R, 1.3-2.0 ->
+    81.9%/+0.475R, >2.0 -> 82.6%/+0.496R. G cuts the strongest bucket, so it
+    is the arm most likely to be wrong, and nothing is now positioned to show
+    that.
+  - E held volume >= 2.5x, the best-supported strict rule available (39% of
+    seed setups, WR 82.1%/+0.493R vs 80.5%/+0.441R below the threshold, and
+    volume_ratio predicts on two independent 6-month windows where mtf_score
+    does not). It was never given live data to fail on.
 
 **Retired 2026-08-03 after the first read-out (54 setups, 27.07-02.08).** The
 arms were judged by the SYMMETRIC DIFFERENCE against control A, not by their
@@ -101,29 +116,10 @@ def _v_a(s):   # control: everything the live filter already passed
     return _live_ok(s)
 
 
-def _v_b(s):   # HTF_ALIGNED_LONG_GUARD=1 — cut LONGs where 1h AND 4h already bullish
-    if not _live_ok(s):
-        return False
-    if s.get("direction") != "LONG":
-        return True
-    return not (s.get("trend_1h") == "bullish" and s.get("trend_4h") == "bullish")
-
 
 def _v_d(s):   # looser score gate — fed by the score-shadow batch (see module docstring)
     return _relaxes(s, "score") and _f(s, "mtf_score") >= 12
 
-
-def _v_e(s):   # volume_ratio >= 2.5 (re-pointed 2026-08-03; was eff_ratio >= 0.25,
-               # RETIRED — over a week it removed 22 setups averaging +0.93R while
-               # the control itself averaged +0.85R, i.e. it cut BETTER-than-average
-               # trades, and the seed agrees: eff_ratio's top bucket (>=0.45) is its
-               # WORST at +0.398R vs +0.475R for the middle).
-               # The replacement is the best-supported strict rule we have: on the
-               # 10,300-trade seed volume>=2.5x is 39% of setups at WR 82.1% /
-               # +0.493R against 80.5% / +0.441R below it — and volume_ratio was
-               # separately confirmed to predict on two 6-month windows (3605
-               # trades) while mtf_score did not.
-    return _live_ok(s) and _f(s, "volume_ratio") >= 2.5
 
 
 def _v_f(s):   # "context momentum pack" OFF — the 5 narrow segment gates
@@ -139,34 +135,12 @@ def _v_g(s):   # skip overheated volatility regime, any direction (live only gua
     return _live_ok(s) and _f(s, "vol_ratio_regime", 1.0) < 2.0
 
 
-def _v_h(s):   # "fresh trend": 4h leads, 1h hasn't caught up yet
-    if not _live_ok(s):
-        return False
-    bos = _bos_of(s)
-    aligned = int(s.get("trend_1h") == bos) + int(s.get("trend_4h") == bos)
-    neutral = int(s.get("trend_1h") == "neutral") + int(s.get("trend_4h") == "neutral")
-    return aligned == 1 and neutral == 1
-
-
-def _v_i(s):   # vol_ratio_regime >= 1.3 (re-pointed 2026-08-03; was RSI-midline OFF,
-               # which bound on only 4 setups a week — net -0.6R, unconcludable).
-               # Deliberately the OPPOSITE END of arm G: the seed says the signal
-               # lives at the BOTTOM of the volatility regime, not the top —
-               # <0.8 → WR 76.1%/+0.387R, 0.8-1.3 → 79.5%/+0.425R, but 1.3-2.0 →
-               # 81.9%/+0.475R and >2.0 → 82.6%/+0.496R. G cuts the BEST bucket;
-               # this cuts the worst. Running both falsifies one of them.
-    return _live_ok(s) and _f(s, "vol_ratio_regime", 1.0) >= 1.3
-
 
 VARIANTS = {
     "A": ("Текущий (контроль)",              _v_a, True),
-    "B": ("HTF-гейт LONG вкл",               _v_b, True),
     "D": ("Мягкий score ≥12 (shadow)",       _v_d, True),
-    "E": ("Объём ≥2.5x",                     _v_e, True),
     "F": ("Контекст-моментум ВЫКЛ",          _v_f, True),
     "G": ("Vol-regime <2.0x",                _v_g, True),
-    "H": ("Свежий тренд (mixed)",            _v_h, True),
-    "I": ("Vol-regime ≥1.3x",                _v_i, True),
 }
 
 
