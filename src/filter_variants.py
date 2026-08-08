@@ -19,8 +19,10 @@ Why not run 5-9 separate Claude calls per scan:
 Single-verdict replay keeps arms on identical verdicts, so the only difference
 between them is the filter rule itself.
 
-STRICTER arms (G) are a plain subset of what live already admits, so
-they replay directly against real-signal outcomes.
+There are no STRICTER arms left (2026-08-09): every surviving arm either IS
+the live filter (A) or loosens it. The experiment now asks one question only —
+does relaxing a gate help — which matches where the evidence has pointed all
+along: the strict arms measured so far cut better-than-average trades.
 
 LOOSER arms (D/F) need setups the live filter REJECTED — which Claude
 would never see and nothing would ever log. The shadow mechanism (2026-07-25)
@@ -44,16 +46,14 @@ the same day at the user's request. Note what that leaves standing: the
 a base later found broken, and no data will ever accumulate to confirm or
 refute it. Re-add a _soft_fail("overlap") in signal_filter.py to revive it.
 
-Slots B, E, H, I are FREE (2026-08-09) — removed on request. Live arms are now
-A (control), D, F, G. Two things this leaves standing, recorded so they do not
-resurface as surprises:
-  - G survives WITHOUT its falsifier. I was deliberately pointed at the
-    opposite end of the same axis (vol-regime >= 1.3 against G's < 2.0), and
-    the 10,300-trade seed says the edge sits at the TOP of that axis, not the
-    bottom: <0.8 -> 76.1%/+0.387R, 0.8-1.3 -> 79.5%/+0.425R, 1.3-2.0 ->
-    81.9%/+0.475R, >2.0 -> 82.6%/+0.496R. G cuts the strongest bucket, so it
-    is the arm most likely to be wrong, and nothing is now positioned to show
-    that.
+Slots B, E, G, H, I are FREE (2026-08-09) — removed on request in two steps.
+LIVE ARMS ARE NOW A (control), D, F. What was given up, recorded so it does
+not resurface as a surprise:
+  - G (vol-regime < 2.0x) cut the STRONGEST bucket on the 10,300-trade seed:
+    <0.8 -> 76.1%/+0.387R, 0.8-1.3 -> 79.5%/+0.425R, 1.3-2.0 -> 81.9%/+0.475R,
+    >2.0 -> 82.6%/+0.496R. Removing it costs nothing and probably prevents a
+    mistake; I, its deliberate falsifier at the opposite end of the same axis,
+    went in the previous step.
   - E held volume >= 2.5x, the best-supported strict rule available (39% of
     seed setups, WR 82.1%/+0.493R vs 80.5%/+0.441R below the threshold, and
     volume_ratio predicts on two independent 6-month windows where mtf_score
@@ -92,10 +92,6 @@ def _f(setup, key, default=0.0):
         return default
 
 
-def _bos_of(setup):
-    return "bullish" if setup.get("direction") == "LONG" else "bearish"
-
-
 def _live_ok(s):
     """True only for setups the LIVE filter actually admitted.
 
@@ -130,17 +126,10 @@ def _v_f(s):   # "context momentum pack" OFF — the 5 narrow segment gates
     return _relaxes(s, "ctxmom")
 
 
-def _v_g(s):   # skip overheated volatility regime, any direction (live only guards
-               # bear+SHORT+hot-vol via BEAR_TREND_HOT_VOL_GUARD — this is the broader form)
-    return _live_ok(s) and _f(s, "vol_ratio_regime", 1.0) < 2.0
-
-
-
 VARIANTS = {
     "A": ("Текущий (контроль)",              _v_a, True),
     "D": ("Мягкий score ≥12 (shadow)",       _v_d, True),
     "F": ("Контекст-моментум ВЫКЛ",          _v_f, True),
-    "G": ("Vol-regime <2.0x",                _v_g, True),
 }
 
 
