@@ -122,7 +122,9 @@ _MODERATOR_ALLOWED_EXACT = {
     "adm_back", "adm_open_new",
 }
 _MODERATOR_ALLOWED_PREFIX = (
-    "adm_setups_pg_", "adm_mb_block_", "adm_mb_unblock_",
+    # adm_mb_d_ = pick block duration; moderators already may block/unblock,
+    # so choosing how long is within the same authority.
+    "adm_setups_pg_", "adm_mb_block_", "adm_mb_unblock_", "adm_mb_d_",
     "adm_top_d", "adm_worst_d",
     "adm_users_p", "adm_users_q_",
     "adm_at_rm_",
@@ -137,6 +139,21 @@ def _moderator_may(data: str) -> bool:
 _pending_add_admin: dict = {}
 # State: admin is typing a symbol name to manually block.
 _pending_block_chat: dict = {}
+# Chosen block duration per chat, in days. Sticky so the coin buttons and the
+# manual-symbol path always agree on it. 36500 days ≈ 100 years = "forever";
+# set_symbol_block stores an absolute expiry, so there is no sentinel to add.
+_block_days: dict = {}
+_BLOCK_FOREVER_DAYS = 36500
+
+
+def _block_days_label(days: int) -> str:
+    if days >= _BLOCK_FOREVER_DAYS:
+        return "навсегда"
+    if days >= 30:
+        return f"{days} дней"
+    if days > 1:
+        return f"{days} дней"
+    return "24 часа"
 # State: admin is typing a user search query.
 _pending_users_search: dict = {}
 # State: admin is typing a date to view setup history.
@@ -953,8 +970,13 @@ def _render_manual_block_panel(chat_id: int, message_id: int):
     if blocks:
         lines.append("*Заблокированы сейчас:*")
         for b in blocks:
-            until = datetime.fromtimestamp(b["blocked_until"], tz=_RIGA).strftime("%d.%m %H:%M")
-            lines.append(f"• *{_disp_sym(b['symbol'])}* до {until}")
+            # A "forever" block is stored as an expiry ~100 years out; printing
+            # that as a 2126 date is noise, not information.
+            _left_d = (b["blocked_until"] - _t.time()) / 86400
+            until = ("навсегда" if _left_d > 365
+                     else "до " + datetime.fromtimestamp(b["blocked_until"],
+                                                         tz=_RIGA).strftime("%d.%m %H:%M"))
+            lines.append(f"• *{_disp_sym(b['symbol'])}* {until}")
             kb_rows.append([{
                 "text": f"✅ Разблок {_disp_sym(b['symbol'])}",
                 "callback_data": f"adm_mb_unblock_{b['symbol']}",
@@ -974,6 +996,18 @@ def _render_manual_block_panel(chat_id: int, message_id: int):
         if row:
             kb_rows.append(row)
 
+    # Duration is chosen first and remembered for this chat, so both paths —
+    # tapping a coin above and typing a symbol below — use the same setting.
+    _d = _block_days.get(chat_id, 1)
+    kb_rows.append([
+        {"text": ("✅ " if _d == 1 else "") + "24ч",       "callback_data": "adm_mb_d_1"},
+        {"text": ("✅ " if _d == 7 else "") + "7д",        "callback_data": "adm_mb_d_7"},
+        {"text": ("✅ " if _d == 30 else "") + "30д",      "callback_data": "adm_mb_d_30"},
+        {"text": ("✅ " if _d >= _BLOCK_FOREVER_DAYS else "") + "навсегда",
+         "callback_data": "adm_mb_d_max"},
+    ])
+    lines.append(f"\n_Срок блокировки: *{_block_days_label(_d)}*. "
+                 "Кнопка монеты и ручной ввод используют его._")
     kb_rows.append([{"text": "✏️ Ввести символ вручную", "callback_data": "adm_mb_input"}])
     kb_rows.append([{"text": "« Назад", "callback_data": _sec_back_cb(chat_id)}])
 
@@ -1638,11 +1672,19 @@ def _handle_admin_callback(callback_id: str, chat_id: int,
     elif data == "adm_manblock":
         _render_manual_block_panel(chat_id, message_id)
 
+    elif data.startswith("adm_mb_d_"):
+        _key = data[len("adm_mb_d_"):]
+        _block_days[chat_id] = (_BLOCK_FOREVER_DAYS if _key == "max"
+                                else int(_key) if _key.isdigit() else 1)
+        _render_manual_block_panel(chat_id, message_id)
+
     elif data.startswith("adm_mb_block_"):
         symbol = data[len("adm_mb_block_"):]
+        _d = _block_days.get(chat_id, 1)
         try:
-            set_symbol_block(symbol, days=1, reason="Manual block by admin")
-            _answer_callback(callback_id, f"🚫 {_disp_sym(symbol)} заблокирована на 24ч")
+            set_symbol_block(symbol, days=_d, reason="Manual block by admin")
+            _answer_callback(callback_id,
+                             f"🚫 {_disp_sym(symbol)} заблокирована: {_block_days_label(_d)}")
         except Exception as e:
             _answer_callback(callback_id, f"Ошибка: {e}")
         _render_manual_block_panel(chat_id, message_id)
@@ -1657,14 +1699,15 @@ def _handle_admin_callback(callback_id: str, chat_id: int,
         _render_manual_block_panel(chat_id, message_id)
 
     elif data == "adm_mb_input":
-        _pending_block_chat[chat_id] = 1  # days
+        _d = _block_days.get(chat_id, 1)
+        _pending_block_chat[chat_id] = _d
         try:
             _requests.post(
                 f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage",
                 json={
                     "chat_id": chat_id,
                     "text": (
-                        "Введи символ монеты для блокировки на 24ч.\n"
+                        f"Введи символ монеты. Блокировка: *{_block_days_label(_d)}*.\n"
                         "Пример: `BTCUSDC` или `BTC`"
                     ),
                     "parse_mode": "Markdown",
@@ -2627,7 +2670,12 @@ def webhook():
         return "ok", 200
 
     # ── Pending "manual block" state — admin typed a symbol to block ──────────
-    if is_dm and _is_admin(user_id) and chat_id in _pending_block_chat:
+    # NOT gated on is_dm (fixed 2026-08-09): the admin panel works in the group
+    # too, so the prompt appeared there, the admin typed the symbol there, and
+    # this handler silently skipped it — the reported "type a coin and nothing
+    # happens". The pending dict is already keyed by chat, and _is_admin still
+    # gates it, so the DM requirement protected nothing.
+    if _is_admin(user_id) and chat_id in _pending_block_chat:
         days = _pending_block_chat.pop(chat_id)
         raw_sym = text_raw.strip().upper().replace("-", "").replace("/", "").replace("_", "")
         # Normalize any quote (USDC display / USDT internal / bare base) → internal USDT
@@ -2638,7 +2686,10 @@ def webhook():
         raw_sym = raw_sym + "USDT"
         try:
             set_symbol_block(raw_sym, days=days, reason="Manual block by admin")
-            _reply(chat_id, f"🚫 *{_disp_sym(raw_sym)}* заблокирована на {days}ч (24ч).\nОткрой 🔒 Блок монет чтобы проверить.")
+            # Was "на {days}ч (24ч)" — days is DAYS, so a 7-day block read as "7ч".
+            _reply(chat_id, f"🚫 *{_disp_sym(raw_sym)}* заблокирована: "
+                            f"{_block_days_label(days)}.\n"
+                            "Открой 🔒 Блок монет чтобы проверить.")
         except Exception as e:
             _reply(chat_id, f"Ошибка: {e}")
         return "ok", 200
