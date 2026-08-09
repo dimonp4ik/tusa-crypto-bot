@@ -31,7 +31,7 @@ from config import (
     STOP_CLOSE_CONFIRM, MAX_SAME_DIRECTION_POSITIONS, STOP_EXCHANGE_BACKSTOP_R,
     MTF_MIN_SCORE, SHADOW_MIN_SCORE, TP1_R_MULT, LIVE_HIST_EPOCH_TS,
     STALE_ENTRY_GUARD, STALE_ENTRY_ZONE_TOLERANCE, STALE_ENTRY_MAX_RISK_FRAC,
-    STALE_ENTRY_MAX_ADVERSE_PCT,
+    STALE_ENTRY_MAX_ADVERSE_PCT, SPREAD_GATE_ENABLED, SPREAD_MAX_BPS,
     RISK_MIN_PCT, RISK_MAX_PCT, SL_ATR_BUFFER, TOP_COINS_COUNT,
     TP1_CLOSE_FRAC, EXIT_PROFILE,
     POST_TP1_STRONG_TRAIL_ATR_MULT, POST_TP1_WEAK_TRAIL_ATR_MULT,
@@ -433,7 +433,8 @@ def _build_and_send_report(chat_id: int, message_id: int,
         for code, title in (("dir_cap", f"лимит одной стороны ({MAX_SAME_DIRECTION_POSITIONS})"),
                             ("scan_cap", "лимит 3 за скан"),
                             ("send_failed", "⚠️ СБОЙ ОТПРАВКИ (баг, не лимит — должно быть 0)"),
-                            ("stale_entry", "🏃 цена ушла из зоны до публикации")):
+                            ("stale_entry", "🏃 цена ушла из зоны до публикации"),
+                            ("wide_spread", f"📏 широкий спред (>{SPREAD_MAX_BPS:.0f}бп)")):
             st = _caps.get(code) or {}
             if st.get("n"):
                 A(f"  {title}: срезано {st['n']}  "
@@ -1260,7 +1261,8 @@ def _handle_admin_callback(callback_id: str, chat_id: int,
             _titles = {"dir_cap": f"Лимит одной стороны ({MAX_SAME_DIRECTION_POSITIONS})",
                        "scan_cap": "Лимит 3 за скан",
                        "send_failed": "⚠️ Сбой отправки в Telegram",
-                       "stale_entry": "🏃 Цена ушла из зоны (погоня)"}
+                       "stale_entry": "🏃 Цена ушла из зоны (погоня)",
+                       "wide_spread": f"📏 Широкий спред (>{SPREAD_MAX_BPS:.0f}бп)"}
             _any = False
             for code, title in _titles.items():
                 st = caps.get(code) or {}
@@ -4113,6 +4115,30 @@ def run_scan():
                         # that always fills at the zone).
                         try:
                             mark_setup_blocked(analysis.get("_setup_log_id"), "stale_entry")
+                        except Exception:
+                            pass
+                        continue
+
+                    # Execution-quality gate: the bid/ask gap on the X-Perp we
+                    # actually trade. Paid in full on entry and again on exit,
+                    # before the market has moved at all — so it comes straight
+                    # out of a ~2% stop. Not a market prediction: the number is
+                    # known exactly at decision time.
+                    # Live spreads span 7000x, and global volume does NOT
+                    # predict them — BICO is #3 in the world by turnover and
+                    # still shows 0.54%, worse than HOME's 0.41% (measured
+                    # 2026-08-09, after a HOME trade whose price ran away from
+                    # the signal). So ranking the universe by volume, on either
+                    # venue, cannot fix this; only the spread itself can.
+                    _spr = analysis.get("book_spread_bps")
+                    if (SPREAD_GATE_ENABLED and _spr is not None
+                            and float(_spr) > SPREAD_MAX_BPS):
+                        log.warning(
+                            f"  Skip {analysis['symbol']} — spread {float(_spr):.1f}bp "
+                            f"> {SPREAD_MAX_BPS:.0f}bp (thin X-Perp book)"
+                        )
+                        try:
+                            mark_setup_blocked(analysis.get("_setup_log_id"), "wide_spread")
                         except Exception:
                             pass
                         continue

@@ -467,6 +467,31 @@ SKIP_RSI_DIV_SETUPS = os.getenv("SKIP_RSI_DIV_SETUPS", "1") != "0"
 SKIP_UTC_HOURS = {h for h in os.getenv("SKIP_UTC_HOURS", "").split(",") if h.strip()}
 SKIP_WEEKDAYS  = {d for d in os.getenv("SKIP_WEEKDAYS", "").split(",") if d.strip()}
 
+# --- Spread gate (2026-08-09) --------------------------------------------------
+# Skip a signal when the bid/ask gap on the X-Perp we actually trade is wider
+# than this. The spread is paid in full entering and again exiting, before the
+# market moves at all, and the stop is only ~2% away — so 0.25% of spread is
+# already an eighth of the risk, twice.
+#
+# Not a market prediction, which is why this is a gate and the price-pattern
+# hypotheses tested the same day are not: the number is known exactly at
+# decision time and measures whether the instrument can be transacted, not
+# where it will go.
+#
+# Live spreads span ~7000x across the scannable universe (BTC 0.0001%, AEON
+# 0.68%), and — the reason a volume-ranked universe cannot fix this — turnover
+# does NOT predict spread: BICO is #3 in the world by 24h volume and still
+# shows 0.54%, worse than the HOME trade that prompted this. It is #3 on the EU
+# venue too, so ranking by local volume fails identically.
+#
+# 25bp chosen to match STALE_ENTRY_MAX_ADVERSE_PCT (0.25%): we already allow
+# price to drift that far from the signal before refusing to publish, so an
+# instrument whose spread alone eats that entire budget does not belong.
+# Blocked setups are tagged 'wide_spread' and keep being shadow-resolved, so
+# the cost of this gate is measurable in the cap-impact panel.
+SPREAD_GATE_ENABLED = os.getenv("SPREAD_GATE_ENABLED", "1") != "0"
+SPREAD_MAX_BPS      = float(os.getenv("SPREAD_MAX_BPS", "25"))
+
 # --- Sniper tag (VALIDATED 2026-08-09, walk-forward) ---------------------------
 # A LABEL on the normal stream, never a filter: it does not add, remove or alter
 # a single signal. It marks the subset that historically resolved best, so the
