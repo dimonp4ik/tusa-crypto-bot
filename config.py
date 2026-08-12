@@ -467,6 +467,36 @@ SKIP_RSI_DIV_SETUPS = os.getenv("SKIP_RSI_DIV_SETUPS", "1") != "0"
 SKIP_UTC_HOURS = {h for h in os.getenv("SKIP_UTC_HOURS", "").split(",") if h.strip()}
 SKIP_WEEKDAYS  = {d for d in os.getenv("SKIP_WEEKDAYS", "").split(",") if d.strip()}
 
+# --- Zone watch (2026-08-10) ---------------------------------------------------
+# Instead of publishing the moment Claude approves — which means entering at
+# whatever price is showing, on average 0.55% worse than the setup's own zone —
+# hold the setup and poll until price trades back INTO the zone, then publish
+# and enter at market that instant.
+#
+# Why this matters more than anything else measured so far: the backtest fills
+# at the zone midpoint, and that single assumption is worth +0.341R of its
+# +0.400R/trade headline. Every other knob tried (TP distance, entry-drift
+# tolerance, structural-target threshold) only trades win rate against
+# drawdown; entry price is the one lever that raises both.
+#
+# Measured over 18000 candles (~187 days), same filter, same everything else:
+#   publish immediately, 0.25% drift gate:  285 trades, 75.4% WR, +47R, DD -17.5R
+#   wait for the zone (60 min):             708 trades, 73.4% WR, +116R, DD -17.6R
+# Same profit per trade, same drawdown, 2.5x the trades — because the drift
+# gate throws away far more than the wait does.
+#
+# A resting limit order would be slightly better still (+116R vs an estimated
+# +85-100R here, since a market fill crosses the spread), but it would need the
+# whole protective-OCO/position-tracking path rebuilt around a maybe-filled
+# order, and it can sit and fire hours later at a moment nobody chose. Polling
+# keeps every existing mechanism and the user gets the alert at the instant of
+# entry. The spread cost is small on the pairs that survive SPREAD_MAX_BPS —
+# but it is steep in relative terms: +0.05% of overpay costs ~27% of the edge,
+# which is exactly why the poll interval is seconds, not minutes.
+ZONE_WATCH_ENABLED  = os.getenv("ZONE_WATCH_ENABLED", "1") != "0"
+ZONE_WATCH_MINUTES  = float(os.getenv("ZONE_WATCH_MINUTES", "60"))
+ZONE_WATCH_POLL_SEC = int(os.getenv("ZONE_WATCH_POLL_SEC", "15"))
+
 # --- Spread gate (2026-08-09) --------------------------------------------------
 # Skip a signal when the bid/ask gap on the X-Perp we actually trade is wider
 # than this. The spread is paid in full entering and again exiting, before the

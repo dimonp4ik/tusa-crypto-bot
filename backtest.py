@@ -344,6 +344,12 @@ def fetch_history(
     return data
 
 
+# RESEARCH ONLY: how far a structural level must be before TP1 snaps to it.
+# Live hardcodes 1.0R in telegram_notifier.calculate_tp_sl; this makes the
+# threshold sweepable so the 21%-of-trades structural bucket can be widened.
+_STRUCT_TP1_MIN_R = float(os.getenv("BT_STRUCT_TP1_MIN_R", "1.0") or 1.0)
+
+
 def calculate_tp_sl_local(
     price: float,
     direction: str,
@@ -364,7 +370,7 @@ def calculate_tp_sl_local(
         risk = min(max(price - struct_sl, min_risk), max_risk)
         sl = price - risk
 
-        if tp1_level and tp1_level > price * 1.001 and (tp1_level - price) >= risk:
+        if tp1_level and tp1_level > price * 1.001 and (tp1_level - price) >= risk * _STRUCT_TP1_MIN_R:
             tp1 = tp1_level
         else:
             tp1 = price + risk * TP1_R_MULT
@@ -380,7 +386,7 @@ def calculate_tp_sl_local(
         risk = min(max(struct_sl - price, min_risk), max_risk)
         sl = price + risk
 
-        if tp1_level and tp1_level < price * 0.999 and (price - tp1_level) >= risk:
+        if tp1_level and tp1_level < price * 0.999 and (price - tp1_level) >= risk * _STRUCT_TP1_MIN_R:
             tp1 = tp1_level
         else:
             tp1 = price - risk * TP1_R_MULT
@@ -941,11 +947,53 @@ def backtest_symbol(
         )
         setup["_knn_score"] = -1.0 if knn is None else knn
 
+        # RESEARCH ONLY (2026-08-10): model the live stale-entry guard, which
+        # refuses to publish when price has already drifted off the zone. The
+        # backtest otherwise fills at the zone midpoint unconditionally — a
+        # price the market offered on only ~20% of setups — so without this the
+        # entry-quality/volume trade-off cannot be measured at all.
+        _mx = float(os.getenv("BT_MAX_ENTRY_DRIFT_PCT", "0") or 0)
+        if _mx > 0:
+            _pe = float(setup["current_price"])
+            _cl = float(c15["close"][i - 1]) if i >= 1 else _pe
+            _dr = ((_cl - _pe) if setup["direction"] == "LONG" else (_pe - _cl)) / _pe
+            if _dr > _mx / 100.0:
+                continue
+            _mn = float(os.getenv("BT_MIN_ENTRY_DRIFT_PCT", "0") or 0)
+            if _mn > 0 and _dr <= _mn / 100.0:
+                continue
+            # ...and fill where the market actually was when the signal fired,
+            # not at the zone midpoint. Gating without this measures a fantasy
+            # fill on a filtered subset, which is the wrong question.
+            setup = dict(setup, current_price=_cl)
+
+        # RESEARCH ONLY (2026-08-10): LIMIT-ORDER mode. The default backtest
+        # fills at the zone midpoint unconditionally — a price the market
+        # actually offered on only ~20% of setups within the signal bar — which
+        # is why its +0.400R/trade is unreachable live, where we market-buy at
+        # whatever price is showing. This models the honest alternative: rest a
+        # limit AT the zone, fill only if price trades back into it within
+        # BT_LIMIT_WAIT_BARS, and start the trade from THAT bar. Unfilled
+        # setups are simply not traded.
+        _entry_bar = i
+        _wait = int(os.getenv("BT_LIMIT_WAIT_BARS", "0") or 0)
+        if _wait > 0:
+            _px = float(setup["current_price"])
+            _lo, _hi = c15["low"], c15["high"]
+            _hit = None
+            for _j in range(i, min(i + _wait, len(_lo))):
+                if _lo[_j] <= _px <= _hi[_j]:
+                    _hit = _j
+                    break
+            if _hit is None:
+                continue
+            _entry_bar = _hit
+
         trade = simulate_trade_direct(
             symbol,
             setup,
             c15,
-            i,
+            _entry_bar,
             tp_window,
             fee_rate,
             slippage_rate,

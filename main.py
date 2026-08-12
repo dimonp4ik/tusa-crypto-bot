@@ -30,6 +30,7 @@ from config import (
     TRAIL_RUNNER_ENABLED, TRAIL_ATR_MULT,
     STOP_CLOSE_CONFIRM, MAX_SAME_DIRECTION_POSITIONS, STOP_EXCHANGE_BACKSTOP_R,
     MTF_MIN_SCORE, SHADOW_MIN_SCORE, TP1_R_MULT, LIVE_HIST_EPOCH_TS,
+    ZONE_WATCH_ENABLED, ZONE_WATCH_MINUTES, ZONE_WATCH_POLL_SEC,
     STALE_ENTRY_GUARD, STALE_ENTRY_ZONE_TOLERANCE, STALE_ENTRY_MAX_RISK_FRAC,
     STALE_ENTRY_MAX_ADVERSE_PCT, SPREAD_GATE_ENABLED, SPREAD_MAX_BPS,
     RISK_MIN_PCT, RISK_MAX_PCT, SL_ATR_BUFFER, TOP_COINS_COUNT,
@@ -45,7 +46,7 @@ from src.binance_client import (
     get_top_coins, get_klines, get_klines_1h, get_klines_4h, get_klines_1d,
     get_btc_change_1h, get_btc_change_1d, get_funding_rate, get_current_price,
     get_open_interest, get_xperp_instruments, get_xperp_price, get_klines_xperp,
-    get_xperp_book,
+    get_xperp_book, get_xperp_prices_bulk,
 )
 from src.signal_filter import analyze_coin_smc
 from src.filter_variants import VARIANTS, compute_variants
@@ -84,6 +85,7 @@ from src.db import (
     at_set_mode, at_set_active, at_set_balance, at_set_mode_prompt,
     at_set_tp1_close_pct,
     get_latest_open_signal, get_signal_by_id,
+    watch_add, watch_active, watch_resolve, watch_stats,
 )
 from src import autotrader
 from src.keystore import keystore_ready, encrypt_secret
@@ -428,6 +430,18 @@ def _build_and_send_report(chat_id: int, message_id: int,
         A("")
 
         # 4. Caps
+        if ZONE_WATCH_ENABLED:
+            _w = watch_stats(since_ts)
+            A(f"## ОЖИДАНИЕ ЗОНЫ ({window_label})")
+            A(f"  дождались входа: {_w['published']}   не дождались: {_w['expired']}"
+              f"   ждут сейчас: {_w['watching']}")
+            A(f"  доля исполнения: {_w['fill_pct']:.0f}%   "
+              f"среднее ожидание: {_w['avg_wait_min']:.0f} мин")
+            A("  _Не дождались = цена не вернулась в зону за отведённое время._")
+            A("  _По бектесту ждать выгоднее, чем догонять: та же прибыль на сделку,_")
+            A("  _но сделок в 2.5 раза больше. Эта строка проверяет это вживую._")
+            A("")
+
         A(f"## ВЛИЯНИЕ ЛИМИТОВ ({window_label})")
         _caps = get_cap_impact_stats(since_ts) or {}
         for code, title in (("dir_cap", f"лимит одной стороны ({MAX_SAME_DIRECTION_POSITIONS})"),
@@ -3601,6 +3615,260 @@ def _attach_oi(setup: dict) -> None:
     setup["oi_confirms"] = 1 if regime in ("real_up", "real_down") else 0
 
 
+def _publish_signal(analysis: dict, decision: str, direction: str,
+                    _dir_open: dict) -> bool:
+    """Publish an approved setup: re-anchor to the live X-Perp price, run the
+    last two guards, send it, link the setup row and mirror into autotrades.
+    Returns True only if a signal actually went out.
+
+    Extracted from run_scan 2026-08-10 so the zone-watch job publishes through
+    exactly this path. Duplicating it would mean two places that must stay in
+    sync on basis rescaling, the stale-entry guard, the spread gate, the
+    setup<->signal link and the autotrade hook.
+    """
+    _sent = False
+    # Snapshot the live X-Perp price (the instrument the user
+    # actually trades on OKX EU) at publish moment — signal
+    # levels re-anchor to it so entry/TP/SL match the user's
+    # chart. Falls back to the analysis feed price if X-Perp
+    # ticker is unavailable.
+    _stale = False
+    try:
+        _xp_px = get_xperp_price(analysis["symbol"])
+        live_px = _xp_px or get_current_price(analysis["symbol"])
+        if live_px and live_px > 0:
+            # Structure (zone bounds, recent high/low, structural
+            # TP levels, ATR) is measured on the DEEP GLOBAL feed,
+            # but the position is opened and monitored on the
+            # X-Perp, which trades at a small persistent discount
+            # (measured 2026-07-31: -0.11%..-0.18%, stdev only
+            # 0.01-0.04pp, stable day and night). Mixing the two
+            # puts the stop ~0.15% off the traded market's real
+            # structure — on a ~2% stop that is ~8% of the whole
+            # stop distance, always in the same direction. Rescale
+            # the global-derived levels into X-Perp space so every
+            # level and the entry live in one price space.
+            _basis = 1.0
+            if _xp_px:
+                try:
+                    _gp = get_current_price(analysis["symbol"])
+                    if _gp and _gp > 0:
+                        _b = _xp_px / _gp
+                        # Sanity-bound: a real basis is fractions of
+                        # a percent. Anything beyond 1% means one of
+                        # the feeds is stale/wrong — skip rescaling
+                        # rather than corrupt every level.
+                        if 0.99 <= _b <= 1.01:
+                            _basis = _b
+                        else:
+                            log.warning(
+                                f"  {analysis['symbol']}: implausible X-Perp basis "
+                                f"{(_b-1)*100:+.2f}% — levels left unscaled"
+                            )
+                except Exception as _be:
+                    log.debug(f"  basis calc failed {analysis['symbol']}: {_be}")
+            if _basis != 1.0:
+                for _k in ("recent_high", "recent_low", "tp1_level",
+                           "tp2_level", "entry_low", "entry_high", "atr"):
+                    try:
+                        _v = analysis.get(_k)
+                        if _v:
+                            analysis[_k] = float(_v) * _basis
+                    except (TypeError, ValueError):
+                        return False
+                log.info(
+                    f"  Levels rescaled to X-Perp space "
+                    f"(basis {(_basis-1)*100:+.3f}%)"
+                )
+            zone_px = float(analysis.get("current_price") or live_px)
+            drift   = abs(live_px - zone_px) / zone_px if zone_px else 0
+            _stale, _why = _entry_is_stale(analysis, live_px, direction)
+            if _stale:
+                log.warning(
+                    f"  Skip {analysis['symbol']} — stale entry: {_why} "
+                    f"(live {live_px}, zone {zone_px}, drift {drift*100:.2f}%)"
+                )
+            else:
+                analysis["zone_entry_price"] = zone_px   # keep zone for reference
+                analysis["current_price"]    = round(live_px, 8)
+                analysis["market_price"]     = round(live_px, 8)
+                log.info(
+                    f"  Entry price updated to live: {live_px} "
+                    f"(zone was {zone_px}, drift {drift*100:.2f}%)"
+                )
+    except Exception as e:
+        log.warning(f"  Live price fetch failed for {analysis['symbol']}: {e}")
+
+    if _stale:
+        # Claude approved it; the setup just went stale before we
+        # could publish. Tag like the caps so it is not counted
+        # as one of Claude's rejections, and so the frequency of
+        # this is measurable (it is NOT observable in backtest —
+        # that always fills at the zone).
+        try:
+            mark_setup_blocked(analysis.get("_setup_log_id"), "stale_entry")
+        except Exception:
+            pass
+        return False
+
+    # Execution-quality gate: the bid/ask gap on the X-Perp we
+    # actually trade. Paid in full on entry and again on exit,
+    # before the market has moved at all — so it comes straight
+    # out of a ~2% stop. Not a market prediction: the number is
+    # known exactly at decision time.
+    # Live spreads span 7000x, and global volume does NOT
+    # predict them — BICO is #3 in the world by turnover and
+    # still shows 0.54%, worse than HOME's 0.41% (measured
+    # 2026-08-09, after a HOME trade whose price ran away from
+    # the signal). So ranking the universe by volume, on either
+    # venue, cannot fix this; only the spread itself can.
+    _spr = analysis.get("book_spread_bps")
+    if (SPREAD_GATE_ENABLED and _spr is not None
+            and float(_spr) > SPREAD_MAX_BPS):
+        log.warning(
+            f"  Skip {analysis['symbol']} — spread {float(_spr):.1f}bp "
+            f"> {SPREAD_MAX_BPS:.0f}bp (thin X-Perp book)"
+        )
+        try:
+            mark_setup_blocked(analysis.get("_setup_log_id"), "wide_spread")
+        except Exception:
+            pass
+        return False
+
+    if send_signal(analysis):
+        _sent = True
+        _cache_signal(analysis["symbol"], direction)
+        if direction in _dir_open:
+            _dir_open[direction] += 1
+        log.info(f"  Signal sent: {analysis['symbol']} {direction}")
+        try:
+            mark_setup_sent(analysis.get("_setup_log_id"))
+        except Exception as _me:
+            log.warning(f"  mark_setup_sent failed: {_me}")
+        # Fetch the just-written signal row once, shared by the
+        # link below and the autotrade hook further down. Keyed
+        # on the id log_signal returned, not "newest OPEN row
+        # for this symbol" — that was a guess that held only
+        # while one setup per symbol per scan is generated.
+        _sig_row = None
+        try:
+            _sid = analysis.get("_signal_id")
+            _sig_row = (get_signal_by_id(_sid) if _sid
+                        else get_latest_open_signal(analysis["symbol"]))
+        except Exception as _ge:
+            log.warning(f"  Could not fetch new signal row: {_ge}")
+        # Link this setup_log row to its real position: from
+        # here its outcome comes from the real signal's close,
+        # not an independent shadow simulation on a different
+        # feed (found 2026-07-31 — the two disagreed on a real
+        # trade: shadow said TP1, the real position hit SL).
+        # A failure here must be loud: the row stays sent=1 with
+        # no signal_id, and is then excluded from BOTH resolvers
+        # until backfill_setup_signal_links() repairs it.
+        try:
+            if _sig_row:
+                link_setup_to_signal(analysis.get("_setup_log_id"), _sig_row["id"])
+        except Exception as _le:
+            log.warning(f"  link_setup_to_signal failed: {_le}")
+        # Autotrade: mirror the just-published signal into real
+        # OKX positions for onboarded users (async, fail-safe).
+        try:
+            autotrader.open_positions_for_signal(_sig_row)
+        except Exception as _ae:
+            log.warning(f"  Autotrade open hook failed: {_ae}")
+    else:
+        log.warning(
+            f"  Signal NOT sent: {analysis['symbol']} {direction} "
+            f"({analysis.get('confidence','?')}) — send_signal returned False"
+        )
+        # Same accounting gap as the two caps above: a setup
+        # Claude APPROVED that failed to send (Telegram API
+        # error, now retried once — see _send_message) sits at
+        # sent=0 with no block_reason, silently counted as a
+        # Claude rejection. Found 2026-07-30 from a real setup
+        # (PUMPUSDT) that reached TP2 and was approved 3
+        # consecutive scans, never sent, never tagged.
+        try:
+            mark_setup_blocked(analysis.get("_setup_log_id"), "send_failed")
+        except Exception:
+            pass
+    return _sent
+
+
+def _check_zone_watch():
+    """Fire parked setups the moment price trades back into their zone.
+
+    Runs every ZONE_WATCH_POLL_SEC. One bulk ticker call covers every watched
+    symbol, so the cost does not grow with the number of setups being watched.
+
+    The caps are re-checked HERE, not at park time: minutes may have passed and
+    the open book has moved. A setup that was inside the direction cap when
+    Claude approved it can be outside it by the time price finally comes back.
+    """
+    if not ZONE_WATCH_ENABLED:
+        return
+    try:
+        rows = watch_active()
+        if not rows:
+            return
+        now = time.time()
+        prices = get_xperp_prices_bulk()
+        # Live book state, for the same caps run_scan applies.
+        _dir_open = {"LONG": 0, "SHORT": 0}
+        _open_syms = set()
+        for _s in get_open_signals():
+            _d = str(_s.get("direction", "")).upper()
+            if _d in _dir_open:
+                _dir_open[_d] += 1
+            _open_syms.add(_s["symbol"])
+
+        for r in rows:
+            try:
+                if now >= float(r["expires_at"]):
+                    watch_resolve(r["id"], "expired")
+                    log.info(f"  Watch expired: {r['symbol']} {r['direction']} "
+                             f"— price never returned to zone")
+                    continue
+                # The symbol may have been blocked, or opened by another route,
+                # while we waited.
+                if r["symbol"] in _open_syms or is_symbol_auto_blocked(r["symbol"]):
+                    watch_resolve(r["id"], "cancelled")
+                    continue
+                px = prices.get(_base_of_symbol(r["symbol"]))
+                if not px:
+                    continue
+                if not (float(r["zone_low"]) <= px <= float(r["zone_high"])):
+                    continue
+
+                analysis = json.loads(r["payload"])
+                direction = str(analysis.get("direction", "")).upper()
+                if (MAX_SAME_DIRECTION_POSITIONS > 0
+                        and _dir_open.get(direction, 0) >= MAX_SAME_DIRECTION_POSITIONS):
+                    watch_resolve(r["id"], "cancelled")
+                    try:
+                        mark_setup_blocked(analysis.get("_setup_log_id"), "dir_cap")
+                    except Exception:
+                        pass
+                    continue
+
+                log.info(f"  Zone hit: {r['symbol']} {direction} @ {px} "
+                         f"(waited {(now - float(r['created_at']))/60:.0f}min)")
+                if _publish_signal(analysis, analysis.get("decision", direction),
+                                   direction, _dir_open):
+                    watch_resolve(r["id"], "published", px)
+                else:
+                    # _publish_signal already tagged why (stale/spread/send fail).
+                    watch_resolve(r["id"], "cancelled", px)
+            except Exception as _e:
+                log.warning(f"  watch check failed for {r.get('symbol','?')}: {_e}")
+    except Exception as e:
+        log.warning(f"Zone-watch job failed: {e}")
+
+
+def _base_of_symbol(symbol: str) -> str:
+    return symbol[:-4] if symbol.endswith("USDT") else symbol
+
+
 def run_scan():
     now_utc = datetime.now(timezone.utc)
 
@@ -4035,171 +4303,25 @@ def run_scan():
                             pass
                         continue
 
-                    # Snapshot the live X-Perp price (the instrument the user
-                    # actually trades on OKX EU) at publish moment — signal
-                    # levels re-anchor to it so entry/TP/SL match the user's
-                    # chart. Falls back to the analysis feed price if X-Perp
-                    # ticker is unavailable.
-                    _stale = False
-                    try:
-                        _xp_px = get_xperp_price(analysis["symbol"])
-                        live_px = _xp_px or get_current_price(analysis["symbol"])
-                        if live_px and live_px > 0:
-                            # Structure (zone bounds, recent high/low, structural
-                            # TP levels, ATR) is measured on the DEEP GLOBAL feed,
-                            # but the position is opened and monitored on the
-                            # X-Perp, which trades at a small persistent discount
-                            # (measured 2026-07-31: -0.11%..-0.18%, stdev only
-                            # 0.01-0.04pp, stable day and night). Mixing the two
-                            # puts the stop ~0.15% off the traded market's real
-                            # structure — on a ~2% stop that is ~8% of the whole
-                            # stop distance, always in the same direction. Rescale
-                            # the global-derived levels into X-Perp space so every
-                            # level and the entry live in one price space.
-                            _basis = 1.0
-                            if _xp_px:
-                                try:
-                                    _gp = get_current_price(analysis["symbol"])
-                                    if _gp and _gp > 0:
-                                        _b = _xp_px / _gp
-                                        # Sanity-bound: a real basis is fractions of
-                                        # a percent. Anything beyond 1% means one of
-                                        # the feeds is stale/wrong — skip rescaling
-                                        # rather than corrupt every level.
-                                        if 0.99 <= _b <= 1.01:
-                                            _basis = _b
-                                        else:
-                                            log.warning(
-                                                f"  {analysis['symbol']}: implausible X-Perp basis "
-                                                f"{(_b-1)*100:+.2f}% — levels left unscaled"
-                                            )
-                                except Exception as _be:
-                                    log.debug(f"  basis calc failed {analysis['symbol']}: {_be}")
-                            if _basis != 1.0:
-                                for _k in ("recent_high", "recent_low", "tp1_level",
-                                           "tp2_level", "entry_low", "entry_high", "atr"):
-                                    try:
-                                        _v = analysis.get(_k)
-                                        if _v:
-                                            analysis[_k] = float(_v) * _basis
-                                    except (TypeError, ValueError):
-                                        continue
-                                log.info(
-                                    f"  Levels rescaled to X-Perp space "
-                                    f"(basis {(_basis-1)*100:+.3f}%)"
-                                )
-                            zone_px = float(analysis.get("current_price") or live_px)
-                            drift   = abs(live_px - zone_px) / zone_px if zone_px else 0
-                            _stale, _why = _entry_is_stale(analysis, live_px, direction)
-                            if _stale:
-                                log.warning(
-                                    f"  Skip {analysis['symbol']} — stale entry: {_why} "
-                                    f"(live {live_px}, zone {zone_px}, drift {drift*100:.2f}%)"
-                                )
-                            else:
-                                analysis["zone_entry_price"] = zone_px   # keep zone for reference
-                                analysis["current_price"]    = round(live_px, 8)
-                                analysis["market_price"]     = round(live_px, 8)
-                                log.info(
-                                    f"  Entry price updated to live: {live_px} "
-                                    f"(zone was {zone_px}, drift {drift*100:.2f}%)"
-                                )
-                    except Exception as e:
-                        log.warning(f"  Live price fetch failed for {analysis['symbol']}: {e}")
-
-                    if _stale:
-                        # Claude approved it; the setup just went stale before we
-                        # could publish. Tag like the caps so it is not counted
-                        # as one of Claude's rejections, and so the frequency of
-                        # this is measurable (it is NOT observable in backtest —
-                        # that always fills at the zone).
+                    # Zone watch: hold instead of publishing at whatever price
+                    # is showing. The setup's edge is priced AT its zone — see
+                    # config.py ZONE_WATCH_ENABLED for the measurement. The
+                    # publish path itself is unchanged; only its timing moves.
+                    _zl, _zh = analysis.get("entry_low"), analysis.get("entry_high")
+                    if (ZONE_WATCH_ENABLED and _zl and _zh and float(_zh) > float(_zl)):
                         try:
-                            mark_setup_blocked(analysis.get("_setup_log_id"), "stale_entry")
-                        except Exception:
-                            pass
-                        continue
-
-                    # Execution-quality gate: the bid/ask gap on the X-Perp we
-                    # actually trade. Paid in full on entry and again on exit,
-                    # before the market has moved at all — so it comes straight
-                    # out of a ~2% stop. Not a market prediction: the number is
-                    # known exactly at decision time.
-                    # Live spreads span 7000x, and global volume does NOT
-                    # predict them — BICO is #3 in the world by turnover and
-                    # still shows 0.54%, worse than HOME's 0.41% (measured
-                    # 2026-08-09, after a HOME trade whose price ran away from
-                    # the signal). So ranking the universe by volume, on either
-                    # venue, cannot fix this; only the spread itself can.
-                    _spr = analysis.get("book_spread_bps")
-                    if (SPREAD_GATE_ENABLED and _spr is not None
-                            and float(_spr) > SPREAD_MAX_BPS):
-                        log.warning(
-                            f"  Skip {analysis['symbol']} — spread {float(_spr):.1f}bp "
-                            f"> {SPREAD_MAX_BPS:.0f}bp (thin X-Perp book)"
-                        )
-                        try:
-                            mark_setup_blocked(analysis.get("_setup_log_id"), "wide_spread")
-                        except Exception:
-                            pass
-                        continue
-
-                    if send_signal(analysis):
-                        _cache_signal(analysis["symbol"], direction)
+                            watch_add(analysis, float(_zl), float(_zh),
+                                      ZONE_WATCH_MINUTES * 60)
+                            log.info(
+                                f"  Watching {analysis['symbol']} {direction} — "
+                                f"zone {_zl}-{_zh}, up to {ZONE_WATCH_MINUTES:.0f}min"
+                            )
+                        except Exception as _we:
+                            log.warning(f"  watch_add failed, publishing now: {_we}")
+                            if _publish_signal(analysis, decision, direction, _dir_open):
+                                sent_count += 1
+                    elif _publish_signal(analysis, decision, direction, _dir_open):
                         sent_count += 1
-                        if direction in _dir_open:
-                            _dir_open[direction] += 1
-                        log.info(f"  Signal sent: {analysis['symbol']} {direction}")
-                        try:
-                            mark_setup_sent(analysis.get("_setup_log_id"))
-                        except Exception as _me:
-                            log.warning(f"  mark_setup_sent failed: {_me}")
-                        # Fetch the just-written signal row once, shared by the
-                        # link below and the autotrade hook further down. Keyed
-                        # on the id log_signal returned, not "newest OPEN row
-                        # for this symbol" — that was a guess that held only
-                        # while one setup per symbol per scan is generated.
-                        _sig_row = None
-                        try:
-                            _sid = analysis.get("_signal_id")
-                            _sig_row = (get_signal_by_id(_sid) if _sid
-                                        else get_latest_open_signal(analysis["symbol"]))
-                        except Exception as _ge:
-                            log.warning(f"  Could not fetch new signal row: {_ge}")
-                        # Link this setup_log row to its real position: from
-                        # here its outcome comes from the real signal's close,
-                        # not an independent shadow simulation on a different
-                        # feed (found 2026-07-31 — the two disagreed on a real
-                        # trade: shadow said TP1, the real position hit SL).
-                        # A failure here must be loud: the row stays sent=1 with
-                        # no signal_id, and is then excluded from BOTH resolvers
-                        # until backfill_setup_signal_links() repairs it.
-                        try:
-                            if _sig_row:
-                                link_setup_to_signal(analysis.get("_setup_log_id"), _sig_row["id"])
-                        except Exception as _le:
-                            log.warning(f"  link_setup_to_signal failed: {_le}")
-                        # Autotrade: mirror the just-published signal into real
-                        # OKX positions for onboarded users (async, fail-safe).
-                        try:
-                            autotrader.open_positions_for_signal(_sig_row)
-                        except Exception as _ae:
-                            log.warning(f"  Autotrade open hook failed: {_ae}")
-                    else:
-                        log.warning(
-                            f"  Signal NOT sent: {analysis['symbol']} {direction} "
-                            f"({analysis.get('confidence','?')}) — send_signal returned False"
-                        )
-                        # Same accounting gap as the two caps above: a setup
-                        # Claude APPROVED that failed to send (Telegram API
-                        # error, now retried once — see _send_message) sits at
-                        # sent=0 with no block_reason, silently counted as a
-                        # Claude rejection. Found 2026-07-30 from a real setup
-                        # (PUMPUSDT) that reached TP2 and was approved 3
-                        # consecutive scans, never sent, never tagged.
-                        try:
-                            mark_setup_blocked(analysis.get("_setup_log_id"), "send_failed")
-                        except Exception:
-                            pass
             except Exception as e:
                 log.error(f"  Error sending {analysis.get('symbol','?')}: {e}")
 
@@ -4517,6 +4639,18 @@ def start_bot():
         minute="*",
         timezone="UTC",
     )
+
+    # Zone watch — fires parked setups the instant price re-enters their zone.
+    # Seconds, not minutes: overpaying 0.05% on entry costs ~27% of the edge
+    # (config.py ZONE_WATCH_ENABLED), so the gap between price touching the
+    # zone and the order going out is itself a cost. One bulk ticker call per
+    # tick, independent of how many setups are waiting.
+    if ZONE_WATCH_ENABLED:
+        scheduler.add_job(
+            _check_zone_watch, "interval",
+            seconds=max(5, ZONE_WATCH_POLL_SEC),
+            max_instances=1, coalesce=True,
+        )
 
     # Shadow-outcome tracker — every 15 min, resolves rejected+sent setup results
     # so the bot can learn whether Claude's verdicts matched reality.

@@ -583,3 +583,26 @@ def get_xperp_book(symbol: str, levels: int = 20) -> dict | None:
     except Exception as e:
         _logger.debug(f"get_xperp_book failed for {symbol}: {e}")
         return None
+
+
+def get_xperp_prices_bulk() -> dict:
+    """{base_asset: last_price} for every live X-Perp, in ONE request.
+
+    The zone-watch job polls every few seconds; asking per symbol would be one
+    HTTP call per watched setup per tick. This is a single call regardless of
+    how many are being watched.
+    """
+    try:
+        body = _okx_get("/api/v5/market/tickers", {"instType": "FUTURES"}, timeout=10)
+        out = {}
+        for t in body.get("data", []):
+            iid = str(t.get("instId", ""))
+            if "_UM_XPERP-" not in iid:
+                continue
+            px = _safe_float(t.get("last"))
+            if px > 0:
+                out[iid.split("-")[0]] = px
+        return out
+    except Exception as e:
+        _logger.debug(f"get_xperp_prices_bulk failed: {e}")
+        return {}

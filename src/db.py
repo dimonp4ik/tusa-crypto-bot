@@ -300,6 +300,30 @@ def init_db():
         """)
         _ensure_column(c, "autotrade_users", "tp1_close_pct", "REAL NOT NULL DEFAULT 0")
 
+        # ── Zone watch: setups approved but not yet published ─────────────────
+        # Claude has said yes; we are holding until price trades back INTO the
+        # setup's own zone (config.py ZONE_WATCH_ENABLED). In the DB rather than
+        # in memory on purpose: this project redeploys often and an in-memory
+        # watch list would silently drop every pending setup on every deploy —
+        # the same bug class as the cooldowns fixed on 2026-08-03.
+        # status: watching -> published | expired | cancelled
+        c.execute("""
+            CREATE TABLE IF NOT EXISTS signal_watch (
+                id          INTEGER PRIMARY KEY AUTOINCREMENT,
+                symbol      TEXT NOT NULL,
+                direction   TEXT NOT NULL,
+                zone_low    REAL NOT NULL,
+                zone_high   REAL NOT NULL,
+                payload     TEXT NOT NULL,   -- full analysis dict as JSON
+                created_at  REAL NOT NULL,
+                expires_at  REAL NOT NULL,
+                status      TEXT NOT NULL DEFAULT 'watching',
+                resolved_at REAL,
+                fill_price  REAL
+            )
+        """)
+        c.execute("CREATE INDEX IF NOT EXISTS idx_watch_status ON signal_watch(status)")
+
         # ── Autotrading: one row per live position per user per signal ───────
         c.execute("""
             CREATE TABLE IF NOT EXISTS autotrade_positions (
@@ -1974,3 +1998,66 @@ def get_latest_open_signal(symbol: str) -> dict | None:
             ORDER BY id DESC LIMIT 1
         """, (symbol,)).fetchone()
         return dict(row) if row else None
+
+
+# ── Zone watch ────────────────────────────────────────────────────────────────
+
+def watch_add(analysis: dict, zone_low: float, zone_high: float,
+              ttl_sec: float) -> int:
+    """Park an approved setup until price returns to its zone. Returns row id."""
+    now = time_mod.time()
+    with _conn() as c:
+        cur = c.execute(
+            """INSERT INTO signal_watch
+               (symbol, direction, zone_low, zone_high, payload,
+                created_at, expires_at, status)
+               VALUES (?, ?, ?, ?, ?, ?, ?, 'watching')""",
+            (analysis.get("symbol", ""), analysis.get("direction", ""),
+             float(zone_low), float(zone_high), json.dumps(analysis, default=str),
+             now, now + float(ttl_sec)),
+        )
+        return cur.lastrowid
+
+
+def watch_active() -> list:
+    """Setups still waiting for their zone, oldest first."""
+    with _conn() as c:
+        rows = c.execute(
+            "SELECT * FROM signal_watch WHERE status='watching' ORDER BY created_at ASC"
+        ).fetchall()
+    return [dict(r) for r in rows]
+
+
+def watch_resolve(watch_id: int, status: str, fill_price: float = None) -> None:
+    """Close a watch row: 'published', 'expired' or 'cancelled'.
+
+    Expired rows are kept, not deleted — the share of setups that never come
+    back to their zone IS the fill rate, and it is the number that decides
+    whether waiting beats publishing immediately.
+    """
+    with _conn() as c:
+        c.execute(
+            "UPDATE signal_watch SET status=?, resolved_at=?, fill_price=? WHERE id=?",
+            (status, time_mod.time(), fill_price, int(watch_id)),
+        )
+
+
+def watch_stats(since_ts: float) -> dict:
+    """Fill-rate summary for the admin report."""
+    with _conn() as c:
+        rows = c.execute(
+            "SELECT status, created_at, resolved_at FROM signal_watch WHERE created_at >= ?",
+            (since_ts,),
+        ).fetchall()
+    pub = [r for r in rows if r["status"] == "published"]
+    exp = [r for r in rows if r["status"] == "expired"]
+    waits = [r["resolved_at"] - r["created_at"] for r in pub
+             if r["resolved_at"] and r["created_at"]]
+    done = len(pub) + len(exp)
+    return {
+        "watching":  sum(1 for r in rows if r["status"] == "watching"),
+        "published": len(pub),
+        "expired":   len(exp),
+        "fill_pct":  (len(pub) / done * 100) if done else 0.0,
+        "avg_wait_min": (sum(waits) / len(waits) / 60) if waits else 0.0,
+    }
