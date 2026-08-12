@@ -187,11 +187,6 @@ def send_signal(analysis: dict) -> bool:
 
     arrow     = "🟢 ЛОНГ" if decision == "LONG" else "🔴 ШОРТ"
     conf_icon = {"HIGH": "🔥", "MEDIUM": "⚡", "LOW": "⚠️"}.get(analysis.get("confidence", ""), "⚡")
-    # Sniper label — the ~2.5% of the stream that resolved best historically
-    # (config.py SNIPER_TAG_ENABLED). Marks the signal so the size can be
-    # chosen by hand; it does not change the signal itself in any way.
-    sniper_line = ("🎯 *СНАЙПЕР* — редкий тип (2.5% сетапов), "
-                   "исторически 85% против 81%\n") if analysis.get("sniper") else ""
     conf_ru   = {"HIGH": "ВЫСОКАЯ", "MEDIUM": "СРЕДНЯЯ", "LOW": "НИЗКАЯ"}.get(analysis.get("confidence", ""), "—")
 
     session_icons = {
@@ -255,7 +250,6 @@ def send_signal(analysis: dict) -> bool:
         f"{event_line}"
         f"\n*Сигналы:*\n{signals_text}\n\n"
         f"{conf_icon} Уверенность: *{conf_ru}*\n"
-        f"{sniper_line}"
         f"📝 _{_esc(analysis.get('reason', ''))}_\n\n"
         f"🕐 {session_str}  ⏰ {timestamp}"
     )

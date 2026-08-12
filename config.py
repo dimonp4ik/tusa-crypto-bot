@@ -522,37 +522,28 @@ ZONE_WATCH_POLL_SEC = int(os.getenv("ZONE_WATCH_POLL_SEC", "15"))
 SPREAD_GATE_ENABLED = os.getenv("SPREAD_GATE_ENABLED", "1") != "0"
 SPREAD_MAX_BPS      = float(os.getenv("SPREAD_MAX_BPS", "25"))
 
-# --- Sniper tag (VALIDATED 2026-08-09, walk-forward) ---------------------------
-# A LABEL on the normal stream, never a filter: it does not add, remove or alter
-# a single signal. It marks the subset that historically resolved best, so the
-# position can be sized differently by hand.
+# --- Counter-structure marker (2026-08-13) -------------------------------------
+# Telemetry only: written to setup_log, shown to nobody, read by no gate. It
+# exists so the split stays measurable — the user asked for no label on the
+# signal, and there is none.
 #
-# Two conditions, both declared from mechanism BEFORE looking at the test years,
-# and both of which came out OPPOSITE to the strategy's own stated thesis:
-#   1. stop distance < SNIPER_MAX_STOP_ATR of the instrument's own ATR. The
-#      thesis says a tight stop is riskier (noise knocks you out); the data says
-#      the opposite, because a stop that is few ATRs away puts TP1 (0.7R) within
-#      easy reach in ATR terms. What matters is target reachability, not stop
-#      safety.
-#   2. 1h and 4h do NOT both agree with the direction. The thesis treats full
-#      HTF alignment as the best case; the data says those win LESS. Consistent
-#      with the counter-structure result (see claude_analyzer's Str note): this
-#      system earns on pullback entries into a zone, not on trend continuation.
+# Marks entries that cut AGAINST the 15m swing (a LONG while structure is
+# bearish, a SHORT while it is bullish). The only marker validated twice, on
+# two different populations:
+#   seed, 10,300 trades, filled at the zone:  83.1%/+0.552R vs 80.7%/+0.442R,
+#     same sign every year 2022-2026
+#   after ZONE_WATCH, 1,353 trades:           77.3%/+0.286R vs 73.8%/+0.168R,
+#     same sign in both windows (75%/+0.232 and 79%/+0.339)
+# Frequency ~1 setup in 6.
 #
-# Threshold 2.09 = the 25th percentile of stop/ATR measured on 2022-2024 ONLY,
-# frozen before the 2025-2026 check. Result, defined-then-tested:
-#   train 2022-24  85.7% WR / +0.641R   |   test 2025-26  84.4% WR / +0.637R
-# By year (never negative, never below the base): 2023 88.1%/+0.647 ·
-# 2024 85.2%/+0.670 · 2025 83.1%/+0.645 · 2026 85.5%/+0.631, against a base of
-# 81.1%/+0.461. ~65 trades a year.
-#
-# ⚠️ This is NOT the 90-100% the idea started from, and it cannot be: an earlier
-# search over ~600 feature combinations DID find 90.5% on 2022-24, and every one
-# of those rules collapsed to 80.6-83.5% (i.e. the base) on 2025-26. Searching
-# for a win rate manufactures it. These two conditions survive precisely because
-# they were fixed in advance.
-SNIPER_TAG_ENABLED  = os.getenv("SNIPER_TAG_ENABLED", "1") != "0"
-SNIPER_MAX_STOP_ATR = float(os.getenv("SNIPER_MAX_STOP_ATR", "2.09"))
+# ⚠️ Replaced the previous definition (stop < 2.09 ATR AND no full 1h/4h
+# agreement), which measured 90% win rate while the bot chased the price and
+# fell to 71.1%/+0.162R — BELOW the 73.8% baseline — once ZONE_WATCH began
+# filling at the zone. Its stop-distance condition selected for roughly what
+# waiting for the zone now selects for, so the two overlapped and the edge
+# disappeared. SNIPER_MAX_STOP_ATR is gone with it. A marker validated on one
+# population is not validated on another.
+SNIPER_TAG_ENABLED = os.getenv("SNIPER_TAG_ENABLED", "1") != "0"
 
 # --- Stale-entry guard (VALIDATED 2026-07-31, default ON) ----------------------
 # The strategy's edge lives in entering AT the FVG/OB retest zone. The backtest

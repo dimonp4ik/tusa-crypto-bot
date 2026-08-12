@@ -40,7 +40,7 @@ from config import (
     REL_STRENGTH_RISK_UP_MULT, REL_STRENGTH_RISK_UP_MAX_MULT,
     TREND_PAIR_RISK_UP, TREND_PAIR_RISK_UP_1H, TREND_PAIR_RISK_UP_4H,
     TREND_PAIR_RISK_UP_MULT, TREND_PAIR_RISK_UP_MAX_MULT,
-    SNIPER_TAG_ENABLED, SNIPER_MAX_STOP_ATR,
+    SNIPER_TAG_ENABLED,
     RISK_MIN_PCT, RISK_MAX_PCT, SL_ATR_BUFFER,
     STABILITY_FILTERS_ENABLED, STABILITY_SKIP_PACKS, STABILITY_SKIP_SESSIONS,
     STABILITY_MIN_EFF_RATIO, STABILITY_MIN_VOLUME_RATIO, STABILITY_MIN_QUALITY_SCORE,
@@ -484,38 +484,39 @@ def _quality_breakdown(ind: dict, bos: str, entry_zone, adaptive_pack: str) -> d
 
 def _is_sniper(ind: dict, price: float, direction: str,
                trend_1h: str, trend_4h: str) -> bool:
-    """The historically best-resolving subset of setups. A LABEL, not a gate.
+    """Counter-structure entry: the one marker that has survived every change.
 
-    Computed here so live and backtest cannot disagree: both reach this through
-    analyze_coin_smc, and the risk distance is derived with the same clamp
-    calculate_tp_sl() uses, so the flag matches the bracket that will actually
-    be placed. See config.py SNIPER_TAG_ENABLED for the walk-forward evidence
-    and for why both conditions run OPPOSITE to the strategy's stated thesis.
+    Telemetry only — no gate reads it, nothing is shown to the user. It exists
+    so the split stays measurable in setup_log (column kept as `sniper` to
+    avoid a pointless migration; the name is historical).
+
+    True when the entry cuts AGAINST the 15m swing structure — a LONG while the
+    structure is bearish, a SHORT while it is bullish. Counter-intuitive, and
+    consistent across two independent validations on different populations:
+      seed, 10,300 trades, fill-at-zone:  83.1% / +0.552R vs 80.7% / +0.442R,
+        same sign in all five years 2022-2026
+      zone-watch population, 1,353 trades: 77.3% / +0.286R vs 73.8% / +0.168R,
+        same sign in both windows (75%/+0.232 and 79%/+0.339)
+    Mechanically it fits what this strategy is: entry at an FVG/OB retest, and a
+    retest that cuts against the swing IS the deep pullback the zone exists to
+    catch.
+
+    ⚠️ The previous definition (stop < 2.09 ATR AND no full 1h/4h agreement)
+    was retired 2026-08-13. It measured 90% win rate under the old
+    chase-the-price entry and collapsed to 71.1% / +0.162R — i.e. below the
+    73.8% baseline — once ZONE_WATCH started filling at the zone instead. Its
+    stop-distance condition was selecting for roughly what waiting for the zone
+    now selects for, so the two overlapped and the edge vanished. The lesson is
+    general: a marker validated on one population is not validated on another.
     """
     if not SNIPER_TAG_ENABLED:
         return False
     try:
-        atr = float(ind.get("atr") or 0.0)
-        atr_pct = float(ind.get("vol_atr_pct") or 0.0)
-        if price <= 0 or atr <= 0 or atr_pct <= 0:
-            return False
-        # Same risk the bracket will use: swing invalidation + ATR buffer,
-        # clamped into [RISK_MIN_PCT, RISK_MAX_PCT] of price.
-        lo, hi = float(ind.get("recent_low") or 0.0), float(ind.get("recent_high") or 0.0)
-        if direction == "LONG":
-            struct = (lo - atr * SL_ATR_BUFFER) if lo > 0 else price * (1 - RISK_MAX_PCT)
-            risk = price - struct
-        else:
-            struct = (hi + atr * SL_ATR_BUFFER) if hi > 0 else price * (1 + RISK_MAX_PCT)
-            risk = struct - price
-        risk = min(max(risk, price * RISK_MIN_PCT), price * RISK_MAX_PCT)
-        if (risk / price) / atr_pct >= SNIPER_MAX_STOP_ATR:
-            return False
-        # Full 1h+4h agreement with the direction resolves WORSE — this system
-        # earns on pullbacks into a zone, not on trend continuation.
         want = "bullish" if direction == "LONG" else "bearish"
-        return not (trend_1h == want and trend_4h == want)
-    except (TypeError, ValueError, ZeroDivisionError):
+        swing = str(ind.get("swing_trend") or "")
+        opposite = "bear" if direction == "LONG" else "bull"
+        return swing == opposite
+    except (TypeError, ValueError):
         return False
 
 
