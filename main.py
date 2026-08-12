@@ -163,13 +163,14 @@ _pending_setups_date: dict = {}
 _pending_report_date: dict = {}
 
 # The point where live signal outcomes started being produced by the CURRENT
-# bot. Was 2026-07-26 13:38 (close-confirmed stop + direction cap, commit
-# 43e0cd9); moved to 2026-07-31 because the parity fixes that landed that day
-# were far larger — Strong1h finally computing, matched history windows, 24/7
-# scanning, the stale-entry guard. Same value as config.LIVE_HIST_EPOCH_TS on
-# purpose: Claude's history and the admin report must draw the line in the
-# same place, or they describe two different bots.
-_CONFIG_CHANGE_LABEL = "31.07"
+# bot. 26.07 (close-confirmed stop) -> 31.07 (parity fixes) -> 12.08 23:00 UTC,
+# when ZONE_WATCH changed how the bot ENTERS: it stopped publishing at whatever
+# price was showing and started waiting for price to come back to the setup's
+# zone. Entry price is the one thing that moves win rate and profit together,
+# so results either side of it are not comparable. Deliberately the same value
+# as config.LIVE_HIST_EPOCH_TS: Claude's history and the admin report must draw
+# the line in the same place, or they describe two different bots.
+_CONFIG_CHANGE_LABEL = "13.08"
 _CONFIG_CHANGE_TS = LIVE_HIST_EPOCH_TS
 
 
@@ -187,14 +188,15 @@ def _clamp_window(since_ts: float, label: str, epoch: float, epoch_label: str) -
         return epoch, f"{label} → обрезано до {epoch_label} (раньше был другой бот)"
     return since_ts, label
 
-# Same idea for the filter-variant experiment, which has its OWN clock: the arm
-# map changed 2026-08-03 (E retired for volume>=2.5x, I re-pointed to
-# vol-regime>=1.3x, C removed). Rows tagged before that carry the same letters
-# for completely different rules, so pooling across this moment does not just
-# dilute the numbers — it silently attributes one hypothesis's outcomes to
-# another. Always the default window for "🧪 Тест фильтров".
-_ARMS_CHANGE_LABEL = "03.08"
-_ARMS_CHANGE_TS = 1785715200.0   # 2026-08-03 00:00 UTC
+# The filter-variant experiment has its own clock, but it has just been reset to
+# the same moment. The arm map last changed 2026-08-03 (E retired, I re-pointed,
+# C removed) and A/D/F have not moved since — but ZONE_WATCH changed the
+# POPULATION every arm is measured on, which invalidates the comparison just as
+# thoroughly as renaming an arm would. The proof it matters is on record: two
+# markers that held across five years of history died on this exact transition.
+# So the variant read-out starts from scratch here too.
+_ARMS_CHANGE_LABEL = "13.08"
+_ARMS_CHANGE_TS = LIVE_HIST_EPOCH_TS
 # State: admin pressed "Своя дата" on the variant report; value = message_id.
 _pending_variant_date: dict = {}
 # State: admin is typing a user ID to allow autotrading.
@@ -347,16 +349,21 @@ def _build_and_send_report(chat_id: int, message_id: int,
         else:
             A("  всё, что есть в базе")
         A("")
-        A("Прогноз модели (backtest.py на данных OKX = та же биржа, что торгуем;")
-        A("реальный BTC, окна истории совпадают с живыми; конфиг от 2026-07-31):")
-        A("  окно 1 (01..07.26): 1622 сделок, WR 82.5%, +0.494R/сделка, maxDD -21.3R")
-        A("  окно 2 (08.25..01): 1418 сделок, WR 81.5%, +0.441R/сделка, maxDD -18.2R")
-        A("ВАЖНО: в модели НЕТ Клода — она измеряет только фильтр правил, поэтому")
-        A("живых сделок будет СИЛЬНО меньше. Сравнивать нужно ВИНРЕЙТ, не количество.")
+        A("Прогноз модели (backtest.py, OKX = та же биржа; вход по зоне, как")
+        A("работает бот с 13.08; TP1=0.6R; 18000 свечей ≈ 187 дней):")
+        A("  708 сделок, WR 73.4%, +0.164R/сделка, maxDD -17.6R")
+        A("ВАЖНО: в модели НЕТ Клода — она мерит только фильтр правил, поэтому")
+        A("живых сделок будет меньше. Сравнивать нужно ВИНРЕЙТ, не количество.")
         A("")
-        A("ОТСЧЁТ С 31.07.2026 — в этот день фильтр реально изменился (заработал")
-        A("Strong1h, окна истории, круглосуточный режим, гейт устаревшего входа).")
-        A("Живые результаты ДО этой даты с прогнозом несопоставимы.")
+        A("Прежний ориентир 82% / +0.49R БОЛЬШЕ НЕ ДЕЙСТВУЕТ: он считался при")
+        A("входе по середине зоны, а такую цену рынок давал лишь в 20% случаев.")
+        A("Одна эта поблажка стоила +0.34R из тех +0.49R.")
+        A("")
+        A(f"ОТСЧЁТ С {_CONFIG_CHANGE_LABEL}.2026 — в этот день изменился ВХОД: бот")
+        A("перестал догонять цену и стал ждать возврата в зону. Вход — единственное,")
+        A("что двигает винрейт и прибыль вместе, поэтому результаты до этой даты")
+        A("относятся к другому боту. Два признака, державшихся пять лет, умерли")
+        A("ровно на этом переходе — это и есть мера того, насколько всё поменялось.")
         if _CONFIG_CHANGE_TS and 0 < since_ts < _CONFIG_CHANGE_TS:
             A("")
             A(f"!! ВНИМАНИЕ: выбранное окно начинается ДО {_CONFIG_CHANGE_LABEL}, значит")
@@ -4500,6 +4507,16 @@ _BT_SEED_BATCHES = [
 # Bumping this purges ALL source='backtest' rows once, then the batches above
 # re-seed. Raise it whenever the priors themselves become invalid (config or
 # data-source change), NOT for ordinary redeploys.
+# ⚠️ STALE GEOMETRY, known and accepted for now (2026-08-13). These priors were
+# generated at TP1_R_MULT=0.7 and, more importantly, with the backtest's
+# unconditional fill at the zone midpoint. The bot now runs TP1=0.6 and only
+# enters when price actually returns to the zone, so the priors' outcome mix is
+# not what the current bot produces. They are kept because they are coarse base
+# rates ("how do entries of this shape usually resolve"), the system prompt
+# tells Claude live Hist outweighs them — and because LIVE_HIST_EPOCH_TS was
+# just reset to 2026-08-12, so for the next weeks these are the ONLY history he
+# has. Re-seeding means re-running eight sequential deep windows; do it once the
+# new entry model has settled, and bump this string to purge automatically.
 _BT_SEED_GENERATION = "okx_2026_07_31"
 
 

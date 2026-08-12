@@ -371,17 +371,28 @@ CLAUDE_CACHE_TTL          = os.getenv("CLAUDE_CACHE_TTL", "1h")              # p
 CLAUDE_DAILY_BUDGET_USD   = float(os.getenv("CLAUDE_DAILY_BUDGET_USD", "1.00"))  # hard daily cap (real Sonnet usage ~$0.3-0.5/day)
 CLAUDE_BUDGET_RESERVE_USD = float(os.getenv("CLAUDE_BUDGET_RESERVE_USD", "0.05")) # stop when remaining < reserve
 
-# Epoch for the LIVE tier of Claude's self-feedback history (unix ts, 0 = off).
-# The live tier looks back 30 days, which on 2026-08-01 still reached into the
-# pre-parity-fix bot: those trades were entered by a filter with a 50-candle 1h
-# lookback (Strong1h could never fire), a 3% entry-drift allowance and a stop
-# that fired on wicks. Their record — 17 sent, 3W/14SL — describes software
-# that no longer exists, yet it dominated every prompt: Claude quoted it in 6
-# of 6 rejections on 31.07, and all 6 of those rejected setups went on to hit
-# TP1 or TP2. Rows before this timestamp are excluded from the live tier only;
-# admin stats and the global over-strictness corrector still see everything.
-# 1785456000 = 2026-07-31 00:00 UTC, the day the parity fixes shipped.
-LIVE_HIST_EPOCH_TS = float(os.getenv("LIVE_HIST_EPOCH_TS", "1785456000"))
+# Epoch for every live-history read: Claude's Hist/SCORECARD/coin-memory, the
+# over-strictness corrector, the rolling report windows, the variant arms and
+# the auto-block statistics. Rows before it describe a bot that no longer
+# exists and must not be averaged in with the current one.
+#
+# 1786575600 = 2026-08-12 23:00 UTC — ZONE_WATCH shipped. The bot stopped
+# publishing at whatever price was showing and started waiting for price to
+# return to the setup's own zone. That changes the ENTRY, which is the single
+# thing that moves both win rate and profit together, so every rate measured
+# before it belongs to a different system. Two markers died on exactly this
+# transition and are the proof it matters: the old sniper definition went from
+# 90% to 71% win rate, and the extreme-RSI claim in Claude's prompt from
+# 83-86% to no edge at all. Nothing else changed about either — only the fill.
+#
+# Previous epoch was 1785456000 (2026-07-31, the parity fixes: Strong1h finally
+# computing, matched history windows, 24/7 scanning, the stale-entry guard).
+# Raise this WHENEVER a change makes past live outcomes unrepresentative; that
+# is cheaper than discovering months later that a number was a blend of two
+# different bots. Historical rows are never deleted — the admin report's
+# "all time" and typed-date windows still reach them, which is the only way to
+# compare eras at all.
+LIVE_HIST_EPOCH_TS = float(os.getenv("LIVE_HIST_EPOCH_TS", "1786575600"))
 
 # --- Structure-based stops/takes (swing mode, 15m, ~20x leverage) ---
 # SL sits at swing invalidation (recent swing low/high) + ATR buffer, then
