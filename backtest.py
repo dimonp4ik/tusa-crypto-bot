@@ -348,6 +348,12 @@ def fetch_history(
 # Live hardcodes 1.0R in telegram_notifier.calculate_tp_sl; this makes the
 # threshold sweepable so the 21%-of-trades structural bucket can be widened.
 _STRUCT_TP1_MIN_R = float(os.getenv("BT_STRUCT_TP1_MIN_R", "1.0") or 1.0)
+# RESEARCH ONLY: TP1 as a FIXED % of price instead of a multiple of risk.
+# The user's idea — "take 0.5-1% of price movement". Worth testing because it
+# behaves very differently per coin: on a 1.2% stop, 0.5% is 0.42R (break-even
+# ~70%); on a 3% stop the same 0.5% is only 0.17R, which needs ~85% just to
+# break even. 0 disables.
+_TP1_FIXED_PCT = float(os.getenv("BT_TP1_FIXED_PCT", "0") or 0)
 
 
 def calculate_tp_sl_local(
@@ -370,7 +376,9 @@ def calculate_tp_sl_local(
         risk = min(max(price - struct_sl, min_risk), max_risk)
         sl = price - risk
 
-        if tp1_level and tp1_level > price * 1.001 and (tp1_level - price) >= risk * _STRUCT_TP1_MIN_R:
+        if _TP1_FIXED_PCT > 0:
+            tp1 = price * (1 + _TP1_FIXED_PCT / 100.0)
+        elif tp1_level and tp1_level > price * 1.001 and (tp1_level - price) >= risk * _STRUCT_TP1_MIN_R:
             tp1 = tp1_level
         else:
             tp1 = price + risk * TP1_R_MULT
@@ -386,7 +394,9 @@ def calculate_tp_sl_local(
         risk = min(max(struct_sl - price, min_risk), max_risk)
         sl = price + risk
 
-        if tp1_level and tp1_level < price * 0.999 and (price - tp1_level) >= risk * _STRUCT_TP1_MIN_R:
+        if _TP1_FIXED_PCT > 0:
+            tp1 = price * (1 - _TP1_FIXED_PCT / 100.0)
+        elif tp1_level and tp1_level < price * 0.999 and (price - tp1_level) >= risk * _STRUCT_TP1_MIN_R:
             tp1 = tp1_level
         else:
             tp1 = price - risk * TP1_R_MULT
@@ -510,6 +520,15 @@ def _post_tp1_trail_mult_bt(direction: str, entry: float, tp1: float, tp2: float
 # here on 2026-07-26 and REJECTED: 32 bars gave WR 80.8%→71.1% and netR
 # +904→+850 on the 6-month window — it scratches trades that would have won.
 from config import STOP_CLOSE_CONFIRM as _STOP_CLOSE_CONFIRM
+
+# Research only, default OFF. When a single bar satisfies BOTH the stop and a
+# target, the loop below resolves it as a stop because that check comes first.
+# 15m OHLC does not record which level was touched first, so that ordering is a
+# convention, not data — a pessimistic one. Set BT_TP_FIRST=1 to flip it to the
+# optimistic convention; the gap between the two runs is the size of the
+# uncertainty this convention hides. Measured 2026-08-13 after a spike-strategy
+# test where 65 of 87 trades were decided by tie-break alone.
+_BT_TP_FIRST = os.getenv("BT_TP_FIRST", "0") == "1"
 
 
 def _r_from_price(entry: float, exit_px: float, sl: float, direction: str) -> float:
@@ -694,6 +713,36 @@ def simulate_trade_direct(
         h = highs[j]
         l = lows[j]
         if not tp1_reached:
+            _stop_hit = ((closes[j] <= sl) if _STOP_CLOSE_CONFIRM else (l <= sl)) if direction == "LONG" \
+                else ((closes[j] >= sl) if _STOP_CLOSE_CONFIRM else (h >= sl))
+            _tgt_hit = (h >= tp1) if direction == "LONG" else (l <= tp1)
+            if _stop_hit and _tgt_hit:
+                globals()["_BT_AMBIGUOUS"] = globals().get("_BT_AMBIGUOUS", 0) + 1
+            if _BT_TP_FIRST:
+                # optimistic tie-break: a bar that reaches a target counts as the
+                # target even if it also satisfies the stop
+                if direction == "LONG" and h >= tp1:
+                    if h >= tp2:
+                        outcome = "TP2"
+                        exit_bar = j
+                        closed = True
+                        break
+                    outcome = "TP1"
+                    tp1_reached = True
+                    exit_bar = j
+                    trail_mult_eff = _post_tp1_trail_mult_bt(direction, entry, tp1, tp2, h, l, closes[j])
+                    continue
+                if direction == "SHORT" and l <= tp1:
+                    if l <= tp2:
+                        outcome = "TP2"
+                        exit_bar = j
+                        closed = True
+                        break
+                    outcome = "TP1"
+                    tp1_reached = True
+                    exit_bar = j
+                    trail_mult_eff = _post_tp1_trail_mult_bt(direction, entry, tp1, tp2, h, l, closes[j])
+                    continue
             if direction == "LONG":
                 if (closes[j] <= sl) if _STOP_CLOSE_CONFIRM else (l <= sl):
                     outcome = "SL"

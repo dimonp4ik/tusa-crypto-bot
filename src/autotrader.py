@@ -38,6 +38,7 @@ from config import (
 from src.db import (
     at_get_active_traders, at_get, at_set_balance, at_set_mode_prompt,
     at_log_position, at_open_positions_for_signal, at_update_position_sl,
+    at_has_open_position,
     at_close_position, at_all_open_positions, at_reduce_position_sz,
 )
 from src.keystore import decrypt_secret, keystore_ready
@@ -151,6 +152,19 @@ def _open_for_user(u: dict, sig: dict, inst_id: str, disp: str) -> None:
     uid = u["user_id"]
     creds = _creds_of(u)
     if not creds:
+        return
+
+    # One instrument, one position. A second entry on the same instId cannot be
+    # protected: OKX permits a single closeFraction=1 TP/SL algo per position,
+    # so place_protection_oco below would fail and the handler would close the
+    # position — flattening the FIRST trade too. Seen live 2026-08-13 on PUMP,
+    # caused by a duplicate signal (parked zone-watch setups were invisible to
+    # the scan's dedup). That root cause is fixed in main.py; this stays as the
+    # backstop, because any future duplicate path would cost a live trade.
+    if at_has_open_position(uid, inst_id):
+        log.warning(f"autotrade: {uid} already holds {inst_id} — second entry refused")
+        _dm(uid, f"ℹ️ Автотрейдинг: по {disp} уже есть открытая позиция — "
+                 f"повторный сигнал пропущен.")
         return
 
     ok, balance = okx.get_balance(creds)

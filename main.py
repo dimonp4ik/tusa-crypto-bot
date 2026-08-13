@@ -3863,6 +3863,11 @@ def _check_zone_watch():
                 if _publish_signal(analysis, analysis.get("decision", direction),
                                    direction, _dir_open):
                     watch_resolve(r["id"], "published", px)
+                    # Any other row for this symbol — a duplicate parked before
+                    # the scan-side guard existed, or a genuine opposite-side
+                    # setup — is now stale: the check at the top of this loop
+                    # cancels it on this same pass instead of publishing twice.
+                    _open_syms.add(r["symbol"])
                 else:
                     # _publish_signal already tagged why (stale/spread/send fail).
                     watch_resolve(r["id"], "cancelled", px)
@@ -4039,10 +4044,30 @@ def run_scan():
         # This prevents re-signalling a coin we're already trading (e.g. BNB hit TP1,
         # still waiting for TP2 — bot must not open a second trade on BNB).
         _active_now = {sig["symbol"] for sig in get_open_signals()}
+        # A setup parked by zone-watch has NOT been published yet, so it leaves
+        # no trace in _signal_cache or in the open-signal set — the next scan
+        # used to re-find it, pay Claude again, and park a SECOND copy. Both
+        # copies then fired, sending duplicate signals and opening duplicate
+        # positions. Seen live 2026-08-13 (HYPE parked twice, 5 min apart, two
+        # distinct Claude verdicts). Watches live up to ZONE_WATCH_MINUTES, so
+        # the window was wide enough for a dozen copies.
+        try:
+            # Expired-but-not-yet-resolved rows must NOT block: the watch job
+            # clears them on its own cycle, and until then the setup is dead.
+            _now_ts = time.time()
+            _watching_now = ({w["symbol"] for w in watch_active()
+                              if float(w["expires_at"]) > _now_ts}
+                             if ZONE_WATCH_ENABLED else set())
+        except Exception as _we:
+            log.warning(f"  watch_active failed, dedup falls back to cache only: {_we}")
+            _watching_now = set()
         def _blocked(s):
             sym = s["symbol"]
             if sym in _active_now:
                 log.info(f"  Skip {sym} — already have open position")
+                return True
+            if sym in _watching_now:
+                log.info(f"  Skip {sym} {s['direction']} — already waiting for its zone")
                 return True
             if _is_reject_cooled(sym, s["direction"], s.get("current_price"), s.get("atr")):
                 log.info(f"  Skip {sym} {s['direction']} — Claude rejected recently, price still in zone")
