@@ -24,8 +24,21 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from config import (
     DB_PATH, AUTO_BLOCK_ENABLED, AUTO_BLOCK_LOOKBACK_TRADES, AUTO_BLOCK_MIN_TRADES,
     AUTO_BLOCK_MAX_PROFIT_FACTOR, AUTO_BLOCK_MAX_WIN_RATE, AUTO_BLOCK_DAYS,
-    TP1_R_MULT, LIVE_HIST_EPOCH_TS,
+    TP1_R_MULT, TP2_R_MULT, TP1_CLOSE_FRAC, LIVE_HIST_EPOCH_TS,
 )
+
+# Shadow bookkeeping (blocked setups, the mirror experiment) only ever knows
+# whether a setup reached TP1 or stopped — it never simulates the runner, so it
+# needs a value for each event. These were TP1_R_MULT (0.6) and 1.0, which is
+# the arithmetic of a 50%-at-TP1 profile the bot no longer runs: reaching TP1
+# banks nothing now, the position trails, and a close-confirmed stop overshoots
+# the level. Measured over 1758 backtest trades on 2026-08-16:
+#   trades that reached TP1 and trailed out  →  +0.735R mean (1444 of them)
+#   trades that stopped                      →  -1.312R mean (252)
+# Both sides were understated before, which flattered nothing in particular —
+# it simply made every shadow R too small by a different factor per side.
+_SHADOW_R_TP1  = 0.74   # value of a setup that reached TP1
+_SHADOW_R_STOP = 1.31   # cost of a setup that stopped
 
 ACTIVE_STATUSES = ("OPEN", "TP1_PARTIAL")
 FINAL_STATUSES  = ("TP2_HIT", "BREAKEVEN", "SL_HIT", "EXPIRED", "TP1_EXPIRED", "TP1_HIT", "TP1_TRAIL")
@@ -904,21 +917,43 @@ def get_symbols_performance(days: int = 30, since_ts: float = None) -> list:
     return results
 
 
-def _status_r(status: str) -> float:
-    """R value of a closed trade outcome (fixed R model, TP1=1.0R TP2=2.0R SL=1R).
+# Banked at TP1 itself. Under the live exit profile (post_tp1_v2) TP1_CLOSE_FRAC
+# is 0 — nothing is closed there, TP1 only arms the trail — so this is 0.0. It is
+# derived rather than written down so it stays true if the profile ever changes.
+_TP1_BANKED_R = float(TP1_CLOSE_FRAC) * float(TP1_R_MULT)
+# The runner's outcome is genuinely variable, so no formula can produce it. This
+# is the measured median of 1444 trailed exits on the 18k-candle backtest
+# (2026-08-16); the mean is higher (+0.735) but a fallback should not flatter.
+_TRAIL_FALLBACK_R = 0.60
 
-    NOTE: for TP1_TRAIL the real R is variable and stored in the realized_r column;
-    this fixed value is only a fallback when realized_r is missing.
+
+def _status_r(status: str) -> float:
+    """R of a closed outcome — FALLBACK ONLY, for rows with no realized_r.
+
+    Every close path in the monitor writes realized_r from the trade's real
+    prices, so this fires only on rows closed before that column existed, and
+    those sit below LIVE_HIST_EPOCH_TS where the stats clamp excludes them.
+
+    It was nevertheless wrong: the values encoded a 50%-at-TP1 model with
+    TP1=1.0R (TP2_HIT=1.5, TP1_HIT=0.5), a geometry the bot stopped running
+    when the exit profile moved to post_tp1_v2 and TP1 moved to 0.6R. A silent
+    fallback that lies is worse than one that is obviously absent, hence the
+    derivation below. Measured check on 1758 backtest trades: TP2 exits really
+    average +1.962R against the 2.0 this returns.
     """
-    # TP2: 50% closed at TP1 (0.5R) + 50% at TP2 (1.0R) = 1.5R
-    if status == "TP2_HIT":    return  1.50
-    # Trailed runner — fallback estimate (real value comes from realized_r)
-    if status == "TP1_TRAIL":  return  0.75
-    # TP1 only outcomes: 50% at TP1 = 0.5R
-    if status in ("TP1_HIT", "BREAKEVEN", "TP1_EXPIRED"): return 0.5
-    # Full SL before TP1
-    if status == "SL_HIT":     return -1.00
-    # Expired before any TP — no profit, small fee drag (treat as 0)
+    # Full position rides to TP2 (nothing banked at TP1 while the frac is 0).
+    if status == "TP2_HIT":
+        return _TP1_BANKED_R + (1.0 - float(TP1_CLOSE_FRAC)) * float(TP2_R_MULT)
+    if status == "TP1_TRAIL":
+        return _TP1_BANKED_R + (1.0 - float(TP1_CLOSE_FRAC)) * _TRAIL_FALLBACK_R
+    # Reached TP1, then gave the runner back at entry (or ran out of clock):
+    # only the banked share counts, which is currently nothing.
+    if status in ("TP1_HIT", "BREAKEVEN", "TP1_EXPIRED"):
+        return _TP1_BANKED_R
+    if status == "SL_HIT":
+        return -1.00
+    # Expired before any TP. Measured -0.187R (fees plus adverse drift), but a
+    # fallback for an unresolved row should not invent a loss.
     return 0.0
 
 
@@ -1180,9 +1215,10 @@ def get_cap_impact_stats(since_ts: float) -> dict:
             tp1 = sum(1 for r in rows if r["reached_tp1"])
             sl = sum(1 for r in rows if r["outcome"] == "SL")
             # Net R the cap saved (+) or cost (-), on the same first-order
-            # basis the mirror experiment uses: a stopped setup avoided is +1R,
-            # a TP1 setup missed is -TP1_R_MULT.
-            saved_r = sl * 1.0 - tp1 * float(TP1_R_MULT)
+            # basis the mirror experiment uses: a stopped setup avoided is
+            # worth the real average loss, a TP1 setup missed costs the real
+            # average of a trailed winner.
+            saved_r = sl * _SHADOW_R_STOP - tp1 * _SHADOW_R_TP1
             out[reason] = {
                 "n": n, "reached_tp1": tp1, "sl": sl,
                 "tp1_pct": (tp1 / n * 100) if n else 0.0,
@@ -1441,12 +1477,12 @@ def get_setup_accuracy(since_ts: float) -> dict:
                 "sl_pct":  (sl / n * 100) if n else 0.0,
             }
             if key == "rejected":
-                # Mirror: original SL → win (+1R), original reached-TP1 → loss
-                # (-TP1_R_MULT R, read from config so this stays correct if the
-                # live TP1 target distance ever changes).
+                # Mirror: original SL → win, original reached-TP1 → loss, each
+                # valued at what that event is really worth on this exit profile
+                # (see _SHADOW_R_* above) rather than at the old 1R / 0.6R pair.
                 m_win, m_loss = sl, tp1
                 m_dec = m_win + m_loss
-                m_r = m_win * 1.0 - m_loss * float(TP1_R_MULT)
+                m_r = m_win * _SHADOW_R_STOP - m_loss * _SHADOW_R_TP1
                 out[key].update({
                     "mirror_wins":   m_win,
                     "mirror_losses": m_loss,

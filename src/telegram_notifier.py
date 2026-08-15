@@ -62,8 +62,13 @@ def calculate_tp_sl(price: float, direction: str, atr: float = 0.0,
     SL  — placed at swing invalidation (recent_low/high) + ATR buffer, clamped
           to RISK_MIN_PCT..RISK_MAX_PCT of price for safe leverage.
 
-    TP1 — nearest confirmed swing high/low (tp1_level) when it gives ≥ 1.5R.
+    TP1 — nearest confirmed swing high/low (tp1_level) when it gives ≥ 1.0R
+          (the code below, and backtest.py's copy, both test 1.0 — this line
+          said 1.5 and was simply wrong).
           Falls back to price ± risk * TP1_R_MULT.
+          Measured 2026-08-16: the structural branch takes 21% of trades at a
+          median 1.27R, stops out 21.8% of the time against 12.3% for the
+          fixed branch, and still earns +0.770R/trade against +0.385R.
 
     TP2 — next swing level (tp2_level) when it's further than TP1.
           Falls back to price ± risk * TP2_R_MULT.
