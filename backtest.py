@@ -67,6 +67,7 @@ from config import (  # noqa: E402
     TP1_R_MULT,
     TP2_R_MULT,
     SYMBOL_SIZE_MULT,
+    MAX_SAME_DIRECTION_POSITIONS,
     TRAIL_ATR_MULT,
     TP1_CLOSE_FRAC,
     EXIT_PROFILE,
@@ -1114,6 +1115,36 @@ def merge_results(results: Iterable[SymbolResult]) -> SymbolResult:
     return total
 
 
+def apply_direction_cap(trades: list[TradeRecord], cap: int) -> list[TradeRecord]:
+    """Trades that survive the live bot's MAX_SAME_DIRECTION_POSITIONS cap.
+
+    The engine cannot enforce this while scanning: symbols run in separate
+    processes and none of them can see the shared book. So the cap has simply
+    never been modelled, and every headline figure this file has ever printed
+    counted setups the live bot would have refused — 1758 against 1644 on the
+    18k-candle window, i.e. profit overstated by about 6%.
+
+    Replayed here in entry order over the merged trade list, which is how the
+    live book actually fills. Reported alongside the uncapped total rather than
+    replacing it: the uncapped number measures the strategy, this one measures
+    the book the bot is allowed to carry, and past results stay comparable.
+    """
+    if cap <= 0:
+        return list(trades)
+    ordered = sorted(trades, key=lambda t: (t.entry_time or 0, t.symbol, t.entry_bar))
+    open_by_dir: dict[str, list[TradeRecord]] = {}
+    kept: list[TradeRecord] = []
+    for t in ordered:
+        now = t.entry_time or 0
+        live = [o for o in open_by_dir.get(t.direction, []) if (o.exit_time or 0) > now]
+        if len(live) >= cap:
+            continue
+        live.append(t)
+        open_by_dir[t.direction] = live
+        kept.append(t)
+    return kept
+
+
 def max_drawdown_r(trades: list[TradeRecord], *, net: bool = True) -> float:
     equity = peak = 0.0
     max_dd = 0.0
@@ -1280,6 +1311,22 @@ def main(argv: list[str] | None = None) -> int:
     print(f"Max DD gross:  {max_drawdown_r(total.trade_records, net=False):+.2f}R")
     print(f"Max DD net:    {max_drawdown_r(total.trade_records, net=True):+.2f}R")
     print(f"Elapsed:       {wall_sec:.2f}s wall-clock")
+
+    # What the live bot could actually have carried. Everything above counts
+    # setups it would have refused once MAX_SAME_DIRECTION_POSITIONS was full.
+    if MAX_SAME_DIRECTION_POSITIONS > 0 and total.trade_records:
+        capped = apply_direction_cap(total.trade_records, MAX_SAME_DIRECTION_POSITIONS)
+        if len(capped) != len(total.trade_records):
+            c_net = sum(t.net_r for t in capped)
+            c_wins = sum(1 for t in capped if t.outcome != "SL")
+            print(
+                f"\nWith live cap ({MAX_SAME_DIRECTION_POSITIONS}/direction): "
+                f"{len(capped)} trades "
+                f"({len(total.trade_records) - len(capped)} refused), "
+                f"WR {c_wins / len(capped) * 100:.1f}%, "
+                f"net {c_net:+.2f}R, "
+                f"Max DD {max_drawdown_r(capped, net=True):+.2f}R"
+            )
 
     if args.export_trades:
         write_trades_csv(args.export_trades, total.trade_records)
