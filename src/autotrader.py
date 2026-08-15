@@ -256,7 +256,7 @@ def _open_for_user(u: dict, sig: dict, inst_id: str, disp: str) -> None:
                 _pct_s = (f"{_act_pct:.0f}%" if abs(_act_pct - close_pct) < 0.5
                           else f"{_act_pct:.1f}% (просил {close_pct:.0f}%, "
                                f"ровно не делится на контракты)")
-                tp1_line = (f"На TP1 ({tp1_px}) закроется {_pct_s} "
+                tp1_line = (f"На TP1 ({okx.fmt_px_display(tp1_px, tick)}) закроется {_pct_s} "
                             f"({okx._fmt_sz(raw_tp1_sz)} из {okx._fmt_sz(sz)} контр.), "
                             f"остаток — под трейлинг.")
             else:
@@ -276,12 +276,14 @@ def _open_for_user(u: dict, sig: dict, inst_id: str, disp: str) -> None:
     _ctval = float((spec or {}).get("ctVal") or 0) or 0.0
     _real_notional = sz * _ctval * _fill_px if _ctval else margin * lev
     _real_margin   = _real_notional / lev if lev else margin
-    _px_line = (f"Вход: {okx._fmt_px(_fill_px)}" if _avg_px
-                else f"Вход: ~{px} _(биржа не отдала цену заливки)_")
+    _px_line = (f"Вход: {okx.fmt_px_display(_fill_px, tick)}" if _avg_px
+                else f"Вход: ~{okx.fmt_px_display(px, tick)} _(биржа не отдала цену заливки)_")
     _dm(uid, (f"🤖 *Сделка открыта: {disp} {sig['direction']}*\n"
               f"Объём: {okx._fmt_sz(sz)} контр. (${_real_notional:.2f} позиция, "
               f"${_real_margin:.2f} маржа, {lev}x)\n"
-              f"{_px_line}\nSL: {sl_px}\nTP2: {tp_px}\n"
+              f"{_px_line}\n"
+              f"SL: {okx.fmt_px_display(sl_px, tick)}\n"
+              f"TP2: {okx.fmt_px_display(tp_px, tick)}\n"
               f"{tp1_line}"))
 
 
@@ -370,7 +372,9 @@ def mirror_transition(sig: dict, new_status: str, exit_px: float) -> None:
                 ok, err = okx.close_position_market(creds, pos["inst_id"])
                 at_close_position(pos["id"], new_status,
                                   error=None if ok else str(err))
-                _dm(pos["user_id"], f"🤖 *{disp}*: {label} (~{exit_px}).")
+                _tick = (okx.get_xperp_spec(pos["inst_id"]) or {}).get("tickSz", 0)
+                _dm(pos["user_id"],
+                    f"🤖 *{disp}*: {label} (~{okx.fmt_px_display(exit_px, _tick)}).")
             elif new_status == "TP1_PARTIAL":
                 # Move the exchange stop to breakeven RIGHT NOW — don't wait
                 # for the next monitor cycle's trail computation, which would
