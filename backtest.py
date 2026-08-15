@@ -640,6 +640,12 @@ class TradeRecord:
     sniper: int = 0   # label only, never a filter (config.py SNIPER_TAG_ENABLED)
     knn_score: float = -1.0
     swing_trend: str = ""  # 15m structure (bull/bear/range) — feeds Claude memory seeding
+    # Worst adverse excursion while the trade was open, in R, measured on WICKS.
+    # The engine stops on a candle CLOSE beyond 1R, but the exchange backstop is
+    # a plain trigger at STOP_EXCHANGE_BACKSTOP_R — a wick that deep fires it for
+    # real while the bot still believes the trade is alive. This column is how
+    # that divergence gets counted instead of assumed away.
+    mae_r: float = 0.0
 
 
 @dataclass
@@ -709,10 +715,19 @@ def simulate_trade_direct(
     trail_mult_eff = max(0.0, float(trail_atr_mult))  # context-frozen at TP1 candle
 
     stop_exit_price = None  # set when we exit at a price other than the SL level
+    _risk_abs = abs(entry - sl)
+    _mae_r = 0.0
     for j in range(fill_bar, end):
         h = highs[j]
         l = lows[j]
         if not tp1_reached:
+            # Only the pre-TP1 phase counts: once TP1 prints, the autotrader
+            # amends the exchange stop to breakeven, so the 2R backstop is no
+            # longer the thing that can fire behind the engine's back.
+            if _risk_abs > 0:
+                _adv = (entry - l) if direction == "LONG" else (h - entry)
+                if _adv / _risk_abs > _mae_r:
+                    _mae_r = _adv / _risk_abs
             _stop_hit = ((closes[j] <= sl) if _STOP_CLOSE_CONFIRM else (l <= sl)) if direction == "LONG" \
                 else ((closes[j] >= sl) if _STOP_CLOSE_CONFIRM else (h >= sl))
             _tgt_hit = (h >= tp1) if direction == "LONG" else (l <= tp1)
@@ -877,6 +892,7 @@ def simulate_trade_direct(
         sniper=int(bool(setup.get("sniper"))),
         knn_score=float(setup.get("_knn_score", -1.0)),
         swing_trend=str(setup.get("swing_trend", "") or ""),
+        mae_r=round(_mae_r, 4),
     )
 
 
@@ -1124,6 +1140,7 @@ def write_trades_csv(path: str, trades: list[TradeRecord]) -> None:
         "entry_quality_score", "portfolio_risk_score",
         "session", "trend_1h", "trend_4h", "entry_source",
         "signals", "score_tags", "premium", "sniper", "knn_score", "swing_trend",
+        "mae_r",
     ]
     with open(path, "w", newline="", encoding="utf-8") as f:
         writer = csv.DictWriter(f, fieldnames=fields)
