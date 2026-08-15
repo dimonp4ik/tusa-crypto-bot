@@ -696,6 +696,35 @@ BACKTEST_SLIPPAGE_RATE  = float(os.getenv("BACKTEST_SLIPPAGE_RATE", "0.0005"))
 AUTOTRADE_ENABLED           = os.getenv("AUTOTRADE_ENABLED", "1") != "0"
 AUTOTRADE_LEVERAGE          = int(os.getenv("AUTOTRADE_LEVERAGE", "10"))
 AUTOTRADE_BALANCE_THRESHOLD = float(os.getenv("AUTOTRADE_BALANCE_THRESHOLD", "100"))
+# Per-symbol position-size multiplier. Format: "BTCUSDT:0.5,ETHUSDT:1.0".
+#
+# BTC earns money but shakes: measured 2026-08-16 over 1758 backtest trades it
+# stops out at ~2x the rate of every other coin, and does so in all four
+# quarters of the window (24.2 / 25.0 / 20.0 / 30.0% against 9.4 / 14.4 / 13.7 /
+# 16.6% for the rest). It is 7.6% of trades and 3% of profit, yet the portfolio's
+# worst drawdown shrinks from -11.83R to -8.67R when it is removed.
+#
+# Halved rather than dropped, deliberately: BTC is +25.8R over the window, so it
+# is not a losing coin. And the elevated stop rate is confirmed four times over
+# while the drawdown contribution rests on ONE cluster of 11 consecutive trades —
+# strong evidence for trimming size, weak evidence for cutting the coin.
+# Measured effect of halving: +819.9R -> +807.0R (-1.6%), DD -11.83R -> -10.09R
+# (-15%), profit-per-drawdown 69.3 -> 79.9.
+def _parse_symbol_size_mult(raw: str) -> dict:
+    out = {}
+    for part in (raw or "").split(","):
+        if ":" not in part:
+            continue
+        sym, _, val = part.partition(":")
+        try:
+            out[sym.strip().upper()] = max(0.0, float(val))
+        except ValueError:
+            continue
+    return out
+
+SYMBOL_SIZE_MULT = _parse_symbol_size_mult(
+    os.getenv("SYMBOL_SIZE_MULT", "BTCUSDT:0.5")
+)
 AUTOTRADE_CONTACT           = os.getenv("AUTOTRADE_CONTACT", "@sanja_tusagang")
 # Fernet key for encrypting user API keys at rest — generate once:
 #   python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"

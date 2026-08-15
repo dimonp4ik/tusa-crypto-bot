@@ -33,7 +33,7 @@ from config import (
     TELEGRAM_TOKEN,
     AUTOTRADE_ENABLED, AUTOTRADE_LEVERAGE, AUTOTRADE_BALANCE_THRESHOLD,
     AUTOTRADE_CONTACT,
-    STOP_CLOSE_CONFIRM, STOP_EXCHANGE_BACKSTOP_R,
+    STOP_CLOSE_CONFIRM, STOP_EXCHANGE_BACKSTOP_R, SYMBOL_SIZE_MULT,
 )
 from src.db import (
     at_get_active_traders, at_get, at_set_balance, at_set_mode_prompt,
@@ -175,7 +175,11 @@ def _open_for_user(u: dict, sig: dict, inst_id: str, disp: str) -> None:
     at_set_balance(uid, balance)
     _check_threshold_cross(u, balance)
 
-    margin = _margin_for(u, balance)
+    # Per-symbol size trim (see SYMBOL_SIZE_MULT in config.py). Applied before
+    # the balance and min-contract checks below, so a symbol trimmed under the
+    # exchange minimum is reported as "too small" rather than silently rounded.
+    _size_mult = float(SYMBOL_SIZE_MULT.get(str(sig["symbol"]).upper(), 1.0))
+    margin = _margin_for(u, balance) * _size_mult
     if margin <= 0:
         return
     if margin > balance:
@@ -278,9 +282,11 @@ def _open_for_user(u: dict, sig: dict, inst_id: str, disp: str) -> None:
     _real_margin   = _real_notional / lev if lev else margin
     _px_line = (f"Вход: {okx.fmt_px_display(_fill_px, tick)}" if _avg_px
                 else f"Вход: ~{okx.fmt_px_display(px, tick)} _(биржа не отдала цену заливки)_")
+    _trim = (f" _(размер x{_size_mult:g} — {disp.split('/')[0]} чаще ходит в стоп)_"
+             if _size_mult != 1.0 else "")
     _dm(uid, (f"🤖 *Сделка открыта: {disp} {sig['direction']}*\n"
               f"Объём: {okx._fmt_sz(sz)} контр. (${_real_notional:.2f} позиция, "
-              f"${_real_margin:.2f} маржа, {lev}x)\n"
+              f"${_real_margin:.2f} маржа, {lev}x){_trim}\n"
               f"{_px_line}\n"
               f"SL: {okx.fmt_px_display(sl_px, tick)}\n"
               f"TP2: {okx.fmt_px_display(tp_px, tick)}\n"

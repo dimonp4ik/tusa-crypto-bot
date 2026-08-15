@@ -66,6 +66,7 @@ from config import (  # noqa: E402
     TIMEFRAME_KUCOIN,
     TP1_R_MULT,
     TP2_R_MULT,
+    SYMBOL_SIZE_MULT,
     TRAIL_ATR_MULT,
     TP1_CLOSE_FRAC,
     EXIT_PROFILE,
@@ -646,6 +647,9 @@ class TradeRecord:
     # real while the bot still believes the trade is alive. This column is how
     # that divergence gets counted instead of assumed away.
     mae_r: float = 0.0
+    # Live per-symbol position-size trim (config.SYMBOL_SIZE_MULT). Deliberately
+    # not merged into risk_mult — see the construction site for why.
+    size_mult: float = 1.0
 
 
 @dataclass
@@ -877,6 +881,12 @@ def simulate_trade_direct(
         adaptive_pack=str(setup.get("adaptive_pack", "") or ""),
         adaptive_reason=str(setup.get("adaptive_reason", "") or ""),
         risk_mult=float(setup.get("risk_mult", 1.0) or 1.0),
+        # Kept SEPARATE from risk_mult on purpose. risk_mult is the kNN adaptive
+        # multiplier, which the live autotrader does NOT apply (_margin_for
+        # ignores it) — folding the two together would make every --use-risk-mult
+        # analysis model a book the bot never trades. This column is the trim the
+        # autotrader really applies, and nothing else.
+        size_mult=float(SYMBOL_SIZE_MULT.get(str(symbol).upper(), 1.0)),
         quality_score=float(setup.get("quality_score", 0.0) or 0.0),
         trend_score=int(setup.get("trend_score", 0) or 0),
         volatility_score=int(setup.get("volatility_score", 0) or 0),
@@ -1140,7 +1150,7 @@ def write_trades_csv(path: str, trades: list[TradeRecord]) -> None:
         "entry_quality_score", "portfolio_risk_score",
         "session", "trend_1h", "trend_4h", "entry_source",
         "signals", "score_tags", "premium", "sniper", "knn_score", "swing_trend",
-        "mae_r",
+        "mae_r", "size_mult",
     ]
     with open(path, "w", newline="", encoding="utf-8") as f:
         writer = csv.DictWriter(f, fieldnames=fields)
