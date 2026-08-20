@@ -34,6 +34,7 @@ from config import (
     AUTOTRADE_ENABLED, AUTOTRADE_LEVERAGE, AUTOTRADE_BALANCE_THRESHOLD,
     AUTOTRADE_CONTACT,
     STOP_CLOSE_CONFIRM, STOP_EXCHANGE_BACKSTOP_R, SYMBOL_SIZE_MULT,
+    COUNTER_STRUCTURE_SIZE_MULT,
 )
 from src.db import (
     at_get_active_traders, at_get, at_set_balance, at_set_mode_prompt,
@@ -179,6 +180,9 @@ def _open_for_user(u: dict, sig: dict, inst_id: str, disp: str) -> None:
     # the balance and min-contract checks below, so a symbol trimmed under the
     # exchange minimum is reported as "too small" rather than silently rounded.
     _size_mult = float(SYMBOL_SIZE_MULT.get(str(sig["symbol"]).upper(), 1.0))
+    # Counter-structure setups size up — see COUNTER_STRUCTURE_SIZE_MULT.
+    if sig.get("sniper"):
+        _size_mult *= float(COUNTER_STRUCTURE_SIZE_MULT)
     margin = _margin_for(u, balance) * _size_mult
     if margin <= 0:
         return

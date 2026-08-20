@@ -745,6 +745,33 @@ def _parse_symbol_size_mult(raw: str) -> dict:
 SYMBOL_SIZE_MULT = _parse_symbol_size_mult(
     os.getenv("SYMBOL_SIZE_MULT", "BTCUSDT:0.5")
 )
+
+# Size multiplier for counter-structure setups (the `sniper` flag: LONG while the
+# 15m swing is bear, SHORT while it is bull). NOT a filter — every setup still
+# trades, this only sizes the validated ones up.
+#
+# Counter-structure is the only marker validated three separate times on three
+# different populations: the 10,300-trade seed (83.1% vs 80.7%), the zone-watch
+# set (77.3% vs 73.8%), and a 65-feature screen on 2026-08-16 where it was one of
+# only two survivors of a both-halves test.
+#
+# Measured 2026-08-16 on the trade set that survives the live gates — the book
+# production can actually carry, not the raw backtest headline. 228 of 1248
+# trades are counter-structure, 89.0% WR against 84.8%, +0.572R against +0.450R:
+#   x1.00  +589.3R  DD -6.46R  ratio  91.2
+#   x1.25  +621.9R  DD -6.46R  ratio  96.2
+#   x1.50  +654.6R  DD -6.46R  ratio 101.3   <- +11% profit, worst drawdown unchanged
+#   x1.75  +687.2R  DD -6.61R  ratio 104.0
+#   x2.00  +719.8R  DD -7.46R  ratio  96.5
+#
+# 1.5 is the last value that leaves the WORST drawdown untouched. Be honest about
+# what it does cost: in the first half alone drawdown deepens -4.68R -> -5.76R.
+# It is not free, it is free at the peak. 1.75 buys a little more at the price of
+# exceeding the baseline drawdown, and past 2.0 the ratio falls apart.
+#
+# Sizing does not change WHICH setups fire or how they resolve, so this does not
+# confound the still-pending live validation of the zone-watch entry.
+COUNTER_STRUCTURE_SIZE_MULT = float(os.getenv("COUNTER_STRUCTURE_SIZE_MULT", "1.5"))
 AUTOTRADE_CONTACT           = os.getenv("AUTOTRADE_CONTACT", "@sanja_tusagang")
 # Fernet key for encrypting user API keys at rest — generate once:
 #   python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"
