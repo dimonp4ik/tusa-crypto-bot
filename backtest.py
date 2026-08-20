@@ -532,6 +532,20 @@ from config import STOP_CLOSE_CONFIRM as _STOP_CLOSE_CONFIRM
 # test where 65 of 87 trades were decided by tie-break alone.
 _BT_TP_FIRST = os.getenv("BT_TP_FIRST", "0") == "1"
 
+# Research only, both default OFF. Conditional stale exit: once a trade is at
+# least BT_STALE_EXIT_BARS old and STILL has not reached TP1, close it if it is
+# currently underwater by more than BT_STALE_EXIT_MAX_R.
+#
+# This is NOT the flat time-stop rejected on 2026-07-26 (scratch everything at 32
+# bars: WR 80.8->71.1%, netR +904->+850). That one killed trades that were merely
+# slow, most of which still won. This one only scratches trades that are slow AND
+# losing, which is a different population: measured 2026-08-16, trades lasting
+# 48+ bars run 42.9% stops and -0.090R/trade while trades under 4 bars run 0.1%
+# stops and +0.722R. Duration is unknowable at entry, so the only place to act on
+# it is mid-trade.
+_BT_STALE_BARS  = int(os.getenv("BT_STALE_EXIT_BARS", "0") or 0)
+_BT_STALE_MAX_R = float(os.getenv("BT_STALE_EXIT_MAX_R", "0") or 0.0)
+
 
 def _r_from_price(entry: float, exit_px: float, sl: float, direction: str) -> float:
     """Actual R of an exit at an arbitrary price (pre-TP1, full position open).
@@ -726,6 +740,16 @@ def simulate_trade_direct(
         h = highs[j]
         l = lows[j]
         if not tp1_reached:
+            # Conditional stale exit (research flag, default off) — see above.
+            if _BT_STALE_BARS > 0 and (j - fill_bar) >= _BT_STALE_BARS and _risk_abs > 0:
+                _unreal = ((closes[j] - entry) if direction == "LONG"
+                           else (entry - closes[j])) / _risk_abs
+                if _unreal < -abs(_BT_STALE_MAX_R):
+                    outcome = "STALE"
+                    stop_exit_price = closes[j]
+                    exit_bar = j
+                    closed = True
+                    break
             # Only the pre-TP1 phase counts: once TP1 prints, the autotrader
             # amends the exchange stop to breakeven, so the 2R backstop is no
             # longer the thing that can fire behind the engine's back.

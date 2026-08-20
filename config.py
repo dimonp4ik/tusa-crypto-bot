@@ -156,11 +156,12 @@ RETEST_MAX_DIST_PCT = float(os.getenv("RETEST_MAX_DIST_PCT", "0.015"))  # within
 # Raising 10→14 cut those: WR 48.9→50.7%, R/tr +17%, DD -25% on both windows.
 MTF_MIN_SCORE = int(os.getenv("MTF_MIN_SCORE", "14"))
 
-# 2026-07-25: filter-variant experiment only (src/filter_variants.py variant D).
-# Setups scoring [SHADOW_MIN_SCORE, MTF_MIN_SCORE) are NOT real signals (never
-# sent, never traded — see _shadow_only flag in signal_filter.py) but ARE sent
-# to Claude + logged, so variant D (soft score>=12) gets real verdicts instead
-# of mirroring variant A. Real signal gate (MTF_MIN_SCORE) is untouched.
+# INERT since 2026-08-07 — variant D was removed on request, and it was the only
+# consumer. signal_filter.py no longer calls _soft_fail("score"), so nothing
+# scoring below MTF_MIN_SCORE survives and no score-shadow setups reach Claude.
+# Kept only so reviving D is a one-line change there (see filter_variants.py,
+# "Slot D is FREE"). Was: setups in [SHADOW_MIN_SCORE, MTF_MIN_SCORE) were never
+# real signals but were sent to Claude + logged so arm D got real verdicts.
 SHADOW_MIN_SCORE = int(os.getenv("SHADOW_MIN_SCORE", "12"))
 
 # --- Signal-quality filters (backtested on a PINNED 20-coin / ~21-day set) ---
@@ -683,7 +684,26 @@ BACKTEST_TP_WINDOW      = int(os.getenv("BACKTEST_TP_WINDOW", "192"))
 # make runs non-reproducible — but it does mean results carry survivorship
 # bias (coins that mattered in 2022 and died are absent by construction) and
 # do not match the live universe, which scans TOP_COINS_COUNT dynamically.
-BACKTEST_FEE_RATE       = float(os.getenv("BACKTEST_FEE_RATE", "0.001"))
+# Costs are the single largest drag on this strategy — measured over 1758 trades
+# they take 333R against gross winnings of 1437R (23%), MORE than the 284R the
+# stops take (20%). So the number has to be right.
+#
+# FEE was 0.001 (0.1% per side) until 2026-08-16. That is Binance's classic SPOT
+# taker rate, inherited when this bot still ran on that feed, and it was never
+# revisited when execution moved to OKX EU X-Perps. OKX Lv1 perpetual futures is
+# 0.020% maker / 0.050% taker; zone-watch fires a MARKET order, so taker applies.
+# The old value charged double the real fee. Correcting it: costs 333R -> 222R,
+# net +819.9R -> ~+931R on the same trades.
+#
+# EVERY figure recorded before this date was measured at the doubled fee and is
+# therefore CONSERVATIVE, not wrong in direction — comparisons between variants
+# were run at the same setting and still hold.
+#
+# SLIPPAGE stays at 0.05%/side and is NOT verified. It could be optimistic: a
+# market order pays half the spread, and SPREAD_MAX_BPS lets through books up to
+# 25bps wide (0.125% per side worst case). Left alone deliberately rather than
+# guessed at — the honest state is "fee measured, slippage assumed".
+BACKTEST_FEE_RATE       = float(os.getenv("BACKTEST_FEE_RATE", "0.0005"))
 BACKTEST_SLIPPAGE_RATE  = float(os.getenv("BACKTEST_SLIPPAGE_RATE", "0.0005"))
 # BACKTEST_USE_BTC_FILTER removed 2026-08-03 — dead, and it implied the BTC
 # context was optional in backtest. It is not: since the 2026-07-31 fix

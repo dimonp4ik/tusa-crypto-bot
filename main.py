@@ -4079,9 +4079,15 @@ def run_scan():
 
         # Step 3b: news + funding enrichment
         enriched = []
+        _news_blind = 0
         for s in fresh:
             # News check — block on bad news
             news = check_news_sentiment(s["symbol"])
+            # A gate that fails open must say so. The CryptoPanic version went
+            # 403 and returned "safe" for every coin for an unknown length of
+            # time, and nothing in the logs showed it (fixed 2026-08-16).
+            if not news.get("checked", True):
+                _news_blind += 1
             if not news["safe"]:
                 log.info(f"  Skip {s['symbol']} — {news['reason']}")
                 continue
@@ -4096,6 +4102,11 @@ def run_scan():
                     log.info(f"  Skip {s['symbol']} SHORT — funding {fr*100:+.3f}% crowded")
                     continue
             enriched.append(s)
+        if _news_blind:
+            log.warning(
+                f"  News gate BLIND for {_news_blind}/{len(fresh)} setups "
+                f"— feeds unreachable, bad-news filtering did not run"
+            )
 
         # Sort by quality score, keep only top MAX_SETUPS_TO_CLAUDE (saves tokens)
         enriched.sort(key=_setup_rank, reverse=True)

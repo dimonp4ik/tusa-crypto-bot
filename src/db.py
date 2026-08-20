@@ -535,16 +535,20 @@ def get_sl_wick_stats(since_ts: float) -> dict:
 
 
 def _status_to_r(status: str) -> float:
-    """Approximate R for symbol-level blocking."""
-    if status == "TP2_HIT":
-        return 1.5   # 50% at 1R + 50% at 2R
-    if status == "TP1_TRAIL":
-        return 0.75  # TP1 taken + trailed runner in profit
-    if status in ("BREAKEVEN", "TP1_EXPIRED", "TP1_HIT"):
-        return 0.5
-    if status == "SL_HIT":
-        return -1.0
-    return 0.0
+    """Approximate R from a status alone. Delegates — do not reimplement.
+
+    This was a THIRD hand-written copy of the R model (TP2_HIT=1.5,
+    TP1_HIT=0.5, "50% at 1R + 50% at 2R"), the arithmetic of a 50%-at-TP1
+    profile the bot stopped running when EXIT_PROFILE became post_tp1_v2 and
+    TP1 moved to 0.6R. It fed get_symbol_performance, which feeds
+    auto_block_bad_symbols — a real decision that stops the bot trading a
+    symbol. Counting BREAKEVEN as +0.5R made it score as a WIN, inflating both
+    win rate and profit factor, so bad symbols were under-blocked.
+
+    Found 2026-08-16 while auditing the two copies fixed earlier the same day.
+    Kept as a name because several call sites use it; the body is gone.
+    """
+    return _status_r(status)
 
 
 def get_symbol_performance(symbol: str, lookback: int = None) -> dict:
@@ -566,14 +570,17 @@ def get_symbol_performance(symbol: str, lookback: int = None) -> dict:
     placeholders = ",".join("?" for _ in FINAL_STATUSES)
     with _conn() as c:
         rows = c.execute(
-            f"SELECT status FROM signals WHERE symbol = ? AND status IN ({placeholders})"
+            f"SELECT status, realized_r FROM signals WHERE symbol = ? AND status IN ({placeholders})"
             f" AND opened_at >= ?"
             f" ORDER BY opened_at DESC LIMIT ?",
             [symbol, *FINAL_STATUSES, LIVE_HIST_EPOCH_TS or 0.0, lookback],
         ).fetchall()
 
+    # Prefer the R the monitor actually measured from the trade's own prices.
+    # This used to read the status alone and approximate, discarding a stored
+    # exact value — on a decision that can stop the bot trading a symbol.
     statuses = [r["status"] for r in rows]
-    rs = [_status_to_r(s) for s in statuses]
+    rs = [_row_r(r) for r in rows]
     gross_profit = sum(r for r in rs if r > 0)
     gross_loss   = abs(sum(r for r in rs if r < 0))
     profit_factor = gross_profit / gross_loss if gross_loss > 0 else (999.0 if gross_profit > 0 else 0.0)
@@ -890,7 +897,7 @@ def get_symbols_performance(days: int = 30, since_ts: float = None) -> list:
     placeholders = ",".join("?" for _ in FINAL_STATUSES)
     with _conn() as c:
         rows = c.execute(
-            f"SELECT symbol, status FROM signals "
+            f"SELECT symbol, status, realized_r FROM signals "
             f"WHERE opened_at >= ? AND status IN ({placeholders})",
             [cutoff, *FINAL_STATUSES],
         ).fetchall()
@@ -898,7 +905,7 @@ def get_symbols_performance(days: int = 30, since_ts: float = None) -> list:
     from collections import defaultdict
     by_sym: dict = defaultdict(list)
     for r in rows:
-        by_sym[r["symbol"]].append(_status_to_r(r["status"]))
+        by_sym[r["symbol"]].append(_row_r(r))
 
     results = []
     for sym, rs in by_sym.items():
