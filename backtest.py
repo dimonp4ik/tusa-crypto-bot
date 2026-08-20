@@ -68,6 +68,8 @@ from config import (  # noqa: E402
     TP2_R_MULT,
     SYMBOL_SIZE_MULT,
     MAX_SAME_DIRECTION_POSITIONS,
+    SIGNAL_COOLDOWN_HOURS,
+    KILL_SWITCH_SL_STREAK,
     TRAIL_ATR_MULT,
     TP1_CLOSE_FRAC,
     EXIT_PROFILE,
@@ -79,6 +81,10 @@ from config import (  # noqa: E402
     MIN_24H_QUOTE_VOLUME_USDT,
 )
 from src.signal_filter import analyze_coin_smc  # noqa: E402
+
+# run_scan publishes at most this many signals per scan. It lives as a literal
+# there rather than in config, so it is mirrored (not imported) — keep in sync.
+_LIVE_MAX_PER_SCAN = int(os.getenv("BT_LIVE_MAX_PER_SCAN", "3"))
 from src.knn_analog import knn_direction_score  # noqa: E402
 
 
@@ -1139,6 +1145,64 @@ def merge_results(results: Iterable[SymbolResult]) -> SymbolResult:
     return total
 
 
+def apply_live_gates(trades: list[TradeRecord]) -> list[TradeRecord]:
+    """Trades that survive the live bot's throughput gates.
+
+    An audit on 2026-08-16 listed every gate run_scan applies and grepped for it
+    in this file. NINE gates, ZERO of them modelled here: funding, news, spread,
+    stale-entry, kill-switch, auto-blocked symbols, reject cooldown, the
+    per-scan signal cap, and the per-coin signal cooldown. The backtest has
+    always reported a strategy taking far more trades than production can.
+
+    The four that are reproducible from a trade list alone are replayed here.
+    News, spread, funding and the two Claude-dependent gates need live state and
+    stay unmodelled — so even this figure is an upper bound.
+
+    Measured effect on the 18k-candle window: 1758 -> 1248 trades (-29%) and
+    +819.9R -> +589.3R (-28%), while max drawdown halves (-11.83R -> -6.46R).
+    Win rate is unchanged (85.7% -> 85.6%), so the gates drop average trades
+    rather than bad ones — the live book is smaller and steadier, not better
+    selected. Risk-adjusted it is the stronger number: 91.2 against 69.3.
+    """
+    ordered = sorted(trades, key=lambda t: (t.entry_time or 0, t.symbol, t.entry_bar))
+    last_sig: dict = {}
+    per_bar: dict = {}
+    open_by_dir: dict = {}
+    kept: list[TradeRecord] = []
+    streak = 0
+    cur_day = None
+    blocked_day = None
+    for t in ordered:
+        raw = t.entry_time or 0
+        ts = raw / 1000 if raw > 1e11 else raw
+        day = int(ts // 86400)
+        if day != cur_day:
+            cur_day, streak, blocked_day = day, 0, None
+        if KILL_SWITCH_SL_STREAK > 0 and blocked_day == day:
+            continue
+        key = (t.symbol, t.direction)
+        if SIGNAL_COOLDOWN_HOURS > 0 and key in last_sig                 and (ts - last_sig[key]) / 3600 < SIGNAL_COOLDOWN_HOURS:
+            continue
+        bar = int(ts // (KLINES_INTERVAL_SEC or 900))
+        if _LIVE_MAX_PER_SCAN > 0 and per_bar.get(bar, 0) >= _LIVE_MAX_PER_SCAN:
+            continue
+        if MAX_SAME_DIRECTION_POSITIONS > 0:
+            live = [o for o in open_by_dir.get(t.direction, [])
+                    if (o.exit_time or 0) > raw]
+            if len(live) >= MAX_SAME_DIRECTION_POSITIONS:
+                continue
+            live.append(t)
+            open_by_dir[t.direction] = live
+        last_sig[key] = ts
+        per_bar[bar] = per_bar.get(bar, 0) + 1
+        kept.append(t)
+        if KILL_SWITCH_SL_STREAK > 0:
+            streak = streak + 1 if t.outcome == "SL" else 0
+            if streak >= KILL_SWITCH_SL_STREAK:
+                blocked_day = day
+    return kept
+
+
 def apply_direction_cap(trades: list[TradeRecord], cap: int) -> list[TradeRecord]:
     """Trades that survive the live bot's MAX_SAME_DIRECTION_POSITIONS cap.
 
@@ -1337,19 +1401,32 @@ def main(argv: list[str] | None = None) -> int:
     print(f"Elapsed:       {wall_sec:.2f}s wall-clock")
 
     # What the live bot could actually have carried. Everything above counts
-    # setups it would have refused once MAX_SAME_DIRECTION_POSITIONS was full.
-    if MAX_SAME_DIRECTION_POSITIONS > 0 and total.trade_records:
-        capped = apply_direction_cap(total.trade_records, MAX_SAME_DIRECTION_POSITIONS)
-        if len(capped) != len(total.trade_records):
-            c_net = sum(t.net_r for t in capped)
-            c_wins = sum(1 for t in capped if t.outcome != "SL")
+    # setups production would have refused: the per-coin cooldown, the per-scan
+    # signal cap, the direction cap and the kill-switch. Still an upper bound —
+    # news, spread, funding and the Claude gates need live state to model.
+    if total.trade_records:
+        gated = apply_live_gates(total.trade_records)
+        if len(gated) != len(total.trade_records):
+            g_net = sum(t.net_r for t in gated)
+            # A win is an outcome that reached TP1: TP1, TP2, or TRAIL (TP1 hit,
+            # then the runner trailed out). NOT merely "outcome != SL" — that
+            # counted EXPIRED and the research STALE exit as wins and reported
+            # 96% on a run where the stale-exit flag was converting stops into
+            # scratches.
+            g_wins = sum(1 for t in gated if t.outcome in ("TP1", "TP2", "TRAIL"))
+            g_dd = max_drawdown_r(gated, net=True)
+
+            print()
             print(
-                f"\nWith live cap ({MAX_SAME_DIRECTION_POSITIONS}/direction): "
-                f"{len(capped)} trades "
-                f"({len(total.trade_records) - len(capped)} refused), "
-                f"WR {c_wins / len(capped) * 100:.1f}%, "
-                f"net {c_net:+.2f}R, "
-                f"Max DD {max_drawdown_r(capped, net=True):+.2f}R"
+                f"With live gates (cooldown {SIGNAL_COOLDOWN_HOURS}h, "
+                f"{_LIVE_MAX_PER_SCAN}/scan, {MAX_SAME_DIRECTION_POSITIONS}/dir, "
+                f"kill {KILL_SWITCH_SL_STREAK}): "
+                f"{len(gated)} trades "
+                f"({len(total.trade_records) - len(gated)} refused), "
+                f"WR {g_wins / len(gated) * 100:.1f}%, "
+                f"net {g_net:+.2f}R, "
+                f"Max DD {g_dd:+.2f}R, "
+                f"profit/DD {g_net / abs(g_dd):.1f}"
             )
 
     if args.export_trades:
