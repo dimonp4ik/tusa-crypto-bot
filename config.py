@@ -772,6 +772,35 @@ SYMBOL_SIZE_MULT = _parse_symbol_size_mult(
 # Sizing does not change WHICH setups fire or how they resolve, so this does not
 # confound the still-pending live validation of the zone-watch entry.
 COUNTER_STRUCTURE_SIZE_MULT = float(os.getenv("COUNTER_STRUCTURE_SIZE_MULT", "1.5"))
+
+# --- Approach quality: did price come INTO the zone, or are we chasing? ---
+# `approach_pct` (main._attach_approach) is how far price already moved in the
+# trade's direction over the previous APPROACH_LOOKBACK_BARS. Collected as
+# telemetry only — it does NOT size or filter anything.
+#
+# 🔴 A sizing rule WAS built on this on 2026-08-20 and reverted the same hour.
+# The first measurement looked spectacular — stop rate rising monotonically from
+# 6.4% to 25% as pre-entry run-up increased, stable across both halves, 39% of
+# trades qualifying for a 1.5x size-up worth +29% profit. All of it was an
+# artifact: the analysis located each trade's candle by the `entry_bar` INDEX
+# from an exported CSV, while the candle array had been refetched and shifted
+# since that export. It was comparing entry prices against unrelated bars.
+#
+# Caught because a fresh export reproduced none of it. Re-measured with bars
+# located by TIMESTAMP, the effect is gone:
+#   ниже +0.1%    295 сд  12.2% стопов  +0.624R
+#   +0.1..+0.4%   296 сд  15.9%         +0.539R
+#   +0.4..+0.7%   295 сд  14.6%         +0.571R
+#   +0.7..+1.1%   296 сд  15.5%         +0.461R
+#   +1.1..+1.7%   295 сд  12.9%         +0.464R
+#   +1.7%+        296 сд  15.5%         +0.452R
+# No monotonicity, no consistent split. And there is little to exploit anyway:
+# the honest distribution is tight — 10th pct -0.04%, median +0.73%, 90th +2.17%.
+#
+# 🔑 RULE THIS COST: never index candles by a bar number stored in an artifact.
+# Bar indices are only valid against the exact array that produced them; a
+# refetch shifts them. Locate by timestamp.
+APPROACH_LOOKBACK_BARS  = int(os.getenv("APPROACH_LOOKBACK_BARS", "24"))   # 6h of 15m
 AUTOTRADE_CONTACT           = os.getenv("AUTOTRADE_CONTACT", "@sanja_tusagang")
 # Fernet key for encrypting user API keys at rest — generate once:
 #   python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"

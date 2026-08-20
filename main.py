@@ -34,6 +34,7 @@ from config import (
     STALE_ENTRY_GUARD, STALE_ENTRY_ZONE_TOLERANCE, STALE_ENTRY_MAX_RISK_FRAC,
     STALE_ENTRY_MAX_ADVERSE_PCT, SPREAD_GATE_ENABLED, SPREAD_MAX_BPS,
     RISK_MIN_PCT, RISK_MAX_PCT, SL_ATR_BUFFER, TOP_COINS_COUNT,
+    APPROACH_LOOKBACK_BARS as _APPROACH_LOOKBACK_BARS,
     TP1_CLOSE_FRAC, EXIT_PROFILE,
     POST_TP1_STRONG_TRAIL_ATR_MULT, POST_TP1_WEAK_TRAIL_ATR_MULT,
     POST_TP1_STRONG_CLOSE_PROGRESS, POST_TP1_STRONG_WICK_PROGRESS,
@@ -3877,6 +3878,43 @@ def _check_zone_watch():
         log.warning(f"Zone-watch job failed: {e}")
 
 
+def _attach_approach(setup: dict, df_15m: dict) -> None:
+    """How far price already travelled IN THE TRADE'S DIRECTION before entry.
+
+    Negative means price came INTO the zone against us — the genuine pullback
+    this strategy is built on. Positive means we are joining a move already in
+    progress, i.e. chasing.
+
+    Measured 2026-08-20 over 1758 backtest trades on the 6h (24-bar) window, and
+    the response is monotonic and holds on both halves of the data:
+
+        подход против нас 5%+   390 сд    6.4% стопов  +0.710R
+        против 2-5%             289 сд    6.9%         +0.647R
+        против 0-2%             237 сд   11.8%         +0.497R
+        по нам 0-2%             306 сд   16.0%         +0.387R
+        по нам 2-5%             283 сд   23.7%         +0.200R
+        по нам 5-10%            182 сд   25.3%         +0.179R
+
+    Stop rate quadruples across the range. Used for SIZE, not as a filter — the
+    chased trades are still profitable, so cutting them costs money (a >1% gate
+    lifts win rate 85.6%->90.6% but drops profit 589R->476R).
+    """
+    try:
+        closes = df_15m.get("close") or []
+        if len(closes) <= _APPROACH_LOOKBACK_BARS:
+            return
+        past = float(closes[-1 - _APPROACH_LOOKBACK_BARS])
+        now = float(setup.get("current_price") or closes[-1])
+        if past <= 0:
+            return
+        move = (now - past) / past * 100.0
+        setup["approach_pct"] = round(
+            move if str(setup.get("direction", "")).upper() == "LONG" else -move, 3
+        )
+    except (TypeError, ValueError, IndexError):
+        return
+
+
 def _base_of_symbol(symbol: str) -> str:
     return symbol[:-4] if symbol.endswith("USDT") else symbol
 
@@ -4015,6 +4053,7 @@ def run_scan():
                     shadow_setups.append(setup)
                 elif setup:
                     _apply_knn_overlay(setup, symbol)
+                    _attach_approach(setup, df_15m)
                     log.info(
                         f"  SMC setup: {symbol:12s}  {setup['direction']}  "
                         f"1d={setup.get('trend_1d','?')} 4h={setup['trend_4h']} 1h={setup['trend_1h']}  "

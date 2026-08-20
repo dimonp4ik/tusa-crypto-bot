@@ -286,7 +286,7 @@ def _open_for_user(u: dict, sig: dict, inst_id: str, disp: str) -> None:
     _real_margin   = _real_notional / lev if lev else margin
     _px_line = (f"Вход: {okx.fmt_px_display(_fill_px, tick)}" if _avg_px
                 else f"Вход: ~{okx.fmt_px_display(px, tick)} _(биржа не отдала цену заливки)_")
-    _trim = (f" _(размер x{_size_mult:g} — {disp.split('/')[0]} чаще ходит в стоп)_"
+    _trim = (f" _(размер x{_size_mult:g} по калибровке)_"
              if _size_mult != 1.0 else "")
     _dm(uid, (f"🤖 *Сделка открыта: {disp} {sig['direction']}*\n"
               f"Объём: {okx._fmt_sz(sz)} контр. (${_real_notional:.2f} позиция, "
