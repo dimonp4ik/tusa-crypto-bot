@@ -699,10 +699,27 @@ BACKTEST_TP_WINDOW      = int(os.getenv("BACKTEST_TP_WINDOW", "192"))
 # therefore CONSERVATIVE, not wrong in direction — comparisons between variants
 # were run at the same setting and still hold.
 #
-# SLIPPAGE stays at 0.05%/side and is NOT verified. It could be optimistic: a
-# market order pays half the spread, and SPREAD_MAX_BPS lets through books up to
-# 25bps wide (0.125% per side worst case). Left alone deliberately rather than
-# guessed at — the honest state is "fee measured, slippage assumed".
+# SLIPPAGE measured 2026-08-20 and DELIBERATELY LEFT AT 0.05%/side.
+#
+# Four order-book snapshots over ~3 minutes across the pinned universe, then
+# weighted by how many trades each coin actually produced (1603 of 1773 trades
+# covered; SEI and LAB returned no book):
+#   trade-weighted half-spread   2.65 bps = 0.027% per side
+#   model                        5.00 bps = 0.050% per side
+#   raw median 1.49 · 90th 6.20 · 95th 20.00 · max 25.01 bps
+# The distribution is heavily skewed — BILLUSDT alone sits at 23.74 bps across
+# 52 trades and drags the weighted figure up from the 1.49 bps median.
+#
+# So the model is roughly 1.9x conservative, and it stays that way on purpose:
+#   * snapshots were taken in calm tape; entries fire on zone touches, which are
+#     by definition moments when price is moving and books widen;
+#   * a book snapshot captures half-spread only — it says nothing about the
+#     latency between decision and fill, which is real slippage we do not model
+#     anywhere else;
+#   * 10% of trades are on coins that returned no book at all.
+# Unlike the fee, which was verifiably wrong against OKX's published schedule,
+# this is an estimate weighed against an estimate. Erring high on costs is the
+# safe direction. Recorded here so the number is measured rather than assumed.
 BACKTEST_FEE_RATE       = float(os.getenv("BACKTEST_FEE_RATE", "0.0005"))
 BACKTEST_SLIPPAGE_RATE  = float(os.getenv("BACKTEST_SLIPPAGE_RATE", "0.0005"))
 # BACKTEST_USE_BTC_FILTER removed 2026-08-03 — dead, and it implied the BTC
