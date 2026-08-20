@@ -959,10 +959,12 @@ def analyze_coin_smc(candles_15m: dict, candles_1h: dict, symbol: str,
     if mtf_score < MTF_MIN_SCORE:
         if diag is not None:
             diag["score_fail"] = diag.get("score_fail", 0) + 1
-        # Variant D: near-misses in [SHADOW_MIN_SCORE, MTF_MIN_SCORE) survive as
-        # shadow-only. Anything below SHADOW_MIN_SCORE is dropped outright.
-        if mtf_score < SHADOW_MIN_SCORE or _soft_fail("score"):
-            return None
+        # Variant D removed 2026-08-07 at the user's request: score near-misses
+        # are no longer soft-failed, so nothing below MTF_MIN_SCORE survives and
+        # the score-shadow batch stops costing Claude budget. To revive, restore
+        #   if mtf_score < SHADOW_MIN_SCORE or _soft_fail("score"):
+        # here and re-add the D arm in src/filter_variants.py.
+        return None
 
     # 8b. Adaptive regime pack gate (DEFAULT OFF — under backtest evaluation).
     #     Requires higher quality as the regime worsens + sets a per-regime risk_mult.

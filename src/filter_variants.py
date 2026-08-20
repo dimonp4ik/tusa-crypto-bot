@@ -37,7 +37,6 @@ pre-existing analytic keeps filtering source='live' so the numbers the admin
 panel reports are unchanged.
 
 Current soft-failable gates and the arm each one feeds:
-    "score"          -> D  (mtf_score in [SHADOW_MIN_SCORE, MTF_MIN_SCORE))
     "ctxmom"         -> F  (the five narrow "context momentum pack" gates)
 
 Slot C is FREE (2026-08-03). It last held the OVERLAP-session unblock, removed
@@ -46,8 +45,17 @@ the same day at the user's request. Note what that leaves standing: the
 a base later found broken, and no data will ever accumulate to confirm or
 refute it. Re-add a _soft_fail("overlap") in signal_filter.py to revive it.
 
+Slot D is FREE (2026-08-07) — removed on request. It held the soft score gate
+(mtf_score in [SHADOW_MIN_SCORE=12, MTF_MIN_SCORE=14)), the only arm fed by the
+"score" shadow reason, so removing it also switches that shadow batch off and
+stops those near-misses costing Claude budget. What is given up: the live test
+of whether the 10->14 score raise (A/B'd on ONE 2026-06-11 window: scores 12-13
+= WR ~20%, -6.3R over 20 symbols) still holds now. That raise stays in force
+unmeasured. SHADOW_MIN_SCORE remains in config but is inert until the
+_soft_fail("score") call in signal_filter.py is restored.
+
 Slots B, E, G, H, I are FREE (2026-08-09) — removed on request in two steps.
-LIVE ARMS ARE NOW A (control), D, F. What was given up, recorded so it does
+LIVE ARMS ARE NOW A (control) and F. What was given up, recorded so it does
 not resurface as a surprise:
   - G (vol-regime < 2.0x) cut the STRONGEST bucket on the 10,300-trade seed:
     <0.8 -> 76.1%/+0.387R, 0.8-1.3 -> 79.5%/+0.425R, 1.3-2.0 -> 81.9%/+0.475R,
@@ -113,11 +121,6 @@ def _v_a(s):   # control: everything the live filter already passed
 
 
 
-def _v_d(s):   # looser score gate — fed by the score-shadow batch (see module docstring)
-    return _relaxes(s, "score") and _f(s, "mtf_score") >= 12
-
-
-
 def _v_f(s):   # "context momentum pack" OFF — the 5 narrow segment gates
                # (rel-weakness / narrow-zone / NY-momentum / SHORT-FVG-momentum /
                # FVG-London-BTC). All validated TOGETHER on one window 2026-06-05,
@@ -128,7 +131,6 @@ def _v_f(s):   # "context momentum pack" OFF — the 5 narrow segment gates
 
 VARIANTS = {
     "A": ("Текущий (контроль)",              _v_a, True),
-    "D": ("Мягкий score ≥12 (shadow)",       _v_d, True),
     "F": ("Контекст-моментум ВЫКЛ",          _v_f, True),
 }
 
