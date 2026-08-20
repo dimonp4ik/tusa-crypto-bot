@@ -4151,9 +4151,12 @@ def run_scan():
             try:
                 shadow_setups.sort(key=_setup_rank, reverse=True)
                 # Per-reason quota: each soft-failed gate feeds its OWN variant
-                # arm, so a frequently-firing gate (rsi_mid) must not crowd the
-                # rarer ones out of the batch. Best 2 per reason, 8 total (4
-                # reasons live: double_neutral/score/ctxmom/rsi_mid).
+                # arm, so a frequently-firing gate must not crowd the rarer ones
+                # out of the batch. Best 2 per reason, 8 total.
+                # As of 2026-08-07 only ONE reason is live — "ctxmom" (arm F);
+                # "score" (arm D) was removed on request. So this batch now
+                # costs at most 2 Claude verdicts per scan, not 8, and makes no
+                # call at all when empty (see the early return above).
                 _per_reason, shadow_batch = {}, []
                 for _sh in shadow_setups:
                     _r = _sh.get("_shadow_reason", "")
