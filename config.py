@@ -612,13 +612,36 @@ BTC_BLOCK_THRESHOLD_PCT = 1.0
 # global feed, while the user trades the thin X-Perp where false wicks are more
 # common (this is the same phenomenon the SL-wick diagnostic was built to log).
 STOP_CLOSE_CONFIRM = os.getenv("STOP_CLOSE_CONFIRM", "1") != "0"
-# The exchange-side stop stays in place as a DISASTER backstop, just widened to
-# this multiple of R. It is what protects the position when the bot itself is
-# down (deploy, restart, network) — without it a close-confirmed stop would
-# leave the position naked and 10x leverage liquidates ~9% away. At 2.0R it
-# would not have fired once in either backtest window, so it costs nothing in
-# normal operation and caps the tail at -2R instead of a liquidation.
-STOP_EXCHANGE_BACKSTOP_R = float(os.getenv("STOP_EXCHANGE_BACKSTOP_R", "2.0"))
+# The exchange-side stop stays in place as a DISASTER backstop at this multiple
+# of R. It protects the position when the bot itself is down (deploy, restart,
+# network) — without it a close-confirmed stop leaves the position naked and 10x
+# leverage liquidates ~9% away.
+#
+# 2.0 -> 1.5 on 2026-08-22, after it fired TWICE within three minutes on live
+# money (DOGE and PUMP, both longs opened 08:07 Riga, both backstopped by ~08:10).
+# The old comment here claimed 2.0R "would not have fired once in either
+# backtest window, so it costs nothing in normal operation". That was wrong on
+# both halves: mae_r (added 2026-08-16) shows two trades reaching 2.0R in the
+# 1773-trade window, and at 10x a 2R stop on a 3%-risk trade is -60% of that
+# trade's margin — the opposite of costing nothing.
+#
+# Measured on wick depth before TP1, which is exactly what a trigger order sees:
+#   уровень   сделок глубже   из них ВЫИГРЫШНЫХ
+#   1.20R          138             6 (4%)
+#   1.30R           73             2 (3%)
+#   1.50R           25             0 (0%)
+#   2.00R            2             0 (0%)
+# No winning trade in 1773 ever wicks 1.5R against itself, so a backstop there
+# kills nothing that close-confirm was protecting — it only truncates 25 tails.
+# Net R is marginally BETTER for it (+919.3R -> +921.8R); tighter still keeps
+# gaining (+924.1R at 1.3R) but starts costing real winners, so 1.5 is the last
+# level that is unambiguously free.
+#
+# Why this matters more live than in backtest: the engine's own stop waits for a
+# 15m candle to CLOSE beyond 1R, and in a fast dump price does not wait. The
+# backstop, not the engine, is what actually exits — so its level IS the real
+# stop in exactly the cases that hurt most.
+STOP_EXCHANGE_BACKSTOP_R = float(os.getenv("STOP_EXCHANGE_BACKSTOP_R", "1.5"))
 
 # --- Concurrent same-direction exposure cap (2026-07-26) ------------------------
 # Nothing capped total open positions before this: only per-symbol dedup and

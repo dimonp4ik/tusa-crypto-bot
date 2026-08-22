@@ -493,8 +493,27 @@ def poll_exchange_closes() -> None:
                 okx.cancel_protection(creds, pos["inst_id"], pos["tp1_algo_id"])
             at_close_position(pos["id"], "EXCHANGE_FLAT")
             base = pos["inst_id"].split("-")[0]
+            # Report the REAL fill. The signal engine sends its own message
+            # later — it waits for a 15m candle to close beyond the stop — and
+            # quotes that candle close, a price this position never traded at.
+            # Seen live 2026-08-22: the exchange closed DOGE near 08:10, the
+            # engine reported 08:31 at -6.73%.
+            _tick = (okx.get_xperp_spec(pos["inst_id"]) or {}).get("tickSz", 0)
+            _fill = okx.get_last_fill_px(creds, pos["inst_id"])
+            _entry = float(pos.get("entry_px") or 0)
+            if _fill and _entry > 0:
+                _mv = ((_fill - _entry) / _entry * 100.0
+                       if str(pos.get("direction", "")).upper() == "LONG"
+                       else (_entry - _fill) / _entry * 100.0)
+                _px_line = (f"Закрыто по `{okx.fmt_px_display(_fill, _tick)}` "
+                            f"(вход `{okx.fmt_px_display(_entry, _tick)}`, "
+                            f"{_mv:+.2f}%, x{AUTOTRADE_LEVERAGE}: {_mv * AUTOTRADE_LEVERAGE:+.0f}%)")
+            else:
+                _px_line = "Цену заливки биржа не отдала."
             _dm(pos["user_id"],
                 f"🤖 *{base}/USDC*: позиция закрыта на бирже (стоп/тейк сработал).\n"
-                f"Детали сигнала придут отдельным сообщением.")
+                f"{_px_line}\n"
+                f"_Это реальная цена сделки. Сообщение по сигналу придёт позже "
+                f"и покажет цену закрытия свечи — она может отличаться._")
         except Exception as e:
             log.warning(f"autotrade exchange-close poll failed pos#{pos['id']}: {e}")
