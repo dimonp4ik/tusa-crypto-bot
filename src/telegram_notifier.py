@@ -123,9 +123,33 @@ def calculate_tp_sl(price: float, direction: str, atr: float = 0.0,
 
 
 def _format_price(price: float) -> str:
-    if price >= 1000:  return f"{price:,.2f}"
-    if price >= 1:     return f"{price:.4f}"
-    return f"{price:.6f}"
+    """Price for a human, in fixed point, never in scientific notation.
+
+    Below 0.001 a fixed number of decimals destroys the number: at .6f a PEPE
+    price of 4.08e-06 rendered as "0.000004" and 1.234e-08 as "0.000000" — all
+    significant digits gone. Small-cap prices therefore switch to a
+    significant-digit rule, which keeps four regardless of magnitude.
+
+    Larger prices keep their previous formatting exactly, so nothing that was
+    already readable changes.
+    """
+    try:
+        price = float(price)
+    except (TypeError, ValueError):
+        return str(price)
+    if price >= 1000:
+        return f"{price:,.2f}"
+    if price >= 1:
+        return f"{price:.4f}"
+    if price >= 0.001:
+        return f"{price:.6f}"
+    if price <= 0:
+        return "0"
+    # Four significant digits, expressed as plain decimals.
+    import math as _math
+    exp = _math.floor(_math.log10(price))
+    decimals = min(18, -exp + 3)
+    return f"{price:.{decimals}f}"
 
 
 def recommend_leverage(price: float, sl: float, tp1: float, tp2: float,

@@ -53,7 +53,7 @@ from src.signal_filter import analyze_coin_smc
 from src.filter_variants import VARIANTS, compute_variants
 from src.knn_analog import knn_direction_score, knn_risk_mult
 from src.claude_analyzer import analyze_batch_with_claude, analyze_heavy
-from src.telegram_notifier import send_signal, send_status, send_news_alert, send_signal_update, calculate_tp_sl, send_morning_digest, send_weekly_digest, send_daily_prayer, send_commandments, send_evening_prayer, send_evening_ritual, _disp_sym, _esc
+from src.telegram_notifier import send_signal, send_status, send_news_alert, send_signal_update, calculate_tp_sl, send_morning_digest, send_weekly_digest, send_daily_prayer, send_commandments, send_evening_prayer, send_evening_ritual, _disp_sym, _esc, _format_price
 from src.news_filter import check_news_sentiment
 from src.news_agent import (
     get_market_news, detect_major_events, fetch_recent_headlines,
@@ -889,11 +889,15 @@ def _format_open_signal(s: dict) -> str:
         # positive pnl means price moved in our favour
         pnl   = pct if direction == "LONG" else -pct
         pnl_s = f"+{pnl:.2f}%" if pnl >= 0 else f"{pnl:.2f}%"
-        price_line = f"   {arrow} `{cur}` ({pnl_s}) | 🎯 {nearest_label}: `{nearest_tp}` | 🛑 SL: `{sl}`"
+        price_line = (f"   {arrow} `{_format_price(cur)}` ({pnl_s}) | "
+                      f"🎯 {nearest_label}: `{_format_price(nearest_tp)}` | "
+                      f"🛑 SL: `{_format_price(sl)}`")
     else:
-        price_line = f"   🎯 {nearest_label}: `{nearest_tp}` | 🛑 SL: `{sl}`"
+        price_line = (f"   🎯 {nearest_label}: `{_format_price(nearest_tp)}` | "
+                      f"🛑 SL: `{_format_price(sl)}`")
 
-    header = f"{icon} *{_disp_sym(s['symbol'])}* {direction} @ `{entry}`  _{age_h}ч_"
+    header = (f"{icon} *{_disp_sym(s['symbol'])}* {direction} "
+              f"@ `{_format_price(entry)}`  _{age_h}ч_")
     return f"{header}\n{price_line}"
 
 
