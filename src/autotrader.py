@@ -35,6 +35,7 @@ from config import (
     AUTOTRADE_CONTACT,
     STOP_CLOSE_CONFIRM, STOP_EXCHANGE_BACKSTOP_R, SYMBOL_SIZE_MULT,
     COUNTER_STRUCTURE_SIZE_MULT,
+    RISK_NORMALIZED_SIZING, RISK_REFERENCE_PCT, RISK_SIZE_MULT_MIN,
 )
 from src.db import (
     at_get_active_traders, at_get, at_set_balance, at_set_mode_prompt,
@@ -183,6 +184,20 @@ def _open_for_user(u: dict, sig: dict, inst_id: str, disp: str) -> None:
     # Counter-structure setups size up — see COUNTER_STRUCTURE_SIZE_MULT.
     if sig.get("sniper"):
         _size_mult *= float(COUNTER_STRUCTURE_SIZE_MULT)
+    # Risk-normalised sizing: a wide stop gets less size so that 1R costs the
+    # same money regardless of where structure put the stop. Downward only —
+    # see RISK_NORMALIZED_SIZING in config.py. Without this a 3.0% stop risked
+    # 2.5x a 1.2% stop for the same "size", which is also what broke the R
+    # accounting every backtest figure in this project is written in.
+    if RISK_NORMALIZED_SIZING:
+        try:
+            _e, _sl = float(sig["entry_price"]), float(sig["sl"])
+            _risk_pct = abs(_e - _sl) / _e if _e > 0 else 0.0
+            if _risk_pct > RISK_REFERENCE_PCT:
+                _size_mult *= max(RISK_SIZE_MULT_MIN,
+                                  RISK_REFERENCE_PCT / _risk_pct)
+        except (TypeError, ValueError, ZeroDivisionError, KeyError):
+            pass
     margin = _margin_for(u, balance) * _size_mult
     if margin <= 0:
         return

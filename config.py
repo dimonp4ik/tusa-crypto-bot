@@ -813,6 +813,35 @@ SYMBOL_SIZE_MULT = _parse_symbol_size_mult(
 # confound the still-pending live validation of the zone-watch entry.
 COUNTER_STRUCTURE_SIZE_MULT = float(os.getenv("COUNTER_STRUCTURE_SIZE_MULT", "1.5"))
 
+# --- Risk-normalised sizing (added 2026-08-22 after a live incident) ---
+# Position size was fixed regardless of how far away the stop sat, so a trade
+# with 1R = 3.0% of price risked 2.5x the money of one with 1R = 1.2% for the
+# same "size". Stop width across 1773 backtest trades: min 1.20%, median 1.47%,
+# max 3.00%, with 20.4% of trades pinned at the 3.0% ceiling.
+#
+# At 10x that means a 1R loss costs 12% of the trade's margin on a tight stop
+# and 30% on a wide one. On 2026-08-22 DOGE and PUMP both had 1R = 3.0% — the
+# ceiling — so each cost 60% of its margin when the 2R backstop fired
+# (-2.12 and -2.11 USDC on ~3.4 USDC of margin).
+#
+# 🔑 THE DEEPER PROBLEM: every backtest figure in this project is in R, and
+# summing R assumes each R is worth the same money. The live bot broke that
+# assumption, so live dollar outcomes carry variance the backtest never showed.
+# This is the same class of live-vs-backtest gap as the missing gates — the
+# model was right, the execution did not match it.
+#
+# Scaling is DOWNWARD ONLY: a wide stop gets less size, a tight stop is left
+# alone rather than levered up. That is strictly risk-reducing and needs no
+# further validation to be safe. The symmetric version (sizing tight stops UP
+# to hit the reference exactly) would raise exposure and has NOT been measured.
+RISK_NORMALIZED_SIZING = os.getenv("RISK_NORMALIZED_SIZING", "1") != "0"
+# Reference 1R width. At or below this, size is untouched; above it, size is cut
+# proportionally. Set to the measured median so the typical trade is unaffected.
+RISK_REFERENCE_PCT     = float(os.getenv("RISK_REFERENCE_PCT", "0.015"))
+# Floor on the multiplier, so an extreme stop cannot shrink a position below the
+# exchange minimum and silently drop the trade.
+RISK_SIZE_MULT_MIN     = float(os.getenv("RISK_SIZE_MULT_MIN", "0.45"))
+
 # --- Approach quality: did price come INTO the zone, or are we chasing? ---
 # `approach_pct` (main._attach_approach) is how far price already moved in the
 # trade's direction over the previous APPROACH_LOOKBACK_BARS. Collected as
