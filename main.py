@@ -2298,6 +2298,7 @@ def _at_show_menu(chat_id: int, u: dict):
               "callback_data": "at_toggle"}],
             [{"text": "⚙️ Изменить размер сделки", "callback_data": "at_resize"}],
             [{"text": f"🎯 % закрытия на TP1: {tp1_pct:.0f}%", "callback_data": "at_tp1pct"}],
+            [{"text": "💰 Прибыль и вывод", "callback_data": "at_pnl"}],
             [{"text": "🔑 Заменить API-ключи", "callback_data": "at_rekey"}]]
     _at_reply_kb(chat_id,
                  f"🤖 *Автотрейдинг*\n\nСтатус: {state}\nРазмер: *{mode_str}*\n"
@@ -2620,6 +2621,73 @@ def _sweep_execute_buy(chat_id: int, user_id: int, u: dict,
                     + "Эти деньги больше не под 10x.")
 
 
+def _sweep_show_report(chat_id: int, user_id: int, u: dict) -> None:
+    """On-demand profit report for one autotrader.
+
+    Same source as the automatic offer — OKX positions-history, not our own
+    exit prices — so what the user reads here and what the sweep acts on can
+    never disagree. Shows the offer buttons only when the threshold is met, so
+    the screen doubles as a way to trigger a sweep early.
+    """
+    from src.autotrader import _creds_of
+    st = sweep_state(user_id)
+    creds = _creds_of(u)
+    L = ["*Прибыль и вывод с плеча*", ""]
+
+    bal = u.get("last_balance")
+    if creds:
+        ok_b, live_bal = _okx.get_balance(creds)
+        if ok_b:
+            bal = live_bal
+    L.append("Баланс: *$" + (format(bal, ".2f") if bal is not None else "—") + "*")
+
+    since = float(st.get("watermark_ts") or 0)
+    since_txt = datetime.fromtimestamp(since, _riga_tz()).strftime("%d.%m %H:%M")
+    pnl, amount = _sweep_pending(u)
+    L.append("Прибыль с " + since_txt + ": *$" + format(pnl, "+.2f") + "*")
+    L.append("Уже выведено всего: $" + format(float(st.get("total_swept") or 0), ".2f"))
+    L.append("")
+
+    if pnl <= 0:
+        L.append("_Пока выводить нечего. Считается только закрытая прибыль, "
+                 "открытые позиции не в счёт._")
+        _at_reply_kb(chat_id, chr(10).join(L),
+                     {"inline_keyboard": [[{"text": "« Назад", "callback_data": "at_menu"}]]})
+        return
+
+    L.append("Порог для предложения: $" + format(PROFIT_SWEEP_THRESHOLD_USD, ".0f")
+             + ", доля: " + format(PROFIT_SWEEP_PCT, ".0f") + "%")
+
+    if pnl < PROFIT_SWEEP_THRESHOLD_USD:
+        need = PROFIT_SWEEP_THRESHOLD_USD - pnl
+        L.append("")
+        L.append("_До предложения осталось заработать $" + format(need, ".2f") + "._")
+        _at_reply_kb(chat_id, chr(10).join(L),
+                     {"inline_keyboard": [[{"text": "« Назад", "callback_data": "at_menu"}]]})
+        return
+
+    L.append("К выводу сейчас: *$" + format(amount, ".2f") + "*")
+    facts = _sweep_coin_facts()
+    if facts:
+        L.append("")
+        L.append("*Как бот торговал эти монеты за 90 дней:*")
+        for f in facts:
+            L.append("  `" + f["base"].ljust(6) + "` "
+                     + str(f["trades"]) + " сд · "
+                     + format(f["win_rate"], ".0f") + "% · "
+                     + format(f["total_r"], "+.1f") + "R")
+        L.append("")
+        L.append("_Это факты по работе бота, а не совет что покупать._")
+    rows = [[{"text": f["base"], "callback_data": "sw_buy_" + f["base"]}]
+            for f in facts]
+    kb = {"inline_keyboard": rows + [
+        [{"text": "Другая монета", "callback_data": "sw_manual"}],
+        [{"text": "Оставить в USDC", "callback_data": "sw_usdc"}],
+        [{"text": "« Назад", "callback_data": "at_menu"}],
+    ]}
+    _at_reply_kb(chat_id, chr(10).join(L), kb)
+
+
 def _sweep_handle_callback(cb_id: str, chat_id: int, user_id: int, data: str) -> bool:
     """Profit-sweep buttons. Returns True if handled.
 
@@ -2718,6 +2786,12 @@ def _at_handle_callback(cb_id: str, chat_id: int, user_id: int, data: str) -> bo
         _reply(chat_id,
                "Какой % позиции закрывать на TP1? Напиши число *0-100* "
                "(0 = не закрывать, оставить всё под трейлинг).")
+    elif data == "at_pnl":
+        _answer_callback(cb_id)
+        _sweep_show_report(chat_id, user_id, u)
+    elif data == "at_menu":
+        _answer_callback(cb_id)
+        _at_show_menu(chat_id, u)
     elif data == "at_mode_keep":
         at_set_mode_prompt(user_id, False)
         _answer_callback(cb_id, "Ок, оставляем как есть.")
