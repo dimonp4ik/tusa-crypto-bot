@@ -309,6 +309,81 @@ def cancel_protection(creds: dict, inst_id: str, algo_id: str) -> tuple:
     return ok, data
 
 
+# ── Profit sweep: read realised PnL, buy spot ────────────────────────────────
+
+def get_realized_pnl_since(creds: dict, since_ts: float) -> tuple:
+    """(ok, realised PnL in USDC on closed positions after `since_ts`).
+
+    Read from the exchange, never computed from our own prices: the engine and
+    the exchange do not exit at the same moment (see get_last_fill_px), so our
+    numbers are the wrong basis for moving real money. positions-history carries
+    realizedPnl per closed position, already net of fees and funding.
+    """
+    ok, data = _request(creds, "GET", "/api/v5/account/positions-history",
+                        params={"instType": "FUTURES", "limit": "100"})
+    if not ok:
+        return False, data
+    total = 0.0
+    try:
+        for row in data or []:
+            ts = float(row.get("uTime") or row.get("cTime") or 0) / 1000.0
+            if ts <= since_ts:
+                continue
+            total += float(row.get("realizedPnl") or 0.0)
+        return True, total
+    except (TypeError, ValueError) as e:
+        return False, f"pnl parse failed: {e}"
+
+
+_spot_cache = {"at": 0.0, "pairs": {}}
+
+
+def get_spot_pairs() -> dict:
+    """{BASE: instId} for live USDC spot pairs on this host. Cached 24h."""
+    now = time.time()
+    if now - _spot_cache["at"] > _SPEC_TTL or not _spot_cache["pairs"]:
+        try:
+            resp = requests.get(_base_url() + "/api/v5/public/instruments",
+                                params={"instType": "SPOT"}, timeout=15)
+            pairs = {}
+            for x in resp.json().get("data", []):
+                if x.get("quoteCcy") == "USDC" and x.get("state") == "live":
+                    pairs[str(x.get("baseCcy", "")).upper()] = {
+                        "instId": x["instId"],
+                        "minSz":  float(x.get("minSz") or 0),
+                        "lotSz":  float(x.get("lotSz") or 0),
+                    }
+            if pairs:
+                _spot_cache["pairs"], _spot_cache["at"] = pairs, now
+        except Exception as e:
+            _log.warning(f"get_spot_pairs failed: {e}")
+    return _spot_cache["pairs"]
+
+
+def place_spot_buy(creds: dict, inst_id: str, quote_usdc: float) -> tuple:
+    """Market-buy `quote_usdc` worth of the base currency. (ok, ordId|err).
+
+    tgtCcy=quote_ccy makes `sz` the amount of USDC to SPEND rather than the
+    amount of coin to buy — the only sane unit when sweeping a cash amount.
+    That parameter is SPOT-only; on a swap it is silently ignored, which is why
+    this is a separate function from place_market_entry.
+    """
+    ok, data = _request(creds, "POST", "/api/v5/trade/order", body={
+        "instId":  inst_id,
+        "tdMode":  "cash",
+        "side":    "buy",
+        "ordType": "market",
+        "tgtCcy":  "quote_ccy",
+        "sz":      f"{quote_usdc:.2f}",
+    })
+    if not ok:
+        return False, data
+    try:
+        return True, data[0].get("ordId", "")
+    except Exception:
+        return True, ""
+
+
 def get_last_fill_px(creds: dict, inst_id: str) -> float | None:
     """Average price of the most recent fill on this instrument, or None.
 

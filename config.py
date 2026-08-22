@@ -842,6 +842,40 @@ RISK_REFERENCE_PCT     = float(os.getenv("RISK_REFERENCE_PCT", "0.015"))
 # exchange minimum and silently drop the trade.
 RISK_SIZE_MULT_MIN     = float(os.getenv("RISK_SIZE_MULT_MIN", "0.45"))
 
+# --- Profit sweep: take money off leverage ------------------------------------
+# Everything the bot earns currently becomes collateral for the next 10x trade,
+# so profit is never actually banked — it just raises the stake. This offers a
+# slice of realised profit for withdrawal into unleveraged spot.
+#
+# The value here is the DE-LEVERAGING, not the buying. Moving money out from
+# under 10x is the one risk control that works without needing any edge. Which
+# coin it then sits in is a separate decision the bot has no measured basis for
+# — see the note on recommendations below.
+#
+# Realised PnL is read from OKX (positions-history), never computed from our own
+# prices: the engine and the exchange exit at different moments, so our numbers
+# are the wrong basis for moving real money.
+#
+# ⚠️ The bot NEVER buys on its own. It sends an offer with buttons and only acts
+# on an explicit press. Declining still advances the watermark, otherwise the
+# same profit is re-offered forever.
+PROFIT_SWEEP_ENABLED       = os.getenv("PROFIT_SWEEP_ENABLED", "1") != "0"
+PROFIT_SWEEP_THRESHOLD_USD = float(os.getenv("PROFIT_SWEEP_THRESHOLD_USD", "20"))
+PROFIT_SWEEP_PCT           = float(os.getenv("PROFIT_SWEEP_PCT", "10"))
+# Do not pester: minimum hours between offers to the same user.
+PROFIT_SWEEP_MIN_GAP_H     = float(os.getenv("PROFIT_SWEEP_MIN_GAP_H", "24"))
+# OKX spot minimum order is a few dollars; below this a sweep cannot execute.
+PROFIT_SWEEP_MIN_ORDER_USD = float(os.getenv("PROFIT_SWEEP_MIN_ORDER_USD", "2"))
+#
+# NO RECOMMENDATION ENGINE. The measured edge in this project is a 15m return to
+# a zone with a stop and a target, holding hours. It says nothing about which
+# coin to buy and hold, and the one time buy-and-hold momentum WAS measured on
+# crypto it came out at roughly zero to negative (alts pump and dump — see the
+# TUSA FINANCE work). A picker built on that would emit confident suggestions
+# with nothing behind them, and would be believed because the rest of this bot's
+# numbers are real. The offer therefore shows FACTS per coin (24h volume,
+# spread, how this bot has traded it) and lets the user choose.
+
 # --- Approach quality: did price come INTO the zone, or are we chasing? ---
 # `approach_pct` (main._attach_approach) is how far price already moved in the
 # trade's direction over the previous APPROACH_LOOKBACK_BARS. Collected as

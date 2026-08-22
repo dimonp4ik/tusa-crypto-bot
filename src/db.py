@@ -1998,6 +1998,60 @@ def at_open_positions_for_signal(signal_id: int) -> list:
         return [dict(r) for r in rows]
 
 
+def sweep_state(user_id: int) -> dict:
+    """Profit-sweep watermark for one user.
+
+    `watermark_ts` is the point up to which realised PnL has already been
+    offered for sweeping. Without it the same profit is counted on every check
+    and the bot keeps proposing to invest money it already proposed.
+    `total_swept` is cumulative, for the report only.
+    """
+    with _conn() as c:
+        c.execute("""
+            CREATE TABLE IF NOT EXISTS profit_sweeps (
+                user_id      INTEGER PRIMARY KEY,
+                watermark_ts REAL NOT NULL,
+                total_swept  REAL NOT NULL DEFAULT 0,
+                last_offer_ts REAL NOT NULL DEFAULT 0,
+                updated_at   REAL NOT NULL
+            )
+        """)
+        row = c.execute("SELECT * FROM profit_sweeps WHERE user_id = ?",
+                        (user_id,)).fetchone()
+        if row:
+            return dict(row)
+        now = time_mod.time()
+        c.execute("""INSERT INTO profit_sweeps
+                     (user_id, watermark_ts, total_swept, last_offer_ts, updated_at)
+                     VALUES (?, ?, 0, 0, ?)""", (user_id, now, now))
+        return {"user_id": user_id, "watermark_ts": now, "total_swept": 0.0,
+                "last_offer_ts": 0.0, "updated_at": now}
+
+
+def sweep_mark_offered(user_id: int) -> None:
+    """Remember that an offer was just sent, so the job does not repeat it."""
+    sweep_state(user_id)
+    with _conn() as c:
+        c.execute("UPDATE profit_sweeps SET last_offer_ts = ?, updated_at = ? "
+                  "WHERE user_id = ?", (time_mod.time(), time_mod.time(), user_id))
+
+
+def sweep_commit(user_id: int, amount: float) -> None:
+    """Move the watermark to now and add to the swept total.
+
+    Called only after the user acted on an offer — including 'skip', because
+    declining means this profit has been considered and should not be offered
+    again as if it were new.
+    """
+    sweep_state(user_id)
+    now = time_mod.time()
+    with _conn() as c:
+        c.execute("""UPDATE profit_sweeps
+                     SET watermark_ts = ?, total_swept = total_swept + ?,
+                         updated_at = ?
+                     WHERE user_id = ?""", (now, float(amount or 0.0), now, user_id))
+
+
 def at_has_open_position(user_id: int, inst_id: str) -> bool:
     """True if this user already holds an OPEN position on this instrument.
 

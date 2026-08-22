@@ -89,6 +89,15 @@ from src.db import (
     watch_add, watch_active, watch_resolve, watch_stats,
 )
 from src import autotrader
+from src import okx_trader as _okx
+from src.db import (
+    sweep_state, sweep_mark_offered, sweep_commit,
+    get_symbols_performance, at_get_active_traders,
+)
+from config import (
+    PROFIT_SWEEP_ENABLED, PROFIT_SWEEP_THRESHOLD_USD, PROFIT_SWEEP_PCT,
+    PROFIT_SWEEP_MIN_GAP_H, PROFIT_SWEEP_MIN_ORDER_USD,
+)
 from src.keystore import keystore_ready, encrypt_secret
 from src import okx_trader as _okx_trade
 from config import ADMIN_IDS, AUTOTRADE_BALANCE_THRESHOLD, AUTOTRADE_CONTACT
@@ -2457,6 +2466,213 @@ def _at_show_final_confirm(chat_id: int, mode_str: str, tp1_pct: float):
                    {"text": "❌ Отмена", "callback_data": "at_cancel"}]])
 
 
+def _sweep_pending(u: dict) -> tuple:
+    """(unswept realised PnL, offer amount) for one autotrade user, or (0, 0).
+
+    PnL comes from OKX, not from our own exit prices. The engine books the
+    candle close while the exchange books the fill, and those differ — see
+    okx_trader.get_last_fill_px. Real money must not move on our number.
+    """
+    from src.autotrader import _creds_of
+    creds = _creds_of(u)
+    if not creds:
+        return 0.0, 0.0
+    st = sweep_state(u["user_id"])
+    ok, pnl = _okx.get_realized_pnl_since(creds, float(st["watermark_ts"]))
+    if not ok or pnl is None or pnl <= 0:
+        return 0.0, 0.0
+    return float(pnl), round(float(pnl) * PROFIT_SWEEP_PCT / 100.0, 2)
+
+
+def _sweep_coin_facts(limit: int = 4) -> list:
+    """Facts about coins this bot has actually traded — NOT a recommendation.
+
+    Deliberately unranked by expected return. The measured edge here is a 15m
+    return-to-zone with a stop, holding hours; it says nothing about what to buy
+    and hold, and crypto buy-and-hold momentum measured at roughly zero to
+    negative the one time it was tested. Showing trades / win rate / R lets the
+    user see what the bot's own history says and decide for himself.
+    """
+    out = []
+    try:
+        perf = get_symbols_performance(days=90)
+    except Exception:
+        perf = []
+    try:
+        pairs = _okx.get_spot_pairs()
+    except Exception:
+        pairs = {}
+    for row in perf:
+        base = str(row.get("symbol", "")).replace("USDT", "").upper()
+        if base in pairs and int(row.get("trades", 0)) >= 5:
+            out.append({
+                "base": base,
+                "trades": int(row.get("trades", 0)),
+                "win_rate": float(row.get("win_rate", 0.0)),
+                "total_r": float(row.get("total_r", 0.0)),
+            })
+        if len(out) >= limit:
+            break
+    return out
+
+
+def _send_sweep_offer(uid: int, pnl: float, amount: float) -> None:
+    facts = _sweep_coin_facts()
+    rows = [[{"text": f["base"], "callback_data": "sw_buy_" + f["base"]}]
+            for f in facts]
+    kb = {"inline_keyboard": rows + [
+        [{"text": "Другая монета", "callback_data": "sw_manual"}],
+        [{"text": "Оставить в USDC", "callback_data": "sw_usdc"}],
+        [{"text": "Не сейчас", "callback_data": "sw_skip"}],
+    ]}
+    L = []
+    L.append("*Накопилась прибыль: $" + format(pnl, ".2f") + "*")
+    L.append("")
+    L.append("Предлагаю снять с плеча *$" + format(amount, ".2f") + "* ("
+             + format(PROFIT_SWEEP_PCT, ".0f") + "%) и переложить в спот.")
+    L.append("")
+    L.append("_Смысл в том, чтобы вывести часть денег из-под 10x. Пока прибыль "
+             "лежит на счёте, она просто увеличивает размер следующей ставки._")
+    if facts:
+        L.append("")
+        L.append("*Как бот торговал эти монеты за 90 дней:*")
+        for f in facts:
+            L.append("  `" + f["base"].ljust(6) + "` "
+                     + str(f["trades"]) + " сд · "
+                     + format(f["win_rate"], ".0f") + "% · "
+                     + format(f["total_r"], "+.1f") + "R")
+        L.append("")
+        L.append("_Это факты по работе бота, а не совет что покупать. Край бота "
+                 "измерен на 15-минутных сделках со стопом — он ничего не "
+                 "говорит о том, что стоит держать долго._")
+    _send_admin_text(uid, chr(10).join(L), kb)
+
+
+def _check_profit_sweeps() -> None:
+    """Offer to move a slice of realised profit off leverage into spot.
+
+    Sends an OFFER ONLY. Nothing is bought without an explicit button press —
+    the bot never moves a user's money on its own initiative.
+    """
+    if not (PROFIT_SWEEP_ENABLED and AUTOTRADE_ENABLED):
+        return
+    try:
+        traders = at_get_active_traders()
+    except Exception as e:
+        log.warning(f"sweep: cannot list traders: {e}")
+        return
+    for u in traders:
+        try:
+            uid = u["user_id"]
+            st = sweep_state(uid)
+            gap_h = (time.time() - float(st.get("last_offer_ts") or 0)) / 3600.0
+            if gap_h < PROFIT_SWEEP_MIN_GAP_H:
+                continue
+            pnl, amount = _sweep_pending(u)
+            if pnl < PROFIT_SWEEP_THRESHOLD_USD:
+                continue
+            if amount < PROFIT_SWEEP_MIN_ORDER_USD:
+                continue
+            _send_sweep_offer(uid, pnl, amount)
+            sweep_mark_offered(uid)
+            log.info(f"sweep offer sent to {uid}: pnl={pnl:.2f} offer={amount:.2f}")
+        except Exception as e:
+            log.warning(f"sweep check failed for {u.get('user_id')}: {e}")
+
+
+# user_id -> сумма, ожидающая ручного ввода тикера
+_sweep_pending_manual: dict = {}
+
+
+def _sweep_execute_buy(chat_id: int, user_id: int, u: dict,
+                       base: str, amount: float, cb_id: str = None) -> None:
+    """Market-buy `amount` USDC of `base` on spot. Only ever called from a press."""
+    from src.autotrader import _creds_of
+    try:
+        pairs = _okx.get_spot_pairs()
+    except Exception:
+        pairs = {}
+    info = pairs.get(base)
+    if not info:
+        if cb_id:
+            _answer_callback(cb_id, "Нет такой пары.")
+        _reply(chat_id, "Пара " + base + "/USDC на OKX EU не торгуется. "
+                        "Попробуй другой тикер.")
+        return
+    creds = _creds_of(u)
+    if not creds:
+        if cb_id:
+            _answer_callback(cb_id, "Нет ключей.")
+        return
+    ok, res = _okx.place_spot_buy(creds, info["instId"], amount)
+    if not ok:
+        log.warning(f"sweep buy failed for {user_id} {base}: {res}")
+        if cb_id:
+            _answer_callback(cb_id, "Биржа отклонила заявку.")
+        _reply(chat_id, "Не смог купить " + base + " на $"
+                        + format(amount, ".2f") + "." + chr(10) + "`" + str(res) + "`")
+        return
+    sweep_commit(user_id, amount)
+    if cb_id:
+        _answer_callback(cb_id, "Куплено")
+    _reply(chat_id, "✅ *Куплено " + base + " на $" + format(amount, ".2f")
+                    + "* — спот, без плеча." + chr(10)
+                    + "Эти деньги больше не под 10x.")
+
+
+def _sweep_handle_callback(cb_id: str, chat_id: int, user_id: int, data: str) -> bool:
+    """Profit-sweep buttons. Returns True if handled.
+
+    Every path that ends the offer calls sweep_commit, including 'skip' and
+    'keep in USDC' — the profit has been considered, and re-offering it would
+    make the bot nag about the same money forever.
+
+    A purchase happens ONLY here, on an explicit press. The job that produced
+    the offer never touches money.
+    """
+    if not data.startswith("sw_"):
+        return False
+    u = at_get(user_id)
+    if not u or not u.get("allowed"):
+        _answer_callback(cb_id, "Нет доступа.")
+        return True
+
+    pnl, amount = _sweep_pending(u)
+    if amount < PROFIT_SWEEP_MIN_ORDER_USD:
+        _answer_callback(cb_id, "Прибыль уже учтена.")
+        return True
+
+    if data == "sw_skip":
+        sweep_commit(user_id, 0.0)
+        _answer_callback(cb_id, "Пропускаем.")
+        _reply(chat_id, "Понял, ничего не покупаю. Предложу в следующий раз.")
+        return True
+
+    if data == "sw_usdc":
+        sweep_commit(user_id, amount)
+        _answer_callback(cb_id, "Оставляем в USDC.")
+        _reply(chat_id, "$" + format(amount, ".2f") + " остаются в USDC." + chr(10)
+                        + "_Ничего не покупал. Чтобы они перестали работать под "
+                          "плечом, выведи их с торгового счёта._")
+        return True
+
+    if data == "sw_manual":
+        _sweep_pending_manual[user_id] = amount
+        _answer_callback(cb_id)
+        _reply(chat_id, "Напиши тикер монеты, например `SOL`." + chr(10)
+                        + "Куплю на $" + format(amount, ".2f")
+                        + " по рынку, спот, без плеча.")
+        return True
+
+    if data.startswith("sw_buy_"):
+        _sweep_execute_buy(chat_id, user_id, u, data[len("sw_buy_"):].upper(),
+                           amount, cb_id)
+        return True
+
+    _answer_callback(cb_id)
+    return True
+
+
 def _at_handle_callback(cb_id: str, chat_id: int, user_id: int, data: str) -> bool:
     """Autotrade inline-button presses (user side). Returns True if handled."""
     if not data.startswith("at_"):
@@ -2541,6 +2757,8 @@ def webhook():
             send_evening_ritual(chat_id)
         elif cb_data.startswith("at_"):
             _at_handle_callback(cb_id, chat_id, user_id, cb_data)
+        elif cb_data.startswith("sw_"):
+            _sweep_handle_callback(cb_id, chat_id, user_id, cb_data)
         elif _is_admin(user_id):
             _handle_admin_callback(cb_id, chat_id, message_id, cb_data, user_id)
         else:
@@ -2699,6 +2917,22 @@ def webhook():
     # this handler silently skipped it — the reported "type a coin and nothing
     # happens". The pending dict is already keyed by chat, and _is_admin still
     # gates it, so the DM requirement protected nothing.
+    # Manual ticker for a profit sweep. Checked before the admin block prompt so
+    # a user who is also an admin does not have his coin swallowed by that flow.
+    if user_id in _sweep_pending_manual:
+        amount = _sweep_pending_manual.pop(user_id)
+        base = (text_raw or "").strip().upper()
+        for q in ("USDC", "USDT"):
+            if base.endswith(q):
+                base = base[:-len(q)]
+        base = base.replace("-", "").replace("/", "").replace("_", "")
+        u = at_get(user_id)
+        if not base or not u:
+            _reply(chat_id, "Не понял тикер. Нажми кнопку в предложении ещё раз.")
+            return
+        _sweep_execute_buy(chat_id, user_id, u, base, amount)
+        return
+
     if _is_admin(user_id) and chat_id in _pending_block_chat:
         days = _pending_block_chat.pop(chat_id)
         raw_sym = text_raw.strip().upper().replace("-", "").replace("/", "").replace("_", "")
@@ -4752,6 +4986,15 @@ def start_bot():
     scheduler.add_job(
         _shadow_tracker_job, "cron",
         minute="3,18,33,48",
+        timezone="UTC",
+    )
+
+    # Profit sweep — hourly check, but PROFIT_SWEEP_MIN_GAP_H is what actually
+    # decides how often a user hears from it. Offer only; nothing is bought
+    # without a button press.
+    scheduler.add_job(
+        _check_profit_sweeps, "cron",
+        minute="20",
         timezone="UTC",
     )
 
