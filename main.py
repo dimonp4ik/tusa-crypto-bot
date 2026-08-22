@@ -2256,13 +2256,35 @@ def _at_delete_msg(chat_id: int, message_id: int):
 
 
 def _at_reply_kb(chat_id: int, text: str, kb_rows: list):
+    """Send a message with an inline keyboard. `kb_rows` is a LIST OF ROWS —
+    this wraps it in inline_keyboard itself, so passing an already-wrapped dict
+    nests it and Telegram rejects the whole call.
+
+    The response is checked. It used to be discarded: Telegram answers a bad
+    payload with HTTP 400, which is not an exception, so the send failed
+    silently and the button simply did nothing with nothing in the logs. That
+    is how the profit screen shipped broken on 2026-08-22. On failure this
+    retries as plain text, the same fallback _reply already uses, so a
+    Markdown problem degrades instead of vanishing.
+    """
+    payload = {"chat_id": chat_id, "text": text, "parse_mode": "Markdown",
+               "reply_markup": {"inline_keyboard": kb_rows}}
     try:
-        _requests.post(
+        resp = _requests.post(
             f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage",
-            json={"chat_id": chat_id, "text": text, "parse_mode": "Markdown",
-                  "reply_markup": {"inline_keyboard": kb_rows}},
-            timeout=10,
+            json=payload, timeout=10,
         )
+        if resp.status_code == 200:
+            return
+        log.warning(f"_at_reply_kb rejected ({resp.status_code}): {resp.text[:200]}")
+        payload.pop("parse_mode", None)
+        resp2 = _requests.post(
+            f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage",
+            json=payload, timeout=10,
+        )
+        if resp2.status_code != 200:
+            log.warning(f"_at_reply_kb plain retry also failed "
+                        f"({resp2.status_code}): {resp2.text[:200]}")
     except Exception as e:
         log.warning(f"_at_reply_kb failed: {e}")
 
@@ -2652,7 +2674,7 @@ def _sweep_show_report(chat_id: int, user_id: int, u: dict) -> None:
         L.append("_Пока выводить нечего. Считается только закрытая прибыль, "
                  "открытые позиции не в счёт._")
         _at_reply_kb(chat_id, chr(10).join(L),
-                     {"inline_keyboard": [[{"text": "« Назад", "callback_data": "at_menu"}]]})
+                     [[{"text": "« Назад", "callback_data": "at_menu"}]])
         return
 
     L.append("Порог для предложения: $" + format(PROFIT_SWEEP_THRESHOLD_USD, ".0f")
@@ -2663,7 +2685,7 @@ def _sweep_show_report(chat_id: int, user_id: int, u: dict) -> None:
         L.append("")
         L.append("_До предложения осталось заработать $" + format(need, ".2f") + "._")
         _at_reply_kb(chat_id, chr(10).join(L),
-                     {"inline_keyboard": [[{"text": "« Назад", "callback_data": "at_menu"}]]})
+                     [[{"text": "« Назад", "callback_data": "at_menu"}]])
         return
 
     L.append("К выводу сейчас: *$" + format(amount, ".2f") + "*")
@@ -2680,12 +2702,12 @@ def _sweep_show_report(chat_id: int, user_id: int, u: dict) -> None:
         L.append("_Это факты по работе бота, а не совет что покупать._")
     rows = [[{"text": f["base"], "callback_data": "sw_buy_" + f["base"]}]
             for f in facts]
-    kb = {"inline_keyboard": rows + [
+    kb_rows = rows + [
         [{"text": "Другая монета", "callback_data": "sw_manual"}],
         [{"text": "Оставить в USDC", "callback_data": "sw_usdc"}],
         [{"text": "« Назад", "callback_data": "at_menu"}],
-    ]}
-    _at_reply_kb(chat_id, chr(10).join(L), kb)
+    ]
+    _at_reply_kb(chat_id, chr(10).join(L), kb_rows)
 
 
 def _sweep_handle_callback(cb_id: str, chat_id: int, user_id: int, data: str) -> bool:
