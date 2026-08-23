@@ -154,7 +154,20 @@ RETEST_MAX_DIST_PCT = float(os.getenv("RETEST_MAX_DIST_PCT", "0.015"))  # within
 # --- Multi-timeframe score gate (max ~15) ---
 # 2026-06-11 A/B (20 sym, 2880+5760×15m, trail): scores 12-13 = WR ~20%, -6.3R.
 # Raising 10→14 cut those: WR 48.9→50.7%, R/tr +17%, DD -25% on both windows.
-MTF_MIN_SCORE = int(os.getenv("MTF_MIN_SCORE", "14"))
+# 14 -> 13 on 2026-08-24. The 2026-06-11 note above measured the 12-13 band at
+# WR ~20% / -6.3R — under the OLD backtest, which filled at the zone midpoint
+# without checking the market ever traded there. Re-measured on the honest
+# execution model, the band that gate was discarding is BETTER than the book it
+# was protecting: score exactly 13 runs 154 trades at 76.6% WR and +0.224R,
+# against a base of 73.8% and +0.204R, and it holds on both halves
+# (+0.253/+0.195).
+#
+# Effect of the change alone, live gates applied:
+#   14: 767 сд  73.8%  +170.73R  DD -15.52R  ratio 11.0
+#   13: 843 сд  74.3%  +190.22R  DD -14.38R  ratio 13.2
+# More trades, higher win rate, more profit, less drawdown — no trade-off.
+# 12 was also tested and adds little beyond 13, so the gate stops here.
+MTF_MIN_SCORE = int(os.getenv("MTF_MIN_SCORE", "13"))
 
 # INERT since 2026-08-07 — variant D was removed on request, and it was the only
 # consumer. signal_filter.py no longer calls _soft_fail("score"), so nothing
@@ -351,7 +364,19 @@ ADAPTIVE_BEAR_VOL_MAX_RATIO = float(os.getenv("ADAPTIVE_BEAR_VOL_MAX_RATIO", "1.
 # --- Stability overlay: deterministic kill-switch for poorly-validated regimes -
 # 2026-06-11 A/B: OVERLAP session (London+NY overlap) = WR 32%, -6.3R over 19tr.
 # Skipping it: +5R total, DD -20%. Both sessions fight at overlap = chop hour.
-STABILITY_FILTERS_ENABLED   = os.getenv("STABILITY_FILTERS_ENABLED", "1") != "0"
+# DISABLED 2026-08-24. The justification above rests on NINETEEN trades, and on
+# the old backtest that filled at prices the market never offered. It bans the
+# entire OVERLAP session — 122 trades in the current window, which run 73.8% and
+# +0.257R against a base of 73.8% and +0.204R, positive in both halves.
+#
+# Effect of switching it off, live gates applied:
+#   on:  767 сд  73.8%  +170.73R  DD -15.52R  ratio 11.0
+#   off: 838 сд  74.0%  +191.73R  DD -12.15R  ratio 15.8
+# The OVERLAP half-split is uneven (+0.061/+0.446), so this is not shipped
+# because that session is proven good — it is shipped because the ban was never
+# proven at all. A gate that closes a whole trading session needs more than 19
+# samples behind it, and the burden of proof belongs to the filter.
+STABILITY_FILTERS_ENABLED   = os.getenv("STABILITY_FILTERS_ENABLED", "0") != "0"
 STABILITY_SKIP_PACKS        = {s.lower() for s in _parse_symbol_list(os.getenv("STABILITY_SKIP_PACKS", ""))}
 STABILITY_SKIP_SESSIONS     = set(_parse_symbol_list(os.getenv("STABILITY_SKIP_SESSIONS", "OVERLAP")))
 STABILITY_MIN_EFF_RATIO     = float(os.getenv("STABILITY_MIN_EFF_RATIO", "0.0"))
