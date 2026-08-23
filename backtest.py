@@ -68,6 +68,8 @@ from config import (  # noqa: E402
     TP2_R_MULT,
     SYMBOL_SIZE_MULT,
     MAX_SAME_DIRECTION_POSITIONS,
+    ZONE_WATCH_ENABLED,
+    ZONE_WATCH_MINUTES,
     SIGNAL_COOLDOWN_HOURS,
     KILL_SWITCH_SL_STREAK,
     TRAIL_ATR_MULT,
@@ -549,6 +551,39 @@ _BT_TP_FIRST = os.getenv("BT_TP_FIRST", "0") == "1"
 # 48+ bars run 42.9% stops and -0.090R/trade while trades under 4 bars run 0.1%
 # stops and +0.722R. Duration is unknowable at entry, so the only place to act on
 # it is mid-trade.
+# ── Execution model: match what the live bot actually does ────────────────────
+# Until 2026-08-23 the backtest filled every setup at the ZONE MIDPOINT on the
+# signal bar, without requiring that price ever traded there. Live does not do
+# that: zone-watch parks an approved setup and fires only when price genuinely
+# re-enters [entry_low, entry_high] within ZONE_WATCH_MINUTES, at whatever the
+# market shows — which on approach is the near EDGE of the zone.
+#
+# Isolated on 18k candles, 2x2:
+#     A середина, без ожидания   1819 сд  84.8%  +955.07R  DD -10.22R
+#     B край,     без ожидания   1819 сд  81.7%  +772.62R  DD -18.24R
+#     C середина, с ожиданием     738 сд  73.3%  +164.77R  DD -14.74R
+#     D край,     с ожиданием     998 сд  73.2%  +203.31R  DD -24.22R
+#
+# The fill PRICE costs 3.1pp of win rate and 19% of profit (A->B). The WAIT
+# costs 11.5pp and 83%, because 59% of setups never come back (A->C). The wait
+# is the whole story; the price is a footnote.
+#
+# D is the live model and is now the default, so the headline stops describing
+# an execution nobody has. Note D beats C: given that we wait, filling at the
+# edge yields MORE trades and MORE profit than holding out for the midpoint —
+# so the live behaviour is already the best of the realistic options, and the
+# "enter deeper into the zone" idea is dead.
+#
+# ⚠️ Every figure recorded before this date used model A. Relative comparisons
+# between variants survive (they all ran at A), but absolute levels do not.
+#
+# BT_ZONE_DEPTH=-1 and BT_LIMIT_WAIT_BARS=0 restore the old behaviour.
+_DEFAULT_ZONE_DEPTH = 0.0 if ZONE_WATCH_ENABLED else -1.0
+_DEFAULT_WAIT_BARS = (
+    max(1, int(ZONE_WATCH_MINUTES * 60 // (KLINES_INTERVAL_SEC or 900)))
+    if ZONE_WATCH_ENABLED else 0
+)
+
 _BT_STALE_BARS  = int(os.getenv("BT_STALE_EXIT_BARS", "0") or 0)
 _BT_STALE_MAX_R = float(os.getenv("BT_STALE_EXIT_MAX_R", "0") or 0.0)
 
@@ -1081,8 +1116,32 @@ def backtest_symbol(
         # limit AT the zone, fill only if price trades back into it within
         # BT_LIMIT_WAIT_BARS, and start the trade from THAT bar. Unfilled
         # setups are simply not traded.
+        # RESEARCH ONLY (2026-08-23): ZONE DEPTH. The live bot parks an approved
+        # setup and fires the moment price touches ANYWHERE in [entry_low,
+        # entry_high]. Approaching a LONG zone from above, that first touch is
+        # the TOP edge — the worst price in the zone. The backtest meanwhile
+        # fills at the zone MIDPOINT (signal_filter sets entry_price = mid), so
+        # the two disagree by half a zone width on every trade.
+        #
+        # Seen live on XPL 2026-08-23: zone 0.108048-0.110200, midpoint
+        # 0.108995, actual fill 0.110000 — 0.92% worse, which on that trade's
+        # 3.0% stop is 0.31R given away before the trade even started.
+        #
+        # depth 0.0 = zone edge (what live does today), 0.5 = midpoint (what the
+        # backtest assumes), 1.0 = far edge. Requires price to actually reach
+        # that level within BT_LIMIT_WAIT_BARS; unfilled setups are not traded.
+        _depth = float(os.getenv("BT_ZONE_DEPTH", str(_DEFAULT_ZONE_DEPTH)) or -1)
+        if _depth >= 0.0:
+            _lo_z = float(setup.get("entry_low") or 0)
+            _hi_z = float(setup.get("entry_high") or 0)
+            if _hi_z > _lo_z > 0:
+                _target = (_hi_z - (_hi_z - _lo_z) * _depth
+                           if setup["direction"] == "LONG"
+                           else _lo_z + (_hi_z - _lo_z) * _depth)
+                setup = dict(setup, current_price=_target)
+
         _entry_bar = i
-        _wait = int(os.getenv("BT_LIMIT_WAIT_BARS", "0") or 0)
+        _wait = int(os.getenv("BT_LIMIT_WAIT_BARS", str(_DEFAULT_WAIT_BARS)) or 0)
         if _wait > 0:
             _px = float(setup["current_price"])
             _lo, _hi = c15["low"], c15["high"]
