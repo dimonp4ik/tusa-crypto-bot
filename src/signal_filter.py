@@ -49,6 +49,26 @@ from config import (
 from src.indicators import get_indicators, get_smc_indicators
 
 
+# ── Rejection funnel (diagnostic) ─────────────────────────────────────────────
+# The filter has 20+ places where a setup dies, and until 2026-08-24 only two of
+# them were counted. That made "which gate is costing us volume" unanswerable —
+# every tuning discussion had to guess. _rej() names each exit so the funnel can
+# be printed and each gate judged on what it actually removes.
+#
+# Costs one dict increment on a path that already returns; production reads
+# nothing unless asked.
+REJECT_COUNTS: dict = {}
+
+
+def _rej(reason: str):
+    REJECT_COUNTS[reason] = REJECT_COUNTS.get(reason, 0) + 1
+    return None
+
+
+def reset_reject_counts() -> None:
+    REJECT_COUNTS.clear()
+
+
 def _norm_symbol(symbol: str) -> str:
     return str(symbol or "").upper().replace("-", "").replace("/", "").replace("_", "")
 
@@ -797,7 +817,7 @@ def analyze_coin_smc(candles_15m: dict, candles_1h: dict, symbol: str,
         if sk > 75 and sk < sd:                             confirmations.append("StochCross")
         direction = "SHORT"
     else:
-        return None
+        return _rej("no_direction")
 
     # 6a. Entry-candle wick-exhaustion gate — TESTED AND DROPPED (default off,
     #     2026-07-16). Hypothesis: an entry candle with an OPPOSING pin-bar
@@ -809,31 +829,31 @@ def analyze_coin_smc(candles_15m: dict, candles_1h: dict, symbol: str,
     #     re-testing against a different entry model, same as PD_RANGE_FILTER.
     if os.getenv("WICK_EXHAUSTION_FILTER", "0") != "0":
         if bos == "bullish" and wicks.get("rejection") == "bearish":
-            return None
+            return _rej("wick_reject")
         if bos == "bearish" and wicks.get("rejection") == "bullish":
-            return None
+            return _rej("wick_reject")
 
     # 6-exp. Research-validated cuts (2026-06-11 A/B, 30/60/90d windows).
     #   RSI_Div setups: WR 23%, -0.21R/tr — 15m divergence in chop = noise.
     #   Monday + 18-20 UTC: near-zero R segments, cutting lifts WR ~2pp.
     if SKIP_RSI_DIV_SETUPS and "RSI_Div" in confirmations:
-        return None
+        return _rej("rsi_div")
     if SKIP_UTC_HOURS or SKIP_WEEKDAYS:
         _ts = (candles_15m.get("time") or [None])[-1]
         if _ts:
             from datetime import datetime as _dt, timezone as _tzz
             _d = _dt.fromtimestamp(int(_ts), tz=_tzz.utc)
             if str(_d.hour) in SKIP_UTC_HOURS:
-                return None
+                return _rej("skip_hour")
             if str(_d.weekday()) in SKIP_WEEKDAYS:
-                return None
+                return _rej("skip_weekday")
 
     # 6a. Direction edge filter — skip symbol/direction combos with proven poor edge.
     if DIRECTION_EDGE_FILTER:
         if direction == "LONG" and symbol_norm in _LOW_EDGE_LONG_SYMBOLS_NORM:
-            return None
+            return _rej("low_edge_long")
         if direction == "SHORT" and symbol_norm in _LOW_EDGE_SHORT_SYMBOLS_NORM:
-            return None
+            return _rej("low_edge_short")
 
     # 6a-1. Context momentum filters — coin relative to BTC + session momentum.
     coin_change_1h = _change_pct_from_1h(candles_1h or {}, RELATIVE_STRENGTH_LOOKBACK_HOURS)
@@ -849,7 +869,7 @@ def analyze_coin_smc(candles_15m: dict, candles_1h: dict, symbol: str,
         and rel_strength <= LONG_RELATIVE_WEAKNESS_MAX_PCT
     ):
         if _soft_fail("ctxmom"):
-            return None
+            return _rej("ctx_momentum")
     if (
         LONG_NY_COIN_MOMENTUM_FILTER
         and direction == "LONG"
@@ -857,39 +877,39 @@ def analyze_coin_smc(candles_15m: dict, candles_1h: dict, symbol: str,
         and coin_change_1h <= LONG_NY_MIN_COIN_CHANGE_1H
     ):
         if _soft_fail("ctxmom"):
-            return None
+            return _rej("ctx_momentum")
 
     if len(confirmations) < SMC_MIN_CONFIRMATIONS:
-        return None
+        return _rej("few_confirmations")
 
     # 6b. Require >=1 STRUCTURAL confirmation — two weak candle signals
     #     (Engulfing + Wick) alone are noise, not smart-money structure.
     if REQUIRE_STRONG_CONFIRM:
         _STRUCTURAL = {"FVG", "OB", "LiqSweep", "ChoCH"}
         if not any(c in _STRUCTURAL for c in confirmations):
-            return None
+            return _rej("no_structural")
 
     # 6c. MACD+ChoCH noise — both on same bar = double-counted signal, not added confluence.
     if MACD_CHOCH_NOISE_FILTER and "MACD_Div" in confirmations and "ChoCH" in confirmations:
-        return None
+        return _rej("macd_choch_noise")
 
     # 6d. Overlap-session bearish 1h guard — A/B 8640×15m: +9.39R net, +0.5pp WR.
     #     Expansion session + bearish 1h = latecomers get squeezed at NYSE open.
     if OVERLAP_BEARISH_1H_GUARD and ind.get("session") == "OVERLAP" and trend_1h == "bearish":
-        return None
+        return _rej("overlap_bear_guard")
 
     # 7. Entry zone
     entry_zone = _select_entry_zone(ind, direction)
     if REQUIRE_ENTRY_ZONE and not entry_zone:
-        return None
+        return _rej("no_entry_zone")
 
     # 7a. Source edge filter — skip entry sources with proven poor edge per symbol.
     if SOURCE_EDGE_FILTER and entry_zone:
         _src = str(entry_zone.get("entry_source") or "").upper()
         if _src == "FVG" and symbol_norm in _LOW_EDGE_FVG_SYMBOLS_NORM:
-            return None
+            return _rej("low_edge_fvg")
         if _src == "OB" and symbol_norm in _LOW_EDGE_OB_SYMBOLS_NORM:
-            return None
+            return _rej("low_edge_ob")
 
     # 7b-1. Bull/neutral LONG narrow-zone filter — mixed-trend LONGs into tight zones
     #       wicked through and reversed to SL in backtest.
@@ -902,7 +922,7 @@ def analyze_coin_smc(candles_15m: dict, candles_1h: dict, symbol: str,
         and float(entry_zone.get("zone_width_pct", 0.0) or 0.0) <= BULL_NEUTRAL_LONG_MAX_ZONE_WIDTH_PCT
     ):
         if _soft_fail("ctxmom"):
-            return None
+            return _rej("ctx_momentum")
 
     # 7b-2. Short FVG coin-momentum filter — coin still trending up fills FVG as support
     #       before the SHORT move materialises.
@@ -914,7 +934,7 @@ def analyze_coin_smc(candles_15m: dict, candles_1h: dict, symbol: str,
         and coin_change_1h >= SHORT_FVG_MAX_COIN_CHANGE_1H
     ):
         if _soft_fail("ctxmom"):
-            return None
+            return _rej("ctx_momentum")
 
     # 7b-3. FVG London BTC-up filter — FVG LONGs in London when BTC already up >0.29%
     #       are late entries; expansion stalls then reverses at NYC open.
@@ -926,7 +946,7 @@ def analyze_coin_smc(candles_15m: dict, candles_1h: dict, symbol: str,
         and btc_change_pct >= FVG_LONDON_BTC_UP_MIN_PCT
     ):
         if _soft_fail("ctxmom"):
-            return None
+            return _rej("ctx_momentum")
 
     # 7c. Retest — price must currently be at/near the zone (true retest, not chase)
     if REQUIRE_RETEST and entry_zone:
@@ -940,7 +960,7 @@ def analyze_coin_smc(candles_15m: dict, candles_1h: dict, symbol: str,
         else:
             dist = 0.0
         if dist > RETEST_MAX_DIST_PCT:
-            return None
+            return _rej("retest_too_far")
 
     # 8. MTF score (premium triple-confluence boosts score)
     premium = _premium_setup(ind, direction)
@@ -964,7 +984,7 @@ def analyze_coin_smc(candles_15m: dict, candles_1h: dict, symbol: str,
         # the score-shadow batch stops costing Claude budget. To revive, restore
         #   if mtf_score < SHADOW_MIN_SCORE or _soft_fail("score"):
         # here and re-add the D arm in src/filter_variants.py.
-        return None
+        return _rej("variant_arm")
 
     # 8b. Adaptive regime pack gate (DEFAULT OFF — under backtest evaluation).
     #     Requires higher quality as the regime worsens + sets a per-regime risk_mult.
@@ -976,7 +996,7 @@ def analyze_coin_smc(candles_15m: dict, candles_1h: dict, symbol: str,
             ind, bos, direction, confirmations, mtf_score
         )
         if not allowed:
-            return None
+            return _rej("not_allowed")
     quality = _quality_breakdown(ind, bos, entry_zone, adaptive_pack)
     # NOTE: this also blocks 11:00-12:59 UTC outright (STABILITY_SKIP_SESSIONS
     # = OVERLAP), on the strength of 19 trades measured 2026-06-11 — before the
@@ -986,7 +1006,7 @@ def analyze_coin_smc(candles_15m: dict, candles_1h: dict, symbol: str,
     # Variant C briefly measured them (2026-08-03) and was removed the same day
     # at the user's request; re-add a soft_fail here if that changes.
     if not _stability_overlay_pass(ind, adaptive_pack, quality["quality_score"]):
-        return None
+        return _rej("stability_overlay")
 
     # Risk multiplier overlays — boost size on statistically stronger setups (no filtering).
     risk_mult, quality_risk_tag = _apply_quality_risk_overlay(

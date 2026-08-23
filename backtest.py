@@ -706,6 +706,11 @@ class TradeRecord:
     # Live per-symbol position-size trim (config.SYMBOL_SIZE_MULT). Deliberately
     # not merged into risk_mult — see the construction site for why.
     size_mult: float = 1.0
+    # Scan bar that produced the setup. entry_bar is the FILL bar, which under
+    # the zone-wait model can be several bars later — so entry_bar/entry_time
+    # cannot identify a setup across execution models, and joining on them
+    # silently mismatches. This is the stable key.
+    signal_bar: int = -1
 
 
 @dataclass
@@ -969,6 +974,7 @@ def simulate_trade_direct(
         knn_score=float(setup.get("_knn_score", -1.0)),
         swing_trend=str(setup.get("swing_trend", "") or ""),
         mae_r=round(_mae_r, 4),
+        signal_bar=int(setup.get("_signal_bar", -1)),
     )
 
 
@@ -1140,6 +1146,7 @@ def backtest_symbol(
                            else _lo_z + (_hi_z - _lo_z) * _depth)
                 setup = dict(setup, current_price=_target)
 
+        setup = dict(setup, _signal_bar=i)
         _entry_bar = i
         _wait = int(os.getenv("BT_LIMIT_WAIT_BARS", str(_DEFAULT_WAIT_BARS)) or 0)
         if _wait > 0:
@@ -1328,7 +1335,7 @@ def write_trades_csv(path: str, trades: list[TradeRecord]) -> None:
         "entry_quality_score", "portfolio_risk_score",
         "session", "trend_1h", "trend_4h", "entry_source",
         "signals", "score_tags", "premium", "sniper", "knn_score", "swing_trend",
-        "mae_r", "size_mult",
+        "mae_r", "size_mult", "signal_bar",
     ]
     with open(path, "w", newline="", encoding="utf-8") as f:
         writer = csv.DictWriter(f, fieldnames=fields)
