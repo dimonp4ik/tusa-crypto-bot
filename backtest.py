@@ -558,6 +558,18 @@ _BT_TP_FIRST = os.getenv("BT_TP_FIRST", "0") == "1"
 # trail exit can never be filled off the same bar that printed the peak.
 _BT_TRAIL_LAG = os.getenv("BT_TRAIL_LAG", "1") == "1"
 
+# Average-down research flag, default OFF. When set, a SECOND unit of the same
+# size is added by resting limit order once price trades BT_AVG_DOWN_R risk
+# units against the entry, before TP1. The stop stays where structure put it,
+# so total risk is 1.0 + (1.0 - BT_AVG_DOWN_R) units and every R below is
+# reported per unit of that combined risk — otherwise the variant would just be
+# betting more money and would not be comparable.
+# The fill level sits BETWEEN entry and stop, so on any bar that reaches the
+# stop, price has already passed the add level: unlike a TP-vs-SL tie this
+# ordering is forced by geometry, not assumed. Fills are modelled AT the level
+# (backtest.py carries no opens, so a gap through it is filled optimistically).
+_BT_AVG_DOWN_R = float(os.getenv("BT_AVG_DOWN_R", "0") or 0)
+
 # Research only, both default OFF. Conditional stale exit: once a trade is at
 # least BT_STALE_EXIT_BARS old and STILL has not reached TP1, close it if it is
 # currently underwater by more than BT_STALE_EXIT_MAX_R.
@@ -798,6 +810,7 @@ def simulate_trade_direct(
     trail_mult_eff = max(0.0, float(trail_atr_mult))  # context-frozen at TP1 candle
 
     stop_exit_price = None  # set when we exit at a price other than the SL level
+    add_price = None        # fill price of the averaging-down unit, when armed
     _risk_abs = abs(entry - sl)
     _mae_r = 0.0
     for j in range(fill_bar, end):
@@ -821,6 +834,10 @@ def simulate_trade_direct(
                 _adv = (entry - l) if direction == "LONG" else (h - entry)
                 if _adv / _risk_abs > _mae_r:
                     _mae_r = _adv / _risk_abs
+            if _BT_AVG_DOWN_R > 0 and add_price is None and _risk_abs > 0:
+                _lvl = (entry - _risk_abs * _BT_AVG_DOWN_R) if direction == "LONG"                     else (entry + _risk_abs * _BT_AVG_DOWN_R)
+                if (l <= _lvl) if direction == "LONG" else (h >= _lvl):
+                    add_price = _lvl
             _stop_hit = ((closes[j] <= sl) if _STOP_CLOSE_CONFIRM else (l <= sl)) if direction == "LONG" \
                 else ((closes[j] >= sl) if _STOP_CLOSE_CONFIRM else (h >= sl))
             _tgt_hit = (h >= tp1) if direction == "LONG" else (l <= tp1)
@@ -956,6 +973,14 @@ def simulate_trade_direct(
     else:
         gross_r = gross_r_for_outcome(outcome, entry, tp1, tp2, sl)
     cost_r = estimate_cost_r(entry, sl, fee_rate, slippage_rate)
+    if add_price is not None and _risk_abs > 0:
+        # Both units leave at the same price; the second simply entered closer
+        # to it. Reported per unit of COMBINED risk so the comparison against a
+        # single unit is like-for-like rather than "we bet more".
+        _edge = ((entry - add_price) if direction == "LONG" else (add_price - entry)) / _risk_abs
+        _total_risk = 1.0 + max(0.0, 1.0 - _edge)
+        gross_r = (gross_r + (gross_r + _edge)) / _total_risk
+        cost_r  = (cost_r * 2.0) / _total_risk
     net_r = gross_r - cost_r
     # Live position-size rules scale BOTH the win and the loss, so they belong
     # in the R the summary reports. Until 2026-08-24 size_mult was recorded on
