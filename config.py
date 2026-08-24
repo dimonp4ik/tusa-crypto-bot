@@ -427,7 +427,28 @@ LIVE_HIST_EPOCH_TS = float(os.getenv("LIVE_HIST_EPOCH_TS", "1786575600"))
 #   TP1 = 1.5R (1.8–4.5% move → 36–90% on 20x), close 50%, move SL to BE
 #   TP2 = 3.0R (3.6–9%   move → 72–180% on 20x), let winner run
 ATR_PERIOD    = 14
-SL_ATR_BUFFER = float(os.getenv("SL_ATR_BUFFER", "0.5"))   # buffer beyond swing, in ATR
+# 0.5 -> 1.0 on 2026-08-24. This is how far beyond the swing the structural stop
+# is pushed, and at 0.5 ATR it sat close enough to the level that noise took it
+# out without the structure actually breaking.
+#
+# Swept on the honest execution model, live gates applied. The response is
+# monotone across the whole range — win rate up, profit up, drawdown down —
+# which is what a real effect looks like, and it holds in BOTH halves:
+#   буфер   сд   WR      netR      DD      p/DD    1пол WR / 2пол WR
+#   0.5    921  74.5%  +215.6R  -11.91R   18.1     —
+#   0.7    924  74.8%  +222.5R   -9.65R   23.1    76.6% / 75.6%
+#   0.8    924  74.9%  +228.5R   -9.78R   23.4    76.8% / 75.8%
+#   1.0    923  74.9%  +232.0R   -9.25R   25.1    77.2% / 75.6%
+#   1.3    923  75.5%  +231.1R   -9.15R   25.2    77.8% / 76.5%
+#
+# Trade count barely moves: the buffer changes where the stop goes, not which
+# setups fire. So this is purely an exit improvement.
+#
+# Stopped at 1.0 rather than 1.3 because the risk clamp starts binding: the
+# share of trades pinned at RISK_MAX_PCT goes 23.3% -> 27.8% -> 32.5%, and past
+# that the buffer is not actually expressed — it is silently truncated, and
+# risk-normalised sizing then halves those positions.
+SL_ATR_BUFFER = float(os.getenv("SL_ATR_BUFFER", "1.0"))
 RISK_MIN_PCT  = float(os.getenv("RISK_MIN_PCT", "0.012"))  # min SL distance = 1.2%
 RISK_MAX_PCT  = float(os.getenv("RISK_MAX_PCT", "0.03"))   # max SL distance = 3.0% (20x safe)
 # 2026-06-11 TP1 sweep (20 sym, 90d×15m, trail 0.5): TP1=1.0R beats 1.5R on WR
