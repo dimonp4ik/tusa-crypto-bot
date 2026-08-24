@@ -200,7 +200,15 @@ REQUIRE_STRONG_CONFIRM  = os.getenv("REQUIRE_STRONG_CONFIRM", "0") != "0"
 MACD_CHOCH_NOISE_FILTER = os.getenv("MACD_CHOCH_NOISE_FILTER", "0") != "0"
 # 2026-06-05 A/B, 8640×15m: +9.39R net, +0.5pp WR, better portfolio guard and Monte Carlo.
 # Skips only overlap-session setups when 1h trend is bearish (latecomers get squeezed at NYC open).
-OVERLAP_BEARISH_1H_GUARD = os.getenv("OVERLAP_BEARISH_1H_GUARD", "1") != "0"
+# DISABLED 2026-08-24. This guard only ever mattered once STABILITY_FILTERS was
+# switched off and the OVERLAP session came back — while that session was cut
+# entirely, the guard was watching an empty room, and an earlier sweep of it
+# reported "no change" for exactly that reason. Re-measured after the session
+# returned, it is actively costing money:
+#   on:  921 сд  74.8%  +230.87R  DD -9.25R  ratio 25.0
+#   off: 947 сд  75.1%  +243.79R  DD -9.25R  ratio 26.4
+# Its own note claims +9.39R / +0.5pp WR, measured on the old fill model.
+OVERLAP_BEARISH_1H_GUARD = os.getenv("OVERLAP_BEARISH_1H_GUARD", "0") != "0"
 
 # 1D macro trend filter — skip LONG when daily candle trend is BEARISH.
 # Prevents buying into a day-scale downtrend (as happened with sideways/red daily days).
@@ -294,7 +302,11 @@ SHORT_FVG_COIN_MOMENTUM_FILTER        = os.getenv("SHORT_FVG_COIN_MOMENTUM_FILTE
 SHORT_FVG_MAX_COIN_CHANGE_1H          = float(os.getenv("SHORT_FVG_MAX_COIN_CHANGE_1H", "0.0"))
 
 # Small edge on top of context momentum pack: improves aggregate/MC/DD.
-FVG_LONDON_BTC_UP_FILTER  = os.getenv("FVG_LONDON_BTC_UP_FILTER", "1") != "0"
+# DISABLED 2026-08-24. Measured individually on the honest execution model
+# rather than as part of the pack it shipped with:
+#   on:  921 сд  74.8%  +230.87R  DD -9.25R  ratio 25.0
+#   off: 946 сд  74.9%  +241.10R  DD -9.25R  ratio 26.1
+FVG_LONDON_BTC_UP_FILTER  = os.getenv("FVG_LONDON_BTC_UP_FILTER", "0") != "0"
 FVG_LONDON_BTC_UP_MIN_PCT = float(os.getenv("FVG_LONDON_BTC_UP_MIN_PCT", "0.29"))
 
 # --- Risk sizing overlays (DEFAULT ON) -----------------------------------------
