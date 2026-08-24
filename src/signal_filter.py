@@ -2,6 +2,7 @@ import sys
 import os
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from config import (EFF_RATIO_MAX, HTF_ALIGNED_SCORE, HTF_NEUTRAL_SCORE, HTF_STRONG_SCORE)
 from config import (
     RSI_OVERSOLD, RSI_OVERBOUGHT, VOLUME_SPIKE_MULTIPLIER, MIN_SIGNALS_TO_PASS,
     SMC_MIN_CONFIRMATIONS, SMC_BOS_MIN_VOLUME, BTC_BLOCK_THRESHOLD_PCT,
@@ -293,14 +294,14 @@ def _calc_mtf_score(ind: dict, bos: str, direction: str, confirmations: list,
         score += 1; tags.append("BodyStrong+1")
 
     if ind.get("trend_1h") == bos:
-        score += 2; tags.append("1h+2")
+        score += HTF_ALIGNED_SCORE; tags.append(f"1h+{HTF_ALIGNED_SCORE}")
     elif ind.get("trend_1h") == "neutral":
-        score += 1; tags.append("1hN+1")
+        score += HTF_NEUTRAL_SCORE; tags.append(f"1hN+{HTF_NEUTRAL_SCORE}")
 
     if ind.get("trend_4h") == bos:
-        score += 2; tags.append("4h+2")
+        score += HTF_ALIGNED_SCORE; tags.append(f"4h+{HTF_ALIGNED_SCORE}")
     elif ind.get("trend_4h") == "neutral":
-        score += 1; tags.append("4hN+1")
+        score += HTF_NEUTRAL_SCORE; tags.append(f"4hN+{HTF_NEUTRAL_SCORE}")
 
     vol = float(ind.get("volume_ratio", 0.0))
     if vol >= max(SMC_BOS_MIN_VOLUME * 1.35, 2.0):
@@ -339,9 +340,9 @@ def _calc_mtf_score(ind: dict, bos: str, direction: str, confirmations: list,
 
     # Strong HTF trend alignment (EMA stack confirmed)
     if ind.get("trend_1h_strong") and ind.get("trend_1h") == bos:
-        score += 1; tags.append("Strong1h+1")
+        score += HTF_STRONG_SCORE; tags.append(f"Strong1h+{HTF_STRONG_SCORE}")
     if ind.get("trend_4h_strong") and ind.get("trend_4h") == bos:
-        score += 1; tags.append("Strong4h+1")
+        score += HTF_STRONG_SCORE; tags.append(f"Strong4h+{HTF_STRONG_SCORE}")
 
     # Nested OB: 1h OB overlaps 15m entry zone → double confluence
     if entry_zone:
@@ -712,6 +713,8 @@ def analyze_coin_smc(candles_15m: dict, candles_1h: dict, symbol: str,
         return None
 
     # 2b-A. Efficiency-Ratio chop gate — false BOS in ranges → SL clusters
+    if EFF_RATIO_MAX > 0 and float(ind.get("eff_ratio", 0.0) or 0.0) >= EFF_RATIO_MAX:
+        return _rej("eff_ratio_too_clean")
     if EFF_RATIO_FILTER and ind.get("eff_ratio", 1.0) < EFF_RATIO_MIN:
         return None
 
@@ -984,7 +987,7 @@ def analyze_coin_smc(candles_15m: dict, candles_1h: dict, symbol: str,
         # the score-shadow batch stops costing Claude budget. To revive, restore
         #   if mtf_score < SHADOW_MIN_SCORE or _soft_fail("score"):
         # here and re-add the D arm in src/filter_variants.py.
-        return _rej("variant_arm")
+        return _rej("low_mtf_score")
 
     # 8b. Adaptive regime pack gate (DEFAULT OFF — under backtest evaluation).
     #     Requires higher quality as the regime worsens + sets a per-regime risk_mult.

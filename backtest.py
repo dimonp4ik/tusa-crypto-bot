@@ -67,6 +67,9 @@ from config import (  # noqa: E402
     TP1_R_MULT,
     TP2_R_MULT,
     SYMBOL_SIZE_MULT,
+    COUNTER_STRUCTURE_SIZE_MULT,
+    SESSION_SIZE_MULT,
+    HTF_NEUTRAL_4H_SIZE_MULT,
     MAX_SAME_DIRECTION_POSITIONS,
     ZONE_WATCH_ENABLED,
     ZONE_WATCH_MINUTES,
@@ -499,6 +502,17 @@ _TP1_CLOSE_FRAC = max(0.0, min(1.0, float(TP1_CLOSE_FRAC)))
 _RUNNER_FRAC = 1.0 - _TP1_CLOSE_FRAC
 
 
+def _size_mult_for(symbol: str, setup: dict) -> float:
+    """Mirror of the live sizing rules in src/autotrader.py."""
+    m = float(SYMBOL_SIZE_MULT.get(str(symbol).upper(), 1.0))
+    if setup.get("sniper"):
+        m *= float(COUNTER_STRUCTURE_SIZE_MULT)
+    m *= float(SESSION_SIZE_MULT.get(str(setup.get("session") or "").upper(), 1.0))
+    if str(setup.get("trend_4h") or "").lower() == "neutral":
+        m *= float(HTF_NEUTRAL_4H_SIZE_MULT)
+    return m
+
+
 def _post_tp1_trail_mult_bt(direction: str, entry: float, tp1: float, tp2: float,
                             high: float, low: float, close: float) -> float:
     """Context-aware runner trail from the TP1 candle (mirrors live _post_tp1_trail_mult)."""
@@ -539,6 +553,10 @@ from config import STOP_CLOSE_CONFIRM as _STOP_CLOSE_CONFIRM
 # uncertainty this convention hides. Measured 2026-08-13 after a spike-strategy
 # test where 65 of 87 trades were decided by tie-break alone.
 _BT_TP_FIRST = os.getenv("BT_TP_FIRST", "0") == "1"
+
+# Research only, default OFF. Anchor the runner trail to prior bars only, so a
+# trail exit can never be filled off the same bar that printed the peak.
+_BT_TRAIL_LAG = os.getenv("BT_TRAIL_LAG", "1") == "1"
 
 # Research only, both default OFF. Conditional stale exit: once a trade is at
 # least BT_STALE_EXIT_BARS old and STILL has not reached TP1, close it if it is
@@ -874,8 +892,17 @@ def simulate_trade_direct(
         else:
             if direction == "LONG":
                 if exit_policy == "trail":
-                    best_price = max(best_price, h)
+                    # Under BT_TRAIL_LAG the trail is anchored to the peak of
+                    # PRIOR bars only. Anchoring to this bar's own high and then
+                    # testing this bar's low assumes the high printed before the
+                    # low, which 15m OHLC does not record — an optimistic
+                    # convention that pays out on every bar once the trail is
+                    # narrower than the average bar range.
+                    if not _BT_TRAIL_LAG:
+                        best_price = max(best_price, h)
                     trailing_stop = max(entry, best_price - max(0.0, float(setup.get("atr", 0.0) or 0.0)) * trail_mult_eff)
+                    if _BT_TRAIL_LAG:
+                        best_price = max(best_price, h)
                     if l <= trailing_stop:
                         outcome = "TRAIL"
                         trail_exit_price = trailing_stop
@@ -894,8 +921,11 @@ def simulate_trade_direct(
                     break
             else:
                 if exit_policy == "trail":
-                    best_price = min(best_price, l)
+                    if not _BT_TRAIL_LAG:
+                        best_price = min(best_price, l)
                     trailing_stop = min(entry, best_price + max(0.0, float(setup.get("atr", 0.0) or 0.0)) * trail_mult_eff)
+                    if _BT_TRAIL_LAG:
+                        best_price = min(best_price, l)
                     if h >= trailing_stop:
                         outcome = "TRAIL"
                         trail_exit_price = trailing_stop
@@ -927,6 +957,14 @@ def simulate_trade_direct(
         gross_r = gross_r_for_outcome(outcome, entry, tp1, tp2, sl)
     cost_r = estimate_cost_r(entry, sl, fee_rate, slippage_rate)
     net_r = gross_r - cost_r
+    # Live position-size rules scale BOTH the win and the loss, so they belong
+    # in the R the summary reports. Until 2026-08-24 size_mult was recorded on
+    # the record but never applied, which meant no backtest figure in this
+    # project reflected the BTC half-size trim or the counter-structure boost.
+    _sz = _size_mult_for(symbol, setup)
+    gross_r *= _sz
+    net_r   *= _sz
+    cost_r  *= _sz
 
     return TradeRecord(
         symbol=symbol,
@@ -957,7 +995,7 @@ def simulate_trade_direct(
         # ignores it) — folding the two together would make every --use-risk-mult
         # analysis model a book the bot never trades. This column is the trim the
         # autotrader really applies, and nothing else.
-        size_mult=float(SYMBOL_SIZE_MULT.get(str(symbol).upper(), 1.0)),
+        size_mult=_sz,
         quality_score=float(setup.get("quality_score", 0.0) or 0.0),
         trend_score=int(setup.get("trend_score", 0) or 0),
         volatility_score=int(setup.get("volatility_score", 0) or 0),
@@ -1496,7 +1534,11 @@ def main(argv: list[str] | None = None) -> int:
             )
 
     if args.export_trades:
-        write_trades_csv(args.export_trades, total.trade_records)
+        # Export the gated book by default — an ungated dump cannot be compared
+        # against the headline numbers, which are all post-gate. BT_EXPORT_RAW=1
+        # restores the full pre-gate list.
+        _export = total.trade_records if os.getenv("BT_EXPORT_RAW") == "1"             else apply_live_gates(total.trade_records)
+        write_trades_csv(args.export_trades, _export)
         print(f"Trades CSV:    {args.export_trades}")
 
     return 1 if errors and len(errors) == len(symbols) else 0

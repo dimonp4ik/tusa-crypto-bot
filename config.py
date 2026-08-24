@@ -234,6 +234,18 @@ DAILY_TREND_SHORT_FILTER = os.getenv("DAILY_TREND_SHORT_FILTER", "1") != "0"
 EFF_RATIO_FILTER   = os.getenv("EFF_RATIO_FILTER", "1") != "0"
 EFF_RATIO_LOOKBACK = int(os.getenv("EFF_RATIO_LOOKBACK", "20"))
 EFF_RATIO_MIN      = float(os.getenv("EFF_RATIO_MIN", "0.15"))
+# Upper bound on trend cleanliness. Measured 2026-08-24 on the honest model:
+# the top eff_ratio quartile (>=0.365) runs +0.147R vs +0.244R base, consistent
+# across both halves. Reading: a very clean trend at entry means the move is
+# already extended, so the retest we are buying is late. 0 = off.
+EFF_RATIO_MAX      = float(os.getenv("EFF_RATIO_MAX", "0"))
+# MTF scoring weights for higher-timeframe trend. The original scheme rewarded
+# alignment (+2, plus +1 when the EMA stack confirms) over a neutral HTF (+1),
+# but the outcome data runs the other way: trend_4h=neutral scores 84.8% WR /
+# +0.365R and trend_1h=neutral 79.8% / +0.357R, both stable across halves.
+HTF_ALIGNED_SCORE  = int(os.getenv("HTF_ALIGNED_SCORE", "2"))
+HTF_NEUTRAL_SCORE  = int(os.getenv("HTF_NEUTRAL_SCORE", "1"))
+HTF_STRONG_SCORE   = int(os.getenv("HTF_STRONG_SCORE", "0"))
 # Premium/Discount structure gate — "discount" only counts as a buy signal inside
 # a bullish/neutral dealing range, "premium" only inside a bearish/neutral one. In
 # a clean lower-high+lower-low down-structure, price below the range midpoint is
@@ -462,7 +474,12 @@ ATR_PERIOD    = 14
 # risk-normalised sizing then halves those positions.
 SL_ATR_BUFFER = float(os.getenv("SL_ATR_BUFFER", "1.0"))
 RISK_MIN_PCT  = float(os.getenv("RISK_MIN_PCT", "0.012"))  # min SL distance = 1.2%
-RISK_MAX_PCT  = float(os.getenv("RISK_MAX_PCT", "0.03"))   # max SL distance = 3.0% (20x safe)
+RISK_MAX_PCT  = float(os.getenv("RISK_MAX_PCT", "0.035"))  # max SL distance = 3.5%
+# 2026-08-24: raised from 0.03. The clamp was pinning 23-33% of stops tighter
+# than structure wanted, i.e. into noise. mae_r shows a trade sitting 0.9R
+# against us still wins 87.2% of the time, so that zone is not information.
+# Raising the cap improved EVERY axis at once: +2 trades, +0.5pp WR, +7%
+# profit, -10% drawdown. See memory exit-mechanics-sweep.
 # 2026-06-11 TP1 sweep (20 sym, 90d×15m, trail 0.5): TP1=1.0R beats 1.5R on WR
 # (+13-16pp, 65-76% across 30/60/90d) at equal-or-better total R and half the DD.
 # 2026-07-22 follow-up sweep (365d/20sym, corrected 192 window): closer STILL
@@ -490,7 +507,12 @@ TP2_R_MULT    = float(os.getenv("TP2_R_MULT", "2.0"))      # TP2 = entry ± risk
 # Backtest (10 sym, 2880x15m): +21% net R, -27% max drawdown, same win rate vs
 # fixed TP2. Trailing stop = peak ∓ TRAIL_ATR_MULT×ATR, floored at breakeven.
 TRAIL_RUNNER_ENABLED = os.getenv("TRAIL_RUNNER_ENABLED", "1") != "0"
-TRAIL_ATR_MULT       = float(os.getenv("TRAIL_ATR_MULT", "0.25"))  # base trail; post_tp1_v2 overrides per-context
+TRAIL_ATR_MULT       = float(os.getenv("TRAIL_ATR_MULT", "0.05"))  # base trail; post_tp1_v2 overrides per-context
+# 2026-08-24: 0.25 -> 0.05, monotone across the whole range on the honest
+# model and confirmed in both halves. The runner earns, but gives it back on
+# the pullback; exiting at the first failure to extend keeps +0.029R per
+# trail exit over 702 of them. NOT the same as banking at TP1 — TP1_CLOSE_FRAC
+# 0.5 was tested and is far worse (+184R vs +236R).
 
 # Exit profile: "post_tp1_v2" keeps the FULL position past TP1 (TP1_CLOSE_FRAC=0)
 # and trails by an ATR multiple chosen from the TP1-acceptance candle — strong
@@ -500,7 +522,7 @@ TRAIL_ATR_MULT       = float(os.getenv("TRAIL_ATR_MULT", "0.25"))  # base trail;
 # are harvested, never which trades are taken. "fixed" = legacy 50%-at-TP1 + BE.
 TP1_CLOSE_FRAC = max(0.0, min(1.0, float(os.getenv("TP1_CLOSE_FRAC", "0.0"))))
 EXIT_PROFILE   = os.getenv("EXIT_PROFILE", "post_tp1_v2").strip().lower()
-POST_TP1_STRONG_TRAIL_ATR_MULT = float(os.getenv("POST_TP1_STRONG_TRAIL_ATR_MULT", "0.35"))
+POST_TP1_STRONG_TRAIL_ATR_MULT = float(os.getenv("POST_TP1_STRONG_TRAIL_ATR_MULT", "0.05"))
 POST_TP1_WEAK_TRAIL_ATR_MULT   = float(os.getenv("POST_TP1_WEAK_TRAIL_ATR_MULT", "0.15"))
 POST_TP1_STRONG_CLOSE_PROGRESS = float(os.getenv("POST_TP1_STRONG_CLOSE_PROGRESS", "0.25"))
 POST_TP1_STRONG_WICK_PROGRESS  = float(os.getenv("POST_TP1_STRONG_WICK_PROGRESS", "0.55"))
@@ -870,6 +892,18 @@ SYMBOL_SIZE_MULT = _parse_symbol_size_mult(
 # Sizing does not change WHICH setups fire or how they resolve, so this does not
 # confound the still-pending live validation of the zone-watch entry.
 COUNTER_STRUCTURE_SIZE_MULT = float(os.getenv("COUNTER_STRUCTURE_SIZE_MULT", "1.5"))
+# Session and HTF-context size multipliers, measured 2026-08-24 on the honest
+# model over the combo book (924 trades). Both groups beat base expectancy in
+# BOTH window halves: LONDON 145 сд +0.385R, trend_4h=neutral 59 сд +0.365R at
+# 84.8% WR, against base +0.244R. Loading them 1.5x is worth +22% at equal risk
+# (+343.9 vs +280.9) with drawdown DOWN (-7.60 vs -8.02).
+# Deliberately NOT the maximum: neutral x3.0 scores higher still (+401) but that
+# is 59 trades carrying triple weight and the gain rides on this window's
+# drawdown path avoiding them; LONDON x2.5+ puts the whole gain in the second
+# half (first half falls BELOW base). Monotone improvement under concentration
+# is the same tell that exposed the trail bug — see memory exit-mechanics-sweep.
+SESSION_SIZE_MULT = {"LONDON": float(os.getenv("LONDON_SIZE_MULT", "1.5"))}
+HTF_NEUTRAL_4H_SIZE_MULT = float(os.getenv("HTF_NEUTRAL_4H_SIZE_MULT", "1.5"))
 
 # --- Risk-normalised sizing (added 2026-08-22 after a live incident) ---
 # Position size was fixed regardless of how far away the stop sat, so a trade

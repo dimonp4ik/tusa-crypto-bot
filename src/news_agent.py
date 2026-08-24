@@ -29,14 +29,21 @@ from config import GROQ_API_KEY, NEWS_LOOKBACK_HOURS
 
 # RSS sources — all public, no registration
 RSS_FEEDS = [
-    ("Reuters",   "https://feeds.reuters.com/reuters/businessNews"),
-    ("CNBC",      "https://search.cnbc.com/rs/search/combinedcms/view.xml?partnerId=wrss01&id=15839135"),
-    ("BBC Biz",   "https://feeds.bbci.co.uk/news/business/rss.xml"),
+    # Crypto sources first, deliberately. The per-symbol gate in news_filter.py
+    # only fires when a coin name and a risk keyword appear in the SAME
+    # headline, so a general-business headline can essentially never match it.
+    # With the 35-headline cap these feeds were being crowded out by BBC/CNBC:
+    # measured 2026-08-24 the cut was CoinDesk 15 / BBC 10 / CTelegraph 7 /
+    # Decrypt 3, with CryptoSlate and BTC Magazine never reaching the list.
     ("CoinDesk",  "https://www.coindesk.com/arc/outboundfeeds/rss/"),
     ("Decrypt",   "https://decrypt.co/feed"),
     ("Cointelegraph", "https://cointelegraph.com/rss"),
     ("CryptoSlate",   "https://cryptoslate.com/feed/"),
     ("BTC Magazine",  "https://bitcoinmagazine.com/feed"),
+    # General macro, used by the sentiment agent rather than the per-coin gate.
+    # Reuters dropped 2026-08-24: the feed has been returning 0 items.
+    ("CNBC",      "https://search.cnbc.com/rs/search/combinedcms/view.xml?partnerId=wrss01&id=15839135"),
+    ("BBC Biz",   "https://feeds.bbci.co.uk/news/business/rss.xml"),
 ]
 
 
@@ -77,7 +84,7 @@ def fetch_recent_headlines(hours: int = NEWS_LOOKBACK_HOURS) -> list[str]:
                 continue   # too old
             result.append(f"[{name}] {it['title']}")
 
-    return result[:35]  # cap at 35 headlines to keep prompt small
+    return result[:60]  # cap kept small for the Groq prompt; 60 fits every feed
 
 
 def analyze_with_groq(headlines: list[str]) -> dict:

@@ -116,6 +116,12 @@ def init_db():
             # changes no signal, it only lets the position be sized by hand and
             # its live win rate compared to the backtest's 85.1%/+0.641R.
             "sniper":        "INTEGER DEFAULT 0",
+            # Sizing context (2026-08-24). The autotrader sizes from the DB row,
+            # not from the in-memory setup, so any field a size multiplier keys
+            # on has to survive the insert or the rule silently applies in the
+            # backtest only — see SESSION_SIZE_MULT / HTF_NEUTRAL_4H_SIZE_MULT.
+            "session":       "TEXT",
+            "trend_4h":      "TEXT",
         }.items():
             _ensure_column(c, "signals", col, ddl)
 
@@ -448,9 +454,9 @@ def log_signal(analysis: dict, tp1: float, tp2: float, sl: float) -> int:
             INSERT INTO signals (
                 symbol, direction, entry_price, tp1, tp2, sl, opened_at, status,
                 confidence, reason, entry_low, entry_high, entry_source, market_price,
-                mtf_score, mtf_score_max, premium, atr, sniper
+                mtf_score, mtf_score_max, premium, atr, sniper, session, trend_4h
             )
-            VALUES (?, ?, ?, ?, ?, ?, ?, 'OPEN', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            VALUES (?, ?, ?, ?, ?, ?, ?, 'OPEN', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """, (
             analysis["symbol"], analysis["direction"], analysis["current_price"],
             tp1, tp2, sl, time_mod.time(),
@@ -461,6 +467,8 @@ def log_signal(analysis: dict, tp1: float, tp2: float, sl: float) -> int:
             1 if analysis.get("premium") else 0,
             analysis.get("atr"),
             1 if analysis.get("sniper") else 0,
+            analysis.get("session"),
+            analysis.get("trend_4h"),
         ))
         return cur.lastrowid
 
