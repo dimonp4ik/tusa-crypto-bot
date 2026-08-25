@@ -7,7 +7,9 @@ Sources (all free, no API key needed):
   - BBC Business RSS
   - CoinDesk RSS
 
-AI: Groq free tier (llama-3.1-8b-instant) — 14 400 req/day, ~200ms latency.
+AI: Groq free tier — 14 400 req/day. The model is NOT pinned: Groq retires
+    models without notice, so _groq_chat asks /models what is actually served
+    and falls back. GROQ_MODEL overrides the preference.
 Register free at https://groq.com → API Keys → Create Key → set GROQ_API_KEY in Render.
 
 Runs once per scan. Returns:
@@ -74,6 +76,81 @@ def _fetch_rss(url: str, timeout: int = 8) -> list[dict]:
         return []
 
 
+GROQ_URL = "https://api.groq.com/openai/v1"
+# Preference order. Groq retires models without warning — that is the most
+# likely reason a digest that worked for months goes quiet — so this is only a
+# preference, not a requirement: _groq_chat falls back to whatever /models
+# actually lists. Override with GROQ_MODEL.
+_GROQ_MODELS = [
+    os.getenv("GROQ_MODEL", "").strip(),
+    "llama-3.3-70b-versatile",
+    "llama-3.1-8b-instant",
+]
+_live_model = {"name": "", "ts": 0.0}
+
+
+def _groq_pick_model() -> str:
+    """Ask Groq what it actually serves. Cached for an hour."""
+    import time as _t
+    if _live_model["name"] and _t.time() - _live_model["ts"] < 3600:
+        return _live_model["name"]
+    try:
+        r = _req.get(f"{GROQ_URL}/models",
+                     headers={"Authorization": f"Bearer {GROQ_API_KEY}"}, timeout=10)
+        ids = [m.get("id", "") for m in (r.json().get("data") or [])]
+    except Exception as e:
+        log.warning(f"groq: /models unreachable ({e})")
+        return ""
+    for want in _GROQ_MODELS:
+        if want and want in ids:
+            _live_model.update(name=want, ts=_t.time())
+            return want
+    # Nothing preferred survived — take any text model rather than give up.
+    for mid in ids:
+        if "whisper" not in mid and "guard" not in mid and "tts" not in mid:
+            log.warning(f"groq: preferred models gone, falling back to {mid}")
+            _live_model.update(name=mid, ts=_t.time())
+            return mid
+    return ""
+
+
+def _groq_chat(prompt: str, max_tokens: int, temperature: float, timeout: int) -> str:
+    """One Groq completion. Raises RuntimeError carrying the API error text.
+
+    The old call sites did resp.json()["choices"][0] with no status check, so a
+    decommissioned model surfaced as KeyError('choices') — which is why this
+    stayed invisible in the logs for days.
+    """
+    if not GROQ_API_KEY:
+        raise RuntimeError("GROQ_API_KEY не задан")
+    tried = []
+    for model in [m for m in _GROQ_MODELS if m] + [_groq_pick_model()]:
+        if not model or model in tried:
+            continue
+        tried.append(model)
+        try:
+            r = _req.post(
+                f"{GROQ_URL}/chat/completions",
+                headers={"Authorization": f"Bearer {GROQ_API_KEY}",
+                         "Content-Type": "application/json"},
+                json={"model": model,
+                      "messages": [{"role": "user", "content": prompt}],
+                      "max_tokens": max_tokens, "temperature": temperature},
+                timeout=timeout)
+        except Exception as e:
+            log.warning(f"groq {model}: request failed ({e})")
+            continue
+        if r.status_code == 200:
+            try:
+                return r.json()["choices"][0]["message"]["content"].strip()
+            except Exception as e:
+                raise RuntimeError(f"неожиданный ответ Groq: {e}")
+        body = (r.text or "")[:200]
+        log.warning(f"groq {model}: HTTP {r.status_code} {body}")
+        if r.status_code in (401, 403):
+            raise RuntimeError(f"ключ отклонён (HTTP {r.status_code})")
+    raise RuntimeError(f"ни одна модель не ответила (пробовал: {', '.join(tried) or '—'})")
+
 def fetch_recent_headlines(hours: int = NEWS_LOOKBACK_HOURS) -> list[str]:
     """Collect headlines from all RSS sources published in last `hours` hours."""
     cutoff = datetime.now(timezone.utc) - timedelta(hours=hours)
@@ -92,7 +169,7 @@ def fetch_recent_headlines(hours: int = NEWS_LOOKBACK_HOURS) -> list[str]:
 
 def analyze_with_groq(headlines: list[str]) -> dict:
     """
-    Send headlines to Groq llama-3.1-8b-instant.
+    Send headlines to Groq (model chosen at runtime, see _groq_chat).
     Free tier: 14 400 req/day, ~200ms.
     """
     if not headlines:
@@ -117,24 +194,9 @@ PAUSE=YES ONLY for: confirmed exchange hack >$500M, total government crypto ban 
 PAUSE=NO for EVERYTHING else including: general bearish sentiment, geopolitics, tech stock drops, inflation fears, regulations discussions, uncertainty, tariffs, trade wars, normal market corrections."""
 
     try:
-        resp = _req.post(
-            "https://api.groq.com/openai/v1/chat/completions",
-            headers={
-                "Authorization": f"Bearer {GROQ_API_KEY}",
-                "Content-Type": "application/json",
-            },
-            json={
-                "model":       "llama-3.1-8b-instant",
-                "messages":    [{"role": "user", "content": prompt}],
-                "max_tokens":  100,
-                "temperature": 0.1,
-            },
-            timeout=12,
-        )
-        raw = resp.json()["choices"][0]["message"]["content"].strip()
-        return _parse_groq(raw)
-
+        return _parse_groq(_groq_chat(prompt, 100, 0.1, 12))
     except Exception as e:
+        log.warning(f"analyze_with_groq: {e}")
         return {"sentiment": "NEUTRAL", "summary": f"Groq unavailable: {e}", "pause": False}
 
 
@@ -204,23 +266,9 @@ Impact scale: 1=moderate, 2=significant, 3=major market mover
 If NO high impact events found, reply only: NONE"""
 
     try:
-        resp = _req.post(
-            "https://api.groq.com/openai/v1/chat/completions",
-            headers={
-                "Authorization": f"Bearer {GROQ_API_KEY}",
-                "Content-Type": "application/json",
-            },
-            json={
-                "model":       "llama-3.1-8b-instant",
-                "messages":    [{"role": "user", "content": prompt}],
-                "max_tokens":  150,
-                "temperature": 0.1,
-            },
-            timeout=12,
-        )
-        raw = resp.json()["choices"][0]["message"]["content"].strip()
-        return _parse_events(raw)
-    except Exception:
+        return _parse_events(_groq_chat(prompt, 150, 0.1, 12))
+    except Exception as e:
+        log.warning(f"get_upcoming_high_impact_events: {e}")
         return []
 
 
@@ -324,22 +372,7 @@ ITEM|[название на рус., макс 8 слов]|[время HH:MM UTC 
 OVERALL|BULLISH или BEARISH или NEUTRAL|[ключевая тема дня на рус., макс 10 слов]"""
 
     try:
-        resp = _req.post(
-            "https://api.groq.com/openai/v1/chat/completions",
-            headers={
-                "Authorization": f"Bearer {GROQ_API_KEY}",
-                "Content-Type":  "application/json",
-            },
-            json={
-                "model":       "llama-3.1-8b-instant",
-                "messages":    [{"role": "user", "content": prompt}],
-                "max_tokens":  550,
-                "temperature": 0.2,
-            },
-            timeout=25,
-        )
-        raw = resp.json()["choices"][0]["message"]["content"].strip()
-        return _parse_digest(raw)
+        return _parse_digest(_groq_chat(prompt, 550, 0.2, 25))
     except Exception as e:
         log.warning(f"get_daily_digest: Groq failed ({e}) — sending headlines without analysis")
         return {"items": [], "overall": "NEUTRAL", "raw": raw_items,
@@ -457,22 +490,9 @@ AI ФИЛЬТР:
 Напиши разбор недели на РУССКОМ. Максимум 5 предложений. Без воды. Что сработало, что нет, на что смотреть на следующей неделе."""
 
     try:
-        resp = _req.post(
-            "https://api.groq.com/openai/v1/chat/completions",
-            headers={
-                "Authorization": f"Bearer {GROQ_API_KEY}",
-                "Content-Type":  "application/json",
-            },
-            json={
-                "model":       "llama-3.3-70b-versatile",
-                "messages":    [{"role": "user", "content": prompt}],
-                "max_tokens":  350,
-                "temperature": 0.4,
-            },
-            timeout=25,
-        )
-        return resp.json()["choices"][0]["message"]["content"].strip()
+        return _groq_chat(prompt, 350, 0.4, 25)
     except Exception as e:
+        log.warning(f"weekly commentary: {e}")
         return f"(комментарий недоступен: {e})"
 
 
