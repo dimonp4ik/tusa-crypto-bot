@@ -671,6 +671,8 @@ _KB_SETTINGS = {"inline_keyboard": [[
 ], [
     {"text": "🚫 Авто-блок",     "callback_data": "adm_blocks"},
     {"text": "💰 Бюджет Claude", "callback_data": "adm_budget"},
+], [
+    {"text": "🩺 Проверка сервисов", "callback_data": "adm_health"},
 ], [_BACK_ROW[0]]]}
 
 _KB_ANALYTICS = {"inline_keyboard": [[
@@ -1754,6 +1756,40 @@ def _handle_admin_callback(callback_id: str, chat_id: int,
         except Exception as e:
             log.warning(f"adm_mb_input prompt failed: {e}")
 
+    elif data == "adm_health":
+        # Answers "is the news pipeline actually alive" without shell access to
+        # the host. Added after several days of empty morning digests where the
+        # only way to see the cause was the platform log.
+        lines = ["🩺 *Проверка сервисов*", ""]
+        try:
+            from src.news_agent import (fetch_headlines_with_meta, _groq_chat,
+                                        _groq_pick_model, GROQ_API_KEY)
+            try:
+                heads = fetch_headlines_with_meta(hours=18)
+                lines.append(f"📰 Заголовки за 18ч: *{len(heads)}*")
+            except Exception as e:
+                lines.append(f"📰 Заголовки: ❌ {_esc(str(e))[:90]}")
+            lines.append(f"🔑 GROQ_API_KEY: *{"задан" if GROQ_API_KEY else "НЕ ЗАДАН"}*")
+            if GROQ_API_KEY:
+                try:
+                    live = _groq_pick_model() or "—"
+                    lines.append(f"🤖 Модель от Groq: `{live}`")
+                except Exception as e:
+                    lines.append(f"🤖 Список моделей: ❌ {_esc(str(e))[:90]}")
+                try:
+                    _groq_chat("Ответь одним словом: OK", 10, 0.0, 12)
+                    lines.append("✅ Groq отвечает — дайджест будет с разбором")
+                except Exception as e:
+                    lines.append(f"❌ Groq не отвечает: {_esc(str(e))[:160]}")
+        except Exception as e:
+            lines.append(f"❌ Проверка упала: {_esc(str(e))[:120]}")
+        try:
+            from src.news_filter import check_news_sentiment
+            r = check_news_sentiment("BTCUSDT")
+            lines.append(f"🛡 Новостной фильтр: {"работает" if r.get("checked") else "СЛЕПОЙ"}")
+        except Exception as e:
+            lines.append(f"🛡 Новостной фильтр: ❌ {_esc(str(e))[:90]}")
+        _edit_message(chat_id, message_id, chr(10).join(lines))
     elif data == "adm_budget":
         try:
             from config import CLAUDE_DAILY_BUDGET_USD
