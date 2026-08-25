@@ -34,7 +34,7 @@ from config import (
     AUTOTRADE_ENABLED, AUTOTRADE_LEVERAGE, AUTOTRADE_BALANCE_THRESHOLD,
     AUTOTRADE_CONTACT,
     STOP_CLOSE_CONFIRM, STOP_EXCHANGE_BACKSTOP_R, SYMBOL_SIZE_MULT,
-    SESSION_SIZE_MULT, HTF_NEUTRAL_4H_SIZE_MULT,
+    SESSION_SIZE_MULT, HTF_NEUTRAL_4H_SIZE_MULT, SYMBOL_TIER_MULT, SIZE_MULT_MAX,
     COUNTER_STRUCTURE_SIZE_MULT,
     RISK_NORMALIZED_SIZING, RISK_REFERENCE_PCT, RISK_SIZE_MULT_MIN,
 )
@@ -182,6 +182,7 @@ def _open_for_user(u: dict, sig: dict, inst_id: str, disp: str) -> None:
     # the balance and min-contract checks below, so a symbol trimmed under the
     # exchange minimum is reported as "too small" rather than silently rounded.
     _size_mult = float(SYMBOL_SIZE_MULT.get(str(sig["symbol"]).upper(), 1.0))
+    _size_mult *= float(SYMBOL_TIER_MULT.get(str(sig["symbol"]).upper(), 1.0))
     # Counter-structure setups size up — see COUNTER_STRUCTURE_SIZE_MULT.
     if sig.get("sniper"):
         _size_mult *= float(COUNTER_STRUCTURE_SIZE_MULT)
@@ -192,6 +193,8 @@ def _open_for_user(u: dict, sig: dict, inst_id: str, disp: str) -> None:
     _size_mult *= float(SESSION_SIZE_MULT.get(str(sig.get("session") or "").upper(), 1.0))
     if str(sig.get("trend_4h") or "").lower() == "neutral":
         _size_mult *= float(HTF_NEUTRAL_4H_SIZE_MULT)
+    # Ceiling on the stacked product — see SIZE_MULT_MAX in config.py.
+    _size_mult = min(_size_mult, float(SIZE_MULT_MAX))
     # Risk-normalised sizing: a wide stop gets less size so that 1R costs the
     # same money regardless of where structure put the stop. Downward only —
     # see RISK_NORMALIZED_SIZING in config.py. Without this a 3.0% stop risked

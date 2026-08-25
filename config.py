@@ -904,6 +904,29 @@ COUNTER_STRUCTURE_SIZE_MULT = float(os.getenv("COUNTER_STRUCTURE_SIZE_MULT", "1.
 # is the same tell that exposed the trail bug — see memory exit-mechanics-sweep.
 SESSION_SIZE_MULT = {"LONDON": float(os.getenv("LONDON_SIZE_MULT", "1.5"))}
 HTF_NEUTRAL_4H_SIZE_MULT = float(os.getenv("HTF_NEUTRAL_4H_SIZE_MULT", "1.5"))
+# Per-coin tier multiplier, 2026-08-24. Coins ranked by expectancy on the
+# 923-trade book, bottom third 0.75 / top third 1.25, middle untouched.
+# Kept SEPARATE from SYMBOL_SIZE_MULT so the BTC trim (measured on its own,
+# see memory btc-size-trim) and this ranking can be reverted independently.
+#
+# The strength is the whole point. Validated OUT OF SAMPLE — fit on one half of
+# the window, scored on the other, both directions:
+#   0.75/1.25  →  +6.3% and +2.9%   both halves better
+#   0.50/1.50  →  -10.6% and -2.2%  both halves WORSE
+# Aggressive multipliers bet on the per-coin number, which is ~50 trades of
+# noise; mild ones bet only on the ordering, which holds. Fitting on the full
+# window and scoring on it flatters this to +15.2% — that figure is an artefact.
+# LAB sits in the top tier on 22 trades; that is an outlier the mild multiplier
+# is allowed to carry, not a conviction.
+SYMBOL_TIER_MULT = _parse_symbol_size_mult(os.getenv(
+    "SYMBOL_TIER_MULT",
+    "BTCUSDT:0.75,ADAUSDT:0.75,SEIUSDT:0.75,SOLUSDT:0.75,DOTUSDT:0.75,"
+    "LINKUSDT:1.25,ETHUSDT:1.25,TAOUSDT:1.25,ZECUSDT:1.25,LABUSDT:1.25"))
+# Ceiling on the PRODUCT of every size multiplier. They stack: a top-tier coin
+# in LONDON with a neutral 4h reaches 1.25*1.5*1.5 = 2.81x, a concentration
+# nothing here was measured at. Each multiplier was validated on its own; their
+# product was not.
+SIZE_MULT_MAX = float(os.getenv("SIZE_MULT_MAX", "2.0"))
 
 # --- Risk-normalised sizing (added 2026-08-22 after a live incident) ---
 # Position size was fixed regardless of how far away the stop sat, so a trade

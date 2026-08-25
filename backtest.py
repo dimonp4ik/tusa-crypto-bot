@@ -69,6 +69,8 @@ from config import (  # noqa: E402
     SYMBOL_SIZE_MULT,
     COUNTER_STRUCTURE_SIZE_MULT,
     SESSION_SIZE_MULT,
+    SYMBOL_TIER_MULT,
+    SIZE_MULT_MAX,
     HTF_NEUTRAL_4H_SIZE_MULT,
     MAX_SAME_DIRECTION_POSITIONS,
     ZONE_WATCH_ENABLED,
@@ -505,12 +507,13 @@ _RUNNER_FRAC = 1.0 - _TP1_CLOSE_FRAC
 def _size_mult_for(symbol: str, setup: dict) -> float:
     """Mirror of the live sizing rules in src/autotrader.py."""
     m = float(SYMBOL_SIZE_MULT.get(str(symbol).upper(), 1.0))
+    m *= float(SYMBOL_TIER_MULT.get(str(symbol).upper(), 1.0))
     if setup.get("sniper"):
         m *= float(COUNTER_STRUCTURE_SIZE_MULT)
     m *= float(SESSION_SIZE_MULT.get(str(setup.get("session") or "").upper(), 1.0))
     if str(setup.get("trend_4h") or "").lower() == "neutral":
         m *= float(HTF_NEUTRAL_4H_SIZE_MULT)
-    return m
+    return min(m, float(SIZE_MULT_MAX))
 
 
 def _post_tp1_trail_mult_bt(direction: str, entry: float, tp1: float, tp2: float,
