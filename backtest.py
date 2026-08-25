@@ -739,6 +739,14 @@ class TradeRecord:
     # Live per-symbol position-size trim (config.SYMBOL_SIZE_MULT). Deliberately
     # not merged into risk_mult — see the construction site for why.
     size_mult: float = 1.0
+    # Microstructure at the moment of entry, added 2026-08-25 to answer "in
+    # which scenario are stops more likely". The filter already computes the
+    # first three and threw them away at the export boundary.
+    zone_age_bars: int = -1      # how stale the zone was when price returned
+    bos_candles_ago: int = -1    # how long ago structure actually broke
+    extension_atr: float = 0.0   # distance from the BOS level to entry, in ATR
+    entry_range_atr: float = 0.0 # range of the entry bar itself, in ATR
+    run_bars: int = 0            # consecutive same-direction closes before entry
     # Scan bar that produced the setup. entry_bar is the FILL bar, which under
     # the zone-wait model can be several bars later — so entry_bar/entry_time
     # cannot identify a setup across execution models, and joining on them
@@ -989,6 +997,24 @@ def simulate_trade_direct(
     # in the R the summary reports. Until 2026-08-24 size_mult was recorded on
     # the record but never applied, which meant no backtest figure in this
     # project reflected the BTC half-size trim or the counter-structure boost.
+    # --- microstructure ---
+    _atr = max(1e-12, float(setup.get("atr", 0.0) or 0.0))
+    try:
+        _ext = float(setup.get("bos_extension_atr") or 0.0)
+    except (TypeError, ValueError):
+        _ext = 0.0
+    _b = max(0, min(fill_bar, len(highs) - 1))
+    _rng = (highs[_b] - lows[_b]) / _atr if _b < len(highs) else 0.0
+    _run = 0
+    for _k in range(_b - 1, max(-1, _b - 13), -1):
+        if _k <= 0 or _k >= len(closes):
+            break
+        _up = closes[_k] > closes[_k - 1]
+        if (_up and direction == "LONG") or ((not _up) and direction == "SHORT"):
+            _run += 1
+        else:
+            break
+
     _sz = _size_mult_for(symbol, setup)
     gross_r *= _sz
     net_r   *= _sz
@@ -1040,6 +1066,11 @@ def simulate_trade_direct(
         knn_score=float(setup.get("_knn_score", -1.0)),
         swing_trend=str(setup.get("swing_trend", "") or ""),
         mae_r=round(_mae_r, 4),
+        zone_age_bars=int(setup.get("zone_age_bars", -1) or -1),
+        bos_candles_ago=int(setup.get("bos_candles_ago") or -1),
+        extension_atr=round(_ext, 3),
+        entry_range_atr=round(_rng, 3),
+        run_bars=_run,
         signal_bar=int(setup.get("_signal_bar", -1)),
     )
 
@@ -1402,6 +1433,8 @@ def write_trades_csv(path: str, trades: list[TradeRecord]) -> None:
         "session", "trend_1h", "trend_4h", "entry_source",
         "signals", "score_tags", "premium", "sniper", "knn_score", "swing_trend",
         "mae_r", "size_mult", "signal_bar",
+        "zone_age_bars", "bos_candles_ago", "extension_atr",
+        "entry_range_atr", "run_bars",
     ]
     with open(path, "w", newline="", encoding="utf-8") as f:
         writer = csv.DictWriter(f, fieldnames=fields)
