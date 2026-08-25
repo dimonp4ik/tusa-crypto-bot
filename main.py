@@ -4984,23 +4984,32 @@ _BT_SEED_BATCHES = [
     # NB: run the windows SEQUENTIALLY when regenerating — three concurrent
     # deep backtests tripped OKX rate limits and silently lost 14 of 18
     # symbols on the first attempt.
-    ("backtest_seed_okx_2026.csv", "bt_seed_okx2026_done"),
+    # Superseded 2026-08-25 by the honest-fill rebuild below. Kept in the list
+    # only as a comment so the file's purpose is not lost:
+    #   ("backtest_seed_okx_2026.csv", "bt_seed_okx2026_done"),
+    #
+    # 6,594 trades, 2022-07 -> 2026-07, eight sequential OKX windows regenerated
+    # on the corrected execution model. Exported RAW (no live gates, since those
+    # are portfolio constraints and Claude judges one setup) and at UNIT SIZE
+    # (no symbol/tier/session multipliers, or the per-coin sizing would leak
+    # into what reads as a base rate).
+    ("backtest_seed_okx_honest.csv", "bt_seed_okx_honest_done"),
 ]
 
 # Bumping this purges ALL source='backtest' rows once, then the batches above
 # re-seed. Raise it whenever the priors themselves become invalid (config or
 # data-source change), NOT for ordinary redeploys.
-# ⚠️ STALE GEOMETRY, known and accepted for now (2026-08-13). These priors were
-# generated at TP1_R_MULT=0.7 and, more importantly, with the backtest's
-# unconditional fill at the zone midpoint. The bot now runs TP1=0.6 and only
-# enters when price actually returns to the zone, so the priors' outcome mix is
-# not what the current bot produces. They are kept because they are coarse base
-# rates ("how do entries of this shape usually resolve"), the system prompt
-# tells Claude live Hist outweighs them — and because LIVE_HIST_EPOCH_TS was
-# just reset to 2026-08-12, so for the next weeks these are the ONLY history he
-# has. Re-seeding means re-running eight sequential deep windows; do it once the
-# new entry model has settled, and bump this string to purge automatically.
-_BT_SEED_GENERATION = "okx_2026_07_31"
+# RESOLVED 2026-08-25. The previous generation was flagged here as stale and
+# accepted "for now": generated at TP1_R_MULT=0.7 and, worse, with the
+# backtest's unconditional fill at the zone midpoint. It claimed 81.1% WR over
+# 10,300 trades. Regenerated on the corrected model over the same eight
+# windows: 6,594 trades, 72.1% WR, +0.194R/trade — a 9.6-point inflation in the
+# number Claude reads as his historical base rate. Trade count fell because a
+# setup only becomes a trade when price actually returns to the zone.
+# The new spread by year is 69.0% (2023 bear) to 74.0% (2026); the old one was
+# 79.9-82.4%, and that flatness across four very different markets was itself
+# the tell.
+_BT_SEED_GENERATION = "okx_honest_2026_08_25"
 
 
 def maybe_seed_backtest():
@@ -5017,7 +5026,8 @@ def maybe_seed_backtest():
             set_bot_state("bt_seed_generation", _BT_SEED_GENERATION)
             # Clear the per-batch flags too, so the new batch actually loads.
             for _f in ("bt_seed_2024_done", "bt_seed_2024b_done",
-                       "bt_seed_2022_done", "bt_seed_okx2026_done"):
+                       "bt_seed_2022_done", "bt_seed_okx2026_done",
+                       "bt_seed_okx_honest_done"):
                 set_bot_state(_f, "")
             log.info(f"Claude priors: purged {_purged} stale backtest rows "
                      f"(generation → {_BT_SEED_GENERATION})")
