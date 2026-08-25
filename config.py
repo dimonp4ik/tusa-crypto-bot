@@ -56,7 +56,9 @@ VOLUME_SPIKE_MULTIPLIER = 1.8
 MIN_SIGNALS_TO_PASS = 2
 
 # --- Signal deduplication ---
-SIGNAL_COOLDOWN_HOURS = 3  # 15m swing signals hold 2-8h — 3h cooldown per coin/direction
+# Readable from the environment since 2026-08-26: it was a plain constant, so
+# every sweep of it silently re-ran the default and reported "no effect".
+SIGNAL_COOLDOWN_HOURS = float(os.getenv("SIGNAL_COOLDOWN_HOURS", "3"))  # 15m swing signals hold 2-8h
 
 # --- Signal expiry (no TP1/SL within this window → EXPIRED) ---
 SIGNAL_EXPIRY_HOURS = int(os.getenv("SIGNAL_EXPIRY_HOURS", "48"))
@@ -1097,4 +1099,18 @@ AUTOTRADE_CONTACT           = os.getenv("AUTOTRADE_CONTACT", "@sanja_tusagang")
 REJECT_COOLDOWN_HOURS = float(os.getenv("REJECT_COOLDOWN_HOURS", "3"))
 # N consecutive SL among today's closed signals → pause new signals until the
 # next Riga day. 0 = off.
-KILL_SWITCH_SL_STREAK = int(os.getenv("KILL_SWITCH_SL_STREAK", "3"))
+# 3 -> 2 on 2026-08-26. The kill switch turned out to be the single most
+# effective risk control in the system, and the reason is the whole lesson
+# of this session: the ~50 trades it blocks at a threshold of 3 average
+# almost exactly ZERO, so no analysis of mean expectancy can ever find
+# them — but they land inside the worst stretches. Turning it off entirely
+# leaves profit unchanged (+334.8R against +336.3R) while worst-windows go
+# 3.67 -> 6.15 and ulcer 1.65 -> 2.19.
+# Tightening to 2 improves everything except trade count, and passes all
+# six checks (both measures, both halves, whole window):
+#   kill 3   967 сд  75.4%  +336.3R  окна 3.67 (91.6)  ulcer 1.65 (203.7)
+#   kill 2   901 сд  76.8%  +342.1R  окна 2.50 (136.8) ulcer 1.38 (248.6)
+# kill 1 was also tested: 79.8% WR — close to the 80% the user keeps asking
+# for — but only 650 trades and +285.7R, so it buys the win rate with a
+# third of the book and 15% of the profit.
+KILL_SWITCH_SL_STREAK = int(os.getenv("KILL_SWITCH_SL_STREAK", "2"))
