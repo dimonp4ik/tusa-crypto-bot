@@ -589,6 +589,12 @@ _BT_AVG_DOWN_R = float(os.getenv("BT_AVG_DOWN_R", "0") or 0)
 # structure.
 _BT_STRUCT_EXIT = os.getenv("BT_STRUCT_EXIT", "0") == "1"
 
+# Mirror mode, research flag, default OFF. Trades every setup in the OPPOSITE
+# direction with the bracket reflected through the entry, to answer "would this
+# have reached the target faster the other way". The mirror experiment in db.py
+# only ever ran on REJECTED setups; this runs it on the whole book.
+_BT_MIRROR = os.getenv("BT_MIRROR", "0") == "1"
+
 # Research only, both default OFF. Conditional stale exit: once a trade is at
 # least BT_STALE_EXIT_BARS old and STILL has not reached TP1, close it if it is
 # currently underwater by more than BT_STALE_EXIT_MAX_R.
@@ -836,6 +842,13 @@ def simulate_trade_direct(
     trailing_stop = entry
     trail_exit_price = entry
     best_price = entry
+    if _BT_MIRROR:
+        # Reflect the bracket through the entry and flip the side.
+        direction = "SHORT" if direction == "LONG" else "LONG"
+        tp1 = entry - (tp1 - entry)
+        tp2 = entry - (tp2 - entry)
+        sl  = entry - (sl - entry)
+
     trail_mult_eff = max(0.0, float(trail_atr_mult))  # context-frozen at TP1 candle
 
     stop_exit_price = None  # set when we exit at a price other than the SL level
@@ -1352,6 +1365,40 @@ def merge_results(results: Iterable[SymbolResult]) -> SymbolResult:
     return total
 
 
+def risk_profile(rs: list[float]) -> dict:
+    """Downside measures that do NOT hang on a single week.
+
+    Max drawdown is one number produced by one stretch: on the 922-trade book
+    of 2026-08-25 the whole -6.87R came from FIFTEEN trades across five days in
+    April. Every equal-risk ranking divided by that, which is why thresholds
+    jumped and halves disagreed on changes that were really noise.
+
+    worst_windows averages the k deepest rolling N-trade stretches, so it takes
+    several bad patches to move. ulcer is RMS of the underwater curve — it
+    counts how long we spend below water, not just how far. Both are downside
+    only: plain volatility penalises big wins too, which is not the risk here.
+    """
+    import statistics as _st
+    if not rs:
+        return {"max_dd": 0.0, "worst_windows": 0.0, "ulcer": 0.0}
+    cum = peak = 0.0
+    worst = 0.0
+    sq = []
+    for x in rs:
+        cum += x
+        peak = max(peak, cum)
+        worst = min(worst, cum - peak)
+        sq.append((cum - peak) ** 2)
+    win, k = 25, 5
+    ww = 0.0
+    if len(rs) >= win:
+        sums = [sum(rs[i:i + win]) for i in range(len(rs) - win + 1)]
+        ww = -_st.mean(sorted(sums)[:k])
+    return {"max_dd": -worst,
+            "worst_windows": ww,
+            "ulcer": (sum(sq) / len(sq)) ** 0.5}
+
+
 def apply_live_gates(trades: list[TradeRecord]) -> list[TradeRecord]:
     """Trades that survive the live bot's throughput gates.
 
@@ -1638,6 +1685,17 @@ def main(argv: list[str] | None = None) -> int:
                 f"Max DD {g_dd:+.2f}R, "
                 f"profit/DD {g_net / abs(g_dd):.1f}"
             )
+            # Max DD is one number from one stretch — see risk_profile. Print
+            # the measures that need several bad patches to move, so variants
+            # stop being ranked by a single week.
+            _rp = risk_profile([t.net_r for t in gated])
+            if _rp["worst_windows"] > 0:
+                print(
+                    f"  устойчивый риск: худшие окна {_rp['worst_windows']:.2f}R "
+                    f"(прибыль/риск {g_net / _rp['worst_windows']:.1f})   "
+                    f"ulcer {_rp['ulcer']:.2f} "
+                    f"(прибыль/ulcer {g_net / _rp['ulcer']:.1f})"
+                )
 
     if args.export_trades:
         # Export the gated book by default — an ungated dump cannot be compared
