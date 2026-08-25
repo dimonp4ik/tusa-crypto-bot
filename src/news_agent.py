@@ -498,6 +498,9 @@ AI ФИЛЬТР:
 
 # ── Economic calendar (ForexFactory weekly XML — free, no key) ─────────────────
 
+# Only thisweek exists — nextweek.xml and lastweek.xml both 404, so there is
+# no way to see past the current week. The feed also rate-limits with HTTP
+# 429, which is what actually broke this: see the fetch below.
 _FF_CALENDAR_URL = "https://nfs.faireconomy.media/ff_calendar_thisweek.xml"
 
 try:
@@ -563,9 +566,18 @@ def get_upcoming_high_impact_events(within_hours: float = 3.0) -> list[dict]:
                     parsed = _parse_ff_event(ev)
                     if parsed:
                         events.append(parsed)
-            _calendar_cache["events"] = events
+            else:
+                log.warning(f"calendar: HTTP {resp.status_code} — keeping previous events")
+            # Only REPLACE the cache when the fetch actually produced something.
+            # The old code wrote [] on any failure and stamped it for 6 hours, so
+            # a single rate-limited fetch blinded the bot to the calendar for
+            # half a day in silence — which is why hours_to_event came back 0/30
+            # in a live export where every other shadow feature was 22/30.
+            if events or not _calendar_cache["events"]:
+                _calendar_cache["events"] = events
             _calendar_cache["fetched_at"] = now
-        except Exception:
+        except Exception as _ce:
+            log.warning(f"calendar fetch failed ({_ce}) — keeping previous events")
             _calendar_cache["fetched_at"] = now  # don't hammer on failure
 
     now_utc = datetime.now(timezone.utc)
