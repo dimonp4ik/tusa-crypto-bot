@@ -245,7 +245,16 @@ EFF_RATIO_MAX      = float(os.getenv("EFF_RATIO_MAX", "0"))
 # +0.365R and trend_1h=neutral 79.8% / +0.357R, both stable across halves.
 HTF_ALIGNED_SCORE  = int(os.getenv("HTF_ALIGNED_SCORE", "2"))
 HTF_NEUTRAL_SCORE  = int(os.getenv("HTF_NEUTRAL_SCORE", "1"))
-HTF_STRONG_SCORE   = int(os.getenv("HTF_STRONG_SCORE", "0"))
+# REVERTED to 1 on 2026-08-25. Setting it to 0 shipped earlier the same day
+# on a +4.5% equal-risk gain measured against MAX drawdown — which turned
+# out to be fifteen trades in one April week. Re-checked against measures
+# that need several bad patches to move, the two disagree symmetrically:
+#   Strong=1  966 сд  +339.1R  худ.окна 4.49 (75.6)  ulcer 1.91 (177.6)
+#   Strong=0  922 сд  +341.9R  худ.окна 4.97 (68.8)  ulcer 1.75 (195.1)
+# Profit is a wash (0.8%) and Strong=0 costs 44 trades for it. When the
+# risk measures split and the profit does not move, the change is not
+# supported — keep the version with more trades.
+HTF_STRONG_SCORE   = int(os.getenv("HTF_STRONG_SCORE", "1"))
 # Premium/Discount structure gate — "discount" only counts as a buy signal inside
 # a bullish/neutral dealing range, "premium" only inside a bearish/neutral one. In
 # a clean lower-high+lower-low down-structure, price below the range midpoint is
