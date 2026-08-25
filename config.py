@@ -975,6 +975,26 @@ SIZE_MULT_MAX = float(os.getenv("SIZE_MULT_MAX", "2.0"))
 EXTENSION_ATR_THRESHOLD = float(os.getenv("EXTENSION_ATR_THRESHOLD", "1.2"))
 EXTENSION_SIZE_MULT     = float(os.getenv("EXTENSION_SIZE_MULT", "0.75"))
 
+# Volatility boost, under test 2026-08-25. vol_atr_pct is ATR as a share of
+# price. The top quintile is the strongest single group found anywhere in this
+# book — 184 сд, 77.2% WR, +0.494R against a +0.298R base, both halves
+# +0.517/+0.474, and no loss clustering (9 consecutive against 9.6 expected).
+# Held to a HIGHER bar than usual because the response is NOT monotone (the
+# fourth quintile is the worst of the five) and because I have no mechanism for
+# it: the obvious one argues the other way — in high volatility the structural
+# stop wants to be wider, hits the RISK_MAX_PCT clamp, and should therefore sit
+# tighter than intended. Default 1.0 until it earns its place.
+VOL_ATR_BOOST_THRESHOLD = float(os.getenv("VOL_ATR_BOOST_THRESHOLD", "0.0104"))
+# Shipped at 1.25 on 2026-08-25. Against the OFF_HOURS-trimmed book:
+#   base       +313.2R  окна 3.54 (88.4)  ulcer 1.60 (195.5)
+#   x1.25      +336.3R  окна 3.67 (91.6)  ulcer 1.65 (203.7)
+#   x1.5       +354.9R  окна 3.92 (90.6)  ulcer 1.72 (206.5)
+# Both ratios improve at both multipliers and profit rises 7.4%/13.3%; risk
+# rises less than profit does, which is what a boost has to prove. The one
+# blemish is the first half's worst-windows ratio, 45.7 -> 45.4, i.e. -0.7%
+# — noise, but the reason for taking the mild multiplier and not 1.5.
+VOL_ATR_BOOST_MULT      = float(os.getenv("VOL_ATR_BOOST_MULT", "1.25"))
+
 # --- Risk-normalised sizing (added 2026-08-22 after a live incident) ---
 # Position size was fixed regardless of how far away the stop sat, so a trade
 # with 1R = 3.0% of price risked 2.5x the money of one with 1R = 1.2% for the

@@ -36,6 +36,7 @@ from config import (
     STOP_CLOSE_CONFIRM, STOP_EXCHANGE_BACKSTOP_R, SYMBOL_SIZE_MULT,
     SESSION_SIZE_MULT, HTF_NEUTRAL_4H_SIZE_MULT, SYMBOL_TIER_MULT, SIZE_MULT_MAX,
     EXTENSION_ATR_THRESHOLD, EXTENSION_SIZE_MULT,
+    VOL_ATR_BOOST_THRESHOLD, VOL_ATR_BOOST_MULT,
     COUNTER_STRUCTURE_SIZE_MULT,
     RISK_NORMALIZED_SIZING, RISK_REFERENCE_PCT, RISK_SIZE_MULT_MIN,
 )
@@ -200,6 +201,14 @@ def _open_for_user(u: dict, sig: dict, inst_id: str, disp: str) -> None:
     try:
         if float(sig.get("bos_extension_atr") or 0.0) > EXTENSION_ATR_THRESHOLD:
             _size_mult *= float(EXTENSION_SIZE_MULT)
+    except (TypeError, ValueError):
+        pass
+    # High-volatility boost — see VOL_ATR_BOOST_THRESHOLD in config.py. Reads
+    # None on signals written before the 2026-08-25 migration, which falls
+    # through to no boost rather than mis-sizing.
+    try:
+        if float(sig.get("vol_atr_pct") or 0.0) >= VOL_ATR_BOOST_THRESHOLD:
+            _size_mult *= float(VOL_ATR_BOOST_MULT)
     except (TypeError, ValueError):
         pass
     # Ceiling on the stacked product — see SIZE_MULT_MAX in config.py.

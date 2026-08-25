@@ -73,6 +73,8 @@ from config import (  # noqa: E402
     SIZE_MULT_MAX,
     EXTENSION_ATR_THRESHOLD,
     EXTENSION_SIZE_MULT,
+    VOL_ATR_BOOST_THRESHOLD,
+    VOL_ATR_BOOST_MULT,
     HTF_NEUTRAL_4H_SIZE_MULT,
     MAX_SAME_DIRECTION_POSITIONS,
     ZONE_WATCH_ENABLED,
@@ -518,6 +520,11 @@ def _size_mult_for(symbol: str, setup: dict) -> float:
     try:
         if float(setup.get("bos_extension_atr") or 0.0) > EXTENSION_ATR_THRESHOLD:
             m *= float(EXTENSION_SIZE_MULT)
+    except (TypeError, ValueError):
+        pass
+    try:
+        if float(setup.get("vol_atr_pct") or 0.0) >= VOL_ATR_BOOST_THRESHOLD:
+            m *= float(VOL_ATR_BOOST_MULT)
     except (TypeError, ValueError):
         pass
     return min(m, float(SIZE_MULT_MAX))
