@@ -129,6 +129,7 @@ def init_db():
             # backtest only — see SESSION_SIZE_MULT / HTF_NEUTRAL_4H_SIZE_MULT.
             "session":       "TEXT",
             "trend_4h":      "TEXT",
+            "bos_extension_atr": "REAL",
         }.items():
             _ensure_column(c, "signals", col, ddl)
 
@@ -461,9 +462,10 @@ def log_signal(analysis: dict, tp1: float, tp2: float, sl: float) -> int:
             INSERT INTO signals (
                 symbol, direction, entry_price, tp1, tp2, sl, opened_at, status,
                 confidence, reason, entry_low, entry_high, entry_source, market_price,
-                mtf_score, mtf_score_max, premium, atr, sniper, session, trend_4h
+                mtf_score, mtf_score_max, premium, atr, sniper, session, trend_4h,
+                bos_extension_atr
             )
-            VALUES (?, ?, ?, ?, ?, ?, ?, 'OPEN', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            VALUES (?, ?, ?, ?, ?, ?, ?, 'OPEN', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """, (
             analysis["symbol"], analysis["direction"], analysis["current_price"],
             tp1, tp2, sl, time_mod.time(),
@@ -476,6 +478,7 @@ def log_signal(analysis: dict, tp1: float, tp2: float, sl: float) -> int:
             1 if analysis.get("sniper") else 0,
             analysis.get("session"),
             analysis.get("trend_4h"),
+            analysis.get("bos_extension_atr"),
         ))
         return cur.lastrowid
 

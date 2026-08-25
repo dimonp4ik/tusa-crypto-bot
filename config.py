@@ -934,6 +934,22 @@ SYMBOL_TIER_MULT = _parse_symbol_size_mult(os.getenv(
 # nothing here was measured at. Each multiplier was validated on its own; their
 # product was not.
 SIZE_MULT_MAX = float(os.getenv("SIZE_MULT_MAX", "2.0"))
+# Extension trim, 2026-08-25. bos_extension_atr is how far price has travelled
+# from the level where structure broke, in ATR — i.e. how LATE the entry is.
+# It is the one microstructure feature that survived: expectancy falls monotone
+# across its quartiles with both window halves agreeing at every step —
+#   <=0.53 +0.366R (75.8%) · 0.53-1.02 +0.352 · 1.02-1.49 +0.260 · >1.49 +0.214
+#   (68.3%) — against a base of +0.298R.
+# Trimmed rather than filtered: the worst bucket is still PROFITABLE, and
+# dropping profitable trades drops profit (see EFF_RATIO_MAX, tested and
+# rejected the same way).
+# Threshold and multiplier are deliberately mild. The equal-risk response has a
+# stable plateau at 0.9-1.2 under BOTH x0.75 and x0.6, and falls off a cliff at
+# 1.3 under both; 1.2 sits inside the plateau away from that edge. The gain is
+# mostly drawdown reduction driven by ~96 trades in a narrow band, so treat the
+# expectancy edge as the real part and the headline as optimistic.
+EXTENSION_ATR_THRESHOLD = float(os.getenv("EXTENSION_ATR_THRESHOLD", "1.2"))
+EXTENSION_SIZE_MULT     = float(os.getenv("EXTENSION_SIZE_MULT", "0.75"))
 
 # --- Risk-normalised sizing (added 2026-08-22 after a live incident) ---
 # Position size was fixed regardless of how far away the stop sat, so a trade

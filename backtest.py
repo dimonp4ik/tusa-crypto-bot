@@ -71,6 +71,8 @@ from config import (  # noqa: E402
     SESSION_SIZE_MULT,
     SYMBOL_TIER_MULT,
     SIZE_MULT_MAX,
+    EXTENSION_ATR_THRESHOLD,
+    EXTENSION_SIZE_MULT,
     HTF_NEUTRAL_4H_SIZE_MULT,
     MAX_SAME_DIRECTION_POSITIONS,
     ZONE_WATCH_ENABLED,
@@ -513,6 +515,11 @@ def _size_mult_for(symbol: str, setup: dict) -> float:
     m *= float(SESSION_SIZE_MULT.get(str(setup.get("session") or "").upper(), 1.0))
     if str(setup.get("trend_4h") or "").lower() == "neutral":
         m *= float(HTF_NEUTRAL_4H_SIZE_MULT)
+    try:
+        if float(setup.get("bos_extension_atr") or 0.0) > EXTENSION_ATR_THRESHOLD:
+            m *= float(EXTENSION_SIZE_MULT)
+    except (TypeError, ValueError):
+        pass
     return min(m, float(SIZE_MULT_MAX))
 
 

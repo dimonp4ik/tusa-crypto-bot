@@ -35,6 +35,7 @@ from config import (
     AUTOTRADE_CONTACT,
     STOP_CLOSE_CONFIRM, STOP_EXCHANGE_BACKSTOP_R, SYMBOL_SIZE_MULT,
     SESSION_SIZE_MULT, HTF_NEUTRAL_4H_SIZE_MULT, SYMBOL_TIER_MULT, SIZE_MULT_MAX,
+    EXTENSION_ATR_THRESHOLD, EXTENSION_SIZE_MULT,
     COUNTER_STRUCTURE_SIZE_MULT,
     RISK_NORMALIZED_SIZING, RISK_REFERENCE_PCT, RISK_SIZE_MULT_MIN,
 )
@@ -193,6 +194,14 @@ def _open_for_user(u: dict, sig: dict, inst_id: str, disp: str) -> None:
     _size_mult *= float(SESSION_SIZE_MULT.get(str(sig.get("session") or "").upper(), 1.0))
     if str(sig.get("trend_4h") or "").lower() == "neutral":
         _size_mult *= float(HTF_NEUTRAL_4H_SIZE_MULT)
+    # Late entries ride smaller — see EXTENSION_ATR_THRESHOLD in config.py.
+    # Reads None on signals written before the 2026-08-25 migration, which
+    # falls through to no trim rather than mis-sizing.
+    try:
+        if float(sig.get("bos_extension_atr") or 0.0) > EXTENSION_ATR_THRESHOLD:
+            _size_mult *= float(EXTENSION_SIZE_MULT)
+    except (TypeError, ValueError):
+        pass
     # Ceiling on the stacked product — see SIZE_MULT_MAX in config.py.
     _size_mult = min(_size_mult, float(SIZE_MULT_MAX))
     # Risk-normalised sizing: a wide stop gets less size so that 1R costs the
