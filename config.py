@@ -918,7 +918,22 @@ COUNTER_STRUCTURE_SIZE_MULT = float(os.getenv("COUNTER_STRUCTURE_SIZE_MULT", "1.
 # drawdown path avoiding them; LONDON x2.5+ puts the whole gain in the second
 # half (first half falls BELOW base). Monotone improvement under concentration
 # is the same tell that exposed the trail bug — see memory exit-mechanics-sweep.
-SESSION_SIZE_MULT = {"LONDON": float(os.getenv("LONDON_SIZE_MULT", "1.5"))}
+# 2026-08-25: extended beyond LONDON. Sessions were re-examined by their
+# contribution to the WORST STRETCHES rather than to the mean, after max
+# drawdown turned out to be one week — see memory drawdown-is-one-week.
+# Two sessions carry clustered losses, i.e. their stops arrive back-to-back
+# rather than spread out, which is what actually builds a drawdown:
+#   NEW_YORK   52 стопов, 23 подряд против 14.7 ожидаемых  (+56%)
+#   OFF_HOURS 105 стопов, 43 подряд против 31.7            (+36%)
+#   LONDON / OVERLAP / DEAD_ZONE — at or below chance
+# They are also the two overrepresented in the five worst 25-trade stretches
+# (OFF_HOURS 45.6% of them against 37.7% of the book; NEW_YORK 24.0% vs 20.0%).
+SESSION_SIZE_MULT = {
+    "LONDON":    float(os.getenv("LONDON_SIZE_MULT", "1.5")),
+    "OFF_HOURS": float(os.getenv("OFF_HOURS_SIZE_MULT", "0.75")),
+    "NEW_YORK":  float(os.getenv("NEW_YORK_SIZE_MULT", "1.0")),
+    "OVERLAP":   float(os.getenv("OVERLAP_SIZE_MULT", "1.0")),
+}
 HTF_NEUTRAL_4H_SIZE_MULT = float(os.getenv("HTF_NEUTRAL_4H_SIZE_MULT", "1.5"))
 # Per-coin tier multiplier, 2026-08-24. Coins ranked by expectancy on the
 # 923-trade book, bottom third 0.75 / top third 1.25, middle untouched.
