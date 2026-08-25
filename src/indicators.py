@@ -634,6 +634,36 @@ def get_1h_trend(candles_1h: dict) -> dict:
 
 # ── Combined SMC indicator dict ───────────────────────────────────────────────
 
+def htf_levels(candles_1h: dict, candles_4h: dict, price: float, atr: float) -> dict:
+    """Nearest confirmed swing level ABOVE and BELOW price, on 1h and 4h.
+
+    The bot only ever knew recent_high/recent_low over 21 15m candles — about
+    five hours. A long opened directly under a 4h swing high is therefore
+    indistinguishable from one opened into open air, which is precisely the
+    thing a human spots on the chart at a glance. Distances are in ATR so they
+    are comparable across symbols.
+    """
+    out = {"overhead_atr": None, "underfoot_atr": None}
+    if atr <= 0:
+        return out
+    levels_up, levels_dn = [], []
+    for c in (candles_1h, candles_4h):
+        if not c or not c.get("high"):
+            continue
+        sh, sl = find_swing_points(c["high"], c["low"])
+        for _, lvl in sh:
+            if lvl > price:
+                levels_up.append(lvl)
+        for _, lvl in sl:
+            if lvl < price:
+                levels_dn.append(lvl)
+    if levels_up:
+        out["overhead_atr"] = (min(levels_up) - price) / atr
+    if levels_dn:
+        out["underfoot_atr"] = (price - max(levels_dn)) / atr
+    return out
+
+
 def get_smc_indicators(candles_15m: dict, candles_1h: dict = None,
                         candles_4h: dict = None) -> dict:
     """
@@ -703,6 +733,9 @@ def get_smc_indicators(candles_15m: dict, candles_1h: dict = None,
         bos_candles_ago = (len(closes) - 1) - bos_break_idx
         if atr > 0:
             bos_extension_atr = abs(closes[-1] - bos_break_level) / atr
+
+    # Higher-timeframe levels standing in the way — see htf_levels.
+    _htf = htf_levels(candles_1h, candles_4h, closes[-1], atr)
 
     # Volatility regime (dead vs spike) — quality gate
     vol_reg = volatility_regime(highs, lows, closes, VOL_REGIME_LOOKBACK)
@@ -815,6 +848,7 @@ def get_smc_indicators(candles_15m: dict, candles_1h: dict = None,
         "wicks":            wicks,
         "bos_candles_ago":  bos_candles_ago,
         "bos_extension_atr": bos_extension_atr,
+        "bos_break_level":  bos_break_level,
         "divergence":       divergence,
         "macd_divergence":  macd_div,
         "choch":            choch,
@@ -830,6 +864,8 @@ def get_smc_indicators(candles_15m: dict, candles_1h: dict = None,
         "volume_ratio":     round(vol_ratio, 2),
         "current_close":    closes[-1],
         "current_open":     opens[-1],
+        "overhead_atr":     _htf["overhead_atr"],
+        "underfoot_atr":    _htf["underfoot_atr"],
         "recent_high":      recent_high,
         "recent_low":       recent_low,
         # Structural TP targets (direction-specific swing levels)

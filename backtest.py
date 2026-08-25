@@ -580,6 +580,15 @@ _BT_TRAIL_LAG = os.getenv("BT_TRAIL_LAG", "1") == "1"
 # (backtest.py carries no opens, so a gap through it is filled optimistically).
 _BT_AVG_DOWN_R = float(os.getenv("BT_AVG_DOWN_R", "0") or 0)
 
+# Structure-invalidation exit, research flag, default OFF. Exits at the close
+# when price closes back BEYOND the level whose break justified the entry —
+# i.e. the reason for being in the trade has gone, which is what a person means
+# by "it obviously broke, why are we still in it".
+# This is a different test from the MAE one (2026-08-24), which asked how DEEP
+# the trade had gone and found no information below the stop. Depth is not
+# structure.
+_BT_STRUCT_EXIT = os.getenv("BT_STRUCT_EXIT", "0") == "1"
+
 # Research only, both default OFF. Conditional stale exit: once a trade is at
 # least BT_STALE_EXIT_BARS old and STILL has not reached TP1, close it if it is
 # currently underwater by more than BT_STALE_EXIT_MAX_R.
@@ -751,6 +760,8 @@ class TradeRecord:
     # first three and threw them away at the export boundary.
     zone_age_bars: int = -1      # how stale the zone was when price returned
     bos_candles_ago: int = -1    # how long ago structure actually broke
+    room_atr: float = -1.0       # distance to the nearest HTF level IN OUR WAY
+    tp1_beyond_level: int = 0    # 1 = TP1 sits past that level, i.e. through a wall
     extension_atr: float = 0.0   # distance from the BOS level to entry, in ATR
     entry_range_atr: float = 0.0 # range of the entry bar itself, in ATR
     run_bars: int = 0            # consecutive same-direction closes before entry
@@ -829,6 +840,10 @@ def simulate_trade_direct(
 
     stop_exit_price = None  # set when we exit at a price other than the SL level
     add_price = None        # fill price of the averaging-down unit, when armed
+    try:
+        _bos_lvl_num = float(setup.get("bos_break_level"))
+    except (TypeError, ValueError):
+        _bos_lvl_num = None
     _risk_abs = abs(entry - sl)
     _mae_r = 0.0
     for j in range(fill_bar, end):
@@ -852,6 +867,14 @@ def simulate_trade_direct(
                 _adv = (entry - l) if direction == "LONG" else (h - entry)
                 if _adv / _risk_abs > _mae_r:
                     _mae_r = _adv / _risk_abs
+            if _BT_STRUCT_EXIT and _bos_lvl_num is not None:
+                _broke_back = (closes[j] < _bos_lvl_num) if direction == "LONG"                     else (closes[j] > _bos_lvl_num)
+                if _broke_back:
+                    outcome = "STRUCT"
+                    stop_exit_price = closes[j]
+                    exit_bar = j
+                    closed = True
+                    break
             if _BT_AVG_DOWN_R > 0 and add_price is None and _risk_abs > 0:
                 _lvl = (entry - _risk_abs * _BT_AVG_DOWN_R) if direction == "LONG"                     else (entry + _risk_abs * _BT_AVG_DOWN_R)
                 if (l <= _lvl) if direction == "LONG" else (h >= _lvl):
@@ -1022,6 +1045,18 @@ def simulate_trade_direct(
         else:
             break
 
+    # How much room to the nearest higher-timeframe level standing in our way,
+    # and whether TP1 is on the far side of it. A target that requires breaking
+    # a 4h swing is a different proposition from one in open air — the thing a
+    # human reads off the chart instantly and the bot never measured.
+    _room = setup.get("overhead_atr") if direction == "LONG" else setup.get("underfoot_atr")
+    try:
+        _room = float(_room) if _room is not None else -1.0
+    except (TypeError, ValueError):
+        _room = -1.0
+    _tp1_atr = abs(float(tp1) - float(entry)) / _atr if _atr > 0 else 0.0
+    _beyond = 1 if (0 <= _room < _tp1_atr) else 0
+
     _sz = _size_mult_for(symbol, setup)
     gross_r *= _sz
     net_r   *= _sz
@@ -1075,6 +1110,8 @@ def simulate_trade_direct(
         mae_r=round(_mae_r, 4),
         zone_age_bars=int(setup.get("zone_age_bars", -1) or -1),
         bos_candles_ago=int(setup.get("bos_candles_ago") or -1),
+        room_atr=round(_room, 3),
+        tp1_beyond_level=_beyond,
         extension_atr=round(_ext, 3),
         entry_range_atr=round(_rng, 3),
         run_bars=_run,
@@ -1441,6 +1478,7 @@ def write_trades_csv(path: str, trades: list[TradeRecord]) -> None:
         "signals", "score_tags", "premium", "sniper", "knn_score", "swing_trend",
         "mae_r", "size_mult", "signal_bar",
         "zone_age_bars", "bos_candles_ago", "extension_atr",
+        "room_atr", "tp1_beyond_level",
         "entry_range_atr", "run_bars",
     ]
     with open(path, "w", newline="", encoding="utf-8") as f:
