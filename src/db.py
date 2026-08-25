@@ -1222,7 +1222,7 @@ def get_cap_impact_stats(since_ts: float) -> dict:
         for reason in ("dir_cap", "scan_cap", "send_failed", "stale_entry"):
             rows = c.execute(
                 """SELECT outcome, reached_tp1 FROM setup_log
-                   WHERE resolved=1 AND ts >= ? AND block_reason=?
+                   WHERE resolved=1 AND COALESCE(outcome,'') != 'NO_FILL' AND ts >= ? AND block_reason=?
                      AND COALESCE(source,'live')='live'""",
                 (since_ts, reason),
             ).fetchall()
@@ -1476,7 +1476,7 @@ def get_setup_accuracy(since_ts: float) -> dict:
                 # experiment setups Claude actually liked. Judged separately
                 # by get_cap_impact_stats().
                 """SELECT outcome, reached_tp1, reached_tp2 FROM setup_log
-                   WHERE resolved=1 AND ts >= ? AND sent=?
+                   WHERE resolved=1 AND COALESCE(outcome,'') != 'NO_FILL' AND ts >= ? AND sent=?
                      AND COALESCE(source,'live')='live'
                      AND COALESCE(block_reason,'')=''""",
                 (since_ts, sent_val),
@@ -1508,6 +1508,11 @@ def get_setup_accuracy(since_ts: float) -> dict:
     return out
 
 
+# NO_FILL (2026-08-25) means the shadow tracker never saw price reach the entry
+# — the setup was never a trade, so it is neither a win nor a loss and every
+# reader below excludes it. Counting it as "did not reach TP1" would swap one
+# bias for another. See _simulate_setup_outcome in main.py for why the fill
+# requirement exists at all.
 def get_variant_rows(since_ts: float) -> list:
     """Resolved setups carrying variant tags, for the filter A/B report.
 
@@ -1522,7 +1527,7 @@ def get_variant_rows(since_ts: float) -> list:
                       risk_score, sent, outcome, reached_tp1, reached_tp2,
                       trend, session, entry_source, variants, source
                FROM setup_log
-               WHERE resolved=1 AND ts >= ?
+               WHERE resolved=1 AND COALESCE(outcome,'') != 'NO_FILL' AND ts >= ?
                  AND COALESCE(source,'live') IN ('live','shadow')
                  AND variants IS NOT NULL AND variants != ''
                ORDER BY ts ASC""",
@@ -1573,7 +1578,7 @@ def get_similar_resolved_setups(symbol: str, direction: str, mtf_score,
                       entry_price, tp1, tp2, sl, net_r,
                       COALESCE(source,'live') AS source
                FROM setup_log
-               WHERE resolved=1 AND ts >= ? AND direction=?
+               WHERE resolved=1 AND COALESCE(outcome,'') != 'NO_FILL' AND ts >= ? AND direction=?
                  AND COALESCE(source,'live')='live'
                  AND COALESCE(block_reason,'')=''
                  AND (symbol=? OR ABS(COALESCE(mtf_score,0) - ?) <= 2)
@@ -1586,7 +1591,7 @@ def get_similar_resolved_setups(symbol: str, direction: str, mtf_score,
                       entry_price, tp1, tp2, sl, net_r,
                       source
                FROM setup_log
-               WHERE resolved=1 AND direction=? AND source='backtest'
+               WHERE resolved=1 AND COALESCE(outcome,'') != 'NO_FILL' AND direction=? AND source='backtest'
                  AND (symbol=? OR ABS(COALESCE(mtf_score,0) - ?) <= 1)
                ORDER BY ts DESC LIMIT ?""",
             (direction, symbol, score, bt_limit),
@@ -1706,7 +1711,7 @@ def get_calibration_rows(since_ts: float, limit: int = 800) -> list:
             """SELECT decision, confidence, risk_score, outcome, reached_tp1,
                       entry_price, tp1, tp2, sl, net_r
                FROM setup_log
-               WHERE resolved=1 AND ts >= ? AND COALESCE(source,'live')='live'
+               WHERE resolved=1 AND COALESCE(outcome,'') != 'NO_FILL' AND ts >= ? AND COALESCE(source,'live')='live'
                  AND risk_score IS NOT NULL
                ORDER BY ts DESC LIMIT ?""",
             (since_ts, limit),

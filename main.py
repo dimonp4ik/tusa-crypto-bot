@@ -3833,7 +3833,8 @@ def _check_open_signals():
 # ── Shadow-outcome tracker (rejected + sent setups) ───────────────────────────
 def _simulate_setup_outcome(direction: str, entry: float, tp1: float, tp2: float,
                             sl: float, highs: list, lows: list,
-                            closes: list = None) -> tuple:
+                            closes: list = None, require_fill: bool = True,
+                            wait_bars: int = 4) -> tuple:
     """Replay a setup's bracket over forward candles (same order as the validated
     backtest: SL → TP2 → TP1 each bar). Returns (outcome|None, reached_tp1,
     reached_tp2). outcome is None while still live (no TP1/SL hit yet).
@@ -3856,6 +3857,32 @@ def _simulate_setup_outcome(direction: str, entry: float, tp1: float, tp2: float
     risk = abs(entry - sl)
     if risk <= 0:
         return None, 0, 0
+    # 2026-08-25: the bracket used to start at `entry` on bar 0 whether or not
+    # price ever traded there. That is the same fantasy fill removed from
+    # backtest.py on 2026-08-23, and it inflated every shadow number in the
+    # project. Measured on the live A/B export: INSIDE arm A, setups actually
+    # sent resolved at 71.0% WR / +0.145R while unsent ones — same filter, only
+    # difference is that these were simulated — resolved at 83.6% / +0.931R.
+    # That 12.6pp artefact is bigger than _GLOBAL_FEEDBACK_MIN_GAP (8.0), so the
+    # "you are over-rejecting" line fed to Claude fires on the measurement
+    # method rather than on his judgement. Five of the seven stops on the night
+    # of 2026-08-24 cite exactly that line.
+    start = 0
+    if require_fill:
+        # Not enough bars to have SEEN a fill yet — still live, do not resolve.
+        if min(len(highs), len(lows)) < int(wait_bars) + 1:
+            return None, 0, 0
+        start = -1
+        for i in range(min(int(wait_bars) + 1, len(highs), len(lows))):
+            touched = (lows[i] <= entry) if direction == "LONG" else (highs[i] >= entry)
+            if touched:
+                start = i
+                break
+        if start < 0:
+            return "NO_FILL", 0, 0
+        highs, lows = highs[start:], lows[start:]
+        if closes is not None:
+            closes = closes[start:]
     # `closes` is indexed by the zip's position, so it must be at least as long
     # as the shorter of highs/lows — otherwise an IndexError here is swallowed
     # by the shadow tracker's per-symbol try and that symbol's setups silently
