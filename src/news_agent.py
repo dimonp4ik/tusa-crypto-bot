@@ -25,7 +25,10 @@ from datetime import datetime, timezone, timedelta
 from email.utils import parsedate_to_datetime
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+import logging
 from config import GROQ_API_KEY, NEWS_LOOKBACK_HOURS
+
+log = logging.getLogger(__name__)
 
 # RSS sources — all public, no registration
 RSS_FEEDS = [
@@ -288,12 +291,19 @@ def get_daily_digest() -> dict:
     Returns {items: [...], overall: str, key_theme: str}.
     Each item: {title, time_utc, direction, explanation, impact}.
     """
+    # Every failure path carries `raw` and `error` so the caller can tell
+    # "there was no news" from "I could not read the news" — the digest used to
+    # print the same "нет новостей" line for an empty feed, a missing API key
+    # and a dead Groq call, and it printed it for days before anyone noticed.
     raw_items = fetch_headlines_with_meta(hours=18)
     if not raw_items:
-        return {"items": [], "overall": "NEUTRAL", "key_theme": "Нет новостей за последние 18 часов"}
+        return {"items": [], "overall": "NEUTRAL", "raw": [],
+                "key_theme": "Нет новостей за последние 18 часов", "error": ""}
 
     if not GROQ_API_KEY:
-        return {"items": [], "overall": "NEUTRAL", "key_theme": "GROQ_API_KEY не задан"}
+        log.warning("get_daily_digest: GROQ_API_KEY not set — sending headlines without analysis")
+        return {"items": [], "overall": "NEUTRAL", "raw": raw_items,
+                "key_theme": "", "error": "GROQ_API_KEY не задан"}
 
     # Build headlines text with source + time
     lines = []
@@ -331,7 +341,9 @@ OVERALL|BULLISH или BEARISH или NEUTRAL|[ключевая тема дня 
         raw = resp.json()["choices"][0]["message"]["content"].strip()
         return _parse_digest(raw)
     except Exception as e:
-        return {"items": [], "overall": "NEUTRAL", "key_theme": f"Ошибка Groq: {e}"}
+        log.warning(f"get_daily_digest: Groq failed ({e}) — sending headlines without analysis")
+        return {"items": [], "overall": "NEUTRAL", "raw": raw_items,
+                "key_theme": "", "error": f"Groq недоступен: {e}"}
 
 
 def _parse_digest(raw: str) -> dict:

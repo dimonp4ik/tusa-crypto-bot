@@ -429,7 +429,24 @@ def send_morning_digest(digest: dict) -> bool:
     theme   = digest.get("key_theme", "")
 
     if not items:
-        return _send_message("🌅 *УТРЕННИЙ ДАЙДЖЕСТ*\nНовостей за последние 18 часов не найдено.")
+        # No AI analysis. That is NOT the same as no news, and printing one
+        # line for both hid a dead Groq key for days (found 2026-08-25 by the
+        # user, not by the logs). Send the headlines raw rather than nothing.
+        raw = digest.get("raw") or []
+        err = digest.get("error") or ""
+        if not raw:
+            return _send_message("🌅 *УТРЕННИЙ ДАЙДЖЕСТ*\nНовостей за последние 18 часов не найдено.")
+        head = ["🌅 *УТРЕННИЙ ДАЙДЖЕСТ*", "",
+                f"📰 Заголовков за 18ч: *{len(raw)}*", ""]
+        for it in raw[:12]:
+            pub = it.get("published")
+            t = pub.astimezone(_RIGA).strftime("%H:%M") if pub else "?"
+            src_name = str(it.get("source") or "?")
+            title    = _esc(str(it.get("title") or ""))[:110]
+            head.append(f"`{t}` *{src_name}* — {title}")
+        if err:
+            head += ["", f"_Разбор новостей недоступен: {_esc(err)}_"]
+        return _send_message(chr(10).join(head))
 
     _RU_MONTHS = ["янв","фев","мар","апр","май","июн","июл","авг","сен","окт","ноя","дек"]
     _RU_DAYS   = ["Пн","Вт","Ср","Чт","Пт","Сб","Вс"]
