@@ -442,7 +442,14 @@ CLAUDE_BUDGET_RESERVE_USD = float(os.getenv("CLAUDE_BUDGET_RESERVE_USD", "0.05")
 # different bots. Historical rows are never deleted — the admin report's
 # "all time" and typed-date windows still reach them, which is the only way to
 # compare eras at all.
-LIVE_HIST_EPOCH_TS = float(os.getenv("LIVE_HIST_EPOCH_TS", "1786575600"))
+# Previous epoch was 1786575600 (2026-08-12). Raised 2026-08-25: until that
+# day the shadow tracker resolved every UNSENT setup by opening the trade at
+# `entry` whether or not price ever traded there. Measured on the live A/B
+# export, inside ONE arm: sent 71.0 pct WR / +0.145R against unsent 83.6 pct
+# / +0.931R -- same filter, different resolver. Every rejected-bucket number
+# Claude read before this timestamp is inflated by roughly that much, and
+# the prompt turns a strong rejected bucket into "you are over-rejecting".
+LIVE_HIST_EPOCH_TS = float(os.getenv("LIVE_HIST_EPOCH_TS", "1787670000"))
 
 # --- Structure-based stops/takes (swing mode, 15m, ~20x leverage) ---
 # SL sits at swing invalidation (recent swing low/high) + ATR buffer, then

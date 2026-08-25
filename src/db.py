@@ -37,8 +37,15 @@ from config import (
 #   trades that stopped                      →  -1.312R mean (252)
 # Both sides were understated before, which flattered nothing in particular —
 # it simply made every shadow R too small by a different factor per side.
-_SHADOW_R_TP1  = 0.74   # value of a setup that reached TP1
-_SHADOW_R_STOP = 1.31   # cost of a setup that stopped
+# Re-measured 2026-08-25 on the honest fill model and the shipped exit config
+# (trail 0.05, RISK_MAX_PCT 0.035), normalised back to unit size so the per-coin
+# and session multipliers do not leak in — 903 trades:
+#   reached TP1 (trailed out or ran to TP2)  ->  +0.758R mean (698)
+#   stopped                                  ->  -1.230R mean (205)
+# The 2026-08-16 pair was measured on the pre-fix backtest; the TP1 side barely
+# moved, the stop side was 6% too harsh.
+_SHADOW_R_TP1  = 0.76   # value of a setup that reached TP1
+_SHADOW_R_STOP = 1.23   # cost of a setup that stopped
 
 ACTIVE_STATUSES = ("OPEN", "TP1_PARTIAL")
 FINAL_STATUSES  = ("TP2_HIT", "BREAKEVEN", "SL_HIT", "EXPIRED", "TP1_EXPIRED", "TP1_HIT", "TP1_TRAIL")
@@ -939,7 +946,9 @@ _TP1_BANKED_R = float(TP1_CLOSE_FRAC) * float(TP1_R_MULT)
 # The runner's outcome is genuinely variable, so no formula can produce it. This
 # is the measured median of 1444 trailed exits on the 18k-candle backtest
 # (2026-08-16); the mean is higher (+0.735) but a fallback should not flatter.
-_TRAIL_FALLBACK_R = 0.60
+# Re-measured 2026-08-25 on the honest model at unit size: 673 trail exits,
+# median +0.654, mean +0.705.
+_TRAIL_FALLBACK_R = 0.65
 
 
 def _status_r(status: str) -> float:
