@@ -1227,6 +1227,59 @@ HTF_NEUTRAL_1H_SIZE_MULT = float(os.getenv("HTF_NEUTRAL_1H_SIZE_MULT", "1.75"))
 # two windows, the current one by 20% and 12%, and its max drawdown goes
 # -15.30R -> -12.79R. Worst case is 2024 at -3.9% on one measure.
 LONDON_VOL_MIN       = float(os.getenv("LONDON_VOL_MIN", "2.0"))  # 0 = off
+
+# --- OVERLAP runs the other way (2026-08-27) ---------------------------------
+# The session-times-volume rule that works for London and for the stocks bot's
+# opening bell does NOT generalise. Checked on every crypto session, lift in
+# R/trade over the rest of that window:
+#
+#   session    volume |    2023      2024     current
+#   LONDON     >=2.0  |  +0.533    +0.054     +0.344    <- shipped above
+#   LONDON      <2.0  |  -0.120    +0.019     -0.054
+#   OVERLAP     <2.0  |  +0.528    +0.036     +0.315    <- INVERTED
+#   OVERLAP    >=2.0  |  +0.028    -0.052     -0.021
+#   OFF_HOURS   <2.0  |  -0.170    -0.089     -0.101
+#   NEW_YORK    <2.0  |  -0.428    -0.026     -0.027
+#
+# At the London/New-York overlap the CALM half is the good one, in all three
+# windows. Reading: the overlap is already the busiest hour, so volume on top
+# of it is not money arriving, it is a fight — while a quiet overlap means the
+# two sessions agree. The mechanism is not "volume is good" but "volume
+# against the norm FOR THAT HOUR", and a flat 2.0 threshold is a lot for
+# London and little for the overlap.
+#
+# Both general versions of that idea were tested and are dead: thin volume as
+# a standalone feature is negative in all three windows but decays monotonically
+# (-0.179 -> -0.072 -> -0.048) across 36-43% of the book, and volume measured
+# against each session's own median gives +0.088 -> +0.027 -> +0.017 while
+# splitting the book in half. Neither is usable.
+#
+# Default 1.0 = off until measured end-to-end. The subset is 4.3% of the book
+# (28/33/55 trades per window) and the 2024 lift is only +0.036, so the
+# evidence is thin even though the sign holds three times.
+# Robust across thresholds rather than perched on one — the lift is positive
+# in all three windows at every cut from 1.75 to 3.0:
+#   thr    2023            2024            current       share
+#   1.75  84.2% +0.354   87.5% +0.217   83.3% +0.290     2.6%
+#   2.00  82.1% +0.528   75.8% +0.036   87.3% +0.315     4.3%
+#   2.25  87.2% +0.570   75.6% +0.049   85.9% +0.339     5.3%
+#   2.50  84.3% +0.417   76.1% +0.106   85.0% +0.282     6.5%
+#   3.00  83.3% +0.342   72.4% +0.066   81.4% +0.161     7.9%
+#
+# 2.5 is chosen by ranking on the WEAKEST window, the same rule the pair
+# scanner uses. 2.0 was measured first purely because it is a round number,
+# and it is the worst cut on that criterion (+0.036 against +0.106) on half
+# the sample. End-to-end 2.5 beat it on all six numbers.
+#
+# Measured at 1.5x, three windows pinned by date:
+#             base                          calm overlap
+#   2023   668tr +109.77R 13.0/29.6 | 668 +120.78R 13.9/32.3
+#   2024   872tr +173.95R 28.7/63.5 | 872 +184.32R 28.5/63.5
+#   cur   1167tr +384.42R 43.1/159.1|1167 +400.95R 46.8/166.2
+# Profit up in all three (+10.0/+6.0/+4.3%), both risk measures clearly better
+# in two and flat in the third (-0.7% and 0.0%). Max drawdown -12.44R -> -12.09R.
+OVERLAP_VOL_MAX        = float(os.getenv("OVERLAP_VOL_MAX", "2.5"))
+OVERLAP_CALM_SIZE_MULT = float(os.getenv("OVERLAP_CALM_SIZE_MULT", "1.5"))
 LONDON_THIN_SIZE_MULT = float(os.getenv("LONDON_THIN_SIZE_MULT", "1.0"))
 # Per-coin tier multiplier, 2026-08-24. Coins ranked by expectancy on the
 # 923-trade book, bottom third 0.75 / top third 1.25, middle untouched.

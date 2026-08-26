@@ -36,6 +36,7 @@ from config import (
     STOP_CLOSE_CONFIRM, STOP_EXCHANGE_BACKSTOP_R, SYMBOL_SIZE_MULT,
     SESSION_SIZE_MULT, HTF_NEUTRAL_4H_SIZE_MULT, SYMBOL_TIER_MULT, SIZE_MULT_MAX,
     LONDON_VOL_MIN, LONDON_THIN_SIZE_MULT,
+    OVERLAP_VOL_MAX, OVERLAP_CALM_SIZE_MULT,
     HTF_NEUTRAL_1H_SIZE_MULT,
     EXTENSION_ATR_THRESHOLD, EXTENSION_SIZE_MULT,
     VOL_ATR_BOOST_THRESHOLD, VOL_ATR_BOOST_MULT,
@@ -196,6 +197,16 @@ def _open_for_user(u: dict, sig: dict, inst_id: str, disp: str) -> None:
     # 1.0 rather than mis-sizing.
     _sess = str(sig.get("session") or "").upper()
     _size_mult *= float(SESSION_SIZE_MULT.get(_sess, 1.0))
+    # A CALM overlap rides bigger — the opposite sign to London, see
+    # OVERLAP_VOL_MAX in config.py. Missing volume_ratio means no boost, same
+    # as the London rule below and same as the backtest.
+    if OVERLAP_CALM_SIZE_MULT != 1.0 and _sess == "OVERLAP":
+        try:
+            _ovr = sig.get("volume_ratio")
+            if _ovr is not None and float(_ovr) < OVERLAP_VOL_MAX:
+                _size_mult *= float(OVERLAP_CALM_SIZE_MULT)
+        except (TypeError, ValueError):
+            pass
     # The London boost only applies where volume confirms — see LONDON_VOL_MIN
     # in config.py. Note this reverses the fall-through convention used for
     # bos_extension_atr and vol_atr_pct above: those default to NOT trimming

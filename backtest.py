@@ -82,6 +82,7 @@ from config import (  # noqa: E402
     SIGNAL_COOLDOWN_HOURS,
     KILL_SWITCH_SL_STREAK,
     LONDON_VOL_MIN, LONDON_THIN_SIZE_MULT,
+    OVERLAP_VOL_MAX, OVERLAP_CALM_SIZE_MULT,
     HTF_NEUTRAL_1H_SIZE_MULT,
     TRAIL_ATR_MULT,
     TP1_CLOSE_FRAC,
@@ -571,6 +572,13 @@ def _size_mult_for(symbol: str, setup: dict) -> float:
     _sess = str(setup.get("session") or "").upper()
     m *= float(SESSION_SIZE_MULT.get(_sess, 1.0))
     # London boost only where volume confirms — see LONDON_VOL_MIN in config.
+    # A calm OVERLAP rides bigger — see OVERLAP_VOL_MAX in config.py.
+    if OVERLAP_CALM_SIZE_MULT != 1.0 and _sess == "OVERLAP":
+        try:
+            if float(setup.get("volume_ratio") or 99.0) < OVERLAP_VOL_MAX:
+                m *= float(OVERLAP_CALM_SIZE_MULT)
+        except (TypeError, ValueError):
+            pass
     if LONDON_VOL_MIN > 0 and _sess == "LONDON":
         try:
             if float(setup.get("volume_ratio") or 0.0) < LONDON_VOL_MIN:
