@@ -1319,10 +1319,31 @@ LONDON_THIN_SIZE_MULT = float(os.getenv("LONDON_THIN_SIZE_MULT", "1.0"))
 # window and scoring on it flatters this to +15.2% — that figure is an artefact.
 # LAB sits in the top tier on 22 trades; that is an outlier the mild multiplier
 # is allowed to carry, not a conviction.
+#
+# 🔴 2026-08-27 — audited against the historical windows, and most of the top
+# tier CANNOT be checked at all: LAB, TAO, ZEC and SEI did not trade in 2023.
+# No backtest fixes that; the data does not exist. Of the two that can be
+# checked, LINK agrees in one window only and ETH CONTRADICTS outright —
+# +0.590R per trade in the current window against -0.208R in the hostile one.
+#
+# ETH's boost removed on that basis, three windows:
+#             base                          ETH at 1.0
+#   2023   668tr +124.37R 14.2/33.0 | 668 +122.76R 14.1/32.5
+#   2024   872tr +186.00R 26.7/62.3 | 872 +186.22R 28.3/63.8
+#   cur   1167tr +405.43R 47.6/167.1|1167 +399.10R 48.4/167.8
+# Profit is flat (-1.3/+0.1/-1.6%) while both risk measures improve in two
+# windows and give back 0.7%/1.5% in the third — a free risk reduction.
+#
+# The other three boosts are LEFT IN PLACE deliberately. Turning the whole top
+# tier off was measured too: worst-windows improves in all three windows but
+# ulcer only in one, and profit falls 2-7% — no clean verdict either way. And
+# that test is weak by construction, since in the historical windows the thing
+# under test barely exists. Unvalidatable is not the same as contradicted, so
+# only the contradicted one was removed.
 SYMBOL_TIER_MULT = _parse_symbol_size_mult(os.getenv(
     "SYMBOL_TIER_MULT",
     "BTCUSDT:0.75,ADAUSDT:0.75,SEIUSDT:0.75,SOLUSDT:0.75,DOTUSDT:0.75,"
-    "LINKUSDT:1.25,ETHUSDT:1.25,TAOUSDT:1.25,ZECUSDT:1.25,LABUSDT:1.25"))
+    "LINKUSDT:1.25,TAOUSDT:1.25,ZECUSDT:1.25,LABUSDT:1.25"))
 # Ceiling on the PRODUCT of every size multiplier. They stack: a top-tier coin
 # in LONDON with a neutral 4h reaches 1.25*1.5*1.5 = 2.81x, a concentration
 # nothing here was measured at. Each multiplier was validated on its own; their
