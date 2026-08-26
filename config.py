@@ -1043,6 +1043,27 @@ SESSION_SIZE_MULT = {
     "NEW_YORK":  float(os.getenv("NEW_YORK_SIZE_MULT", "1.0")),
     "OVERLAP":   float(os.getenv("OVERLAP_SIZE_MULT", "1.0")),
 }
+# Neutral 4h context rides 1.5x. Re-validated 2026-08-26 because the original
+# justification (line ~293: "trend_4h=neutral scores 84.8% WR") is a
+# fantasy-fill number from before the 2026-08-23 execution fix and therefore
+# void. Turning the multiplier OFF, three windows:
+#            base 1.5x                      off (1.0)
+#   2023   668tr 68.9% +95.96R  11.3/26.7 | 668 68.9% +92.73R  11.4/25.3
+#   2024   872tr 73.5% +161.14R 28.4/58.0 | 872 73.5% +156.53R 27.8/56.1
+#   cur   1172tr 75.9% +369.51R 32.4/127.7|1172 75.9% +355.77R 30.6/123.6
+# Removing it costs 3-4% of profit in EVERY window and worsens profit/ulcer in
+# every window. Trades and win rate are identical, as they must be — this
+# touches size only.
+#
+# Note the honest evidence is weaker than it looks per-trade: on the current
+# window neutral-4h trades run 80.6% / +0.512R against 75.0% / +0.336R, but
+# that is 67 trades and t=+1.24, i.e. not significant on its own, and 2023
+# gives t=+0.52 on 26 trades. The feature test has almost no power at that
+# sample size. What justifies keeping it is the end-to-end money effect
+# reproducing with the same sign and size across three independent windows —
+# and the fact that profit per unit of ulcer RISES with the multiplier on, so
+# the extra size is landing on better-than-average trades rather than simply
+# levering the book up.
 HTF_NEUTRAL_4H_SIZE_MULT = float(os.getenv("HTF_NEUTRAL_4H_SIZE_MULT", "1.5"))
 # Per-coin tier multiplier, 2026-08-24. Coins ranked by expectancy on the
 # 923-trade book, bottom third 0.75 / top third 1.25, middle untouched.
