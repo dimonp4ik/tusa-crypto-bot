@@ -1279,7 +1279,21 @@ LONDON_VOL_MIN       = float(os.getenv("LONDON_VOL_MIN", "2.0"))  # 0 = off
 # Profit up in all three (+10.0/+6.0/+4.3%), both risk measures clearly better
 # in two and flat in the third (-0.7% and 0.0%). Max drawdown -12.44R -> -12.09R.
 OVERLAP_VOL_MAX        = float(os.getenv("OVERLAP_VOL_MAX", "2.5"))
-OVERLAP_CALM_SIZE_MULT = float(os.getenv("OVERLAP_CALM_SIZE_MULT", "1.5"))
+# Swept upward; no turn appears, but that is the CEILING talking, not the
+# market. Share of calm-overlap trades pinned at SIZE_MULT_MAX:
+#   1.5  -> 28%      1.75 -> 46%      2.0 -> 61%
+# so past 1.5 the nominal multiplier is increasingly not applied as written.
+#   mult   2023: profit/worst/ulcer     current: profit/worst/ulcer
+#   1.0    +109.77R 13.0 / 29.6          +384.42R 43.1 / 159.1
+#   1.5    +120.78R 13.9 / 32.3          +400.95R 46.8 / 166.2
+#   1.75   +124.37R 14.2 / 33.0          +405.43R 47.6 / 167.1
+#   2.0    +127.46R 14.3 / 33.4          +409.17R 48.1 / 167.9
+# Gains flatten accordingly: worst-windows moves +2.2% from 1.5 to 1.75 and
+# +0.7% from 1.75 to 2.0. 1.75 takes the meaningful part.
+#
+# Side effect worth its own look: SIZE_MULT_MAX now binds on 8-9% of the book
+# and has never been swept, so the ceiling has quietly become a live parameter.
+OVERLAP_CALM_SIZE_MULT = float(os.getenv("OVERLAP_CALM_SIZE_MULT", "1.75"))
 LONDON_THIN_SIZE_MULT = float(os.getenv("LONDON_THIN_SIZE_MULT", "1.0"))
 # Per-coin tier multiplier, 2026-08-24. Coins ranked by expectancy on the
 # 923-trade book, bottom third 0.75 / top third 1.25, middle untouched.
