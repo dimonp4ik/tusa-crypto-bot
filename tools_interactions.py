@@ -59,9 +59,37 @@ def conditions(rows):
     return out
 
 
+def split_thirds(rows):
+    """Chop one book into three consecutive stretches by entry time.
+
+    For the stocks bot there are no historical windows at all — OKX only
+    listed those perps in Feb-Mar 2026 — so cross-regime consistency cannot be
+    demanded. Consecutive thirds are the weaker substitute: they still catch a
+    pair that lives in one stretch of the window, which is the failure mode
+    that killed per-coin tiers and the outcome model. They do NOT establish
+    that a pair survives a change of market, and nothing found this way should
+    be described as if they did.
+    """
+    rows = sorted(rows, key=lambda r: float(r.get("entry_time") or 0))
+    n = len(rows) // 3
+    return [("1/3", rows[:n]), ("2/3", rows[n:2 * n]), ("3/3", rows[2 * n:])]
+
+
 def main():
-    paths = sys.argv[1:] or ["bt_w2023.csv", "bt_w2024.csv", "bt_wcur.csv"]
-    books = [(p, load(p)) for p in paths]
+    paths = [a for a in sys.argv[1:] if not a.startswith("--")]
+    thirds = "--thirds" in sys.argv
+    paths = paths or ["bt_w2023.csv", "bt_w2024.csv", "bt_wcur.csv"]
+    if thirds:
+        if len(paths) != 1:
+            print("--thirds принимает ровно один файл")
+            return
+        books = split_thirds(load(paths[0]))
+        print(f"режим третей: {paths[0]} разрезан на три последовательных отрезка")
+        print("ВНИМАНИЕ: трети одного окна — НЕ замена трём режимам; "
+              "они ловят пару, живущую в одном отрезке, но ничего не говорят "
+              "об устойчивости к смене рынка" + chr(10))
+    else:
+        books = [(p, load(p)) for p in paths]
     conds = conditions(books[-1][1])
     print(f"окон: {len(books)}, условий: {len(conds)}, "
           f"пар: {len(conds)*(len(conds)-1)//2}, порог выборки: {MIN_N}\n")
