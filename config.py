@@ -567,6 +567,35 @@ RISK_MAX_PCT  = float(os.getenv("RISK_MAX_PCT", "0.035"))  # max SL distance = 3
 # drawdown is the binding constraint on position size: losses cluster (real DD
 # measured 2.9x worse than any of 5000 shuffles of the same trades), so the
 # size a book can carry is set by the cluster, not by the average.
+# 🔴 2026-08-26 — EVERY measurement above predates the 2026-08-23 execution
+# fix and is therefore void. Win rates of 79-84% are the signature of the
+# fantasy-fill model: the backtest filled mid-zone without checking price ever
+# returned there. The "give up 3% of profit for 30-45% less drawdown" trade
+# that chose 0.7, and then 0.6, does not reproduce on honest data — there,
+# widening TP1 makes MORE money, not less.
+#
+# Re-measured across three windows (18000 candles each):
+#            base 0.6                          0.75
+#   2023   668tr 68.9% +95.96R  11.3/26.7 |  653 65.2% +112.30R 12.2/28.2
+#   2024   872tr 73.5% +161.14R 28.4/58.0 |  840 68.3% +168.33R 31.7/59.8
+#   cur   1172tr 75.9% +369.51R 32.4/127.7| 1075 70.7% +346.74R 34.3/104.0
+#   (ratios are profit/worst-windows and profit/ulcer)
+#
+# 0.75 is rejected: win rate drops 3.7-5.2pp in every window and the current
+# window loses 97 trades, while the profit gain is ambiguous — normalised to
+# equal risk it is +7.3/+11.3/+6.0% by worst-windows but +5.3/+3.3/-18.6% by
+# ulcer, i.e. the two risk measures disagree on the window that matters least.
+# 0.5 was tested too and is worse on everything: 2023 gives 72.0% win rate for
+# +74.60R and ratios of 6.7/14.0 against the base 11.3/26.7.
+#
+# So 0.6 STAYS — tuning on a broken model happened to land somewhere sane.
+# What is dead is the REASON, and a live parameter carrying a false reason is
+# a trap: the next person to open this file would reason forward from it.
+#
+# Useful thing the sweep does show, on honest data: TP1 is a clean win-rate
+# dial. 0.5 -> 0.6 -> 0.75 moves 2023 win rate 72.0% -> 68.9% -> 65.2% while
+# profit goes +74.60R -> +95.96R -> +112.30R. Win rate can be bought to
+# almost any level and the price is always money.
 TP1_R_MULT    = float(os.getenv("TP1_R_MULT", "0.6"))      # TP1 = entry ± risk * 0.6
 TP2_R_MULT    = float(os.getenv("TP2_R_MULT", "2.0"))      # TP2 = entry ± risk * 2.0 (was 3.0 — unreachable)
 
