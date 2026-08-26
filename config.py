@@ -1155,7 +1155,18 @@ HTF_NEUTRAL_4H_SIZE_MULT = float(os.getenv("HTF_NEUTRAL_4H_SIZE_MULT", "1.5"))
 # COUNTER_STRUCTURE_SIZE_MULT. Both add size to a subset, but the risk ratios
 # are scale-normalised: leverage lifts profit while pushing the ratios DOWN,
 # which is exactly what counter-structure did. Here they go up.
-HTF_NEUTRAL_1H_SIZE_MULT = float(os.getenv("HTF_NEUTRAL_1H_SIZE_MULT", "1.25"))
+# 1.25 -> 1.5 after sweeping it. 1.5 beats 1.25 on all six numbers:
+#            1.25                          1.5
+#   2023   668tr +102.24R 12.8/28.7 | 668 +106.30R 12.9/29.1
+#   2024   872tr +166.80R 28.4/61.6 | 872 +173.95R 28.7/63.5
+#   cur   1172tr +374.50R 40.7/151.0|1172 +384.06R 42.4/157.3
+# Ratios still RISING at 1.5, so the concentration cost has not bitten yet.
+# The logic: scaling the whole book leaves the ratios flat, scaling a bad
+# subset pushes them down, scaling a genuinely better one pushes them up.
+# There is a ceiling to that — past some multiplier the subset dominates the
+# book and correlation inside it starts setting the drawdown — so this is
+# swept rather than assumed.
+HTF_NEUTRAL_1H_SIZE_MULT = float(os.getenv("HTF_NEUTRAL_1H_SIZE_MULT", "1.5"))
 
 # Measured end-to-end, three windows:
 #              base                          London boost gated on volume
