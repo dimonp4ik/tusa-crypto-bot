@@ -36,6 +36,7 @@ from config import (
     STOP_CLOSE_CONFIRM, STOP_EXCHANGE_BACKSTOP_R, SYMBOL_SIZE_MULT,
     SESSION_SIZE_MULT, HTF_NEUTRAL_4H_SIZE_MULT, SYMBOL_TIER_MULT, SIZE_MULT_MAX,
     LONDON_VOL_MIN, LONDON_THIN_SIZE_MULT,
+    HTF_NEUTRAL_1H_SIZE_MULT,
     EXTENSION_ATR_THRESHOLD, EXTENSION_SIZE_MULT,
     VOL_ATR_BOOST_THRESHOLD, VOL_ATR_BOOST_MULT,
     COUNTER_STRUCTURE_SIZE_MULT,
@@ -213,6 +214,12 @@ def _open_for_user(u: dict, sig: dict, inst_id: str, disp: str) -> None:
             pass
     if str(sig.get("trend_4h") or "").lower() == "neutral":
         _size_mult *= float(HTF_NEUTRAL_4H_SIZE_MULT)
+    # 1h-neutral rides bigger too, and on honest data it is the stronger of the
+    # two neutral-context signals — see HTF_NEUTRAL_1H_SIZE_MULT in config.py.
+    # Absent on rows written before the 2026-08-26 migration, which sizes at
+    # 1.0 rather than guessing.
+    if str(sig.get("trend_1h") or "").lower() == "neutral":
+        _size_mult *= float(HTF_NEUTRAL_1H_SIZE_MULT)
     # Late entries ride smaller — see EXTENSION_ATR_THRESHOLD in config.py.
     # Reads None on signals written before the 2026-08-25 migration, which
     # falls through to no trim rather than mis-sizing.

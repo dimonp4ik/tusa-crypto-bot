@@ -1140,7 +1140,22 @@ HTF_NEUTRAL_4H_SIZE_MULT = float(os.getenv("HTF_NEUTRAL_4H_SIZE_MULT", "1.5"))
 # COUNTER_STRUCTURE_SIZE_MULT did before it turned out to be leverage; the
 # difference here is that this subset is positive in the hostile window too,
 # which is exactly where counter-structure was empty.
-HTF_NEUTRAL_1H_SIZE_MULT = float(os.getenv("HTF_NEUTRAL_1H_SIZE_MULT", "1.0"))
+# Measured end-to-end, three windows, against the base that already has the
+# London gate in it:
+#             base                          + 1h-neutral 1.25
+#   2023   668tr 68.9%  +96.55R 12.4/27.6 | 668 68.9% +102.24R 12.8/28.7
+#   2024   872tr 73.5% +158.55R 27.3/58.8 | 872 73.5% +166.80R 28.4/61.6
+#   cur   1172tr 75.9% +362.62R 38.8/143.1|1172 75.9% +374.50R 40.7/151.0
+#
+# Profit rises in all three (+5.9/+5.2/+3.3%) AND both risk measures rise in
+# all three (+3-5%). No trade-off anywhere, which nothing else measured today
+# managed.
+#
+# That combination is also the test that separates this from
+# COUNTER_STRUCTURE_SIZE_MULT. Both add size to a subset, but the risk ratios
+# are scale-normalised: leverage lifts profit while pushing the ratios DOWN,
+# which is exactly what counter-structure did. Here they go up.
+HTF_NEUTRAL_1H_SIZE_MULT = float(os.getenv("HTF_NEUTRAL_1H_SIZE_MULT", "1.25"))
 
 # Measured end-to-end, three windows:
 #              base                          London boost gated on volume
