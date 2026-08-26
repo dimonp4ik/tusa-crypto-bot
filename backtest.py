@@ -602,6 +602,17 @@ _BT_STRUCT_EXIT = os.getenv("BT_STRUCT_EXIT", "0") == "1"
 # only ever ran on REJECTED setups; this runs it on the whole book.
 _BT_MIRROR = os.getenv("BT_MIRROR", "0") == "1"
 
+# Two-stage trail, research flag. The trail is deliberately tight (0.05 ATR)
+# because that measured best — but the cost is visible in the exit distribution:
+# TP1 arms the trail at +0.6R and the median trail exit is +0.65R, so the runner
+# contributes five hundredths of an R. Wins average +0.65R against -1.0R losses,
+# and NO trail exit in the book reaches +2.0R.
+# The question this tests is whether a trade that has already proved itself
+# deserves more room: keep the tight trail until BT_TRAIL_STAGE_R, then widen to
+# BT_TRAIL_STAGE_MULT. 0 = off.
+_BT_TRAIL_STAGE_R    = float(os.getenv("BT_TRAIL_STAGE_R", "0") or 0)
+_BT_TRAIL_STAGE_MULT = float(os.getenv("BT_TRAIL_STAGE_MULT", "0.35") or 0.35)
+
 # Research only, both default OFF. Conditional stale exit: once a trade is at
 # least BT_STALE_EXIT_BARS old and STILL has not reached TP1, close it if it is
 # currently underwater by more than BT_STALE_EXIT_MAX_R.
@@ -970,6 +981,10 @@ def simulate_trade_direct(
         else:
             if direction == "LONG":
                 if exit_policy == "trail":
+                    if _BT_TRAIL_STAGE_R > 0 and _risk_abs > 0:
+                        _gain = (best_price - entry) / _risk_abs
+                        if _gain >= _BT_TRAIL_STAGE_R:
+                            trail_mult_eff = max(trail_mult_eff, _BT_TRAIL_STAGE_MULT)
                     # Under BT_TRAIL_LAG the trail is anchored to the peak of
                     # PRIOR bars only. Anchoring to this bar's own high and then
                     # testing this bar's low assumes the high printed before the
@@ -999,6 +1014,10 @@ def simulate_trade_direct(
                     break
             else:
                 if exit_policy == "trail":
+                    if _BT_TRAIL_STAGE_R > 0 and _risk_abs > 0:
+                        _gain = (entry - best_price) / _risk_abs
+                        if _gain >= _BT_TRAIL_STAGE_R:
+                            trail_mult_eff = max(trail_mult_eff, _BT_TRAIL_STAGE_MULT)
                     if not _BT_TRAIL_LAG:
                         best_price = min(best_price, l)
                     trailing_stop = min(entry, best_price + max(0.0, float(setup.get("atr", 0.0) or 0.0)) * trail_mult_eff)
