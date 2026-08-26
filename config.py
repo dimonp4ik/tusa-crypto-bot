@@ -264,7 +264,24 @@ DAILY_TREND_SHORT_FILTER = os.getenv("DAILY_TREND_SHORT_FILTER", "1") != "0"
 #    0.15 = clean unimodal peak: beats baseline on win%, R/trade AND total R while
 #    cutting 32% junk trades. First filter to beat baseline on every axis.
 EFF_RATIO_FILTER   = os.getenv("EFF_RATIO_FILTER", "1") != "0"
-EFF_RATIO_LOOKBACK = int(os.getenv("EFF_RATIO_LOOKBACK", "20"))
+# 20 -> 10 on 2026-08-26. How many bars the Kaufman efficiency ratio looks
+# back over — i.e. over what span "is this a clean move or chop" is judged.
+#
+#   окно  знач  сд   винрейт  прибыль   п/окна  п/ulcer
+#   2023   10   622   68.3%    +76.0R     8.2     19.5
+#   2023   20   543   66.9%    +54.2R     6.3     13.4
+#   2024   10   820   74.0%   +164.0R    26.2     61.3
+#   2024   20   731   72.9%   +124.7R    19.0     44.3
+#   2026   10  1110   75.5%   +344.5R    34.4    119.6
+#   2026   20   982   76.6%   +338.7R    39.3    127.8
+#
+# Wins both historical windows on both measures with a higher win rate, and
+# adds 79-128 trades in every window — profit +40% on the hostile 2023 one.
+# The current window objects only on the risk ratios while profit still
+# rises; same shape as SMC_SWING_LOOKBACK, and the same verdict.
+# Reading: a 20-bar window (5 hours on 15m) is too slow to describe the move
+# a zone retest is about to join — by then the chop it measures is history.
+EFF_RATIO_LOOKBACK = int(os.getenv("EFF_RATIO_LOOKBACK", "10"))
 EFF_RATIO_MIN      = float(os.getenv("EFF_RATIO_MIN", "0.15"))
 # Upper bound on trend cleanliness. Measured 2026-08-24 on the honest model:
 # the top eff_ratio quartile (>=0.365) runs +0.147R vs +0.244R base, consistent
