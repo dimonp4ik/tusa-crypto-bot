@@ -96,6 +96,51 @@ from src.signal_filter import analyze_coin_smc  # noqa: E402
 # run_scan publishes at most this many signals per scan. It lives as a literal
 # there rather than in config, so it is mirrored (not imported) — keep in sync.
 _LIVE_MAX_PER_SCAN = int(os.getenv("BT_LIVE_MAX_PER_SCAN", "3"))
+
+# Which setup wins a contested slot. The caps below (3/scan, 8/dir) bind
+# constantly — the current window keeps 1172 trades and refuses 800 — so the
+# tie-break inside one bar decides a large share of the book, not a detail.
+#
+#   alpha  : by symbol name. Arbitrary, and what this file did historically:
+#            AAVE always beats ZEC, which models nothing real.
+#   volume : by volume_ratio, then score. Models main.py:_setup_rank as it
+#            stands today.
+#   score  : by mtf_score, then volume. The reverse of that.
+#
+# Measured on the current window, and the answer is that it does not matter:
+#   alpha   1172 trades  75.9%  +369.51R   ww 32.4  ulcer 127.7
+#   volume  1174 trades  75.5%  +362.64R   ww 31.5  ulcer 116.4
+#   score   1164 trades  75.8%  +365.14R   ww 31.9  ulcer 114.2
+# Both orderings that model something real come out slightly BEHIND the
+# arbitrary one, which is how you know the spread is noise rather than signal.
+#
+# Two reasons it cannot matter much. Contests are rare: 70.8% of trades are
+# alone at their timestamp and only 10.5% come from a bar with three at once,
+# so most of the 800 refusals are the cooldown and direction cap, not the scan
+# cap. And neither ranking key predicts the outcome — logistic slope on the
+# honest book gives mtf_score t=+0.72 and volume_ratio t=-0.78 in the current
+# window, t=-0.01 and t=+1.29 in 2023, i.e. insignificant with signs that flip
+# between windows.
+#
+# So the default stays "alpha" despite modelling nothing: the mismatch with
+# live is real but measured immaterial, and changing it would move every
+# baseline in this file by ~1% to buy nothing. Kept as an instrument.
+#
+# NOTE for anyone re-opening main.py:_setup_rank — its docstring justifies
+# ranking on volume with win rates in the 80s, which are pre-2026-08-23
+# fantasy-fill numbers. That justification is void. The replacement is not
+# "rank by score" though: on honest data neither key clears significance.
+_BT_SCAN_ORDER = os.getenv("BT_SCAN_ORDER", "alpha").lower()
+
+
+def _scan_order_key(t):
+    if _BT_SCAN_ORDER == "volume":
+        return (t.entry_time or 0, -float(t.volume_ratio or 0),
+                -int(t.mtf_score or 0), t.symbol, t.entry_bar)
+    if _BT_SCAN_ORDER == "score":
+        return (t.entry_time or 0, -int(t.mtf_score or 0),
+                -float(t.volume_ratio or 0), t.symbol, t.entry_bar)
+    return (t.entry_time or 0, t.symbol, t.entry_bar)
 from src.knn_analog import knn_direction_score  # noqa: E402
 
 
@@ -1444,7 +1489,7 @@ def apply_live_gates(trades: list[TradeRecord]) -> list[TradeRecord]:
     rather than bad ones — the live book is smaller and steadier, not better
     selected. Risk-adjusted it is the stronger number: 91.2 against 69.3.
     """
-    ordered = sorted(trades, key=lambda t: (t.entry_time or 0, t.symbol, t.entry_bar))
+    ordered = sorted(trades, key=_scan_order_key)
     last_sig: dict = {}
     per_bar: dict = {}
     open_by_dir: dict = {}
@@ -1499,7 +1544,7 @@ def apply_direction_cap(trades: list[TradeRecord], cap: int) -> list[TradeRecord
     """
     if cap <= 0:
         return list(trades)
-    ordered = sorted(trades, key=lambda t: (t.entry_time or 0, t.symbol, t.entry_bar))
+    ordered = sorted(trades, key=_scan_order_key)
     open_by_dir: dict[str, list[TradeRecord]] = {}
     kept: list[TradeRecord] = []
     for t in ordered:
