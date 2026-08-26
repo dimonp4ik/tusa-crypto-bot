@@ -653,7 +653,24 @@ SKIP_WEEKDAYS  = {d for d in os.getenv("SKIP_WEEKDAYS", "").split(",") if d.stri
 # but it is steep in relative terms: +0.05% of overpay costs ~27% of the edge,
 # which is exactly why the poll interval is seconds, not minutes.
 ZONE_WATCH_ENABLED  = os.getenv("ZONE_WATCH_ENABLED", "1") != "0"
-ZONE_WATCH_MINUTES  = float(os.getenv("ZONE_WATCH_MINUTES", "60"))
+# 60 -> 90 on 2026-08-26. How long a parked setup keeps waiting for price to
+# come back to its zone before it is dropped.
+# Rejected once already at 90/120 — on the old structure and against the
+# 2026 base whose risk figure was anomalous. Both reasons are gone, so it
+# was re-measured across three windows:
+#
+#            2023 (кризис)   2024 (обычное)   2026 (текущее)
+#           окна  ulcer     окна  ulcer      окна  ulcer
+#   60       8.2   19.5     26.2   61.3      34.3  119.1
+#   90      11.3   26.7     28.4   58.0      32.4  127.7
+#  120      12.6   25.6     20.5   56.2      38.1  135.0
+#
+# Neither wins everywhere. Across the three windows together: profit 583R ->
+# 627R at 90 and 645R at 120, and both mean risk ratios improve at both.
+# 120 buys its extra 3% by taking 22% off the 2024 window's worst-windows
+# ratio; 90's worst case anywhere is -5.5%. Bounded damage beat the bigger
+# headline. Adds 46-102 trades per window, win rate flat to +0.6pp.
+ZONE_WATCH_MINUTES  = float(os.getenv("ZONE_WATCH_MINUTES", "90"))
 ZONE_WATCH_POLL_SEC = int(os.getenv("ZONE_WATCH_POLL_SEC", "15"))
 
 # --- Spread gate (2026-08-09) --------------------------------------------------
