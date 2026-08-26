@@ -1291,8 +1291,18 @@ OVERLAP_VOL_MAX        = float(os.getenv("OVERLAP_VOL_MAX", "2.5"))
 # Gains flatten accordingly: worst-windows moves +2.2% from 1.5 to 1.75 and
 # +0.7% from 1.75 to 2.0. 1.75 takes the meaningful part.
 #
-# Side effect worth its own look: SIZE_MULT_MAX now binds on 8-9% of the book
-# and has never been swept, so the ceiling has quietly become a live parameter.
+# Side effect that got its own look: SIZE_MULT_MAX now binds on 8-9% of the
+# book, so the ceiling had quietly become a live parameter without anyone
+# deciding that. Swept, and it stays at 2.0:
+#   ceiling   2023 worst/ulcer   2024 worst/ulcer   current worst/ulcer
+#   2.0       14.2 / 33.0        26.7 / 62.3        47.6 / 167.1
+#   2.5       14.1 / 32.6        25.5 / 62.1        52.9 / 173.8
+#   3.0       13.8 / 32.3          -                52.8 / 174.3
+# Raising it helps only the benign window; both historical windows lose on
+# both measures. Principle agrees with the measurement here: this is a safety
+# rail whose job is the crash that is NOT in this data — the same argument
+# MAX_SAME_DIRECTION_POSITIONS makes about itself — so raising it because a
+# calm regime likes it would be tuning the insurance to the weather.
 OVERLAP_CALM_SIZE_MULT = float(os.getenv("OVERLAP_CALM_SIZE_MULT", "1.75"))
 LONDON_THIN_SIZE_MULT = float(os.getenv("LONDON_THIN_SIZE_MULT", "1.0"))
 # Per-coin tier multiplier, 2026-08-24. Coins ranked by expectancy on the
