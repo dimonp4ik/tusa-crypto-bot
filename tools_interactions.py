@@ -20,7 +20,11 @@ import csv, sys, itertools, collections
 
 MIN_N = 35
 CATS = ["session", "trend_1h", "trend_4h", "direction", "entry_source", "swing_trend"]
-NUMS = ["volume_ratio", "mtf_score", "rsi", "eff_ratio", "vol_atr_pct", "extension_atr"]
+# Both spellings: the crypto export calls it extension_atr, the stocks export
+# bos_extension_atr. Whichever is absent is dropped by the constant-feature
+# guard in conditions() rather than quietly becoming a column of zeros.
+NUMS = ["volume_ratio", "mtf_score", "rsi", "eff_ratio", "vol_atr_pct",
+        "extension_atr", "bos_extension_atr"]
 
 
 def load(p):
@@ -50,12 +54,26 @@ def conditions(rows):
             if not v:
                 continue
             out.append((f"{c}={v}", lambda r, c=c, v=v: (r.get(c) or "") == v))
+    dropped = []
     for n in NUMS:
+        if n not in rows[0]:
+            dropped.append(f"{n} (нет колонки)")
+            continue
         vals = sorted(num(r, n) for r in rows)
-        for q, lab in ((0.5, "med"),):
-            cut = vals[int(len(vals) * q)]
-            out.append((f"{n}>={cut:g}", lambda r, n=n, cut=cut: num(r, n) >= cut))
-            out.append((f"{n}<{cut:g}", lambda r, n=n, cut=cut: num(r, n) < cut))
+        cut = vals[len(vals) // 2]
+        share = sum(1 for v in vals if v >= cut) / len(vals)
+        # A missing или constant column silently becomes a column of zeros,
+        # whose median is 0, whose ">=0" side is EVERY row. That produced a
+        # pair reading "session=OPEN + extension_atr>=0" which was really just
+        # "session=OPEN" — a degenerate condition presented as a finding, with
+        # no warning. Anything that fails to split the book is dropped aloud.
+        if len(set(vals)) < 2 or share > 0.95 or share < 0.05:
+            dropped.append(f"{n} (не делит книгу: {share*100:.0f}%)")
+            continue
+        out.append((f"{n}>={cut:g}", lambda r, n=n, cut=cut: num(r, n) >= cut))
+        out.append((f"{n}<{cut:g}", lambda r, n=n, cut=cut: num(r, n) < cut))
+    if dropped:
+        print("отброшены признаки: " + ", ".join(dropped))
     return out
 
 
@@ -114,7 +132,33 @@ def main():
         if len(signs) > 1:
             continue                      # sign flips between windows
         weakest = min(abs(p[2]) for p in per) * (1 if per[0][2] > 0 else -1)
-        keep.append((weakest, n1, n2, per))
+        # Two numbers that decided real calls on 2026-08-26 and are NOT
+        # implied by same-sign-everywhere:
+        #
+        # share  — the subset as a fraction of the book. Every sizing rule that
+        #   survived end-to-end covered 8-15%; one covering 29% turned out to
+        #   be leverage (profit up 18%, risk ratios flat or falling) even
+        #   though its per-trade lift was the strongest found. A big subset
+        #   cannot be sized selectively, because sizing it IS sizing the book.
+        #
+        # trend  — whether the lift grows or decays across the windows. "LONG
+        #   with RSI<60" was negative in all three stretches and passed the
+        #   sign filter, but decayed -0.422 -> -0.381 -> -0.145 while the
+        #   subset itself still earned +0.423R. Acting on it would have cut
+        #   live money to chase an effect already gone. Same sign everywhere
+        #   does not separate a live effect from a dying one.
+        share = sum(p[0] for p in per) / sum(len(rows) for _, rows in books)
+        # MONOTONE movement toward zero, not merely "last below first". The
+        # crude version flagged London-with-volume in the crypto book, whose
+        # lift runs +0.463 -> +0.176 -> +0.327: a dip in the middle window
+        # and a recovery, which is variation between regimes rather than an
+        # effect dying. The stocks pair that genuinely died went -0.422 ->
+        # -0.381 -> -0.145, shrinking at every step. Only that shape earns a
+        # warning; the crude test condemned both.
+        mags = [abs(x[2]) for x in per]
+        trend = per[-1][2] - per[0][2]
+        decaying = all(b < a for a, b in zip(mags, mags[1:]))
+        keep.append((weakest, n1, n2, per, share, decaying, trend))
 
     keep.sort(key=lambda x: -abs(x[0]))
     pos = [k for k in keep if k[0] > 0][:12]
@@ -122,9 +166,15 @@ def main():
     for title, group in (("ЛУЧШЕ книги во ВСЕХ окнах", pos),
                          ("ХУЖЕ книги во ВСЕХ окнах", neg)):
         print(f"=== {title} (ранг по слабейшему окну) ===")
-        for weakest, n1, n2, per in group:
+        for weakest, n1, n2, per, share, decaying, trend in group:
             cells = "  ".join(f"{n:4d}сд {w*100:5.1f}% {d:+.3f}" for n, w, d, _ in per)
-            print(f"  {n1:22s} + {n2:22s} слабейший {weakest:+.3f} | {cells}")
+            # flag the two traps rather than silently ranking past them
+            warn = ""
+            if share > 0.20:
+                warn += f"  [ДОЛЯ {share*100:.0f}% — велика для множителя]"
+            if decaying:
+                warn += f"  [ЗАТУХАЕТ монотонно, {trend:+.3f}]"
+            print(f"  {n1:22s} + {n2:22s} слабейший {weakest:+.3f} | {cells}{warn}")
         print()
 
 
