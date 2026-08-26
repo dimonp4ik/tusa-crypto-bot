@@ -859,6 +859,43 @@ STOP_EXCHANGE_BACKSTOP_R = float(os.getenv("STOP_EXCHANGE_BACKSTOP_R", "1.5"))
 # which is precisely why the cap level cannot be tuned on it.
 MAX_SAME_DIRECTION_POSITIONS = int(os.getenv("MAX_SAME_DIRECTION_POSITIONS", "8"))
 
+# --- Graded crowding trim: REJECTED, premise was wrong -----------------------
+# Idea: the cap above is a cliff — positions 1-8 ride full size, the ninth is
+# refused — while the reason for it (correlated alts resolve together) applies
+# gradually. So scale size down as same-side exposure builds. Unlike the
+# outcome-based version of this thought, the input is genuinely available at
+# entry: the open-position count is known, whereas earlier trades' OUTCOMES are
+# not (that one produced z=+5.52 purely from look-ahead).
+#
+# Measured, step per open position, floor 0.5:
+#             base                   step 0.08              step 0.15
+#   2023  +122.76R 14.1/32.5 | +107.98R 13.7/33.1 |  +96.90R 13.4/33.1
+#   cur   +399.10R 48.4/167.8| +330.13R 49.2/162.4| +296.64R 53.1/161.9
+# Absolute risk falls hard (worst 8.24R -> 6.71R, ulcer 2.38 -> 2.03) and
+# profit falls exactly as much, so the ratios sit still and the two measures
+# disagree in opposite directions between windows. That is de-leveraging, not
+# edge: it does not tell good trades from bad, it just holds less when holding
+# more.
+#
+# 🔑 The premise is simply false — crowded trades are BETTER, in all three
+# windows:
+#   same-side open |   2023            2024           current
+#         0        | 67.8% +0.145   71.2% +0.135   72.2% +0.365
+#         3        | 70.0% +0.096   74.8% +0.240   80.4% +0.318
+#         6+       |     -          84.0% +0.372   83.9% +0.443
+# A crowded book forms in a strong trend and trend trades win more, so trimming
+# for crowding trims the best trades.
+#
+# This was already written down twenty lines above: the cap's own comment says
+# the trades a tight cap removes run 0.632R against a 0.491R mean. Two backtest
+# runs went into rediscovering it. Read the neighbouring parameter's reasoning
+# before building a new one.
+#
+# What survives: drawdown clustering is real, but it comes from correlated
+# OUTCOMES, not from worse trades. The right tool for that is the hard cap that
+# already exists — bounding the disaster case — not graded sizing, which
+# penalises quality that is in fact higher.
+
 # --- News filter (per-coin keywords) ---
 CRYPTOPANIC_API_KEY = os.getenv("CRYPTOPANIC_API_KEY", "")
 NEWS_BLOCK_KEYWORDS = ["hack", "exploit", "scam", "lawsuit", "sec ", "ban", "delist", "rug"]

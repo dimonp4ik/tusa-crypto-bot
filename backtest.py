@@ -29,7 +29,7 @@ import time
 import types
 from bisect import bisect_right
 from concurrent.futures import ProcessPoolExecutor, as_completed
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from pathlib import Path
 from typing import Iterable
 from urllib.parse import urlencode  # noqa: F401 (kept for potential future use)
