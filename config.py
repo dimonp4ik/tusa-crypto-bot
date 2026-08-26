@@ -1004,6 +1004,34 @@ SYMBOL_SIZE_MULT = _parse_symbol_size_mult(
 #
 # Sizing does not change WHICH setups fire or how they resolve, so this does not
 # confound the still-pending live validation of the zone-watch entry.
+# 🔴 2026-08-26 — the "+22% at equal risk" claim above is a fantasy-fill
+# number from before the 2026-08-23 execution fix. Re-measured on honest data
+# it is NEGATIVE at equal risk in two windows out of three. Full sweep, as
+# profit / (profit per worst-windows) / (profit per ulcer):
+#
+#   mult        2023                  2024                  current
+#   1.0    85.92R 10.8 26.0     146.48R 30.7 60.7     336.17R 37.7 145.4
+#   1.25   90.83R 11.0 26.4     153.89R 29.9 59.1     353.90R 34.9 137.1
+#   1.5    95.96R 11.3 26.7     161.14R 28.4 58.0     369.51R 32.4 127.7
+#
+# Monotone in every window, and 2023 runs OPPOSITE to the other two: there a
+# bigger multiplier improves risk, in 2024 and current it degrades it. 1.25 is
+# plain interpolation, not a sweet spot — the response is linear.
+#
+# The feature itself is real: counter-structure trades run +0.664R against
+# +0.286R on the current window, t=+2.50. The two facts are consistent. Those
+# trades are better ON AVERAGE but more dispersed, and they are correlated
+# with each other, so sizing them up concentrates risk faster than it adds
+# expectancy. Same shape as the averaging experiment: a knob that raises mean
+# AND variance together is leverage, not edge.
+#
+# NOT changed here. This is a bare profit-for-risk trade with no free lunch:
+# dropping to 1.0 costs 9-10% of raw profit in every window, which fails the
+# stated goal of more profit, and the version that pays — remove the
+# concentrated bet and carry the freed risk evenly across the whole book,
+# worth +16.5%/+7.6%/-4.8% at UNCHANGED drawdown — means raising base risk
+# per trade, i.e. changing live position sizes. That is the account owner's
+# call, not a tuning decision. Left at 1.5 pending it.
 COUNTER_STRUCTURE_SIZE_MULT = float(os.getenv("COUNTER_STRUCTURE_SIZE_MULT", "1.5"))
 
 # Score relief for counter-structure setups, 2026-08-26. The marker is the most
