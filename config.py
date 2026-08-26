@@ -1093,6 +1093,65 @@ SESSION_SIZE_MULT = {
 # the extra size is landing on better-than-average trades rather than simply
 # levering the book up.
 HTF_NEUTRAL_4H_SIZE_MULT = float(os.getenv("HTF_NEUTRAL_4H_SIZE_MULT", "1.5"))
+
+# --- London boost is conditional on volume (2026-08-26) -----------------------
+# The LONDON 1.5x above fires on every London setup. Split by volume it turns
+# out the edge lives entirely in the half with real participation, and this
+# replicates across three windows:
+#
+#              London & vol>=2       thin London          everything else
+#   2023    57tr 84.2% +0.631     32tr 62.5% +0.030     611tr 67.4% +0.098
+#   2024    76tr 73.7% +0.234     45tr 73.3% +0.203     796tr 73.5% +0.180
+#   cur     98tr 84.7% +0.631     78tr 73.1% +0.265    1074tr 75.1% +0.286
+#
+# Two windows three years apart both land on 84% and +0.631R — more than
+# double the book's expectancy — and 2024 gives nothing at any volume level
+# but never turns negative. Upside in two regimes, neutral in the third, harm
+# in none, which is the shape a size boost should have.
+#
+# It is not a volume proxy: London is UNDER-represented at high volume (10% of
+# the vol>3 trades against 15% of the book). Reading: London open on real
+# volume is money arriving; London open on a thin tape is just a clock.
+#
+# Below the threshold the boost is removed rather than added elsewhere, so
+# this REDUCES deployed size — a reallocation away from a no-edge subset, not
+# extra leverage. That distinction is what separated it from
+# COUNTER_STRUCTURE_SIZE_MULT, which raised mean and variance together.
+# --- 1h-neutral context (2026-08-26) -----------------------------------------
+# HTF_NEUTRAL_4H_SIZE_MULT above boosts a neutral 4h. The comment at line ~293
+# spotted BOTH neutral timeframes back in July, but only the 4h one ever got a
+# multiplier. On honest data the 1h is the stronger of the two, on two to three
+# times the sample:
+#
+#              trend_1h=neutral            trend_4h=neutral (has the 1.5x)
+#   2023     105tr 77.1% +0.237          35tr 68.6% +0.292   (book 68.9%)
+#   2024      89tr 86.5% +0.461 t=+3.55  43tr 79.1% +0.287
+#   cur      130tr 82.3% +0.443          72tr 83.3% +0.621
+#
+# 1h-neutral beats the book in all three windows (+8.2/+13.0/+6.4pp win rate),
+# including the hostile one where the 4h version does nothing at all.
+#
+# Found by tools_interactions.py, which ranks pairs by their WEAKEST window:
+# trend_1h=neutral occupied five of the top twelve positive pairs, against
+# score>=15, low RSI, late extension, low efficiency and FVG entries alike —
+# i.e. it is not carried by any one partner.
+#
+# Default 1.0 = off until measured end-to-end. Adding size to a subset is what
+# COUNTER_STRUCTURE_SIZE_MULT did before it turned out to be leverage; the
+# difference here is that this subset is positive in the hostile window too,
+# which is exactly where counter-structure was empty.
+HTF_NEUTRAL_1H_SIZE_MULT = float(os.getenv("HTF_NEUTRAL_1H_SIZE_MULT", "1.0"))
+
+# Measured end-to-end, three windows:
+#              base                          London boost gated on volume
+#   2023   668tr 68.9% +95.96R  11.3/26.7 | 668 68.9% +96.55R  12.4/27.6
+#   2024   872tr 73.5% +161.14R 28.4/58.0 | 872 73.5% +158.55R 27.3/58.8
+#   cur   1172tr 75.9% +369.51R 32.4/127.7|1172 75.9% +362.62R 38.8/143.1
+# Profit is flat (-1.9% to +0.6%) while risk falls: both measures improve in
+# two windows, the current one by 20% and 12%, and its max drawdown goes
+# -15.30R -> -12.79R. Worst case is 2024 at -3.9% on one measure.
+LONDON_VOL_MIN       = float(os.getenv("LONDON_VOL_MIN", "2.0"))  # 0 = off
+LONDON_THIN_SIZE_MULT = float(os.getenv("LONDON_THIN_SIZE_MULT", "1.0"))
 # Per-coin tier multiplier, 2026-08-24. Coins ranked by expectancy on the
 # 923-trade book, bottom third 0.75 / top third 1.25, middle untouched.
 # Kept SEPARATE from SYMBOL_SIZE_MULT so the BTC trim (measured on its own,

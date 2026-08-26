@@ -131,6 +131,12 @@ def init_db():
             "trend_4h":      "TEXT",
             "bos_extension_atr": "REAL",
             "vol_atr_pct":       "REAL",
+            # 2026-08-26. Same reason as the block above: LONDON_VOL_MIN keys
+            # on volume_ratio and HTF_NEUTRAL_1H_SIZE_MULT on trend_1h, and
+            # neither existed on the row, so both rules would have sized
+            # correctly in the backtest and done nothing at all in production.
+            "volume_ratio":  "REAL",
+            "trend_1h":      "TEXT",
         }.items():
             _ensure_column(c, "signals", col, ddl)
 
@@ -464,9 +470,9 @@ def log_signal(analysis: dict, tp1: float, tp2: float, sl: float) -> int:
                 symbol, direction, entry_price, tp1, tp2, sl, opened_at, status,
                 confidence, reason, entry_low, entry_high, entry_source, market_price,
                 mtf_score, mtf_score_max, premium, atr, sniper, session, trend_4h,
-                bos_extension_atr, vol_atr_pct
+                bos_extension_atr, vol_atr_pct, volume_ratio, trend_1h
             )
-            VALUES (?, ?, ?, ?, ?, ?, ?, 'OPEN', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            VALUES (?, ?, ?, ?, ?, ?, ?, 'OPEN', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """, (
             analysis["symbol"], analysis["direction"], analysis["current_price"],
             tp1, tp2, sl, time_mod.time(),
@@ -481,6 +487,8 @@ def log_signal(analysis: dict, tp1: float, tp2: float, sl: float) -> int:
             analysis.get("trend_4h"),
             analysis.get("bos_extension_atr"),
             analysis.get("vol_atr_pct"),
+            analysis.get("volume_ratio"),
+            analysis.get("trend_1h"),
         ))
         return cur.lastrowid
 

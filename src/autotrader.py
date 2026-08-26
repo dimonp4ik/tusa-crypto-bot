@@ -35,6 +35,7 @@ from config import (
     AUTOTRADE_CONTACT,
     STOP_CLOSE_CONFIRM, STOP_EXCHANGE_BACKSTOP_R, SYMBOL_SIZE_MULT,
     SESSION_SIZE_MULT, HTF_NEUTRAL_4H_SIZE_MULT, SYMBOL_TIER_MULT, SIZE_MULT_MAX,
+    LONDON_VOL_MIN, LONDON_THIN_SIZE_MULT,
     EXTENSION_ATR_THRESHOLD, EXTENSION_SIZE_MULT,
     VOL_ATR_BOOST_THRESHOLD, VOL_ATR_BOOST_MULT,
     COUNTER_STRUCTURE_SIZE_MULT,
@@ -192,7 +193,24 @@ def _open_for_user(u: dict, sig: dict, inst_id: str, disp: str) -> None:
     # both window halves (see config.py). sig is the DB row, so these read as
     # None on signals written before the 2026-08-24 migration and fall back to
     # 1.0 rather than mis-sizing.
-    _size_mult *= float(SESSION_SIZE_MULT.get(str(sig.get("session") or "").upper(), 1.0))
+    _sess = str(sig.get("session") or "").upper()
+    _size_mult *= float(SESSION_SIZE_MULT.get(_sess, 1.0))
+    # The London boost only applies where volume confirms — see LONDON_VOL_MIN
+    # in config.py. Note this reverses the fall-through convention used for
+    # bos_extension_atr and vol_atr_pct above: those default to NOT trimming
+    # when the field is missing, but here the missing field would grant a 1.5x
+    # BOOST on no evidence. Signals written before the 2026-08-26 migration
+    # therefore size at 1.0, matching what backtest._size_mult_for does with an
+    # absent volume_ratio — the two paths must agree or the backtest stops
+    # describing production.
+    if LONDON_VOL_MIN > 0 and _sess == "LONDON":
+        try:
+            _vr = sig.get("volume_ratio")
+            if _vr is None or float(_vr) < LONDON_VOL_MIN:
+                _size_mult *= float(LONDON_THIN_SIZE_MULT) / float(
+                    SESSION_SIZE_MULT.get("LONDON", 1.0) or 1.0)
+        except (TypeError, ValueError, ZeroDivisionError):
+            pass
     if str(sig.get("trend_4h") or "").lower() == "neutral":
         _size_mult *= float(HTF_NEUTRAL_4H_SIZE_MULT)
     # Late entries ride smaller — see EXTENSION_ATR_THRESHOLD in config.py.

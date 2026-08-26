@@ -81,6 +81,8 @@ from config import (  # noqa: E402
     ZONE_WATCH_MINUTES,
     SIGNAL_COOLDOWN_HOURS,
     KILL_SWITCH_SL_STREAK,
+    LONDON_VOL_MIN, LONDON_THIN_SIZE_MULT,
+    HTF_NEUTRAL_1H_SIZE_MULT,
     TRAIL_ATR_MULT,
     TP1_CLOSE_FRAC,
     EXIT_PROFILE,
@@ -559,9 +561,20 @@ def _size_mult_for(symbol: str, setup: dict) -> float:
     m *= float(SYMBOL_TIER_MULT.get(str(symbol).upper(), 1.0))
     if setup.get("sniper"):
         m *= float(COUNTER_STRUCTURE_SIZE_MULT)
-    m *= float(SESSION_SIZE_MULT.get(str(setup.get("session") or "").upper(), 1.0))
+    _sess = str(setup.get("session") or "").upper()
+    m *= float(SESSION_SIZE_MULT.get(_sess, 1.0))
+    # London boost only where volume confirms — see LONDON_VOL_MIN in config.
+    if LONDON_VOL_MIN > 0 and _sess == "LONDON":
+        try:
+            if float(setup.get("volume_ratio") or 0.0) < LONDON_VOL_MIN:
+                m *= float(LONDON_THIN_SIZE_MULT) / float(
+                    SESSION_SIZE_MULT.get("LONDON", 1.0) or 1.0)
+        except (TypeError, ValueError, ZeroDivisionError):
+            pass
     if str(setup.get("trend_4h") or "").lower() == "neutral":
         m *= float(HTF_NEUTRAL_4H_SIZE_MULT)
+    if str(setup.get("trend_1h") or "").lower() == "neutral":
+        m *= float(HTF_NEUTRAL_1H_SIZE_MULT)
     try:
         if float(setup.get("bos_extension_atr") or 0.0) > EXTENSION_ATR_THRESHOLD:
             m *= float(EXTENSION_SIZE_MULT)
