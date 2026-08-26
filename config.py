@@ -1192,6 +1192,32 @@ HTF_NEUTRAL_4H_SIZE_MULT = float(os.getenv("HTF_NEUTRAL_4H_SIZE_MULT", "1.5"))
 # MAX_SAME_DIRECTION_POSITIONS makes about itself.
 HTF_NEUTRAL_1H_SIZE_MULT = float(os.getenv("HTF_NEUTRAL_1H_SIZE_MULT", "1.75"))
 
+# --- Trimming the BEARISH 1h context: REJECTED ------------------------------
+# trend_1h sorts cleanly in all three windows, so having sized the top of that
+# ordering up it looked obvious to size the bottom down:
+#              2023    2024   current      (book 68.9 / 73.5 / 75.9)
+#   neutral   77.1%   86.5%   82.3%        boosted, HTF_NEUTRAL_1H_SIZE_MULT
+#   bullish   67.8%   73.0%   76.3%        level with the book
+#   bearish   66.3%   69.7%   73.2%        below it in all three
+#
+# At 0.75x:
+#              base                          bearish x0.75
+#   2023   668tr +109.77R 13.0/29.6 | 668 +101.03R 12.9/28.7   both worse
+#   2024   872tr +173.95R 28.7/63.5 | 872 +170.91R 31.1/64.8   both better
+#   cur   1173tr +392.82R 44.1/162.8|1173 +367.58R 47.1/165.8  both better
+# Profit falls in every window (-8.0/-1.7/-6.4%) and the HOSTILE window, the
+# one weighted highest, loses on both risk measures.
+#
+# Why it fails where the thin-London trim succeeded: thin London ran +0.265R
+# against a book of +0.286R — nothing to lose by trimming. A bearish 1h is 29%
+# of the book and is still solidly profitable on its own, so trimming it cuts
+# live money to buy a small risk improvement.
+#
+# Mirror of the stocks clean-trend rejection: a large subset can be neither
+# boosted nor trimmed. Boost it and you have leverage; trim it and you are
+# cutting earnings. Sizing rules need a SMALL subset whose edge is genuinely
+# near zero (to trim) or genuinely far above book (to boost).
+
 # Measured end-to-end, three windows:
 #              base                          London boost gated on volume
 #   2023   668tr 68.9% +95.96R  11.3/26.7 | 668 68.9% +96.55R  12.4/27.6

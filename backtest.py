@@ -148,6 +148,13 @@ from src.knn_analog import knn_direction_score  # noqa: E402
 
 PROJECT_DIR = Path(__file__).resolve().parent
 CACHE_DIR = PROJECT_DIR / "backtest_cache"
+# NOTE for anyone comparing runs: a backtest with no --end-date is anchored to
+# NOW, and this TTL means it refetches every two hours and slides the window
+# forward — old candles fall off the back, new ones arrive at the front. Two
+# runs of the SAME config straddling a refresh will not agree: that is how a
+# 1172-trade baseline came back as 1173 and briefly looked like config drift.
+# The dated windows are immune, because their range is pinned. For any
+# comparison that has to be exact, pass --end-date on the current window too.
 CACHE_TTL_SEC = 2 * 3600
 
 # OKX history — the SAME venue the live bot reads (2026-07-31). This used to
