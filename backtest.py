@@ -1700,7 +1700,15 @@ def main(argv: list[str] | None = None) -> int:
             g_dd = max_drawdown_r(gated, net=True)
 
             print()
+            # The candle count belongs on the comparison line. The live default
+            # is 1152 (12 days), while window comparisons need 18000, and a run
+            # that silently used the small default still prints a plausible
+            # "18 symbols (0 errors)" header. One such run produced a variant
+            # and a control that matched to the last decimal because both had
+            # measured twelve days instead of the window.
             print(
+                f"[{args.candles} candles"
+                f"{' to ' + args.end_date if args.end_date else ''}] "
                 f"With live gates (cooldown {SIGNAL_COOLDOWN_HOURS}h, "
                 f"{_LIVE_MAX_PER_SCAN}/scan, {MAX_SAME_DIRECTION_POSITIONS}/dir, "
                 f"kill {KILL_SWITCH_SL_STREAK}): "
