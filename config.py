@@ -1166,7 +1166,31 @@ HTF_NEUTRAL_4H_SIZE_MULT = float(os.getenv("HTF_NEUTRAL_4H_SIZE_MULT", "1.5"))
 # There is a ceiling to that — past some multiplier the subset dominates the
 # book and correlation inside it starts setting the drawdown — so this is
 # swept rather than assumed.
-HTF_NEUTRAL_1H_SIZE_MULT = float(os.getenv("HTF_NEUTRAL_1H_SIZE_MULT", "1.5"))
+# Swept to the turn rather than stopped at the first value that worked:
+#   mult    2023: profit / worst / ulcer     current: profit / worst / ulcer
+#   1.0      +96.55R  12.4 / 27.6             +362.62R  38.8 / 143.1
+#   1.25    +102.24R  12.8 / 28.7             +374.50R  40.7 / 151.0
+#   1.5     +106.30R  12.9 / 29.1             +384.06R  42.4 / 157.3
+#   1.75    +109.77R  13.0 / 29.6             +391.73R  43.9 / 162.3
+#   2.0     +111.60R  12.8 / 29.5   <- turns  +398.64R  45.4 / 166.6
+#
+# In the HOSTILE window both risk measures peak at 1.75 and turn at 2.0 —
+# profit keeps climbing there while the ratios fall, which is leverage caught
+# in the act. The current window never turns, because a benign regime does not
+# punish concentration; that is exactly why the hostile one decides.
+#
+# Two checks that this is selection and not leverage:
+#   * the ceiling binds on only 4.7-7.3% of trades, so SIZE_MULT_MAX is not
+#     distorting the top of the sweep;
+#   * going 1.0 -> 2.0 raises the book's AVERAGE multiplier from 1.015 to
+#     1.044, i.e. +4.4% of deployed size, while current-window profit rises
+#     +9.9%. Leverage moves both together; profit outrunning size by 2x means
+#     the extra size is landing on genuinely better trades.
+#
+# Caveat kept deliberately: the backtest cannot see a crash, and a correlated
+# subset carried at 1.75x is precisely what hurts there — the same argument
+# MAX_SAME_DIRECTION_POSITIONS makes about itself.
+HTF_NEUTRAL_1H_SIZE_MULT = float(os.getenv("HTF_NEUTRAL_1H_SIZE_MULT", "1.75"))
 
 # Measured end-to-end, three windows:
 #              base                          London boost gated on volume
