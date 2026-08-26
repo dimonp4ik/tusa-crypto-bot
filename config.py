@@ -910,6 +910,18 @@ SYMBOL_SIZE_MULT = _parse_symbol_size_mult(
 # Sizing does not change WHICH setups fire or how they resolve, so this does not
 # confound the still-pending live validation of the zone-watch entry.
 COUNTER_STRUCTURE_SIZE_MULT = float(os.getenv("COUNTER_STRUCTURE_SIZE_MULT", "1.5"))
+
+# Score relief for counter-structure setups, 2026-08-26. The marker is the most
+# validated thing in this system — same sign in all five years of the 10,300
+# trade seed, and again on the 1,353-trade zone-watch population — and on the
+# current book it is the best group there is: 78.5% WR / +0.469R against a
+# +0.313R base, rising to 83.6% / +0.668R when the entry is also close to the
+# break.
+# We cannot manufacture more of them; the market decides when a retest cuts
+# against the swing. What we CAN do is stop discarding them for want of a point
+# or two of MTF score, which is the only lever that adds trades in the BEST
+# category rather than the average one.
+COUNTER_STRUCTURE_SCORE_BONUS = int(os.getenv("COUNTER_STRUCTURE_SCORE_BONUS", "0"))
 # Session and HTF-context size multipliers, measured 2026-08-24 on the honest
 # model over the combo book (924 trades). Both groups beat base expectancy in
 # BOTH window halves: LONDON 145 сд +0.385R, trend_4h=neutral 59 сд +0.365R at

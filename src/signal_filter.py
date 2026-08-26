@@ -2,7 +2,7 @@ import sys
 import os
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from config import (EFF_RATIO_MAX, HTF_ALIGNED_SCORE, HTF_NEUTRAL_SCORE, HTF_STRONG_SCORE)
+from config import (EFF_RATIO_MAX, COUNTER_STRUCTURE_SCORE_BONUS, HTF_ALIGNED_SCORE, HTF_NEUTRAL_SCORE, HTF_STRONG_SCORE)
 from config import (
     RSI_OVERSOLD, RSI_OVERBOUGHT, VOLUME_SPIKE_MULTIPLIER, MIN_SIGNALS_TO_PASS,
     SMC_MIN_CONFIRMATIONS, SMC_BOS_MIN_VOLUME, BTC_BLOCK_THRESHOLD_PCT,
@@ -979,7 +979,17 @@ def analyze_coin_smc(candles_15m: dict, candles_1h: dict, symbol: str,
         if mtf_score > diag.get("best_score", -1):
             diag["best_score"]  = mtf_score
             diag["best_symbol"] = symbol
-    if mtf_score < MTF_MIN_SCORE:
+    # Counter-structure setups clear a lower bar — see the bonus in config.py.
+    # Computed here rather than reusing the telemetry call further down, because
+    # that one runs after this gate has already thrown the setup away.
+    _cs_bonus = 0
+    if COUNTER_STRUCTURE_SCORE_BONUS:
+        try:
+            if _is_sniper(ind, price_payload["entry_price"], direction, trend_1h, trend_4h):
+                _cs_bonus = int(COUNTER_STRUCTURE_SCORE_BONUS)
+        except Exception:
+            _cs_bonus = 0
+    if mtf_score + _cs_bonus < MTF_MIN_SCORE:
         if diag is not None:
             diag["score_fail"] = diag.get("score_fail", 0) + 1
         # Variant D removed 2026-08-07 at the user's request: score near-misses
