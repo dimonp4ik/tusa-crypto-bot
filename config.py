@@ -131,7 +131,37 @@ TRADING_HOURS_END   = int(os.getenv("TRADING_HOURS_END", "24"))
 TRADE_WEEKENDS      = os.getenv("TRADE_WEEKENDS", "1") != "0"
 
 # --- SMC settings ---
-SMC_SWING_LOOKBACK    = 5
+# Readable from the environment since 2026-08-26. It was a plain constant,
+# so every sweep of it silently re-ran the default and reported "no effect"
+# — and this is the parameter that DEFINES the structure everything else
+# sits on: how many candles either side make a confirmed swing, and hence
+# where BOS, FVG and order blocks are found at all.
+# 5 -> 3 on 2026-08-26, and the story matters more than the number.
+# This was a plain constant, so it had never been measured — like
+# SIGNAL_COOLDOWN_HOURS and ATR_PERIOD, all three caught the same way: two
+# runs with different values matching to the last decimal.
+# It defines the STRUCTURE everything else sits on — how many candles either
+# side confirm a swing, and hence where BOS, FVG and order blocks exist at
+# all. Three days of tuning ran on top of an unmeasured foundation.
+#
+#   окно  глубина  сд   винрейт  прибыль   п/окна  п/ulcer
+#   2023     3     543   66.9%   +54.2R      6.3     13.4
+#   2023     5     483   66.0%   +33.7R      4.3      4.7
+#   2024     3     731   72.9%  +124.7R     19.0     44.3
+#   2024     5     664   72.1%  +107.1R     16.6     39.6
+#   2025     3     841   76.6%  +220.2R     20.8     74.6
+#   2025     5     748   75.9%  +205.8R     19.9     60.8
+#   2026     3     981   76.5%  +336.6R     39.1    126.9
+#   2026     5     901   76.8%  +342.1R    136.8    248.6
+#
+# 3 wins THREE historical windows on both measures, adds 60-93 trades in
+# every one, and lifts the hostile 2023 window most (+61% profit, ulcer
+# ratio 4.7 -> 13.4). It "loses" only on 2026 — where profit and win rate
+# are flat and only the risk ratios drop, and those ratios are exactly what
+# is anomalous there: the 2026 book scores worst-windows 2.50 against 3.5-8.6
+# for every other configuration measured in three days. That single low
+# number was silently rejecting changes — see memory drawdown-is-one-week.
+SMC_SWING_LOOKBACK    = int(os.getenv("SMC_SWING_LOOKBACK", "3"))
 SMC_FVG_MIN_PCT       = 0.0005
 SMC_OB_LOOKBACK       = 30
 SMC_MIN_CONFIRMATIONS = int(os.getenv("SMC_MIN_CONFIRMATIONS", "2"))
@@ -468,7 +498,9 @@ LIVE_HIST_EPOCH_TS = float(os.getenv("LIVE_HIST_EPOCH_TS", "1787670000"))
 #   risk%  ~1.2–3.0% of price  → on 20x = 24–60% margin at risk per stop
 #   TP1 = 1.5R (1.8–4.5% move → 36–90% on 20x), close 50%, move SL to BE
 #   TP2 = 3.0R (3.6–9%   move → 72–180% on 20x), let winner run
-ATR_PERIOD    = 14
+# Readable from the environment since 2026-08-26 — same reason as
+# SMC_SWING_LOOKBACK: it was a constant and could not be measured.
+ATR_PERIOD    = int(os.getenv("ATR_PERIOD", "14"))
 # 0.5 -> 1.0 on 2026-08-24. This is how far beyond the swing the structural stop
 # is pushed, and at 0.5 ATR it sat close enough to the level that noise took it
 # out without the structure actually breaking.
