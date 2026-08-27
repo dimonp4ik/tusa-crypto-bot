@@ -39,6 +39,7 @@ from config import (
     OVERLAP_VOL_MAX, OVERLAP_CALM_SIZE_MULT,
     CHOP_VOL_MIN, CHOP_EFF_MAX, CHOP_ATR_MIN, CHOP_SIZE_MULT,
     OPEN_SPACE_ROOM_MIN, OPEN_SPACE_SIZE_MULT,
+    PARABOLIC_ACCEL_MIN, PARABOLIC_SIZE_MULT,
     DEAD_THIN_VOL_MAX, DEAD_THIN_SIZE_MULT,
     HTF_NEUTRAL_1H_SIZE_MULT,
     EXTENSION_ATR_THRESHOLD, EXTENSION_SIZE_MULT,
@@ -257,6 +258,16 @@ def _open_for_user(u: dict, sig: dict, inst_id: str, disp: str) -> None:
             _dv = sig.get("volume_ratio")
             if _dv is not None and float(_dv) < DEAD_THIN_VOL_MAX:
                 _size_mult *= float(DEAD_THIN_SIZE_MULT)
+        except (TypeError, ValueError):
+            pass
+    # Parabolic arc rides smaller — see PARABOLIC_ACCEL_MIN in config.py.
+    # Absent on rows written before the 2026-08-28 migration, which means no
+    # trim rather than a guess.
+    if PARABOLIC_SIZE_MULT != 1.0:
+        try:
+            _ar = sig.get("accel_ratio")
+            if _ar is not None and float(_ar) >= PARABOLIC_ACCEL_MIN:
+                _size_mult *= float(PARABOLIC_SIZE_MULT)
         except (TypeError, ValueError):
             pass
     # Open space rides smaller — see OPEN_SPACE_ROOM_MIN in config.py. Derived

@@ -85,6 +85,7 @@ from config import (  # noqa: E402
     OVERLAP_VOL_MAX, OVERLAP_CALM_SIZE_MULT,
     CHOP_VOL_MIN, CHOP_EFF_MAX, CHOP_ATR_MIN, CHOP_SIZE_MULT,
     OPEN_SPACE_ROOM_MIN, OPEN_SPACE_SIZE_MULT,
+    PARABOLIC_ACCEL_MIN, PARABOLIC_SIZE_MULT,
     DEAD_THIN_VOL_MAX, DEAD_THIN_SIZE_MULT,
     HTF_NEUTRAL_1H_SIZE_MULT,
     TRAIL_ATR_MULT,
@@ -628,6 +629,13 @@ def _size_mult_for(symbol: str, setup: dict) -> float:
         try:
             if _fld(setup, "volume_ratio", 99.0) < DEAD_THIN_VOL_MAX:
                 m *= float(DEAD_THIN_SIZE_MULT)
+        except (TypeError, ValueError):
+            pass
+    # Parabolic arc rides smaller — see PARABOLIC_ACCEL_MIN in config.py.
+    if PARABOLIC_SIZE_MULT != 1.0:
+        try:
+            if _fld(setup, "accel_ratio", 1.0) >= PARABOLIC_ACCEL_MIN:
+                m *= float(PARABOLIC_SIZE_MULT)
         except (TypeError, ValueError):
             pass
     # Open space rides smaller — see OPEN_SPACE_ROOM_MIN in config.py.

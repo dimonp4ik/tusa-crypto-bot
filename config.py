@@ -190,6 +190,23 @@ SMC_SWING_LOOKBACK    = int(os.getenv("SMC_SWING_LOOKBACK", "3"))
 # exact shape after SMC_SWING_LOOKBACK and EFF_RATIO_LOOKBACK, both also
 # hardcoded, both also worth trades AND risk once they could be varied.
 SMC_FVG_MIN_PCT       = float(os.getenv("SMC_FVG_MIN_PCT", "0.0003"))
+# Swept 2026-08-28, its first ever. Unlike the FVG threshold next to it, this
+# one was already right:
+#   bars    2023 profit worst/ulcer   2024                  current
+#    20   692tr +129.85R 16.8/41.1      -              1199tr +377.95R 72.1/197.8
+#    30   694tr +136.43R 17.6/44.1  901tr +187.48R 40.5/82.9  1193tr +379.65R 72.4/198.4
+#    45   711tr +141.58R 19.3/45.2  906tr +185.81R 49.7/79.6  1210tr +381.21R 72.6/181.3
+#    60   722tr +131.62R 16.9/35.9      -              1229tr +382.48R 56.5/165.9
+#
+# 45 looks tempting — worst-windows improves in all three windows and by 22.7%
+# in 2024 — but ulcer falls in two of them, 8.6% in the current one. The two
+# measures disagree, which is the signature of noise rather than an edge, and
+# 60 is plainly worse. Kept at 30.
+#
+# Worth noting against the FVG result above: two hardcoded recognition
+# parameters, swept the same night. One was far too strict and worth trades AND
+# risk; this one was already at its optimum. "Never swept" means unknown, not
+# wrong.
 SMC_OB_LOOKBACK       = int(os.getenv("SMC_OB_LOOKBACK", "30"))
 SMC_MIN_CONFIRMATIONS = int(os.getenv("SMC_MIN_CONFIRMATIONS", "2"))
 SMC_BOS_MIN_VOLUME    = float(os.getenv("SMC_BOS_MIN_VOLUME", "1.5"))
@@ -1508,6 +1525,44 @@ OPEN_SPACE_ROOM_MIN  = float(os.getenv("OPEN_SPACE_ROOM_MIN", "3.5"))
 # sat flat and its ulcer went backwards — a mixed bag — while this is six of
 # six, and the mechanism is a dimension nothing else in the config touches.
 OPEN_SPACE_SIZE_MULT = float(os.getenv("OPEN_SPACE_SIZE_MULT", "0.75"))
+
+# --- Parabolic arc rides smaller (2026-08-28) --------------------------------
+# The "parabolic arc" pattern, reduced to a number: how many times steeper the
+# recent leg is than the one before it. The claim is that a trend accelerating
+# like this has buyers in full control until they exhaust themselves, and then
+# it retraces. Measured across three windows, the claim holds directionally:
+#   accel    2023 lag   2024 lag   current lag   share
+#   >=2.5     -0.027     -0.103      -0.028      23.1%
+#   >=4.0     +0.031     -0.056      -0.027      14.9%
+#   >=6.0     -0.065     -0.122      -0.034       9.5%
+#   >=8.0     -0.098     -0.171      -0.001       7.0%
+#
+# 6.0 is the cut: negative in all three windows and 9.5% of the book, inside
+# the band where trims have worked. 4.0 flips positive in 2023 and 2.5 covers a
+# quarter of the book.
+#
+# Default 1.0 = off until measured end-to-end.
+PARABOLIC_ACCEL_MIN  = float(os.getenv("PARABOLIC_ACCEL_MIN", "6.0"))
+# Measured, three windows:
+#            base                       x0.75                  x0.6
+#   2023  +136.43R 17.6/44.1 | +134.12R 19.4/46.7 | +133.03R 20.7/49.6
+#   2024  +187.48R 40.5/82.9 | +185.43R 40.6/85.0 | +184.19R 40.7/86.0
+#   cur   +379.65R 72.4/198.4| +372.43R 72.5/196.0| +368.00R 72.5/194.2
+#
+# The hostile window gains most (+10.2% worst-windows, +5.9% ulcer at 0.75),
+# 2024 gains on both, the current window is flat. Costs 1-2% of profit and no
+# trades at all — the book stays 694/901/1193.
+#
+# 0.75 rather than 0.6, the milder intervention on a new finding, as with every
+# other rule shipped this week. 0.6 gives the hostile window considerably more
+# (+17.6% / +12.5%) if a more defensive setting is ever wanted.
+#
+# Worth recording that the pattern's own claim was PRE-REGISTERED before
+# measuring: an accelerating trend should make entries WORSE because buyers
+# exhaust themselves. It does, in all three windows, and the effect strengthens
+# monotonically with steepness (-0.027 at 2.5x, -0.122 at 6x in 2024). A
+# claim that only worked at one threshold would have been a coincidence.
+PARABOLIC_SIZE_MULT  = float(os.getenv("PARABOLIC_SIZE_MULT", "0.75"))
 
 # --- Zone age: feature REVIVED, sizing rule REJECTED -------------------------
 # zone_age_bars had been declared, plumbed through signal_filter and written to

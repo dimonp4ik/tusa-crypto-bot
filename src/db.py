@@ -147,6 +147,9 @@ def init_db():
             # inputs keeps the two paths honest.
             "overhead_atr":  "REAL",
             "underfoot_atr": "REAL",
+            # 2026-08-28: PARABOLIC_SIZE_MULT keys on accel_ratio.
+            "accel_ratio":   "REAL",
+            "buy_pressure":  "REAL",
         }.items():
             _ensure_column(c, "signals", col, ddl)
 
@@ -481,9 +484,9 @@ def log_signal(analysis: dict, tp1: float, tp2: float, sl: float) -> int:
                 confidence, reason, entry_low, entry_high, entry_source, market_price,
                 mtf_score, mtf_score_max, premium, atr, sniper, session, trend_4h,
                 bos_extension_atr, vol_atr_pct, volume_ratio, trend_1h, eff_ratio,
-                overhead_atr, underfoot_atr
+                overhead_atr, underfoot_atr, accel_ratio, buy_pressure
             )
-            VALUES (?, ?, ?, ?, ?, ?, ?, 'OPEN', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            VALUES (?, ?, ?, ?, ?, ?, ?, 'OPEN', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """, (
             analysis["symbol"], analysis["direction"], analysis["current_price"],
             tp1, tp2, sl, time_mod.time(),
@@ -503,6 +506,8 @@ def log_signal(analysis: dict, tp1: float, tp2: float, sl: float) -> int:
             analysis.get("eff_ratio"),
             analysis.get("overhead_atr"),
             analysis.get("underfoot_atr"),
+            analysis.get("accel_ratio"),
+            analysis.get("buy_pressure"),
         ))
         return cur.lastrowid
 
