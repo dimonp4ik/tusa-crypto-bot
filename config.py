@@ -420,9 +420,29 @@ TREND_PAIR_RISK_UP_MAX_MULT   = float(os.getenv("TREND_PAIR_RISK_UP_MAX_MULT", "
 #   CURRENT : 604 tr, 41.7% WR, +0.153 net R/trade, +92R total
 #   ADAPTIVE: 378 tr, 41.5% WR, +0.129 net R/trade, +49R total
 # Verdict: DEFENSIVE filter — helps in choppy month (May: +0.043→+0.081 R/trade)
-# but cuts winners in strong-trend month (June: +0.625→+0.416). Net slightly
-# WORSE for us — cuts 37% of trades without lifting win rate. KEPT OFF.
-# Enable only as a conservative/range-market mode after re-validation.
+# but cuts winners in strong-trend month (June: +0.625→+0.416).
+#
+# 🔑 RE-VALIDATED 2026-08-28 on the current config. The A/B above ran at 41.7%
+# win rate, i.e. on a system that no longer exists — different fill model,
+# different exits, no sizing stack. Third dead justification found in two days
+# (after _setup_rank and the TP1 history), so the number mattered.
+#
+#            base                          packs ON
+#   2023   668tr +123.39R 15.2/37.2 | 561tr +116.37R 19.8/46.1   +30% / +24%
+#   2024   872tr +177.84R 36.0/72.6 | 761tr +142.16R 25.0/55.6   -31% / -23%
+#   cur   1167tr +377.46R 66.1/195.4| 994tr +303.95R 47.0/162.3  -29% / -17%
+#
+# The old verdict was right in substance: it cuts 12-16% of trades, gives back
+# 6-20% of profit, and trades a large risk improvement in the HOSTILE window
+# for a large degradation in the other two. Stays OFF as a default.
+#
+# What changed is that it now has a measured USE. This is a ready-made
+# emergency brake: one variable turns the bot conservative, and in the hostile
+# window it produced the single largest risk improvement measured anywhere in
+# this project (+30% on worst-windows, +24% on ulcer). It cannot be switched
+# automatically — detecting the regime live has been tested and does not work —
+# but if the account owner decides the market has turned, the price of flipping
+# it is now known in advance rather than guessed.
 ADAPTIVE_FILTER_PACKS       = os.getenv("ADAPTIVE_FILTER_PACKS", "0") != "0"
 ADAPTIVE_MIXED_SCORE_BUMP   = int(os.getenv("ADAPTIVE_MIXED_SCORE_BUMP", "1"))
 ADAPTIVE_CHOP_SCORE_BUMP    = int(os.getenv("ADAPTIVE_CHOP_SCORE_BUMP", "2"))
