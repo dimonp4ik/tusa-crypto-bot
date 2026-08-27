@@ -263,6 +263,32 @@ DAILY_TREND_SHORT_FILTER = os.getenv("DAILY_TREND_SHORT_FILTER", "1") != "0"
 #       0.15 293tr 37.2% +0.14R/+41R (PEAK) | 0.20 245tr +0.13R/+31R | 0.30 151tr +0.13R/+20R
 #    0.15 = clean unimodal peak: beats baseline on win%, R/trade AND total R while
 #    cutting 32% junk trades. First filter to beat baseline on every axis.
+#
+# 🔑 RE-VALIDATED 2026-08-28. That sweep ran on 430 trades over 21 days at 36.7%
+# win rate — a system with half today's. Re-measured across three windows,
+# both as on/off and as a threshold:
+#
+#   thr     2023 profit/worst    2024 profit/worst    current profit/worst
+#   0.15   +123.39R  15.2       +177.84R  36.0       +377.46R  66.1   <- kept
+#   0.12   +123.86R  10.9       +184.59R  37.3       +394.88R  74.6
+#   0.10   +128.10R  11.2       +183.79R  37.2       +394.51R  65.9
+#   off    +146.89R  12.5       +183.92R  22.0       +422.51R  52.4
+#
+# Loosening pays in two windows — the current one by +12.9% on worst-windows —
+# and the hostile one goes from 8.12R of absolute worst-windows to 11.41R, a
+# 40% risk increase for no extra profit. Both 0.12 and 0.10 land on exactly
+# 11.41R, so a specific cluster enters between 0.12 and 0.15 and it is
+# expensive in a bad market.
+#
+# So 0.15 is not an arbitrary number from an obsolete sweep: it is protecting
+# the hostile regime specifically. Dead justification, sound setting — the same
+# as the TP1 history. A dead justification is a reason to re-measure, not a
+# reason to change.
+#
+# The other two legacy filters were checked at the same time and also hold:
+# turning off BEAR_TREND_HOT_VOL_GUARD is near-neutral (+2-5% trades, profit
+# within 2%) but degrades both hostile-window measures; DIRECTIONAL_RSI_MIDLINE
+# adds 6-9% of trades and loses 31% at equal risk. All three earn their keep.
 EFF_RATIO_FILTER   = os.getenv("EFF_RATIO_FILTER", "1") != "0"
 # 20 -> 10 on 2026-08-26. How many bars the Kaufman efficiency ratio looks
 # back over — i.e. over what span "is this a clean move or chop" is judged.
