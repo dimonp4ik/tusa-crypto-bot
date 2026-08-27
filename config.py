@@ -1376,6 +1376,30 @@ CHOP_ATR_MIN     = float(os.getenv("CHOP_ATR_MIN", "0.006268"))
 # sits between the two. Taking the value with no damage anywhere, on a subset
 # this fresh, beats chasing the extra profit into the first breakage.
 CHOP_SIZE_MULT   = float(os.getenv("CHOP_SIZE_MULT", "1.25"))
+
+# --- Worst corner of the book: measured, NOT shipped -------------------------
+# Top of the triple search's negative list and narrow enough to act on:
+#   session=OFF_HOURS & trend_1h=bearish & bos extension>=1.04
+#     2023  49tr 57.1%   2024  55tr 60.0%   cur 101tr 68.3%
+#   205 trades, 7.6% of the book, 7-14 points of win rate below each window.
+#
+# Trimming it to 0.75x:
+#            base                    x0.75
+#   2023  +132.73R 14.9/35.0 | +132.93R 14.9/34.8
+#   2024  +194.98R 29.5/65.2 | +194.66R 30.5/66.2
+#   cur   +409.99R 50.0/168.2| +407.87R 50.4/168.3
+#
+# This PASSES the usual bar — profit flat, both measures better in two windows
+# — and is still not worth shipping. The moves are 0.1% to 3.4%, indistinct
+# from noise, and the mechanism explains why: two of the three conditions
+# already carry trims, so this corner is riding at 0.75 x 0.75 = 0.5625 before
+# the new rule touches it. There is little left to cut.
+#
+# Recorded as a criterion, not just a result: past "does it work" there is
+# "does it earn its complexity". The sizing stack grew by four rules in one
+# night, and each further one adds surface to maintain and another chance of
+# interacting with something else. A rule that does almost nothing is worse
+# than no rule.
 LONDON_THIN_SIZE_MULT = float(os.getenv("LONDON_THIN_SIZE_MULT", "1.0"))
 # Per-coin tier multiplier, 2026-08-24. Coins ranked by expectancy on the
 # 923-trade book, bottom third 0.75 / top third 1.25, middle untouched.
