@@ -883,6 +883,7 @@ class TradeRecord:
     # real while the bot still believes the trade is alive. This column is how
     # that divergence gets counted instead of assumed away.
     mae_r: float = 0.0
+    mfe_tp1: float = 0.0   # доля пути до TP1, пройденная в лучшей точке
     # Live per-symbol position-size trim (config.SYMBOL_SIZE_MULT). Deliberately
     # not merged into risk_mult — see the construction site for why.
     size_mult: float = 1.0
@@ -984,6 +985,12 @@ def simulate_trade_direct(
         _bos_lvl_num = None
     _risk_abs = abs(entry - sl)
     _mae_r = 0.0
+    # Best move TOWARD the target before the trade resolved, as a fraction of
+    # the distance to TP1. 1.0 means it touched TP1; 0.98 means it stopped two
+    # percent short. Recorded to answer a specific question: how often does a
+    # trade die after coming within a whisker of its target?
+    _mfe_tp1 = 0.0
+    _tp1_dist = abs(tp1 - entry)
     for j in range(fill_bar, end):
         h = highs[j]
         l = lows[j]
@@ -1005,6 +1012,10 @@ def simulate_trade_direct(
                 _adv = (entry - l) if direction == "LONG" else (h - entry)
                 if _adv / _risk_abs > _mae_r:
                     _mae_r = _adv / _risk_abs
+            if _tp1_dist > 0:
+                _fav = (h - entry) if direction == "LONG" else (entry - l)
+                if _fav / _tp1_dist > _mfe_tp1:
+                    _mfe_tp1 = _fav / _tp1_dist
             if _BT_STRUCT_EXIT and _bos_lvl_num is not None:
                 _broke_back = (closes[j] < _bos_lvl_num) if direction == "LONG"                     else (closes[j] > _bos_lvl_num)
                 if _broke_back:
@@ -1254,6 +1265,7 @@ def simulate_trade_direct(
         knn_score=float(setup.get("_knn_score", -1.0)),
         swing_trend=str(setup.get("swing_trend", "") or ""),
         mae_r=round(_mae_r, 4),
+        mfe_tp1=round(_mfe_tp1, 4),
         zone_age_bars=int(setup.get("zone_age_bars", -1) or -1),
         bos_candles_ago=int(setup.get("bos_candles_ago") or -1),
         room_atr=round(_room, 3),
@@ -1656,7 +1668,7 @@ def write_trades_csv(path: str, trades: list[TradeRecord]) -> None:
         "entry_quality_score", "portfolio_risk_score",
         "session", "trend_1h", "trend_4h", "entry_source",
         "signals", "score_tags", "premium", "sniper", "knn_score", "swing_trend",
-        "mae_r", "size_mult", "signal_bar",
+        "mae_r", "mfe_tp1", "size_mult", "signal_bar",
         "zone_age_bars", "bos_candles_ago", "extension_atr",
         "room_atr", "tp1_beyond_level",
         "entry_range_atr", "run_bars",

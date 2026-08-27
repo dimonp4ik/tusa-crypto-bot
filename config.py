@@ -1069,7 +1069,31 @@ SYMBOL_SIZE_MULT = _parse_symbol_size_mult(
 # worth +16.5%/+7.6%/-4.8% at UNCHANGED drawdown — means raising base risk
 # per trade, i.e. changing live position sizes. That is the account owner's
 # call, not a tuning decision. Left at 1.5 pending it.
-COUNTER_STRUCTURE_SIZE_MULT = float(os.getenv("COUNTER_STRUCTURE_SIZE_MULT", "1.5"))
+# 🔴 1.5 -> 1.0 on 2026-08-27. Re-measured on the current config (the earlier
+# numbers predate five size rules added overnight):
+#   mult    2023 profit/worst    2024 profit/worst    current profit/worst
+#   1.5    +133.10R  15.9       +190.26R  32.0       +403.27R  51.3
+#   1.25   +128.92R  15.5       +185.04R  34.6       +392.70R  60.1
+#   1.0    +123.39R  15.2       +177.84R  36.0       +377.46R  66.1
+#
+# Removing it costs 6.4-7.3% of profit and buys a large risk reduction where
+# it matters most in practice: the current window's profit-per-worst-windows
+# goes 51.3 -> 66.1 and its max drawdown -11.06R -> -8.26R, a quarter less.
+# 2024 improves too. The hostile window gives back 4.4%, which is small against
+# that.
+#
+# The "+22% at equal risk" claim this multiplier was originally shipped on came
+# from the pre-2026-08-23 fantasy-fill model and is void.
+#
+# NOT paired with a base-risk increase, and that is a correction of what was
+# proposed yesterday. The idea was to remove the concentrated bet and scale the
+# whole book up to restore the old risk level, estimated at +16.5%. Computed
+# exactly, no single scale factor exists: removal cuts absolute worst-windows
+# by 27% in the current window, 17% in 2024 and only 3% in 2023. Scaling by the
+# current window's factor would raise hostile-window risk by a third; scaling
+# by the hostile window's factor recovers almost nothing. The estimate was made
+# through an average and did not survive the arithmetic.
+COUNTER_STRUCTURE_SIZE_MULT = float(os.getenv("COUNTER_STRUCTURE_SIZE_MULT", "1.0"))
 
 # Score relief for counter-structure setups, 2026-08-26. The marker is the most
 # validated thing in this system — same sign in all five years of the 10,300
