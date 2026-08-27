@@ -140,6 +140,13 @@ def init_db():
             # 2026-08-27: CHOP_SIZE_MULT keys on eff_ratio as well, and it was
             # the one field of the three not on the row.
             "eff_ratio":     "REAL",
+            # 2026-08-27: OPEN_SPACE_SIZE_MULT needs the distance to the nearest
+            # HTF level. Stored RAW (both directions) rather than pre-derived,
+            # so the autotrader can pick overhead/underfoot by direction exactly
+            # as backtest._size_mult_for does — same derivation from the same
+            # inputs keeps the two paths honest.
+            "overhead_atr":  "REAL",
+            "underfoot_atr": "REAL",
         }.items():
             _ensure_column(c, "signals", col, ddl)
 
@@ -473,9 +480,10 @@ def log_signal(analysis: dict, tp1: float, tp2: float, sl: float) -> int:
                 symbol, direction, entry_price, tp1, tp2, sl, opened_at, status,
                 confidence, reason, entry_low, entry_high, entry_source, market_price,
                 mtf_score, mtf_score_max, premium, atr, sniper, session, trend_4h,
-                bos_extension_atr, vol_atr_pct, volume_ratio, trend_1h, eff_ratio
+                bos_extension_atr, vol_atr_pct, volume_ratio, trend_1h, eff_ratio,
+                overhead_atr, underfoot_atr
             )
-            VALUES (?, ?, ?, ?, ?, ?, ?, 'OPEN', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            VALUES (?, ?, ?, ?, ?, ?, ?, 'OPEN', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """, (
             analysis["symbol"], analysis["direction"], analysis["current_price"],
             tp1, tp2, sl, time_mod.time(),
@@ -493,6 +501,8 @@ def log_signal(analysis: dict, tp1: float, tp2: float, sl: float) -> int:
             analysis.get("volume_ratio"),
             analysis.get("trend_1h"),
             analysis.get("eff_ratio"),
+            analysis.get("overhead_atr"),
+            analysis.get("underfoot_atr"),
         ))
         return cur.lastrowid
 

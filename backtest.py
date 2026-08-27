@@ -84,6 +84,7 @@ from config import (  # noqa: E402
     LONDON_VOL_MIN, LONDON_THIN_SIZE_MULT,
     OVERLAP_VOL_MAX, OVERLAP_CALM_SIZE_MULT,
     CHOP_VOL_MIN, CHOP_EFF_MAX, CHOP_ATR_MIN, CHOP_SIZE_MULT,
+    OPEN_SPACE_ROOM_MIN, OPEN_SPACE_SIZE_MULT,
     HTF_NEUTRAL_1H_SIZE_MULT,
     TRAIL_ATR_MULT,
     TP1_CLOSE_FRAC,
@@ -601,6 +602,21 @@ def _size_mult_for(symbol: str, setup: dict) -> float:
             m *= float(VOL_ATR_BOOST_MULT)
     except (TypeError, ValueError):
         pass
+    # Open space rides smaller — see OPEN_SPACE_ROOM_MIN in config.py.
+    # NOTE: there is no "room_atr" key on the setup. The exported column of
+    # that name is DERIVED at trade-record time by picking overhead_atr for a
+    # long and underfoot_atr for a short. Reading setup["room_atr"] returns
+    # None, and the first version of this rule did exactly that: six runs
+    # across two multipliers came back byte-identical to the base, which is
+    # the signature of a knob that never reached the code.
+    if OPEN_SPACE_SIZE_MULT != 1.0:
+        try:
+            _dir = str(setup.get("direction") or "").upper()
+            _rm = setup.get("overhead_atr") if _dir == "LONG" else setup.get("underfoot_atr")
+            if _rm is not None and float(_rm) >= OPEN_SPACE_ROOM_MIN:
+                m *= float(OPEN_SPACE_SIZE_MULT)
+        except (TypeError, ValueError):
+            pass
     # Active chop rides bigger — see CHOP_SIZE_MULT in config.py.
     if CHOP_SIZE_MULT != 1.0:
         try:

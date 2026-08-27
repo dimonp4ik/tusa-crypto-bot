@@ -1377,6 +1377,41 @@ CHOP_ATR_MIN     = float(os.getenv("CHOP_ATR_MIN", "0.006268"))
 # this fresh, beats chasing the extra profit into the first breakage.
 CHOP_SIZE_MULT   = float(os.getenv("CHOP_SIZE_MULT", "1.25"))
 
+# --- Open space rides smaller (2026-08-27) -----------------------------------
+# room_atr is the distance to the nearest higher-timeframe level. Far from any
+# level is WORSE, consistently, in all three windows:
+#   thr>=3.5   2023  67tr 62.7% lag -0.131
+#              2024  74tr 67.6% lag -0.119
+#              cur   98tr 72.4% lag -0.072
+#   8.8% of the book; win rate 5-6 points under each window's own book.
+#
+# Counterintuitive at first — "plenty of room to run" sounds good. It is not:
+# with the nearest structure 3.5+ ATR away the setup is in open space with
+# nothing to lean on. The level matters as a REFERENCE, not as an obstacle.
+#
+# 3.5 chosen by ranking on the weakest window (-0.072 against -0.060 at 4.0
+# and -0.051 at 3.0); 5.0 lags harder still but holds only 38-46 trades per
+# window.
+#
+# Unlike the thin-London trim this subset IS profitable on its own (+0.026 /
+# +0.076 / +0.249 R per trade), so trimming costs real money and has to pay
+# for it in risk. Default 1.0 = off until that is measured.
+OPEN_SPACE_ROOM_MIN  = float(os.getenv("OPEN_SPACE_ROOM_MIN", "3.5"))
+# Measured, three windows pinned:
+#            base                       x0.75                  x0.6
+#   2023  +132.73R 14.9/35.0 | +131.92R 15.1/36.3 | +130.82R 15.0/36.6
+#   2024  +194.98R 29.5/65.2 | +192.71R 31.6/66.8 | +191.32R 32.9/67.6
+#   cur   +409.99R 50.0/168.2| +407.36R 50.5/172.2| +404.90R 50.3/174.0
+# At 0.75 all SIX numbers improve — three windows by two measures — for 0.6%
+# to 1.2% of profit. 0.6 buys more risk reduction at twice the profit cost;
+# the milder intervention is taken on a finding this new.
+#
+# Worth contrasting with the worst-corner trim rejected the same night for
+# being immaterial. The magnitudes here are comparable, but there one window
+# sat flat and its ulcer went backwards — a mixed bag — while this is six of
+# six, and the mechanism is a dimension nothing else in the config touches.
+OPEN_SPACE_SIZE_MULT = float(os.getenv("OPEN_SPACE_SIZE_MULT", "0.75"))
+
 # --- Worst corner of the book: measured, NOT shipped -------------------------
 # Top of the triple search's negative list and narrow enough to act on:
 #   session=OFF_HOURS & trend_1h=bearish & bos extension>=1.04

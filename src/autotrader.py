@@ -38,6 +38,7 @@ from config import (
     LONDON_VOL_MIN, LONDON_THIN_SIZE_MULT,
     OVERLAP_VOL_MAX, OVERLAP_CALM_SIZE_MULT,
     CHOP_VOL_MIN, CHOP_EFF_MAX, CHOP_ATR_MIN, CHOP_SIZE_MULT,
+    OPEN_SPACE_ROOM_MIN, OPEN_SPACE_SIZE_MULT,
     HTF_NEUTRAL_1H_SIZE_MULT,
     EXTENSION_ATR_THRESHOLD, EXTENSION_SIZE_MULT,
     VOL_ATR_BOOST_THRESHOLD, VOL_ATR_BOOST_MULT,
@@ -248,6 +249,18 @@ def _open_for_user(u: dict, sig: dict, inst_id: str, disp: str) -> None:
             _size_mult *= float(VOL_ATR_BOOST_MULT)
     except (TypeError, ValueError):
         pass
+    # Open space rides smaller — see OPEN_SPACE_ROOM_MIN in config.py. Derived
+    # here from the raw distances exactly as backtest._size_mult_for does:
+    # overhead for a long, underfoot for a short. Absent on rows written before
+    # the 2026-08-27 migration, which means no trim rather than a guess.
+    if OPEN_SPACE_SIZE_MULT != 1.0:
+        try:
+            _d = str(sig.get("direction") or "").upper()
+            _rm = sig.get("overhead_atr") if _d == "LONG" else sig.get("underfoot_atr")
+            if _rm is not None and float(_rm) >= OPEN_SPACE_ROOM_MIN:
+                _size_mult *= float(OPEN_SPACE_SIZE_MULT)
+        except (TypeError, ValueError):
+            pass
     # Active chop rides bigger — see CHOP_SIZE_MULT in config.py. All three
     # fields are absent on rows written before the 2026-08-27 migration, and an
     # absent field means no boost rather than one granted on no evidence.
