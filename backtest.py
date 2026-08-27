@@ -566,6 +566,26 @@ _TP1_CLOSE_FRAC = max(0.0, min(1.0, float(TP1_CLOSE_FRAC)))
 _RUNNER_FRAC = 1.0 - _TP1_CLOSE_FRAC
 
 
+def _fld(setup: dict, key: str, missing: float) -> float:
+    """Read a numeric setup field, substituting ONLY when it is absent.
+
+    `float(setup.get(k) or default)` is the obvious spelling and it is wrong
+    wherever zero is a legitimate value, because 0 is falsy: a zone that formed
+    on the current bar has zone_age_bars == 0, and `0 or -1` is -1, i.e. "no
+    zone". The fresh-zone trim silently skipped every age-0 trade — half its
+    intended subset — until a direct call was checked against expected output.
+    Same latent trap for eff_ratio (0 = perfectly non-directional) and for the
+    volume fields that default to 99.
+    """
+    v = setup.get(key)
+    if v is None or v == "":
+        return missing
+    try:
+        return float(v)
+    except (TypeError, ValueError):
+        return missing
+
+
 def _size_mult_for(symbol: str, setup: dict) -> float:
     """Mirror of the live sizing rules in src/autotrader.py."""
     m = float(SYMBOL_SIZE_MULT.get(str(symbol).upper(), 1.0))
@@ -578,13 +598,13 @@ def _size_mult_for(symbol: str, setup: dict) -> float:
     # A calm OVERLAP rides bigger — see OVERLAP_VOL_MAX in config.py.
     if OVERLAP_CALM_SIZE_MULT != 1.0 and _sess == "OVERLAP":
         try:
-            if float(setup.get("volume_ratio") or 99.0) < OVERLAP_VOL_MAX:
+            if _fld(setup, "volume_ratio", 99.0) < OVERLAP_VOL_MAX:
                 m *= float(OVERLAP_CALM_SIZE_MULT)
         except (TypeError, ValueError):
             pass
     if LONDON_VOL_MIN > 0 and _sess == "LONDON":
         try:
-            if float(setup.get("volume_ratio") or 0.0) < LONDON_VOL_MIN:
+            if _fld(setup, "volume_ratio", 0.0) < LONDON_VOL_MIN:
                 m *= float(LONDON_THIN_SIZE_MULT) / float(
                     SESSION_SIZE_MULT.get("LONDON", 1.0) or 1.0)
         except (TypeError, ValueError, ZeroDivisionError):
@@ -594,19 +614,19 @@ def _size_mult_for(symbol: str, setup: dict) -> float:
     if str(setup.get("trend_1h") or "").lower() == "neutral":
         m *= float(HTF_NEUTRAL_1H_SIZE_MULT)
     try:
-        if float(setup.get("bos_extension_atr") or 0.0) > EXTENSION_ATR_THRESHOLD:
+        if _fld(setup, "bos_extension_atr", 0.0) > EXTENSION_ATR_THRESHOLD:
             m *= float(EXTENSION_SIZE_MULT)
     except (TypeError, ValueError):
         pass
     try:
-        if float(setup.get("vol_atr_pct") or 0.0) >= VOL_ATR_BOOST_THRESHOLD:
+        if _fld(setup, "vol_atr_pct", 0.0) >= VOL_ATR_BOOST_THRESHOLD:
             m *= float(VOL_ATR_BOOST_MULT)
     except (TypeError, ValueError):
         pass
     # Thin dead zone rides smaller — see DEAD_THIN_VOL_MAX in config.py.
     if DEAD_THIN_SIZE_MULT != 1.0 and _sess == "DEAD_ZONE":
         try:
-            if float(setup.get("volume_ratio") or 99.0) < DEAD_THIN_VOL_MAX:
+            if _fld(setup, "volume_ratio", 99.0) < DEAD_THIN_VOL_MAX:
                 m *= float(DEAD_THIN_SIZE_MULT)
         except (TypeError, ValueError):
             pass
@@ -628,9 +648,9 @@ def _size_mult_for(symbol: str, setup: dict) -> float:
     # Active chop rides bigger — see CHOP_SIZE_MULT in config.py.
     if CHOP_SIZE_MULT != 1.0:
         try:
-            if (float(setup.get("volume_ratio") or 0.0) >= CHOP_VOL_MIN
-                    and float(setup.get("eff_ratio") or 99.0) < CHOP_EFF_MAX
-                    and float(setup.get("vol_atr_pct") or 0.0) >= CHOP_ATR_MIN):
+            if (_fld(setup, "volume_ratio", 0.0) >= CHOP_VOL_MIN
+                    and _fld(setup, "eff_ratio", 99.0) < CHOP_EFF_MAX
+                    and _fld(setup, "vol_atr_pct", 0.0) >= CHOP_ATR_MIN):
                 m *= float(CHOP_SIZE_MULT)
         except (TypeError, ValueError):
             pass
@@ -1270,7 +1290,13 @@ def simulate_trade_direct(
         mfe_tp1=round(_mfe_tp1, 4),
         obv_agree=float(setup.get("obv_agree") or 0.0),
         obv_strength=float(setup.get("obv_strength") or 0.0),
-        zone_age_bars=int(setup.get("zone_age_bars", -1) or -1),
+        # NOT `or -1`: zone_age_bars == 0 is a real value (the zone formed on
+        # the entry bar) and 0 is falsy, so the obvious spelling wrote -1 —
+        # "no zone" — into the export for every age-0 trade. That corrupted the
+        # feature analysis before it corrupted anything else: age 0 appeared to
+        # occur zero times in 2712 trades, which is what made two otherwise
+        # identical sizing runs disagree by 10%.
+        zone_age_bars=int(_fld(setup, "zone_age_bars", -1.0)),
         bos_candles_ago=int(setup.get("bos_candles_ago") or -1),
         room_atr=round(_room, 3),
         tp1_beyond_level=_beyond,

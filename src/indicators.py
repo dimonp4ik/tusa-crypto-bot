@@ -328,6 +328,14 @@ def detect_fvg(opens: list, highs: list, lows: list, closes: list,
 
     bullish_zone = None
     bearish_zone = None
+    # Bar index the surviving zone was formed on, so its AGE can be reported.
+    # zone_age_bars has been plumbed all the way to the trade export since the
+    # feature was written, but nothing ever produced the age: signal_filter
+    # asks for ind["bullish_fvg_age"] and friends, and no such key was ever
+    # returned, so every trade in every book carries -1. Declared, wired, and
+    # empty end to end.
+    bullish_at = None
+    bearish_at = None
 
     for i in range(search_from, n - 2):
         # Bullish FVG
@@ -337,6 +345,7 @@ def detect_fvg(opens: list, highs: list, lows: list, closes: list,
             size = (gap_top - gap_bot) / (gap_bot + 1e-10)
             if size >= min_pct and gap_bot * 0.999 <= current <= gap_top * 1.01:
                 bullish_zone = (gap_bot, gap_top)  # keep most recent active zone
+                bullish_at = i + 2   # gap completes on the third bar
 
         # Bearish FVG
         elif lows[i] > highs[i + 2]:
@@ -345,12 +354,15 @@ def detect_fvg(opens: list, highs: list, lows: list, closes: list,
             size = (gap_top - gap_bot) / (gap_bot + 1e-10)
             if size >= min_pct and gap_bot * 0.99 <= current <= gap_top * 1.001:
                 bearish_zone = (gap_bot, gap_top)
+                bearish_at = i + 2
 
     return {
         "bullish":      bullish_zone is not None,
         "bearish":      bearish_zone is not None,
         "bullish_zone": bullish_zone,
         "bearish_zone": bearish_zone,
+        "bullish_age":  (n - 1 - bullish_at) if bullish_at is not None else None,
+        "bearish_age":  (n - 1 - bearish_at) if bearish_at is not None else None,
     }
 
 
@@ -372,6 +384,8 @@ def detect_order_block(opens: list, highs: list, lows: list, closes: list,
 
     bull_zone = None
     bear_zone = None
+    bull_at = None
+    bear_at = None
 
     for i in range(start, n - 4):
         # Bullish OB: bearish candle → strong bullish impulse
@@ -384,6 +398,7 @@ def detect_order_block(opens: list, highs: list, lows: list, closes: list,
                     ob_bot = min(opens[i], closes[i])
                     if ob_bot * 0.998 <= current <= ob_top * 1.005:
                         bull_zone = (ob_bot, ob_top)
+                        bull_at = i
 
         # Bearish OB: bullish candle → strong bearish impulse
         elif closes[i] > opens[i]:
@@ -395,12 +410,15 @@ def detect_order_block(opens: list, highs: list, lows: list, closes: list,
                     ob_bot = min(opens[i], closes[i])
                     if ob_bot * 0.995 <= current <= ob_top * 1.002:
                         bear_zone = (ob_bot, ob_top)
+                        bear_at = i
 
     return {
         "bullish":      bull_zone is not None,
         "bearish":      bear_zone is not None,
         "bullish_zone": bull_zone,
         "bearish_zone": bear_zone,
+            "bullish_age":  (len(closes) - 1 - bull_at) if bull_at is not None else None,
+        "bearish_age":  (len(closes) - 1 - bear_at) if bear_at is not None else None,
     }
 
 
@@ -876,6 +894,10 @@ def get_smc_indicators(candles_15m: dict, candles_1h: dict = None,
         "bull_ob":          ob["bullish"],
         "bear_ob":          ob["bearish"],
         "bull_ob_zone":     ob.get("bullish_zone"),
+        "bull_ob_age":      ob.get("bullish_age"),
+        "bear_ob_age":      ob.get("bearish_age"),
+        "bullish_fvg_age":  fvg.get("bullish_age"),
+        "bearish_fvg_age":  fvg.get("bearish_age"),
         "bear_ob_zone":     ob.get("bearish_zone"),
         "bull_sweep":       sweep["bullish"],
         "bear_sweep":       sweep["bearish"],

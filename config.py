@@ -1436,6 +1436,36 @@ OPEN_SPACE_ROOM_MIN  = float(os.getenv("OPEN_SPACE_ROOM_MIN", "3.5"))
 # six, and the mechanism is a dimension nothing else in the config touches.
 OPEN_SPACE_SIZE_MULT = float(os.getenv("OPEN_SPACE_SIZE_MULT", "0.75"))
 
+# --- Zone age: feature REVIVED, sizing rule REJECTED -------------------------
+# zone_age_bars had been declared, plumbed through signal_filter and written to
+# every trade export since the feature was created — and was ALWAYS -1, because
+# nothing computed it: signal_filter asked ind["bullish_fvg_age"] and the
+# indicators never returned such a key. Fixed in detect_fvg/detect_order_block.
+#
+# True distribution once a SECOND instance of the same bug was fixed (the export
+# wrote `int(setup.get(...) or -1)`, and 0 is falsy, so every age-0 trade was
+# recorded as "no zone"):
+#   age   2023 lag    2024 lag   current lag   share
+#    0     -0.114      -0.023      -0.123      53.6%
+#    1     -0.160      -0.104      -0.006      15.4%
+#    2     +0.084      -0.039      +0.169       6.8%
+#    3        -        +0.160      +0.209       3.9%
+# Older zones are better; the freshest lag. But age 0 is HALF THE BOOK, so
+# trimming it is de-leveraging rather than selection.
+#
+# Trimming age 1 alone (15.4%, lagging in all three windows) was measured:
+#            base                       x0.75
+#   2023  +123.39R 15.2/37.2 | +122.13R 15.6/37.5
+#   2024  +177.84R 36.0/72.6 | +175.28R 34.4/71.8
+#   cur   +377.46R 66.1/195.4| +366.01R 68.2/199.0
+# Profit falls in all three, 2024 loses on BOTH measures, and the gains
+# elsewhere are 0.8-3.2%. Not worth a rule.
+#
+# The FIXES stay: the indicator now reports zone age, and _fld() replaced nine
+# `x or default` reads where a legitimate zero was being swallowed. That bug
+# class cost two contradictory measurements before the arithmetic gave it away
+# — identical trade sets cannot produce different numbers.
+
 # --- Thin dead zone rides smaller (2026-08-27) -------------------------------
 # DEAD_ZONE is 16% of the book and has never had a multiplier — SESSION_SIZE_MULT
 # lists London, off-hours, New York and the overlap, so it falls through at 1.0.
