@@ -33,11 +33,22 @@ CATS = ["session", "trend_1h", "trend_4h", "direction", "entry_source", "swing_t
 # bos_extension_atr. Whichever is absent is dropped by the constant-feature
 # guard in conditions() rather than quietly becoming a column of zeros.
 NUMS = ["volume_ratio", "mtf_score", "rsi", "eff_ratio", "vol_atr_pct",
-        "extension_atr", "bos_extension_atr"]
+        "extension_atr", "bos_extension_atr", "obv_strength", "obv_dir"]
 
 
 def load(p):
-    return list(csv.DictReader(open(p, encoding="utf-8")))
+    rows = list(csv.DictReader(open(p, encoding="utf-8")))
+    # OBV strength signed by trade direction: positive means the volume flow
+    # was going the same way as the trade. Raw obv_strength is not comparable
+    # between a long and a short, so the sign has to be folded in before it can
+    # be split on.
+    for r in rows:
+        try:
+            v = float(r.get("obv_strength") or 0.0)
+        except (TypeError, ValueError):
+            v = 0.0
+        r["obv_dir"] = str(-v if r.get("direction") == "SHORT" else v)
+    return rows
 
 
 def num(r, k):

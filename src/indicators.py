@@ -695,6 +695,50 @@ def get_smc_indicators(candles_15m: dict, candles_1h: dict = None,
     avg_vol    = sum(volumes[-21:-1]) / 20 if len(volumes) >= 21 else sum(volumes) / len(volumes)
     vol_ratio  = volumes[-1] / (avg_vol + 1e-10)
 
+    # On-Balance Volume, and specifically whether it AGREES with price.
+    # volume_ratio already says how much is trading; it says nothing about
+    # which side is doing it. OBV adds sign: volume is added when the bar
+    # closes up and subtracted when it closes down, so a rising OBV means the
+    # activity is buying.
+    #
+    # The number kept is not OBV itself (unbounded, incomparable between
+    # symbols) but the DISAGREEMENT between OBV and price over the same
+    # window: +1 when both rose or both fell, -1 when they went opposite ways.
+    # Divergence is the whole reason to compute OBV — price making a high that
+    # volume does not confirm is the classic warning.
+    #
+    # 🔴 TESTED 2026-08-27 AND EMPTY. Kept because it is cheap and the data is
+    # now collected, but do NOT build a rule on it without new evidence:
+    #   agreement sign flips between windows — divergence entries ran +0.148
+    #     and +0.068 better in 2023/2024 and -0.072 WORSE in the current one;
+    #   strength as a directional feature: logistic slope -0.055 / -0.097 /
+    #     -0.013, none significant (t = -0.66 / -1.26 / -0.18);
+    #   inside trend_1h=neutral, where the pair scanner made it look strong,
+    #     splitting by OBV gives +0.598 / +0.127 / -0.608 on 13-21 trades.
+    # The pairs looked good because they inherited the strength of the rule
+    # they sat inside, not because OBV added anything.
+    #
+    # The textbook reading — divergence warns of reversal — does not hold on
+    # this book in either direction consistently.
+    _obv_n = 20
+    obv_price_agree = 0.0
+    if len(volumes) > _obv_n and len(closes) > _obv_n:
+        _obv = 0.0
+        for _i in range(len(closes) - _obv_n, len(closes)):
+            if closes[_i] > closes[_i - 1]:
+                _obv += volumes[_i]
+            elif closes[_i] < closes[_i - 1]:
+                _obv -= volumes[_i]
+        _px_move = closes[-1] - closes[-1 - _obv_n]
+        if _obv != 0 and _px_move != 0:
+            obv_price_agree = 1.0 if (_obv > 0) == (_px_move > 0) else -1.0
+        # Normalised OBV strength: signed volume as a share of total volume
+        # over the window, so it is comparable across symbols and regimes.
+        _tot = sum(volumes[len(closes) - _obv_n:]) or 1.0
+        obv_strength = _obv / _tot
+    else:
+        obv_strength = 0.0
+
     # RSI
     rsi = calculate_rsi(closes, 14)
 
@@ -862,6 +906,8 @@ def get_smc_indicators(candles_15m: dict, candles_1h: dict = None,
         "vol_ratio_regime": vol_reg["ratio"],
         "eff_ratio":        eff_ratio,
         "volume_ratio":     round(vol_ratio, 2),
+        "obv_agree":        obv_price_agree,
+        "obv_strength":     round(obv_strength, 4),
         "current_close":    closes[-1],
         "current_open":     opens[-1],
         "overhead_atr":     _htf["overhead_atr"],
