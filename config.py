@@ -162,8 +162,35 @@ TRADE_WEEKENDS      = os.getenv("TRADE_WEEKENDS", "1") != "0"
 # for every other configuration measured in three days. That single low
 # number was silently rejecting changes — see memory drawdown-is-one-week.
 SMC_SWING_LOOKBACK    = int(os.getenv("SMC_SWING_LOOKBACK", "3"))
-SMC_FVG_MIN_PCT       = 0.0005
-SMC_OB_LOOKBACK       = 30
+# Both were HARDCODED until 2026-08-28, i.e. never swept. The same was true of
+# SMC_SWING_LOOKBACK and EFF_RATIO_LOOKBACK, and both turned out to be worth
+# 60-128 extra trades per window once they could actually be varied. These two
+# control how many setups EXIST at all: the gap threshold decides what counts
+# as an FVG, the lookback decides how far back order blocks are searched.
+# 0.0005 -> 0.0003 on 2026-08-28, the first sweep this value has ever had.
+#   thr       2023 profit/worst/ulcer   2024                    current
+#   0.0008  624tr +109.82R 13.3/32.0    -                     1113tr +349.34R 61.5/178.2
+#   0.0005  668tr +123.39R 15.2/37.2  872tr +177.84R 36.0/72.6 1167tr +377.46R 66.1/195.4
+#   0.0003  694tr +136.43R 17.6/44.1  901tr +187.48R 40.5/82.9 1193tr +379.65R 72.4/198.4
+#   0.0002  703tr +130.54R 16.8/40.5    -                     1199tr +384.66R 70.1/195.8
+#   0.0001  714tr +130.63R 16.8/41.2    -                     1196tr +382.96R 69.8/192.9
+#
+# 0.0003 improves MORE TRADES, MORE PROFIT and BOTH risk measures in all three
+# windows at once — the only change in two days of sweeps to do that. And the
+# gain is not leverage: ABSOLUTE worst-windows falls too, 8.12 -> 7.75R,
+# 4.94 -> 4.63R and 5.71 -> 5.25R. Strictly better on every axis.
+#
+# Below 0.0003 it turns: 0.0002 and 0.0001 add a few more trades and give back
+# profit and risk, so the extra gaps down there are noise rather than
+# structure.
+#
+# Reading: the threshold was set by eye when the detector was written and never
+# touched, because it was hardcoded. Strictness looked safe and was not — the
+# bot was failing to SEE real gaps, not filtering bad ones. Third find of that
+# exact shape after SMC_SWING_LOOKBACK and EFF_RATIO_LOOKBACK, both also
+# hardcoded, both also worth trades AND risk once they could be varied.
+SMC_FVG_MIN_PCT       = float(os.getenv("SMC_FVG_MIN_PCT", "0.0003"))
+SMC_OB_LOOKBACK       = int(os.getenv("SMC_OB_LOOKBACK", "30"))
 SMC_MIN_CONFIRMATIONS = int(os.getenv("SMC_MIN_CONFIRMATIONS", "2"))
 SMC_BOS_MIN_VOLUME    = float(os.getenv("SMC_BOS_MIN_VOLUME", "1.5"))
 SMC_RSI_LONG_MAX      = float(os.getenv("SMC_RSI_LONG_MAX", "72"))   # skip overextended longs
