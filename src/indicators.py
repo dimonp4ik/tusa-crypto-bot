@@ -713,6 +713,59 @@ def get_smc_indicators(candles_15m: dict, candles_1h: dict = None,
     avg_vol    = sum(volumes[-21:-1]) / 20 if len(volumes) >= 21 else sum(volumes) / len(volumes)
     vol_ratio  = volumes[-1] / (avg_vol + 1e-10)
 
+    # Buying vs selling pressure, the candle-level stand-in for order-flow.
+    # A "big player accumulating or distributing" indicator reads the tape:
+    # whether large orders are lifting the ask or hitting the bid. We have no
+    # tape, only OHLCV — but where a bar CLOSES inside its own range, weighted
+    # by that bar's volume, is the standard approximation. Close at the high on
+    # heavy volume means buyers finished the bar in control.
+    #
+    # Distinct from OBV, which was measured and empty: OBV uses only
+    # close-to-close direction and ignores where inside the bar the close sat.
+    # This is intrabar, so a bar that opens low, is bought all session and
+    # closes at its high reads strongly positive even if it merely returned to
+    # the previous close.
+    #
+    # Reported as a volume-weighted mean over the window, in [-1, +1].
+    _prs_n = 20
+    pressure = 0.0
+    if len(closes) > _prs_n:
+        _num = _den = 0.0
+        for _i in range(len(closes) - _prs_n, len(closes)):
+            _rng = highs[_i] - lows[_i]
+            if _rng <= 0:
+                continue
+            # +1 = closed at the high, -1 = closed at the low
+            _loc = ((closes[_i] - lows[_i]) - (highs[_i] - closes[_i])) / _rng
+            _num += _loc * volumes[_i]
+            _den += volumes[_i]
+        if _den > 0:
+            pressure = _num / _den
+
+    # Parabolic acceleration — the "parabolic arc" pattern expressed as a
+    # number. The arc is a trend whose every successive leg is steeper: buyers in
+    # full control until the buying exhausts itself, at which point the whole
+    # move retraces. The bot measures how CLEAN a move is (eff_ratio) and how
+    # FAR past the break it has gone (extension), but nothing about whether it
+    # is speeding up.
+    #
+    # Ratio of the recent slope to the preceding one over the same span: >1 is
+    # accelerating (arc-like), <1 is decelerating. Signed by the direction of
+    # the recent leg so a collapsing downtrend reads the same way as a blow-off
+    # top.
+    _acc_n = 10
+    accel_ratio = 1.0
+    if len(closes) > 2 * _acc_n:
+        _recent = closes[-1] - closes[-1 - _acc_n]
+        _prior = closes[-1 - _acc_n] - closes[-1 - 2 * _acc_n]
+        if _prior != 0 and _recent != 0 and (_recent > 0) == (_prior > 0):
+            accel_ratio = abs(_recent) / abs(_prior)
+        elif _prior == 0 and _recent != 0:
+            accel_ratio = 3.0          # from flat into a move: strongly accelerating
+        else:
+            accel_ratio = 0.0          # legs disagree in sign: not an arc at all
+        accel_ratio = min(accel_ratio, 10.0)
+
     # On-Balance Volume, and specifically whether it AGREES with price.
     # volume_ratio already says how much is trading; it says nothing about
     # which side is doing it. OBV adds sign: volume is added when the bar
@@ -928,6 +981,8 @@ def get_smc_indicators(candles_15m: dict, candles_1h: dict = None,
         "vol_ratio_regime": vol_reg["ratio"],
         "eff_ratio":        eff_ratio,
         "volume_ratio":     round(vol_ratio, 2),
+        "buy_pressure":     round(pressure, 4),
+        "accel_ratio":      round(accel_ratio, 3),
         "obv_agree":        obv_price_agree,
         "obv_strength":     round(obv_strength, 4),
         "current_close":    closes[-1],
