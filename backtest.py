@@ -85,6 +85,7 @@ from config import (  # noqa: E402
     OVERLAP_VOL_MAX, OVERLAP_CALM_SIZE_MULT,
     CHOP_VOL_MIN, CHOP_EFF_MAX, CHOP_ATR_MIN, CHOP_SIZE_MULT,
     OPEN_SPACE_ROOM_MIN, OPEN_SPACE_SIZE_MULT,
+    DEAD_THIN_VOL_MAX, DEAD_THIN_SIZE_MULT,
     HTF_NEUTRAL_1H_SIZE_MULT,
     TRAIL_ATR_MULT,
     TP1_CLOSE_FRAC,
@@ -602,6 +603,13 @@ def _size_mult_for(symbol: str, setup: dict) -> float:
             m *= float(VOL_ATR_BOOST_MULT)
     except (TypeError, ValueError):
         pass
+    # Thin dead zone rides smaller — see DEAD_THIN_VOL_MAX in config.py.
+    if DEAD_THIN_SIZE_MULT != 1.0 and _sess == "DEAD_ZONE":
+        try:
+            if float(setup.get("volume_ratio") or 99.0) < DEAD_THIN_VOL_MAX:
+                m *= float(DEAD_THIN_SIZE_MULT)
+        except (TypeError, ValueError):
+            pass
     # Open space rides smaller — see OPEN_SPACE_ROOM_MIN in config.py.
     # NOTE: there is no "room_atr" key on the setup. The exported column of
     # that name is DERIVED at trade-record time by picking overhead_atr for a

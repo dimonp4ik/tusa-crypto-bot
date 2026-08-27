@@ -39,6 +39,7 @@ from config import (
     OVERLAP_VOL_MAX, OVERLAP_CALM_SIZE_MULT,
     CHOP_VOL_MIN, CHOP_EFF_MAX, CHOP_ATR_MIN, CHOP_SIZE_MULT,
     OPEN_SPACE_ROOM_MIN, OPEN_SPACE_SIZE_MULT,
+    DEAD_THIN_VOL_MAX, DEAD_THIN_SIZE_MULT,
     HTF_NEUTRAL_1H_SIZE_MULT,
     EXTENSION_ATR_THRESHOLD, EXTENSION_SIZE_MULT,
     VOL_ATR_BOOST_THRESHOLD, VOL_ATR_BOOST_MULT,
@@ -249,6 +250,15 @@ def _open_for_user(u: dict, sig: dict, inst_id: str, disp: str) -> None:
             _size_mult *= float(VOL_ATR_BOOST_MULT)
     except (TypeError, ValueError):
         pass
+    # Thin dead zone rides smaller — see DEAD_THIN_VOL_MAX in config.py.
+    # Missing volume_ratio means no trim, matching the backtest.
+    if DEAD_THIN_SIZE_MULT != 1.0 and _sess == "DEAD_ZONE":
+        try:
+            _dv = sig.get("volume_ratio")
+            if _dv is not None and float(_dv) < DEAD_THIN_VOL_MAX:
+                _size_mult *= float(DEAD_THIN_SIZE_MULT)
+        except (TypeError, ValueError):
+            pass
     # Open space rides smaller — see OPEN_SPACE_ROOM_MIN in config.py. Derived
     # here from the raw distances exactly as backtest._size_mult_for does:
     # overhead for a long, underfoot for a short. Absent on rows written before

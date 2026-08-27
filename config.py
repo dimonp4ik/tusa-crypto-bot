@@ -1412,6 +1412,46 @@ OPEN_SPACE_ROOM_MIN  = float(os.getenv("OPEN_SPACE_ROOM_MIN", "3.5"))
 # six, and the mechanism is a dimension nothing else in the config touches.
 OPEN_SPACE_SIZE_MULT = float(os.getenv("OPEN_SPACE_SIZE_MULT", "0.75"))
 
+# --- Thin dead zone rides smaller (2026-08-27) -------------------------------
+# DEAD_ZONE is 16% of the book and has never had a multiplier — SESSION_SIZE_MULT
+# lists London, off-hours, New York and the overlap, so it falls through at 1.0.
+# The session as a whole deserves that: lift -0.002 / +0.051 / -0.040, t near
+# zero everywhere. Split by volume it is the familiar shape once more:
+#              2023      2024     current
+#   vol<2.0   -0.265    -0.070    -0.091
+#   vol>=2.0  +0.189    +0.165    -0.001
+# Third confirmation of the same mechanism, after London and the stocks bot's
+# opening bell: a session without volume behind it is just a clock reading.
+#
+# The thin half is 7.0% of the book and, crucially, is WEAK IN THE HOSTILE
+# WINDOW: absolute -0.106R there against a book of +0.144R.
+#
+# That last point is the criterion, and it corrects what was written after the
+# thin-London trim. "Trim when absolute expectancy is near zero" does not fit
+# the evidence — thin London ran +0.265 against a book of +0.286 and trimming
+# WORKED, while the bearish-1h subset ran +0.264 against ~+0.30 and it FAILED.
+# Near-identical profiles, opposite outcomes. The real difference is what the
+# trim does: thin London removed an unjustified BOOST (1.5x back to 1.0x, not
+# below base), whereas bearish-1h cut BELOW base. Cutting below base needs the
+# subset to be weak specifically in the hostile window, where there is least
+# margin — open-space qualified (+0.026 against +0.199 there) and bearish-1h
+# did not (+0.191 against +0.144, i.e. ABOVE its book).
+DEAD_THIN_VOL_MAX   = float(os.getenv("DEAD_THIN_VOL_MAX", "2.0"))
+# Measured, three windows pinned:
+#            base                       x0.75                  x0.6
+#   2023  +131.92R 15.1/36.3 | +133.10R 15.9/38.0 | +133.80R 16.1/38.9
+#   2024  +192.71R 31.6/66.8 | +190.26R 32.0/66.6 | +188.93R 32.3/66.3
+#   cur   +407.36R 50.5/172.2| +403.27R 51.3/173.5| +400.46R 51.8/173.7
+#
+# The HOSTILE window gains profit as well as both risk measures (+5.3% and
+# +4.7%), which is exactly what the corrected trim rule predicts: the subset
+# is NEGATIVE there (-0.106R against a book of +0.144R), so cutting below base
+# is safe. The other two windows give up about 1% of profit for 0.8-1.6% on
+# worst-windows; 2024's ulcer gives back 0.3%.
+#
+# 0.75 rather than 0.6 — the milder intervention, same precedent as elsewhere.
+DEAD_THIN_SIZE_MULT = float(os.getenv("DEAD_THIN_SIZE_MULT", "0.75"))
+
 # --- Worst corner of the book: measured, NOT shipped -------------------------
 # Top of the triple search's negative list and narrow enough to act on:
 #   session=OFF_HOURS & trend_1h=bearish & bos extension>=1.04
