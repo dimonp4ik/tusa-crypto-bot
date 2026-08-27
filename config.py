@@ -1341,6 +1341,41 @@ OVERLAP_VOL_MAX        = float(os.getenv("OVERLAP_VOL_MAX", "2.5"))
 # MAX_SAME_DIRECTION_POSITIONS makes about itself — so raising it because a
 # calm regime likes it would be tuning the insurance to the weather.
 OVERLAP_CALM_SIZE_MULT = float(os.getenv("OVERLAP_CALM_SIZE_MULT", "1.75"))
+
+# --- Active chop rides bigger (2026-08-27) -----------------------------------
+# Found by the triple search, and it names no session and no trend — it
+# describes a market STATE: high volume, LOW efficiency ratio, high ATR
+# percentage. Price is busy and violent but not travelling cleanly.
+#
+#   volume>=2.11 & eff_ratio<0.4476 & vol_atr_pct>=0.006268
+#     2023  114tr 79.8% lift +0.230
+#     2024  132tr 77.3% lift +0.148
+#     cur   152tr 76.3% lift +0.260
+#   398 trades, 14.7% of the book, no size or decay flag.
+#
+# Win rate runs 10.9 / 3.8 / 0.6 points over each window's book. It agrees with
+# a note already in this file at EFF_RATIO_MAX: a very clean trend at entry
+# means the move is already extended and the retest being bought is late. The
+# triple reaches the same idea from the other side — messy is not bad, messy
+# WITH participation is where the edge sits.
+#
+# Default 1.0 = off until measured end-to-end.
+CHOP_VOL_MIN     = float(os.getenv("CHOP_VOL_MIN", "2.11"))
+CHOP_EFF_MAX     = float(os.getenv("CHOP_EFF_MAX", "0.4476"))
+CHOP_ATR_MIN     = float(os.getenv("CHOP_ATR_MIN", "0.006268"))
+# Measured end-to-end, three windows pinned:
+#            base                          x1.25                  x1.5
+#   2023  +122.76R 14.1/32.5 | +132.73R 14.9/35.0 | +139.95R 15.2/36.0
+#   2024  +186.22R 28.3/63.8 | +194.98R 29.5/65.2 | +201.24R 29.3/64.9
+#   cur   +399.10R 48.4/167.8| +409.99R 50.0/168.2| +415.63R 51.0/166.3
+#
+# 1.25 improves profit AND both risk measures in ALL THREE windows — a clean
+# sweep, which almost nothing measured over two days has managed. 1.5 earns
+# more profit but the cracks start: 2024 gives back a little on both ratios
+# and the current window's ulcer turns negative, so the concentration turn
+# sits between the two. Taking the value with no damage anywhere, on a subset
+# this fresh, beats chasing the extra profit into the first breakage.
+CHOP_SIZE_MULT   = float(os.getenv("CHOP_SIZE_MULT", "1.25"))
 LONDON_THIN_SIZE_MULT = float(os.getenv("LONDON_THIN_SIZE_MULT", "1.0"))
 # Per-coin tier multiplier, 2026-08-24. Coins ranked by expectancy on the
 # 923-trade book, bottom third 0.75 / top third 1.25, middle untouched.

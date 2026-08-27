@@ -83,6 +83,7 @@ from config import (  # noqa: E402
     KILL_SWITCH_SL_STREAK,
     LONDON_VOL_MIN, LONDON_THIN_SIZE_MULT,
     OVERLAP_VOL_MAX, OVERLAP_CALM_SIZE_MULT,
+    CHOP_VOL_MIN, CHOP_EFF_MAX, CHOP_ATR_MIN, CHOP_SIZE_MULT,
     HTF_NEUTRAL_1H_SIZE_MULT,
     TRAIL_ATR_MULT,
     TP1_CLOSE_FRAC,
@@ -600,6 +601,15 @@ def _size_mult_for(symbol: str, setup: dict) -> float:
             m *= float(VOL_ATR_BOOST_MULT)
     except (TypeError, ValueError):
         pass
+    # Active chop rides bigger — see CHOP_SIZE_MULT in config.py.
+    if CHOP_SIZE_MULT != 1.0:
+        try:
+            if (float(setup.get("volume_ratio") or 0.0) >= CHOP_VOL_MIN
+                    and float(setup.get("eff_ratio") or 99.0) < CHOP_EFF_MAX
+                    and float(setup.get("vol_atr_pct") or 0.0) >= CHOP_ATR_MIN):
+                m *= float(CHOP_SIZE_MULT)
+        except (TypeError, ValueError):
+            pass
     return min(m, float(SIZE_MULT_MAX))
 
 

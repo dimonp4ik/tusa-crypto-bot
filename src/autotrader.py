@@ -37,6 +37,7 @@ from config import (
     SESSION_SIZE_MULT, HTF_NEUTRAL_4H_SIZE_MULT, SYMBOL_TIER_MULT, SIZE_MULT_MAX,
     LONDON_VOL_MIN, LONDON_THIN_SIZE_MULT,
     OVERLAP_VOL_MAX, OVERLAP_CALM_SIZE_MULT,
+    CHOP_VOL_MIN, CHOP_EFF_MAX, CHOP_ATR_MIN, CHOP_SIZE_MULT,
     HTF_NEUTRAL_1H_SIZE_MULT,
     EXTENSION_ATR_THRESHOLD, EXTENSION_SIZE_MULT,
     VOL_ATR_BOOST_THRESHOLD, VOL_ATR_BOOST_MULT,
@@ -247,6 +248,20 @@ def _open_for_user(u: dict, sig: dict, inst_id: str, disp: str) -> None:
             _size_mult *= float(VOL_ATR_BOOST_MULT)
     except (TypeError, ValueError):
         pass
+    # Active chop rides bigger — see CHOP_SIZE_MULT in config.py. All three
+    # fields are absent on rows written before the 2026-08-27 migration, and an
+    # absent field means no boost rather than one granted on no evidence.
+    if CHOP_SIZE_MULT != 1.0:
+        try:
+            _vr, _er, _ap = (sig.get("volume_ratio"), sig.get("eff_ratio"),
+                             sig.get("vol_atr_pct"))
+            if (_vr is not None and _er is not None and _ap is not None
+                    and float(_vr) >= CHOP_VOL_MIN
+                    and float(_er) < CHOP_EFF_MAX
+                    and float(_ap) >= CHOP_ATR_MIN):
+                _size_mult *= float(CHOP_SIZE_MULT)
+        except (TypeError, ValueError):
+            pass
     # Ceiling on the stacked product — see SIZE_MULT_MAX in config.py.
     _size_mult = min(_size_mult, float(SIZE_MULT_MAX))
     # Risk-normalised sizing: a wide stop gets less size so that 1R costs the
