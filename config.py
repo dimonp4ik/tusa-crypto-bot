@@ -725,7 +725,37 @@ RISK_MAX_PCT  = float(os.getenv("RISK_MAX_PCT", "0.035"))  # max SL distance = 3
 # profit goes +74.60R -> +95.96R -> +112.30R. Win rate can be bought to
 # almost any level and the price is always money.
 TP1_R_MULT    = float(os.getenv("TP1_R_MULT", "0.6"))      # TP1 = entry ± risk * 0.6
-TP2_R_MULT    = float(os.getenv("TP2_R_MULT", "2.0"))      # TP2 = entry ± risk * 2.0 (was 3.0 — unreachable)
+TP2_R_MULT    = float(os.getenv("TP2_R_MULT", "3.0"))      # TP2 = entry ± risk * 3.0
+# 2026-08-28: back to 3.0. It was cut to 2.0 for being "unreachable", which was
+# right under the OLD exit (bank 50% at TP1, fixed TP2) and is wrong under the
+# current one (full position past TP1 + a 0.02 ATR trail). TP2 is no longer the
+# exit — the trail is, on ~70% of trades — so TP2 is just a CAP, and an
+# unreachable cap costs nothing while a near one truncates the best trades.
+#            2023 profit  ratios      2026 profit  ratios
+#   1.5R      +125.11R   17.7/43.1     +360.94R   66.5/185.0
+#   2.0R      +137.03R   20.0/48.5     +378.16R   74.6/200.5   <- was
+#   2.5R      +139.66R   20.4/49.9     +390.02R   78.8/210.6
+#   3.0R      +143.59R   21.0/51.4     +396.98R   80.3/216.4   <- shipped
+#   4.0R      +145.29R   21.2/52.0     +400.90R   81.0/218.5
+#   8.0R      +147.82R   21.6/52.9     +404.95R   81.9/220.8
+# 2024: 2.0R +189.26R 42.1/88.0 -> 3.0R +190.15R 42.3/88.9.
+# All three windows improve on all three measures (+4.8/+0.5/+5.0% profit).
+#
+# Two things worth noting about the shape. Worst-windows is IDENTICAL from 2.5R
+# up (6.84 / 4.95 in every row) — TP2 only ever touches winners, so it cannot
+# move drawdown. And unlike the trail sweep, monotone-to-the-edge is NOT a
+# warning here: raising TP2 REDUCES reliance on the optimistic wick-fill the
+# backtest grants at that level, so the far end of this curve is the
+# conservative end, not the fitted one. 3.0 rather than 8.0 because returns
+# diminish (2.0->3.0 captures ~80% of the total available) and because TP2 has
+# a second job the backtest cannot see: it is a resting exchange order, and if
+# the bot is down it is the only thing that banks a winner. The exchange
+# backstop sits at STOP_EXCHANGE_BACKSTOP_R=1.5, so bot-down is -1.5R against
+# +3.0R rather than +2.0R — a wider net, not a weaker one, but a more distant
+# one, and that trade-off is the reason not to push it to 8.
+#
+# ⚠️ This interacts with TRAIL_ATR_MULT and TP1_CLOSE_FRAC. If the exit ever
+# goes back to banking part of the position at TP1, re-measure this.
 
 # Runner exit after TP1: trail the remaining 50% by ATR instead of fixed TP2.
 # Backtest (10 sym, 2880x15m): +21% net R, -27% max drawdown, same win rate vs
