@@ -367,31 +367,41 @@ SMC_MIN_CONFIRMATIONS = int(os.getenv("SMC_MIN_CONFIRMATIONS", "2"))
 # bad — it was just cutting on volume. Same family as the swing/eff/FVG finds:
 # the bot was not selecting badly, it could not SEE the structure.
 #
-# ⚠️ CORRECTED same day. The line that used to sit here called this a pure gate
-# test. It is not. The threshold also feeds the score's volume tiers, and the
-# +2 tier is max(threshold * 1.35, 2.0):
-#   1.5 -> max(2.025, 2.0) = 2.025
-#   1.4 -> max(1.890, 2.0) = 2.000   <- the tier MOVES on this very step
-#   1.3 -> max(1.755, 2.0) = 2.000   <- and does not move again below 1.4
-# So the shipped step, 1.5 -> 1.4, changes TWO things: the gate loosens AND the
-# +2 tier drops from 2.025 to 2.0, promoting setups in that narrow band. The
-# 1.8 row moves the tier the other way, to 2.43.
+# ⚠️ MEASURED, after two wrong write-ups of this same paragraph. The threshold
+# also feeds the score's +2 volume tier, max(threshold * 1.35, 2.0), which IS
+# 2.025 at gate 1.5 and 2.000 at 1.4 and 1.3 — so the shipped step moves the
+# tier as well as the gate. But moving the tier changes NOTHING, measured by
+# pinning it with SMC_VOL_STRONG_TIER and running the arms apart:
+#   gate 1.5, tier 2.025 (base)   2023  694tr +143.59R 21.0/51.4 | 2026 1192tr +396.98R 80.3/216.4
+#   gate 1.5, tier 2.000          2023  694tr +143.59R 21.0/51.4 | 2026 1192tr +396.98R 80.3/216.4
+#   gate 1.4, tier 2.025 (frozen) 2023  737tr +148.46R 23.2/53.7
+#   gate 1.4, tier 2.000 (shipped)2023  737tr +148.46R 23.2/53.7
+# The tier arm is identical to base to the last decimal in both windows, and the
+# frozen-tier gate arm is identical to the shipped one. The 2.000-2.025 band is
+# 1.2% wide and simply contains no setup. This is a real null, not the "knob
+# never arrived" failure — SMC_VOL_STRONG_TIER was anchor-checked first.
 #
-# The decision stands — 1.4 improves every measure in all three windows, which
-# is true whatever the mechanism — but the explanation does not. What CAN be
-# said cleanly: 1.4 -> 1.3 leaves the tier at 2.0, so that step alone is a pure
-# gate test, and it comes out mixed (+62/+61/+66 trades, +11.4/+9.2/+2.4%
-# profit, risk ratios +2.6/-19.2/-17.2% on worst-windows). Reading: loosening
-# adds trades with diminishing quality — the setups nearest the old threshold
-# are the best of the ones being excluded — and the first increment is worth
-# taking while the second is not.
+# So: the gate is the entire effect, and the first write-up ("the only change is
+# which setups exist") was right in substance while its reasoning was wrong.
+# What IS clean and worth keeping: 1.4 -> 1.3 leaves the tier untouched either
+# way, and that pure gate step comes out mixed — +62/+61/+66 trades and
+# +11.4/+9.2/+2.4% profit, but worst-windows ratios +2.6/-19.2/-17.2%. Loosening
+# adds trades of diminishing quality; the first increment earns its place, the
+# second does not.
 #
-# ⚠️ OPEN QUESTION, do not treat as understood: the stocks desk lands on 1.3,
-# and 1.4 is a DIP there — worse than BOTH neighbours, in nested windows and in
-# two disjoint slices. Diminishing returns cannot produce a dip. Either the tier
-# confound bites differently there or something else is going on. Until that is
-# explained, this parameter must be re-measured per desk, never synced.
+# ⚠️ STILL OPEN: the stocks desk lands on 1.3 and shows 1.4 as a DIP, worse than
+# BOTH neighbours, in nested windows and in two disjoint slices. Diminishing
+# returns cannot make a dip, and the tier confound is now ruled out as the cause
+# here — so whatever produces it there is still unidentified. Measure per desk.
 SMC_BOS_MIN_VOLUME    = float(os.getenv("SMC_BOS_MIN_VOLUME", "1.4"))
+
+# Research handle, default OFF (0 = compute as before). The +2 volume score tier
+# is normally max(SMC_BOS_MIN_VOLUME * 1.35, 2.0), so it MOVES whenever the gate
+# moves and every gate sweep is impure by construction. Set this to a fixed
+# number to pin the tier while the gate moves. Used 2026-08-28 to prove the tier
+# arm is inert (see the block above); left in place so the next gate sweep can
+# be run clean without re-deriving the trick.
+SMC_VOL_STRONG_TIER   = float(os.getenv("SMC_VOL_STRONG_TIER", "0"))
 SMC_RSI_LONG_MAX      = float(os.getenv("SMC_RSI_LONG_MAX", "72"))   # skip overextended longs
 SMC_RSI_SHORT_MIN     = float(os.getenv("SMC_RSI_SHORT_MIN", "28"))  # skip overextended shorts
 MAX_SETUPS_TO_CLAUDE  = int(os.getenv("MAX_SETUPS_TO_CLAUDE", "7"))  # only strongest go to Claude

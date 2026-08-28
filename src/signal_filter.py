@@ -212,6 +212,7 @@ def _zone_payload(zone, source: str, current: float, age=None):
 
 
 from config import SMC_FVG_MAX_FILL as _FVG_MAX_FILL   # see config.py
+from config import SMC_VOL_STRONG_TIER
 
 
 def _fvg_fresh(zone, current: float, direction: str) -> bool:
@@ -304,7 +305,9 @@ def _calc_mtf_score(ind: dict, bos: str, direction: str, confirmations: list,
         score += HTF_NEUTRAL_SCORE; tags.append(f"4hN+{HTF_NEUTRAL_SCORE}")
 
     vol = float(ind.get("volume_ratio", 0.0))
-    if vol >= max(SMC_BOS_MIN_VOLUME * 1.35, 2.0):
+    _vol_strong = (SMC_VOL_STRONG_TIER if SMC_VOL_STRONG_TIER > 0
+                   else max(SMC_BOS_MIN_VOLUME * 1.35, 2.0))
+    if vol >= _vol_strong:
         score += 2; tags.append("Vol+2")
     elif vol >= SMC_BOS_MIN_VOLUME:
         score += 1; tags.append("Vol+1")
