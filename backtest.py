@@ -914,6 +914,7 @@ class TradeRecord:
     mfe_tp1: float = 0.0   # доля пути до TP1, пройденная в лучшей точке
     accel_ratio: float = 1.0   # ускорение движения: >1 = параболическая дуга
     buy_pressure: float = 0.0  # давление покупателей внутри баров, [-1,+1]
+    absorption: float = 0.0    # усилие/результат по Вайкоффу: объём на единицу хода
     obv_agree: float = 0.0
     obv_strength: float = 0.0
     # Live per-symbol position-size trim (config.SYMBOL_SIZE_MULT). Deliberately
@@ -1300,6 +1301,7 @@ def simulate_trade_direct(
         mfe_tp1=round(_mfe_tp1, 4),
         accel_ratio=_fld(setup, "accel_ratio", 1.0),
         buy_pressure=_fld(setup, "buy_pressure", 0.0),
+        absorption=_fld(setup, "absorption", 0.0),
         obv_agree=float(setup.get("obv_agree") or 0.0),
         obv_strength=float(setup.get("obv_strength") or 0.0),
         # NOT `or -1`: zone_age_bars == 0 is a real value (the zone formed on
@@ -1710,7 +1712,7 @@ def write_trades_csv(path: str, trades: list[TradeRecord]) -> None:
         "entry_quality_score", "portfolio_risk_score",
         "session", "trend_1h", "trend_4h", "entry_source",
         "signals", "score_tags", "premium", "sniper", "knn_score", "swing_trend",
-        "mae_r", "mfe_tp1", "accel_ratio", "buy_pressure", "obv_agree", "obv_strength", "size_mult", "signal_bar",
+        "mae_r", "mfe_tp1", "accel_ratio", "buy_pressure", "absorption", "obv_agree", "obv_strength", "size_mult", "signal_bar",
         "zone_age_bars", "bos_candles_ago", "extension_atr",
         "room_atr", "tp1_beyond_level",
         "entry_range_atr", "run_bars",

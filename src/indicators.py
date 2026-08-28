@@ -837,6 +837,45 @@ def get_smc_indicators(candles_15m: dict, candles_1h: dict = None,
     # ATR for stops/takes
     atr = calculate_atr(highs, lows, closes)
 
+
+    # Wyckoff "effort versus result" — the one idea in that method the bot has
+    # no equivalent for. Everything else Wyckoff describes is already here
+    # under other names: the spring is our liquidity sweep, the trading range
+    # is swing_trend=range, a sign of strength is the structure break itself.
+    #
+    # Effort is volume; result is how far price actually travelled. Heavy
+    # volume that moves price barely at all means someone is ABSORBING — a
+    # large participant filling an order without letting the price run. Light
+    # volume that moves price a long way means the opposite: nobody is there.
+    #
+    # volume_ratio alone cannot see this. Heavy volume on a wide bar and heavy
+    # volume on a narrow bar are identical to it, and to Wyckoff they are
+    # opposite events. So: volume relative to its own average, divided by the
+    # bar's range in ATR units. High = effort without result = absorption.
+    #
+    # 🔴 MEASURED 2026-08-28 AND EMPTY. Kept because it is cheap and now
+    # collected, but it does not separate outcomes:
+    #   absorption 3-6   2023 +0.003   2024 +0.019   current -0.057
+    # Sign flips, magnitudes in the hundredths, and the >6 band holds fewer
+    # than 30 trades per window — genuine absorption is nearly absent from this
+    # book.
+    #
+    # The likely reason is not that Wyckoff is wrong but that it describes a
+    # phase this bot never trades. Entry requires a structure break on at least
+    # 1.5x average volume, i.e. the moment price MOVES. Absorption is the phase
+    # before that, where price stands still while someone fills. Using it would
+    # mean changing what the bot enters on, not adding a multiplier.
+    #
+    # Everything else in Wyckoff is already here under other names: the spring
+    # is the liquidity sweep, the trading range is swing_trend=range, a sign of
+    # strength is the structure break itself.
+    absorption = 0.0
+    if len(closes) > 21 and atr > 0:
+        _rng_atr = (highs[-1] - lows[-1]) / atr
+        if _rng_atr > 0.05:          # guard: a doji would divide by ~nothing
+            absorption = vol_ratio / _rng_atr
+            absorption = min(absorption, 20.0)
+
     # BOS staleness/extension — how many candles since the break, and how far
     # (in ATR) price has already run beyond the break level. A signal firing
     # several candles after the actual break can be chasing an already-
@@ -981,6 +1020,7 @@ def get_smc_indicators(candles_15m: dict, candles_1h: dict = None,
         "vol_ratio_regime": vol_reg["ratio"],
         "eff_ratio":        eff_ratio,
         "volume_ratio":     round(vol_ratio, 2),
+        "absorption":       round(absorption, 3),
         "buy_pressure":     round(pressure, 4),
         "accel_ratio":      round(accel_ratio, 3),
         "obv_agree":        obv_price_agree,
