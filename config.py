@@ -208,6 +208,44 @@ SMC_FVG_MIN_PCT       = float(os.getenv("SMC_FVG_MIN_PCT", "0.0003"))
 # risk; this one was already at its optimum. "Never swept" means unknown, not
 # wrong.
 SMC_OB_LOOKBACK       = int(os.getenv("SMC_OB_LOOKBACK", "30"))
+# Minimum impulse after the order-block candle: price must travel this far over
+# the next three candles for the candle to count as an order block at all.
+# Hardcoded as 0.005 until 2026-08-28 and therefore never swept — the same
+# situation as SMC_FVG_MIN_PCT next door, which turned out to be far too strict
+# and was worth trades AND risk in every window. This one governs how many
+# order blocks the bot SEES.
+# Swept 2026-08-28, its first ever, and 0.005 is already the optimum:
+#   impulse   2023 profit worst/ulcer      current
+#   0.003   703tr +120.72R 17.0/41.1   1197tr +376.48R 63.6/175.3
+#   0.005   694tr +136.43R 17.6/44.1   1193tr +379.65R 72.4/198.4  <- kept
+#   0.008   691tr +127.63R 18.2/43.7   1190tr +363.06R 73.9/189.4
+# Loosening and tightening both cost profit in both windows.
+#
+# Running tally for the hardcoded-number hunt, stated honestly: six swept,
+# three changed (swing 5->3, eff-lookback 20->10, FVG 0.0005->0.0003), three
+# already correct (cooldown, OB lookback, this one). Half is still the best
+# hit rate of any approach tried, but "hardcoded" means UNTESTED, not wrong.
+SMC_OB_MIN_IMPULSE    = float(os.getenv("SMC_OB_MIN_IMPULSE", "0.005"))
+# Candle-shape thresholds, both hardcoded until now and both in the
+# recognition path. WICK: what fraction of the candle must be wick for it to
+# count as a rejection. BODY: what fraction must be body for a structure break
+# to score as "strong" — that one feeds the MTF score and the adaptive packs,
+# so it affects whether a setup passes the quality gate at all.
+# BODY swept 2026-08-28, its first ever — 0.4 is already right:
+#   frac    2023                        current
+#   0.3   696tr +130.19R 18.0/44.7   1195tr +373.63R 72.7/198.2
+#   0.4   694tr +136.43R 17.6/44.1   1193tr +379.65R 72.4/198.4  <- kept
+#   0.5   689tr +134.47R 19.4/46.8   1191tr +375.65R 73.1/199.4
+# Profit falls in BOTH directions. 0.5 buys ~6-10% on the 2023 risk ratios but
+# costs trades and profit in both windows, and moves the current window only
+# 0.5-1% — under the bar a rule has to clear to earn its maintenance surface.
+# WICK deliberately NOT swept: it reaches the score through the same +1
+# confirmation slot as the body (1 of 12) AND is diluted further by the `or`
+# against bull_pressure, so its effect is bounded below the body's, which is
+# already inside the noise. Made configurable so the next person need not
+# re-derive that; the default is the value it has always had.
+SMC_WICK_REJECT_FRAC  = float(os.getenv("SMC_WICK_REJECT_FRAC", "0.4"))
+SMC_STRONG_BODY_FRAC  = float(os.getenv("SMC_STRONG_BODY_FRAC", "0.4"))
 SMC_MIN_CONFIRMATIONS = int(os.getenv("SMC_MIN_CONFIRMATIONS", "2"))
 SMC_BOS_MIN_VOLUME    = float(os.getenv("SMC_BOS_MIN_VOLUME", "1.5"))
 SMC_RSI_LONG_MAX      = float(os.getenv("SMC_RSI_LONG_MAX", "72"))   # skip overextended longs
@@ -1760,6 +1798,32 @@ VOL_ATR_BOOST_MULT      = float(os.getenv("VOL_ATR_BOOST_MULT", "1.25"))
 # alone rather than levered up. That is strictly risk-reducing and needs no
 # further validation to be safe. The symmetric version (sizing tight stops UP
 # to hit the reference exactly) would raise exposure and has NOT been measured.
+# --- 2026-08-28: the backtest deliberately does NOT mirror this block -------
+# Mirroring it looks obviously right and is WRONG. backtest.py sums outcomes in
+# R, which already assumes every trade risks the same money; this block is what
+# MAKES that assumption true in live. Multiplying R by the same factor a second
+# time in the backtest deflates every figure for a risk reduction the R unit
+# has already priced in. Written, run, caught, reverted the same night.
+#
+# Measured over the three pinned windows, money at risk per trade (reference
+# units) spans only 0.800 to 1.050, and return per unit of risk differs from
+# the flat-R backtest by +0.97% / +1.19% / +1.20%. The accounting is faithful
+# to ~1%; there is no gap here worth closing.
+#
+# ⚠️ TRAP that produced a whole night of false findings before this was caught:
+# `cost_r` in the trade export is multiplied by the size multiplier
+# (backtest.py: `cost_r *= _sz`), so recovering stop width as
+# `round_trip / cost_r` yields stop_width / size_mult, NOT stop width. Small
+# values then mean "heavily boosted", not "tight stop" — and boosted trades win
+# more BY CONSTRUCTION, so the artefact reproduces across every window, symbol
+# and volatility band and looks like the strongest signal in the book.
+# Use the `entry` and `sl` columns. Note also that `size_mult` and `risk_mult`
+# are DIFFERENT columns; dividing by risk_mult does not remove the size effect.
+#
+# For reference, the real distribution: stop width is bounded at 1.20% and
+# 3.50% of price (median 1.77-2.13%), and per-trade R by stop width is a weak
+# inverted U with no consistent peak — the TIGHTEST bucket is the worst in all
+# three windows. There is no edge to harvest from stop width.
 RISK_NORMALIZED_SIZING = os.getenv("RISK_NORMALIZED_SIZING", "1") != "0"
 # Reference 1R width. At or below this, size is untouched; above it, size is cut
 # proportionally. Set to the measured median so the typical trade is unaffected.

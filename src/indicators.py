@@ -6,7 +6,8 @@ No pandas, no numpy — works on any Python version.
 import sys
 import os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from config import SMC_SWING_LOOKBACK, SMC_FVG_MIN_PCT, SMC_OB_LOOKBACK, ATR_PERIOD, EFF_RATIO_LOOKBACK, PD_TREND_GATE, VOL_REGIME_LOOKBACK
+from config import SMC_SWING_LOOKBACK, SMC_FVG_MIN_PCT, SMC_OB_LOOKBACK, SMC_OB_MIN_IMPULSE, ATR_PERIOD, EFF_RATIO_LOOKBACK, PD_TREND_GATE, VOL_REGIME_LOOKBACK
+from config import SMC_WICK_REJECT_FRAC, SMC_STRONG_BODY_FRAC
 
 
 # ── Basic indicators ──────────────────────────────────────────────────────────
@@ -117,8 +118,8 @@ def analyze_wicks(opens: list, highs: list, lows: list, closes: list,
     if rng > 0:
         u = highs[-1] - max(opens[-1], closes[-1])
         l = min(opens[-1], closes[-1]) - lows[-1]
-        if   l / rng >= 0.4: rejection = "bullish"
-        elif u / rng >= 0.4: rejection = "bearish"
+        if   l / rng >= SMC_WICK_REJECT_FRAC: rejection = "bullish"
+        elif u / rng >= SMC_WICK_REJECT_FRAC: rejection = "bearish"
         else:                rejection = None
     else:
         rejection = None
@@ -393,7 +394,7 @@ def detect_order_block(opens: list, highs: list, lows: list, closes: list,
             next3_bull = all(closes[j] > opens[j] for j in range(i + 1, min(i + 4, n)))
             if next3_bull:
                 move = (closes[min(i + 3, n - 1)] - closes[i]) / (closes[i] + 1e-10)
-                if move > 0.005:
+                if move > SMC_OB_MIN_IMPULSE:
                     ob_top = max(opens[i], closes[i])
                     ob_bot = min(opens[i], closes[i])
                     if ob_bot * 0.998 <= current <= ob_top * 1.005:
@@ -405,7 +406,7 @@ def detect_order_block(opens: list, highs: list, lows: list, closes: list,
             next3_bear = all(closes[j] < opens[j] for j in range(i + 1, min(i + 4, n)))
             if next3_bear:
                 move = (closes[i] - closes[min(i + 3, n - 1)]) / (closes[i] + 1e-10)
-                if move > 0.005:
+                if move > SMC_OB_MIN_IMPULSE:
                     ob_top = max(opens[i], closes[i])
                     ob_bot = min(opens[i], closes[i])
                     if ob_bot * 0.995 <= current <= ob_top * 1.002:
@@ -935,7 +936,7 @@ def get_smc_indicators(candles_15m: dict, candles_1h: dict = None,
         i = -1  # last candle
         body   = abs(closes[i] - opens[i])
         candle_range = highs[i] - lows[i]
-        bos_body_strong = (body / candle_range >= 0.4) if candle_range > 0 else False
+        bos_body_strong = (body / candle_range >= SMC_STRONG_BODY_FRAC) if candle_range > 0 else False
 
     # ── Structural TP levels ──────────────────────────────────────────────────
     # TP1 = nearest confirmed 15m swing high/low beyond price (min 0.5% away)
