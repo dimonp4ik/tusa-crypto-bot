@@ -293,6 +293,30 @@ SMC_FVG_MAX_FILL      = float(os.getenv("SMC_FVG_MAX_FILL", "0.80"))
 # never swept, despite being the single number that sets stop distance — and so
 # R, and so every figure in this project. Same family as SMC_SWING_LOOKBACK.
 SL_REF_LOOKBACK       = int(os.getenv("SL_REF_LOOKBACK", "20"))
+# How far outside a zone price may sit and still count as "at" it. Four bare
+# numbers in indicators.py until 2026-08-28. They are deliberately MIRRORED —
+# wide on the side price approaches from, tight on the far side, so "coming to
+# the zone" counts and "blown through it" does not — but the FVG and OB pairs
+# differ (0.1%/1.0% vs 0.2%/0.5%) with nothing on record saying why.
+# NEAR = far side (price must not have passed through), APPROACH = the side
+# price comes from. These affect DETECTION only; entry still waits for price to
+# return into the zone, so the stale-entry guard is untouched.
+SMC_FVG_NEAR_TOL      = float(os.getenv("SMC_FVG_NEAR_TOL", "0.001"))
+SMC_FVG_APPROACH_TOL  = float(os.getenv("SMC_FVG_APPROACH_TOL", "0.01"))
+# Swept 2026-08-28, first ever. 0.01 KEPT.
+#   tol     2023 tr/profit  ratios        2024 tr/profit  ratios       2026 tr/profit  ratios
+#   0.005   640 +126.82R   18.1/43.3                                   1075 +355.28R  48.2/168.3
+#   0.010   694 +143.59R   21.0/51.4      901 +190.15R  42.3/88.9      1192 +396.98R  80.3/216.4  <- kept
+#   0.015   702 +138.22R   20.2/45.0                                   1249 +419.69R  81.2/225.2
+#   0.020   702 +139.57R   20.4/45.5      918 +186.22R  40.6/82.4      1246 +416.50R  84.1/224.6
+# Tightening to 0.005 (matching the OB pair) is worse everywhere, so the
+# FVG/OB difference is not an accident even though nothing recorded why.
+# Widening is the biggest trade-count gain found all session (+54 in the current
+# window, +4.9% profit, both risk ratios up) and it is STILL rejected: 2023 and
+# 2024 both lose on profit AND on both risk measures. Two windows against one,
+# and the one in favour is the one most likely to be regime-specific.
+SMC_OB_NEAR_TOL       = float(os.getenv("SMC_OB_NEAR_TOL", "0.002"))
+SMC_OB_APPROACH_TOL   = float(os.getenv("SMC_OB_APPROACH_TOL", "0.005"))
 # Swept 2026-08-28, its first ever. 20 KEPT — but read the risk column carefully:
 #   bars   2023 tr/profit  ratios       2026 tr/profit  worst  ratios
 #    10    678 +136.22R   23.2/47.9     1193 +396.65R  10.13  39.2/179.2

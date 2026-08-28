@@ -9,6 +9,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from config import SMC_SWING_LOOKBACK, SMC_FVG_MIN_PCT, SMC_OB_LOOKBACK, SMC_OB_MIN_IMPULSE, ATR_PERIOD, EFF_RATIO_LOOKBACK, PD_TREND_GATE, VOL_REGIME_LOOKBACK
 from config import SMC_WICK_REJECT_FRAC, SMC_STRONG_BODY_FRAC
 from config import SL_REF_LOOKBACK
+from config import SMC_FVG_NEAR_TOL, SMC_FVG_APPROACH_TOL, SMC_OB_NEAR_TOL, SMC_OB_APPROACH_TOL
 
 
 # ── Basic indicators ──────────────────────────────────────────────────────────
@@ -345,7 +346,7 @@ def detect_fvg(opens: list, highs: list, lows: list, closes: list,
             gap_bot = highs[i]
             gap_top = lows[i + 2]
             size = (gap_top - gap_bot) / (gap_bot + 1e-10)
-            if size >= min_pct and gap_bot * 0.999 <= current <= gap_top * 1.01:
+            if size >= min_pct and gap_bot * (1 - SMC_FVG_NEAR_TOL) <= current <= gap_top * (1 + SMC_FVG_APPROACH_TOL):
                 bullish_zone = (gap_bot, gap_top)  # keep most recent active zone
                 bullish_at = i + 2   # gap completes on the third bar
 
@@ -354,7 +355,7 @@ def detect_fvg(opens: list, highs: list, lows: list, closes: list,
             gap_bot = highs[i + 2]
             gap_top = lows[i]
             size = (gap_top - gap_bot) / (gap_bot + 1e-10)
-            if size >= min_pct and gap_bot * 0.99 <= current <= gap_top * 1.001:
+            if size >= min_pct and gap_bot * (1 - SMC_FVG_APPROACH_TOL) <= current <= gap_top * (1 + SMC_FVG_NEAR_TOL):
                 bearish_zone = (gap_bot, gap_top)
                 bearish_at = i + 2
 
@@ -398,7 +399,7 @@ def detect_order_block(opens: list, highs: list, lows: list, closes: list,
                 if move > SMC_OB_MIN_IMPULSE:
                     ob_top = max(opens[i], closes[i])
                     ob_bot = min(opens[i], closes[i])
-                    if ob_bot * 0.998 <= current <= ob_top * 1.005:
+                    if ob_bot * (1 - SMC_OB_NEAR_TOL) <= current <= ob_top * (1 + SMC_OB_APPROACH_TOL):
                         bull_zone = (ob_bot, ob_top)
                         bull_at = i
 
@@ -410,7 +411,7 @@ def detect_order_block(opens: list, highs: list, lows: list, closes: list,
                 if move > SMC_OB_MIN_IMPULSE:
                     ob_top = max(opens[i], closes[i])
                     ob_bot = min(opens[i], closes[i])
-                    if ob_bot * 0.995 <= current <= ob_top * 1.002:
+                    if ob_bot * (1 - SMC_OB_APPROACH_TOL) <= current <= ob_top * (1 + SMC_OB_NEAR_TOL):
                         bear_zone = (ob_bot, ob_top)
                         bear_at = i
 

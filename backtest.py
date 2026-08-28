@@ -102,6 +102,17 @@ from src.signal_filter import analyze_coin_smc  # noqa: E402
 
 # run_scan publishes at most this many signals per scan. It lives as a literal
 # there rather than in config, so it is mirrored (not imported) — keep in sync.
+# Swept 2026-08-28 against the hope that this was the throughput bottleneck.
+# It is not — it barely binds:
+#   cap   2026 trades  profit     ratios
+#    3      1192      +396.98R   80.3/216.4   <- live value
+#    4      1203      +401.73R   81.2/220.7
+#    5      1205      +402.93R   81.5/221.6
+# Going 3 -> 5 buys THIRTEEN trades (+1.1%) and +1.5% profit. Not worth a live
+# change that would also raise concurrent correlated exposure and the per-scan
+# Claude spend. NOTE the live side is not this variable: main.py hardcodes
+# MAX_SIGNALS_PER_SCAN = 3 as a LOCAL inside the scan function, so raising it
+# there is a code edit, not a setting.
 _LIVE_MAX_PER_SCAN = int(os.getenv("BT_LIVE_MAX_PER_SCAN", "3"))
 
 # Which setup wins a contested slot. The caps below (3/scan, 8/dir) bind
