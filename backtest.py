@@ -1890,13 +1890,23 @@ def main(argv: list[str] | None = None) -> int:
             # the measures that need several bad patches to move, so variants
             # stop being ranked by a single week.
             _rp = risk_profile([t.net_r for t in gated])
-            if _rp["worst_windows"] > 0:
-                print(
-                    f"  устойчивый риск: худшие окна {_rp['worst_windows']:.2f}R "
-                    f"(прибыль/риск {g_net / _rp['worst_windows']:.1f})   "
-                    f"ulcer {_rp['ulcer']:.2f} "
-                    f"(прибыль/ulcer {g_net / _rp['ulcer']:.1f})"
-                )
+            # The old guard dropped the WHOLE line when worst_windows was not
+            # positive, taking ulcer with it — but ulcer stays meaningful there.
+            # worst_windows is the mean of the 5 most negative 25-trade sums,
+            # negated, so on a book where even the worst 25-trade stretch made
+            # money it goes negative and its ratio prints as a large negative
+            # number that reads like a catastrophe while meaning the opposite.
+            _ww = _rp["worst_windows"]
+            _ulc = (f"ulcer {_rp['ulcer']:.2f} (прибыль/ulcer "
+                    f"{g_net / _rp['ulcer']:.1f})" if _rp['ulcer'] > 0
+                    else "ulcer 0 (не применим)")
+            if _ww > 0:
+                print(f"  устойчивый риск: худшие окна {_ww:.2f}R "
+                      f"(прибыль/риск {g_net / _ww:.1f})   {_ulc}")
+            else:
+                print(f"  устойчивый риск: худшие окна НЕ ПРИМЕНИМЫ "
+                      f"(ни один отрезок из 25 сделок не убыточен; сырое {_ww:.2f})"
+                      f"   {_ulc}")
 
     if args.export_trades:
         # Export the gated book by default — an ungated dump cannot be compared
