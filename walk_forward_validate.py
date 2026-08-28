@@ -15,7 +15,14 @@ from dataclasses import dataclass
 from datetime import datetime, timezone
 
 
-WIN_OUTCOMES = {"TP1", "TP2", "TRAIL"}
+# A "win" is a trade that CLOSED IN PROFIT after costs, not one whose outcome
+# label looks favourable. The old set counted every TRAIL exit, but the trail is
+# floored at breakeven in PRICE, so the round-trip fee pushes a flat trail exit
+# negative. Measured 2026-08-28 on the current book: 48 trail exits and 25
+# expiries closed below zero, which is why the backtest headline reads ~4pp
+# higher than the share of trades that actually made money. The live reporting
+# in src/db.py has always used r > 0; this now agrees with it.
+WIN_OUTCOMES = {"TP1", "TP2", "TRAIL"}   # kept for reference, no longer used
 
 
 @dataclass
@@ -26,7 +33,11 @@ class Bucket:
 
     def add(self, row: dict[str, str]) -> None:
         self.trades += 1
-        self.wins += int(row.get("outcome") in WIN_OUTCOMES)
+        try:
+            _nr = float(row.get("net_r") or 0.0)
+        except (TypeError, ValueError):
+            _nr = 0.0
+        self.wins += int(_nr > 0.0)
         self.net_r += float(row.get("net_r") or 0.0)
 
     @property
