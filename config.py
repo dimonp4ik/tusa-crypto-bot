@@ -393,6 +393,22 @@ SMC_MIN_CONFIRMATIONS = int(os.getenv("SMC_MIN_CONFIRMATIONS", "2"))
 # BOTH neighbours, in nested windows and in two disjoint slices. Diminishing
 # returns cannot make a dip, and the tier confound is now ruled out as the cause
 # here — so whatever produces it there is still unidentified. Measure per desk.
+# ⚖️ SIGNIFICANCE 2026-08-28: NOT significant on its own, and that is expected
+# rather than damning. Bootstrap on the current window, 1.5 vs 1.4:
+#   delta net +19.48R, delta R/trade -0.004, p_gt_zero 0.636,
+#   90% CI -72.55 to +110.42 — straddles zero widely.
+# Arithmetic agrees the test simply lacks power here: per-trade R scatter is ~1.0
+# over ~1200 trades, so the standard error on total profit is ~35R and a +19.5R
+# effect is 0.56 of one. Detecting it on one window would need roughly +70R.
+# It also cannot be paired — the change alters WHICH trades exist, so only 1128
+# rows matched and the remainder carries the variance. Compare TRAIL_ATR_MULT,
+# which IS paired and comes back p=1.0.
+# What this setting rests on instead: the same sign in three independent windows
+# (2023/2024/2026 do not overlap at 18000 candles), an understood mechanism
+# (profit per trade unchanged, so the gate was cutting on volume rather than
+# selecting), and walk-forward showing no out-of-sample decay. That is a
+# reasonable basis for a config value; it is NOT proof, and should not be
+# described as one.
 SMC_BOS_MIN_VOLUME    = float(os.getenv("SMC_BOS_MIN_VOLUME", "1.4"))
 
 # Research handle, default OFF (0 = compute as before). The +2 volume score tier
@@ -958,6 +974,21 @@ TP2_R_MULT    = float(os.getenv("TP2_R_MULT", "3.0"))      # TP2 = entry ± risk
 # fixed TP2. Trailing stop = peak ∓ TRAIL_ATR_MULT×ATR, floored at breakeven.
 TRAIL_RUNNER_ENABLED = os.getenv("TRAIL_RUNNER_ENABLED", "1") != "0"
 TRAIL_ATR_MULT       = float(os.getenv("TRAIL_ATR_MULT", "0.02"))  # base trail; post_tp1_v2 overrides per-context
+# ✅ SIGNIFICANCE-TESTED 2026-08-28 (significance_check.py, 5000 bootstrap runs),
+# trail 0.02 + TP2 3.0R together against the old exit on the current window:
+#   baseline +390.99R -> candidate +416.45R, delta +25.47R, delta R/trade +0.020
+#   p_gt_zero 1.0, 90% CI +17.42 to +33.96 — entirely above zero
+# Every one of 5000 runs positive. This is the only change shipped this session
+# that is significant on its own rather than merely consistent across windows.
+#
+# 🔑 WHY it tests so cleanly, and the general lesson: the exit change is PAIRED —
+# the same 1266 trades in both arms, only their handling differs — so the
+# comparison is within-trade and the between-trade variance cancels. Changes that
+# alter WHICH trades are taken (a gate, a threshold) cannot be paired: only 1128
+# of them matched, and the unmatched remainder swamps a 5% effect. On a single
+# window, expect selection changes to come back "not significant" even when real,
+# and judge them on cross-window consistency plus mechanism instead. Prefer a
+# paired formulation of an experiment wherever one exists.
 # 2026-08-28: 0.05 -> 0.02. The 08-24 sweep stopped at 0.05 and the curve was
 # still falling. Swept further on all three pinned windows (uniform, i.e. the
 # STRONG/WEAK overrides pinned to the same value so only the trail width moves):
