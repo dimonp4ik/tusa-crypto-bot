@@ -367,10 +367,30 @@ SMC_MIN_CONFIRMATIONS = int(os.getenv("SMC_MIN_CONFIRMATIONS", "2"))
 # bad — it was just cutting on volume. Same family as the swing/eff/FVG finds:
 # the bot was not selecting badly, it could not SEE the structure.
 #
-# Note it also sets the score's +1 volume tier. At 1.4 the +2 tier stays at 2.0
-# (max(1.4*1.35, 2.0)), and setups above 1.5 keep the +1 they already had, so the
-# only change is which setups exist at all. At 1.8 the +2 tier WOULD move (to
-# 2.43) and that arm is confounded — do not read the 1.8 row as a pure gate test.
+# ⚠️ CORRECTED same day. The line that used to sit here called this a pure gate
+# test. It is not. The threshold also feeds the score's volume tiers, and the
+# +2 tier is max(threshold * 1.35, 2.0):
+#   1.5 -> max(2.025, 2.0) = 2.025
+#   1.4 -> max(1.890, 2.0) = 2.000   <- the tier MOVES on this very step
+#   1.3 -> max(1.755, 2.0) = 2.000   <- and does not move again below 1.4
+# So the shipped step, 1.5 -> 1.4, changes TWO things: the gate loosens AND the
+# +2 tier drops from 2.025 to 2.0, promoting setups in that narrow band. The
+# 1.8 row moves the tier the other way, to 2.43.
+#
+# The decision stands — 1.4 improves every measure in all three windows, which
+# is true whatever the mechanism — but the explanation does not. What CAN be
+# said cleanly: 1.4 -> 1.3 leaves the tier at 2.0, so that step alone is a pure
+# gate test, and it comes out mixed (+62/+61/+66 trades, +11.4/+9.2/+2.4%
+# profit, risk ratios +2.6/-19.2/-17.2% on worst-windows). Reading: loosening
+# adds trades with diminishing quality — the setups nearest the old threshold
+# are the best of the ones being excluded — and the first increment is worth
+# taking while the second is not.
+#
+# ⚠️ OPEN QUESTION, do not treat as understood: the stocks desk lands on 1.3,
+# and 1.4 is a DIP there — worse than BOTH neighbours, in nested windows and in
+# two disjoint slices. Diminishing returns cannot produce a dip. Either the tier
+# confound bites differently there or something else is going on. Until that is
+# explained, this parameter must be re-measured per desk, never synced.
 SMC_BOS_MIN_VOLUME    = float(os.getenv("SMC_BOS_MIN_VOLUME", "1.4"))
 SMC_RSI_LONG_MAX      = float(os.getenv("SMC_RSI_LONG_MAX", "72"))   # skip overextended longs
 SMC_RSI_SHORT_MIN     = float(os.getenv("SMC_RSI_SHORT_MIN", "28"))  # skip overextended shorts
