@@ -1,8 +1,8 @@
 # Significance Check
 
-Generated: 2026-08-28T13:08:11+00:00
+Generated: 2026-08-28T13:38:08+00:00
 Mode: `paired_entry`
-Pair key: `auto`
+Pair key: `entry`
 Risk mult: `off`
 Paired rows: `1266`
 Full paired rows: `1239`
