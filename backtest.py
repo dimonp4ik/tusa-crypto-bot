@@ -725,6 +725,32 @@ _BT_TP_FIRST = os.getenv("BT_TP_FIRST", "0") == "1"
 # which is exactly the regime the trail now runs in (0.02 ATR).
 _BT_TRAIL_LAG = os.getenv("BT_TRAIL_LAG", "1") == "1"
 
+# Research flag, default 0 = OFF. Hours after which an open position is closed
+# at market. Added 2026-08-29 to answer "is holding past 12h worth it". Answer:
+# yes, holding is worth it — every horizon tested is worse.
+#   stop   2023 profit  ratios      2024 profit  ratios      2026 profit  ratios
+#    off   +148.46R  23.2/53.7      +206.87R  74.5/102.3     +416.45R  87.2/230.9
+#    24h   +151.36R  21.2/59.3      +187.34R  28.7/75.3      +416.85R  88.8/238.6
+#    12h                                                     +352.74R  32.2/129.7
+#     6h                                                     +295.55R  27.3/109.0
+# 12h costs 15% of profit and halves both risk ratios; 6h is worse still. 24h is
+# flat-to-positive on the current window and MIXED on 2023, but 2024 rejects it
+# outright: -9.4% profit and the worst-windows ratio falls 74.5 -> 28.7.
+#
+# Duration decays monotonically in the book (1-3h +0.582 R/trade, 6-12h +0.137,
+# 24-48h -0.103), which is what made a time stop look obvious. It is not: a
+# trade still open at 24h is one that has not resolved, so closing it banks
+# whatever it is worth then — usually near breakeven — while forfeiting the tail
+# of winners that resolve late. Note also that the trade count RISES with a time
+# stop (+31/+33/+64) purely because closing frees slots under
+# MAX_SAME_DIRECTION_POSITIONS; that is not new signal, it is capital turnover.
+#
+# ⚠️ Do not re-derive this from a "keep only trades under N hours" filter on an
+# export. That deletes long trades rather than closing them at N hours, and so
+# assumes their eventual outcome was knowable at the cut. It reads +9R where the
+# real simulation reads -19R on the same window.
+_BT_TIME_STOP_H = float(os.getenv("BT_TIME_STOP_H", "0"))
+
 # Average-down research flag, default OFF. When set, a SECOND unit of the same
 # size is added by resting limit order once price trades BT_AVG_DOWN_R risk
 # units against the entry, before TP1. The stop stays where structure put it,
@@ -1042,6 +1068,18 @@ def simulate_trade_direct(
     for j in range(fill_bar, end):
         h = highs[j]
         l = lows[j]
+        # Time stop (research flag, default 0 = off). Closes at the bar CLOSE
+        # once the position has been open N hours. Note this is a real exit at
+        # the price then trading — NOT the same as deleting long trades from the
+        # book, which is what a naive "keep only trades under N hours" filter
+        # does and which silently assumes the eventual outcome was knowable at
+        # the cut.
+        if _BT_TIME_STOP_H > 0 and (j - fill_bar) * (KLINES_INTERVAL_SEC or 900) >= _BT_TIME_STOP_H * 3600:
+            outcome = "TIME"
+            stop_exit_price = closes[j]
+            exit_bar = j
+            closed = True
+            break
         if not tp1_reached:
             # Conditional stale exit (research flag, default off) — see above.
             if _BT_STALE_BARS > 0 and (j - fill_bar) >= _BT_STALE_BARS and _risk_abs > 0:
