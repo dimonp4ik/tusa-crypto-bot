@@ -95,6 +95,29 @@ TIMEFRAME_4H_KUCOIN = "4hour"
 # raised: going past 51 would enable a bonus live that the backtest still would
 # not award, recreating the exact mismatch this change fixes. Enabling it is a
 # strategy change and needs its own backtest, not a parity fix.
+# 🔑 2026-08-28: at 50 the 4h "strong trend" flag can NEVER be set, because
+# get_1h_trend() needs >= 51 closes to compute EMA50 — and it is used for the 4h
+# series too. Verified in the book: "Strong4h" appears on 0 of 1167 trades while
+# "Strong1h" appears on 85.7%. So the HTF_STRONG_SCORE bonus for 4h is dead
+# code, and the Strong=1 vs Strong=0 comparison recorded beside HTF_STRONG_SCORE
+# only ever tested the 1h side. This is the SAME defect that was found and fixed
+# on the 1h side (KLINES_1H_LIMIT 50 -> 90); the 4h side was missed then.
+# backtest.py's WINDOW_4H is 50 as well, so the two paths agree — no live/backtest
+# gap, both are simply blind to it.
+#
+# Reviving it was measured (--window-4h 60 and 80) and is NOT shipped:
+#   win4h  2023 tr/profit  ratios       2026 tr/profit  ratios
+#    50    694 +143.59R   21.0/51.4     1192 +396.98R  80.3/216.4  <- kept
+#    60    706 +142.89R   22.3/50.6     1199 +402.56R  76.2/224.9
+#    80    706 +141.37R   21.4/48.3     1196 +397.94R  76.0/224.5
+# +7 to +12 trades, profit flat (-0.5% / +1.4%), and the two risk measures split
+# MIRRORED between windows: 2023 gains on worst-windows and loses on ulcer, 2026
+# does the reverse. Same rule as HTF_STRONG_SCORE — when the risk measures split
+# and profit does not move, the change is not supported.
+# Note also a confound if anyone retries: raising the window changes BOTH whether
+# `strong` can fire AND the EMA values themselves (more warmup), so the effect
+# cannot be attributed. Isolating it needs the flag gated separately from the
+# fetch size.
 KLINES_4H_LIMIT = 50
 KLINES_4H_INTERVAL_SEC = 4 * 3600
 
