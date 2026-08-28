@@ -8,6 +8,7 @@ import os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from config import SMC_SWING_LOOKBACK, SMC_FVG_MIN_PCT, SMC_OB_LOOKBACK, SMC_OB_MIN_IMPULSE, ATR_PERIOD, EFF_RATIO_LOOKBACK, PD_TREND_GATE, VOL_REGIME_LOOKBACK
 from config import SMC_WICK_REJECT_FRAC, SMC_STRONG_BODY_FRAC
+from config import SL_REF_LOOKBACK
 
 
 # ── Basic indicators ──────────────────────────────────────────────────────────
@@ -520,9 +521,19 @@ def detect_choch(closes: list, highs: list, lows: list,
     """
     Change of Character — faster micro-structure shift.
 
-    Uses a shorter swing lookback (3 vs BOS's 5) to detect when price breaks
-    a recent intermediate swing high/low before or alongside the main BOS.
-    Acts as early confirmation of the structural reversal.
+    ⚠️ 2026-08-28: this is now SUBSUMED BY BOS and the sentence below is
+    historical. It was written when SMC_SWING_LOOKBACK was 5 and this used 3,
+    so it genuinely fired earlier. SMC_SWING_LOOKBACK is now 3 as well, so both
+    scan for the same structure break — which is why "ChoCH" appears on 100% of
+    taken trades and contributes a CONSTANT +1 to every MTF score. It cannot be
+    made distinct again by tuning: it is defined as the FASTER detector, and a
+    shorter lookback finds MORE swings, not fewer, so it would still fire
+    everywhere. Removing it and lowering MTF_MIN_SCORE by 1 would be exactly
+    equivalent; left in place because that trade is a wash and the name is
+    carried in signal text and in Claude's prompt.
+    Historical: uses a shorter swing lookback (3 vs BOS's 5) to detect when
+    price breaks a recent intermediate swing high/low before or alongside the
+    main BOS. Acts as early confirmation of the structural reversal.
 
     Returns 'bullish', 'bearish', or None.
     """
@@ -899,8 +910,9 @@ def get_smc_indicators(candles_15m: dict, candles_1h: dict = None,
     eff_ratio = efficiency_ratio(closes, EFF_RATIO_LOOKBACK)
 
     # TP/SL reference levels
-    recent_high = max(highs[-21:-1]) if len(highs) >= 22 else max(highs)
-    recent_low  = min(lows[-21:-1])  if len(lows)  >= 22 else min(lows)
+    _slk = max(2, int(SL_REF_LOOKBACK))
+    recent_high = max(highs[-(_slk + 1):-1]) if len(highs) >= _slk + 2 else max(highs)
+    recent_low  = min(lows[-(_slk + 1):-1])  if len(lows)  >= _slk + 2 else min(lows)
 
     # 1h + 4h trend (returns dict with trend + strong flag)
     t1h = get_1h_trend(candles_1h) if candles_1h else {"trend": "neutral", "strong": False}

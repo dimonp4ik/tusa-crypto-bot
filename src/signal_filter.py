@@ -211,7 +211,7 @@ def _zone_payload(zone, source: str, current: float, age=None):
     }
 
 
-_FVG_MAX_FILL = 0.80   # skip FVG if price already through > 80% of the zone
+from config import SMC_FVG_MAX_FILL as _FVG_MAX_FILL   # see config.py
 
 
 def _fvg_fresh(zone, current: float, direction: str) -> bool:

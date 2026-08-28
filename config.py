@@ -245,6 +245,55 @@ SMC_OB_MIN_IMPULSE    = float(os.getenv("SMC_OB_MIN_IMPULSE", "0.005"))
 # already inside the noise. Made configurable so the next person need not
 # re-derive that; the default is the value it has always had.
 SMC_WICK_REJECT_FRAC  = float(os.getenv("SMC_WICK_REJECT_FRAC", "0.4"))
+# How deep into an FVG price may already have travelled and still count as a
+# valid entry zone. Hardcoded as a bare 0.80 in signal_filter.py until
+# 2026-08-28, therefore never swept. Only bites when there is no OB — the
+# selector prefers OB and falls back to FVG.
+# Note which end it cuts: for a LONG, fill=0 is price at the TOP of the zone (a
+# shallow retest) and fill=1 is at the BOTTOM (the deepest retest, right at
+# invalidation). So this gate rejects the DEEPEST pullbacks, not the shallowest.
+# Swept 2026-08-28, its first ever, and kept — the gate is nearly inert:
+#              2023 tr/profit  ratios        2026 tr/profit  ratios
+#   0.60       691 +143.24R   20.9/51.2      1184 +389.28R  84.2/215.2
+#   0.80       694 +143.59R   21.0/51.4      1192 +396.98R  80.3/216.4  <- kept
+#   0.95       698 +145.47R   21.1/52.9      1192 +396.98R  80.3/216.4
+# It moves 3-8 trades out of 700-1200, under 1% of the book, because it only
+# bites when a setup has NO order block (the selector prefers OB and falls back
+# to FVG). At 0.95 the current window is identical to base to the last decimal
+# — not the "knob never reached" failure, the env anchor was verified first and
+# 2023 does move; there simply is no setup there with fill between 0.80 and
+# 0.95 and no OB. Loosening is mildly positive in 2023 and free in 2026, but
+# 1.3% in one window and nothing in another does not clear the bar.
+SMC_FVG_MAX_FILL      = float(os.getenv("SMC_FVG_MAX_FILL", "0.80"))
+# Bars used to find the swing high/low the structural stop is placed beyond.
+# Hardcoded as a bare [-21:-1] in indicators.py until 2026-08-28 and therefore
+# never swept, despite being the single number that sets stop distance — and so
+# R, and so every figure in this project. Same family as SMC_SWING_LOOKBACK.
+SL_REF_LOOKBACK       = int(os.getenv("SL_REF_LOOKBACK", "20"))
+# Swept 2026-08-28, its first ever. 20 KEPT — but read the risk column carefully:
+#   bars   2023 tr/profit  ratios       2026 tr/profit  worst  ratios
+#    10    678 +136.22R   23.2/47.9     1193 +396.65R  10.13  39.2/179.2
+#    15    678 +134.82R   21.1/46.9     1199 +401.17R   9.71  41.3/193.4
+#    20    694 +143.59R   21.0/51.4     1192 +396.98R   4.95  80.3/216.4  <- kept
+#    30    686 +128.34R   20.8/46.3     1178 +379.05R   4.44  85.3/230.7
+# 20 wins on profit in BOTH windows, which is the whole case for keeping it.
+#
+# ⚠️ Do NOT read the 2x drawdown gap between 15 and 20 in the current window as
+# evidence. Checked it three ways and it does not survive:
+#  - In MONEY per unit of risk the two are identical: +0.3376 vs +0.3370. The
+#    +1.1% profit edge 15 shows in R is the unit, not the result — a tighter
+#    stop means less money in the trade, and R does not know that.
+#  - The loss tails are the same shape: worst trade -4.15R vs -3.92R, 22 vs 21
+#    trades below -2R.
+#  - The 2023 window shows no gap at all (6.40 vs 6.84).
+# Same per-trade returns, same tails, no gap in the other window: the current
+# window's gap is where seven trades landed in the sequence, not a property of
+# the parameter. Drawdown is made by the SERIES here, so a metric built on the
+# five deepest 25-trade stretches moves on reshuffles.
+#
+# Useful side measurement: at 20 bars, 22.1% of the book carries a stop wider
+# than 3.33%, which is where RISK_NORMALIZED_SIZING hits its floor and live
+# risks MORE money than the flat-R accounting assumes. Aggregate effect ~1.2%.
 SMC_STRONG_BODY_FRAC  = float(os.getenv("SMC_STRONG_BODY_FRAC", "0.4"))
 SMC_MIN_CONFIRMATIONS = int(os.getenv("SMC_MIN_CONFIRMATIONS", "2"))
 SMC_BOS_MIN_VOLUME    = float(os.getenv("SMC_BOS_MIN_VOLUME", "1.5"))
