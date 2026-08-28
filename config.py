@@ -343,7 +343,35 @@ SMC_OB_APPROACH_TOL   = float(os.getenv("SMC_OB_APPROACH_TOL", "0.005"))
 # risks MORE money than the flat-R accounting assumes. Aggregate effect ~1.2%.
 SMC_STRONG_BODY_FRAC  = float(os.getenv("SMC_STRONG_BODY_FRAC", "0.4"))
 SMC_MIN_CONFIRMATIONS = int(os.getenv("SMC_MIN_CONFIRMATIONS", "2"))
-SMC_BOS_MIN_VOLUME    = float(os.getenv("SMC_BOS_MIN_VOLUME", "1.5"))
+# 2026-08-28: 1.5 -> 1.4. This gate had no recorded justification and had never
+# been swept, while binding HARD — the minimum volume_ratio in the whole book was
+# exactly 1.500, i.e. every trade sat on it.
+#   min   2023 tr/WR/profit  ratios      2024 tr/WR/profit  ratios      2026 tr/WR/profit  ratios
+#   1.3   799 70.1% +165.41R 23.8/64.8   1016 73.8% +225.90R 60.2/112.6  1332 75.9% +426.47R 72.2/196.8
+#   1.4   737 69.6% +148.46R 23.2/53.7    955 73.8% +206.87R 74.5/102.3  1266 76.0% +416.45R 87.2/230.9  <- shipped
+#   1.5   694 69.5% +143.59R 21.0/51.4    901 73.7% +190.15R 42.3/88.9   1192 75.6% +396.98R 80.3/216.4  <- was
+#   1.8   564 70.6% +123.32R 18.9/40.3                                    947 74.4% +300.23R 29.3/108.2
+#
+# 1.4 beats the old value on EVERY measure in ALL THREE windows: +43/+54/+74
+# trades, +3.4/+8.8/+4.9% profit, win rate up in each, and both risk ratios up in
+# each. 1.3 adds more trades and more profit still but gives up ~10% of both risk
+# ratios in the current window, so the optimum sits between and is not at an edge.
+#
+# Caveat on one number: the 2024 worst-windows ratio moves +76%, and that is the
+# noisiest measure here — a false 2x gap in it was caught the same night on
+# SL_REF_LOOKBACK. The case does not rest on it: ulcer moves +15.1% in that
+# window, and profit, trades and win rate all move too.
+#
+# Reading: profit PER TRADE is unchanged by the loosening (2023 +0.207 before and
+# after; 2026 +0.333 -> +0.320), so the gate was not separating good setups from
+# bad — it was just cutting on volume. Same family as the swing/eff/FVG finds:
+# the bot was not selecting badly, it could not SEE the structure.
+#
+# Note it also sets the score's +1 volume tier. At 1.4 the +2 tier stays at 2.0
+# (max(1.4*1.35, 2.0)), and setups above 1.5 keep the +1 they already had, so the
+# only change is which setups exist at all. At 1.8 the +2 tier WOULD move (to
+# 2.43) and that arm is confounded — do not read the 1.8 row as a pure gate test.
+SMC_BOS_MIN_VOLUME    = float(os.getenv("SMC_BOS_MIN_VOLUME", "1.4"))
 SMC_RSI_LONG_MAX      = float(os.getenv("SMC_RSI_LONG_MAX", "72"))   # skip overextended longs
 SMC_RSI_SHORT_MIN     = float(os.getenv("SMC_RSI_SHORT_MIN", "28"))  # skip overextended shorts
 MAX_SETUPS_TO_CLAUDE  = int(os.getenv("MAX_SETUPS_TO_CLAUDE", "7"))  # only strongest go to Claude
