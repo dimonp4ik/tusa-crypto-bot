@@ -724,6 +724,20 @@ RISK_MAX_PCT  = float(os.getenv("RISK_MAX_PCT", "0.035"))  # max SL distance = 3
 # dial. 0.5 -> 0.6 -> 0.75 moves 2023 win rate 72.0% -> 68.9% -> 65.2% while
 # profit goes +74.60R -> +95.96R -> +112.30R. Win rate can be bought to
 # almost any level and the price is always money.
+# 🔁 RE-CHECKED 2026-08-28 under the NEW exit (trail 0.02, TP2 3.0). TP1 arms
+# the trail, so changing the trail could have moved its optimum — it did not:
+#   TP1    2023 tr/WR/profit  ratio    2026 tr/WR/profit  ratio
+#   0.5R   708 72.3% +113.85R  13.5    1277 78.2% +324.67R  47.4
+#   0.6R   694 69.5% +143.59R  21.0    1192 75.6% +396.98R  80.3  <- kept
+#   0.75R  678 66.1% +161.44R  24.5    1082 70.7% +379.65R  44.0
+# 0.75 buys the hostile window but wrecks the current one (worst-windows 8.63
+# against 4.95, i.e. 74% deeper). 0.6 stays.
+#
+# 📌 FOR THE ACCOUNT OWNER, not an optimisation: this is the win-rate dial, and
+# 0.5R delivers BOTH standing goals at once — win rate 75.6% -> 78.2% and 1192
+# -> 1277 trades — for 18% of the profit and roughly half the risk-adjusted
+# return. Win rate is purchasable to almost any level here and the price is
+# always money. Do not move this without the owner choosing the trade.
 TP1_R_MULT    = float(os.getenv("TP1_R_MULT", "0.6"))      # TP1 = entry ± risk * 0.6
 TP2_R_MULT    = float(os.getenv("TP2_R_MULT", "3.0"))      # TP2 = entry ± risk * 3.0
 # 2026-08-28: back to 3.0. It was cut to 2.0 for being "unreachable", which was
