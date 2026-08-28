@@ -706,8 +706,12 @@ from config import STOP_CLOSE_CONFIRM as _STOP_CLOSE_CONFIRM
 # test where 65 of 87 trades were decided by tie-break alone.
 _BT_TP_FIRST = os.getenv("BT_TP_FIRST", "0") == "1"
 
-# Research only, default OFF. Anchor the runner trail to prior bars only, so a
-# trail exit can never be filled off the same bar that printed the peak.
+# DEFAULT ON (the "research only, default OFF" this comment used to carry was
+# copied from the flag above and was wrong — the code has always defaulted to
+# "1"). Anchors the runner trail to prior bars only, so a trail exit can never
+# be filled off the same bar that printed the peak. Load-bearing: without it a
+# trail narrower than the average bar range pays out on essentially every bar,
+# which is exactly the regime the trail now runs in (0.02 ATR).
 _BT_TRAIL_LAG = os.getenv("BT_TRAIL_LAG", "1") == "1"
 
 # Average-down research flag, default OFF. When set, a SECOND unit of the same

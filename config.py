@@ -731,22 +731,65 @@ TP2_R_MULT    = float(os.getenv("TP2_R_MULT", "2.0"))      # TP2 = entry ± risk
 # Backtest (10 sym, 2880x15m): +21% net R, -27% max drawdown, same win rate vs
 # fixed TP2. Trailing stop = peak ∓ TRAIL_ATR_MULT×ATR, floored at breakeven.
 TRAIL_RUNNER_ENABLED = os.getenv("TRAIL_RUNNER_ENABLED", "1") != "0"
-TRAIL_ATR_MULT       = float(os.getenv("TRAIL_ATR_MULT", "0.05"))  # base trail; post_tp1_v2 overrides per-context
+TRAIL_ATR_MULT       = float(os.getenv("TRAIL_ATR_MULT", "0.02"))  # base trail; post_tp1_v2 overrides per-context
+# 2026-08-28: 0.05 -> 0.02. The 08-24 sweep stopped at 0.05 and the curve was
+# still falling. Swept further on all three pinned windows (uniform, i.e. the
+# STRONG/WEAK overrides pinned to the same value so only the trail width moves):
+#   mult    2023 profit  worst/ulcer     2026 profit  worst/ulcer
+#   0.05     +136.43R     17.6/44.1       +379.65R     72.4/198.4
+#   0.02     +137.03R     20.0/48.5       +378.16R     74.6/200.5   <- shipped
+#   0.01     +138.00R     20.2/49.0       +380.20R     75.4/202.1
+#   0.00     +138.97R     20.5/49.6       +381.69R     76.1/203.4
+# 2024 at 0.02: +189.26R, 42.1/88.0 vs base +185.43R, 40.6/85.0.
+# Against base all three windows improve on BOTH risk ratios (2023 +13.6/+10.0%,
+# 2024 +3.7/+3.5%, 2026 +3.0/+1.1%) while profit is flat (+0.4 / +2.1 / -0.4%).
+#
+# 🔑 NOT shipped at 0.00 even though it measures best everywhere, monotonically.
+# Two reasons, both about the boundary rather than the numbers:
+#  1. An optimum sitting exactly on the edge of the tested range means the model
+#     cannot say where the real optimum is — it can only say "further". Sizing
+#     onto that edge is the largest available bet on the weakest evidence.
+#  2. 0.00 puts the stop exactly on a level price has just traded. 0.02 ATR is
+#     ~0.03% of price, roughly 1.5-3x the OKX perp spread, so the stop still
+#     sits clear of the touch. There is no look-ahead in either (BT_TRAIL_LAG
+#     anchors the peak to CLOSED bars only) — this is about fillability.
 # 2026-08-24: 0.25 -> 0.05, monotone across the whole range on the honest
 # model and confirmed in both halves. The runner earns, but gives it back on
 # the pullback; exiting at the first failure to extend keeps +0.029R per
 # trail exit over 702 of them. NOT the same as banking at TP1 — TP1_CLOSE_FRAC
 # 0.5 was tested and is far worse (+184R vs +236R).
 
-# Exit profile: "post_tp1_v2" keeps the FULL position past TP1 (TP1_CLOSE_FRAC=0)
-# and trails by an ATR multiple chosen from the TP1-acceptance candle — strong
-# follow-through trails wide (let it run), weak/rejected trails tight (lock).
+# Exit profile. ⚠️ As of 2026-08-28 this switch is a NO-OP and the description
+# below is historical. It gates ONLY the context-aware trail split, and that
+# split is inert (see POST_TP1_STRONG_TRAIL_ATR_MULT), so "post_tp1_v2" and
+# "fixed" now produce identical results. The half that still does real work is
+# TP1_CLOSE_FRAC=0 — keeping the FULL position past TP1 instead of banking 50%
+# — and that is its own setting, not this one. Kept as a switch because the
+# split machinery is still there and would come back if the widths diverge.
+# Historical description: "post_tp1_v2" keeps the FULL position past TP1
+# (TP1_CLOSE_FRAC=0) and trails by an ATR multiple chosen from the
+# TP1-acceptance candle — strong follow-through trails wide (let it run),
+# weak/rejected trails tight (lock).
 # Validated 3 windows on our cache (90/180/365d): net R +80/+91/+124% with LOWER
 # drawdown, win rate / trades / SL count UNCHANGED — it only changes how winners
 # are harvested, never which trades are taken. "fixed" = legacy 50%-at-TP1 + BE.
 TP1_CLOSE_FRAC = max(0.0, min(1.0, float(os.getenv("TP1_CLOSE_FRAC", "0.0"))))
 EXIT_PROFILE   = os.getenv("EXIT_PROFILE", "post_tp1_v2").strip().lower()
-POST_TP1_STRONG_TRAIL_ATR_MULT = float(os.getenv("POST_TP1_STRONG_TRAIL_ATR_MULT", "0.05"))
+# 🔑 The context split below has been INERT since 2026-08-24 and is now inert by
+# choice. It reads `max(base, STRONG)` and `min(base, WEAK)`, so with base at or
+# below STRONG and at or below WEAK every branch returns base. Lowering the base
+# trail to 0.05 that day silently neutralised the whole "strong trails wide,
+# weak trails tight" feature the comment above describes, in both bots.
+# Reactivated and measured 2026-08-28, two windows, against base 0.05:
+#   strong 0.15 (widen strong)  2023 +133.46R 19.2/46.4   2026 +371.08R 72.2/195.0
+#   weak   0.02 (tighten weak)  2023 +135.85R 19.8/47.8   2026 +375.65R 73.8/198.5
+#   both                        2023 +135.18R 19.6/47.5   2026 +374.31R 73.5/197.5
+#   uniform 0.02 (no split)     2023 +137.03R 20.0/48.5   2026 +378.16R 74.6/200.5
+# Widening the strong branch LOSES in both windows, and the plain uniform trail
+# beats every split on every measure. The context signal carries nothing the
+# trail width does not already carry, so STRONG is pinned to the base value to
+# keep the branch inert. WEAK stays 0.15 and is inert too: min(0.02, 0.15)=0.02.
+POST_TP1_STRONG_TRAIL_ATR_MULT = float(os.getenv("POST_TP1_STRONG_TRAIL_ATR_MULT", "0.02"))
 POST_TP1_WEAK_TRAIL_ATR_MULT   = float(os.getenv("POST_TP1_WEAK_TRAIL_ATR_MULT", "0.15"))
 POST_TP1_STRONG_CLOSE_PROGRESS = float(os.getenv("POST_TP1_STRONG_CLOSE_PROGRESS", "0.25"))
 POST_TP1_STRONG_WICK_PROGRESS  = float(os.getenv("POST_TP1_STRONG_WICK_PROGRESS", "0.55"))
@@ -1775,6 +1818,20 @@ VOL_ATR_BOOST_THRESHOLD = float(os.getenv("VOL_ATR_BOOST_THRESHOLD", "0.0104"))
 # rises less than profit does, which is what a boost has to prove. The one
 # blemish is the first half's worst-windows ratio, 45.7 -> 45.4, i.e. -0.7%
 # — noise, but the reason for taking the mild multiplier and not 1.5.
+# Re-tested 2026-08-28 against removal (mult=1.0) on all three pinned windows.
+# KEPT — the current window vetoes removal:
+#             profit    worst/ulcer ratios
+#   2023   +136.43R ->  +132.09R    17.6/44.1 -> 19.6/47.7   removal better
+#   2024   +185.43R ->  +180.72R    40.6/85.0 -> 41.4/88.0   removal better
+#   2026   +379.65R ->  +351.01R    72.4/198  -> 64.3/185    removal WORSE, -7.5% profit
+#
+# 🔑 This rule also refutes a tempting way of auditing the sizing book. Per-trade
+# R at equal size says the boosted subset is 79% BELOW book in 2023 (+0.032 vs
+# +0.150) and 26% below in 2024 — on that view alone it looks like leverage on a
+# weak subset and should go. It should not: the boost was fitted against
+# DRAWDOWN (losses arrive in clusters, see the memory note on that), and removing
+# it deepens drawdown in two of three windows. A rule fitted to one measure must
+# be judged on that measure. Do not re-litigate this from per-trade R.
 VOL_ATR_BOOST_MULT      = float(os.getenv("VOL_ATR_BOOST_MULT", "1.25"))
 
 # --- Risk-normalised sizing (added 2026-08-22 after a live incident) ---
