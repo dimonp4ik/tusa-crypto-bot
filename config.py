@@ -824,6 +824,34 @@ ATR_PERIOD    = int(os.getenv("ATR_PERIOD", "14"))
 SL_ATR_BUFFER = float(os.getenv("SL_ATR_BUFFER", "1.0"))
 RISK_MIN_PCT  = float(os.getenv("RISK_MIN_PCT", "0.012"))  # min SL distance = 1.2%
 RISK_MAX_PCT  = float(os.getenv("RISK_MAX_PCT", "0.035"))  # max SL distance = 3.5%
+# 🔁 RE-SWEPT 2026-08-28 in BOTH directions under the new exit (trail 0.02,
+# TP2 3.0R). Reason to re-check: stop width sets the R unit, and TP1, the trail
+# arming point and TP2 are all R multiples — two of the three had just changed.
+# The 08-24 result survives; 0.035 KEPT:
+#   ceil    2023 profit  ratios      2026 profit  ratios
+#   0.028   +148.32R   19.2/49.3     +409.91R   76.6/211.6
+#   0.030   +152.22R   20.7/51.8     +409.98R   73.7/207.2
+#   0.035   +148.46R   23.2/53.7     +416.45R   87.2/230.9   <- kept
+#   0.040   +144.46R   20.7/48.8     +407.18R   87.7/219.9
+#   0.045   +151.95R   22.0/55.9     +421.32R   86.6/248.2
+# Tightening costs 11-17% of both risk ratios in both windows for flat profit.
+#
+# ⚠️ 0.045 LOOKS better (profit up in both windows, ulcer ratio up in both) and
+# is rejected as leverage. Normalisation floors at REF/FLOOR = 3.33%, so any
+# ceiling above that lets money at risk exceed one unit — 1.05 at 3.5%, 1.20 at
+# 4.0%, 1.35 at 4.5%. The signature is there: profit +1.2/+2.3% while
+# worst-windows ratio falls in BOTH windows (23.2->22.0, 87.2->86.6). Profit
+# bought with exposure, not edge. Read any sweep of this parameter in money,
+# never in R alone.
+#
+# Useful negative on interactions: changing the exit did NOT invalidate this
+# setting, unlike TP2 whose "unreachable" justification died with the exit
+# change. Not every coupled parameter needs re-deriving after a change — but
+# the check is cheap and this one was worth running.
+#
+# ⚠️ Does NOT transfer to the stocks desk, where the same clamp is the primary
+# stop mechanism (44-47% of trades pinned on it) and TIGHTENING is what helps
+# early. Opposite direction, same parameter. Measure per desk.
 # 2026-08-24: raised from 0.03. The clamp was pinning 23-33% of stops tighter
 # than structure wanted, i.e. into noise. mae_r shows a trade sitting 0.9R
 # against us still wins 87.2% of the time, so that zone is not information.
