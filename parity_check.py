@@ -66,13 +66,41 @@ def check_tp_sl_parity() -> list[str]:
 
 
 def check_r_model() -> list[str]:
+    """R-model parity, with expectations DERIVED from config, not written in.
+
+    This check was red and unnoticed from whenever TP1_CLOSE_FRAC moved to 0.0
+    (the post_tp1_v2 exit keeps the full position past TP1) until 2026-08-28.
+    The old version hardcoded 1.5 and 0.5, which are the correct answers only
+    when half the position banks at TP1. The CODE was right the whole time; the
+    test was asserting a config that no longer existed, so a guard meant to
+    catch live/backtest drift was instead reporting a permanent false alarm —
+    the worst state for a safety net, because a red light nobody can fix gets
+    ignored. Derive the expectation so it survives the next exit change.
+    """
+    from config import TP1_CLOSE_FRAC
+
     failures = []
     entry, tp1, tp2, sl = 100.0, 101.0, 102.0, 99.0
-    expected = {"TP2": 1.5, "TP1": 0.5, "SL": -1.0, "EXPIRED": 0.0}
+    risk = entry - sl
+    tp1_r = (tp1 - entry) / risk          # 1.0 with these numbers
+    tp2_r = (tp2 - entry) / risk          # 2.0
+    frac = max(0.0, min(1.0, float(TP1_CLOSE_FRAC)))
+    runner = 1.0 - frac
+    expected = {
+        # TP2: the banked TP1 leg plus the runner all the way to TP2.
+        "TP2": frac * tp1_r + runner * tp2_r,
+        # TP1: the banked leg only — the runner is stopped out at breakeven.
+        "TP1": frac * tp1_r,
+        "SL": -1.0,
+        "EXPIRED": 0.0,
+    }
     for outcome, value in expected.items():
         actual = gross_r_for_outcome(outcome, entry, tp1, tp2, sl)
         if not _almost_equal(actual, value):
-            failures.append(f"R model mismatch {outcome}: got {actual}, expected {value}")
+            failures.append(
+                f"R model mismatch {outcome}: got {actual}, expected {value} "
+                f"(TP1_CLOSE_FRAC={frac})"
+            )
     return failures
 
 
