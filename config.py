@@ -1323,6 +1323,28 @@ BTC_BLOCK_THRESHOLD_PCT = 1.0
 # Live effect should be LARGER than backtest: the backtest runs on the deep
 # global feed, while the user trades the thin X-Perp where false wicks are more
 # common (this is the same phenomenon the SL-wick diagnostic was built to log).
+# ⚠️ 2026-08-29: this flag describes the position MONITOR, and on an AUTOTRADING
+# account the monitor is not what closes the trade. src/okx_trader.py places a
+# reduce-only OCO algo with slTriggerPx at the stop and slOrdPx "-1" (market on
+# trigger), so the exchange flattens the position the moment price TOUCHES the
+# level. The monitor only handles what the algo has not already closed.
+#
+# So for an autotrading account the backtest at =1 is modelling the wrong stop
+# rule, and the true figures are the =0 ones. The sweep recorded above already
+# measured that direction: close-confirmation is worth +2 to +2.6pp of win rate
+# and about +5% of profit here, so an autotrading account should expect roughly
+# that much LESS than the headline. Not re-measured across the three windows
+# today — the existing sweep gives the size and sign.
+#
+# NOT flipped. The same flag drives the live monitor, where close-confirmation is
+# the correct behaviour for anyone trading the signals by hand; flipping it would
+# worsen their exits in order to make one report honest. Which population the
+# default serves is the account owner's decision.
+#
+# Found on the stocks desk, where the same structure produces a live stop rate of
+# 60% against 24.4% modelled. Also unpinned there and here: slTriggerPxType is
+# never set on the algo order, so which price triggers a live stop is whatever
+# OKX defaults to — worth deciding deliberately rather than inheriting.
 STOP_CLOSE_CONFIRM = os.getenv("STOP_CLOSE_CONFIRM", "1") != "0"
 # The exchange-side stop stays in place as a DISASTER backstop at this multiple
 # of R. It protects the position when the bot itself is down (deploy, restart,
