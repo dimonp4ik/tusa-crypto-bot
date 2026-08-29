@@ -671,6 +671,28 @@ REQUIRE_STRICT_HTF = os.getenv("REQUIRE_STRICT_HTF", "0") != "0"
 # A/B backtest, 20 symbols, 8640×15m (~3 months), trail exit:
 #   base:  2646tr  38.1% WR  +0.118R/tr  DD -68.17R
 #   guard: 2344tr  39.6% WR  +0.150R/tr  DD -47.36R  (+27% R/tr, -31% DD)
+# Re-measured 2026-08-29 together with the RSI midline filter below. Both are
+# justified on a bot that won 39.6-40.1% against this book's ~70%, and the
+# STOCKS desk had to switch this same guard OFF the same night (it cost profit
+# in all five windows there — the squeeze mechanism is crypto microstructure and
+# does not exist in equities). Here it EARNS its place, which is the point.
+#
+# Both are pure setup rejects on columns the export already carries, so one run
+# with both OFF reconstructs every combination exactly. Anchored each time: the
+# "both on" row reproduced the live book to the decimal in all three windows.
+#
+#                     2023 net  worst/ulcer    2024 net  worst/ulcer   current  worst/ulcer
+#   both off          +135.56   11.1 / 20.2    +220.46   21.6 / 58.3   +540.13  53.1 / 157.0
+#   bear only         +140.47   14.3 / 31.9    +218.86   23.4 / 65.3   +534.76  52.0 / 162.6
+#   rsi only          +143.68   13.6 / 31.5    +199.76   24.6 / 59.6   +474.33  32.5 / 154.2
+#   both on (kept)    +142.50   14.8 / 34.8    +201.26   29.1 / 68.2   +465.37  33.8 / 151.2
+#
+# Dropping the bear guard costs ratios in every window — keep it. Dropping the
+# RSI midline is the arguable one: +10.5% profit and +374 trades in total, but
+# the risk ratios fall in two windows of three INCLUDING the hostile one, and
+# only the current window prefers it. Two of three, hostile among them, says
+# keep. Recorded because that is a real profit figure being left on the table
+# for a risk reason, and the owner may want it.
 BEAR_TREND_HOT_VOL_GUARD     = os.getenv("BEAR_TREND_HOT_VOL_GUARD", "1") != "0"
 BEAR_TREND_HOT_VOL_MIN_RATIO = float(os.getenv("BEAR_TREND_HOT_VOL_MIN_RATIO", "2.5"))
 BEAR_TREND_SKIP_SESSIONS     = set(_parse_symbol_list(os.getenv("BEAR_TREND_SKIP_SESSIONS", "LONDON")))
