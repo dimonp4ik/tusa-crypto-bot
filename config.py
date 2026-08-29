@@ -587,7 +587,31 @@ EFF_RATIO_FILTER   = os.getenv("EFF_RATIO_FILTER", "1") != "0"
 # Reading: a 20-bar window (5 hours on 15m) is too slow to describe the move
 # a zone retest is about to join — by then the chop it measures is history.
 EFF_RATIO_LOOKBACK = int(os.getenv("EFF_RATIO_LOOKBACK", "10"))
-EFF_RATIO_MIN      = float(os.getenv("EFF_RATIO_MIN", "0.15"))
+# 0.15 -> 0.12 on 2026-08-29. The 2026-08-28 re-validation above kept 0.15 on
+# the grounds that loosening took the hostile window "from 8.12R of absolute
+# worst-windows to 11.41R, a 40% risk increase for no extra profit". That was
+# measured while the kill-switch replay peeked at future outcomes. Re-swept
+# honestly on the post-1.3-volume book — this gate is a single reject line on
+# ind["eff_ratio"], so one export with it open reproduces every threshold
+# exactly (tools_filter.py); the 0.15 row reproduces the shipped book to the
+# decimal in all three windows, which anchors it.
+#   thr     2023 net  worst/ulcer     2024 net  worst/ulcer   current  worst/ulcer
+#   off    +146.84   13.1 / 33.3     +216.11   31.5 / 72.9   +482.76  35.1 / 149.3
+#   0.10   +144.20   14.1 / 36.1     +191.91   26.7 / 63.7   +461.61  33.6 / 148.1
+#   0.12   +142.50   14.8 / 34.8     +201.26   29.1 / 68.2   +465.37  33.8 / 151.2
+#   0.15   +133.16   13.9 / 32.2     +204.48   26.1 / 69.3   +433.47  31.5 / 126.2
+#   0.18   +137.68   13.9 / 33.7     +207.97   24.2 / 71.2   +406.89  39.4 / 123.2
+# The feared risk increase is 9.60 -> 9.61R of absolute worst-windows in the
+# hostile window, not 8.12 -> 11.41. 0.12 improves the worst-windows RATIO in
+# ALL THREE windows and the ulcer ratio in two, for +82 trades and +4.9% profit.
+# The 2024 profit dip of -3.2R is inside that window's own noise: 0.10 reads
+# 191.91 between 0.08's 196.07 and 0.12's 201.26, so ~10R of scatter lives there.
+#
+# Turning it OFF earns more still (+9.7% profit, +268 trades, better ulcer ratio
+# in all three) but costs the hostile window 5.8% of its worst-windows ratio and
+# removes the chop protection entirely. Recorded, not taken: a filter in place
+# since the beginning should not be deleted on the strength of one sweep.
+EFF_RATIO_MIN      = float(os.getenv("EFF_RATIO_MIN", "0.12"))
 # Upper bound on trend cleanliness. Measured 2026-08-24 on the honest model:
 # the top eff_ratio quartile (>=0.365) runs +0.147R vs +0.244R base, consistent
 # across both halves. Reading: a very clean trend at entry means the move is
