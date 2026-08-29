@@ -1285,7 +1285,21 @@ STOP_EXCHANGE_BACKSTOP_R = float(os.getenv("STOP_EXCHANGE_BACKSTOP_R", "1.5"))
 # 8 costs 0.2-0.4% and still bounds the disaster case. It is deliberately
 # dormant in normal markets — its job is the crash that is NOT in this data,
 # which is precisely why the cap level cannot be tuned on it.
-MAX_SAME_DIRECTION_POSITIONS = int(os.getenv("MAX_SAME_DIRECTION_POSITIONS", "8"))
+# 8 -> 6 on 2026-08-29, after the backtest's kill-switch replay stopped
+# peeking at future outcomes (see backtest.apply_live_gates). That peek was
+# deleting the tail of every bad patch, which hid how much of this book's
+# drawdown is correlated same-side exposure. Measured honestly on raw pre-gate
+# exports of all three windows, at kill=5:
+#   cap   2023 net/worst-ratio   2024 net/worst-ratio   current net/worst-ratio
+#   8     +116.99R  11.7         +193.16R  22.0         +422.81R  21.4
+#   6     +112.20R  12.1         +180.76R  27.0         +419.62R  29.1
+#   5     +115.86R  13.5         +168.07R  30.0         +401.77R  36.5
+# 6 keeps the trade count identical to the old 8/kill=2 book in every window
+# (817/1070/1455 against 820/1081/1454) while raising profit in all three and
+# cutting worst-windows hard in two. 8 earns more but pays in drawdown in all
+# three; 5 is safer still but costs ~6% of the trades. Tightening this cap is
+# the safe direction anyway — it is the correlation rail.
+MAX_SAME_DIRECTION_POSITIONS = int(os.getenv("MAX_SAME_DIRECTION_POSITIONS", "6"))
 
 # --- Graded crowding trim: REJECTED, premise was wrong -----------------------
 # Idea: the cap above is a cliff — positions 1-8 ride full size, the ninth is
@@ -2233,4 +2247,17 @@ REJECT_COOLDOWN_HOURS = float(os.getenv("REJECT_COOLDOWN_HOURS", "3"))
 # kill 1 was also tested: 79.8% WR — close to the 80% the user keeps asking
 # for — but only 650 trades and +285.7R, so it buys the win rate with a
 # third of the book and 15% of the profit.
-KILL_SWITCH_SL_STREAK = int(os.getenv("KILL_SWITCH_SL_STREAK", "2"))
+# 2 -> 5 on 2026-08-29. WIDENED, not removed. The backtest replay of this gate
+# walked trades in ENTRY order while reading each trade's eventual outcome, so
+# it paused the day at the entry of the second trade that would LATER stop out
+# — knowledge the live bot cannot have, since live reads get_today_sl_streak()
+# over CLOSED signals. Losses cluster on this book, so that peek deleted the
+# rest of each bad patch and made a streak of 2 look protective.
+# Replayed honestly on raw pre-gate exports, a streak of 2 is the worst setting
+# available: fewer trades, less profit AND more risk than no brake at all
+# (current window: 1454sd +386.71R worst 18.97 against 1554sd +424.24R worst
+# 18.05). 5 recovers essentially all of that — it never fires at all in 2023,
+# and keeps 99.6% of the no-brake profit in the current window — while leaving
+# a circuit breaker for a catastrophic day that is not in this sample. That is
+# the whole reason it is not simply set to 0.
+KILL_SWITCH_SL_STREAK = int(os.getenv("KILL_SWITCH_SL_STREAK", "5"))
