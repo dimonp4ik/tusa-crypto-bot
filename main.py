@@ -33,6 +33,7 @@ from config import (
     ZONE_WATCH_ENABLED, ZONE_WATCH_MINUTES, ZONE_WATCH_POLL_SEC,
     STALE_ENTRY_GUARD, STALE_ENTRY_ZONE_TOLERANCE, STALE_ENTRY_MAX_RISK_FRAC,
     STALE_ENTRY_MAX_ADVERSE_PCT, SPREAD_GATE_ENABLED, SPREAD_MAX_BPS,
+    CLAUDE_GATE_ENABLED,
     RISK_MIN_PCT, RISK_MAX_PCT, SL_ATR_BUFFER, TOP_COINS_COUNT,
     APPROACH_LOOKBACK_BARS as _APPROACH_LOOKBACK_BARS,
     TP1_CLOSE_FRAC, EXIT_PROFILE,
@@ -510,6 +511,7 @@ def _build_and_send_report(chat_id: int, message_id: int,
         A("## КОНФИГ НА МОМЕНТ ОТЧЁТА")
         A(f"  MTF_MIN_SCORE={MTF_MIN_SCORE}  SHADOW_MIN_SCORE={SHADOW_MIN_SCORE}")
         A(f"  STOP_CLOSE_CONFIRM={STOP_CLOSE_CONFIRM}  BACKSTOP_R={STOP_EXCHANGE_BACKSTOP_R}")
+        A(f"  КЛОД: {'ФИЛЬТР (его вердикт решает)' if _claude_gate_enabled() else 'ТЕНЬ (торгуют правила, вердикт только пишется)'}")
         A(f"  MAX_SAME_DIRECTION_POSITIONS={MAX_SAME_DIRECTION_POSITIONS}  "
           f"TP1_R_MULT={TP1_R_MULT}")
 
@@ -665,15 +667,33 @@ _KB_TRADING = {"inline_keyboard": [[
     {"text": "🔍 История сетапов", "callback_data": "adm_setups"},
 ], [_BACK_ROW[0]]]}
 
-_KB_SETTINGS = {"inline_keyboard": [[
-    {"text": "📊 Фильтры",       "callback_data": "adm_filters"},
-    {"text": "🔒 Блок монет",    "callback_data": "adm_manblock"},
-], [
-    {"text": "🚫 Авто-блок",     "callback_data": "adm_blocks"},
-    {"text": "💰 Бюджет Claude", "callback_data": "adm_budget"},
-], [
-    {"text": "🩺 Проверка сервисов", "callback_data": "adm_health"},
-], [_BACK_ROW[0]]]}
+def _claude_gate_enabled() -> bool:
+    """Is Claude a GATE, or an observer? DB state wins, config is the default.
+
+    Runtime-switchable so a live experiment can be stopped the moment it looks
+    wrong, without a redeploy.
+    """
+    state = get_bot_state("claude_gate_enabled")
+    if state is not None:
+        return state == "1"
+    return CLAUDE_GATE_ENABLED
+
+
+def _kb_settings():
+    """Built per render so the Claude toggle shows its live state."""
+    gate = ("🤖 Клод: ФИЛЬТР ✅" if _claude_gate_enabled()
+            else "🤖 Клод: ТЕНЬ 👁")
+    return {"inline_keyboard": [[
+        {"text": "📊 Фильтры",       "callback_data": "adm_filters"},
+        {"text": "🔒 Блок монет",    "callback_data": "adm_manblock"},
+    ], [
+        {"text": "🚫 Авто-блок",     "callback_data": "adm_blocks"},
+        {"text": "💰 Бюджет Claude", "callback_data": "adm_budget"},
+    ], [
+        {"text": "🩺 Проверка сервисов", "callback_data": "adm_health"},
+    ], [
+        {"text": gate,               "callback_data": "adm_claude_toggle"},
+    ], [_BACK_ROW[0]]]}
 
 _KB_ANALYTICS = {"inline_keyboard": [[
     {"text": "🏆 Топ монет",     "callback_data": "adm_top"},
@@ -1123,8 +1143,30 @@ def _handle_admin_callback(callback_id: str, chat_id: int,
     if data == "adm_sec_trading":
         _edit_admin_text(chat_id, message_id, "📈 *Торговля*\nВыбери раздел:", _KB_TRADING)
 
+    elif data == "adm_claude_toggle":
+        new_val = "0" if _claude_gate_enabled() else "1"
+        set_bot_state("claude_gate_enabled", new_val)
+        _on = [
+            "🤖 Клод: *ФИЛЬТР*",
+            "Его вердикт решает — отклонённые сетапы не торгуются.",
+            "Так бот работал всегда.",
+        ]
+        _off = [
+            "🤖 Клод: *ТЕНЬ*",
+            "Торгуют только правила. Клод считает и пишет вердикт,",
+            "но ничего не задерживает.",
+            "",
+            "⚠️ Здесь он одобряет только 52% — книга почти УДВОИТСЯ.",
+            "На акциях этот же режим добавляет лишь четверть сделок.",
+            "",
+            "Судить не раньше чем через 2 недели.",
+        ]
+        note = "\n".join(_on if new_val == "1" else _off)
+        _edit_admin_text(chat_id, message_id, "🔧 *Настройки*\n\n" + note,
+                         _kb_settings())
+
     elif data == "adm_sec_settings":
-        _edit_admin_text(chat_id, message_id, "🔧 *Настройки*\nВыбери раздел:", _KB_SETTINGS)
+        _edit_admin_text(chat_id, message_id, "🔧 *Настройки*\nВыбери раздел:", _kb_settings())
 
     elif data == "adm_sec_analytics":
         _edit_admin_text(chat_id, message_id, "📊 *Аналитика*\nВыбери раздел:", _KB_ANALYTICS)
@@ -4803,12 +4845,21 @@ def run_scan():
                     log.warning(f"  Skip {analysis['symbol']} — Claude flipped side blocked")
                     continue
 
-                # Skip LOW confidence signals
-                if confidence == "LOW":
-                    log.info(f"  Skip {analysis['symbol']} — LOW confidence")
-                    continue
+                # SHADOW MODE: Claude still runs and is still logged, but the
+                # rules filter alone decides. The flipped-side guard stays — a
+                # reversed verdict is a contradiction, not a weaker opinion.
+                _gate = _claude_gate_enabled()
 
-                if decision != "NO TRADE":
+                if confidence == "LOW":
+                    if _gate:
+                        log.info(f"  Skip {analysis['symbol']} — LOW confidence")
+                        continue
+                    log.info(f"  [shadow] {analysis['symbol']} — LOW confidence, trading anyway")
+
+                if decision == "NO TRADE" and not _gate:
+                    log.info(f"  [shadow] {analysis['symbol']} — Claude said NO TRADE, trading anyway")
+
+                if decision != "NO TRADE" or not _gate:
                     # Both caps withhold a setup Claude APPROVED. Tag why, so it
                     # is not later counted as one of Claude's rejections and can
                     # be judged on its own realised outcome (get_cap_impact_stats).

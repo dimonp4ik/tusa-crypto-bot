@@ -864,6 +864,20 @@ CLAUDE_HEAVY_MIN_SCORE    = int(os.getenv("CLAUDE_HEAVY_MIN_SCORE", "9"))    # l
 CLAUDE_HEAVY_MAX_PER_SCAN = int(os.getenv("CLAUDE_HEAVY_MAX_PER_SCAN", "5")) # max HEAVY checks per scan
 CLAUDE_MEMORY_LIMIT       = int(os.getenv("CLAUDE_MEMORY_LIMIT", "25"))      # recent outcomes per coin (HEAVY)
 CLAUDE_MAX_RISK_SCORE     = int(os.getenv("CLAUDE_MAX_RISK_SCORE", "7"))     # counter-arg auto-reject if risk >= this (7 = "real concern" per scale)
+
+# Claude as a GATE, or as an observer. 1 = his verdict withholds setups. 0 =
+# SHADOW: he is still called, scored and logged, but the rules filter alone
+# decides what trades. Switchable at runtime from the admin panel; the DB state
+# wins over this default.
+#
+# backtest.py never calls Claude, so with the gate OFF the live bot trades the
+# same population the model measures — the only way to score his verdict against
+# real fills rather than simulated ones.
+#
+# ⚠️ Approval here runs 52%, so shadow mode nearly DOUBLES this book. On the
+# stocks desk approval is 80% and the step is a quarter. Treat these very
+# differently.
+CLAUDE_GATE_ENABLED = os.getenv("CLAUDE_GATE_ENABLED", "1") != "0"
 CLAUDE_CACHE_TTL          = os.getenv("CLAUDE_CACHE_TTL", "1h")              # prompt cache TTL ("5m" or "1h")
 CLAUDE_DAILY_BUDGET_USD   = float(os.getenv("CLAUDE_DAILY_BUDGET_USD", "1.00"))  # hard daily cap (real Sonnet usage ~$0.3-0.5/day)
 CLAUDE_BUDGET_RESERVE_USD = float(os.getenv("CLAUDE_BUDGET_RESERVE_USD", "0.05")) # stop when remaining < reserve
