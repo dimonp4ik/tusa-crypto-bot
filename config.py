@@ -409,7 +409,34 @@ SMC_MIN_CONFIRMATIONS = int(os.getenv("SMC_MIN_CONFIRMATIONS", "2"))
 # selecting), and walk-forward showing no out-of-sample decay. That is a
 # reasonable basis for a config value; it is NOT proof, and should not be
 # described as one.
-SMC_BOS_MIN_VOLUME    = float(os.getenv("SMC_BOS_MIN_VOLUME", "1.4"))
+# 1.4 -> 1.3 on 2026-08-29. The rejection recorded above ("worst-windows ratios
+# +2.6/-19.2/-17.2%") was measured while the kill-switch replay peeked at future
+# outcomes, so those ratios were three to four times too kind and unevenly so.
+# Re-swept honestly. The parameter's only effect in this range is the setup
+# filter in signal_filter.py (volume_ratio < X -> reject); the volume TIER that
+# also reads it is max(X*1.35, 2.0), which pins at 2.0 throughout. So one export
+# at the loosest value, filtered down, reproduces every threshold exactly —
+# verified against the 1.4 export, whose minimum volume_ratio is 1.400 with
+# nothing below it.
+#   thr    2023 net  worst/ulcer     2024 net  worst/ulcer    current  worst/ulcer
+#   1.60    +93.46    8.4 / 18.7     +167.67   25.2 / 54.7   +339.09  26.3 /  89.1
+#   1.50   +107.02   10.1 / 23.3     +171.76   25.8 / 51.1   +374.45  23.7 /  91.3
+#   1.40   +112.20   12.1 / 24.8     +180.76   27.0 / 59.0   +419.62  29.1 / 126.6
+#   1.35   +118.53   13.4 / 27.2     +195.18   29.5 / 69.2   +429.69  29.8 / 127.1
+#   1.30   +133.16   13.9 / 32.2     +204.48   26.1 / 69.3   +433.47  31.5 / 126.2
+# The gradient runs the other way from the old conclusion: every measure improves
+# as this loosens, and it improves MOST in the hostile window (+18.7% profit with
+# absolute ulcer FALLING, 4.53 -> 4.13). 1.35 is better than 1.4 on all six
+# numbers in all three windows; 1.30 earns more (+8.2% profit and +6.9% trades in
+# total) and is better on five of six, the exception being 2024 worst-windows at
+# -3.3%. Taking 1.30 — and note the stocks desk arrived at 1.3 independently, so
+# the long-standing disagreement between the two desks on this parameter was an
+# artefact of the peeking gate here.
+#
+# Below 1.30 is unexplored on the historical windows. The current window keeps
+# improving down to 1.20 (+9.2% profit, both ratios better than 1.4), but a gate
+# must not be loosened past what the hostile window has been asked about.
+SMC_BOS_MIN_VOLUME    = float(os.getenv("SMC_BOS_MIN_VOLUME", "1.3"))
 
 # Research handle, default OFF (0 = compute as before). The +2 volume score tier
 # is normally max(SMC_BOS_MIN_VOLUME * 1.35, 2.0), so it MOVES whenever the gate
