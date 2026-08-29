@@ -90,6 +90,12 @@ def init_db():
                 entry_high    REAL,
                 entry_source  TEXT,
                 market_price  REAL,
+                -- Strategy's own price at signal time, BEFORE it is overwritten
+                -- with the live quote. Without it the drift between the bar the
+                -- model fills at and the price the order actually pays cannot be
+                -- measured at all — three separate live-vs-model conclusions were
+                -- retracted for want of this one number.
+                zone_entry_price REAL,
                 mtf_score     INTEGER,
                 mtf_score_max INTEGER,
                 premium       INTEGER DEFAULT 0,
@@ -106,6 +112,7 @@ def init_db():
             "entry_high":    "REAL",
             "entry_source":  "TEXT",
             "market_price":  "REAL",
+            "zone_entry_price": "REAL",
             "mtf_score":     "INTEGER",
             "mtf_score_max": "INTEGER",
             "premium":       "INTEGER DEFAULT 0",
@@ -481,18 +488,19 @@ def log_signal(analysis: dict, tp1: float, tp2: float, sl: float) -> int:
         cur = c.execute("""
             INSERT INTO signals (
                 symbol, direction, entry_price, tp1, tp2, sl, opened_at, status,
-                confidence, reason, entry_low, entry_high, entry_source, market_price,
+                confidence, reason, entry_low, entry_high, entry_source, market_price, zone_entry_price,
                 mtf_score, mtf_score_max, premium, atr, sniper, session, trend_4h,
                 bos_extension_atr, vol_atr_pct, volume_ratio, trend_1h, eff_ratio,
                 overhead_atr, underfoot_atr, accel_ratio, buy_pressure
             )
-            VALUES (?, ?, ?, ?, ?, ?, ?, 'OPEN', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            VALUES (?, ?, ?, ?, ?, ?, ?, 'OPEN', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """, (
             analysis["symbol"], analysis["direction"], analysis["current_price"],
             tp1, tp2, sl, time_mod.time(),
             analysis.get("confidence", "?"), analysis.get("reason", ""),
             analysis.get("entry_low"), analysis.get("entry_high"),
             analysis.get("entry_source"), analysis.get("market_price"),
+            analysis.get("zone_entry_price"),
             analysis.get("mtf_score"), analysis.get("mtf_score"),
             1 if analysis.get("premium") else 0,
             analysis.get("atr"),
