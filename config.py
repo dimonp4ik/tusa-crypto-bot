@@ -292,6 +292,24 @@ SMC_FVG_MAX_FILL      = float(os.getenv("SMC_FVG_MAX_FILL", "0.80"))
 # Hardcoded as a bare [-21:-1] in indicators.py until 2026-08-28 and therefore
 # never swept, despite being the single number that sets stop distance — and so
 # R, and so every figure in this project. Same family as SMC_SWING_LOOKBACK.
+# Swept 2026-08-29, its first ever, and 20 stands:
+#   bars   2023 net  worst/ulcer     2024 net  worst/ulcer    current  worst/ulcer
+#    20   +142.50   14.8 / 34.8     +201.26   29.1 / 68.2   +465.37  33.8 / 151.2
+#    30   +142.32   14.0 / 33.9          -                  +432.20  37.6 / 157.0
+#    45   +147.66   15.0 / 41.4     +169.88   27.0 / 68.6   +381.03  32.4 / 128.6
+# Trade count falls monotonically as the window lengthens (909 -> 889 -> 866 and
+# 1570 -> 1503 -> 1451) because a wider swing reference means a wider stop, and
+# a wider stop fails the risk gates more often. Profit follows it down in the
+# current window. 45 wins the hostile window alone (+3.6% profit, +19% on the
+# ulcer ratio) and loses the other two by 15.6% and 18.1%; 30 buys ~15% lower
+# absolute drawdown in the current window for 7.1% of its profit, and is flat to
+# slightly worse in the hostile one. Neither is an improvement — both are the
+# same profit-for-drawdown trade the account owner already has better handles for.
+#
+# Method note: this sweep was nearly wasted. The 45-bar runs were started while
+# mistaking the SMC_OB_LOOKBACK table above for this parameter's, which would
+# have compared 45 against a value this parameter has never held. The config
+# assertion in the shipping step caught it before anything was written.
 SL_REF_LOOKBACK       = int(os.getenv("SL_REF_LOOKBACK", "20"))
 # How far outside a zone price may sit and still count as "at" it. Four bare
 # numbers in indicators.py until 2026-08-28. They are deliberately MIRRORED —
