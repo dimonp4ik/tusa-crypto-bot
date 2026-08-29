@@ -2053,6 +2053,32 @@ SYMBOL_TIER_MULT = _parse_symbol_size_mult(os.getenv(
 # in LONDON with a neutral 4h reaches 1.25*1.5*1.5 = 2.81x, a concentration
 # nothing here was measured at. Each multiplier was validated on its own; their
 # product was not.
+# 2026-08-29 RE-MEASURED, and the sweep recorded above is WRONG. It was run
+# while the kill-switch replay was peeking at future outcomes, so every risk
+# ratio it compared was three to four times too kind, and unevenly so. Redone on
+# uncapped exports (SIZE_MULT_MAX=100, then clamped offline — the ceiling is a
+# pure clamp, so one export answers every candidate exactly):
+#   cap    2023 net  worst/ulcer      2024 net  worst/ulcer     current net  worst/ulcer
+#   2.0    +112.20   12.1 / 24.8      +180.76   27.0 / 59.0      +419.62   29.1 / 126.6
+#   2.5    +116.21   12.5 / 25.0      +184.66   28.1 / 61.0      +435.02   28.5 / 124.5
+#   3.0    +118.48   12.7 / 25.1      +186.54   28.4 / 61.6      +440.63   27.7 / 121.3
+# The old claim was "raising helps only the benign window; both historical
+# windows lose on both measures". The truth is the reverse: BOTH historical
+# windows, the hostile one included, gain on both ratios, and it is the CURRENT
+# window that gives them back. Profit rises everywhere (+3.3% in total at 2.5).
+#
+# Why it would work: the cap binds on 3-5% of the book, and those trades earn
+# 2.6-4x the book's per-trade edge at unit size (+0.361 against +0.088 in 2023,
+# +0.427 against +0.164 in 2024), 18 of 29 of them OVERLAP — the rule with the
+# largest measured edge. The ceiling is clamping exactly the trades that have
+# earned size.
+#
+# NOT RAISED ANYWAY, and deliberately. This is a rail whose job is the crash
+# that is not in this data, and that argument never depended on the risk
+# figures, so correcting them removes a reason to keep 2.0 without supplying a
+# reason to leave it. +3.3% of profit against a 25% wider worst-case position is
+# the account owner's call, not a measurement's — same class as TP1_R_MULT. The
+# numbers above are here so the decision can be made on true ones.
 SIZE_MULT_MAX = float(os.getenv("SIZE_MULT_MAX", "2.0"))
 # Extension trim, 2026-08-25. bos_extension_atr is how far price has travelled
 # from the level where structure broke, in ATR — i.e. how LATE the entry is.
