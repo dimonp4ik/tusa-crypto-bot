@@ -711,6 +711,19 @@ def _post_tp1_trail_mult_bt(direction: str, entry: float, tp1: float, tp2: float
 # +904→+850 on the 6-month window — it scratches trades that would have won.
 from config import STOP_CLOSE_CONFIRM as _STOP_CLOSE_CONFIRM
 
+# ...but the monitor is not what closes an AUTOTRADED position. src/okx_trader
+# places a reduce-only OCO algo with slTriggerPx at the stop and slOrdPx "-1",
+# so the exchange flattens on a TOUCH of the level and the monitor only handles
+# what the algo left behind. Modelling close-confirmation describes a bot that
+# exists only for signal-only users.
+#
+# Default ON because this account autotrades. BT_EXCHANGE_STOP=0 restores
+# monitor semantics. Deliberately a BACKTEST-only switch: flipping
+# STOP_CLOSE_CONFIRM would also change the live monitor and make manual exits
+# worse in order to fix a report.
+_BT_EXCHANGE_STOP = os.getenv("BT_EXCHANGE_STOP", "1") != "0"
+_STOP_ON_CLOSE = _STOP_CLOSE_CONFIRM and not _BT_EXCHANGE_STOP
+
 # Research only, default OFF. When a single bar satisfies BOTH the stop and a
 # target, the loop below resolves it as a stop because that check comes first.
 # 15m OHLC does not record which level was touched first, so that ordering is a
@@ -1117,8 +1130,8 @@ def simulate_trade_direct(
                 _lvl = (entry - _risk_abs * _BT_AVG_DOWN_R) if direction == "LONG"                     else (entry + _risk_abs * _BT_AVG_DOWN_R)
                 if (l <= _lvl) if direction == "LONG" else (h >= _lvl):
                     add_price = _lvl
-            _stop_hit = ((closes[j] <= sl) if _STOP_CLOSE_CONFIRM else (l <= sl)) if direction == "LONG" \
-                else ((closes[j] >= sl) if _STOP_CLOSE_CONFIRM else (h >= sl))
+            _stop_hit = ((closes[j] <= sl) if _STOP_ON_CLOSE else (l <= sl)) if direction == "LONG" \
+                else ((closes[j] >= sl) if _STOP_ON_CLOSE else (h >= sl))
             _tgt_hit = (h >= tp1) if direction == "LONG" else (l <= tp1)
             if _stop_hit and _tgt_hit:
                 globals()["_BT_AMBIGUOUS"] = globals().get("_BT_AMBIGUOUS", 0) + 1
@@ -1148,9 +1161,9 @@ def simulate_trade_direct(
                     trail_mult_eff = _post_tp1_trail_mult_bt(direction, entry, tp1, tp2, h, l, closes[j])
                     continue
             if direction == "LONG":
-                if (closes[j] <= sl) if _STOP_CLOSE_CONFIRM else (l <= sl):
+                if (closes[j] <= sl) if _STOP_ON_CLOSE else (l <= sl):
                     outcome = "SL"
-                    if _STOP_CLOSE_CONFIRM:
+                    if _STOP_ON_CLOSE:
                         stop_exit_price = closes[j]
                     exit_bar = j
                     closed = True
@@ -1167,9 +1180,9 @@ def simulate_trade_direct(
                     trail_mult_eff = _post_tp1_trail_mult_bt(direction, entry, tp1, tp2, h, l, closes[j])
                     continue
             else:
-                if (closes[j] >= sl) if _STOP_CLOSE_CONFIRM else (h >= sl):
+                if (closes[j] >= sl) if _STOP_ON_CLOSE else (h >= sl):
                     outcome = "SL"
-                    if _STOP_CLOSE_CONFIRM:
+                    if _STOP_ON_CLOSE:
                         stop_exit_price = closes[j]
                     exit_bar = j
                     closed = True
