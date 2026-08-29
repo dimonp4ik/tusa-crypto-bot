@@ -3903,6 +3903,19 @@ def _simulate_setup_outcome(direction: str, entry: float, tp1: float, tp2: float
     if STOP_CLOSE_CONFIRM and closes is not None and not use_close:
         log.warning(f"  shadow: closes shorter than highs/lows "
                     f"({len(closes)} < {min(len(highs), len(lows))}) — wick stop used")
+    # ATR for the post-TP1 trail, from the same candles. True range needs the
+    # prior close, so fall back to the plain high-low range when closes are
+    # absent; both land in the same magnitude and the trail multiplier is tiny.
+    _rng = []
+    for i in range(min(len(highs), len(lows))):
+        r = highs[i] - lows[i]
+        if closes is not None and i > 0 and i < len(closes):
+            r = max(r, abs(highs[i] - closes[i - 1]), abs(lows[i] - closes[i - 1]))
+        _rng.append(r)
+    _atr = (sum(_rng[:14]) / len(_rng[:14])) if _rng else 0.0
+    _tmult = max(0.0, float(TRAIL_ATR_MULT))
+    _peak = entry
+
     for idx, (h, l) in enumerate(zip(highs, lows)):
         if not tp1_reached:
             if direction == "LONG":
@@ -3916,12 +3929,28 @@ def _simulate_setup_outcome(direction: str, entry: float, tp1: float, tp2: float
                 if l <= tp2:  return "TP2", 1, 1
                 if l <= tp1:  tp1_reached = True
         else:
+            # Post-TP1 the live runner is TRAILED, not carried to TP2 or
+            # breakeven. Modelling it the old way is why unsent setups resolved
+            # TP2 at 25% against 2% for the ones actually sent — a 12x gap that
+            # made every shadow-vs-live comparison in the report meaningless
+            # (the "Claude rejects better setups than he approves" line among
+            # them). The docstring's "TP1=50% -> SL-to-BE" describes a policy
+            # this bot stopped running when TP1_CLOSE_FRAC went to 0.
+            # Anchor the trail to PRIOR bars only. Updating the peak with THIS
+            # bar's high and then testing THIS bar's low assumes the high
+            # printed first, which OHLC does not record — the same bias
+            # backtest.py removes via BT_TRAIL_LAG, worth ~7% of headline
+            # profit there.
+            _trail = (max(entry, _peak - _atr * _tmult) if direction == "LONG"
+                      else min(entry, _peak + _atr * _tmult))
             if direction == "LONG":
-                if h >= tp2:  return "TP2", 1, 1
-                if l <= entry: return "TP1", 1, 0   # breakeven exit after TP1
+                if h >= tp2:    return "TP2", 1, 1
+                if l <= _trail: return "TP1", 1, 0
+                _peak = max(_peak, h)
             else:
-                if l <= tp2:  return "TP2", 1, 1
-                if h >= entry: return "TP1", 1, 0
+                if l <= tp2:    return "TP2", 1, 1
+                if h >= _trail: return "TP1", 1, 0
+                _peak = min(_peak, l)
     # No terminal hit within the candles seen so far.
     return (None, 1, 0) if tp1_reached else (None, 0, 0)
 
