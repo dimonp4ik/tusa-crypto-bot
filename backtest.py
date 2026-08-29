@@ -1041,8 +1041,16 @@ def simulate_trade_direct(
         execution_delay_bars,
         adverse_entry_bps,
     )
+    # Levels are computed at SCAN time live and stored on the signal; the order
+    # then fills wherever it fills. So an adverse fill must NOT drag the targets
+    # with it — doing that keeps R constant and pushes TP1 further away, which is
+    # not what the account experiences. BT_ADVERSE_KEEP_LEVELS=1 anchors tp/sl to
+    # the PLANNED entry and lets only the fill move, matching live.
+    # Default 0 preserves existing figures.
+    _lvl_src = (planned_entry
+                if os.getenv("BT_ADVERSE_KEEP_LEVELS", "0") == "1" else entry)
     tp1, tp2, sl = calculate_tp_sl_local(
-        entry,
+        _lvl_src,
         direction,
         atr=setup.get("atr", 0.0),
         recent_high=setup.get("recent_high", 0.0),
