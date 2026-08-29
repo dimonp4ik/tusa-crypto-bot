@@ -3696,9 +3696,19 @@ def _check_open_signals():
                 # candle's close, not by a wick. Unconfirmed (still-forming)
                 # candles can never trigger it — their "close" is just the
                 # current price, which is exactly the intrabar touch we mean to
-                # ignore. Falls back to wick-touch when the feed carries no
-                # confirmed flags (global-feed fallback path).
-                _is_confirmed = bool(_conf_flags[i]) if i < len(_conf_flags) else True
+                # ignore.
+                #
+                # Only get_klines_xperp() builds these flags; the global-feed
+                # fallback beside it does not. Defaulting to "confirmed" there
+                # made the LAST bar — always the forming one — able to trigger
+                # the stop on its running price, so on that path the rule
+                # silently became touch-the-level while backtest.py still
+                # required a closed bar. Without flags, assume every bar but the
+                # last is closed.
+                if i < len(_conf_flags):
+                    _is_confirmed = bool(_conf_flags[i])
+                else:
+                    _is_confirmed = i < len(df["close"]) - 1
                 if STOP_CLOSE_CONFIRM:
                     _sl_breached = _is_confirmed and (
                         close <= sl if direction == "LONG" else close >= sl
