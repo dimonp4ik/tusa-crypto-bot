@@ -4421,6 +4421,11 @@ def _base_of_symbol(symbol: str) -> str:
 
 
 def run_scan():
+    # Phase timing. Publish latency is what drags the fill away from the
+    # zone, and entry drift is the single largest cost in the book, so the
+    # breakdown is logged every scan rather than guessed at.
+    _ph_t0 = time.time()
+    _ph_smc = _ph_light = 0.0
     now_utc = datetime.now(timezone.utc)
 
     # TP/SL monitoring moved to dedicated 1-min job (_monitor_open_signals)
@@ -4543,6 +4548,7 @@ def run_scan():
                     log.warning(f"  Fetch failed: {e}")
         log.info(f"Candles: {len(_fetched)}/{len(coins)} symbols in {time.time()-_t0:.1f}s")
 
+        _ph_t_smc = time.time()
         for symbol in coins:
             if symbol not in _fetched:
                 continue
@@ -4731,12 +4737,16 @@ def run_scan():
         claude_ctx = dict(news or {})
         claude_ctx["btc_1h"] = btc_change
         claude_ctx["btc_1d"] = btc_change_1d
+        _ph_smc = time.time() - _ph_t_smc   # SMC loop + ranking
+        _ph_t_light = time.time()
         try:
             analyses = analyze_batch_with_claude(enriched, news_context=claude_ctx)
         except Exception as e:
             log.error(f"Claude LIGHT batch call failed: {e}")
             return
 
+
+        _ph_light = time.time() - _ph_t_light
 
         # Step 4b: HEAVY tier — Sonnet second opinion on the strongest survivors.
         # Only setups the LIGHT gate approved (LONG/SHORT, not LOW) with a high
@@ -4832,6 +4842,7 @@ def run_scan():
 
         # Step 5: Send signals to Telegram (hard cap: max 3 per scan)
         MAX_SIGNALS_PER_SCAN = 3
+        _ph_t_send = time.time()
         sent_count = 0
         # Concurrent same-direction exposure. Correlated alts in one direction
         # do not diversify, they concentrate: one BTC move resolves them all the
@@ -4928,6 +4939,8 @@ def run_scan():
         # better. No early return sits between here and the LIGHT call.
         _run_shadow_batch()
 
+        log.info(f"Scan phases: smc+rank {_ph_smc:.1f}s, light {_ph_light:.1f}s, "
+                 f"send {time.time()-_ph_t_send:.1f}s, total {time.time()-_ph_t0:.1f}s")
         log.info(f"=== Scan complete — {sent_count} signal(s) sent ===\n")
 
     except Exception as e:
