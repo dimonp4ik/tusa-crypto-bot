@@ -13,6 +13,7 @@ except Exception:
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from config import (
+    LEVELS_FROM_STRUCTURE,
     TELEGRAM_TOKEN, TELEGRAM_CHAT_ID,
     SL_ATR_BUFFER, RISK_MIN_PCT, RISK_MAX_PCT, TP1_R_MULT, TP2_R_MULT,
 )
@@ -199,7 +200,16 @@ def send_signal(analysis: dict) -> bool:
     if decision == "NO TRADE":
         return False
 
+    # Anchor point for the bracket. current_price has by now been overwritten
+    # with the live quote, so levels computed from it follow the fill wherever
+    # it drifted — dragging the stop toward the noise the setup was meant to sit
+    # outside of. LEVELS_FROM_STRUCTURE=1 keeps them on the pre-drift price.
+    # See config.py for the measured trade-off; default is unchanged.
     price     = analysis["current_price"]
+    if LEVELS_FROM_STRUCTURE:
+        _zp = analysis.get("zone_entry_price")
+        if _zp:
+            price = float(_zp)
     direction = analysis["direction"]
     atr       = analysis.get("atr", 0.0)
     rec_high  = analysis.get("recent_high", price * 1.03)
