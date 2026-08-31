@@ -4242,8 +4242,13 @@ def _publish_signal(analysis: dict, decision: str, direction: str,
         # that always fills at the zone).
         try:
             mark_setup_blocked(analysis.get("_setup_log_id"), "stale_entry")
-        except Exception:
-            pass
+        except Exception as _mbe:
+            # Losing this tag is not cosmetic: an untagged sent=0 row
+            # reads as a Claude rejection, and that history is fed
+            # back to Claude as his own track record. Seen live on
+            # 2026-07-30 before the tagging existed at all.
+            log.warning(f"mark_setup_blocked failed, setup will look "
+                        f"like a Claude rejection: {_mbe}")
         return False
 
     # Execution-quality gate: the bid/ask gap on the X-Perp we
@@ -4266,8 +4271,13 @@ def _publish_signal(analysis: dict, decision: str, direction: str,
         )
         try:
             mark_setup_blocked(analysis.get("_setup_log_id"), "wide_spread")
-        except Exception:
-            pass
+        except Exception as _mbe:
+            # Losing this tag is not cosmetic: an untagged sent=0 row
+            # reads as a Claude rejection, and that history is fed
+            # back to Claude as his own track record. Seen live on
+            # 2026-07-30 before the tagging existed at all.
+            log.warning(f"mark_setup_blocked failed, setup will look "
+                        f"like a Claude rejection: {_mbe}")
         return False
 
     if send_signal(analysis):
@@ -4325,8 +4335,13 @@ def _publish_signal(analysis: dict, decision: str, direction: str,
         # consecutive scans, never sent, never tagged.
         try:
             mark_setup_blocked(analysis.get("_setup_log_id"), "send_failed")
-        except Exception:
-            pass
+        except Exception as _mbe:
+            # Losing this tag is not cosmetic: an untagged sent=0 row
+            # reads as a Claude rejection, and that history is fed
+            # back to Claude as his own track record. Seen live on
+            # 2026-07-30 before the tagging existed at all.
+            log.warning(f"mark_setup_blocked failed, setup will look "
+                        f"like a Claude rejection: {_mbe}")
     return _sent
 
 
@@ -4382,8 +4397,13 @@ def _check_zone_watch():
                     watch_resolve(r["id"], "cancelled")
                     try:
                         mark_setup_blocked(analysis.get("_setup_log_id"), "dir_cap")
-                    except Exception:
-                        pass
+                    except Exception as _mbe:
+                        # Losing this tag is not cosmetic: an untagged sent=0 row
+                        # reads as a Claude rejection, and that history is fed
+                        # back to Claude as his own track record. Seen live on
+                        # 2026-07-30 before the tagging existed at all.
+                        log.warning(f"mark_setup_blocked failed, setup will look "
+                                    f"like a Claude rejection: {_mbe}")
                     continue
 
                 log.info(f"  Zone hit: {r['symbol']} {direction} @ {px} "
@@ -4917,8 +4937,13 @@ def run_scan():
                         log.info(f"  Skip {analysis['symbol']} — scan cap {MAX_SIGNALS_PER_SCAN} reached")
                         try:
                             mark_setup_blocked(analysis.get("_setup_log_id"), "scan_cap")
-                        except Exception:
-                            pass
+                        except Exception as _mbe:
+                            # Losing this tag is not cosmetic: an untagged sent=0 row
+                            # reads as a Claude rejection, and that history is fed
+                            # back to Claude as his own track record. Seen live on
+                            # 2026-07-30 before the tagging existed at all.
+                            log.warning(f"mark_setup_blocked failed, setup will look "
+                                        f"like a Claude rejection: {_mbe}")
                         continue
 
                     if (MAX_SAME_DIRECTION_POSITIONS > 0
@@ -4929,8 +4954,13 @@ def run_scan():
                         )
                         try:
                             mark_setup_blocked(analysis.get("_setup_log_id"), "dir_cap")
-                        except Exception:
-                            pass
+                        except Exception as _mbe:
+                            # Losing this tag is not cosmetic: an untagged sent=0 row
+                            # reads as a Claude rejection, and that history is fed
+                            # back to Claude as his own track record. Seen live on
+                            # 2026-07-30 before the tagging existed at all.
+                            log.warning(f"mark_setup_blocked failed, setup will look "
+                                        f"like a Claude rejection: {_mbe}")
                         continue
 
                     # Zone watch: hold instead of publishing at whatever price
