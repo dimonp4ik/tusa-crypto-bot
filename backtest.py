@@ -1705,6 +1705,21 @@ def apply_live_gates(trades: list[TradeRecord]) -> list[TradeRecord]:
     rather than bad ones — the live book is smaller and steadier, not better
     selected. Risk-adjusted it is the stronger number: 91.2 against 69.3.
     """
+    # Bound the cost of a no-skill filter that rejects a share of the book.
+    # Claude is LIVE-ONLY: he rejects roughly half the crypto setups and so
+    # decides which trades take the per-scan slots, and none of that is here.
+    # Dropping the same share at random says what that costs with zero skill:
+    # live doing worse than this is Claude choosing badly, better is real
+    # selection. Deterministic per trade so runs reproduce.
+    _rej = float(os.getenv("BT_RANDOM_REJECT", "0") or 0)
+    if _rej > 0:
+        import hashlib as _hl
+        _seed = os.getenv("BT_RANDOM_REJECT_SEED", "1")
+        def _drop(t) -> bool:
+            key = f"{_seed}|{t.symbol}|{t.entry_time}|{t.direction}"
+            h = int(_hl.md5(key.encode()).hexdigest()[:8], 16) / 0xFFFFFFFF
+            return h < _rej
+        trades = [t for t in trades if not _drop(t)]
     ordered = sorted(trades, key=_scan_order_key)
     last_sig: dict = {}
     per_bar: dict = {}
