@@ -234,7 +234,14 @@ def place_market_entry(creds: dict, inst_id: str, direction: str, sz: float) -> 
         return False, data
     try:
         return True, data[0]["ordId"]
-    except Exception:
+    except Exception as e:
+        # The exchange call itself SUCCEEDED (outer code 0) - only pulling
+        # the id out of the response failed. Keeping True is right: the
+        # order exists. But an empty id means this order can never be
+        # amended or cancelled again, which for a protection order means
+        # its trail silently freezes for the life of the trade. Should not
+        # be reachable; say so loudly if it ever is.
+        _log.error(f"OKX response parsed empty, order id lost: {e}")
         return True, ""
 
 
@@ -274,7 +281,14 @@ def place_protection_oco(creds: dict, inst_id: str, direction: str,
         return False, data
     try:
         return True, data[0]["algoId"]
-    except Exception:
+    except Exception as e:
+        # The exchange call itself SUCCEEDED (outer code 0) - only pulling
+        # the id out of the response failed. Keeping True is right: the
+        # order exists. But an empty id means this order can never be
+        # amended or cancelled again, which for a protection order means
+        # its trail silently freezes for the life of the trade. Should not
+        # be reachable; say so loudly if it ever is.
+        _log.error(f"OKX response parsed empty, order id lost: {e}")
         return True, ""
 
 
@@ -300,7 +314,14 @@ def place_tp1_partial(creds: dict, inst_id: str, direction: str,
         return False, data
     try:
         return True, data[0]["algoId"]
-    except Exception:
+    except Exception as e:
+        # The exchange call itself SUCCEEDED (outer code 0) - only pulling
+        # the id out of the response failed. Keeping True is right: the
+        # order exists. But an empty id means this order can never be
+        # amended or cancelled again, which for a protection order means
+        # its trail silently freezes for the life of the trade. Should not
+        # be reachable; say so loudly if it ever is.
+        _log.error(f"OKX response parsed empty, order id lost: {e}")
         return True, ""
 
 
@@ -394,7 +415,14 @@ def place_spot_buy(creds: dict, inst_id: str, quote_usdc: float) -> tuple:
         return False, data
     try:
         return True, data[0].get("ordId", "")
-    except Exception:
+    except Exception as e:
+        # The exchange call itself SUCCEEDED (outer code 0) - only pulling
+        # the id out of the response failed. Keeping True is right: the
+        # order exists. But an empty id means this order can never be
+        # amended or cancelled again, which for a protection order means
+        # its trail silently freezes for the life of the trade. Should not
+        # be reachable; say so loudly if it ever is.
+        _log.error(f"OKX response parsed empty, order id lost: {e}")
         return True, ""
 
 
