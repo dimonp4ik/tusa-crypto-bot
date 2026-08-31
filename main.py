@@ -4737,8 +4737,6 @@ def run_scan():
             log.error(f"Claude LIGHT batch call failed: {e}")
             return
 
-        # Real LIGHT call already claimed its budget above — shadow runs now.
-        _run_shadow_batch()
 
         # Step 4b: HEAVY tier — Sonnet second opinion on the strongest survivors.
         # Only setups the LIGHT gate approved (LONG/SHORT, not LOW) with a high
@@ -4921,6 +4919,15 @@ def run_scan():
                 log.error(f"  Error sending {analysis.get('symbol','?')}: {e}")
 
         _last_scan_stats["sent"] = sent_count
+        # Shadow batch runs LAST, off the critical path. It is a Claude
+        # round-trip that cannot affect any real signal, and it used to sit
+        # between the LIGHT verdict and order dispatch - so every live order
+        # waited on it, and the entry drifted further from the zone while it
+        # ran. Real calls still claim the daily budget first, which was the
+        # reason for the old placement; running last satisfies it strictly
+        # better. No early return sits between here and the LIGHT call.
+        _run_shadow_batch()
+
         log.info(f"=== Scan complete — {sent_count} signal(s) sent ===\n")
 
     except Exception as e:
