@@ -1165,7 +1165,14 @@ POST_TP1_WEAK_CLOSE_PROGRESS   = float(os.getenv("POST_TP1_WEAK_CLOSE_PROGRESS",
 # score<0.50 → WR ~59%. Used as a size multiplier (no gating) → +6% total R,
 # trade frequency unchanged. Edge needs a deep pool, so a ~1000-candle fetch is
 # done ONLY for symbols that already produced a setup (rare → cheap).
-KNN_RISK_OVERLAY   = os.getenv("KNN_RISK_OVERLAY", "1") != "0"
+# Off since 2026-08-31. With KNN_HIGH_MULT/KNN_LOW_MULT neutralised the overlay
+# changes no decision, but it still deep-fetched ~1000 candles PAGINATED for
+# every qualified setup, before ranking - so most of those fetches were thrown
+# away by the cap anyway. That sits on the publish path, and publish latency is
+# what drags the fill away from the entry zone, which is the single largest cost
+# in this book. backtest.py still computes knn_score independently, so the
+# feature stays available for research; only the live fetch is gone.
+KNN_RISK_OVERLAY   = os.getenv("KNN_RISK_OVERLAY", "0") != "0"
 KNN_DEEP_CANDLES   = int(os.getenv("KNN_DEEP_CANDLES", "1000"))   # 1 Bybit page
 KNN_MAX_HISTORY    = int(os.getenv("KNN_MAX_HISTORY", "800"))     # analog pool cap
 KNN_SHAPE_LEN      = int(os.getenv("KNN_SHAPE_LEN", "12"))        # query window (3h)
