@@ -1059,7 +1059,25 @@ RISK_MAX_PCT  = float(os.getenv("RISK_MAX_PCT", "0.035"))  # max SL distance = 3
 # return. Win rate is purchasable to almost any level here and the price is
 # always money. Do not move this without the owner choosing the trade.
 TP1_R_MULT    = float(os.getenv("TP1_R_MULT", "0.6"))      # TP1 = entry ± risk * 0.6
-TP2_R_MULT    = float(os.getenv("TP2_R_MULT", "3.0"))      # TP2 = entry ± risk * 3.0
+# SWEPT 2026-09-02 (first time -- TP1 above has two recorded sweeps, this had
+# none). TP2 is nearly inert: under the trail exit fewer than 2% of trades ever
+# reach it. But those few pay ~+4.2R each, so the cap decides the whole tail.
+#
+#   TP2   2023 profit  ratios      2024 profit  ratios      2026 profit  ratios
+#   2.5      --           --          --          --        +459.26R  33.4/148.0
+#   3.0   +142.50R   14.8/34.8    +201.26R   29.1/68.2     +465.37R  33.8/151.2
+#   4.0   +145.52R   15.1/35.7    +203.17R   29.4/68.9     +468.41R  34.1/152.4
+#   5.0      --           --          --          --        +472.41R  34.3/153.8
+#
+# 4.0 wins on profit AND both risk ratios in ALL THREE windows, with drawdown
+# and win rate unchanged to the decimal and the trade count moving by one. That
+# is not leverage -- no position is larger and no trade is riskier; the cap was
+# simply truncating runners the trail would have carried further.
+#
+# 5.0 is better still on the current window and is NOT taken yet: it has only
+# been measured there, and the hostile window is where a longer tail could stop
+# paying. Next step is 5.0/6.0 across all three.
+TP2_R_MULT    = float(os.getenv("TP2_R_MULT", "4.0"))      # TP2 = entry ± risk * 4.0
 # 2026-08-28: back to 3.0. It was cut to 2.0 for being "unreachable", which was
 # right under the OLD exit (bank 50% at TP1, fixed TP2) and is wrong under the
 # current one (full position past TP1 + a 0.02 ATR trail). TP2 is no longer the
