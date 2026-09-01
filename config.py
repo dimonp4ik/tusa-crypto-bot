@@ -943,6 +943,23 @@ ATR_PERIOD    = int(os.getenv("ATR_PERIOD", "14"))
 # that the buffer is not actually expressed — it is silently truncated, and
 # risk-normalised sizing then halves those positions.
 SL_ATR_BUFFER = float(os.getenv("SL_ATR_BUFFER", "1.0"))
+# SWEPT 2026-09-01 (first time -- the ceiling had two recorded sweeps, this
+# floor had none). Motive: cost_r scales inversely with stop width, so trades
+# pinned here pay 0.166R against 0.057R at the ceiling, and the floor bucket
+# sits below book in all three windows. Widening the floor should have bought
+# that back. It does not:
+#   floor   2023 profit  DD      ratios       2024 profit  ratios      2026 profit  DD      ratios
+#   0.012   +142.50R  -11.75  14.8/34.8      +201.26R  29.1/68.2     +465.37R  -17.55  33.8/151.2
+#   0.015   +147.24R  -10.84  16.8/42.9      +202.84R  29.3/68.1     +435.26R  -18.05  31.9/134.3
+#
+# Better on EVERY measure in the hostile window, flat in 2024, worse on every
+# measure in the current one -- and the current loss (-30R) is larger than the
+# hostile gain (+4.7R). Regime-dependent, not a cost effect, so 0.012 KEPT.
+#
+# 0.015 is the highest value comparable in R at all: RISK_REFERENCE_PCT is
+# 0.015, and above it risk-normalised sizing shrinks the position, so R stops
+# meaning the same money. Sweeping higher needs money accounting -- the same
+# warning the ceiling carries.
 RISK_MIN_PCT  = float(os.getenv("RISK_MIN_PCT", "0.012"))  # min SL distance = 1.2%
 RISK_MAX_PCT  = float(os.getenv("RISK_MAX_PCT", "0.035"))  # max SL distance = 3.5%
 # 🔁 RE-SWEPT 2026-08-28 in BOTH directions under the new exit (trail 0.02,
