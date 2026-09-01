@@ -548,8 +548,11 @@ def _build_and_send_report(chat_id: int, message_id: int,
                     v = sorted(float(r.get(k) or 0) for r in _phs)
                     return v[len(v) // 2]
                 A(f"  сканов с сигналами: {len(_phs)}")
+                _fs = sum(int(r.get('fund_skip') or 0) for r in _phs)
+                if _fs:
+                    A(f"  гейт фандинга отказал: {_fs} сетапов за {len(_phs)} сканов")
                 A(f"  медиана: свечи {_med('fetch'):.1f}с, разбор {_med('smc'):.1f}с, "
-          f"Клод {_med('light'):.1f}с, "
+                  f"Клод {_med('light'):.1f}с, "
                   f"отправка {_med('send'):.1f}с, ВСЕГО {_med('total'):.1f}с")
                 _w = max(_phs, key=lambda r: float(r.get("total") or 0))
                 A(f"  худший скан: {_w.get('total')}с "
@@ -4692,6 +4695,7 @@ def run_scan():
         # Step 3b: news + funding enrichment
         enriched = []
         _news_blind = 0
+        _funding_skips = 0
         for s in fresh:
             # News check — block on bad news
             news = check_news_sentiment(s["symbol"])
@@ -4703,17 +4707,25 @@ def run_scan():
             if not news["safe"]:
                 log.info(f"  Skip {s['symbol']} — {news['reason']}")
                 continue
-            # Funding rate — fetch + hard filter crowded positions
+            # Funding rate — fetch + hard filter crowded positions.
+            # Counted: a skipped setup never reaches setup_log, so this gate
+            # was invisible -- it refuses trades and left no trace to weigh
+            # that against. At the median 1.77% stop, the 0.05% it avoids is
+            # 0.028R; the trade it refuses is worth about +0.296R.
             fr = get_funding_rate(s["symbol"])
             s["funding_rate"] = fr
             if fr is not None:
                 if s["direction"] == "LONG"  and fr >  0.0005:   # >+0.05% = crowded longs
                     log.info(f"  Skip {s['symbol']} LONG — funding {fr*100:+.3f}% crowded")
+                    _funding_skips += 1
                     continue
                 if s["direction"] == "SHORT" and fr < -0.0005:   # <-0.05% = crowded shorts
                     log.info(f"  Skip {s['symbol']} SHORT — funding {fr*100:+.3f}% crowded")
+                    _funding_skips += 1
                     continue
             enriched.append(s)
+        if _funding_skips:
+            log.info(f"  Funding gate refused {_funding_skips} setup(s) this scan")
         if _news_blind:
             log.warning(
                 f"  News gate BLIND for {_news_blind}/{len(fresh)} setups "
@@ -5034,6 +5046,7 @@ def run_scan():
                              "light": round(_ph_light, 1),
                              "send": round(time.time() - _ph_t_send, 1),
                              "total": round(time.time() - _ph_t0, 1),
+                             "fund_skip": _funding_skips,
                              "sent": sent_count})
             set_bot_state("scan_phase_ms", json.dumps(_ph_hist[-50:]))
         except Exception as _pe:

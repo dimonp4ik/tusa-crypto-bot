@@ -288,6 +288,13 @@ def init_db():
             "resolved":     "INTEGER NOT NULL DEFAULT 0",
             "resolved_ts":  "REAL",
             "trend":        "TEXT",
+            # Funding is fetched every scan, shown to Claude and used as a HARD
+            # gate (skip LONG above +0.05%, SHORT below -0.05%) -- and then
+            # thrown away. So the gate that refuses trades has never been
+            # measured against outcomes, and its cost cannot be compared with
+            # what it avoids: at the median 1.77% stop, 0.05% of funding is
+            # 0.028R against a book averaging +0.296R per trade.
+            "funding_rate": "REAL",
             # Open Interest shadow feature (logged, not yet acted on).
             "oi_delta_pct": "REAL",
             "oi_regime":    "TEXT",
@@ -1233,9 +1240,9 @@ def log_setup_candidate(analysis: dict) -> int:
                  oi_delta_pct, oi_regime, oi_confirms, counter, variants, source,
                  open_same_dir,
                  book_spread_bps, book_depth_usd, book_imbalance,
-                 hours_to_event, next_event, sniper)
+                 hours_to_event, next_event, sniper, funding_rate)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
-                    ?, ?, ?, ?, ?, ?, ?)
+                    ?, ?, ?, ?, ?, ?, ?, ?)
         """, (
             time_mod.time(),
             analysis.get("symbol", ""),
@@ -1274,6 +1281,7 @@ def log_setup_candidate(analysis: dict) -> int:
             analysis.get("hours_to_event"),
             analysis.get("next_event"),
             1 if analysis.get("sniper") else 0,
+            analysis.get("funding_rate"),
         ))
         return cur.lastrowid
 
