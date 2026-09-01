@@ -548,7 +548,8 @@ def _build_and_send_report(chat_id: int, message_id: int,
                     v = sorted(float(r.get(k) or 0) for r in _phs)
                     return v[len(v) // 2]
                 A(f"  сканов с сигналами: {len(_phs)}")
-                A(f"  медиана: разбор {_med('smc'):.1f}с, Клод {_med('light'):.1f}с, "
+                A(f"  медиана: свечи {_med('fetch'):.1f}с, разбор {_med('smc'):.1f}с, "
+          f"Клод {_med('light'):.1f}с, "
                   f"отправка {_med('send'):.1f}с, ВСЕГО {_med('total'):.1f}с")
                 _w = max(_phs, key=lambda r: float(r.get("total") or 0))
                 A(f"  худший скан: {_w.get('total')}с "
@@ -4489,7 +4490,7 @@ def run_scan():
     # zone, and entry drift is the single largest cost in the book, so the
     # breakdown is logged every scan rather than guessed at.
     _ph_t0 = time.time()
-    _ph_smc = _ph_light = 0.0
+    _ph_smc = _ph_light = _ph_fetch = 0.0
     now_utc = datetime.now(timezone.utc)
 
     # TP/SL monitoring moved to dedicated 1-min job (_monitor_open_signals)
@@ -4610,7 +4611,8 @@ def run_scan():
                     _fetched[_sym] = _dfs
                 except Exception as e:
                     log.warning(f"  Fetch failed: {e}")
-        log.info(f"Candles: {len(_fetched)}/{len(coins)} symbols in {time.time()-_t0:.1f}s")
+        _ph_fetch = time.time() - _t0
+        log.info(f"Candles: {len(_fetched)}/{len(coins)} symbols in {_ph_fetch:.1f}s")
 
         _ph_t_smc = time.time()
         for symbol in coins:
@@ -5013,7 +5015,8 @@ def run_scan():
         # better. No early return sits between here and the LIGHT call.
         _run_shadow_batch()
 
-        log.info(f"Scan phases: smc+rank {_ph_smc:.1f}s, light {_ph_light:.1f}s, "
+        log.info(f"Scan phases: fetch {_ph_fetch:.1f}s, smc+rank {_ph_smc:.1f}s, "
+                 f"light {_ph_light:.1f}s, "
                  f"send {time.time()-_ph_t_send:.1f}s, total {time.time()-_ph_t0:.1f}s")
         # Persist the breakdown too. The log lives on the host and is not
         # reachable from where this gets analysed, so without this the timing
@@ -5022,6 +5025,7 @@ def run_scan():
         try:
             _ph_hist = json.loads(get_bot_state("scan_phase_ms") or "[]")
             _ph_hist.append({"t": round(time.time()),
+                             "fetch": round(_ph_fetch, 1),
                              "smc": round(_ph_smc, 1),
                              "light": round(_ph_light, 1),
                              "send": round(time.time() - _ph_t_send, 1),
