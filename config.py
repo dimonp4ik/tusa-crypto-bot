@@ -1172,7 +1172,9 @@ TRAIL_RUNNER_ENABLED = os.getenv("TRAIL_RUNNER_ENABLED", "1") != "0"
 #   0.0 +477.15/156.5 | 0.003 +477.29/156.4 | 0.006 +476.43/155.9
 #   0.01 +475.28/155.3 | 0.02 +472.41/153.8 (was) | 0.05 +464.09/149.2
 # Confirmed on both other windows, better on every measure in all three:
-#   2023 +147.23 → +149.04   2024 +204.61 → +207.14
+#   2023 +147.23 → +149.06   2024 +204.61 → +207.17
+# (those two re-measured on the shipped uniform config, not on the variant
+#  with the strong branch revived — they differ by 0.02-0.03R)
 # Not taking the 0.0-0.003 floor: it puts the stop flush against price and
 # live X-Perp wicks are harsher than the model represents.
 TRAIL_ATR_MULT       = float(os.getenv("TRAIL_ATR_MULT", "0.006"))  # base trail; post_tp1_v2 overrides per-context
