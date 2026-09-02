@@ -1710,8 +1710,26 @@ BACKTEST_TP_WINDOW      = int(os.getenv("BACKTEST_TP_WINDOW", "192"))
 # Unlike the fee, which was verifiably wrong against OKX's published schedule,
 # this is an estimate weighed against an estimate. Erring high on costs is the
 # safe direction. Recorded here so the number is measured rather than assumed.
-BACKTEST_FEE_RATE       = float(os.getenv("BACKTEST_FEE_RATE", "0.0005"))
-BACKTEST_SLIPPAGE_RATE  = float(os.getenv("BACKTEST_SLIPPAGE_RATE", "0.0005"))
+# 2026-09-03: both rates were 0.0005 and both were wrong, by a lot.
+# FEE: the account owner's actual per-side fee is 0.0001, five times lower than
+# what was assumed here.
+# SLIPPAGE: 0.0005 per side was never measured. The honest cost of crossing is
+# half the spread, and the spread was measured live on the venue — crypto perps
+# above $5M turnover have a median spread of 0.0172% (half = 0.0086%), and the
+# stock X-Perps 0.011% (half = 0.0055%). Rounded up to 0.0001 per side for both.
+# Round trip therefore goes from 0.20% to 0.04% of notional.
+#
+# This matters far beyond tidiness. Cost in R is round-trip / risk-in-price, so
+# at a 2.14% median stop the old rates charged 0.0934R per trade against a live
+# gross edge of +0.091R — i.e. the model believed the whole edge was eaten by
+# costs. On the real rates the charge is 0.0187R and the live book is clearly
+# profitable: crypto +19.90R gross over 218 trades becomes +15.8R net, stocks
+# +27.44R over 168 becomes +21.9R.
+# Every table recorded before this date was measured with costs 5x too high.
+# Overstated costs bias the model toward fewer trades and wider stops, so
+# cost-sensitive decisions need re-checking, not just re-baselining.
+BACKTEST_FEE_RATE       = float(os.getenv("BACKTEST_FEE_RATE", "0.0001"))
+BACKTEST_SLIPPAGE_RATE  = float(os.getenv("BACKTEST_SLIPPAGE_RATE", "0.0001"))
 # BACKTEST_USE_BTC_FILTER removed 2026-08-03 — dead, and it implied the BTC
 # context was optional in backtest. It is not: since the 2026-07-31 fix
 # backtest.py always computes a REAL btc_change_pct per scan bar, exactly as
