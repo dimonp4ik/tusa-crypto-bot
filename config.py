@@ -943,6 +943,15 @@ LIVE_HIST_EPOCH_TS = float(os.getenv("LIVE_HIST_EPOCH_TS", "1787670000"))
 #   TP2 = 3.0R (3.6–9%   move → 72–180% on 20x), let winner run
 # Readable from the environment since 2026-08-26 — same reason as
 # SMC_SWING_LOOKBACK: it was a constant and could not be measured.
+# RE-SWEPT 2026-09-02 on current mechanics (the earlier note predates
+# LEVELS_FROM_STRUCTURE). 2026-08-26 window, trades / net R / worst-windows
+# (ratio) / profit-per-ulcer:
+#   10   1577  +471.16  13.75 (34.3)  147.5
+#   14   1570  +472.41  13.75 (34.3)  153.8   ← best profit and ulcer
+#   20   1563  +463.13  14.14 (32.8)  146.0
+#   28   1561  +463.32  14.04 (33.0)  144.8
+# Longer periods are worse on every measure; 10 is a near-tie on profit but
+# loses on ulcer. 14 stays.
 ATR_PERIOD    = int(os.getenv("ATR_PERIOD", "14"))
 # 0.5 -> 1.0 on 2026-08-24. This is how far beyond the swing the structural stop
 # is pushed, and at 0.5 ATR it sat close enough to the level that noise took it
