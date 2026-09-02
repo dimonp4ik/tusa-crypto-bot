@@ -496,6 +496,24 @@ RETEST_MAX_DIST_PCT = float(os.getenv("RETEST_MAX_DIST_PCT", "0.015"))  # within
 #   13: 843 сд  74.3%  +190.22R  DD -14.38R  ratio 13.2
 # More trades, higher win rate, more profit, less drawdown — no trade-off.
 # 12 was also tested and adds little beyond 13, so the gate stops here.
+#
+# RE-CHECKED 2026-09-03 on honest costs (fees were 5x too high until today) and
+# 13 SURVIVES here, even though the same re-check moved the stocks desk to 11.
+#            trades      net R      maxDD   worst-win ratio   profit/ulcer
+#   2026-08-26  1570/1597  597.61/604.48  -14.86/-14.86   48.6/49.1   252.8/251.2
+#   2024-07-31  1175/1187  287.90/295.07   -8.67/ -8.34   54.7/55.2   130.7/134.7
+#   2023-07-31   908/ 938  223.18/220.10   -9.24/-11.81   30.6/21.9    83.6/ 72.7
+# (left = 13, right = 11.) The two calm windows favour 11 slightly, and the
+# HOSTILE one rejects it outright: the 30 extra trades earn nothing while max
+# drawdown worsens 28% and both risk ratios fall by a quarter and a seventh.
+#
+# The mechanism explains why the desks disagree rather than one of them being
+# wrong. In stocks the quota binds harder than setup quality, so lowering the
+# bar only reshuffles WHICH setups fill the same slots — trade count barely
+# moves and only the refusal count climbs. Here the quota has room, so a lower
+# bar admits genuinely weaker setups, and a hostile tape is where that shows.
+# Rule this confirms: a boost is only earned if the subset does not weaken in
+# the hostile window.
 MTF_MIN_SCORE = int(os.getenv("MTF_MIN_SCORE", "13"))
 
 # INERT since 2026-08-07 — variant D was removed on request, and it was the only
