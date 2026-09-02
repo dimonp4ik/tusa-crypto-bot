@@ -760,12 +760,20 @@ FVG_LONDON_BTC_UP_MIN_PCT = float(os.getenv("FVG_LONDON_BTC_UP_MIN_PCT", "0.29")
 # The same was true of the kNN overlay removed on 2026-08-31: its commit said
 # the live book carried +-20% from it, and that was wrong for this reason.
 #
-# Left in place rather than deleted: they are inert, so removing them changes
-# nothing measurable, and the contexts they encode (OB entries, optimal
-# RSI/volume, relative momentum) may be worth wiring properly. That is a real
-# open question -- make backtest.py apply risk_mult, measure across windows,
-# and watch for double-counting against the size_mult stack, which boosts
-# overlapping contexts already.
+# Left in place rather than deleted: inert code costs nothing to keep.
+#
+# ✅ 2026-09-02 the open question is CLOSED and the answer is do not wire them.
+# The field does vary -- 1.0 / 1.15 / 1.25, with 72-79% of the book boosted --
+# but it does not predict. Unit R by bucket, size divided out:
+#          1.0        1.15       1.25        base
+#   2023  +0.095     +0.095     +0.213      +0.119
+#   2024  +0.150     +0.195     +0.159      +0.177
+#   2026  +0.234     +0.272     +0.206      +0.248
+# The LARGEST boost lands on the WORST bucket in two windows of three, and the
+# response is not monotone in any of them. Applying this would grow the size of
+# the trades that do worst -- exactly the defect found in the stocks kNN rule
+# on 2026-08-31. A boost covering three quarters of the book is leverage, not
+# selection, and this one is not even aimed the right way.
 QUALITY_RISK_OVERLAY    = os.getenv("QUALITY_RISK_OVERLAY", "1") != "0"
 QUALITY_RISK_MULT       = float(os.getenv("QUALITY_RISK_MULT", "1.15"))
 QUALITY_RISK_MAX_MULT   = float(os.getenv("QUALITY_RISK_MAX_MULT", "1.15"))
