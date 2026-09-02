@@ -1164,7 +1164,18 @@ TP2_R_MULT    = float(os.getenv("TP2_R_MULT", "5.0"))      # TP2 = entry ± risk
 # Backtest (10 sym, 2880x15m): +21% net R, -27% max drawdown, same win rate vs
 # fixed TP2. Trailing stop = peak ∓ TRAIL_ATR_MULT×ATR, floored at breakeven.
 TRAIL_RUNNER_ENABLED = os.getenv("TRAIL_RUNNER_ENABLED", "1") != "0"
-TRAIL_ATR_MULT       = float(os.getenv("TRAIL_ATR_MULT", "0.02"))  # base trail; post_tp1_v2 overrides per-context
+# RE-SWEPT 2026-09-02 (the 0.02 predates LEVELS_FROM_STRUCTURE). Seven values
+# on 2026-08-26: the response is monotone, tighter is better on profit AND
+# both risk measures, while trade count and win rate do not move at all --
+# the trail only acts inside trades that are already winning, so this is a
+# pure exit change, the class that is actually provable.
+#   0.0 +477.15/156.5 | 0.003 +477.29/156.4 | 0.006 +476.43/155.9
+#   0.01 +475.28/155.3 | 0.02 +472.41/153.8 (was) | 0.05 +464.09/149.2
+# Confirmed on both other windows, better on every measure in all three:
+#   2023 +147.23 → +149.04   2024 +204.61 → +207.14
+# Not taking the 0.0-0.003 floor: it puts the stop flush against price and
+# live X-Perp wicks are harsher than the model represents.
+TRAIL_ATR_MULT       = float(os.getenv("TRAIL_ATR_MULT", "0.006"))  # base trail; post_tp1_v2 overrides per-context
 # ✅ SIGNIFICANCE-TESTED 2026-08-28 (significance_check.py, 5000 bootstrap runs),
 # trail 0.02 + TP2 3.0R together against the old exit on the current window:
 #   baseline +390.99R -> candidate +416.45R, delta +25.47R, delta R/trade +0.020
@@ -1237,7 +1248,15 @@ EXIT_PROFILE   = os.getenv("EXIT_PROFILE", "post_tp1_v2").strip().lower()
 # beats every split on every measure. The context signal carries nothing the
 # trail width does not already carry, so STRONG is pinned to the base value to
 # keep the branch inert. WEAK stays 0.15 and is inert too: min(0.02, 0.15)=0.02.
-POST_TP1_STRONG_TRAIL_ATR_MULT = float(os.getenv("POST_TP1_STRONG_TRAIL_ATR_MULT", "0.02"))
+# 2026-09-02: pinned to 0.0 instead of to the base value. The branch is
+# max(base, STRONG), so holding it inert by setting it EQUAL to the base
+# only works until the base is tuned — lowering the base to 0.006 today
+# would have silently revived it. 0.0 keeps max(base, 0.0) == base for any
+# base, so the 2026-08-28 decision survives future tuning. Measured at the
+# new base: uniform +476.48R / ulcer-ratio 156.0 vs revived +476.43 / 155.9
+# — neutral now (it lost at base 0.05), so this costs nothing today and
+# removes the trap.
+POST_TP1_STRONG_TRAIL_ATR_MULT = float(os.getenv("POST_TP1_STRONG_TRAIL_ATR_MULT", "0.0"))
 POST_TP1_WEAK_TRAIL_ATR_MULT   = float(os.getenv("POST_TP1_WEAK_TRAIL_ATR_MULT", "0.15"))
 POST_TP1_STRONG_CLOSE_PROGRESS = float(os.getenv("POST_TP1_STRONG_CLOSE_PROGRESS", "0.25"))
 POST_TP1_STRONG_WICK_PROGRESS  = float(os.getenv("POST_TP1_STRONG_WICK_PROGRESS", "0.55"))
