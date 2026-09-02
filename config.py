@@ -965,6 +965,20 @@ ATR_PERIOD    = int(os.getenv("ATR_PERIOD", "14"))
 # share of trades pinned at RISK_MAX_PCT goes 23.3% -> 27.8% -> 32.5%, and past
 # that the buffer is not actually expressed — it is silently truncated, and
 # risk-normalised sizing then halves those positions.
+#
+# RE-SWEPT 2026-09-02. The table above predates LEVELS_FROM_STRUCTURE (shipped
+# 2026-08-31), which changed where the stop is placed — it shows 921-924 trades
+# where the same window now has ~1570, so it was measuring a different bot.
+# Re-run on current mechanics, 2026-08-26 window: trades / net R / worst-windows
+# (ratio) / profit-per-ulcer
+#   0.5   1605  +456.94  12.75 (35.8)  140.8
+#   0.7   1594  +469.56  13.71 (34.2)  141.0
+#   1.0   1570  +472.41  13.75 (34.3)  153.8   ← best on profit AND ulcer
+#   1.3   1546  +455.29  13.45 (33.9)  147.2
+#   1.6   1523  +454.36  12.96 (35.1)  151.4
+# The value survives the mechanics change unchanged. Worst-windows is flat
+# across the whole range (33.9-35.8), so the choice rests on profit and ulcer,
+# and 1.0 tops both.
 SL_ATR_BUFFER = float(os.getenv("SL_ATR_BUFFER", "1.0"))
 # SWEPT 2026-09-01 (first time -- the ceiling had two recorded sweeps, this
 # floor had none). Motive: cost_r scales inversely with stop width, so trades
