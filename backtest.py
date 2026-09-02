@@ -1895,6 +1895,16 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--fee-rate", type=float, default=BACKTEST_FEE_RATE, help="Per-side fee rate for net R estimate.")
     p.add_argument("--slippage-rate", type=float, default=BACKTEST_SLIPPAGE_RATE, help="Per-side slippage rate for net R estimate.")
     p.add_argument("--execution-delay-bars", type=int, default=0, help="Delay entry by N 15m bars for execution realism.")
+    # 2026-09-02: the live-vs-model fill gap was measured for this bot at a
+    # median +0.081% (8 bps) -- zone_entry_price is the analyzer price this model
+    # fills at, market_price is the live price at order time, and both sit on the
+    # signal row. Adverse in BOTH directions (LONG +0.104%, SHORT +0.051%, 100%
+    # each), so it is neither an exchange basis nor the zone-midpoint double
+    # count. At 8 bps: 2026 +476.48 -> +390.70R (WR 73.9 -> 71.4), 2024 +207.17 ->
+    # +154.17R. That closes only part of the gap to the live 61.5% WR, unlike the
+    # stocks bot where the same correction lands on the live numbers -- consistent
+    # with this bot waiting for the zone instead of entering at market.
+    # Default stays 0 so the recorded tables remain comparable.
     p.add_argument("--adverse-entry-bps", type=float, default=0.0, help="Extra adverse fill in basis points.")
     p.add_argument("--exit-policy", choices=["classic", "trail"], default="trail", help="Exit model after TP1 (default mirrors live TRAIL_RUNNER_ENABLED).")
     p.add_argument("--trail-atr-mult", type=float, default=TRAIL_ATR_MULT, help="ATR multiple for --exit-policy trail (default mirrors live config).")
