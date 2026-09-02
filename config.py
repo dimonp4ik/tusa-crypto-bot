@@ -748,9 +748,24 @@ SHORT_FVG_MAX_COIN_CHANGE_1H          = float(os.getenv("SHORT_FVG_MAX_COIN_CHAN
 FVG_LONDON_BTC_UP_FILTER  = os.getenv("FVG_LONDON_BTC_UP_FILTER", "0") != "0"
 FVG_LONDON_BTC_UP_MIN_PCT = float(os.getenv("FVG_LONDON_BTC_UP_MIN_PCT", "0.29"))
 
-# --- Risk sizing overlays (DEFAULT ON) -----------------------------------------
-# Does not filter trades. Raises risk_mult for contexts that repeatedly showed
-# stronger R/trade: OB entries, optimal RSI/vol, strong relative coin momentum.
+# --- Risk sizing overlays (COMPUTED BUT NOT APPLIED) ---------------------------
+# ⚠️ 2026-09-02: these do NOT size anything, despite the name and despite the
+# 'DEFAULT ON' they used to advertise. They write setup['risk_mult'], and
+# NOTHING multiplies a position or an R by that field:
+#   * src/autotrader.py never mentions risk_mult (its size comes from
+#     SYMBOL/SESSION/HTF/EXTENSION/VOL_ATR, a separate stack);
+#   * backtest.py only copies it into the export column;
+#   * neither `signals` nor `setup_log` even has a risk_mult column, so it
+#     cannot reach the live sizing path at all.
+# The same was true of the kNN overlay removed on 2026-08-31: its commit said
+# the live book carried +-20% from it, and that was wrong for this reason.
+#
+# Left in place rather than deleted: they are inert, so removing them changes
+# nothing measurable, and the contexts they encode (OB entries, optimal
+# RSI/volume, relative momentum) may be worth wiring properly. That is a real
+# open question -- make backtest.py apply risk_mult, measure across windows,
+# and watch for double-counting against the size_mult stack, which boosts
+# overlapping contexts already.
 QUALITY_RISK_OVERLAY    = os.getenv("QUALITY_RISK_OVERLAY", "1") != "0"
 QUALITY_RISK_MULT       = float(os.getenv("QUALITY_RISK_MULT", "1.15"))
 QUALITY_RISK_MAX_MULT   = float(os.getenv("QUALITY_RISK_MAX_MULT", "1.15"))
