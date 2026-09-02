@@ -1082,17 +1082,22 @@ TP1_R_MULT    = float(os.getenv("TP1_R_MULT", "0.6"))      # TP1 = entry ± risk
 #   2.5      --           --          --          --        +459.26R  33.4/148.0
 #   3.0   +142.50R   14.8/34.8    +201.26R   29.1/68.2     +465.37R  33.8/151.2
 #   4.0   +145.52R   15.1/35.7    +203.17R   29.4/68.9     +468.41R  34.1/152.4
-#   5.0      --           --          --          --        +472.41R  34.3/153.8
+#   5.0   +147.23R   15.3/36.1    +204.61R   29.6/69.4     +472.41R  34.3/153.8
 #
 # 4.0 wins on profit AND both risk ratios in ALL THREE windows, with drawdown
 # and win rate unchanged to the decimal and the trade count moving by one. That
 # is not leverage -- no position is larger and no trade is riskier; the cap was
 # simply truncating runners the trail would have carried further.
 #
-# 5.0 is better still on the current window and is NOT taken yet: it has only
-# been measured there, and the hostile window is where a longer tail could stop
-# paying. Next step is 5.0/6.0 across all three.
-TP2_R_MULT    = float(os.getenv("TP2_R_MULT", "4.0"))      # TP2 = entry ± risk * 4.0
+# 5.0 then measured on all three and beats 4.0 everywhere on profit and on both
+# risk ratios, so it is taken. The hostile window is where a longer tail could
+# have stopped paying and it does not: +147.23R against +145.52R there.
+#
+# Not pushed further. On the stocks desk, where the same sweep ran wider, the
+# current window plateaus past 6.0 -- nothing reaches TP2 any more and the trail
+# decides everything -- while another window drops at 6.0 and wobbles back up at
+# 8.0 and 12.0. That is individual trades crossing a boundary, not a trend.
+TP2_R_MULT    = float(os.getenv("TP2_R_MULT", "5.0"))      # TP2 = entry ± risk * 5.0
 # 2026-08-28: back to 3.0. It was cut to 2.0 for being "unreachable", which was
 # right under the OLD exit (bank 50% at TP1, fixed TP2) and is wrong under the
 # current one (full position past TP1 + a 0.02 ATR trail). TP2 is no longer the
