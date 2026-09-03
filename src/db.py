@@ -1951,7 +1951,13 @@ def get_weekly_stats() -> dict:
     since = max(time_mod.time() - 7 * 86400, LIVE_HIST_EPOCH_TS or 0.0)
     with _conn() as c:
         sig_rows = c.execute(
-            "SELECT symbol, direction, status, realized_r, trend FROM signals "
+            # trend has never been a column on signals — it is migrated onto
+        # setup_log. This query therefore raised "no such column" on every
+        # call, and run_weekly_digest swallows the exception, so the weekly
+        # digest simply never arrived. trend_1h is the HTF trend that IS
+        # recorded here; alias it so the breakdown below reads unchanged.
+        "SELECT symbol, direction, status, realized_r, size_mult, "
+            "trend_1h AS trend FROM signals "
             "WHERE opened_at >= ? AND status IN ({})".format(
                 ",".join("?" * len(FINAL_STATUSES))
             ),
@@ -1975,11 +1981,12 @@ def get_weekly_stats() -> dict:
     n_exp   = sum(1 for t in trades if t["status"] in ("EXPIRED", "TP1_EXPIRED"))
     n_win   = sum(1 for t in trades if t["status"] in PROFIT_STATUSES)
     wr      = round(n_win / n_total * 100, 1) if n_total else 0.0
-    total_r = round(sum(
-        float(t.get("realized_r") or 0) if t.get("realized_r") is not None
-        else _status_to_r(t["status"])
-        for t in trades
-    ), 2)
+    # Was a hand-rolled copy of "stored R, else fall back to the status" — the
+    # same selection _row_r makes, written out again. It drifted the moment
+    # _row_r started scaling by the size the trade actually ran at, leaving the
+    # weekly digest reporting unit R while every other view reported the
+    # account's R. Delegate instead of re-deriving.
+    total_r = round(sum(_row_r(t) for t in trades), 2)
 
     sym_w: dict = defaultdict(int)
     sym_sl: dict = defaultdict(int)
@@ -1991,8 +1998,10 @@ def get_weekly_stats() -> dict:
     top3 = sorted(all_syms, key=lambda s: sym_w.get(s, 0) - sym_sl.get(s, 0), reverse=True)[:3]
     top3_data = [(s, sym_w.get(s, 0), sym_sl.get(s, 0)) for s in top3]
 
-    best  = max(trades, key=lambda t: float(t.get("realized_r") or 0), default=None)
-    worst = min(trades, key=lambda t: float(t.get("realized_r") or 0), default=None)
+    # Best/worst by what the trade did to the ACCOUNT, not per unit of risk —
+    # a full-size 0.6R winner moved more money than a quarter-size 1.2R one.
+    best  = max(trades, key=_row_r, default=None)
+    worst = min(trades, key=_row_r, default=None)
 
     trend_w: dict = defaultdict(int)
     trend_sl: dict = defaultdict(int)
@@ -2024,8 +2033,11 @@ def get_weekly_stats() -> dict:
         "wr":             wr,
         "total_r":        total_r,
         "top3":           top3_data,
-        "best_trade":     {"symbol": best["symbol"],  "r": float(best.get("realized_r")  or _status_to_r(best["status"]))}  if best  else None,
-        "worst_trade":    {"symbol": worst["symbol"], "r": float(worst.get("realized_r") or _status_to_r(worst["status"]))} if worst else None,
+        # Reported at the same weight they were SELECTED at. This was a
+        # third hand-written copy of "stored R else fall back", and its
+        # `or` also swallowed a legitimate realized_r of exactly 0.0.
+        "best_trade":     {"symbol": best["symbol"],  "r": _row_r(best)}  if best  else None,
+        "worst_trade":    {"symbol": worst["symbol"], "r": _row_r(worst)} if worst else None,
         "n_sent":         len(sent_s),
         "n_rejected":     len(rej_s),
         "sent_tp1_rate":  round(sent_tp1 / len(sent_s) * 100, 1) if sent_s else 0.0,
