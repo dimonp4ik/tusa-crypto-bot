@@ -360,6 +360,31 @@ SMC_OB_APPROACH_TOL   = float(os.getenv("SMC_OB_APPROACH_TOL", "0.005"))
 # than 3.33%, which is where RISK_NORMALIZED_SIZING hits its floor and live
 # risks MORE money than the flat-R accounting assumes. Aggregate effect ~1.2%.
 SMC_STRONG_BODY_FRAC  = float(os.getenv("SMC_STRONG_BODY_FRAC", "0.4"))
+# A swing level only qualifies as TP1/TP2 if it sits at least this far beyond
+# the current price. Was hardcoded as 1.005/0.995 in indicators.py with no
+# recorded reason; lifted here 2026-09-03 at exactly its old value so behaviour
+# is unchanged until measured. It shapes the targets of EVERY trade: too tight
+# and TP1 lands on noise, too loose and the nearest real level stops counting.
+# SWEPT 2026-09-03 right after lifting it, on the 2026-08-26 window:
+#   0.003  1578tr  WR 74.4%  +602.07R  DD -14.86  worst 12.30 (48.9)  ulcer 251.7
+#   0.005  1570tr  WR 73.9%  +597.61R  DD -14.86  worst 12.30 (48.6)  ulcer 252.8
+#   0.008  1552tr  WR 73.1%  +595.99R  DD -14.86  worst 12.30 (48.4)  ulcer 254.6
+#   0.012  1525tr  WR 71.3%  +580.30R  DD -17.81  worst 15.16 (38.3)  ulcer 215.5
+# Max drawdown and worst-windows are IDENTICAL across 0.003-0.008 and the cliff
+# only starts at 0.012, so the shipped value sits in a flat region rather than
+# on an edge. 0.003 is worth +0.7% and half a point of win rate, which is under
+# the bar for touching a live bot on one window.
+#
+# Lifting this took two passes and the second one matters. The first patch
+# covered only the 15m levels and left the 1h ones hardcoded, so the sweep was
+# moving half the parameter -- and the ANCHOR DID NOT CATCH IT, because the new
+# default equalled the old literal and the numbers matched either way. An anchor
+# proves nothing was broken, not that everything was covered; the check for that
+# is counting the remaining literals (now zero). As it happens the completed
+# knob reproduces the partial sweep exactly, which says the 1h level path does
+# not reach the outcome here.
+TP_LEVEL_MIN_DISTANCE_PCT = float(os.getenv("TP_LEVEL_MIN_DISTANCE_PCT", "0.005"))
+
 SMC_MIN_CONFIRMATIONS = int(os.getenv("SMC_MIN_CONFIRMATIONS", "2"))
 # 2026-08-28: 1.5 -> 1.4. This gate had no recorded justification and had never
 # been swept, while binding HARD — the minimum volume_ratio in the whole book was
