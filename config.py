@@ -1006,6 +1006,28 @@ ATR_PERIOD    = int(os.getenv("ATR_PERIOD", "14"))
 # The value survives the mechanics change unchanged. Worst-windows is flat
 # across the whole range (33.9-35.8), so the choice rests on profit and ulcer,
 # and 1.0 tops both.
+#
+# RE-SWEPT AGAIN 2026-09-03, this time on honest fee/slippage (they were 5x too
+# high until that day, and cost in R scales inversely with stop width, so this
+# parameter was the most distorted of all by the old rates). 1.0 still wins.
+#              trades      net R       maxDD   worst-ratio  profit/ulcer
+#   2026-08-26  1570/1605  597.61/595.37  -14.86/-12.50  48.6/54.0  252.8/236.3
+#   2024-07-31  1175/1202  287.90/274.18   -8.67/ -9.28  54.7/40.6  130.7/109.3
+#   2023-07-31   908/ 924  223.18/222.60   -9.24/ -9.85  30.6/29.8   83.6/ 74.0
+# (left 1.0, right 0.5.) The current window liked 0.5 — flat profit, 16%
+# shallower max drawdown, better worst-windows. Both older windows reject it on
+# every measure.
+#
+# Note the shape of that mistake, because it is now the SECOND candidate in a
+# row to look good on 2026 alone and reverse on 2024 and 2023 (the other was the
+# per-scan cap). The current window is the largest and most recent, it dominates
+# the anchors, and a single-window read on it is systematically flattering.
+# Nothing ships off 2026 alone.
+#
+# Unlike the stocks desk, narrowing here does NOT spring the leverage trap: max
+# drawdown improved rather than worsened. Stocks sits at a 1.22% median risk
+# with the stop pinned to the 1.5% cap on 65% of live trades, so narrowing there
+# inflates position size hard; crypto runs at 2.14% against a 3.5% cap.
 SL_ATR_BUFFER = float(os.getenv("SL_ATR_BUFFER", "1.0"))
 # SWEPT 2026-09-01 (first time -- the ceiling had two recorded sweeps, this
 # floor had none). Motive: cost_r scales inversely with stop width, so trades
