@@ -88,7 +88,7 @@ from src.db import (
     at_add_allowed, at_remove, at_get, at_all_allowed, at_set_keys,
     at_set_mode, at_set_active, at_set_balance, at_set_mode_prompt,
     at_set_tp1_close_pct,
-    get_latest_open_signal, get_signal_by_id,
+    get_signal_by_id,
     watch_add, watch_active, watch_resolve, watch_stats,
 )
 from src import autotrader
@@ -4354,8 +4354,20 @@ def _publish_signal(analysis: dict, decision: str, direction: str,
         _sig_row = None
         try:
             _sid = analysis.get("_signal_id")
-            _sig_row = (get_signal_by_id(_sid) if _sid
-                        else get_latest_open_signal(analysis["symbol"]))
+            if _sid:
+                _sig_row = get_signal_by_id(_sid)
+            else:
+                # No id means log_signal failed BOTH times (see send_signal),
+                # so this signal has no DB row at all. The old fallback here
+                # guessed "newest OPEN row for this symbol" — which in that
+                # exact situation resolves to a DIFFERENT, earlier trade.
+                # Linking the setup to it corrupts the record, and opening a
+                # real leveraged position against it hands that position
+                # another trade's levels and expiry, to be closed when THAT
+                # signal transitions. Announcing a signal we cannot monitor is
+                # bad; trading it against the wrong row is worse.
+                log.error("  signal has no DB row (log_signal failed twice) "
+                          "— not linking it and not auto-trading it")
         except Exception as _ge:
             log.warning(f"  Could not fetch new signal row: {_ge}")
         # Link this setup_log row to its real position: from
