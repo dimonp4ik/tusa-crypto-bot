@@ -498,6 +498,22 @@ SMC_RSI_SHORT_MIN     = float(os.getenv("SMC_RSI_SHORT_MIN", "28"))  # skip over
 # reason; lifted 2026-09-03 at exactly those values, behaviour unchanged.
 # One point out of ~20 bites only at the score floor, so a small effect is
 # expected — the value of lifting it is that it becomes measurable.
+# SWEPT 2026-09-03 right after lifting it. Unlike the stocks desk, where this
+# band is inert, here it binds: the score floor is 13 rather than 11, so the
+# setup total stops on the boundary where this one point decides far more often.
+#              trades      net R       maxDD   worst-ratio  profit/ulcer
+#   2026-08-26  1570/1581  597.61/607.72  -14.86/-14.86  48.6/48.6  252.8/252.8
+#   2024-07-31  1175/1178  287.90/290.14   -8.67/ -8.67  54.7/55.1  130.7/132.1
+#   2023-07-31   908/ 919  223.18/213.30   -9.24/-12.41  30.6/20.1   83.6/ 71.1
+# (left 38-68/32-62, right 35-71/29-65.) Both calm windows like the wider band
+# — +1.7% and +0.8% with drawdown unchanged to the digit. The hostile one
+# rejects it outright: drawdown 34% deeper, worst-windows ratio down a third.
+#
+# THIRD consecutive gate-loosening this desk has rejected the same way, after
+# MTF_MIN_SCORE 13→11 and the per-scan cap 3→6. Three for three is a rule, not
+# a coincidence: this bot's gates are already set to survive a bad tape, and a
+# calm window will always ask for them to be opened. Loosening anything here
+# needs 2023 to agree, and so far nothing has.
 RSI_SCORE_LONG_MIN  = float(os.getenv("RSI_SCORE_LONG_MIN",  "38"))
 RSI_SCORE_LONG_MAX  = float(os.getenv("RSI_SCORE_LONG_MAX",  "68"))
 RSI_SCORE_SHORT_MIN = float(os.getenv("RSI_SCORE_SHORT_MIN", "32"))
