@@ -403,7 +403,12 @@ def _build_and_send_report(chat_id: int, message_id: int,
             A(f"## ЖИВЫЕ РЕЗУЛЬТАТЫ — {label}")
             A(f"  сигналов: {s['total']}  закрыто: {s['closed']}  "
               f"открыто: {s['open']}+{s['tp1_partial_open']}")
-            A(f"  винрейт: {s['win_rate']}%   (модель: ~82%)")
+            # The ~82% this used to quote predates the execution-model fix: the
+            # backtest was filling into the MIDDLE of the zone without checking
+            # price got there. On the honest fill the same window measures 73.9%
+            # (18000 candles to 2026-08-26). Dated, because a bare number here
+            # is what made the old one outlive its own correction.
+            A(f"  винрейт: {s['win_rate']}%   (модель на 2026-08-26: 73.9%)")
             A(f"  TP1: {s['tp1_hit']} ({s['tp1_rate']}%)  TP2: {s['tp2_hit']}  "
               f"SL: {s['sl_hit']}  истекло: {s['expired']}")
             A(f"  валовой: {s['total_r']}R  ({s['r_per_trade']}R/сделка)")
