@@ -63,7 +63,8 @@ def risk_profile(rs: list[float], k: int = 5, n: int = 25) -> dict:
 
 def apply_gates(rows: list[dict], *, cooldown_h: float, per_scan: int,
                 per_dir: int, kill: int, bar_sec: int = 900,
-                lookahead: bool = False) -> list[dict]:
+                lookahead: bool = False,
+                dd_brake: float = 0.0, dd_window: int = 0) -> list[dict]:
     """Replay cooldown / per-scan / per-direction / kill-switch in entry order.
 
     The kill-switch is the one gate that cannot be replayed naively. Live it
@@ -71,6 +72,14 @@ def apply_gates(rows: list[dict], *, cooldown_h: float, per_scan: int,
     outcome pauses the day at the entry of a trade that only stops out later,
     which is knowledge the live bot does not have. Losses cluster, so that peek
     deletes the rest of a bad patch and understates drawdown several-fold.
+
+    dd_brake/dd_window add a SECOND brake, on the same honest footing: pause the
+    day when the last `dd_window` trades CLOSED so far today sum to -dd_brake or
+    worse. It exists because the streak brake structurally cannot fire in the
+    regime that actually causes drawdown here — inside the five worst stretches
+    the win rate is 48%, so stops arrive interleaved with wins rather than in a
+    run of five. Measured on the crypto book, the streak brake catches three of
+    those five stretches and misses two worth -7.57R of the -20.42R total.
     """
     ordered = sorted(rows, key=lambda r: (_num(r, "entry_time"),
                                           r.get("symbol", ""),
@@ -87,8 +96,14 @@ def apply_gates(rows: list[dict], *, cooldown_h: float, per_scan: int,
     def _ts(v: float) -> float:
         return v / 1000 if v > 1e11 else v
 
+    def _dd_at(now: float, dy: int) -> float:
+        """Sum of the last dd_window trades CLOSED today before `now`."""
+        done = sorted((e, r) for e, _o, r in closed if e <= now and int(e // 86400) == dy)
+        tail = done[-dd_window:] if dd_window > 0 else done
+        return sum(r for _e, r in tail)
+
     def _sl_streak_at(now: float, dy: int) -> int:
-        done = sorted((e, o) for e, o in closed if e <= now and int(e // 86400) == dy)
+        done = sorted((e, o) for e, o, _r in closed if e <= now and int(e // 86400) == dy)
         n = 0
         for _, outcome in reversed(done):
             if outcome != "SL":
@@ -108,6 +123,12 @@ def apply_gates(rows: list[dict], *, cooldown_h: float, per_scan: int,
             if not lookahead and _sl_streak_at(ts, day) >= kill:
                 blocked_day = day
                 continue
+        if dd_brake > 0 and not lookahead:
+            if blocked_day == day:
+                continue
+            if _dd_at(ts, day) <= -abs(dd_brake):
+                blocked_day = day
+                continue
         key = (t.get("symbol", ""), t.get("direction", ""))
         if cooldown_h > 0 and key in last_sig and (ts - last_sig[key]) / 3600 < cooldown_h:
             continue
@@ -124,10 +145,14 @@ def apply_gates(rows: list[dict], *, cooldown_h: float, per_scan: int,
         last_sig[key] = ts
         per_bar[bar] = per_bar.get(bar, 0) + 1
         kept.append(t)
+        if kill <= 0 and dd_brake > 0:
+            ex = _ts(_num(t, "exit_time"))
+            if ex > 0:
+                closed.append((ex, t.get("outcome", ""), _num(t, "net_r")))
         if kill > 0:
             ex = _ts(_num(t, "exit_time"))
             if ex > 0:
-                closed.append((ex, t.get("outcome", "")))
+                closed.append((ex, t.get("outcome", ""), _num(t, "net_r")))
             if lookahead:
                 streak = streak + 1 if t.get("outcome") == "SL" else 0
                 if streak >= kill:
@@ -157,6 +182,12 @@ def main() -> int:
     ap.add_argument("--per-scan", type=int, default=3)
     ap.add_argument("--per-dir", type=int, default=8)
     ap.add_argument("--kill", type=int, default=2)
+    ap.add_argument("--dd-brake", type=float, default=0.0,
+                    help="pause the day when today's last --dd-window closed "
+                         "trades sum to this many R in the red (0 = off)")
+    ap.add_argument("--dd-window", type=int, default=0,
+                    help="how many closed trades the brake looks back over "
+                         "(0 = the whole day)")
     ap.add_argument("--lookahead", action="store_true")
     ap.add_argument("--grid", action="store_true", help="Sweep every capacity gate.")
     ap.add_argument("--out", default=None,
@@ -172,7 +203,8 @@ def main() -> int:
 
     if a.out:
         kept = apply_gates(rows, cooldown_h=a.cooldown, per_scan=a.per_scan,
-                           per_dir=a.per_dir, kill=a.kill, lookahead=a.lookahead)
+                           per_dir=a.per_dir, kill=a.kill,
+                           dd_brake=a.dd_brake, dd_window=a.dd_window, lookahead=a.lookahead)
         with open(a.out, "w", newline="", encoding="utf-8") as fh:
             w = csv.DictWriter(fh, fieldnames=list(rows[0].keys()))
             w.writeheader()
@@ -184,15 +216,18 @@ def main() -> int:
     if not a.grid:
         report("подглядка",
                apply_gates(rows, cooldown_h=a.cooldown, per_scan=a.per_scan,
-                           per_dir=a.per_dir, kill=a.kill, lookahead=True))
+                           per_dir=a.per_dir, kill=a.kill,
+                           dd_brake=a.dd_brake, dd_window=a.dd_window, lookahead=True))
         report("честно",
                apply_gates(rows, cooldown_h=a.cooldown, per_scan=a.per_scan,
-                           per_dir=a.per_dir, kill=a.kill, lookahead=False))
+                           per_dir=a.per_dir, kill=a.kill,
+                           dd_brake=a.dd_brake, dd_window=a.dd_window, lookahead=False))
         return 0
 
     def run(**kw):
         base = dict(cooldown_h=a.cooldown, per_scan=a.per_scan,
-                    per_dir=a.per_dir, kill=a.kill, lookahead=False)
+                    per_dir=a.per_dir, kill=a.kill,
+                    dd_brake=a.dd_brake, dd_window=a.dd_window, lookahead=False)
         base.update(kw)
         return apply_gates(rows, **base)
 

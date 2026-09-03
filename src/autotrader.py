@@ -40,6 +40,7 @@ from config import (
     CHOP_VOL_MIN, CHOP_EFF_MAX, CHOP_ATR_MIN, CHOP_SIZE_MULT,
     OPEN_SPACE_ROOM_MIN, OPEN_SPACE_SIZE_MULT,
     PARABOLIC_ACCEL_MIN, PARABOLIC_SIZE_MULT,
+    RSI_STRETCH_LONG_MIN, RSI_STRETCH_SIZE_MULT,
     DEAD_THIN_VOL_MAX, DEAD_THIN_SIZE_MULT,
     HTF_NEUTRAL_1H_SIZE_MULT,
     EXTENSION_ATR_THRESHOLD, EXTENSION_SIZE_MULT,
@@ -270,6 +271,16 @@ def _open_for_user(u: dict, sig: dict, inst_id: str, disp: str) -> None:
             _ar = sig.get("accel_ratio")
             if _ar is not None and float(_ar) >= PARABOLIC_ACCEL_MIN:
                 _size_mult *= float(PARABOLIC_SIZE_MULT)
+        except (TypeError, ValueError):
+            pass
+    # Stretched longs ride smaller — see RSI_STRETCH_LONG_MIN in config.py.
+    # Absent rsi means no trim, matching the backtest.
+    if (RSI_STRETCH_SIZE_MULT != 1.0
+            and str(sig.get("direction") or "").upper() == "LONG"):
+        try:
+            _rs = sig.get("rsi")
+            if _rs is not None and float(_rs) >= RSI_STRETCH_LONG_MIN:
+                _size_mult *= float(RSI_STRETCH_SIZE_MULT)
         except (TypeError, ValueError):
             pass
     # Open space rides smaller — see OPEN_SPACE_ROOM_MIN in config.py. Derived

@@ -182,6 +182,11 @@ def init_db():
             # 2026-08-28: PARABOLIC_SIZE_MULT keys on accel_ratio.
             "accel_ratio":   "REAL",
             "buy_pressure":  "REAL",
+            # 2026-09-03: RSI_STRETCH_SIZE_MULT keys on the RSI at entry.
+            # It was shown to Claude and printed in the signal, but never
+            # stored, so the rule could not have fired live no matter what
+            # the config said — the same gap trend_1h had on the other desk.
+            "rsi":           "REAL",
             # 2026-09-03: the size multiplier ACTUALLY used when this signal
             # was opened. Every input above was already stored, but the
             # product was not, so the only way to weight a past trade by its
@@ -537,9 +542,9 @@ def log_signal(analysis: dict, tp1: float, tp2: float, sl: float) -> int:
                 confidence, reason, entry_low, entry_high, entry_source, market_price, zone_entry_price,
                 mtf_score, mtf_score_max, premium, atr, sniper, session, trend_4h,
                 bos_extension_atr, vol_atr_pct, volume_ratio, trend_1h, eff_ratio,
-                overhead_atr, underfoot_atr, accel_ratio, buy_pressure
+                overhead_atr, underfoot_atr, accel_ratio, buy_pressure, rsi
             )
-            VALUES (?, ?, ?, ?, ?, ?, ?, 'OPEN', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            VALUES (?, ?, ?, ?, ?, ?, ?, 'OPEN', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """, (
             analysis["symbol"], analysis["direction"], analysis["current_price"],
             tp1, tp2, sl, time_mod.time(),
@@ -562,6 +567,7 @@ def log_signal(analysis: dict, tp1: float, tp2: float, sl: float) -> int:
             analysis.get("underfoot_atr"),
             analysis.get("accel_ratio"),
             analysis.get("buy_pressure"),
+            analysis.get("rsi"),
         ))
         return cur.lastrowid
 

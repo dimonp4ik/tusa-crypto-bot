@@ -79,6 +79,7 @@ def main_() -> int:
             "trend_1h": random.choice(trends),
             "trend_4h": random.choice(trends),
             "volume_ratio": round(random.uniform(0.8, 6.0), 2),
+            "rsi": round(random.uniform(30.0, 80.0), 2),
             "sniper": random.choice([0, 1]),
             "bos_extension_atr": round(random.uniform(0.0, 4.0), 2),
             "vol_atr_pct": round(random.uniform(0.002, 0.020), 4),

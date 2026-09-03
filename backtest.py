@@ -86,6 +86,7 @@ from config import (  # noqa: E402
     CHOP_VOL_MIN, CHOP_EFF_MAX, CHOP_ATR_MIN, CHOP_SIZE_MULT,
     OPEN_SPACE_ROOM_MIN, OPEN_SPACE_SIZE_MULT,
     PARABOLIC_ACCEL_MIN, PARABOLIC_SIZE_MULT,
+    RSI_STRETCH_LONG_MIN, RSI_STRETCH_SIZE_MULT,
     DEAD_THIN_VOL_MAX, DEAD_THIN_SIZE_MULT,
     HTF_NEUTRAL_1H_SIZE_MULT,
     TRAIL_ATR_MULT,
@@ -650,6 +651,17 @@ def _size_mult_for(symbol: str, setup: dict) -> float:
         try:
             if _fld(setup, "accel_ratio", 1.0) >= PARABOLIC_ACCEL_MIN:
                 m *= float(PARABOLIC_SIZE_MULT)
+        except (TypeError, ValueError):
+            pass
+    # A long bought while RSI is already at the top of its corridor rides
+    # smaller — see RSI_STRETCH_LONG_MIN in config.py. A missing rsi defaults
+    # BELOW the threshold, so an absent field means no trim rather than one
+    # applied on no evidence.
+    if (RSI_STRETCH_SIZE_MULT != 1.0
+            and str(setup.get("direction") or "").upper() == "LONG"):
+        try:
+            if _fld(setup, "rsi", 0.0) >= RSI_STRETCH_LONG_MIN:
+                m *= float(RSI_STRETCH_SIZE_MULT)
         except (TypeError, ValueError):
             pass
     # Open space rides smaller — see OPEN_SPACE_ROOM_MIN in config.py.

@@ -540,6 +540,43 @@ SMC_RSI_SHORT_MIN     = float(os.getenv("SMC_RSI_SHORT_MIN", "28"))  # skip over
 # needs 2023 to agree, and so far nothing has.
 RSI_SCORE_LONG_MIN  = float(os.getenv("RSI_SCORE_LONG_MIN",  "38"))
 RSI_SCORE_LONG_MAX  = float(os.getenv("RSI_SCORE_LONG_MAX",  "68"))
+
+# --- Stretched-long size trim (2026-09-03) -----------------------------------
+# A long taken while RSI is already at the top of the corridor is buying into a
+# move that has run. The corridor above says so, but it only feeds the score, so
+# those setups still publish at full size. Raw pre-gate trades, longs by RSI:
+#
+#   50-60  n=400  -30.5% losers  +0.394R      65-68  n=419  -29.4%  +0.318R
+#   60-65  n=520  -30.0%         +0.357R      68-72  n=356  -33.7%  +0.203R
+#
+# Monotone, and pooled the >=68 longs run +0.201R against +0.362R: 2.76 sigma.
+#
+# 🔴 GATING them was tried FIRST and rejected. Dropping the trades helped 2026
+# (worst windows 12.30 -> 10.52) and badly hurt 2024 (5.26 -> 7.98, 52% deeper),
+# because removing a trade frees the per-scan and per-direction slot it would
+# have taken and the whole sequence shifts. A weaker subset is not the same as
+# a subset worth removing. Trimming SIZE touches no slot, so the same trades
+# happen in the same order and one group simply weighs less:
+#
+#   окно   прибыль   просадка      худшие окна    ulcer
+#   2026   -2.1%   9.39 -> 9.33   5.21 -> 4.97   1.91 -> 1.81
+#   2024   -1.7%   8.67 -> 8.47   5.21 -> 5.03   2.20 -> 2.08
+#   2023   -0.8%   9.24 -> 8.84   7.29 -> 7.05   2.73 -> 2.63
+#
+# Every risk measure improves in every window, hostile one included, for under
+# 2% of profit. It is a trim, so it cannot be leverage: no position grows.
+#
+# SHORTS ARE NOT INCLUDED. The mirror case points the same way (RSI 28-32 +0.280R,
+# 32-36 +0.320R, 36-42 +0.371R) but pools to only 1.17 sigma, under the bar.
+RSI_STRETCH_LONG_MIN  = float(os.getenv("RSI_STRETCH_LONG_MIN", "68"))
+# End to end on all three windows, trade count and win rate identical in each
+# (a size rule must not move selection; a shift there would have been a bug):
+#
+#   окно   сделок  ВР      прибыль          просадка        приб/просадка
+#   2026    1570   73.9%  597.61 -> 585.38  14.86 -> 14.19   40.2 -> 41.2
+#   2024    1175   71.1%  287.90 -> 283.02   8.67 ->  8.47   33.2 -> 33.4
+#   2023     908   67.0%  223.18 -> 221.33   9.24 ->  8.84   24.2 -> 25.0
+RSI_STRETCH_SIZE_MULT = float(os.getenv("RSI_STRETCH_SIZE_MULT", "0.75"))
 RSI_SCORE_SHORT_MIN = float(os.getenv("RSI_SCORE_SHORT_MIN", "32"))
 RSI_SCORE_SHORT_MAX = float(os.getenv("RSI_SCORE_SHORT_MAX", "62"))
 
