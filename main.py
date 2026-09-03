@@ -4500,19 +4500,17 @@ def _attach_approach(setup: dict, df_15m: dict) -> None:
     this strategy is built on. Positive means we are joining a move already in
     progress, i.e. chasing.
 
-    Measured 2026-08-20 over 1758 backtest trades on the 6h (24-bar) window, and
-    the response is monotonic and holds on both halves of the data:
+    TELEMETRY ONLY. It sizes nothing and filters nothing.
 
-        подход против нас 5%+   390 сд    6.4% стопов  +0.710R
-        против 2-5%             289 сд    6.9%         +0.647R
-        против 0-2%             237 сд   11.8%         +0.497R
-        по нам 0-2%             306 сд   16.0%         +0.387R
-        по нам 2-5%             283 сд   23.7%         +0.200R
-        по нам 5-10%            182 сд   25.3%         +0.179R
-
-    Stop rate quadruples across the range. Used for SIZE, not as a filter — the
-    chased trades are still profitable, so cutting them costs money (a >1% gate
-    lifts win rate 85.6%->90.6% but drops profit 589R->476R).
+    This docstring used to quote a table where the stop rate quadrupled with
+    run-up, and said the value was used for size. Both were wrong. The sizing
+    rule was built on 2026-08-20 and reverted the same hour: that table was an
+    artifact of locating each trade's candle by a stored bar INDEX against an
+    array that had been refetched and shifted since. Re-measured with bars
+    located by timestamp, the effect is gone — stop rate sits at 12-16% across
+    all six buckets with no monotonicity. config.py APPROACH_LOOKBACK_BARS
+    carries the full account and the honest numbers; read that before building
+    anything on this field again.
     """
     try:
         closes = df_15m.get("close") or []
