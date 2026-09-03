@@ -4953,6 +4953,22 @@ def run_scan():
             log.warning(f"Calendar check failed: {e}")
 
         # Step 5: Send signals to Telegram (hard cap: max 3 per scan)
+        # SWEPT 2026-09-03 via the model's BT_LIVE_MAX_PER_SCAN and kept at 3.
+        #             trades      net R      maxDD   worst-ratio  profit/ulcer
+        #   2026-08-26  1570/1575  597.61/592.74  -14.86/-12.98  48.6/52.1  252.8/266.0
+        #   2024-07-31  1175/1186  287.90/291.42   -8.67/-11.22  54.7/37.0  130.7/116.6
+        #   2023-07-31   908/ 910  223.18/220.71   -9.24/-10.16  30.6/27.1   83.6/ 80.4
+        # (left 3, right 6.) On the current window raising it looked like a rare
+        # good trade: give up 0.8% of profit and take 13% less drawdown, with all
+        # three risk measures improving. It does not hold — both other windows,
+        # including the hostile one, move the other way.
+        #
+        # Worth remembering HOW this nearly shipped. The numbers came with a
+        # mechanism that sounded right: the direction cap fixes how many
+        # positions we hold, this one fixes how many we open per pass, so
+        # loosening it should spread entries across more symbols inside the same
+        # exposure. That story explains the one window it was invented on and
+        # nothing else. A mechanism that fits a single window is not evidence.
         MAX_SIGNALS_PER_SCAN = 3
         _ph_t_send = time.time()
         sent_count = 0
