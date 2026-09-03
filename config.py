@@ -568,6 +568,21 @@ RETEST_MAX_DIST_PCT = float(os.getenv("RETEST_MAX_DIST_PCT", "0.015"))  # within
 # bar admits genuinely weaker setups, and a hostile tape is where that shows.
 # Rule this confirms: a boost is only earned if the subset does not weaken in
 # the hostile window.
+#
+# TIGHTENING TESTED 2026-09-03 and rejected too, which closes this knob from
+# both sides. 13 → 14:
+#              trades      net R       maxDD   worst-ratio  profit/ulcer
+#   2026-08-26  1570/1467  597.61/548.11  -14.86/-15.65  48.6/61.5  252.8/224.4
+#   2023-07-31   908/ 851  223.18/205.79   -9.24/-12.16  30.6/22.7   83.6/ 68.0
+# Profit falls ~8% on both ends and drawdown worsens on both, including the
+# hostile window by 32%.
+#
+# This corrects the reading recorded above. After three loosenings were rejected
+# by 2023 it looked like the gates were 'set for a bad tape, and calm windows
+# want them opened' — which implies the hostile window would welcome a tighter
+# one. It does not. 2023 punishes movement in EITHER direction, so 13 is simply
+# the optimum rather than a conservative choice. Nothing to gain here in either
+# direction; stop sweeping it.
 MTF_MIN_SCORE = int(os.getenv("MTF_MIN_SCORE", "13"))
 
 # INERT since 2026-08-07 — variant D was removed on request, and it was the only
