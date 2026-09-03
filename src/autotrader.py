@@ -53,6 +53,7 @@ from src.db import (
     at_has_open_position,
     at_close_position, at_all_open_positions, at_reduce_position_sz,
     get_signal_by_id,
+    set_signal_size_mult,
 )
 from src.keystore import decrypt_secret, keystore_ready
 from src import okx_trader as okx
@@ -299,6 +300,17 @@ def _open_for_user(u: dict, sig: dict, inst_id: str, disp: str) -> None:
             pass
     # Ceiling on the stacked product — see SIZE_MULT_MAX in config.py.
     _size_mult = min(_size_mult, float(SIZE_MULT_MAX))
+    # Record what this signal actually traded at, HERE — above the risk
+    # normalisation below, which resizes so that 1R costs the same money at
+    # any stop width and therefore does not scale R. These rule multipliers
+    # do scale it, and are what the backtest multiplies gross_r/net_r by.
+    # Best-effort: the trade matters more than the bookkeeping, so a failure
+    # here is logged and the open continues.
+    try:
+        set_signal_size_mult(sig["id"], _size_mult)
+    except Exception as _sm_err:
+        log.warning(f"could not record size_mult for signal {sig.get('id')}: "
+                    f"{_sm_err}")
     # Risk-normalised sizing: a wide stop gets less size so that 1R costs the
     # same money regardless of where structure put the stop. Downward only —
     # see RISK_NORMALIZED_SIZING in config.py. Without this a 3.0% stop risked
