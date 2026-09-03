@@ -212,7 +212,9 @@ def _zone_payload(zone, source: str, current: float, age=None):
 
 
 from config import SMC_FVG_MAX_FILL as _FVG_MAX_FILL   # see config.py
-from config import SMC_VOL_STRONG_TIER
+from config import (SMC_VOL_STRONG_TIER,
+                    RSI_SCORE_LONG_MIN, RSI_SCORE_LONG_MAX,
+                    RSI_SCORE_SHORT_MIN, RSI_SCORE_SHORT_MAX)
 
 
 def _fvg_fresh(zone, current: float, direction: str) -> bool:
@@ -313,9 +315,9 @@ def _calc_mtf_score(ind: dict, bos: str, direction: str, confirmations: list,
         score += 1; tags.append("Vol+1")
 
     rsi = float(ind.get("rsi", 50.0))
-    if direction == "LONG" and 38 <= rsi <= 68:
+    if direction == "LONG" and RSI_SCORE_LONG_MIN <= rsi <= RSI_SCORE_LONG_MAX:
         score += 1; tags.append("RSI+1")
-    elif direction == "SHORT" and 32 <= rsi <= 62:
+    elif direction == "SHORT" and RSI_SCORE_SHORT_MIN <= rsi <= RSI_SCORE_SHORT_MAX:
         score += 1; tags.append("RSI+1")
 
     if direction == "LONG" and btc_change_pct >= 0:

@@ -490,6 +490,19 @@ SMC_BOS_MIN_VOLUME    = float(os.getenv("SMC_BOS_MIN_VOLUME", "1.3"))
 SMC_VOL_STRONG_TIER   = float(os.getenv("SMC_VOL_STRONG_TIER", "0"))
 SMC_RSI_LONG_MAX      = float(os.getenv("SMC_RSI_LONG_MAX", "72"))   # skip overextended longs
 SMC_RSI_SHORT_MIN     = float(os.getenv("SMC_RSI_SHORT_MIN", "28"))  # skip overextended shorts
+# The RSI band that earns a setup its +1 SCORE point. Distinct from the
+# overextension caps just above (SMC_RSI_LONG_MAX / SMC_RSI_SHORT_MIN, which
+# REJECT a setup) and from the midline filter further down
+# (RSI_LONG_MIN_MIDLINE, which gates direction): this one only adds a point.
+# Was hardcoded in signal_filter.py as 38..68 / 32..62 with no recorded
+# reason; lifted 2026-09-03 at exactly those values, behaviour unchanged.
+# One point out of ~20 bites only at the score floor, so a small effect is
+# expected — the value of lifting it is that it becomes measurable.
+RSI_SCORE_LONG_MIN  = float(os.getenv("RSI_SCORE_LONG_MIN",  "38"))
+RSI_SCORE_LONG_MAX  = float(os.getenv("RSI_SCORE_LONG_MAX",  "68"))
+RSI_SCORE_SHORT_MIN = float(os.getenv("RSI_SCORE_SHORT_MIN", "32"))
+RSI_SCORE_SHORT_MAX = float(os.getenv("RSI_SCORE_SHORT_MAX", "62"))
+
 MAX_SETUPS_TO_CLAUDE  = int(os.getenv("MAX_SETUPS_TO_CLAUDE", "7"))  # only strongest go to Claude
 
 # --- Entry zone (FVG / Order Block) ---
