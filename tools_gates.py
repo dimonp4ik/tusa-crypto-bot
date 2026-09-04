@@ -64,7 +64,8 @@ def risk_profile(rs: list[float], k: int = 5, n: int = 25) -> dict:
 def apply_gates(rows: list[dict], *, cooldown_h: float, per_scan: int,
                 per_dir: int, kill: int, bar_sec: int = 900,
                 lookahead: bool = False,
-                dd_brake: float = 0.0, dd_window: int = 0) -> list[dict]:
+                dd_brake: float = 0.0, dd_window: int = 0,
+                dir_rate: int = 0, dir_rate_min: float = 0.0) -> list[dict]:
     """Replay cooldown / per-scan / per-direction / kill-switch in entry order.
 
     The kill-switch is the one gate that cannot be replayed naively. Live it
@@ -72,6 +73,13 @@ def apply_gates(rows: list[dict], *, cooldown_h: float, per_scan: int,
     outcome pauses the day at the entry of a trade that only stops out later,
     which is knowledge the live bot does not have. Losses cluster, so that peek
     deletes the rest of a bad patch and understates drawdown several-fold.
+
+    dir_rate/dir_rate_min cap the RATE of same-direction entries: at most
+    `dir_rate` of them inside any `dir_rate_min` minutes. The position cap
+    cannot do this — it counts what is open AT THAT INSTANT, so early trades
+    close while later ones are still opening and a run of seven longs passes a
+    cap of five. That is exactly how the live book lost its week: five crypto
+    longs inside 25 minutes, seven stock longs inside 150, all stopped together.
 
     dd_brake/dd_window add a SECOND brake, on the same honest footing: pause the
     day when the last `dd_window` trades CLOSED so far today sum to -dd_brake or
@@ -90,6 +98,7 @@ def apply_gates(rows: list[dict], *, cooldown_h: float, per_scan: int,
     kept: list[dict] = []
     closed: list[tuple[float, str]] = []
     streak = 0
+    dir_entries: dict = {}
     cur_day = None
     blocked_day = None
 
@@ -135,6 +144,12 @@ def apply_gates(rows: list[dict], *, cooldown_h: float, per_scan: int,
         bar = int(ts // (bar_sec or 900))
         if per_scan > 0 and per_bar.get(bar, 0) >= per_scan:
             continue
+        if dir_rate > 0 and dir_rate_min > 0:
+            d = t.get("direction", "")
+            recent = [x for x in dir_entries.get(d, []) if ts - x <= dir_rate_min * 60]
+            dir_entries[d] = recent
+            if len(recent) >= dir_rate:
+                continue
         if per_dir > 0:
             live = [o for o in open_by_dir.get(t.get("direction", ""), [])
                     if _num(o, "exit_time") > raw]
@@ -144,6 +159,8 @@ def apply_gates(rows: list[dict], *, cooldown_h: float, per_scan: int,
             open_by_dir[t.get("direction", "")] = live
         last_sig[key] = ts
         per_bar[bar] = per_bar.get(bar, 0) + 1
+        if dir_rate > 0:
+            dir_entries.setdefault(t.get("direction", ""), []).append(ts)
         kept.append(t)
         if kill <= 0 and dd_brake > 0:
             ex = _ts(_num(t, "exit_time"))
@@ -185,6 +202,11 @@ def main() -> int:
     ap.add_argument("--dd-brake", type=float, default=0.0,
                     help="pause the day when today's last --dd-window closed "
                          "trades sum to this many R in the red (0 = off)")
+    ap.add_argument("--dir-rate", type=int, default=0,
+                    help="max same-direction ENTRIES inside --dir-rate-min "
+                         "minutes (0 = off); the rail the position cap cannot be")
+    ap.add_argument("--dir-rate-min", type=float, default=0.0,
+                    help="the window in minutes for --dir-rate")
     ap.add_argument("--dd-window", type=int, default=0,
                     help="how many closed trades the brake looks back over "
                          "(0 = the whole day)")
@@ -204,7 +226,8 @@ def main() -> int:
     if a.out:
         kept = apply_gates(rows, cooldown_h=a.cooldown, per_scan=a.per_scan,
                            per_dir=a.per_dir, kill=a.kill,
-                           dd_brake=a.dd_brake, dd_window=a.dd_window, lookahead=a.lookahead)
+                           dd_brake=a.dd_brake, dd_window=a.dd_window,
+                           dir_rate=a.dir_rate, dir_rate_min=a.dir_rate_min, lookahead=a.lookahead)
         with open(a.out, "w", newline="", encoding="utf-8") as fh:
             w = csv.DictWriter(fh, fieldnames=list(rows[0].keys()))
             w.writeheader()
@@ -217,17 +240,20 @@ def main() -> int:
         report("подглядка",
                apply_gates(rows, cooldown_h=a.cooldown, per_scan=a.per_scan,
                            per_dir=a.per_dir, kill=a.kill,
-                           dd_brake=a.dd_brake, dd_window=a.dd_window, lookahead=True))
+                           dd_brake=a.dd_brake, dd_window=a.dd_window,
+                           dir_rate=a.dir_rate, dir_rate_min=a.dir_rate_min, lookahead=True))
         report("честно",
                apply_gates(rows, cooldown_h=a.cooldown, per_scan=a.per_scan,
                            per_dir=a.per_dir, kill=a.kill,
-                           dd_brake=a.dd_brake, dd_window=a.dd_window, lookahead=False))
+                           dd_brake=a.dd_brake, dd_window=a.dd_window,
+                           dir_rate=a.dir_rate, dir_rate_min=a.dir_rate_min, lookahead=False))
         return 0
 
     def run(**kw):
         base = dict(cooldown_h=a.cooldown, per_scan=a.per_scan,
                     per_dir=a.per_dir, kill=a.kill,
-                    dd_brake=a.dd_brake, dd_window=a.dd_window, lookahead=False)
+                    dd_brake=a.dd_brake, dd_window=a.dd_window,
+                           dir_rate=a.dir_rate, dir_rate_min=a.dir_rate_min, lookahead=False)
         base.update(kw)
         return apply_gates(rows, **base)
 
