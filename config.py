@@ -1764,7 +1764,36 @@ STOP_EXCHANGE_BACKSTOP_R = float(os.getenv("STOP_EXCHANGE_BACKSTOP_R", "1.5"))
 # cutting worst-windows hard in two. 8 earns more but pays in drawdown in all
 # three; 5 is safer still but costs ~6% of the trades. Tightening this cap is
 # the safe direction anyway — it is the correlation rail.
-MAX_SAME_DIRECTION_POSITIONS = int(os.getenv("MAX_SAME_DIRECTION_POSITIONS", "6"))
+#
+# 🔴 6 -> 3 on 2026-09-05, after the live week that forced it. The owner's book
+# lost 9.51R over 41 trades while the win rate matched the model within 0.38
+# sigma — the hit rate was fine, the losses were not: wins averaged +0.601R
+# against the model's +0.963R, losses -1.372R against -0.742R.
+#
+# Reading the stops one by one showed why. Five LONGS — PEPE, XRP, SOL, TRUMP,
+# ADA — opened inside 25 minutes and were all stopped together, each one blowing
+# 0.6-1.1R PAST its level. That is not a session effect and not a selection
+# effect: it is six correlated positions allowed to stack and then gapped
+# through at once. The cap is the only rail against it and it was set too wide.
+#
+# Swept on all three windows (replay for 2026/2024, full run for the hostile
+# 2023 where the replay is known to lie):
+#
+#   лимит   2026 сд/прибыль/худшие(отн)      2024 сд/прибыль/худшие(отн)     2023 сд/прибыль/худшие(отн)/ulcer(отн)
+#     6     1570 +597.61 12.30 (48.6)        1175 +287.90  5.26 ( 54.7)      908 +223.18 7.29 (30.6) 2.67 (83.6)
+#     5     1468 +569.30  9.67 (58.8)        1103 +275.79  4.40 ( 62.7)        -
+#     4     1314 +500.44  7.62 (65.7)        1001 +265.44  2.51 (105.7)      794 +192.83 6.61 (29.2) 2.44 (79.0)
+#     3     1121 +447.84  4.03 (111.0)        869 +231.38  1.21 (191.6)      695 +189.70 6.10 (31.1) 1.91 (99.6)
+#
+# 3 is the only setting that improves every risk measure in every window. 4 is
+# tempting on the two recent windows but turns BOTH ratios negative in 2023,
+# which is exactly the window that exists to catch that.
+#
+# The price is 15-25% of modelled profit and about a quarter of the trades. The
+# win rate does not pay it: 70.3->70.1 in 2026, 68.4->70.0 in 2024, 67.0->67.8
+# in 2023 — flat or better. That is the trade the owner asked for: fewer trades,
+# same hit rate, drawdown cut by a fifth to two thirds.
+MAX_SAME_DIRECTION_POSITIONS = int(os.getenv("MAX_SAME_DIRECTION_POSITIONS", "3"))
 
 # --- Graded crowding trim: REJECTED, premise was wrong -----------------------
 # Idea: the cap above is a cliff — positions 1-8 ride full size, the ninth is
