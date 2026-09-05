@@ -845,6 +845,42 @@ HTF_STRONG_SCORE   = int(os.getenv("HTF_STRONG_SCORE", "1"))
 # a setup frees the per-scan and per-direction slot it would have taken, so its
 # effect cannot be read off an already-gated export.
 HTF_FULL_ALIGN_SKIP = os.getenv("HTF_FULL_ALIGN_SKIP", "0") != "0"
+
+# --- Early breakeven arming (2026-09-05) --------------------------------------
+# Today the stop only moves to breakeven AFTER TP1 prints, so a trade that runs
+# most of the way and turns round pays the full -1R. Measured on the exports,
+# that is not an edge case, it is the typical loss:
+#
+#   окно   медиана хода убыточной к цели   дошли >половины и всё равно в стоп
+#   2026            0.56                          42.2%
+#   2024            0.51                          49.1%
+#   2023            0.57                          45.7%
+#
+# Only 2-5% of losers never move our way at all, so the direction is read
+# correctly and the money is given back rather than never earned. This arms
+# breakeven once price has travelled BE_ARM_PROGRESS of the way from entry to
+# TP1; the trade then exits at entry instead of at the stop. Costs still apply,
+# so a breakeven exit is slightly negative, not free.
+#
+# 🔴 MEASURED AND REJECTED 2026-09-05. Profit falls in every window at every
+# threshold — the idea is intuitive and the data says no:
+#
+#   вариант        2026        2024        2023
+#   как есть     +435.84R    +226.17R    +189.70R
+#   с 0.4 пути   +345.53R    +170.20R    +143.26R
+#   с 0.5 пути   +366.92R    +173.54R    +161.55R
+#   с 0.6 пути   +390.83R    +181.11R    +176.84R
+#
+# The reason is in the post-stop columns added the same day: trades that DO
+# reach TP1 after being stopped first dive a median 0.67R BEYOND the stop, so
+# deep retracement is normal for eventual winners. A breakeven stop fires on
+# exactly those. Note the trade count also jumps (1121 -> 1406 on 2026) because
+# earlier exits free capacity slots, so this is not a clean exit-only change.
+#
+# Kept, not deleted: it is the honest test of "stop giving back open profit",
+# and the next person to have that idea should see the numbers rather than
+# re-run them. 0 = off.
+BE_ARM_PROGRESS = float(os.getenv("BE_ARM_PROGRESS", "0"))
 # Premium/Discount structure gate — "discount" only counts as a buy signal inside
 # a bullish/neutral dealing range, "premium" only inside a bearish/neutral one. In
 # a clean lower-high+lower-low down-structure, price below the range midpoint is

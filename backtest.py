@@ -76,6 +76,7 @@ from config import (  # noqa: E402
     VOL_ATR_BOOST_THRESHOLD,
     VOL_ATR_BOOST_MULT,
     HTF_NEUTRAL_4H_SIZE_MULT,
+    BE_ARM_PROGRESS,
     MAX_SAME_DIRECTION_POSITIONS,
     ZONE_WATCH_ENABLED,
     ZONE_WATCH_MINUTES,
@@ -898,6 +899,8 @@ def gross_r_for_outcome(outcome: str, entry: float, tp1: float, tp2: float, sl: 
         return _TP1_CLOSE_FRAC * tp1_r
     if outcome == "SL":
         return -1.0
+    if outcome == "BE":
+        return 0.0
     return 0.0
 
 
@@ -984,6 +987,15 @@ class TradeRecord:
     # a plain trigger at STOP_EXCHANGE_BACKSTOP_R — a wick that deep fires it for
     # real while the bot still believes the trade is alive. This column is how
     # that divergence gets counted instead of assumed away.
+    # What price did AFTER the stop, recorded during the run so the candles and
+    # the trade are the same object — matching an export back to cached candles
+    # afterwards was tried and failed (3.5% of bar indices and 23.7% of
+    # timestamps landed on the right bar), which is why this lives here.
+    #   post_sl_tp1  1 if TP1 was reached within the normal window after the stop
+    #   post_sl_max_r how far past the stop price ran, in units of the trade's risk
+    # Together they separate "the stop stood in noise" from "the entry was wrong".
+    post_sl_tp1: int = -1
+    post_sl_max_r: float = 0.0
     mae_r: float = 0.0
     mfe_tp1: float = 0.0   # доля пути до TP1, пройденная в лучшей точке
     accel_ratio: float = 1.0   # ускорение движения: >1 = параболическая дуга
@@ -1159,6 +1171,18 @@ def simulate_trade_direct(
                 _fav = (h - entry) if direction == "LONG" else (entry - l)
                 if _fav / _tp1_dist > _mfe_tp1:
                     _mfe_tp1 = _fav / _tp1_dist
+            # Early breakeven — see BE_ARM_PROGRESS in config.py. Armed once the
+            # trade has travelled far enough toward TP1; from then on the stop
+            # sits at entry, which is TIGHTER than the original, so it is
+            # checked BEFORE the normal stop.
+            if BE_ARM_PROGRESS > 0 and _mfe_tp1 >= BE_ARM_PROGRESS:
+                _be_hit = ((closes[j] <= entry) if _STOP_ON_CLOSE else (l <= entry))                     if direction == "LONG" else                     ((closes[j] >= entry) if _STOP_ON_CLOSE else (h >= entry))
+                if _be_hit:
+                    outcome = "BE"
+                    stop_exit_price = entry
+                    exit_bar = j
+                    closed = True
+                    break
             if _BT_STRUCT_EXIT and _bos_lvl_num is not None:
                 _broke_back = (closes[j] < _bos_lvl_num) if direction == "LONG"                     else (closes[j] > _bos_lvl_num)
                 if _broke_back:
@@ -1322,6 +1346,21 @@ def simulate_trade_direct(
         _total_risk = 1.0 + max(0.0, 1.0 - _edge)
         gross_r = (gross_r + (gross_r + _edge)) / _total_risk
         cost_r  = (cost_r * 2.0) / _total_risk
+    # Post-stop walk-forward (research only; changes no outcome). Scans the same
+    # `window` the trade itself was allowed, starting at the stop bar.
+    _post_sl_tp1 = -1
+    _post_sl_max_r = 0.0
+    if outcome == "SL" and _risk_abs > 0:
+        _post_sl_tp1 = 0
+        for _j in range(exit_bar, min(exit_bar + 1 + window, len(highs))):
+            _adv = (sl - lows[_j]) if direction == "LONG" else (highs[_j] - sl)
+            if _adv > _post_sl_max_r * _risk_abs:
+                _post_sl_max_r = _adv / _risk_abs
+            if _j > exit_bar and ((highs[_j] >= tp1) if direction == "LONG"
+                                  else (lows[_j] <= tp1)):
+                _post_sl_tp1 = 1
+                break
+
     net_r = gross_r - cost_r
     # Live position-size rules scale BOTH the win and the loss, so they belong
     # in the R the summary reports. Until 2026-08-24 size_mult was recorded on
@@ -1407,6 +1446,8 @@ def simulate_trade_direct(
         sniper=int(bool(setup.get("sniper"))),
         knn_score=float(setup.get("_knn_score", -1.0)),
         swing_trend=str(setup.get("swing_trend", "") or ""),
+        post_sl_tp1=_post_sl_tp1,
+        post_sl_max_r=round(_post_sl_max_r, 4),
         mae_r=round(_mae_r, 4),
         mfe_tp1=round(_mfe_tp1, 4),
         accel_ratio=_fld(setup, "accel_ratio", 1.0),
@@ -1866,7 +1907,7 @@ def write_trades_csv(path: str, trades: list[TradeRecord]) -> None:
         "entry_quality_score", "portfolio_risk_score",
         "session", "trend_1h", "trend_4h", "entry_source",
         "signals", "score_tags", "premium", "sniper", "knn_score", "swing_trend",
-        "mae_r", "mfe_tp1", "accel_ratio", "buy_pressure", "absorption", "obv_agree", "obv_strength", "size_mult", "signal_bar",
+        "post_sl_tp1", "post_sl_max_r", "mae_r", "mfe_tp1", "accel_ratio", "buy_pressure", "absorption", "obv_agree", "obv_strength", "size_mult", "signal_bar",
         "zone_age_bars", "bos_candles_ago", "extension_atr",
         "room_atr", "tp1_beyond_level",
         "entry_range_atr", "run_bars",
