@@ -894,6 +894,31 @@ _DEFAULT_WAIT_BARS = (
     if ZONE_WATCH_ENABLED else 0
 )
 
+# 🔴 SWEPT AND REJECTED 2026-09-05. This is the refined version of the time
+# stop above: close a trade only if it has hung for N bars AND is STILL
+# underwater by more than X R, so the winners that are trailing are left alone.
+# That reasoning is sound and the screening window agreed with it — there is a
+# clean ladder where later and deeper is better (2026-08-26, base 1121 trades,
+# +435.84R, DD -7.76, pd 56.2):
+#
+#   16 баров / -0.3R  1356сд  +388.44R  DD-7.96  pd 48.8
+#   24 / -0.5         1256сд  +416.14R  DD-8.04  pd 51.8
+#   32 / -0.5         1239сд  +449.76R  DD-8.12  pd 55.4
+#   32 / -0.7         1189сд  +453.28R  DD-8.30  pd 54.6
+#   48 / -0.7         1170сд  +442.67R  DD-7.67  pd 57.7   <- beats base on both
+#
+# And it does not survive the other windows:
+#
+#   48 / -0.7   2024  903сд +218.10R DD-6.80 pd 32.1  (база +226.17 -6.32 35.8)
+#   48 / -0.7   2023  724сд +191.85R DD-7.54 pd 25.5  (база +189.70 -7.29 26.0)
+#
+# Better on 2026, worse on 2024, worse on 2023. Pushing further out (64 bars)
+# improves 2026 again to +447.94R / DD-7.38 / pd 60.7 — which is the shape of
+# fitting one window, not of an edge, so the sweep stopped there.
+#
+# Note -1.0R reproduces the baseline exactly: the stop already sits at -1R, so
+# a trade cannot be that far underwater and still be open. The usable range is
+# -0.5 to -0.9 and it was covered.
 _BT_STALE_BARS  = int(os.getenv("BT_STALE_EXIT_BARS", "0") or 0)
 _BT_STALE_MAX_R = float(os.getenv("BT_STALE_EXIT_MAX_R", "0") or 0.0)
 
