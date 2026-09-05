@@ -582,8 +582,19 @@ RSI_SCORE_LONG_MAX  = float(os.getenv("RSI_SCORE_LONG_MAX",  "68"))
 # Every risk measure improves in every window, hostile one included, for under
 # 2% of profit. It is a trim, so it cannot be leverage: no position grows.
 #
-# SHORTS ARE NOT INCLUDED. The mirror case points the same way (RSI 28-32 +0.280R,
-# 32-36 +0.320R, 36-42 +0.371R) but pools to only 1.17 sigma, under the bar.
+# SHORTS ARE NOT INCLUDED, and RE-MEASURED 2026-09-06 on the grown book — still
+# no. The mirror does not merely fall short of significance, it changes SIGN
+# with the threshold, which an effect does not do (unit R, subset against the
+# rest of the shorts):
+#
+#   порог        2026     2024     2023     сводно
+#   RSI <= 32   +0.091   -0.043   +0.066   +0.053 (0.95 сигмы)
+#   RSI <= 36   -0.009   -0.035   -0.281   -0.072 (1.33 сигмы)
+#
+# At 32 the stretched shorts are BETTER than the rest, at 36 worse. Contrast
+# the long side, where the sign is the same in all three windows and ports to
+# the stocks desk as well. The market is not symmetric here: being stretched
+# upward is punished, being stretched downward is not.
 RSI_STRETCH_LONG_MIN  = float(os.getenv("RSI_STRETCH_LONG_MIN", "68"))
 # End to end on all three windows, trade count and win rate identical in each
 # (a size rule must not move selection; a shift there would have been a bug):
