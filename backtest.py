@@ -1931,12 +1931,12 @@ def main(argv: list[str] | None = None) -> int:
         from datetime import datetime as _dt, timezone as _tz
         end_date_ms = int(_dt.strptime(args.end_date, "%Y-%m-%d")
                           .replace(tzinfo=_tz.utc).timestamp() * 1000)
-    # ⚠ SURVIVORSHIP BIAS, measured 2026-09-05. fetch_top_symbols() reads the
-    # OKX tickers endpoint NOW and freezes that list for the whole run, however
-    # far back it reaches. The live bot re-ranks the top-25 on every scan, so
-    # over three months it traded 47 distinct symbols while this export covers
-    # 18. Coins that were briefly top-25 and then died are invisible here — and
-    # they are not a rounding error, they are half the live book:
+    # ⚠ THE MODEL AND THE LIVE BOT DO NOT TRADE THE SAME COINS. Measured
+    # 2026-09-05. --top defaults to 0, so the default universe is the FIXED
+    # 18-symbol list in parse_symbols(). The live bot re-ranks its top-25 by
+    # turnover on every scan, so over three months it traded 47 distinct
+    # symbols. The 29 it never tests are not a rounding error, they are half
+    # the live book:
     #
     #   живые сделки крипты   сделок  винрейт   итого
     #   монета есть в модели     114    68.4%  +22.05R
@@ -1944,11 +1944,15 @@ def main(argv: list[str] | None = None) -> int:
     #
     # The tested half lands near the model (68.4% against 70.6% over the same
     # days); the untested half loses. So the model's optimism is structural,
-    # not a mis-tuned knob, and any win rate from this file is an upper bound
-    # on what the live universe can deliver. Fixing it means ranking symbols by
-    # the volume they HAD at each point in the window, which needs historical
-    # ticker data this script does not fetch. Until then, prefer --symbols with
-    # an explicit list when a result has to describe the live book.
+    # not a mis-tuned knob, and any win rate from this file describes those 18
+    # coins — not the universe the bot actually trades.
+    #
+    # Do NOT reach for --top as the fix: fetch_top_symbols() ranks on
+    # volCcyQuote, and that field comes back 0.0 from this endpoint for the
+    # majors (BTC and ETH included). Its top-25 and the live bot's top-25 agree
+    # on 2 of 25 — it selects obscure and stock-tracking swaps. Ranking has to
+    # match get_top_coins() in src/binance_client.py (volCcy24h * last, with the
+    # crypto-only and spread filters) before --top means anything.
     if args.symbols:
         symbols = parse_symbols(args.symbols)
     elif args.top > 0:
