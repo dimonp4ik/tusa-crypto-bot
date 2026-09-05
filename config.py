@@ -900,6 +900,18 @@ HTF_FULL_ALIGN_SKIP = os.getenv("HTF_FULL_ALIGN_SKIP", "0") != "0"
 # deeper cut buys 2026 and 2024 by selling 2023, which is the shape of fitting
 # the easy years.
 #
+# TWO HARDER TESTS, both passed:
+#
+#   Trained on the HOSTILE 2023 window ALONE and tested on the calm ones, the
+#   gap is +0.219 (2024) and +0.212 (2026). The weights the crisis teaches have
+#   the same signs and similar sizes as the shipped ones (-0.181 / -0.075 /
+#   +0.117 against -0.208 / -0.150 / +0.051). Fitting calm and predicting calm
+#   is the easy direction; a rule learned from a crisis that still works
+#   afterwards has caught something structural.
+#
+#   The SHIPPED formula scored against the 16 UNPINNED coins — instruments that
+#   appear in no training set in any form — gives +0.215 on 1,165 trades.
+#
 # 0.75 is therefore the setting — the only one better than base in ALL THREE.
 # It is a TRIM, so no leverage is added, and the trimmed fifth is still
 # PROFITABLE (+0.169 unit R): this weights a weak group down, it does not cut a
