@@ -857,6 +857,60 @@ HTF_STRONG_SCORE   = int(os.getenv("HTF_STRONG_SCORE", "1"))
 # effect cannot be read off an already-gated export.
 HTF_FULL_ALIGN_SKIP = os.getenv("HTF_FULL_ALIGN_SKIP", "0") != "0"
 
+# --- Fitted setup-quality score (2026-09-06) ---------------------------------
+# The MTF score adds hand-set weights over mixed factors, and its trend half was
+# measured to predict BACKWARDS. This is the same job done by fitting weights to
+# the book instead of guessing them. Trained on the raw pre-gate exports, tested
+# only on windows the fit never saw, and judged by RANKING (unit R of the top
+# fifth minus the bottom fifth) against the existing score on the same rows:
+#
+#   проверочное окно   подобранная   нынешний балл
+#   2023 (злое)          +0.149         +0.103
+#   2024                 +0.279         -0.014
+#   2026                 +0.261         -0.016
+#
+# The existing score does not separate at all in two of three windows. Twenty
+# features do no better than five, and three of them survive EVERY training
+# split, so the shipped model is those three — small enough to read and check
+# by hand, which a twenty-coefficient one is not.
+#
+# Refitted once on all 5,845 trades to pin the constants. The result is monotone
+# across every fifth, in win rate and in unit R alike:
+#
+#   нижняя пятая  60.8%  +0.169      четвёртая     68.5%  +0.306
+#   вторая        65.0%  +0.210      верхняя пятая 75.9%  +0.404
+#   третья        66.2%  +0.240
+#
+# score = -0.2078*z(trend_score) - 0.1502*z(entry_range_atr)
+#         + 0.0512*z(entry_quality_score) + 0.7327,  z = (x - mean)/spread
+#
+# SETUP_QUALITY_MIN is the 20th percentile, so the trim bites the bottom fifth.
+#
+# MEASURED end-to-end, three windows, trade count unchanged (size only):
+#
+#   уровень   2026                    2024                    2023 (злое)
+#   база     +435.84 -7.76 pd 56.2   +226.17 -6.32 pd 35.8   +189.70 -7.29 pd 26.0
+#   x0.75    +425.50 -7.54 pd 56.4   +219.49 -5.99 pd 36.6   +180.81 -6.89 pd 26.2
+#   x0.60    +419.35 -7.10 pd 59.1   +215.38 -5.79 pd 37.2   +175.43 -6.86 pd 25.6
+#   x0.50    +415.46 -6.59 pd 63.0   +212.65 -5.66 pd 37.6   +171.85 -6.86 pd 25.0
+#
+# Drawdown falls monotonically with a deeper trim in every window, and so does
+# profit. The hostile window decides the level: its profit-per-drawdown peaks at
+# 0.75 and degrades below it, while the two benign windows keep improving. A
+# deeper cut buys 2026 and 2024 by selling 2023, which is the shape of fitting
+# the easy years.
+#
+# 0.75 is therefore the setting — the only one better than base in ALL THREE.
+# It is a TRIM, so no leverage is added, and the trimmed fifth is still
+# PROFITABLE (+0.169 unit R): this weights a weak group down, it does not cut a
+# losing one, which is why it must cost some profit.
+#
+# Default 1.0 = off. SETUP_QUALITY_TRIM_MULT=0.75 on Railway turns it on — but
+# NOT YET: the live bot cannot compute this score, see the plumbing note in
+# backtest.py at _setup_quality.
+SETUP_QUALITY_MIN       = float(os.getenv("SETUP_QUALITY_MIN", "0.582"))
+SETUP_QUALITY_TRIM_MULT = float(os.getenv("SETUP_QUALITY_TRIM_MULT", "1.0"))
+
 # --- Early breakeven arming (2026-09-05) --------------------------------------
 # Today the stop only moves to breakeven AFTER TP1 prints, so a trade that runs
 # most of the way and turns round pays the full -1R. Measured on the exports,

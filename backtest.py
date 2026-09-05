@@ -77,6 +77,7 @@ from config import (  # noqa: E402
     VOL_ATR_BOOST_MULT,
     HTF_NEUTRAL_4H_SIZE_MULT,
     BE_ARM_PROGRESS,
+    SETUP_QUALITY_MIN, SETUP_QUALITY_TRIM_MULT,
     MAX_SAME_DIRECTION_POSITIONS,
     ZONE_WATCH_ENABLED,
     ZONE_WATCH_MINUTES,
@@ -603,6 +604,30 @@ def _fld(setup: dict, key: str, missing: float) -> float:
         return missing
 
 
+# Constants fitted on 5,845 raw trades — see SETUP_QUALITY_MIN in config.py for
+# how they were obtained and what they are worth out of sample. Kept as plain
+# numbers rather than a loaded model so the whole rule can be read here.
+_Q_MEAN = (84.9683, 1.3580, 70.3678)
+_Q_SD   = (10.9413, 0.8432, 13.9871)
+_Q_W    = (-0.2078, -0.1502, 0.0512)
+_Q_B    = 0.7327
+
+
+def _setup_quality(row: dict) -> float | None:
+    """Fitted quality score, or None when a field it needs is missing.
+
+    None means NO TRIM: an absent field must not be read as low quality, which
+    is the convention every other size rule here follows.
+    """
+    try:
+        xs = (float(row["trend_score"]), float(row["entry_range_atr"]),
+              float(row["entry_quality_score"]))
+    except (KeyError, TypeError, ValueError):
+        return None
+    return _Q_B + sum(w * (x - m) / sd
+                      for x, m, sd, w in zip(xs, _Q_MEAN, _Q_SD, _Q_W))
+
+
 def _size_mult_for(symbol: str, setup: dict) -> float:
     """Mirror of the live sizing rules in src/autotrader.py."""
     m = float(SYMBOL_SIZE_MULT.get(str(symbol).upper(), 1.0))
@@ -689,6 +714,11 @@ def _size_mult_for(symbol: str, setup: dict) -> float:
                 m *= float(CHOP_SIZE_MULT)
         except (TypeError, ValueError):
             pass
+    # Weakest fifth by the fitted score rides smaller — see config.py.
+    if SETUP_QUALITY_TRIM_MULT != 1.0:
+        _q = _setup_quality(setup)
+        if _q is not None and _q < SETUP_QUALITY_MIN:
+            m *= float(SETUP_QUALITY_TRIM_MULT)
     return min(m, float(SIZE_MULT_MAX))
 
 
@@ -1530,7 +1560,9 @@ def simulate_trade_direct(
     _tp1_atr = abs(float(tp1) - float(entry)) / _atr if _atr > 0 else 0.0
     _beyond = 1 if (0 <= _room < _tp1_atr) else 0
 
-    _sz = _size_mult_for(symbol, setup)
+    # entry_range_atr is a local here and is NOT on the setup dict, so it is
+    # passed explicitly — the fitted quality rule reads it.
+    _sz = _size_mult_for(symbol, {**setup, "entry_range_atr": _rng})
     gross_r *= _sz
     net_r   *= _sz
     cost_r  *= _sz
