@@ -1156,6 +1156,13 @@ def analyze_coin_smc(candles_15m: dict, candles_1h: dict, symbol: str,
         "adaptive_reason":  adaptive_reason,
         "risk_mult":        round(float(risk_mult), 4),
         "quality_score":    quality["quality_score"],
+        # Range of the signal bar in ATR. backtest.py derives the same number
+        # from the FILL bar; with no execution delay those are the same bar, and
+        # the fitted quality score reads it on both sides.
+        "entry_range_atr":  (round((float(ind.get("current_high") or 0.0)
+                                    - float(ind.get("current_low") or 0.0))
+                                   / float(ind.get("atr") or 1e-12), 3)
+                             if ind.get("atr") else 0.0),
         "trend_score":      quality["trend_score"],
         "volatility_score": quality["volatility_score"],
         "entry_quality_score":  quality["entry_quality_score"],

@@ -187,6 +187,15 @@ def init_db():
             # stored, so the rule could not have fired live no matter what
             # the config said — the same gap trend_1h had on the other desk.
             "rsi":           "REAL",
+            # 2026-09-06: the three inputs to the fitted quality score
+            # (SETUP_QUALITY_MIN in config.py). trend_score and
+            # entry_quality_score were computed and shown but never stored;
+            # entry_range_atr did not exist in the live filter at all. Without
+            # all three on the row the autotrader cannot size on the score, so
+            # the rule would be inert live however well it measures.
+            "trend_score":        "REAL",
+            "entry_quality_score": "REAL",
+            "entry_range_atr":    "REAL",
             # 2026-09-03: the size multiplier ACTUALLY used when this signal
             # was opened. Every input above was already stored, but the
             # product was not, so the only way to weight a past trade by its
@@ -542,9 +551,10 @@ def log_signal(analysis: dict, tp1: float, tp2: float, sl: float) -> int:
                 confidence, reason, entry_low, entry_high, entry_source, market_price, zone_entry_price,
                 mtf_score, mtf_score_max, premium, atr, sniper, session, trend_4h,
                 bos_extension_atr, vol_atr_pct, volume_ratio, trend_1h, eff_ratio,
-                overhead_atr, underfoot_atr, accel_ratio, buy_pressure, rsi
+                overhead_atr, underfoot_atr, accel_ratio, buy_pressure, rsi,
+                trend_score, entry_quality_score, entry_range_atr
             )
-            VALUES (?, ?, ?, ?, ?, ?, ?, 'OPEN', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            VALUES (?, ?, ?, ?, ?, ?, ?, 'OPEN', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """, (
             analysis["symbol"], analysis["direction"], analysis["current_price"],
             tp1, tp2, sl, time_mod.time(),
@@ -568,6 +578,9 @@ def log_signal(analysis: dict, tp1: float, tp2: float, sl: float) -> int:
             analysis.get("accel_ratio"),
             analysis.get("buy_pressure"),
             analysis.get("rsi"),
+            analysis.get("trend_score"),
+            analysis.get("entry_quality_score"),
+            analysis.get("entry_range_atr"),
         ))
         return cur.lastrowid
 
@@ -751,7 +764,7 @@ def set_symbol_block(symbol: str, days: int, reason: str, stats: dict = None) ->
     with _conn() as c:
         c.execute("""
             INSERT INTO symbol_blocks (symbol, blocked_until, reason, created_at, stats_json)
-            VALUES (?, ?, ?, ?, ?)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
             ON CONFLICT(symbol) DO UPDATE SET
                 blocked_until = excluded.blocked_until,
                 reason = excluded.reason,

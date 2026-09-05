@@ -1068,6 +1068,11 @@ def get_smc_indicators(candles_15m: dict, candles_1h: dict = None,
         "obv_strength":     round(obv_strength, 4),
         "current_close":    closes[-1],
         "current_open":     opens[-1],
+        # The signal bar's own range. entry_range_atr is built from this and is
+        # one of the three inputs to the fitted quality score — see
+        # SETUP_QUALITY_MIN in config.py.
+        "current_high":     highs[-1],
+        "current_low":      lows[-1],
         "overhead_atr":     _htf["overhead_atr"],
         "underfoot_atr":    _htf["underfoot_atr"],
         "recent_high":      recent_high,

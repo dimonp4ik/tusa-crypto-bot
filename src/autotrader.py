@@ -41,6 +41,7 @@ from config import (
     OPEN_SPACE_ROOM_MIN, OPEN_SPACE_SIZE_MULT,
     PARABOLIC_ACCEL_MIN, PARABOLIC_SIZE_MULT,
     RSI_STRETCH_LONG_MIN, RSI_STRETCH_SIZE_MULT,
+    SETUP_QUALITY_MIN, SETUP_QUALITY_TRIM_MULT,
     DEAD_THIN_VOL_MAX, DEAD_THIN_SIZE_MULT,
     HTF_NEUTRAL_1H_SIZE_MULT,
     EXTENSION_ATR_THRESHOLD, EXTENSION_SIZE_MULT,
@@ -282,6 +283,18 @@ def _open_for_user(u: dict, sig: dict, inst_id: str, disp: str) -> None:
             if _rs is not None and float(_rs) >= RSI_STRETCH_LONG_MIN:
                 _size_mult *= float(RSI_STRETCH_SIZE_MULT)
         except (TypeError, ValueError):
+            pass
+    # Weakest fifth by the fitted quality score rides smaller — see
+    # SETUP_QUALITY_MIN in config.py. The score is IMPORTED from backtest rather
+    # than reimplemented: three standardised weights are exactly the kind of
+    # arithmetic that drifts when it exists twice.
+    if SETUP_QUALITY_TRIM_MULT != 1.0:
+        try:
+            from backtest import _setup_quality as _sq
+            _q = _sq(sig)
+            if _q is not None and _q < SETUP_QUALITY_MIN:
+                _size_mult *= float(SETUP_QUALITY_TRIM_MULT)
+        except (TypeError, ValueError, ImportError):
             pass
     # Open space rides smaller — see OPEN_SPACE_ROOM_MIN in config.py. Derived
     # here from the raw distances exactly as backtest._size_mult_for does:

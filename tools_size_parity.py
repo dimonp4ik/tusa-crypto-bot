@@ -80,6 +80,13 @@ def main_() -> int:
             "trend_4h": random.choice(trends),
             "volume_ratio": round(random.uniform(0.8, 6.0), 2),
             "rsi": round(random.uniform(30.0, 80.0), 2),
+            # The fitted quality score reads these three. Without them the
+            # branch is never reached and parity passes proving nothing — the
+            # failure this harness exists to catch. Ranges straddle the
+            # thresholds on purpose.
+            "trend_score": round(random.uniform(55.0, 95.0), 1),
+            "entry_quality_score": round(random.uniform(50.0, 100.0), 1),
+            "entry_range_atr": round(random.uniform(0.2, 4.0), 3),
             "sniper": random.choice([0, 1]),
             "bos_extension_atr": round(random.uniform(0.0, 4.0), 2),
             "vol_atr_pct": round(random.uniform(0.002, 0.020), 4),
