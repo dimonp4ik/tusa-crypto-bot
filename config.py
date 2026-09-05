@@ -145,6 +145,19 @@ TIMEFRAME_4H_KUCOIN = "4hour"
 # `strong` can fire AND the EMA values themselves (more warmup), so the effect
 # cannot be attributed. Isolating it needs the flag gated separately from the
 # fetch size.
+# ⚠ 2026-09-05: this budget is ONE SHORT of what the strong-trend flag needs.
+# get_1h_trend() sets strong=True only when len(closes) >= 51, so with 50 the
+# 4h EMA-stack flag has NEVER been True — not once, in the live bot or in the
+# backtest (which hardcodes its own WINDOW_4H = 50). Evidence: trend_score is a
+# sum of fixed bonuses and the value 100 (both aligned + BOTH strong) does not
+# occur in a single one of 5,845 exported setups across three windows.
+#
+# DO NOT "fix" this to 51 as tidy-up. Raising it REVIVES a dead scoring input:
+# HTF_STRONG_SCORE would start firing for 4h, pushing mtf_score up by 1 on
+# exactly the fully-aligned setups that measure WORST (67.3/65.9/59.1% WR
+# against 76.8/82.9/70.8% for the neutral-1h group), so more of the weakest
+# group would clear MTF_MIN_SCORE. It is a behaviour change and needs its own
+# three-window measurement, not a one-character edit.
 KLINES_4H_LIMIT = 50
 KLINES_4H_INTERVAL_SEC = 4 * 3600
 
@@ -802,6 +815,36 @@ HTF_NEUTRAL_SCORE  = int(os.getenv("HTF_NEUTRAL_SCORE", "1"))
 # risk measures split and the profit does not move, the change is not
 # supported — keep the version with more trades.
 HTF_STRONG_SCORE   = int(os.getenv("HTF_STRONG_SCORE", "1"))
+
+# --- Fully-aligned strong HTF trend gate (2026-09-05) -------------------------
+# The book is 82% one single condition: 1h and 4h both agreeing with the break
+# while the 1h EMA stack is strong. That group is the WORST of the five trend
+# combinations, in all three windows, on both win rate and unit R:
+#
+#   комбинация                              2026        2024        2023
+#   оба согласны + 1ч сильный (82% книги)   67.3%/+0.27 65.9%/+0.22 59.1%/+0.16
+#   1ч НЕЙТРАЛЕН, 4ч согласен  (8%)         76.8%/+0.50 82.9%/+0.51 70.8%/+0.31
+#   оба согласны, 1ч не сильный (1.5%)      87.2%/+0.68 95.2%/+0.74 80.0%/+0.64
+#
+# Unit R is net_r/size_mult, so the ranking is not a size artefact. Reading:
+# a retest bought while both higher timeframes are already running hard is a
+# chase — the very thing the owner pointed at on the ARB long.
+#
+# Two cheaper fixes were measured FIRST and both failed, which is why this is a
+# gate and not a scoring tweak. Lowering the alignment bonus (HTF_ALIGNED_SCORE
+# 2->1) and preferring neutral (aligned 1 / neutral 2 / strong 0) both left the
+# win rate flat and cost 12-18% of profit, because with MTF_MIN_SCORE fixed a
+# smaller bonus is just a higher bar, not a re-ranking:
+#
+#   вариант            2026                    2024                  2023
+#   база               1121сд 74.0% +435.8R    869сд 72.8% +226.2R   695сд 67.8% DD-7.29
+#   веса равные        959сд  74.1% +385.2R    761сд 72.3% +185.4R   604сд 68.4% DD-11.83
+#   нейтраль выше      780сд  73.7% +350.0R    630сд 73.2% +169.1R   -
+#
+# DEFAULT OFF until the full-run numbers are in. Note this is a GATE: dropping
+# a setup frees the per-scan and per-direction slot it would have taken, so its
+# effect cannot be read off an already-gated export.
+HTF_FULL_ALIGN_SKIP = os.getenv("HTF_FULL_ALIGN_SKIP", "0") != "0"
 # Premium/Discount structure gate — "discount" only counts as a buy signal inside
 # a bullish/neutral dealing range, "premium" only inside a bearish/neutral one. In
 # a clean lower-high+lower-low down-structure, price below the range midpoint is

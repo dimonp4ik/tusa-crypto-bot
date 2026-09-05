@@ -9,6 +9,7 @@ from config import (
     SMC_RSI_LONG_MAX, SMC_RSI_SHORT_MIN, MTF_MIN_SCORE, SHADOW_MIN_SCORE,
     REQUIRE_ENTRY_ZONE, ENTRY_ZONE_SL_BUFFER_ATR,
     REQUIRE_HTF_TREND, REQUIRE_RETEST, RETEST_MAX_DIST_PCT,
+    HTF_FULL_ALIGN_SKIP,
     VOL_REGIME_FILTER, VOL_MIN_ATR_PCT, VOL_MIN_RATIO, VOL_MAX_RATIO,
     REQUIRE_STRONG_BOS, STRONG_BOS_VOL_MULT,
     REQUIRE_STRONG_CONFIRM,
@@ -732,6 +733,12 @@ def analyze_coin_smc(candles_15m: dict, candles_1h: dict, symbol: str,
 
     # 2b. Regime filter — reject chop: no established HTF trend (both neutral)
     if REQUIRE_HTF_TREND and trend_1h == "neutral" and trend_4h == "neutral":
+        return None
+
+    # 2b-B. Fully-aligned strong HTF trend — see HTF_FULL_ALIGN_SKIP in config.
+    # Buying a retest while both higher timeframes already run hard is a chase.
+    if (HTF_FULL_ALIGN_SKIP and trend_1h == bos and trend_4h == bos
+            and ind.get("trend_1h_strong")):
         return None
 
     # 2b-A. Efficiency-Ratio chop gate — false BOS in ranges → SL clusters
