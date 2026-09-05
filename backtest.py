@@ -994,6 +994,47 @@ class TradeRecord:
     #   post_sl_tp1  1 if TP1 was reached within the normal window after the stop
     #   post_sl_max_r how far past the stop price ran, in units of the trade's risk
     # Together they separate "the stop stood in noise" from "the entry was wrong".
+    # Shape of the price action AT the entry, measured from the bars themselves.
+    # The existing columns are all derived INDICATORS; none of them describes
+    # what the chart actually looked like, which is why a feature sweep kept
+    # coming up empty on "is this a stupid entry".
+    #   pullback_frac  how far price retraced the recent swing before we bought.
+    #                  Near 0 = buying a shallow dip after a big run (a chase),
+    #                  near 1 = buying near the base of the move.
+    #   run_len_before consecutive bars closing OUR way immediately before entry
+    #   impulse6_atr   size of the last six bars' range, in ATR
+    #
+    # 🔴 ALL FIVE MEASURED AND NULL, 2026-09-05. Kept because their absence is
+    # the finding: the shape of the chart at entry does not separate winners
+    # from losers on this book, which is why every indicator sweep came up
+    # empty too. Unit R by window (2023 / 2024 / 2026):
+    #
+    #   pullback_frac <0.20 (buying right under the swing high, the "chase")
+    #        +0.128 / -0.036 / +0.017 against the book — windows disagree
+    #   pullback_frac >0.60 (buying near the base)
+    #        -0.005 / -0.003 / -0.147 — if anything worse
+    #   run_len_before 0 bars   +0.18 / +0.28 / +0.31
+    #                  4+ bars  +0.24 / +0.11 / +0.33 — no order
+    #   impulse6_atr — windows disagree on which end is better
+    #   retrace_bars_ratio — degenerate, 97% of trades fall in one bucket
+    #   pullback_vol_ratio — the textbook "quiet pullback is healthy" reverses:
+    #        quiet <0.7 runs -0.199 in 2026, loud 1.0-1.5 runs +0.050 in 2024
+    #
+    # Reading: local 15m "chasing" costs nothing. What does predict, in every
+    # window, is how extended the HIGHER timeframes are — see
+    # HTF_FULL_ALIGN_SKIP in config.py. Same conclusion reached from the
+    # opposite direction, which is why it is worth trusting.
+    #   retrace_bars_ratio  bars spent retracing / bars spent on the impulse.
+    #                  Above 1 = the pullback is taking LONGER than the move it
+    #                  is correcting, which is opposition, not a pause.
+    #   pullback_vol_ratio  average volume while retracing / average volume of
+    #                  the impulse. The textbook healthy pullback is quiet; a
+    #                  loud one is distribution.
+    retrace_bars_ratio: float = -1.0
+    pullback_vol_ratio: float = -1.0
+    pullback_frac: float = -1.0
+    run_len_before: int = 0
+    impulse6_atr: float = 0.0
     post_sl_tp1: int = -1
     post_sl_max_r: float = 0.0
     mae_r: float = 0.0
@@ -1127,6 +1168,47 @@ def simulate_trade_direct(
     except (TypeError, ValueError):
         _bos_lvl_num = None
     _risk_abs = abs(entry - sl)
+    # --- entry-context candle shape (recorded only, changes no outcome) ---
+    _o = candles_15m.get("open") or []
+    _h_all, _l_all, _c_all = candles_15m["high"], candles_15m["low"], candles_15m["close"]
+    _atr_e = float(setup.get("atr", 0.0) or 0.0)
+    _lo_i = max(0, fill_bar - 20)
+    _swing_hi = max(_h_all[_lo_i:fill_bar]) if fill_bar > _lo_i else entry
+    _swing_lo = min(_l_all[_lo_i:fill_bar]) if fill_bar > _lo_i else entry
+    _span = _swing_hi - _swing_lo
+    if _span > 0:
+        _pullback_frac = ((_swing_hi - entry) / _span if direction == "LONG"
+                          else (entry - _swing_lo) / _span)
+        _pullback_frac = max(0.0, min(1.0, _pullback_frac))
+    else:
+        _pullback_frac = -1.0
+    _run_len = 0
+    for _k in range(fill_bar - 1, max(-1, fill_bar - 12), -1):
+        if _k <= 0 or _k >= len(_c_all): break
+        _up = _c_all[_k] > _c_all[_k - 1]
+        if _up == (direction == "LONG"): _run_len += 1
+        else: break
+    _i6 = max(0, fill_bar - 6)
+    _impulse6 = ((max(_h_all[_i6:fill_bar]) - min(_l_all[_i6:fill_bar])) / _atr_e
+                 if fill_bar > _i6 and _atr_e > 0 else 0.0)
+    # Where the swing extreme sits tells us how long the retrace has run
+    # against how long the impulse took, and on what volume.
+    _retrace_ratio = -1.0
+    _pb_vol_ratio = -1.0
+    if fill_bar > _lo_i:
+        _seg_h = _h_all[_lo_i:fill_bar]
+        _seg_l = _l_all[_lo_i:fill_bar]
+        _ext_i = (_lo_i + _seg_h.index(max(_seg_h))) if direction == "LONG"             else (_lo_i + _seg_l.index(min(_seg_l)))
+        _retr_bars = fill_bar - _ext_i
+        _imp_bars = _ext_i - _lo_i
+        if _imp_bars > 0 and _retr_bars > 0:
+            _retrace_ratio = _retr_bars / _imp_bars
+            _vol = candles_15m.get("volume") or []
+            if len(_vol) > fill_bar:
+                _iv = _vol[_lo_i:_ext_i]; _rv = _vol[_ext_i:fill_bar]
+                _im = sum(_iv) / len(_iv) if _iv else 0.0
+                _rm = sum(_rv) / len(_rv) if _rv else 0.0
+                if _im > 0: _pb_vol_ratio = _rm / _im
     _mae_r = 0.0
     # Best move TOWARD the target before the trade resolved, as a fraction of
     # the distance to TP1. 1.0 means it touched TP1; 0.98 means it stopped two
@@ -1446,6 +1528,11 @@ def simulate_trade_direct(
         sniper=int(bool(setup.get("sniper"))),
         knn_score=float(setup.get("_knn_score", -1.0)),
         swing_trend=str(setup.get("swing_trend", "") or ""),
+        retrace_bars_ratio=round(_retrace_ratio, 4),
+        pullback_vol_ratio=round(_pb_vol_ratio, 4),
+        pullback_frac=round(_pullback_frac, 4),
+        run_len_before=_run_len,
+        impulse6_atr=round(_impulse6, 4),
         post_sl_tp1=_post_sl_tp1,
         post_sl_max_r=round(_post_sl_max_r, 4),
         mae_r=round(_mae_r, 4),
@@ -1907,7 +1994,7 @@ def write_trades_csv(path: str, trades: list[TradeRecord]) -> None:
         "entry_quality_score", "portfolio_risk_score",
         "session", "trend_1h", "trend_4h", "entry_source",
         "signals", "score_tags", "premium", "sniper", "knn_score", "swing_trend",
-        "post_sl_tp1", "post_sl_max_r", "mae_r", "mfe_tp1", "accel_ratio", "buy_pressure", "absorption", "obv_agree", "obv_strength", "size_mult", "signal_bar",
+        "pullback_frac", "run_len_before", "impulse6_atr", "retrace_bars_ratio", "pullback_vol_ratio", "post_sl_tp1", "post_sl_max_r", "mae_r", "mfe_tp1", "accel_ratio", "buy_pressure", "absorption", "obv_agree", "obv_strength", "size_mult", "signal_bar",
         "zone_age_bars", "bos_candles_ago", "extension_atr",
         "room_atr", "tp1_beyond_level",
         "entry_range_atr", "run_bars",
