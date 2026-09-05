@@ -1931,6 +1931,24 @@ def main(argv: list[str] | None = None) -> int:
         from datetime import datetime as _dt, timezone as _tz
         end_date_ms = int(_dt.strptime(args.end_date, "%Y-%m-%d")
                           .replace(tzinfo=_tz.utc).timestamp() * 1000)
+    # ⚠ SURVIVORSHIP BIAS, measured 2026-09-05. fetch_top_symbols() reads the
+    # OKX tickers endpoint NOW and freezes that list for the whole run, however
+    # far back it reaches. The live bot re-ranks the top-25 on every scan, so
+    # over three months it traded 47 distinct symbols while this export covers
+    # 18. Coins that were briefly top-25 and then died are invisible here — and
+    # they are not a rounding error, they are half the live book:
+    #
+    #   живые сделки крипты   сделок  винрейт   итого
+    #   монета есть в модели     114    68.4%  +22.05R
+    #   монеты в модели НЕТ      118    55.1%   -8.71R
+    #
+    # The tested half lands near the model (68.4% against 70.6% over the same
+    # days); the untested half loses. So the model's optimism is structural,
+    # not a mis-tuned knob, and any win rate from this file is an upper bound
+    # on what the live universe can deliver. Fixing it means ranking symbols by
+    # the volume they HAD at each point in the window, which needs historical
+    # ticker data this script does not fetch. Until then, prefer --symbols with
+    # an explicit list when a result has to describe the live book.
     if args.symbols:
         symbols = parse_symbols(args.symbols)
     elif args.top > 0:
