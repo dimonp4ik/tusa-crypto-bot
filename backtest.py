@@ -783,6 +783,33 @@ _BT_TRAIL_LAG = os.getenv("BT_TRAIL_LAG", "1") == "1"
 # export. That deletes long trades rather than closing them at N hours, and so
 # assumes their eventual outcome was knowable at the cut. It reads +9R where the
 # real simulation reads -19R on the same window.
+# 🔴 SWEPT AND REJECTED 2026-09-05, with the hours recorded so nobody repeats it.
+# The motivation is real and worth restating, because it will look compelling
+# again: expected unit R decays monotonically with time in trade, conditional on
+# the trade STILL BEING OPEN — which is observable live, not hindsight.
+#
+#   всё ещё открыта   2026     2024     2023
+#   на входе         +0.344   +0.265   +0.217
+#   через 4 часа     +0.150   +0.075   -0.009
+#   через 8 часов    +0.003   +0.037   -0.106
+#   через 12 часов   -0.032   +0.013   -0.176
+#
+# Winners resolve in a median 15-16 bars, stops in 30-36; two hours in, a third
+# of the winners have closed against 8-12% of the stops.
+#
+# And yet closing on it does not pay:
+#
+#   вариант   2026            2024            2023
+#   база     +435.84 pd 56.2  +226.17 pd 35.8  +189.70 pd 26.0
+#   6 часов  +390.21 pd 49.2  +185.46 pd 25.8  +164.93 pd 24.0
+#   8 часов  +426.35 pd 52.5  +201.39 pd 26.0  +195.38 pd 25.7
+#   12 часов +445.10 pd 63.1  +197.07 pd 28.4  +182.73 pd 28.0
+#
+# 6h and 8h lose on every measure; 12h wins one window and costs profit in the
+# other two. The reason the curve misleads: the trades still open at hour N are
+# not all dying — many are IN PROFIT and trailing, and a time exit cuts those
+# together with the hopeless ones. The decay is real; it just cannot be
+# harvested by closing on the clock.
 _BT_TIME_STOP_H = float(os.getenv("BT_TIME_STOP_H", "0"))
 
 # Average-down research flag, default OFF. When set, a SECOND unit of the same
