@@ -984,6 +984,24 @@ SETUP_QUALITY_MIN       = float(os.getenv("SETUP_QUALITY_MIN", "0.582"))
 # The trim SURVIVES the fill cost, which the stocks size pair did not. Note what
 # the fill cost alone does to the book: profit 435.84 -> 377.70 and win rate
 # 74.0% -> 71.6% in the calm window. That is the honest level to quote.
+# 🔴 THE LADDER DOES NOT SURVIVE HONEST FILLS INTACT — measured 2026-09-06 at
+# --adverse-entry-bps 8 on all three windows (2026-08-26 / 2024-07-31 /
+# 2023-07-31), profit/DD, base 44.7 / 23.5 / 19.9:
+#   0.75   45.4 / 23.0 / 20.0     better, WORSE, better
+#   0.6    48.0 / 22.7 / 20.0     better, WORSE, better
+#   0.5    51.6 /  -   / 19.8
+# At zero fill cost 0.75 was better in ALL THREE (56.4/36.6/26.2 against
+# 56.2/35.8/26.0), which is the whole reason it was picked over 0.6. Charge the
+# fill and 2024 turns slightly negative for every level, so NO level clears the
+# "better everywhere" bar any more.
+# The magnitudes are small in both directions (+1.6% / -2.1% / +0.5% at 0.75),
+# so the honest description is that the trim is roughly NEUTRAL once fills are
+# charged — not the improvement the zero-fill ladder advertised. It stays
+# available and default-off; the owner was told to treat it as optional rather
+# than as the second thing to switch on.
+# The fitted score itself is unaffected: it still RANKS (see the held-out
+# numbers under SETUP_QUALITY_MIN). What fails is turning that ranking into
+# money through a size trim, which is the same wall every other subset hit.
 SETUP_QUALITY_TRIM_MULT = float(os.getenv("SETUP_QUALITY_TRIM_MULT", "1.0"))
 
 # --- Early breakeven arming (2026-09-05) --------------------------------------
