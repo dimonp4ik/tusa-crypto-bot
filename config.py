@@ -2897,6 +2897,24 @@ SIZE_MULT_MAX = float(os.getenv("SIZE_MULT_MAX", "2.0"))
 # mostly drawdown reduction driven by ~96 trades in a narrow band, so treat the
 # expectancy edge as the real part and the headline as optimistic.
 EXTENSION_ATR_THRESHOLD = float(os.getenv("EXTENSION_ATR_THRESHOLD", "1.2"))
+# ✅ HONEST-FILL AUDIT OF EVERY LIVE SIZE RULE, 2026-09-06. Each rule was
+# removed in turn and the run repeated at --adverse-entry-bps 8, because the
+# tables that justify these rules were all measured at zero fill cost and the
+# same test demoted a pair of stocks rules that day. Base: 44.7 / 23.5 / 19.9
+# profit/DD on 2026-08-26 / 2024-07-31 / 2023-07-31. Removing:
+#   OVERLAP_CALM   42.2  /   -   / 17.4     worse
+#   CHOP           44.2  /   -   / 19.5     worse
+#   PARABOLIC      44.5  /   -   / 18.9     worse
+#   DEAD_THIN      41.8  /   -   / 19.3     worse
+#   OPEN_SPACE     45.7  / 23.0  / 20.3     better twice, worse once
+#   this one       43.5  / 20.9  / 21.7     better once, worse twice
+# NOTHING is removed. Every rule pays for itself once fills are charged, and the
+# two that looked removable failed on the window that was not yet run — which is
+# why the third window is run before any recommendation.
+# The one thing worth remembering about THIS knob: its only win is the hostile
+# 2023 window (19.9 -> 21.7), i.e. it may be helping in calm markets and hurting
+# in a crisis, the opposite of what a protective trim is for. Re-check when a
+# fourth window exists.
 EXTENSION_SIZE_MULT     = float(os.getenv("EXTENSION_SIZE_MULT", "0.75"))
 
 # Volatility boost, under test 2026-08-25. vol_atr_pct is ATR as a share of
