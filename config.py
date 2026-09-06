@@ -73,6 +73,18 @@ def _normalize_market_symbol(symbol: str) -> str:
 # earn almost nothing once their fills are charged at a rate a thin alt actually
 # gets, and they carry THREE TIMES the drawdown of the pinned book to do it.
 # 8 bps is calibrated on majors; 20-34 is the honest range for these names.
+# CONTROLLED COMPARISON — the pinned book put through the SAME fill ladder, so
+# the two halves differ only in which coins they hold:
+#   pinned 18    8 bps  +48.42R  DD -5.33  pd 9.1
+#               20 bps  +43.40R  DD -5.41  pd 8.0
+#               34 bps  +28.79R  DD -4.40  pd 6.5
+# The pinned book DEGRADES GRACEFULLY: profit falls, drawdown does not grow, and
+# even at the harshest fill assumption it beats the unpinned half at that half's
+# BEST assumption (6.5 against 1.6). The unpinned half collapses instead
+# (1.6 -> 0.3) and its drawdown grows the whole way (-12.06 -> -16.72).
+# So the answer is the COINS, not the execution: fill cost hurts both, but only
+# one of them stops working. That is what makes the symbol list the change
+# worth making rather than an execution fix.
 # So the case for ALLOWED_SYMBOLS is not "they lose money" — it is that half the
 # book contributes no profit and most of the risk.
 ALLOWED_SYMBOLS = [_normalize_market_symbol(s) for s in _parse_symbol_list(os.getenv("ALLOWED_SYMBOLS", ""))]
