@@ -893,6 +893,18 @@ HTF_FULL_ALIGN_SKIP = os.getenv("HTF_FULL_ALIGN_SKIP", "0") != "0"
 #   x0.75    +425.50 -7.54 pd 56.4   +219.49 -5.99 pd 36.6   +180.81 -6.89 pd 26.2
 #   x0.60    +419.35 -7.10 pd 59.1   +215.38 -5.79 pd 37.2   +175.43 -6.86 pd 25.6
 #   x0.50    +415.46 -6.59 pd 63.0   +212.65 -5.66 pd 37.6   +171.85 -6.86 pd 25.0
+#   предел   +396.00 -5.06 pd 78.3   +198.97 -5.62 pd 35.4   +153.92 -6.86 pd 22.4
+#
+# The last row zeroes the weak fifth's contribution (the limit of this family —
+# not a gate, the trade still holds its slot). It is spectacular on 2026 and
+# WORSE THAN BASE on both other windows, which settles the level for good.
+#
+# The mechanism is visible in the hostile column: drawdown there stops improving
+# after 0.6 — it sits at -6.86 for 0.6, 0.5 and the limit alike — while profit
+# keeps falling. In a crisis the weak fifth is NOT what makes the drawdown, so
+# trimming it buys nothing and costs the profit. In a calm market it IS what
+# makes the drawdown, which is why 2026 keeps improving. That asymmetry is
+# exactly what a hostile window is kept for.
 #
 # Drawdown falls monotonically with a deeper trim in every window, and so does
 # profit. The hostile window decides the level: its profit-per-drawdown peaks at
