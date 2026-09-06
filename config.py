@@ -955,9 +955,11 @@ HTF_FULL_ALIGN_SKIP = os.getenv("HTF_FULL_ALIGN_SKIP", "0") != "0"
 # PROFITABLE (+0.169 unit R): this weights a weak group down, it does not cut a
 # losing one, which is why it must cost some profit.
 #
-# Default 1.0 = off. SETUP_QUALITY_TRIM_MULT=0.75 on Railway turns it on — but
-# NOT YET: the live bot cannot compute this score, see the plumbing note in
-# backtest.py at _setup_quality.
+# Default 1.0 = off. SETUP_QUALITY_TRIM_MULT=0.75 on Railway turns it on.
+# (This used to say "NOT YET — the live bot cannot compute this score". That
+# blocker is GONE as of 2026-09-06: the three fields are computed by the live
+# filter, stored by log_signal and read by the autotrader, and the whole chain
+# was walked by hand — see the verification note under SETUP_QUALITY_MIN below.)
 # ❌ 2026-09-06: dropping entry_quality_score (its weight is only +0.0512, so it
 # looked like a passenger) makes the score WORSE in all three held-out windows:
 # +0.253/+0.271/+0.066 against +0.300/+0.288/+0.075 for the shipped three. A
