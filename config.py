@@ -958,6 +958,10 @@ HTF_FULL_ALIGN_SKIP = os.getenv("HTF_FULL_ALIGN_SKIP", "0") != "0"
 # Default 1.0 = off. SETUP_QUALITY_TRIM_MULT=0.75 on Railway turns it on — but
 # NOT YET: the live bot cannot compute this score, see the plumbing note in
 # backtest.py at _setup_quality.
+# ❌ 2026-09-06: dropping entry_quality_score (its weight is only +0.0512, so it
+# looked like a passenger) makes the score WORSE in all three held-out windows:
+# +0.253/+0.271/+0.066 against +0.300/+0.288/+0.075 for the shipped three. A
+# small weight is not a useless one — keep all three.
 SETUP_QUALITY_MIN       = float(os.getenv("SETUP_QUALITY_MIN", "0.582"))
 SETUP_QUALITY_TRIM_MULT = float(os.getenv("SETUP_QUALITY_TRIM_MULT", "1.0"))
 
