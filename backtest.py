@@ -723,9 +723,21 @@ def _size_mult_for(symbol: str, setup: dict) -> float:
 
 
 def _post_tp1_trail_mult_bt(direction: str, entry: float, tp1: float, tp2: float,
-                            high: float, low: float, close: float) -> float:
-    """Context-aware runner trail from the TP1 candle (mirrors live _post_tp1_trail_mult)."""
-    base = max(0.0, float(TRAIL_ATR_MULT))
+                            high: float, low: float, close: float,
+                            base_mult: float | None = None) -> float:
+    """Context-aware runner trail from the TP1 candle (mirrors live _post_tp1_trail_mult).
+
+    base_mult is the sweep knob (--trail-atr-mult); it defaults to the live
+    TRAIL_ATR_MULT so shipped behaviour is unchanged.
+
+    WARNING 2026-09-06: this used to read TRAIL_ATR_MULT unconditionally, which
+    made --trail-atr-mult DEAD. Trailing only starts after TP1, and every branch
+    that starts it calls this helper, so the CLI value was overwritten before it
+    could act: a sweep at 0.05 reproduced the 0.006 baseline to the digit
+    (+435.84R, DD -7.76). Sweeps run with the flag rather than the
+    TRAIL_ATR_MULT env var are not evidence of anything.
+    """
+    base = max(0.0, float(TRAIL_ATR_MULT if base_mult is None else base_mult))
     if str(EXIT_PROFILE).lower() != "post_tp1_v2":
         return base
     leg = abs(float(tp2) - float(tp1))
@@ -1376,7 +1388,8 @@ def simulate_trade_direct(
                     outcome = "TP1"
                     tp1_reached = True
                     exit_bar = j
-                    trail_mult_eff = _post_tp1_trail_mult_bt(direction, entry, tp1, tp2, h, l, closes[j])
+                    trail_mult_eff = _post_tp1_trail_mult_bt(direction, entry, tp1, tp2, h, l, closes[j],
+                                                            base_mult=trail_atr_mult)
                     continue
                 if direction == "SHORT" and l <= tp1:
                     if l <= tp2:
@@ -1387,7 +1400,8 @@ def simulate_trade_direct(
                     outcome = "TP1"
                     tp1_reached = True
                     exit_bar = j
-                    trail_mult_eff = _post_tp1_trail_mult_bt(direction, entry, tp1, tp2, h, l, closes[j])
+                    trail_mult_eff = _post_tp1_trail_mult_bt(direction, entry, tp1, tp2, h, l, closes[j],
+                                                            base_mult=trail_atr_mult)
                     continue
             if direction == "LONG":
                 if (closes[j] <= sl) if _STOP_ON_CLOSE else (l <= sl):
@@ -1406,7 +1420,8 @@ def simulate_trade_direct(
                     outcome = "TP1"
                     tp1_reached = True
                     exit_bar = j
-                    trail_mult_eff = _post_tp1_trail_mult_bt(direction, entry, tp1, tp2, h, l, closes[j])
+                    trail_mult_eff = _post_tp1_trail_mult_bt(direction, entry, tp1, tp2, h, l, closes[j],
+                                                            base_mult=trail_atr_mult)
                     continue
             else:
                 if (closes[j] >= sl) if _STOP_ON_CLOSE else (h >= sl):
@@ -1425,7 +1440,8 @@ def simulate_trade_direct(
                     outcome = "TP1"
                     tp1_reached = True
                     exit_bar = j
-                    trail_mult_eff = _post_tp1_trail_mult_bt(direction, entry, tp1, tp2, h, l, closes[j])
+                    trail_mult_eff = _post_tp1_trail_mult_bt(direction, entry, tp1, tp2, h, l, closes[j],
+                                                            base_mult=trail_atr_mult)
                     continue
         else:
             if direction == "LONG":
