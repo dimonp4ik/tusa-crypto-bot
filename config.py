@@ -963,6 +963,15 @@ HTF_FULL_ALIGN_SKIP = os.getenv("HTF_FULL_ALIGN_SKIP", "0") != "0"
 # +0.253/+0.271/+0.066 against +0.300/+0.288/+0.075 for the shipped three. A
 # small weight is not a useless one — keep all three.
 SETUP_QUALITY_MIN       = float(os.getenv("SETUP_QUALITY_MIN", "0.582"))
+# ✅ LIVE CHAIN VERIFIED END TO END 2026-09-06 (the knob being wired is not the
+# same as the knob being fed — see the parity-passes-while-dead lesson):
+#   signal_filter returns trend_score / entry_quality_score / entry_range_atr as
+#   TOP-LEVEL keys -> log_signal inserts all three -> get_signal_by_id returns a
+#   real dict (not a sqlite3.Row, so .get() and KeyError both behave) ->
+#   autotrader calls backtest._setup_quality on that dict.
+# Residual: entry_range_atr falls back to 0.0 when ATR is missing, which scores
+# ~+0.24 higher and therefore fails towards NO trim. Wrong-but-safe direction;
+# left alone deliberately rather than turned into a silent 0-quality trade.
 SETUP_QUALITY_TRIM_MULT = float(os.getenv("SETUP_QUALITY_TRIM_MULT", "1.0"))
 
 # --- Early breakeven arming (2026-09-05) --------------------------------------
