@@ -164,6 +164,30 @@ def _scan_order_key(t):
     if _BT_SCAN_ORDER == "score":
         return (t.entry_time or 0, -int(t.mtf_score or 0),
                 -float(t.volume_ratio or 0), t.symbol, t.entry_bar)
+    # ❌ MEASURED 2026-09-06 AND WORSE EVERYWHERE. Ranking same-scan candidates
+    # by the fitted score (against base 1121/+435.84/-7.76/56.2,
+    # 869/+226.17/-6.32/35.8, 695/+189.70/-7.29/26.0):
+    #     2026  1115  +429.02  -8.54  50.2
+    #     2024   870  +222.81  -7.61  29.3
+    #     2023   700  +186.38  -9.48  19.7
+    # Profit barely moves (it even rises in 2023/2024) but the DRAWDOWN rises in
+    # all three, by 10-35%. The reading: picking "the best" among simultaneous
+    # candidates picks ALIKE ones -- same regime, same reason, same direction --
+    # and a slot filled by three of a kind empties all at once. The alphabetical
+    # tie-break is arbitrary, and that is exactly what keeps the book mixed.
+    # Kept as a knob so the finding stays reproducible; do not ship it.
+    if _BT_SCAN_ORDER == "quality":
+        # Same-scan candidates ranked by the fitted setup score (see
+        # SETUP_QUALITY_MIN in config.py) instead of by symbol name. The
+        # default order breaks ties ALPHABETICALLY, and the tie decides who
+        # takes the per-scan slot and, far more importantly, who occupies a
+        # MAX_SAME_DIRECTION_POSITIONS slot for the whole life of the trade.
+        # A trade missing a field sorts last rather than first.
+        _q = _setup_quality({"trend_score": t.trend_score,
+                             "entry_range_atr": t.entry_range_atr,
+                             "entry_quality_score": t.entry_quality_score})
+        return (t.entry_time or 0, -_q if _q is not None else 9.9,
+                t.symbol, t.entry_bar)
     return (t.entry_time or 0, t.symbol, t.entry_bar)
 from src.knn_analog import knn_direction_score  # noqa: E402
 

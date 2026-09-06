@@ -613,6 +613,17 @@ MAX_SETUPS_TO_CLAUDE  = int(os.getenv("MAX_SETUPS_TO_CLAUDE", "7"))  # only stro
 # When enabled, setups without an active FVG or OB zone near price are skipped.
 REQUIRE_ENTRY_ZONE       = os.getenv("REQUIRE_ENTRY_ZONE", "1") != "0"
 ENTRY_ZONE_SL_BUFFER_ATR = float(os.getenv("ENTRY_ZONE_SL_BUFFER_ATR", "0.25"))
+# ↓ The entry price inside the zone is NOT a free parameter, and this was
+# re-derived from scratch on 2026-09-06 before the earlier work was found.
+# signal_filter sets entry_price to the zone MIDPOINT, but nothing downstream
+# trades off it: the live bot fires on the first touch ANYWHERE in
+# [entry_low, entry_high] (ZONE_WATCH), and the model has its own depth knob,
+# BT_ZONE_DEPTH, defaulting to 0.0 = the edge, to mirror exactly that. Adding a
+# depth knob to signal_filter therefore changes NOTHING in the model: 0.35 and
+# 0.65 both reproduced the baseline 1121/+435.84R/-7.76 to the digit.
+# The 2x2 at backtest.py:937 already settled the question -- given that we wait
+# for the zone, filling at the EDGE beats holding out for the midpoint
+# (998 trades +203.31R against 738 +164.77R), so entering deeper is dead.
 
 # --- Regime / retest filters (cut chop + false breakouts) ---
 # REQUIRE_HTF_TREND : reject when both 1h AND 4h are neutral (no real trend = chop).
@@ -1534,6 +1545,20 @@ TRAIL_RUNNER_ENABLED = os.getenv("TRAIL_RUNNER_ENABLED", "1") != "0"
 # Not taking the 0.0-0.003 floor: it puts the stop flush against price and
 # live X-Perp wicks are harsher than the model represents.
 TRAIL_ATR_MULT       = float(os.getenv("TRAIL_ATR_MULT", "0.006"))  # base trail; post_tp1_v2 overrides per-context
+# ❌ PER-SETUP TRAIL — measured 2026-09-06 and dead. The idea was to let the
+# best setups run on a loose trail while the weak ones are cut short, i.e. the
+# fitted quality score (SETUP_QUALITY_MIN below) applied to the EXIT.
+# Paired test, same 1121 trades, 0.006 against 0.05, split into fifths by that
+# score (delta net R, and how many trades in the fifth actually changed hands):
+#   fifth 1  -1.05R (130/224 changed)   unit R +0.140 -> +0.134
+#   fifth 2  -1.66R (154/224)                  +0.298 -> +0.290
+#   fifth 3  -2.03R (168/224)                  +0.421 -> +0.412
+#   fifth 4  -1.76R (158/224)                  +0.377 -> +0.369
+#   fifth 5  -2.38R (172/225)                  +0.484 -> +0.476
+# Every fifth loses, and loses the SAME amount per unit of size (0.006-0.009R).
+# A loose trail is a flat tax, not a trade-off that some setups win: the best
+# fifth has no more appetite for room than the worst. Well powered — the knob
+# moved 58-76% of the trades in every fifth. Nothing to condition on here.
 # ✅ SIGNIFICANCE-TESTED 2026-08-28 (significance_check.py, 5000 bootstrap runs),
 # trail 0.02 + TP2 3.0R together against the old exit on the current window:
 #   baseline +390.99R -> candidate +416.45R, delta +25.47R, delta R/trade +0.020
@@ -1979,6 +2004,16 @@ STOP_EXCHANGE_BACKSTOP_R = float(os.getenv("STOP_EXCHANGE_BACKSTOP_R", "1.5"))
 # win rate does not pay it: 70.3->70.1 in 2026, 68.4->70.0 in 2024, 67.0->67.8
 # in 2023 — flat or better. That is the trade the owner asked for: fewer trades,
 # same hit rate, drawdown cut by a fifth to two thirds.
+# ❌ 2 MEASURED 2026-09-06 AND NOT TAKEN. Against base (1121/+435.84/-7.76/56.2,
+# 869/+226.17/-6.32/35.8, 695/+189.70/-7.29/26.0):
+#     2026  857 trades  +328.25R  DD -6.67  pd 49.2
+#     2024  674         +159.91R  DD -5.40  pd 29.6
+#     2023  550         +144.58R  DD -6.49  pd 22.3
+# The cap does what a cap does: -24% trades and -14% drawdown, bought with -25%
+# profit. Risk-adjusted it is worse in all three windows. Compare the fitted
+# quality trim (SETUP_QUALITY_MIN below) at 0.5, which buys -15% drawdown for
+# -5% profit on the same window -- the trim dominates the cap, so a request for
+# "fewer trades, smaller drawdown" should be answered with the trim, not here.
 MAX_SAME_DIRECTION_POSITIONS = int(os.getenv("MAX_SAME_DIRECTION_POSITIONS", "3"))
 
 # --- Graded crowding trim: REJECTED, premise was wrong -----------------------
