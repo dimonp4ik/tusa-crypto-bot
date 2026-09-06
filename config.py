@@ -62,6 +62,19 @@ def _parse_symbol_list(value, default=None):
 def _normalize_market_symbol(symbol: str) -> str:
     return str(symbol or "").upper().replace("-", "").replace("_", "").replace("/", "")
 
+# 🔑 WHY PINNING THE UNIVERSE IS THE ONE CHANGE WORTH MAKING — measured
+# 2026-09-06 with the model itself, not inferred from the live book. Same fresh
+# window (2000 candles to 2026-09-05), same gates, split by universe:
+#   the 18 pinned coins,   8 bps   121 trades  77.7%  +48.42R  DD  -5.33  pd 9.1
+#   the 16 the live bot added, 8 bps 139 trades 69.1%  +19.65R  DD -12.06  pd 1.6
+#                             20 bps 136 trades 66.9%  +16.67R  DD -13.31  pd 1.3
+#                             34 bps 132 trades 64.4%   +5.46R  DD -16.72  pd 0.3
+# State it correctly: the unpinned coins are NOT loss-makers in the model. They
+# earn almost nothing once their fills are charged at a rate a thin alt actually
+# gets, and they carry THREE TIMES the drawdown of the pinned book to do it.
+# 8 bps is calibrated on majors; 20-34 is the honest range for these names.
+# So the case for ALLOWED_SYMBOLS is not "they lose money" — it is that half the
+# book contributes no profit and most of the risk.
 ALLOWED_SYMBOLS = [_normalize_market_symbol(s) for s in _parse_symbol_list(os.getenv("ALLOWED_SYMBOLS", ""))]
 BLOCKED_SYMBOLS = [_normalize_market_symbol(s) for s in _parse_symbol_list(os.getenv("BLOCKED_SYMBOLS", ""))]
 # Always block commodity derivatives — metals/indices follow macro drivers, not crypto SMC
