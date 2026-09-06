@@ -884,6 +884,21 @@ HTF_FULL_ALIGN_SKIP = os.getenv("HTF_FULL_ALIGN_SKIP", "0") != "0"
 # score = -0.2078*z(trend_score) - 0.1502*z(entry_range_atr)
 #         + 0.0512*z(entry_quality_score) + 0.7327,  z = (x - mean)/spread
 #
+# TWO VARIANTS TRIED AND NOT TAKEN, so they are not rediscovered:
+#
+#   Interaction terms (pairwise products plus a square) rank +0.066 / +0.310 /
+#   +0.291 against the plain sum's +0.075 / +0.288 / +0.307 — better in one
+#   window, worse in two, and worse in the hostile one. A sum is the right
+#   complexity here.
+#
+#   Ranking by EXPECTED R (ridge on unit R) instead of win probability is
+#   slightly better in all three: +0.096 / +0.296 / +0.308. The reasoning is
+#   sound — size should track what a trade earns, not how often it wins — but
+#   two of the three gains are +0.001 and +0.008, i.e. noise, and swapping would
+#   need new constants, a new bottom-fifth threshold and a re-run of the whole
+#   trim ladder, which was measured on the logistic score. Not worth trading
+#   something validated three ways for a gain that is real only in one window.
+#
 # SETUP_QUALITY_MIN is the 20th percentile, so the trim bites the bottom fifth.
 #
 # MEASURED end-to-end, three windows, trade count unchanged (size only):
