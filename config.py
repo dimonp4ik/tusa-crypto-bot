@@ -2667,6 +2667,17 @@ OPEN_SPACE_ROOM_MIN  = float(os.getenv("OPEN_SPACE_ROOM_MIN", "3.5"))
 # being immaterial. The magnitudes here are comparable, but there one window
 # sat flat and its ulcer went backwards — a mixed bag — while this is six of
 # six, and the mechanism is a dimension nothing else in the config touches.
+# ⚖️ RE-TESTED UNDER HONEST FILLS 2026-09-06 (8 bps) BY REMOVING IT, against
+# base 44.7 / 23.5 / 19.9 profit/DD on 2026-08-26 / 2024-07-31 / 2023-07-31:
+#   without this trim  45.7  /  23.0  /  20.3
+# Better in two windows and worse in one, so it STAYS — but note the shape of
+# the two wins: removing the trim raised profit AND lowered drawdown in both,
+# which is not what adding exposure normally looks like. Only 2024 behaves the
+# ordinary way (profit +4.16R, drawdown -7.87 -> -8.20). Worth re-running when
+# a fourth window exists; two of three is not the bar this file uses.
+# For contrast, the same test on the other live size rules: removing
+# OVERLAP_CALM gives 42.2/17.4 and removing CHOP 44.2/19.5 (both clearly worse,
+# they earn their place), removing PARABOLIC gives 44.5/18.9 (worse).
 OPEN_SPACE_SIZE_MULT = float(os.getenv("OPEN_SPACE_SIZE_MULT", "0.75"))
 
 # --- Parabolic arc rides smaller (2026-08-28) --------------------------------
