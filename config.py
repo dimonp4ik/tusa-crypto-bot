@@ -2590,6 +2590,13 @@ OVERLAP_VOL_MAX        = float(os.getenv("OVERLAP_VOL_MAX", "2.5"))
 # rail whose job is the crash that is NOT in this data — the same argument
 # MAX_SAME_DIRECTION_POSITIONS makes about itself — so raising it because a
 # calm regime likes it would be tuning the insurance to the weather.
+# ✅ STILL PAYS UNDER HONEST FILLS (2026-09-06). Both live boosts were re-tested
+# at --adverse-entry-bps 8 by REMOVING them, against base 44.7 (2026-08-26) and
+# 19.9 (2023-07-31) profit/DD:
+#   without this boost      42.2  and  17.4      -> both worse, it earns its place
+#   without CHOP_SIZE_MULT  44.2  and  19.5      -> both worse, marginally
+# Worth stating because the same test demoted the stocks size pair the same day:
+# a rule measured at zero fill cost is not automatically safe, and these two are.
 OVERLAP_CALM_SIZE_MULT = float(os.getenv("OVERLAP_CALM_SIZE_MULT", "1.75"))
 
 # --- Active chop rides bigger (2026-08-27) -----------------------------------
