@@ -155,6 +155,14 @@ _BT_KILL_LOOKAHEAD = os.getenv("BT_KILL_LOOKAHEAD", "0") == "1"
 # fantasy-fill numbers. That justification is void. The replacement is not
 # "rank by score" though: on honest data neither key clears significance.
 _BT_SCAN_ORDER = os.getenv("BT_SCAN_ORDER", "alpha").lower()
+from dataclasses import replace as _dc_replace
+# "N:mult" — from the (N+1)th concurrent same-direction position on, take the
+# trade at `mult` size instead of refusing it. Off by default.
+_BT_CONC_TRIM = os.getenv("BT_CONCURRENCY_TRIM", "").strip()
+_BT_CONC_MIN, _BT_CONC_MULT = (
+    (int(_BT_CONC_TRIM.split(":")[0]), float(_BT_CONC_TRIM.split(":")[1]))
+    if _BT_CONC_TRIM else (0, 1.0)
+)
 
 
 def _scan_order_key(t):
@@ -2036,6 +2044,33 @@ def apply_live_gates(trades: list[TradeRecord]) -> list[TradeRecord]:
             if len(live) >= MAX_SAME_DIRECTION_POSITIONS:
                 continue
             live.append(t)
+            # ❌ MEASURED 2026-09-06 AND NOT TAKEN, at 1:0.75 (against base
+            # 1121/+435.84/-7.76/56.2, 869/+226.17/-6.32/35.8,
+            # 695/+189.70/-7.29/26.0):
+            #     2026  +365.94R  DD -6.43  pd 56.9
+            #     2024  +187.15R  DD -5.05  pd 37.0
+            #     2023  +160.73R  DD -6.33  pd 25.4   <- worse than base
+            # Better in the two calm windows, worse in the hostile one, which is
+            # the window that decides. Note also how much smaller the real gain
+            # is than the arithmetic on an export predicted (58.3 -> 63.8): the
+            # offline equity curve is ordered by exit_time and the run is not,
+            # and drawdown is very sensitive to that. Offline size arithmetic is
+            # a direction finder, not a measurement.
+            # Graded alternative to the hard cap: keep the trade but take it
+            # smaller once N same-direction positions are already open. The cap
+            # removes the trade (measured: -25% profit for -14% drawdown, see
+            # MAX_SAME_DIRECTION_POSITIONS in config.py); this keeps the entry
+            # and only lightens the correlated exposure. BT_CONCURRENCY_TRIM is
+            # "N:mult", e.g. "1:0.75" = from the second concurrent position on,
+            # size x0.75. Empty (default) leaves the run untouched.
+            if _BT_CONC_TRIM:
+                _n_open = len(live) - 1          # excludes the trade just added
+                if _n_open >= _BT_CONC_MIN:
+                    t = _dc_replace(t, gross_r=t.gross_r * _BT_CONC_MULT,
+                                    net_r=t.net_r * _BT_CONC_MULT,
+                                    cost_r=t.cost_r * _BT_CONC_MULT,
+                                    size_mult=t.size_mult * _BT_CONC_MULT)
+                    live[-1] = t
             open_by_dir[t.direction] = live
         last_sig[key] = ts
         per_bar[bar] = per_bar.get(bar, 0) + 1
