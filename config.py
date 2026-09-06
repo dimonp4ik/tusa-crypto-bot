@@ -974,6 +974,16 @@ SETUP_QUALITY_MIN       = float(os.getenv("SETUP_QUALITY_MIN", "0.582"))
 # Residual: entry_range_atr falls back to 0.0 when ATR is missing, which scores
 # ~+0.24 higher and therefore fails towards NO trim. Wrong-but-safe direction;
 # left alone deliberately rather than turned into a silent 0-quality trade.
+# ✅ RE-TESTED UNDER HONEST FILLS 2026-09-06. Every table above was measured at
+# --adverse-entry-bps 0; the honest base for this desk is 8 bps (it waits for
+# the zone, so the penalty is small — the stocks desk enters at market and pays
+# 34). At 8 bps, base against 0.75:
+#   2026-08-26  1093 trades  +377.70R  DD -8.45  44.7  ->  +369.26R  -8.14  45.4
+#   2023-07-31   695 trades  +168.36R  DD -8.44  19.9  ->  +162.11R  -8.12  20.0
+# Better in both, by the same slim margin as at 0 bps (56.2->56.4, 26.0->26.2).
+# The trim SURVIVES the fill cost, which the stocks size pair did not. Note what
+# the fill cost alone does to the book: profit 435.84 -> 377.70 and win rate
+# 74.0% -> 71.6% in the calm window. That is the honest level to quote.
 SETUP_QUALITY_TRIM_MULT = float(os.getenv("SETUP_QUALITY_TRIM_MULT", "1.0"))
 
 # --- Early breakeven arming (2026-09-05) --------------------------------------
