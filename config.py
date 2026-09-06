@@ -2016,6 +2016,32 @@ STOP_EXCHANGE_BACKSTOP_R = float(os.getenv("STOP_EXCHANGE_BACKSTOP_R", "1.5"))
 # "fewer trades, smaller drawdown" should be answered with the trim, not here.
 MAX_SAME_DIRECTION_POSITIONS = int(os.getenv("MAX_SAME_DIRECTION_POSITIONS", "3"))
 
+# ---------------------------------------------------------------------------
+# 🕓 HOUR OF DAY — measured 2026-09-06. Real, consistent, and too small to act on.
+# 16:00-21:59 UTC earns less in every window (unit R, i.e. net_r / size_mult):
+#     2026  n=221  +0.232 (66% win)   against  n=900  +0.372 (71%)
+#     2024  n=293  +0.129 (65%)       against  n=1681 +0.284 (69%)
+#     2023  n=232  +0.065 (56%)       against  n=1043 +0.221 (63%)
+# The block cuts ACROSS the session labels (NEW_YORK ends at 17, DEAD_ZONE
+# starts at 19 — see src/indicators.py), which is why no session multiplier
+# catches it, and the size rules only half-price it already (mean size_mult
+# 0.858 inside against 0.959 outside) while the gap survives on unit R.
+# Trimming the block is the same flat exchange as everything else here: -12%
+# profit for -15% drawdown, profit/DD 58.3 -> 59.8 across the whole ladder.
+# The sharp slice — weakest quality fifth INSIDE those hours — really is dead
+# money (-0.044 / -0.181 / +0.011 unit R, 48/49/52% win rate, all three
+# windows), but it is 33 trades of 1121 worth +1.65R in total: removing it
+# moves the account by nothing. Weekday: nothing in any window.
+# 🔑 The lesson worth keeping: size a candidate subset in R, not in per-cent.
+#
+# 🔴 KILL_SWITCH_SL_STREAK=4 measured the same day and NOT taken: 2026 and 2023
+# reproduce the baseline to the digit (no day in either window ever closes four
+# stops in a row), and 2024 loses three trades and 4.26R for it
+# (866/+221.91/-6.32/35.1 against 869/+226.17/-6.32/35.8). At 5 the switch is
+# effectively inert in the model; it earns its keep only as live protection
+# against a day the model has never seen.
+# ---------------------------------------------------------------------------
+
 # --- Graded crowding trim: REJECTED, premise was wrong -----------------------
 # Idea: the cap above is a cliff — positions 1-8 ride full size, the ninth is
 # refused — while the reason for it (correlated alts resolve together) applies
