@@ -66,7 +66,7 @@ from src.news_agent import (
 from config import EVENT_WARN_HOURS
 from config import TREND4H_ENABLED, TREND4H_SYMBOLS, TREND4H_STATE_FILE, TREND4H_FETCH_15M
 from config import PULLBACK_ENABLED, PULLBACK_SYMBOLS, PULLBACK_RULES, PULLBACK_STATE_FILE, PULLBACK_FETCH_15M
-from config import PULLBACK_LIVE_ENABLED
+from config import PULLBACK_LIVE_ENABLED, SMC_SIGNALS_ENABLED
 from src.r_model import blended_r
 from src.db import (
     init_db, get_open_signals, update_signal_status, get_stats,
@@ -3975,7 +3975,8 @@ def _check_open_signals():
                     set_sl_xperp_only(sig["id"], 0 if _deep_ok else 1)
                 log.info(f"  Signal #{sig['id']} {sig['symbol']} → {new_status}")
                 try:
-                    send_signal_update(sig, new_status, exit_px)
+                    if SMC_SIGNALS_ENABLED:     # old book is tracked silently now
+                        send_signal_update(sig, new_status, exit_px)
                 except Exception as _e:
                     log.warning(f"  Update notification failed #{sig['id']}: {_e}")
                 # Autotrade: mirror the transition on the exchange (close /
@@ -4363,7 +4364,7 @@ def _check_zone_watch():
     the open book has moved. A setup that was inside the direction cap when
     Claude approved it can be outside it by the time price finally comes back.
     """
-    if not ZONE_WATCH_ENABLED:
+    if not ZONE_WATCH_ENABLED or not SMC_SIGNALS_ENABLED:
         return
     try:
         rows = watch_active()
@@ -4527,6 +4528,11 @@ def run_scan():
     _ph_t0 = time.time()
     _ph_smc = _ph_light = _ph_fetch = 0.0
     now_utc = datetime.now(timezone.utc)
+
+    # Old SMC path is off (config SMC_SIGNALS_ENABLED): no scan, no Claude calls, nothing
+    # posted to the group. Signals come from the pullback bank now.
+    if not SMC_SIGNALS_ENABLED:
+        return
 
     # TP/SL monitoring moved to dedicated 1-min job (_monitor_open_signals)
 
@@ -5152,6 +5158,8 @@ def run_evening_prayer():
 def run_weekly_digest():
     """Collect 7-day trade stats, generate Groq commentary, send to Telegram."""
     log.info("=== Weekly digest started ===")
+    if not SMC_SIGNALS_ENABLED:                 # its stats are the old SMC book
+        return
     try:
         stats = get_weekly_stats()
         commentary = generate_weekly_commentary(stats)
@@ -5404,7 +5412,7 @@ def start_bot():
         if os.path.exists(_flag):
             if time.time() - os.path.getmtime(_flag) < 60:
                 skip = True
-        if not skip:
+        if not skip and SMC_SIGNALS_ENABLED:    # announces the old SMC scanner
             open(_flag, "w").close()
             # Hours are derived from config, not hardcoded — they were stale
             # ("Пн-Пт, 10:00–02:00") for a while after the switch to 24/7.

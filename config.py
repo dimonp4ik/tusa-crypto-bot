@@ -3219,3 +3219,13 @@ PULLBACK_LIVE_SLIP_MIN_N = int(os.getenv("PULLBACK_LIVE_SLIP_MIN_N", "8"))
 # autotrader's -1% day / -3% peak latch almost immediately.
 PULLBACK_LIVE_MAX_DAILY_LOSS = float(os.getenv("PULLBACK_LIVE_MAX_DAILY_LOSS", "0.03"))
 PULLBACK_LIVE_MAX_DRAWDOWN = float(os.getenv("PULLBACK_LIVE_MAX_DRAWDOWN", "0.15"))
+# The bank posts its signals and their results to the group (TELEGRAM_CHAT_ID): one
+# message per signal when price touches the level, one when the signal's take, stop or
+# 48h exit is reached. Owner's choice, 11.09.2026.
+PULLBACK_GROUP_POSTS = os.getenv("PULLBACK_GROUP_POSTS", "1") == "1"
+
+# --- Old SMC signal path ---
+# OFF since 11.09.2026 (owner: "по старой логике не надо сообщений в группе"): no scan, no
+# Claude calls, no group signals, TP/SL updates or weekly stats of the old book. Tracking
+# of signals that are still open keeps running silently. News digest and prayers stay.
+SMC_SIGNALS_ENABLED = os.getenv("SMC_SIGNALS_ENABLED", "0") == "1"

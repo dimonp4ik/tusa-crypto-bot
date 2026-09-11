@@ -218,6 +218,60 @@ class SlippageGuardTest(unittest.TestCase):
         self.assertTrue(live.state["paused"])
 
 
+class GroupPostTest(unittest.TestCase):
+    def test_one_signal_post_and_one_result_for_many_traders(self):
+        posts = []
+        ex = FakeEx(); live, _ = make(ex, group=posts.append)
+        live.users = lambda: [{"user_id": i, "creds": {"k": i}, "margin": lambda bal: 50.0}
+                              for i in (7, 8)]
+        live.state["watch"].append(watch(level=100.0, atr=1.0, rule=0))   # tp 0.5, sl 3 ATR
+        live.tick(NOW + 5, {"ETHUSDT": 100.0})
+        self.assertEqual(len(posts), 1)
+        self.assertIn("ЛОНГ — ETHUSDC", posts[0])
+        self.assertIn("Тейк: 100.5", posts[0]); self.assertIn("Стоп: 97", posts[0])
+        live.check_group(NOW + 60, {"ETHUSDT": 100.2})
+        self.assertEqual(len(posts), 1)                          # between the levels: quiet
+        live.check_group(NOW + 70, {"ETHUSDT": 100.6})
+        self.assertEqual(len(posts), 2)
+        self.assertIn("✅", posts[1]); self.assertIn("тейк", posts[1])
+        live.check_group(NOW + 80, {"ETHUSDT": 90.0})
+        self.assertEqual(len(posts), 2)                          # closed once only
+
+    def test_short_stop_and_time_exit(self):
+        posts = []
+        ex = FakeEx(); live, _ = make(ex, group=posts.append)
+        k = next(i for i, r in enumerate(live.rules) if r.get("side") == "SHORT")
+        live.state["watch"].append(watch(side="SHORT", level=100.0, rule=k))
+        live.tick(NOW + 5, {"ETHUSDT": 100.0})
+        self.assertIn("ШОРТ", posts[0])
+        live.check_group(NOW + 60, {"ETHUSDT": 104.0})
+        self.assertIn("🔴", posts[-1]); self.assertIn("стоп", posts[-1])
+        live.state["gsig"].append(dict(sym="ETHUSDT", side="LONG", entry=100.0, tp=101.0,
+                                       sl=97.0, open_ts=NOW, deadline=NOW + 10))
+        live.check_group(NOW + 11, {"ETHUSDT": 100.3})
+        self.assertIn("48 часов", posts[-1]); self.assertIn("+0.30%", posts[-1])
+
+    def test_no_group_no_posts_and_paused_posts_nothing(self):
+        ex = FakeEx(); live, _ = make(ex)
+        live.state["watch"].append(watch())
+        live.tick(NOW + 5, {"ETHUSDT": 99.0})
+        self.assertEqual(live.state["gsig"], [])
+        posts = []
+        ex = FakeEx(); live, _ = make(ex, group=posts.append)
+        live.state["paused"] = True
+        live.state["watch"].append(watch())
+        live.tick(NOW + 5, {"ETHUSDT": 99.0})
+        self.assertEqual(posts, [])
+
+    def test_failed_group_post_does_not_block_entries(self):
+        def boom(text):
+            raise RuntimeError("telegram down")
+        ex = FakeEx(); live, _ = make(ex, group=boom)
+        live.state["watch"].append(watch())
+        live.tick(NOW + 5, {"ETHUSDT": 99.0})
+        self.assertEqual([c[0] for c in ex.calls], ["market", "oco"])
+
+
 class ScanTest(unittest.TestCase):
     def test_signal_becomes_watch_once(self):
         t = NOW - PB.BAR * (4 * (PB.MIN_HOURS + 60)) + np.arange(4 * (PB.MIN_HOURS + 60)) * PB.BAR

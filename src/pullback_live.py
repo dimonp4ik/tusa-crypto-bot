@@ -47,6 +47,15 @@ KEEP_15M = 6000
 FILL_READ_TRIES = 5
 
 
+def _disp(sym):
+    """Display name: the users trade the USDC-margined OKX EU market."""
+    return sym[:-4] + "USDC" if sym.endswith("USDT") else sym
+
+
+def _fmt(px):
+    return f"{px:.6g}" if px < 1000 else f"{px:.2f}"
+
+
 # ---------------------------------------------------------------- candles
 def _as_arrays(d):
     t = np.asarray(d["time"], dtype=np.int64)
@@ -88,8 +97,9 @@ class Live:
     def __init__(self, *, symbols, rules_name, ex, inst_id_of, candles, feed_prices, users,
                  dm, load_state, save_state, max_spread, max_slip, slip_min_n, leverage,
                  max_daily_loss, max_drawdown, peak_floor=0.0, sleep=time.sleep, btc_sma=0,
-                 stop_ref=0.0):
+                 stop_ref=0.0, group=None):
         self.symbols = list(symbols)
+        self.group = group                          # text -> posts to the signals group
         self.rules = PB.RULE_SETS[rules_name]
         self.ex, self.inst_id_of, self.candles = ex, inst_id_of, candles
         self.feed_prices, self.users, self.dm = feed_prices, users, dm
@@ -102,7 +112,7 @@ class Live:
         self.stop_ref = stop_ref
         st = load_state() or {}
         for k, v in (("regime", {}), ("watch", []), ("pos", []), ("slip", {}), ("slip_all", []), ("hist", []),
-                     ("excluded", {}), ("guard", {}), ("scan", {}), ("paused", False)):
+                     ("excluded", {}), ("guard", {}), ("scan", {}), ("paused", False), ("gsig", [])):
             st.setdefault(k, v)
         self.state = st
 
@@ -195,6 +205,7 @@ class Live:
                 if self.state["paused"]:
                     log.warning("pullback live: paused by slippage guard, %s skipped", w["sym"])
                     continue
+                self._post_signal(w, p, now)
                 for u in self.users():
                     try:
                         self._enter(u, w, now)
@@ -332,6 +343,58 @@ class Live:
                            f"Открытые позиции сопровождаются.")
         self.save()
 
+    # ------------------------------------------------------------ group channel
+    # One post per signal, independent of how many traders entered or of their fills:
+    # levels are measured from the touch price, the result is read from the feed price.
+    def _post(self, text):
+        if self.group is None:
+            return
+        try:
+            self.group(text)
+        except Exception as e:
+            log.warning("pullback live: group post failed: %s", e)
+
+    def _post_signal(self, w, px, now):
+        if self.group is None:
+            return
+        r = self.rules[w["rule"]]
+        lg = w["side"] == "LONG"
+        tp_frac = r["tp"] * w["atr"] / w["level"]
+        sl_frac = r["sl"] * w["atr"] / w["level"]
+        tp = px * (1 + tp_frac) if lg else px * (1 - tp_frac)
+        sl = px * (1 - sl_frac) if lg else px * (1 + sl_frac)
+        self.state["gsig"].append(dict(sym=w["sym"], side=w["side"], entry=px, tp=tp, sl=sl,
+                                       open_ts=now, deadline=now + HOLD_SEC))
+        self._post(f"{'🟢 ЛОНГ' if lg else '🔴 ШОРТ'} — {_disp(w['sym'])}\n"
+                   f"━━━━━━━━━━━━━━━━━━━\n"
+                   f"💰 Вход: {_fmt(px)}\n"
+                   f"🎯 Тейк: {_fmt(tp)}  (+{100 * tp_frac:.2f}%)\n"
+                   f"❌ Стоп: {_fmt(sl)}  (-{100 * sl_frac:.2f}%)\n"
+                   f"⏱ Закрытие не позже чем через 48ч\n"
+                   f"🤖 Банк откатов")
+
+    def check_group(self, now, prices):
+        for g in list(self.state["gsig"]):
+            p = prices.get(g["sym"])
+            lg = g["side"] == "LONG"
+            if p is not None and ((p >= g["tp"]) if lg else (p <= g["tp"])):
+                how, px = "тейк", g["tp"]
+            elif p is not None and ((p <= g["sl"]) if lg else (p >= g["sl"])):
+                how, px = "стоп", g["sl"]
+            elif now >= g["deadline"]:
+                how, px = "48 часов", p
+            else:
+                continue
+            self.state["gsig"].remove(g)
+            self.save()
+            if px is None:
+                self._post(f"ℹ️ {_disp(g['sym'])}: сигнал закрыт по времени (48ч)")
+                continue
+            ret = (px / g["entry"] - 1) if lg else (1 - px / g["entry"])
+            icon = "✅" if ret > 0 else "🔴"
+            self._post(f"{icon} {_disp(g['sym'])} {'ЛОНГ' if lg else 'ШОРТ'} закрыт: {how}\n"
+                       f"Вход {_fmt(g['entry'])} → выход {_fmt(px)}  ({100 * ret:+.2f}%)")
+
     # ------------------------------------------------------------ open positions
     def manage(self, now):
         if not self.state["pos"]:
@@ -390,9 +453,11 @@ class Live:
             self.maybe_scan(now)
         except Exception as e:
             log.error("pullback live: scan crashed: %s", e)
-        if self.state["watch"]:
+        if self.state["watch"] or self.state["gsig"]:
             try:
-                self.tick(now, self.feed_prices())
+                prices = self.feed_prices()
+                self.tick(now, prices)
+                self.check_group(now, prices)
             except Exception as e:
                 log.warning("pullback live: price tick failed: %s", e)
         try:
@@ -463,6 +528,10 @@ def build_default():
     def save_state(st):
         set_bot_state(STATE_KEY, json.dumps(st))
 
+    group = None
+    if C.PULLBACK_GROUP_POSTS and C.TELEGRAM_CHAT_ID:
+        from src.telegram_notifier import send_status as group
+
     candles = CandleStore(
         lambda s: fetch_history(s, "15min", 900, C.PULLBACK_FETCH_15M, refresh_cache=True),
         _fetch_recent)
@@ -473,7 +542,7 @@ def build_default():
                 slip_min_n=C.PULLBACK_LIVE_SLIP_MIN_N, leverage=C.AUTOTRADE_LEVERAGE,
                 max_daily_loss=C.PULLBACK_LIVE_MAX_DAILY_LOSS,
                 max_drawdown=C.PULLBACK_LIVE_MAX_DRAWDOWN, btc_sma=C.PULLBACK_BTC_SMA,
-                stop_ref=C.PULLBACK_STOP_REF)
+                stop_ref=C.PULLBACK_STOP_REF, group=group)
 
 
 def start_default():
