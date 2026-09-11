@@ -155,6 +155,11 @@ _BT_KILL_LOOKAHEAD = os.getenv("BT_KILL_LOOKAHEAD", "0") == "1"
 # fantasy-fill numbers. That justification is void. The replacement is not
 # "rank by score" though: on honest data neither key clears significance.
 _BT_SCAN_ORDER = os.getenv("BT_SCAN_ORDER", "alpha").lower()
+_BT_ENTRY_FILTER_SRC = os.getenv("BT_ENTRY_FILTER", "").strip()
+_BT_ENTRY_FILTER = eval("lambda t: " + _BT_ENTRY_FILTER_SRC) if _BT_ENTRY_FILTER_SRC else None
+_FORBIDDEN = ("outcome", "net_r", "gross_r", "mae_r", "mfe_", "exit_", "post_sl")
+if _BT_ENTRY_FILTER_SRC and any(w in _BT_ENTRY_FILTER_SRC for w in _FORBIDDEN):
+    raise SystemExit("BT_ENTRY_FILTER uses an outcome field - that reads the future")
 from dataclasses import replace as _dc_replace
 # "N:mult" — from the (N+1)th concurrent same-direction position on, take the
 # trade at `mult` size instead of refusing it. Off by default.
@@ -593,23 +598,10 @@ def cheap_prefilter_at(candles_15m: dict[str, list], end: int, window: int) -> b
     return False
 
 
-def aligned_slice_by_time(
-    candles: dict[str, list],
-    t_cur: int | None,
-    lookback: int,
-    fallback_end: int,
-) -> dict[str, list]:
-    if not candles or not candles.get("close"):
-        return {}
+def aligned_slice_by_time(candles, t_cur, lookback, fallback_end, interval_sec=3600):
+    from src.backtest_integrity import closed_snapshot
+    return closed_snapshot(candles, t_cur, lookback, fallback_end, interval_sec)
 
-    if t_cur is not None and candles.get("time"):
-        end = bisect_right(candles["time"], t_cur)
-    else:
-        end = fallback_end
-
-    end = max(1, min(end, len(candles["close"])))
-    start = max(0, end - lookback)
-    return candle_slice(candles, start, end)
 
 
 _TP1_CLOSE_FRAC = max(0.0, min(1.0, float(TP1_CLOSE_FRAC)))
@@ -1051,7 +1043,7 @@ def execution_fill_price(
     adverse_bps: float,
 ) -> tuple[float, int]:
     fill_bar = min(max(entry_bar, entry_bar + max(0, delay_bars)), len(candles_15m["close"]) - 1)
-    price = planned_entry if delay_bars <= 0 else float(candles_15m["close"][fill_bar])
+    price = float(candles_15m["open"][fill_bar])
     adverse = adverse_bps / 10_000.0
     if direction == "LONG":
         price *= 1.0 + adverse
@@ -1102,6 +1094,8 @@ class TradeRecord:
     trend_1h: str = ""
     trend_4h: str = ""
     entry_source: str = ""
+    entry_is_intrabar: bool = False
+    atr_at_signal: float = 0.0
     signals: str = ""
     score_tags: str = ""
     premium: int = 0
@@ -1254,8 +1248,13 @@ def simulate_trade_direct(
     # BT_ADVERSE_KEEP_LEVELS remains correct in itself: if an adverse fill is
     # ever modelled, the levels must NOT move with it, because live computes
     # them at scan time and stores them.
-    _lvl_src = (planned_entry
-                if os.getenv("BT_ADVERSE_KEEP_LEVELS", "0") == "1" else entry)
+    # A watched zone is filled on touch; ordinary signals execute at next open.
+    if setup.get('_intrabar_entry') and execution_delay_bars == 0:
+        entry = planned_entry * (1 + (1 if direction == 'LONG' else -1) * adverse_entry_bps / 10000)
+    from config import LEVELS_FROM_STRUCTURE
+    # Levels are set at publication; a later adverse execution must not move them.
+    publication_quote = planned_entry if setup.get('_intrabar_entry') else float(candles_15m['open'][entry_bar])
+    _lvl_src = planned_entry if LEVELS_FROM_STRUCTURE else publication_quote
     tp1, tp2, sl = calculate_tp_sl_local(
         _lvl_src,
         direction,
@@ -1342,237 +1341,19 @@ def simulate_trade_direct(
     # trade die after coming within a whisker of its target?
     _mfe_tp1 = 0.0
     _tp1_dist = abs(tp1 - entry)
-    for j in range(fill_bar, end):
-        h = highs[j]
-        l = lows[j]
-        # Time stop (research flag, default 0 = off). Closes at the bar CLOSE
-        # once the position has been open N hours. Note this is a real exit at
-        # the price then trading — NOT the same as deleting long trades from the
-        # book, which is what a naive "keep only trades under N hours" filter
-        # does and which silently assumes the eventual outcome was knowable at
-        # the cut.
-        if _BT_TIME_STOP_H > 0 and (j - fill_bar) * (KLINES_INTERVAL_SEC or 900) >= _BT_TIME_STOP_H * 3600:
-            outcome = "TIME"
-            stop_exit_price = closes[j]
-            exit_bar = j
-            closed = True
-            break
-        if not tp1_reached:
-            # Conditional stale exit (research flag, default off) — see above.
-            if _BT_STALE_BARS > 0 and (j - fill_bar) >= _BT_STALE_BARS and _risk_abs > 0:
-                _unreal = ((closes[j] - entry) if direction == "LONG"
-                           else (entry - closes[j])) / _risk_abs
-                if _unreal < -abs(_BT_STALE_MAX_R):
-                    outcome = "STALE"
-                    stop_exit_price = closes[j]
-                    exit_bar = j
-                    closed = True
-                    break
-            # Only the pre-TP1 phase counts: once TP1 prints, the autotrader
-            # amends the exchange stop to breakeven, so the 2R backstop is no
-            # longer the thing that can fire behind the engine's back.
-            if _risk_abs > 0:
-                _adv = (entry - l) if direction == "LONG" else (h - entry)
-                if _adv / _risk_abs > _mae_r:
-                    _mae_r = _adv / _risk_abs
-            if _tp1_dist > 0:
-                _fav = (h - entry) if direction == "LONG" else (entry - l)
-                if _fav / _tp1_dist > _mfe_tp1:
-                    _mfe_tp1 = _fav / _tp1_dist
-            # Early breakeven — see BE_ARM_PROGRESS in config.py. Armed once the
-            # trade has travelled far enough toward TP1; from then on the stop
-            # sits at entry, which is TIGHTER than the original, so it is
-            # checked BEFORE the normal stop.
-            if BE_ARM_PROGRESS > 0 and _mfe_tp1 >= BE_ARM_PROGRESS:
-                _be_hit = ((closes[j] <= entry) if _STOP_ON_CLOSE else (l <= entry))                     if direction == "LONG" else                     ((closes[j] >= entry) if _STOP_ON_CLOSE else (h >= entry))
-                if _be_hit:
-                    outcome = "BE"
-                    stop_exit_price = entry
-                    exit_bar = j
-                    closed = True
-                    break
-            if _BT_STRUCT_EXIT and _bos_lvl_num is not None:
-                _broke_back = (closes[j] < _bos_lvl_num) if direction == "LONG"                     else (closes[j] > _bos_lvl_num)
-                if _broke_back:
-                    outcome = "STRUCT"
-                    stop_exit_price = closes[j]
-                    exit_bar = j
-                    closed = True
-                    break
-            if _BT_AVG_DOWN_R > 0 and add_price is None and _risk_abs > 0:
-                _lvl = (entry - _risk_abs * _BT_AVG_DOWN_R) if direction == "LONG"                     else (entry + _risk_abs * _BT_AVG_DOWN_R)
-                if (l <= _lvl) if direction == "LONG" else (h >= _lvl):
-                    add_price = _lvl
-            _stop_hit = ((closes[j] <= sl) if _STOP_ON_CLOSE else (l <= sl)) if direction == "LONG" \
-                else ((closes[j] >= sl) if _STOP_ON_CLOSE else (h >= sl))
-            _tgt_hit = (h >= tp1) if direction == "LONG" else (l <= tp1)
-            if _stop_hit and _tgt_hit:
-                globals()["_BT_AMBIGUOUS"] = globals().get("_BT_AMBIGUOUS", 0) + 1
-            if _BT_TP_FIRST:
-                # optimistic tie-break: a bar that reaches a target counts as the
-                # target even if it also satisfies the stop
-                if direction == "LONG" and h >= tp1:
-                    if h >= tp2:
-                        outcome = "TP2"
-                        exit_bar = j
-                        closed = True
-                        break
-                    outcome = "TP1"
-                    tp1_reached = True
-                    exit_bar = j
-                    trail_mult_eff = _post_tp1_trail_mult_bt(direction, entry, tp1, tp2, h, l, closes[j],
-                                                            base_mult=trail_atr_mult)
-                    continue
-                if direction == "SHORT" and l <= tp1:
-                    if l <= tp2:
-                        outcome = "TP2"
-                        exit_bar = j
-                        closed = True
-                        break
-                    outcome = "TP1"
-                    tp1_reached = True
-                    exit_bar = j
-                    trail_mult_eff = _post_tp1_trail_mult_bt(direction, entry, tp1, tp2, h, l, closes[j],
-                                                            base_mult=trail_atr_mult)
-                    continue
-            if direction == "LONG":
-                if (closes[j] <= sl) if _STOP_ON_CLOSE else (l <= sl):
-                    outcome = "SL"
-                    if _STOP_ON_CLOSE:
-                        stop_exit_price = closes[j]
-                    exit_bar = j
-                    closed = True
-                    break
-                if h >= tp2:
-                    outcome = "TP2"
-                    exit_bar = j
-                    closed = True
-                    break
-                if h >= tp1:
-                    outcome = "TP1"
-                    tp1_reached = True
-                    exit_bar = j
-                    trail_mult_eff = _post_tp1_trail_mult_bt(direction, entry, tp1, tp2, h, l, closes[j],
-                                                            base_mult=trail_atr_mult)
-                    continue
-            else:
-                if (closes[j] >= sl) if _STOP_ON_CLOSE else (h >= sl):
-                    outcome = "SL"
-                    if _STOP_ON_CLOSE:
-                        stop_exit_price = closes[j]
-                    exit_bar = j
-                    closed = True
-                    break
-                if l <= tp2:
-                    outcome = "TP2"
-                    exit_bar = j
-                    closed = True
-                    break
-                if l <= tp1:
-                    outcome = "TP1"
-                    tp1_reached = True
-                    exit_bar = j
-                    trail_mult_eff = _post_tp1_trail_mult_bt(direction, entry, tp1, tp2, h, l, closes[j],
-                                                            base_mult=trail_atr_mult)
-                    continue
-        else:
-            if direction == "LONG":
-                if exit_policy == "trail":
-                    if _BT_TRAIL_STAGE_R > 0 and _risk_abs > 0:
-                        _gain = (best_price - entry) / _risk_abs
-                        if _gain >= _BT_TRAIL_STAGE_R:
-                            trail_mult_eff = max(trail_mult_eff, _BT_TRAIL_STAGE_MULT)
-                    # Under BT_TRAIL_LAG the trail is anchored to the peak of
-                    # PRIOR bars only. Anchoring to this bar's own high and then
-                    # testing this bar's low assumes the high printed before the
-                    # low, which 15m OHLC does not record — an optimistic
-                    # convention that pays out on every bar once the trail is
-                    # narrower than the average bar range.
-                    if not _BT_TRAIL_LAG:
-                        best_price = max(best_price, h)
-                    trailing_stop = max(entry, best_price - max(0.0, float(setup.get("atr", 0.0) or 0.0)) * trail_mult_eff)
-                    if _BT_TRAIL_LAG:
-                        best_price = max(best_price, h)
-                    if l <= trailing_stop:
-                        outcome = "TRAIL"
-                        trail_exit_price = trailing_stop
-                        exit_bar = j
-                        closed = True
-                        break
-                if l <= entry:
-                    outcome = "TP1"
-                    exit_bar = j
-                    closed = True
-                    break
-                if h >= tp2:
-                    outcome = "TP2"
-                    exit_bar = j
-                    closed = True
-                    break
-            else:
-                if exit_policy == "trail":
-                    if _BT_TRAIL_STAGE_R > 0 and _risk_abs > 0:
-                        _gain = (entry - best_price) / _risk_abs
-                        if _gain >= _BT_TRAIL_STAGE_R:
-                            trail_mult_eff = max(trail_mult_eff, _BT_TRAIL_STAGE_MULT)
-                    if not _BT_TRAIL_LAG:
-                        best_price = min(best_price, l)
-                    trailing_stop = min(entry, best_price + max(0.0, float(setup.get("atr", 0.0) or 0.0)) * trail_mult_eff)
-                    if _BT_TRAIL_LAG:
-                        best_price = min(best_price, l)
-                    if h >= trailing_stop:
-                        outcome = "TRAIL"
-                        trail_exit_price = trailing_stop
-                        exit_bar = j
-                        closed = True
-                        break
-                if h >= entry:
-                    outcome = "TP1"
-                    exit_bar = j
-                    closed = True
-                    break
-                if l <= tp2:
-                    outcome = "TP2"
-                    exit_bar = j
-                    closed = True
-                    break
-
-    if tp1_reached and outcome == "TP1" and not closed:
-        exit_bar = max(fill_bar, end - 1)
-
-    if outcome == "TRAIL":
-        gross_r = gross_r_for_trailing_exit(entry, tp1, trail_exit_price, sl, direction)
-    elif stop_exit_price is not None:
-        # Close-confirmed stop or time-stop: full position still open, so R is
-        # the real move to the exit price — NOT the -1.0R that a level-touch
-        # stop would have booked. Can be worse than -1R (gap through the level).
-        gross_r = _r_from_price(entry, stop_exit_price, sl, direction)
-    else:
-        gross_r = gross_r_for_outcome(outcome, entry, tp1, tp2, sl)
+    from src.backtest_integrity import simulate_exit
+    from config import STOP_EXCHANGE_BACKSTOP_R
+    result = simulate_exit(candles_15m, range(fill_bar, end), direction=direction,
+        entry=entry, sl=sl, tp1=tp1, tp2=tp2, atr=float(setup.get('atr') or 0),
+        tp1_fraction=_TP1_CLOSE_FRAC, trail=exit_policy == 'trail',
+        trail_mult=trail_atr_mult, stop_on_close=_STOP_ON_CLOSE,
+        backstop_r=STOP_EXCHANGE_BACKSTOP_R,
+        choose_trail=lambda h,l,c: _post_tp1_trail_mult_bt(direction, entry, tp1, tp2, h,l,c, base_mult=trail_atr_mult),
+        intrabar_entry=bool(setup.get('_intrabar_entry')))
+    outcome, exit_bar, gross_r = result.outcome, result.bar, result.gross_r
+    _mae_r, _mfe_tp1 = result.mae_r, result.mfe_tp1
+    _post_sl_tp1, _post_sl_max_r = -1, 0.0
     cost_r = estimate_cost_r(entry, sl, fee_rate, slippage_rate)
-    if add_price is not None and _risk_abs > 0:
-        # Both units leave at the same price; the second simply entered closer
-        # to it. Reported per unit of COMBINED risk so the comparison against a
-        # single unit is like-for-like rather than "we bet more".
-        _edge = ((entry - add_price) if direction == "LONG" else (add_price - entry)) / _risk_abs
-        _total_risk = 1.0 + max(0.0, 1.0 - _edge)
-        gross_r = (gross_r + (gross_r + _edge)) / _total_risk
-        cost_r  = (cost_r * 2.0) / _total_risk
-    # Post-stop walk-forward (research only; changes no outcome). Scans the same
-    # `window` the trade itself was allowed, starting at the stop bar.
-    _post_sl_tp1 = -1
-    _post_sl_max_r = 0.0
-    if outcome == "SL" and _risk_abs > 0:
-        _post_sl_tp1 = 0
-        for _j in range(exit_bar, min(exit_bar + 1 + window, len(highs))):
-            _adv = (sl - lows[_j]) if direction == "LONG" else (highs[_j] - sl)
-            if _adv > _post_sl_max_r * _risk_abs:
-                _post_sl_max_r = _adv / _risk_abs
-            if _j > exit_bar and ((highs[_j] >= tp1) if direction == "LONG"
-                                  else (lows[_j] <= tp1)):
-                _post_sl_tp1 = 1
-                break
-
     net_r = gross_r - cost_r
     # Live position-size rules scale BOTH the win and the loss, so they belong
     # in the R the summary reports. Until 2026-08-24 size_mult was recorded on
@@ -1584,7 +1365,7 @@ def simulate_trade_direct(
         _ext = float(setup.get("bos_extension_atr") or 0.0)
     except (TypeError, ValueError):
         _ext = 0.0
-    _b = max(0, min(fill_bar, len(highs) - 1))
+    _b = max(0, min(fill_bar - 1, len(highs) - 1))
     _rng = (highs[_b] - lows[_b]) / _atr if _b < len(highs) else 0.0
     _run = 0
     for _k in range(_b - 1, max(-1, _b - 13), -1):
@@ -1619,8 +1400,8 @@ def simulate_trade_direct(
         symbol=symbol,
         entry_bar=fill_bar,
         exit_bar=exit_bar,
-        entry_time=times[fill_bar - 1] if 0 <= fill_bar - 1 < len(times) else None,
-        exit_time=times[exit_bar] if 0 <= exit_bar < len(times) else None,
+        entry_time=times[fill_bar] if 0 <= fill_bar < len(times) else None,
+        exit_time=times[exit_bar] + KLINES_INTERVAL_SEC if 0 <= exit_bar < len(times) else None,
         direction=direction,
         outcome=outcome,
         entry=entry,
@@ -1654,6 +1435,8 @@ def simulate_trade_direct(
         trend_1h=str(setup.get("trend_1h", "") or ""),
         trend_4h=str(setup.get("trend_4h", "") or ""),
         entry_source=str(setup.get("entry_source", "") or ""),
+        entry_is_intrabar=bool(setup.get("_intrabar_entry")),
+        atr_at_signal=float(setup.get("atr") or 0),
         signals=" | ".join(setup.get("signals", [])),
         score_tags=" | ".join(setup.get("score_tags", [])),
         premium=int(bool(setup.get("premium"))),
@@ -1777,10 +1560,10 @@ def backtest_symbol(
             continue
 
         snap_15 = candle_slice(c15, max(0, i - window_15m), i)
-        t_cur = c15["time"][i - 1] if c15.get("time") and i > 0 else None
+        t_cur = c15["time"][i - 1] + KLINES_INTERVAL_SEC if c15.get("time") and i > 0 else None
         snap_1h = aligned_slice_by_time(c1h, t_cur, window_1h, max(1, i // 4))
-        snap_4h = aligned_slice_by_time(c4h, t_cur, window_4h, max(1, i // 16))
-        snap_1d = aligned_slice_by_time(c1d, t_cur, 8, max(1, i // 96)) if c1d else None
+        snap_4h = aligned_slice_by_time(c4h, t_cur, window_4h, max(0, i // 16), interval_sec=14400)
+        snap_1d = aligned_slice_by_time(c1d, t_cur, 8, max(0, i // 96), interval_sec=86400) if c1d else None
 
         # Same definition the live bot uses (get_btc_change_1h): pct move of the
         # last CLOSED 1h BTC candle vs the one before it, as of this scan bar.
@@ -1873,6 +1656,7 @@ def backtest_symbol(
             if _hit is None:
                 continue
             _entry_bar = _hit
+            setup = dict(setup, _intrabar_entry=True)
 
         trade = simulate_trade_direct(
             symbol,
@@ -1887,6 +1671,12 @@ def backtest_symbol(
             exit_policy=exit_policy,
             trail_atr_mult=trail_atr_mult,
         )
+        # Research hook (BT_ENTRY_FILTER): drop a candidate BEFORE the live gates
+        # see it, so a filtered-out setup frees its slot exactly as it would live.
+        # The expression must use entry-time fields only (never outcome, net_r,
+        # gross_r, mae_r, mfe_*, exit_*), or the test reads the future.
+        if _BT_ENTRY_FILTER is not None and not _BT_ENTRY_FILTER(trade):
+            continue
         result.trade_records.append(trade)
         result.trades += 1
         result.gross_r += trade.gross_r
@@ -2025,13 +1815,15 @@ def apply_live_gates(trades: list[TradeRecord]) -> list[TradeRecord]:
         ts = raw / 1000 if raw > 1e11 else raw
         day = int(ts // 86400)
         if day != cur_day:
-            cur_day, streak, blocked_day, closed = day, 0, None, []
+            cur_day, streak, blocked_day = day, 0, None
         if KILL_SWITCH_SL_STREAK > 0:
             if blocked_day == day:
                 continue
             if not _BT_KILL_LOOKAHEAD and _sl_streak_at(ts, day) >= KILL_SWITCH_SL_STREAK:
                 blocked_day = day
                 continue
+        if any(o.symbol == t.symbol and (o.exit_time or 0) >= raw for o in kept):
+            continue
         key = (t.symbol, t.direction)
         if SIGNAL_COOLDOWN_HOURS > 0 and key in last_sig                 and (ts - last_sig[key]) / 3600 < SIGNAL_COOLDOWN_HOURS:
             continue
@@ -2120,7 +1912,7 @@ def apply_direction_cap(trades: list[TradeRecord], cap: int) -> list[TradeRecord
 def max_drawdown_r(trades: list[TradeRecord], *, net: bool = True) -> float:
     equity = peak = 0.0
     max_dd = 0.0
-    ordered = sorted(trades, key=lambda t: (t.entry_time or 0, t.symbol, t.entry_bar))
+    ordered = sorted(trades, key=lambda t: (t.exit_time or 0, t.symbol, t.exit_bar))
     for trade in ordered:
         equity += trade.net_r if net else trade.gross_r
         peak = max(peak, equity)
@@ -2151,7 +1943,7 @@ def write_trades_csv(path: str, trades: list[TradeRecord]) -> None:
         "adaptive_pack", "adaptive_reason", "risk_mult",
         "quality_score", "trend_score", "volatility_score",
         "entry_quality_score", "portfolio_risk_score",
-        "session", "trend_1h", "trend_4h", "entry_source",
+        "session", "trend_1h", "trend_4h", "entry_source", "entry_is_intrabar", "atr_at_signal",
         "signals", "score_tags", "premium", "sniper", "knn_score", "swing_trend",
         "pullback_frac", "run_len_before", "impulse6_atr", "retrace_bars_ratio", "pullback_vol_ratio", "post_sl_tp1", "post_sl_max_r", "mae_r", "mfe_tp1", "accel_ratio", "buy_pressure", "absorption", "obv_agree", "obv_strength", "size_mult", "signal_bar",
         "zone_age_bars", "bos_candles_ago", "extension_atr",
@@ -2295,7 +2087,7 @@ def main(argv: list[str] | None = None) -> int:
     wall_sec = time.perf_counter() - started
     total = merge_results(results)
     errors = [r for r in results if r.error]
-    wins = total.tp1 + total.tp2
+    wins = sum(t.net_r > 0 for t in total.trade_records)
     win_rate = wins / total.trades * 100 if total.trades else 0.0
     gross_rpt = total.gross_r / total.trades if total.trades else 0.0
     net_rpt = total.net_r / total.trades if total.trades else 0.0
@@ -2332,7 +2124,7 @@ def main(argv: list[str] | None = None) -> int:
             # counted EXPIRED and the research STALE exit as wins and reported
             # 96% on a run where the stale-exit flag was converting stops into
             # scratches.
-            g_wins = sum(1 for t in gated if t.outcome in ("TP1", "TP2", "TRAIL"))
+            g_wins = sum(t.net_r > 0 for t in gated)
             g_dd = max_drawdown_r(gated, net=True)
 
             print()

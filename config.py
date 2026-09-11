@@ -1302,13 +1302,14 @@ CLAUDE_MEMORY_LIMIT       = int(os.getenv("CLAUDE_MEMORY_LIMIT", "25"))      # r
 CLAUDE_MAX_RISK_SCORE     = int(os.getenv("CLAUDE_MAX_RISK_SCORE", "7"))     # counter-arg auto-reject if risk >= this (7 = "real concern" per scale)
 
 # Claude as a GATE, or as an observer. 1 = his verdict withholds setups. 0 =
-# SHADOW: he is still called, scored and logged, but the rules filter alone
-# decides what trades. Switchable at runtime from the admin panel; the DB state
-# wins over this default.
+# SHADOW: he is still called, scored and logged, but the rules filter decides
+# what paper signals are published. A signal admitted only because the gate is
+# off is marked ineligible for real-money autotrading. Switchable at runtime
+# from the admin panel; the DB state wins over this default.
 #
-# backtest.py never calls Claude, so with the gate OFF the live bot trades the
-# same population the model measures — the only way to score his verdict against
-# real fills rather than simulated ones.
+# backtest.py never calls Claude, so with the gate OFF the signal tracker sees
+# the same population the model measures. This scores the verdict on forward
+# X-Perp candle outcomes without risking money on rejected setups.
 #
 # ⚠️ Approval here runs 52%, so shadow mode nearly DOUBLES this book. On the
 # stocks desk approval is 80% and the step is a quarter. Treat these very
@@ -2242,7 +2243,8 @@ BACKTEST_TP_WINDOW      = int(os.getenv("BACKTEST_TP_WINDOW", "192"))
 # Every table recorded before this date was measured with costs 5x too high.
 # Overstated costs bias the model toward fewer trades and wider stops, so
 # cost-sensitive decisions need re-checking, not just re-baselining.
-BACKTEST_FEE_RATE       = float(os.getenv("BACKTEST_FEE_RATE", "0.0001"))
+# Public X-Perp base taker estimate; account-specific fees may differ.
+BACKTEST_FEE_RATE       = float(os.getenv("BACKTEST_FEE_RATE", "0.0005"))
 BACKTEST_SLIPPAGE_RATE  = float(os.getenv("BACKTEST_SLIPPAGE_RATE", "0.0001"))
 # BACKTEST_USE_BTC_FILTER removed 2026-08-03 — dead, and it implied the BTC
 # context was optional in backtest. It is not: since the 2026-07-31 fix
@@ -2252,7 +2254,10 @@ BACKTEST_SLIPPAGE_RATE  = float(os.getenv("BACKTEST_SLIPPAGE_RATE", "0.0001"))
 # went unnoticed for the project's whole life.
 
 # --- Autotrading (real OKX EU orders for allow-listed users) ---
-AUTOTRADE_ENABLED           = os.getenv("AUTOTRADE_ENABLED", "1") != "0"
+# OFF since 11.09.2026: the old SMC entry loses money on the honest model in every year
+# (reports/NIGHT_2026_09_11.md). Real orders now come from the pullback bank
+# (PULLBACK_LIVE_ENABLED below). Set AUTOTRADE_ENABLED=1 to bring the old path back.
+AUTOTRADE_ENABLED           = os.getenv("AUTOTRADE_ENABLED", "0") != "0"
 AUTOTRADE_LEVERAGE          = int(os.getenv("AUTOTRADE_LEVERAGE", "10"))
 AUTOTRADE_BALANCE_THRESHOLD = float(os.getenv("AUTOTRADE_BALANCE_THRESHOLD", "100"))
 # Per-symbol position-size multiplier. Format: "BTCUSDT:0.5,ETHUSDT:1.0".
@@ -3150,3 +3155,60 @@ REJECT_COOLDOWN_HOURS = float(os.getenv("REJECT_COOLDOWN_HOURS", "3"))
 # a circuit breaker for a catastrophic day that is not in this sample. That is
 # the whole reason it is not simply set to 0.
 KILL_SWITCH_SL_STREAK = int(os.getenv("KILL_SWITCH_SL_STREAK", "5"))
+
+# Risk limits introduced by the 2026-09-08 audit. Fractions of account equity.
+# Portfolio cap covers this service's tracked positions, not another Railway DB.
+AUTOTRADE_RISK_PER_TRADE = float(os.getenv("AUTOTRADE_RISK_PER_TRADE", "0.0025"))
+AUTOTRADE_MAX_OPEN_RISK = float(os.getenv("AUTOTRADE_MAX_OPEN_RISK", "0.0075"))
+AUTOTRADE_COST_RESERVE = float(os.getenv("AUTOTRADE_COST_RESERVE", "0.0014"))
+AUTOTRADE_MAX_DAILY_LOSS = float(os.getenv("AUTOTRADE_MAX_DAILY_LOSS", "0.01"))
+AUTOTRADE_MAX_DRAWDOWN = float(os.getenv("AUTOTRADE_MAX_DRAWDOWN", "0.03"))
+# Optional known account high-water mark. Set this on the host when the first
+# guarded deployment happens after an existing drawdown; otherwise the guard
+# can only learn peaks observed from that deployment onward.
+AUTOTRADE_EQUITY_PEAK_FLOOR = float(os.getenv("AUTOTRADE_EQUITY_PEAK_FLOOR", "0"))
+
+# --- 4h breakout trend strategy (research: reports/NIGHT_2026_09_11.md) -------
+# PAPER ONLY for now: when enabled, a job runs once per closed 4h bar, tracks
+# virtual positions with src/trend4h.py (the same code the backtest replays) and
+# messages the admin. It never places orders. Forward results are what decide
+# whether real money is ever attached to it.
+TREND4H_ENABLED = os.getenv("TREND4H_ENABLED", "1") == "1"
+TREND4H_SYMBOLS = [s.strip() for s in os.getenv(
+    "TREND4H_SYMBOLS",
+    "BTCUSDT,ETHUSDT,XRPUSDT,SOLUSDT,DOTUSDT,XLMUSDT,LINKUSDT,SUIUSDT,HYPEUSDT,"
+    "ZECUSDT,SEIUSDT,AAVEUSDT,TAOUSDT,NEARUSDT,BILLUSDT,LABUSDT,ADAUSDT,AVAXUSDT",
+).split(",") if s.strip()]
+TREND4H_STATE_FILE = os.getenv("TREND4H_STATE_FILE", "trend4h_paper_state.json")
+# 15m candles fetched per symbol per run: EMA50 on 4h needs a long warm-up so the
+# live value matches the backtest's; 6000 x 15m = 375 4h bars.
+TREND4H_FETCH_15M = int(os.getenv("TREND4H_FETCH_15M", "6000"))
+
+# --- High win-rate pullback bank (src/pullback_bank.py) — PAPER ONLY, no orders.
+# Long-only filters that act only while the 4h trend strategy holds a LONG; limit entry.
+# Research + honest out-of-sample numbers: reports/NIGHT_2026_09_11.md. Off by default.
+PULLBACK_ENABLED = os.getenv("PULLBACK_ENABLED", "0") == "1"
+PULLBACK_SYMBOLS = [s.strip() for s in os.getenv(
+    "PULLBACK_SYMBOLS", ",".join(TREND4H_SYMBOLS)).split(",") if s.strip()]
+# bank9 | strict3 | short2 | strict3+short2 | bank9+short2 (see pullback_bank.RULE_SETS)
+PULLBACK_RULES = os.getenv("PULLBACK_RULES", "strict3+short2")
+PULLBACK_STATE_FILE = os.getenv("PULLBACK_STATE_FILE", "pullback_paper_state.json")
+PULLBACK_FETCH_15M = int(os.getenv("PULLBACK_FETCH_15M", "6000"))
+
+# --- Pullback bank LIVE (src/pullback_live.py) — REAL orders, ON by default ---
+# Trades for every onboarded autotrade user with the user's own size setting (percent of
+# deposit or fixed $ margin, AUTOTRADE_LEVERAGE). No resting limit orders: a 1-second price
+# loop enters at market when the level is touched; stop and take are one exchange OCO with
+# market execution on trigger. Backtest of this execution: reports/NIGHT_2026_09_11.md.
+PULLBACK_LIVE_ENABLED = os.getenv("PULLBACK_LIVE_ENABLED", "1") == "1"
+# Skip an entry when the X-Perp book spread is wider than this.
+PULLBACK_LIVE_MAX_SPREAD = float(os.getenv("PULLBACK_LIVE_MAX_SPREAD", "0.0005"))
+# The edge survives ~0.02-0.03% slippage per side and dies near 0.10%. A coin whose
+# average measured entry slippage exceeds this is excluded for 7 days; if the average
+# over all coins does, new entries stop and the traders are told.
+PULLBACK_LIVE_MAX_SLIP = float(os.getenv("PULLBACK_LIVE_MAX_SLIP", "0.0003"))
+PULLBACK_LIVE_SLIP_MIN_N = int(os.getenv("PULLBACK_LIVE_SLIP_MIN_N", "8"))
+# Own loss limits: the bank's normal drawdown (~23R over 4 years) would trip the old
+# autotrader's -1% day / -3% peak latch almost immediately.
+PULLBACK_LIVE_MAX_DAILY_LOSS = float(os.getenv("PULLBACK_LIVE_MAX_DAILY_LOSS", "0.03"))
+PULLBACK_LIVE_MAX_DRAWDOWN = float(os.getenv("PULLBACK_LIVE_MAX_DRAWDOWN", "0.15"))

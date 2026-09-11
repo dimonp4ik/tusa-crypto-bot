@@ -64,6 +64,9 @@ from src.news_agent import (
     generate_weekly_commentary,
 )
 from config import EVENT_WARN_HOURS
+from config import TREND4H_ENABLED, TREND4H_SYMBOLS, TREND4H_STATE_FILE, TREND4H_FETCH_15M
+from config import PULLBACK_ENABLED, PULLBACK_SYMBOLS, PULLBACK_RULES, PULLBACK_STATE_FILE, PULLBACK_FETCH_15M
+from config import PULLBACK_LIVE_ENABLED
 from src.r_model import blended_r
 from src.db import (
     init_db, get_open_signals, update_signal_status, get_stats,
@@ -416,7 +419,7 @@ def _build_and_send_report(chat_id: int, message_id: int,
             A(f"  издержки: -{s.get('cost_r', 0)}R  "
               f"(комиссия+спред, посчитаны по {s.get('cost_n', 0)} сделкам)")
             A(f"  ЧИСТЫМИ: {s.get('net_r', 0)}R  "
-              f"({s.get('net_per_trade', 0)}R/сделка)  ← это и есть прибыль")
+              f"({s.get('net_per_trade', 0)}R/сделка)  оценка по сигналам, не PnL счёта OKX")
             _l, _sh = s.get("long") or {}, s.get("short") or {}
             A(f"  LONG  n={_l.get('total', 0)} WR={_l.get('win_rate', 0)}% R={_l.get('total_r', 0)}")
             A(f"  SHORT n={_sh.get('total', 0)} WR={_sh.get('win_rate', 0)}% R={_sh.get('total_r', 0)}")
@@ -523,7 +526,7 @@ def _build_and_send_report(chat_id: int, message_id: int,
         A("## КОНФИГ НА МОМЕНТ ОТЧЁТА")
         A(f"  MTF_MIN_SCORE={MTF_MIN_SCORE}  SHADOW_MIN_SCORE={SHADOW_MIN_SCORE}")
         A(f"  STOP_CLOSE_CONFIRM={STOP_CLOSE_CONFIRM}  BACKSTOP_R={STOP_EXCHANGE_BACKSTOP_R}")
-        A(f"  КЛОД: {'ФИЛЬТР (его вердикт решает)' if _claude_gate_enabled() else 'ТЕНЬ (торгуют правила, вердикт только пишется)'}")
+        A(f"  КЛОД: {'ФИЛЬТР (его вердикт решает)' if _claude_gate_enabled() else 'ТЕНЬ (сигналы правил; отклонённые без автосделок)'}")
         A(f"  MAX_SAME_DIRECTION_POSITIONS={MAX_SAME_DIRECTION_POSITIONS}  "
           f"TP1_R_MULT={TP1_R_MULT}")
 
@@ -1220,11 +1223,11 @@ def _handle_admin_callback(callback_id: str, chat_id: int,
         ]
         _off = [
             "🤖 Клод: *ТЕНЬ*",
-            "Торгуют только правила. Клод считает и пишет вердикт,",
-            "но ничего не задерживает.",
+            "Правила публикуют бумажные сигналы. Клод считает и пишет вердикт,",
+            "но отклонённые и LOW-сигналы не открывают реальные позиции.",
             "",
-            "⚠️ Здесь он одобряет только 52% — книга почти УДВОИТСЯ.",
-            "На акциях этот же режим добавляет лишь четверть сделок.",
+            "Здесь он одобряет только 52% — поток наблюдений почти удвоится,",
+            "а реальный автотрейдер останется на одобренной части.",
             "",
             "Судить не раньше чем через 2 недели.",
         ]
@@ -3821,8 +3824,23 @@ def _check_open_signals():
             else:
                 trail_atr_mult = max(0.0, float(TRAIL_ATR_MULT))
 
+            from src.live_accounting import trailing_observation, marked_r
+            if not df_all.get('close'):
+                continue
+            latest_quote = float(df_all['close'][-1])
+            if status == 'TP1_PARTIAL' and use_trail:
+                live_trail_stop, crossed = trailing_observation(df, direction=direction,
+                    entry=entry, atr=atr, multiple=trail_atr_mult, quote=latest_quote)
+                resting_tp2_hit = (max(df.get('high') or [latest_quote]) >= tp2
+                    if direction == 'LONG' else min(df.get('low') or [latest_quote]) <= tp2)
+                if resting_tp2_hit or crossed:
+                    new_status = 'TP2_HIT' if resting_tp2_hit else 'TP1_TRAIL'
+                    exit_px = tp2 if resting_tp2_hit else latest_quote
+                    realized_r = marked_r(direction=direction, entry=entry,
+                        exit_price=exit_px, sl=sl, tp1=tp1,
+                        tp1_fraction=tp1_close_frac, reached_tp1=True)
             _conf_flags = df.get("confirmed") or []
-            for i in range(len(df.get("close", []))):
+            for i in range(0 if status == "TP1_PARTIAL" and use_trail else len(df.get("close", []))):
                 high  = float(df["high"][i])
                 low   = float(df["low"][i])
                 close = float(df["close"][i])
@@ -3924,7 +3942,10 @@ def _check_open_signals():
 
             if new_status is None and age_hours > SIGNAL_EXPIRY_HOURS:
                 new_status = "TP1_EXPIRED" if status == "TP1_PARTIAL" else "EXPIRED"
-                realized_r = blended_r(tp1_close_frac, tp1_r, 0.0, 0.0) if status == "TP1_PARTIAL" else 0.0
+                exit_px = latest_quote
+                realized_r = marked_r(direction=direction, entry=entry, exit_price=exit_px,
+                    sl=sl, tp1=tp1, tp1_fraction=tp1_close_frac,
+                    reached_tp1=status == 'TP1_PARTIAL')
 
             # Optional second opinion before closing: the position trades on the
             # X-Perp, but the levels come from the deep feed and so does every
@@ -3940,6 +3961,10 @@ def _check_open_signals():
                     log.info(f"  #{sig['id']} {sig['symbol']} — стоп только на X-Perp, "
                              f"глубокий фид не подтверждает, держим")
                     new_status = None
+            if new_status == 'SL_HIT' and STOP_CLOSE_CONFIRM:
+                exit_px = latest_quote
+                realized_r = marked_r(direction=direction, entry=entry,
+                    exit_price=exit_px, sl=sl, tp1=tp1)
             if new_status:
                 update_signal_status(sig["id"], new_status, exit_px, realized_r=realized_r,
                                      runner_trail_atr_mult=runner_trail_atr_mult)
@@ -3970,133 +3995,42 @@ def _check_open_signals():
             log.warning(f"  Could not check signal #{sig['id']}: {e}")
 
 
+
 # ── Shadow-outcome tracker (rejected + sent setups) ───────────────────────────
 def _simulate_setup_outcome(direction: str, entry: float, tp1: float, tp2: float,
-                            sl: float, highs: list, lows: list,
-                            closes: list = None, require_fill: bool = True,
-                            wait_bars: int = 4, atr: float = 0.0) -> tuple:
-    """Replay a setup's bracket over forward candles (same order as the validated
-    backtest: SL → TP2 → TP1 each bar). Returns (outcome|None, reached_tp1,
-    reached_tp2). outcome is None while still live (no TP1/SL hit yet).
+                            sl: float, highs: list, lows: list, closes: list = None,
+                            require_fill: bool = True, wait_bars: int = 4,
+                            atr: float = 0.0, opens: list = None) -> tuple:
+    """Categorical research outcome using the same causal exit model as replay.
 
-    After TP1 the stop moves to breakeven (mirrors live TP1=50%→SL-to-BE); the
-    runner either reaches TP2 or exits flat at BE. We only need the categorical
-    result (SL / TP1 / TP2) for the learning signal, not the runner's exact R.
-
-    STOP_CLOSE_CONFIRM must mirror the live position monitor (_check_open_signals)
-    and backtest.py here too — this function is a THIRD, independent place the
-    stop rule is implemented (setup_log / "Точность ИИ" / the mirror experiment).
-    Without this, a setup that is BOTH sent (real position) and logged (setup_log
-    row) gets two different outcomes for the same trade: the live monitor exits
-    late on a closed candle while this function still exits early on a wick —
-    same trade, contradictory numbers in "Живые результаты" vs "Точность ИИ".
-    `closes` is only passed by the shadow tracker's own caller; other call sites
-    (if any) fall back to wick-touch.
+    Without recorded opens, prior closes are an approximation for gap fills.
+    These unsent outcomes remain simulated, never actual exchange profits.
     """
-    tp1_reached = False
-    risk = abs(entry - sl)
-    if risk <= 0:
+    from src.backtest_integrity import simulate_exit
+    from config import STOP_EXCHANGE_BACKSTOP_R
+    if not highs or not lows or not closes:
         return None, 0, 0
-    # 2026-08-25: the bracket used to start at `entry` on bar 0 whether or not
-    # price ever traded there. That is the same fantasy fill removed from
-    # backtest.py on 2026-08-23, and it inflated every shadow number in the
-    # project. Measured on the live A/B export: INSIDE arm A, setups actually
-    # sent resolved at 71.0% WR / +0.145R while unsent ones — same filter, only
-    # difference is that these were simulated — resolved at 83.6% / +0.931R.
-    # That 12.6pp artefact is bigger than _GLOBAL_FEEDBACK_MIN_GAP (8.0), so the
-    # "you are over-rejecting" line fed to Claude fires on the measurement
-    # method rather than on his judgement. Five of the seven stops on the night
-    # of 2026-08-24 cite exactly that line.
-    start = 0
+    fill = 0
     if require_fill:
-        # Not enough bars to have SEEN a fill yet — still live, do not resolve.
-        if min(len(highs), len(lows)) < int(wait_bars) + 1:
-            return None, 0, 0
-        start = -1
-        for i in range(min(int(wait_bars) + 1, len(highs), len(lows))):
-            touched = (lows[i] <= entry) if direction == "LONG" else (highs[i] >= entry)
-            if touched:
-                start = i
-                break
-        if start < 0:
-            return "NO_FILL", 0, 0
-        highs, lows = highs[start:], lows[start:]
-        if closes is not None:
-            closes = closes[start:]
-    # `closes` is indexed by the zip's position, so it must be at least as long
-    # as the shorter of highs/lows — otherwise an IndexError here is swallowed
-    # by the shadow tracker's per-symbol try and that symbol's setups silently
-    # stop resolving. Falling back to wick-touch is wrong but visible; a
-    # length mismatch means the caller handed us misaligned series.
-    use_close = (STOP_CLOSE_CONFIRM and closes is not None
-                 and len(closes) >= min(len(highs), len(lows)))
-    if STOP_CLOSE_CONFIRM and closes is not None and not use_close:
-        log.warning(f"  shadow: closes shorter than highs/lows "
-                    f"({len(closes)} < {min(len(highs), len(lows))}) — wick stop used")
-    # ATR for the post-TP1 trail, from the same candles. True range needs the
-    # prior close, so fall back to the plain high-low range when closes are
-    # absent; both land in the same magnitude and the trail multiplier is tiny.
-    _rng = []
-    for i in range(min(len(highs), len(lows))):
-        r = highs[i] - lows[i]
-        if closes is not None and i > 0 and i < len(closes):
-            r = max(r, abs(highs[i] - closes[i - 1]), abs(lows[i] - closes[i - 1]))
-        _rng.append(r)
-    # The live monitor and backtest both trail on the ATR the strategy measured
-    # at signal time. Estimating one from FORWARD candles instead put this
-    # tracker 13% out of step with the model on synthetic series — always in the
-    # same direction, TP2 in the model against TP1 here. Use the stored value
-    # whenever setup_log has it; the estimate is only a fallback for rows
-    # written before that column existed.
-    _atr = float(atr) if atr and atr > 0 else (
-        (sum(_rng[:14]) / len(_rng[:14])) if _rng else 0.0)
-    _tmult = max(0.0, float(TRAIL_ATR_MULT))
-    _peak = entry
-
-    for idx, (h, l) in enumerate(zip(highs, lows)):
-        if not tp1_reached:
-            if direction == "LONG":
-                _sl_hit = (closes[idx] <= sl) if use_close else (l <= sl)
-                if _sl_hit:   return "SL", 0, 0
-                if h >= tp2:  return "TP2", 1, 1
-                if h >= tp1:  tp1_reached = True
-                # The peak must run from the FILL, not from the TP1 bar. Starting
-                # it at entry when TP1 lands leaves the trail sitting near entry,
-                # so the runner survives pullbacks the real trail would have
-                # closed — 24 of 400 synthetic cases resolved TP2 here against
-                # TP1 in the model, all in that direction.
-                _peak = max(_peak, h)
-            else:
-                _sl_hit = (closes[idx] >= sl) if use_close else (h >= sl)
-                if _sl_hit:   return "SL", 0, 0
-                if l <= tp2:  return "TP2", 1, 1
-                if l <= tp1:  tp1_reached = True
-                _peak = min(_peak, l)
-        else:
-            # Post-TP1 the live runner is TRAILED, not carried to TP2 or
-            # breakeven. Modelling it the old way is why unsent setups resolved
-            # TP2 at 25% against 2% for the ones actually sent — a 12x gap that
-            # made every shadow-vs-live comparison in the report meaningless
-            # (the "Claude rejects better setups than he approves" line among
-            # them). The docstring's "TP1=50% -> SL-to-BE" describes a policy
-            # this bot stopped running when TP1_CLOSE_FRAC went to 0.
-            # Anchor the trail to PRIOR bars only. Updating the peak with THIS
-            # bar's high and then testing THIS bar's low assumes the high
-            # printed first, which OHLC does not record — the same bias
-            # backtest.py removes via BT_TRAIL_LAG, worth ~7% of headline
-            # profit there.
-            _trail = (max(entry, _peak - _atr * _tmult) if direction == "LONG"
-                      else min(entry, _peak + _atr * _tmult))
-            if direction == "LONG":
-                if h >= tp2:    return "TP2", 1, 1
-                if l <= _trail: return "TP1", 1, 0
-                _peak = max(_peak, h)
-            else:
-                if l <= tp2:    return "TP2", 1, 1
-                if h >= _trail: return "TP1", 1, 0
-                _peak = min(_peak, l)
-    # No terminal hit within the candles seen so far.
-    return (None, 1, 0) if tp1_reached else (None, 0, 0)
+        hit = next((i for i in range(min(len(highs), max(1, wait_bars)))
+                    if lows[i] <= entry <= highs[i]), None)
+        if hit is None:
+            return ('NO_FILL', 0, 0) if len(highs) >= wait_bars else (None, 0, 0)
+        fill = hit
+    data = dict(open=opens if opens is not None else [entry]+list(closes[:-1]),
+                high=highs, low=lows, close=closes)
+    result = simulate_exit(data, range(fill,len(highs)), direction=direction,
+        entry=entry, sl=sl, tp1=tp1, tp2=tp2, atr=atr,
+        tp1_fraction=TP1_CLOSE_FRAC, trail=TRAIL_RUNNER_ENABLED,
+        trail_mult=TRAIL_ATR_MULT, stop_on_close=STOP_CLOSE_CONFIRM,
+        backstop_r=STOP_EXCHANGE_BACKSTOP_R,
+        choose_trail=lambda h,l,c: _post_tp1_trail_mult(direction,entry,tp1,tp2,h,l,c),
+        intrabar_entry=require_fill)
+    reached = int(result.reached_tp1)
+    if result.outcome == 'EXPIRED':
+        return None, reached, 0
+    return ('TP1' if result.outcome == 'TRAIL' else result.outcome,
+            reached, int(result.outcome == 'TP2'))
 
 
 def _track_setup_outcomes():
@@ -4536,6 +4470,54 @@ def _attach_approach(setup: dict, df_15m: dict) -> None:
 
 def _base_of_symbol(symbol: str) -> str:
     return symbol[:-4] if symbol.endswith("USDT") else symbol
+
+
+def _trend4h_paper_job():
+    """Paper-trade the 4h breakout strategy and message the admin. No orders."""
+    try:
+        from backtest import fetch_history
+        from src import trend4h_paper
+
+        def _fetch_15m(sym):
+            return fetch_history(sym, "15min", 900, TREND4H_FETCH_15M, refresh_cache=True)
+
+        def _fetch_btc_daily():
+            d = fetch_history("BTCUSDT", "1d", 86400, 120, refresh_cache=True)
+            return d["time"], d["close"]
+
+        def _notify(text):
+            for admin in ADMIN_IDS:
+                try:
+                    _send_admin_text(admin, text, {})
+                except Exception as e:
+                    log.warning(f"trend4h paper notify failed: {e}")
+
+        trend4h_paper.run_once(TREND4H_SYMBOLS, _fetch_15m, _fetch_btc_daily,
+                               TREND4H_STATE_FILE, _notify)
+    except Exception as e:
+        log.warning(f"trend4h paper job failed: {e}")
+
+
+def _pullback_paper_job():
+    """Paper-trade the high win-rate pullback bank and message the admin. No orders."""
+    try:
+        from backtest import fetch_history
+        from src import pullback_paper
+
+        def _fetch_15m(sym):
+            return fetch_history(sym, "15min", 900, PULLBACK_FETCH_15M, refresh_cache=True)
+
+        def _notify(text):
+            for admin in ADMIN_IDS:
+                try:
+                    _send_admin_text(admin, text, {})
+                except Exception as e:
+                    log.warning(f"pullback paper notify failed: {e}")
+
+        pullback_paper.run_once(PULLBACK_SYMBOLS, _fetch_15m, PULLBACK_STATE_FILE, _notify,
+                                rules_name=PULLBACK_RULES)
+    except Exception as e:
+        log.warning(f"pullback paper job failed: {e}")
 
 
 def run_scan():
@@ -5022,10 +5004,12 @@ def run_scan():
                     if _gate:
                         log.info(f"  Skip {analysis['symbol']} — LOW confidence")
                         continue
-                    log.info(f"  [shadow] {analysis['symbol']} — LOW confidence, trading anyway")
+                    analysis["_shadow_only"] = True
+                    log.info(f"  [shadow] {analysis['symbol']} — LOW confidence, paper signal only")
 
                 if decision == "NO TRADE" and not _gate:
-                    log.info(f"  [shadow] {analysis['symbol']} — Claude said NO TRADE, trading anyway")
+                    analysis["_shadow_only"] = True
+                    log.info(f"  [shadow] {analysis['symbol']} — Claude said NO TRADE, paper signal only")
                     # send_signal refuses any NO TRADE outright, so without this the
                     # shadow toggle silently did nothing for exactly the setups it
                     # exists to let through: they came back as "send failed".
@@ -5535,6 +5519,21 @@ def start_bot():
         day_of_week="sun", hour=22, minute=0,
         timezone="Europe/Riga",
     )
+    # 4h breakout trend strategy — PAPER ONLY (no orders). Runs 2 minutes after
+    # each 4h close so the closing 15m candle has settled. See config TREND4H_*.
+    if TREND4H_ENABLED:
+        scheduler.add_job(
+            _trend4h_paper_job, "cron",
+            hour="0,4,8,12,16,20", minute=2,
+            timezone="UTC", max_instances=1, coalesce=True,
+        )
+    # High win-rate pullback bank — PAPER ONLY (no orders). Hourly, 1 minute after the
+    # hour so the closing 15m candle has settled. See config PULLBACK_*.
+    if PULLBACK_ENABLED:
+        scheduler.add_job(
+            _pullback_paper_job, "cron", minute=1,
+            timezone="UTC", max_instances=1, coalesce=True,
+        )
     scheduler.start()
     log.info("Scheduler: signal scan every 5 min (:01/:06/...), TP/SL monitor every 1 min")
 
@@ -5543,6 +5542,13 @@ def start_bot():
 
     # First scan immediately
     threading.Thread(target=run_scan, daemon=True).start()
+
+    # Pullback bank — LIVE real orders (src/pullback_live.py). Its own thread: hourly
+    # signals, a 1-second price loop for 15-minute entry windows, position management.
+    if PULLBACK_LIVE_ENABLED:
+        from src import pullback_live
+        threading.Thread(target=pullback_live.start_default, daemon=True).start()
+        log.info("Pullback bank LIVE started (real orders)")
 
     # Self-ping — only needed on hosts that idle-sleep (e.g. Render free tier).
     # Off by default: Railway runs the container 24/7, so it's pointless there.
@@ -5554,7 +5560,8 @@ def start_bot():
         log.info("Self-ping disabled (Railway does not idle-sleep)")
 
 
-start_bot()  # runs at module load — works with gunicorn
+if os.getenv("BOT_STARTUP_ENABLED", "1") != "0":
+    start_bot()  # gunicorn startup; disabled explicitly by offline verification
 
 def _warn_stop_rule_coupling() -> None:
     """Shout if STOP_CLOSE_CONFIRM is off, because it silently changes TWO things.
