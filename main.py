@@ -5545,10 +5545,15 @@ def start_bot():
 
     # Pullback bank — LIVE real orders (src/pullback_live.py). Its own thread: hourly
     # signals, a 1-second price loop for 15-minute entry windows, position management.
+    # A failure here must never take the bot down (buttons, signals, monitor): log it
+    # and keep serving. 11.09.2026 a missing dependency crashed every boot.
     if PULLBACK_LIVE_ENABLED:
-        from src import pullback_live
-        threading.Thread(target=pullback_live.start_default, daemon=True).start()
-        log.info("Pullback bank LIVE started (real orders)")
+        try:
+            from src import pullback_live
+            threading.Thread(target=pullback_live.start_default, daemon=True).start()
+            log.info("Pullback bank LIVE started (real orders)")
+        except Exception as e:
+            log.error(f"Pullback bank LIVE could not start: {e}")
 
     # Self-ping — only needed on hosts that idle-sleep (e.g. Render free tier).
     # Off by default: Railway runs the container 24/7, so it's pointless there.
