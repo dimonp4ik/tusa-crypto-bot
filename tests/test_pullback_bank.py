@@ -143,6 +143,23 @@ class LivePathTest(unittest.TestCase):
         self.assertEqual(seen, {"LONG", "SHORT"})              # both sides really exercised
 
 
+class BtcTrendFilterTest(unittest.TestCase):
+    def test_longs_only_while_btc_above_its_sma(self):
+        import bisect
+        t, a = _walk(96 * 70, seed=3, drift=0.00012)
+        bt, ba = _walk(96 * 70, seed=11, drift=-0.00008)          # BTC drifting down
+        rules = PB.RULE_SETS["bank9"]
+        off = PB.hourly_signals(t, a, bt, ba, rules)
+        on = PB.hourly_signals(t, a, bt, ba, rules, btc_sma=10)
+        self.assertLess(len(on), len(off))                         # the filter really bites
+        self.assertTrue(set(on) <= set(off))                       # it only removes signals
+        d, c = PB.btc_daily(bt, ba); c = np.asarray(c)
+        sm = PB._sma(c, 10)
+        for close in on:
+            j = bisect.bisect_right(d, close - 86400) - 1
+            self.assertTrue(j < 9 or c[j] >= sm[j])
+
+
 class ShortMirrorTest(unittest.TestCase):
     def _run(self, rows):
         t = 1_700_006_400 + np.arange(len(rows), dtype=np.int64) * PB.BAR

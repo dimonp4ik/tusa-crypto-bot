@@ -70,6 +70,11 @@ SHORT_RULES = [
 ]
 RULE_SETS = {"bank9": RULES, "strict3": RULES_STRICT, "short2": SHORT_RULES,
              "strict3+short2": RULES_STRICT + SHORT_RULES, "bank9+short2": RULES + SHORT_RULES}
+# Same five rules with a wider take (0.75 ATR, stop 3 ATR). Chosen on 2022-24 with the owner's
+# win-rate floor of 75%; more profit AND a smaller drawdown in both 2022-24 and 2025-26
+# (18 coins, btc_sma=50 + stop sizing, margin 3%: +4.0%/+4.3% a month vs +3.2%/+3.1%,
+# drawdown -9.1%/-10.3% vs -9.9%/-10.5%; win rate ~85%). reports/NIGHT_2026_09_11.md.
+RULE_SETS["strict3+short2_wide"] = [dict(r, tp=0.75) for r in RULES_STRICT + SHORT_RULES]
 
 
 # ---------------------------------------------------------------- bars and indicators
@@ -211,10 +216,13 @@ def _match(rule, F, i):
     return True
 
 
-def hourly_signals(t15, a15, btc_t15, btc_a15, rules=RULES, regime=None):
+def hourly_signals(t15, a15, btc_t15, btc_a15, rules=RULES, regime=None, btc_sma=0):
     """{hour_close_ts: (rule_index, limit, atr)} for every closed 1h bar that would place
     an order if the coin were flat. Pure function of closed bars. `regime`: intervals from
-    regime_update() (live, persisted); None = recompute from these bars (backtest)."""
+    regime_update() (live, persisted); None = recompute from these bars (backtest).
+    `btc_sma` > 0: LONG rules act only while BTC's last CLOSED daily close is at or above
+    its SMA(btc_sma) - longs into a falling BTC were the whole Feb-Apr 2025 drawdown
+    (reports/NIGHT_2026_09_11.md). With too little BTC history the filter stays open."""
     T1, B1 = build_bars(t15, a15, HOUR)
     if len(T1) <= MIN_HOURS:
         return {}
@@ -224,6 +232,15 @@ def hourly_signals(t15, a15, btc_t15, btc_a15, rules=RULES, regime=None):
         regime = trend_regime(t15, a15, bt, bc)
     iv = regime
     starts = [x[0] for x in iv]
+    btc_down = lambda close: False
+    if btc_sma:
+        bdt, bdc = btc_daily(btc_t15, btc_a15)
+        bdc = np.asarray(bdc, dtype=float)
+        bsm = _sma(bdc, btc_sma)
+
+        def btc_down(close):
+            d = bisect.bisect_right(bdt, close - 86400) - 1      # last closed daily bar
+            return d >= btc_sma - 1 and bdc[d] < bsm[d]
     sig = {}
     for i in range(MIN_HOURS, len(T1)):
         close = int(T1[i]) + HOUR
@@ -231,6 +248,8 @@ def hourly_signals(t15, a15, btc_t15, btc_a15, rules=RULES, regime=None):
         if j < 0 or not (iv[j][0] <= close < iv[j][1]) or np.isnan(F["atr"][i]):
             continue
         side = iv[j][2]
+        if side == "LONG" and btc_down(close):
+            continue
         for k, r in enumerate(rules):
             if r.get("side", "LONG") == side and _match(r, F, i):
                 sig[close] = (k, float(B1[i, 3]), float(F["atr"][i]))
@@ -302,10 +321,10 @@ def advance(state, t15, a15, signals, rules=RULES):
     return ev
 
 
-def simulate(t15, a15, btc_t15, btc_a15, rules=RULES):
+def simulate(t15, a15, btc_t15, btc_a15, rules=RULES, btc_sma=0):
     """Backtest = the live path over the whole history. Returns closed trades
     (signal_close_ts, exit_ts, ret, risk, rule_name)."""
-    sig = hourly_signals(t15, a15, btc_t15, btc_a15, rules)
+    sig = hourly_signals(t15, a15, btc_t15, btc_a15, rules, btc_sma=btc_sma)
     st = {}
     out, orders = [], {}
     for e in advance(st, t15, a15, sig, rules):

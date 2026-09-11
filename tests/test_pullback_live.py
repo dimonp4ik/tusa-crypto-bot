@@ -76,14 +76,14 @@ class FakeEx:
     fmt_px_display = staticmethod(okx_trader.fmt_px_display)
 
 
-def make(ex, state=None, margin=lambda bal: bal * 0.05, rules="strict3+short2"):
+def make(ex, state=None, margin=lambda bal: bal * 0.05, rules="strict3+short2", **kw):
     msgs, saved = [], {}
     live = L.Live(symbols=["ETHUSDT"], rules_name=rules, ex=ex, inst_id_of=lambda s: "ETH-X",
                   candles=None, feed_prices=lambda: {}, dm=lambda uid, t: msgs.append(t),
                   users=lambda: [{"user_id": 7, "creds": {"k": 1}, "margin": margin}],
                   load_state=lambda: state or {}, save_state=lambda st: saved.update(st),
                   max_spread=0.0005, max_slip=0.0003, slip_min_n=3, leverage=10,
-                  max_daily_loss=0.03, max_drawdown=0.15, sleep=lambda s: None)
+                  max_daily_loss=0.03, max_drawdown=0.15, sleep=lambda s: None, **kw)
     return live, msgs
 
 
@@ -120,6 +120,19 @@ class EntryTest(unittest.TestCase):
         p = live.state["pos"][0]
         self.assertEqual((p["side"], p["entry"], p["algo"]), ("LONG", 100.0, "algo"))
         self.assertIn("вход ETHUSDT LONG", msgs[-1])
+
+    def test_stop_width_sizing_only_shrinks(self):
+        spec = FakeEx().get_xperp_spec("x")
+        # stop = 3 ATR of 1.0 on level 100 -> 3% ; ref 1% -> margin x 1/3
+        ex = FakeEx(); live, _ = make(ex, margin=lambda bal: 60.0, stop_ref=0.01)
+        live.state["watch"].append(watch(level=100.0, atr=1.0, rule=0))
+        live.tick(NOW + 5, {"ETHUSDT": 100.0})
+        self.assertEqual(ex.calls[0][3], okx_trader.calc_contracts(20.0, 10, 100.0, spec))
+        # ref wider than the stop -> the user's full margin, never more
+        ex = FakeEx(); live, _ = make(ex, margin=lambda bal: 60.0, stop_ref=0.10)
+        live.state["watch"].append(watch(level=100.0, atr=1.0, rule=0))
+        live.tick(NOW + 5, {"ETHUSDT": 100.0})
+        self.assertEqual(ex.calls[0][3], okx_trader.calc_contracts(60.0, 10, 100.0, spec))
 
     def test_short_mirror(self):
         ex = FakeEx(fill_px=100.0); live, _ = make(ex)

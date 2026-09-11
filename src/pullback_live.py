@@ -87,7 +87,8 @@ class Live:
 
     def __init__(self, *, symbols, rules_name, ex, inst_id_of, candles, feed_prices, users,
                  dm, load_state, save_state, max_spread, max_slip, slip_min_n, leverage,
-                 max_daily_loss, max_drawdown, peak_floor=0.0, sleep=time.sleep):
+                 max_daily_loss, max_drawdown, peak_floor=0.0, sleep=time.sleep, btc_sma=0,
+                 stop_ref=0.0):
         self.symbols = list(symbols)
         self.rules = PB.RULE_SETS[rules_name]
         self.ex, self.inst_id_of, self.candles = ex, inst_id_of, candles
@@ -97,6 +98,8 @@ class Live:
         self.leverage = leverage
         self.max_daily_loss, self.max_drawdown, self.peak_floor = max_daily_loss, max_drawdown, peak_floor
         self.sleep = sleep
+        self.btc_sma = btc_sma
+        self.stop_ref = stop_ref
         st = load_state() or {}
         for k, v in (("regime", {}), ("watch", []), ("pos", []), ("slip", {}), ("slip_all", []), ("hist", []),
                      ("excluded", {}), ("guard", {}), ("scan", {}), ("paused", False)):
@@ -151,7 +154,8 @@ class Live:
                 horizon = int(t[0]) - 30 * 86400
                 iv = [x for x in PB.regime_update(reg, t, a, bd, bc) if x[1] > horizon]
                 reg["iv"] = [x for x in reg["iv"] if x[1] > horizon]
-                s = PB.hourly_signals(t, a, bt, ba, self.rules, regime=iv).get(close)
+                s = PB.hourly_signals(t, a, bt, ba, self.rules, regime=iv,
+                                      btc_sma=self.btc_sma).get(close)
                 if s is None or self._busy(sym):
                     continue
                 ex_ts = self.state["excluded"].get(sym)
@@ -165,6 +169,10 @@ class Live:
                 log.info("pullback live: watch %s %s level %s", sym, self.rules[k]["name"], level)
             except Exception as e:
                 log.warning("pullback live: scan %s failed: %s", sym, e)
+        if len(sc["done"]) == len(self.symbols):
+            log.info("pullback live: scan %s done, %d symbols, %d watching, %d open",
+                     time.strftime("%H:%M", time.gmtime(close)), len(self.symbols),
+                     len(self.state["watch"]), len(self.state["pos"]))
         self.save()
 
     def _busy(self, sym):
@@ -228,6 +236,12 @@ class Live:
         margin = float(u["margin"](bal))            # the user's own size setting
         if margin <= 0:
             return
+        # Stop-width sizing: a wide (high-volatility) stop takes a proportionally smaller
+        # position so one stop costs about the same money; never larger than the setting.
+        # Halved the 2025-26 drawdown in the backtest (reports/NIGHT_2026_09_11.md).
+        sl_frac0 = r["sl"] * w["atr"] / w["level"]
+        if self.stop_ref and sl_frac0 > self.stop_ref:
+            margin *= self.stop_ref / sl_frac0
         if margin > bal:
             log.info("pullback live: %s margin %.2f above balance %.2f - skipped", uid, margin, bal)
             return
@@ -458,7 +472,8 @@ def build_default():
                 max_spread=C.PULLBACK_LIVE_MAX_SPREAD, max_slip=C.PULLBACK_LIVE_MAX_SLIP,
                 slip_min_n=C.PULLBACK_LIVE_SLIP_MIN_N, leverage=C.AUTOTRADE_LEVERAGE,
                 max_daily_loss=C.PULLBACK_LIVE_MAX_DAILY_LOSS,
-                max_drawdown=C.PULLBACK_LIVE_MAX_DRAWDOWN)
+                max_drawdown=C.PULLBACK_LIVE_MAX_DRAWDOWN, btc_sma=C.PULLBACK_BTC_SMA,
+                stop_ref=C.PULLBACK_STOP_REF)
 
 
 def start_default():
@@ -474,4 +489,12 @@ def start_default():
         log.error("pullback live: start failed: %s", e)
         return
     log.info("pullback live: started, %d symbols, %d rules", len(live.symbols), len(live.rules))
+    try:                                        # tell the admins the live bank is really running
+        import config as C
+        from src.autotrader import _dm
+        for admin in C.ADMIN_IDS:
+            _dm(admin, f"🤖 Банк откатов запущен: {len(live.symbols)} монет, правил {len(live.rules)}, "
+                       f"трейдеров {len(live.users())}. Открытых позиций: {len(live.state['pos'])}.")
+    except Exception as e:
+        log.warning("pullback live: start notice failed: %s", e)
     run_forever(live)

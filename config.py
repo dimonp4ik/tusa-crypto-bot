@@ -3191,8 +3191,15 @@ PULLBACK_ENABLED = os.getenv("PULLBACK_ENABLED", "0") == "1"
 PULLBACK_SYMBOLS = [s.strip() for s in os.getenv(
     "PULLBACK_SYMBOLS", ",".join(TREND4H_SYMBOLS)).split(",") if s.strip()]
 # bank9 | strict3 | short2 | strict3+short2 | bank9+short2 (see pullback_bank.RULE_SETS)
-PULLBACK_RULES = os.getenv("PULLBACK_RULES", "strict3+short2")
+PULLBACK_RULES = os.getenv("PULLBACK_RULES", "strict3+short2_wide")
 PULLBACK_STATE_FILE = os.getenv("PULLBACK_STATE_FILE", "pullback_paper_state.json")
+# LONG rules only while BTC's daily close is at/above its SMA(N); 0 = off. Prespecified
+# guard against buying pullbacks while BTC itself falls (the whole Feb-Apr 2025 drawdown).
+PULLBACK_BTC_SMA = int(os.getenv("PULLBACK_BTC_SMA", "50"))
+# Stop-width sizing for the live bank: a trade whose stop distance exceeds this fraction
+# of price gets margin x (ref / stop); never more than the user's own setting. 0 = off.
+# 0.0394 = median stop of 2022-24 trades.
+PULLBACK_STOP_REF = float(os.getenv("PULLBACK_STOP_REF", "0.0394"))
 PULLBACK_FETCH_15M = int(os.getenv("PULLBACK_FETCH_15M", "6000"))
 
 # --- Pullback bank LIVE (src/pullback_live.py) — REAL orders, ON by default ---
