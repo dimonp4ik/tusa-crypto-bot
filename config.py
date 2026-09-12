@@ -3207,7 +3207,10 @@ PULLBACK_FETCH_15M = int(os.getenv("PULLBACK_FETCH_15M", "6000"))
 # deposit or fixed $ margin, AUTOTRADE_LEVERAGE). No resting limit orders: a 1-second price
 # loop enters at market when the level is touched; stop and take are one exchange OCO with
 # market execution on trigger. Backtest of this execution: reports/NIGHT_2026_09_11.md.
-PULLBACK_LIVE_ENABLED = os.getenv("PULLBACK_LIVE_ENABLED", "1") == "1"
+# OFF since 12.09.2026 by the owner. New entries stop immediately; positions already open keep
+# their exchange OCO (stop and take sit on OKX and still fire), but nothing manages them any
+# more - in particular the 48h time exit does not run. Set to 1 to bring the bank back.
+PULLBACK_LIVE_ENABLED = os.getenv("PULLBACK_LIVE_ENABLED", "0") == "1"
 # Skip an entry when the X-Perp book spread is wider than this.
 PULLBACK_LIVE_MAX_SPREAD = float(os.getenv("PULLBACK_LIVE_MAX_SPREAD", "0.0005"))
 # The edge survives ~0.02-0.03% slippage per side and dies near 0.10%. A coin whose
