@@ -1,0 +1,36 @@
+{
+  "variants": [
+    [
+      "early_tight",
+      0.25,
+      0.15,
+      "hard_stop"
+    ],
+    [
+      "early_wide",
+      0.25,
+      0.5,
+      "hard_stop"
+    ],
+    [
+      "later_wide",
+      1.0,
+      0.5,
+      "hard_stop"
+    ],
+    [
+      "wide_close",
+      0.6,
+      0.5,
+      "current"
+    ]
+  ],
+  "symbols": "BTCUSDT,ETHUSDT,SOLUSDT,XRPUSDT,LINKUSDT,SUIUSDT,ADAUSDT,AVAXUSDT",
+  "status": "EXPLORATORY_ONLY",
+  "constraints": [
+    "TP1 partial fraction unchanged at configured 0%",
+    "Previously inspected history; no untouched holdout claim",
+    "All variants retained including failures; no live selection",
+    "Next validation must include unseen windows and actual venue costs"
+  ]
+}

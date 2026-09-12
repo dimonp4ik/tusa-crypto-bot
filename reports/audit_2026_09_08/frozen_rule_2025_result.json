@@ -1,0 +1,48 @@
+{
+  "status": "FROZEN_RULE_CHECK",
+  "rule": [
+    [
+      "vol_atr_pct",
+      "ge",
+      0.01
+    ],
+    [
+      "entry_source",
+      "eq",
+      "FVG"
+    ]
+  ],
+  "window": "2025 cached first-half window",
+  "selected": {
+    "n": 273,
+    "wr": 60.8058608058608,
+    "wr_lower_95": 54.90321908237964,
+    "net_r": -8.33331643447126,
+    "mean_r": -0.030524968624436852,
+    "pf": 0.9199877308569772,
+    "dd_r": 16.38867519621464,
+    "active_days": 115,
+    "daily_lcb": -0.3744025393401123,
+    "symbols": 11,
+    "stress_net_r": -17.2150137865683
+  },
+  "baseline": {
+    "n": 743,
+    "wr": 62.85329744279946,
+    "wr_lower_95": 59.32105142579306,
+    "net_r": -1.4102529043809675,
+    "mean_r": -0.0018980523612126077,
+    "pf": 0.9942368793820004,
+    "dd_r": 25.64843638030343,
+    "active_days": 170,
+    "daily_lcb": -0.3461364890212663,
+    "symbols": 12,
+    "stress_net_r": -30.56000873834308
+  },
+  "raw_sha256": "516e6a3236d48cdccd7db220db699bc464a016e1d0507b8dd9f07715f9582b1e",
+  "limitations": [
+    "Historical development data, not fresh live evidence. Original strategy was developed on historical periods.",
+    "SWAP execution model, estimated costs 12bps; funding excluded.",
+    "Rule frozen from early/June2026 before inspecting this replay. This is backward robustness validation, not chronological forecasting."
+  ]
+}

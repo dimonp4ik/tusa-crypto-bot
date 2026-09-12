@@ -1,0 +1,70 @@
+{
+  "status": "RESEARCH_ONLY",
+  "results": [
+    {
+      "label": "causal_execution",
+      "trades": 603,
+      "win_rate": 57.21393034825871,
+      "net_r": -27.91364053829385,
+      "profit_factor": 0.8697003308112412,
+      "closed_equity_drawdown_r": 42.65113603154458,
+      "worst_trade_r": -3.066666666666667
+    },
+    {
+      "label": "exit_wide_hard",
+      "trades": 628,
+      "win_rate": 54.77707006369427,
+      "net_r": -28.243338984418166,
+      "profit_factor": 0.8692555008895475,
+      "closed_equity_drawdown_r": 44.50567521241781,
+      "worst_trade_r": -2.0666666666666678
+    },
+    {
+      "label": "exit_early_tight",
+      "trades": 792,
+      "win_rate": 46.843434343434346,
+      "net_r": -50.116025665103834,
+      "profit_factor": 0.6673365542385458,
+      "closed_equity_drawdown_r": 59.650476136254525,
+      "worst_trade_r": -2.0666666666666678
+    },
+    {
+      "label": "exit_early_wide",
+      "trades": 789,
+      "win_rate": 46.64131812420786,
+      "net_r": -53.409188368593504,
+      "profit_factor": 0.6436531665226987,
+      "closed_equity_drawdown_r": 62.224708243828076,
+      "worst_trade_r": -2.0666666666666678
+    },
+    {
+      "label": "exit_later_wide",
+      "trades": 517,
+      "win_rate": 47.969052224371374,
+      "net_r": 4.285247192525921,
+      "profit_factor": 1.0192293462310258,
+      "closed_equity_drawdown_r": 31.56056785093329,
+      "worst_trade_r": -2.0666666666666678
+    },
+    {
+      "label": "exit_wide_close",
+      "trades": 603,
+      "win_rate": 57.21393034825871,
+      "net_r": -27.41718297445549,
+      "profit_factor": 0.8710475012050308,
+      "closed_equity_drawdown_r": 42.35464788413406,
+      "worst_trade_r": -3.066666666666667
+    }
+  ],
+  "partial_tp1": 0,
+  "notes": [
+    "Activation R only changes fallback TP1; structural TP1 can override it.",
+    "Distance CLI propagation fixed; experiments use matching environment and argument values, so earlier completed variants remain comparable.",
+    "No result demonstrates 85-95 percent win rate or zero drawdown.",
+    "Do not choose a live policy by maximum return on these previously inspected samples."
+  ],
+  "sources": [
+    "https://www.davidhbailey.com/dhbpapers/backtest-prob.pdf",
+    "https://www.okx.com/en-gb/help/how-to-use-trailing-stop"
+  ]
+}

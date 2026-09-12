@@ -1,0 +1,146 @@
+{
+  "status": "RESEARCH_ONLY",
+  "source_sha256": "a4eca53e89cad028c39b27f1d5d1b702c512238d2b38417a36da5e8d57b40d32",
+  "script_sha256": "55ada77c445dc08dcda8adb6ad2e66da126d00efa06843af2f3e05d11e170db6",
+  "plan": {
+    "directions": [
+      "original",
+      "reversed"
+    ],
+    "targets": [
+      0.25,
+      1.0
+    ],
+    "timeout_bars": 192,
+    "roundtrip_cost": 0.0012,
+    "max_cost_target_fraction": 0.25
+  },
+  "results": [
+    {
+      "mode": "original",
+      "target": 0.25,
+      "all": {
+        "n": 640,
+        "wr": 82.1875,
+        "wr_lower_95": 79.03370776021958,
+        "net_r": -10.275331472697017,
+        "mean_r": -0.01605520542608909,
+        "pf": 0.9135843744647488,
+        "dd_r": 14.736464464567932,
+        "active_days": 168,
+        "daily_lcb": -0.23618166537645424,
+        "symbols": 18,
+        "stress_net_r": -33.421441033277866
+      },
+      "july_august": {
+        "n": 174,
+        "wr": 83.9080459770115,
+        "wr_lower_95": 77.72550257837264,
+        "net_r": 0.7806833617514651,
+        "mean_r": 0.004486685987077386,
+        "pf": 1.0266739448140825,
+        "dd_r": 6.379306683199726,
+        "active_days": 50,
+        "daily_lcb": -0.2645889822984248,
+        "symbols": 18,
+        "stress_net_r": -5.652080503455638
+      }
+    },
+    {
+      "mode": "original",
+      "target": 1.0,
+      "all": {
+        "n": 712,
+        "wr": 56.17977528089888,
+        "wr_lower_95": 52.51170691023452,
+        "net_r": 45.47721391780447,
+        "mean_r": 0.06387249145759055,
+        "pf": 1.1393613148112969,
+        "dd_r": 24.74815866029996,
+        "active_days": 179,
+        "daily_lcb": -0.11822824245840674,
+        "symbols": 18,
+        "stress_net_r": 8.714498114889416
+      },
+      "july_august": {
+        "n": 236,
+        "wr": 57.20338983050848,
+        "wr_lower_95": 50.82500163130449,
+        "net_r": 20.417435202998504,
+        "mean_r": 0.08651455594490892,
+        "pf": 1.195027509389567,
+        "dd_r": 21.80338153030031,
+        "active_days": 54,
+        "daily_lcb": -0.3363915332965292,
+        "symbols": 18,
+        "stress_net_r": 7.180449099326852
+      }
+    },
+    {
+      "mode": "reversed",
+      "target": 0.25,
+      "all": {
+        "n": 559,
+        "wr": 73.8819320214669,
+        "wr_lower_95": 70.08613947284647,
+        "net_r": -66.99339045227995,
+        "mean_r": -0.11984506342089438,
+        "pf": 0.5603461583500421,
+        "dd_r": 68.47137659696362,
+        "active_days": 166,
+        "daily_lcb": -0.5985521770386943,
+        "symbols": 18,
+        "stress_net_r": -87.19621582917995
+      },
+      "july_august": {
+        "n": 147,
+        "wr": 61.904761904761905,
+        "wr_lower_95": 53.845803159619855,
+        "net_r": -39.776391783507805,
+        "mean_r": -0.27058769920753606,
+        "pf": 0.3203757246721374,
+        "dd_r": 41.47699437309318,
+        "active_days": 48,
+        "daily_lcb": -1.2112984874313912,
+        "symbols": 17,
+        "stress_net_r": -45.215051603097656
+      }
+    },
+    {
+      "mode": "reversed",
+      "target": 1.0,
+      "all": {
+        "n": 671,
+        "wr": 43.666169895678095,
+        "wr_lower_95": 39.95997841345129,
+        "net_r": -122.73287118227401,
+        "mean_r": -0.18291038924332936,
+        "pf": 0.6883479761785842,
+        "dd_r": 129.21323955307813,
+        "active_days": 179,
+        "daily_lcb": -1.039579135986509,
+        "symbols": 18,
+        "stress_net_r": -157.8594829523247
+      },
+      "july_august": {
+        "n": 211,
+        "wr": 42.18009478672986,
+        "wr_lower_95": 35.71471236916149,
+        "net_r": -47.721868334121815,
+        "mean_r": -0.22616999210484273,
+        "pf": 0.6245637588538382,
+        "dd_r": 55.13769525450415,
+        "active_days": 54,
+        "daily_lcb": -1.5395042278734845,
+        "symbols": 18,
+        "stress_net_r": -59.74818969229403
+      }
+    }
+  ],
+  "limitations": [
+    "Previously inspected SWAP history; no fresh holdout or actual X-Perp execution.",
+    "Funding excluded. Intrabar entries use conservative OHLC ordering.",
+    "Entry candidate generation unchanged; no claim of complete independent opportunity set.",
+    "Equal risk units replace legacy size weighting. No production change."
+  ]
+}

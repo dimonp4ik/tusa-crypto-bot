@@ -1,0 +1,78 @@
+{
+  "status": "EXECUTION_DIAGNOSTIC",
+  "market_entries": 0,
+  "excluded_intrabar_entries": 314,
+  "results": {
+    "swap_matched_xperp": {
+      "raw": {
+        "n": 0,
+        "wr": 0,
+        "wr_lower_95": 0,
+        "net_r": 0,
+        "mean_r": 0,
+        "pf": null,
+        "dd_r": 0.0,
+        "active_days": 0,
+        "daily_lcb": -1000000000.0,
+        "symbols": 0,
+        "stress_net_r": 0
+      },
+      "gated": {
+        "n": 0,
+        "wr": 0,
+        "wr_lower_95": 0,
+        "net_r": 0,
+        "mean_r": 0,
+        "pf": null,
+        "dd_r": 0.0,
+        "active_days": 0,
+        "daily_lcb": -1000000000.0,
+        "symbols": 0,
+        "stress_net_r": 0
+      },
+      "bracket_rejections": 0,
+      "errors": []
+    },
+    "xperp_cache": {
+      "raw": {
+        "n": 0,
+        "wr": 0,
+        "wr_lower_95": 0,
+        "net_r": 0,
+        "mean_r": 0,
+        "pf": null,
+        "dd_r": 0.0,
+        "active_days": 0,
+        "daily_lcb": -1000000000.0,
+        "symbols": 0,
+        "stress_net_r": 0
+      },
+      "gated": {
+        "n": 0,
+        "wr": 0,
+        "wr_lower_95": 0,
+        "net_r": 0,
+        "mean_r": 0,
+        "pf": null,
+        "dd_r": 0.0,
+        "active_days": 0,
+        "daily_lcb": -1000000000.0,
+        "symbols": 0,
+        "stress_net_r": 0
+      },
+      "bracket_rejections": 0,
+      "errors": []
+    }
+  },
+  "input_hashes": {},
+  "source_sha256": "4ceef20ce8ca70eb4b4a22a4b574b12a6f8426d5f34418dd7608433705fe208d",
+  "limitations": [
+    "Original signal callback times fixed; market fills approximated by 15m open/close, not actual bid/ask.",
+    "Exchange TP2/backstop can terminate earlier. Stop wins on ambiguous OHLC bars.",
+    "Signal callbacks originate from conservative historical simulator, not production polling logs.",
+    "No partial TP1; no historical depth/funding. New order-book guard cannot be reproduced from OHLC.",
+    "All intrabar zone entries excluded; crypto requires minute-level trigger reconstruction.",
+    "R normalized to original signal risk; gates reapplied using modeled execution outcomes."
+  ],
+  "raw_signals_sha256": "23dbfa92f310792234a4ba7c29f47c87892fc742ff94d4316ffdeb35aba464b5"
+}

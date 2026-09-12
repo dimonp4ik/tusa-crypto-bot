@@ -1,0 +1,112 @@
+{
+  "status": "RESEARCH_ONLY",
+  "frozen_rule": [
+    [
+      "vol_atr_pct",
+      "ge",
+      0.01
+    ],
+    [
+      "entry_source",
+      "eq",
+      "FVG"
+    ]
+  ],
+  "results": [
+    {
+      "window": "filter_2023",
+      "selected": {
+        "n": 160,
+        "wr": 46.875,
+        "wr_lower_95": 39.306676250273334,
+        "net_r": -51.45722563931057,
+        "mean_r": -0.3216076602456911,
+        "pf": 0.4315164700351548,
+        "dd_r": 55.85944638981845,
+        "active_days": 98,
+        "daily_lcb": -0.7876718927463059,
+        "symbols": 11,
+        "stress_net_r": -56.43956675489873
+      },
+      "baseline": {
+        "n": 625,
+        "wr": 52.800000000000004,
+        "wr_lower_95": 48.88098184903449,
+        "net_r": -82.41404752110749,
+        "mean_r": -0.131862476033772,
+        "pf": 0.684094245682681,
+        "dd_r": 85.50162546802444,
+        "active_days": 173,
+        "daily_lcb": -0.7453306458725368,
+        "symbols": 12,
+        "stress_net_r": -113.67393062330581
+      },
+      "raw_sha256": "35859bff06895631e5b7e8028a705aa6cb4c4eb1494cb0134db3c03edf543fa1"
+    },
+    {
+      "window": "filter_2024",
+      "selected": {
+        "n": 241,
+        "wr": 60.58091286307054,
+        "wr_lower_95": 54.291472904625756,
+        "net_r": -4.359339277394909,
+        "mean_r": -0.018088544719480952,
+        "pf": 0.9539375753984177,
+        "dd_r": 12.064515181761514,
+        "active_days": 118,
+        "daily_lcb": -0.28399288683601015,
+        "symbols": 11,
+        "stress_net_r": -11.824981791558145
+      },
+      "baseline": {
+        "n": 803,
+        "wr": 61.51930261519303,
+        "wr_lower_95": 58.10671612539937,
+        "net_r": -15.922279683931405,
+        "mean_r": -0.019828492757075225,
+        "pf": 0.9416153611810174,
+        "dd_r": 35.35384955168365,
+        "active_days": 177,
+        "daily_lcb": -0.3895267209265193,
+        "symbols": 12,
+        "stress_net_r": -49.10715139604032
+      },
+      "raw_sha256": "dc1af2112894f141c4e3ed80ac36521e1d9fec21e00c8c65b4a3d50eea3c5b53"
+    },
+    {
+      "window": "filter_universe",
+      "selected": {
+        "n": 358,
+        "wr": 69.27374301675978,
+        "wr_lower_95": 64.31096943406189,
+        "net_r": 72.21948733022778,
+        "mean_r": 0.2017304115369491,
+        "pf": 1.6109373882775184,
+        "dd_r": 11.45699977275386,
+        "active_days": 146,
+        "daily_lcb": 0.11373611741497702,
+        "symbols": 17,
+        "stress_net_r": 59.5827620702584
+      },
+      "baseline": {
+        "n": 984,
+        "wr": 61.99186991869918,
+        "wr_lower_95": 58.917836597394135,
+        "net_r": 15.070813810572961,
+        "mean_r": 0.015315867693671709,
+        "pf": 1.0432740123598245,
+        "dd_r": 36.21479444711466,
+        "active_days": 182,
+        "daily_lcb": -0.3076898149851398,
+        "symbols": 18,
+        "stress_net_r": -29.986913433205537
+      },
+      "raw_sha256": "92670bb77ea2610e5e20fe0d8e598446f8d986bf8d4864522d46afbf5a2fda9f"
+    }
+  ],
+  "limitations": [
+    "Retrospective robustness check; 2026 has been inspected in previous searches.",
+    "Historical windows cover parts of years, not full calendar years. Funding omitted.",
+    "SWAP signals/exits and legacy risk weights; actual X-Perp profitability not established."
+  ]
+}

@@ -1,0 +1,397 @@
+{
+  "arguments": {
+    "label": "filter_2023",
+    "symbols": "BTCUSDT,ETHUSDT,XRPUSDT,SOLUSDT,DOTUSDT,XLMUSDT,LINKUSDT,SUIUSDT,AAVEUSDT,NEARUSDT,ADAUSDT,AVAXUSDT",
+    "candles": 18000,
+    "end_date": "2023-07-31",
+    "stride": 1,
+    "fee_rate": 0.0001,
+    "slippage_rate": 0.0001,
+    "profile": "current"
+  },
+  "git_head": "79a1e63fb68f6e8bf19f43a6dc37f14dd376a345",
+  "source_hashes": {
+    "backtest.py": "cd586f3ac00e57a0caded2243b405d419983b345c7416963004ee81567557e82",
+    "config.py": "1e4b44130a4c01a1cd201730fc11c9f48b593650fc185de1355d780501c7e8fa",
+    "src\\__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "src\\autotrader.py": "c16f228fc264facb3bd652b9b146303016125dfdb0c6ca45481a0df4b291141a",
+    "src\\backtest_integrity.py": "a311124335bc87753ac81d51b99222bf55373b21a918f3969e28d9ec7f181826",
+    "src\\binance_client.py": "35f966c332c94828d75c06207dafe4943e0491f70389540f76ad8ae2bcbbeedb",
+    "src\\claude_analyzer.py": "51608a61cd2a70c0a411ab7e59a9c30272ddb042fe6a03ce20a1af1d16dad2e1",
+    "src\\db.py": "e964444353190c2d01b0f628fd9a0a3610a508886c282821e03e174911b62b0b",
+    "src\\filter_variants.py": "5120fd992b3928b482068673d3d87557c5d9df6c0978c0cd24ecbd8515ce9714",
+    "src\\indicators.py": "24e96dd83e50f7c95f73d54309845528bbf168d3d4319d95bdd027e76987d5c1",
+    "src\\keystore.py": "50f0d8368bf3559af9d1aa0568912e8087a053a1affa33610cc45aaa00aef1e7",
+    "src\\knn_analog.py": "f215686654725f194235e4f747cd644f87911316757cf1632f75a2ceed825821",
+    "src\\live_accounting.py": "74735aa21f4213e0c05d385774e647241889cae94bc021731caad713e926d3f1",
+    "src\\news_agent.py": "641a8c3930e9d68d1afa1b69cb460e8633dd7252a063bdc8663f844821afcac9",
+    "src\\news_filter.py": "de5fb74c1b6a37d5ab703e843c4b4a27a253a1d554b8f33653a89aaf80c7aa8b",
+    "src\\okx_trader.py": "c72d0167581d40cb14ab14729d1de41761d3bc65f505d0f151e47bdc048e3d0d",
+    "src\\r_model.py": "2d66f1c63d0d923dbabadd1f22262e160ea7821f668de2db1b7bdfb2ff899f64",
+    "src\\risk_limits.py": "08e8dcdee73cbb8fbc22af821b6623bf8ec7501004135c4229c69fde5de839a7",
+    "src\\signal_filter.py": "5e1511034ba3e8c21c63c24213dbb99e43fea40f34118d5a5cb8092498a7d361",
+    "src\\telegram_notifier.py": "1890f7caba4aaae942c8cd8e8a986b7ff155ad26de8e24e64cf91c1059749cd8"
+  },
+  "missing_inputs": [],
+  "errors": {},
+  "raw": {
+    "trades": 1547,
+    "win_rate": 51.260504201680675,
+    "net_r": -192.51237527383668,
+    "profit_factor": 0.7051715552932446,
+    "closed_equity_drawdown_r": 195.0345680346677,
+    "worst_trade_r": -3.0666666666666784
+  },
+  "gated": {
+    "trades": 655,
+    "win_rate": 53.282442748091604,
+    "net_r": -53.8225526233065,
+    "profit_factor": 0.7904606151258664,
+    "closed_equity_drawdown_r": 59.94795213930889,
+    "worst_trade_r": -3.066666666666667
+  },
+  "cache_manifest": {
+    "BTCUSDT_15min_18000_end1690761600000.pkl": {
+      "sha256": "57a415a1350f5bd6d966df45f6f553b2cd23aa15f8bb833481efb06cc4c7e00b",
+      "bars": 18000,
+      "start": 1674561600,
+      "end": 1690760700,
+      "interval_sec": 900
+    },
+    "BTCUSDT_1hour_4504_end1690761600000.pkl": {
+      "sha256": "2206161f7c9c366381954d2162619309dd5eea6af1dbdfde338c4da765c751f8",
+      "bars": 4504,
+      "start": 1674547200,
+      "end": 1690758000,
+      "interval_sec": 3600
+    },
+    "BTCUSDT_4hour_1129_end1690761600000.pkl": {
+      "sha256": "90bd741d191a6705269a34d7fc4c229d7252518b2428cc4ee48914fa112a3043",
+      "bars": 1129,
+      "start": 1674504000,
+      "end": 1690747200,
+      "interval_sec": 14400
+    },
+    "BTCUSDT_1d_192_end1690761600000.pkl": {
+      "sha256": "55f6ea127339a0014fa8ac7bcbce0d7b0ddccfbc954708cf40100fc3622e1d93",
+      "bars": 192,
+      "start": 1674172800,
+      "end": 1690675200,
+      "interval_sec": 86400
+    },
+    "ETHUSDT_15min_18000_end1690761600000.pkl": {
+      "sha256": "29df6d14fdc54cb2b95db32c986337fd8c65dedc89878a07d1c76853baefd149",
+      "bars": 18000,
+      "start": 1674561600,
+      "end": 1690760700,
+      "interval_sec": 900
+    },
+    "ETHUSDT_1hour_4504_end1690761600000.pkl": {
+      "sha256": "87a51cd2cfc19a7fc2f9572fddb35077c845efcc3e6128b365da330e962132da",
+      "bars": 4504,
+      "start": 1674547200,
+      "end": 1690758000,
+      "interval_sec": 3600
+    },
+    "ETHUSDT_4hour_1129_end1690761600000.pkl": {
+      "sha256": "c7bda1a4babcccc7e1a6b9a2232f807418651a4e147dc2508b9da6dff3e36866",
+      "bars": 1129,
+      "start": 1674504000,
+      "end": 1690747200,
+      "interval_sec": 14400
+    },
+    "ETHUSDT_1d_192_end1690761600000.pkl": {
+      "sha256": "2d0ab36704525e5bfe8285dc22b63c785e3fc0c4fd4911206a5a0b256922884c",
+      "bars": 192,
+      "start": 1674172800,
+      "end": 1690675200,
+      "interval_sec": 86400
+    },
+    "XRPUSDT_15min_18000_end1690761600000.pkl": {
+      "sha256": "2cd00e089fb16fc6cf63f2c5fd1813e7432ddb03c48612759c00b89df2cc8df7",
+      "bars": 18000,
+      "start": 1674561600,
+      "end": 1690760700,
+      "interval_sec": 900
+    },
+    "XRPUSDT_1hour_4504_end1690761600000.pkl": {
+      "sha256": "1d335913597bfec7e6ec543da33de349f757d464667c1b5d1433b6df6076da88",
+      "bars": 4504,
+      "start": 1674547200,
+      "end": 1690758000,
+      "interval_sec": 3600
+    },
+    "XRPUSDT_4hour_1129_end1690761600000.pkl": {
+      "sha256": "8b2df150ea7e179c1910967382b1286704e6646ae6e1dcca16d238b2a106a1da",
+      "bars": 1129,
+      "start": 1674504000,
+      "end": 1690747200,
+      "interval_sec": 14400
+    },
+    "XRPUSDT_1d_192_end1690761600000.pkl": {
+      "sha256": "c67c8c6af451bad3e4a53f1ec2072aaed4fffdf4c10f7ec957d539a39947c2a2",
+      "bars": 192,
+      "start": 1674172800,
+      "end": 1690675200,
+      "interval_sec": 86400
+    },
+    "SOLUSDT_15min_18000_end1690761600000.pkl": {
+      "sha256": "6cef1a0f4dc4e047b9e3dfd46a3184a457f30390ad9b2f612b78491a94d89d78",
+      "bars": 18000,
+      "start": 1674561600,
+      "end": 1690760700,
+      "interval_sec": 900
+    },
+    "SOLUSDT_1hour_4504_end1690761600000.pkl": {
+      "sha256": "13ac47524da44e58178c8658e92a097affbde65f1641804e2675e135f606c722",
+      "bars": 4504,
+      "start": 1674547200,
+      "end": 1690758000,
+      "interval_sec": 3600
+    },
+    "SOLUSDT_4hour_1129_end1690761600000.pkl": {
+      "sha256": "a64708efcf4d227b3e76140eea6f0553522331609f17917783d2218b11a059d7",
+      "bars": 1129,
+      "start": 1674504000,
+      "end": 1690747200,
+      "interval_sec": 14400
+    },
+    "SOLUSDT_1d_192_end1690761600000.pkl": {
+      "sha256": "242f1cc45fa00025bceaa082c2b2c7993b33ef37dfe439a8d90a1ca629f366cb",
+      "bars": 192,
+      "start": 1674172800,
+      "end": 1690675200,
+      "interval_sec": 86400
+    },
+    "DOTUSDT_15min_18000_end1690761600000.pkl": {
+      "sha256": "2dd0852ad800cf990eb2bc7b0a183ab9d811c54f36ceaac9860543bdebf2feb3",
+      "bars": 18000,
+      "start": 1674561600,
+      "end": 1690760700,
+      "interval_sec": 900
+    },
+    "DOTUSDT_1hour_4504_end1690761600000.pkl": {
+      "sha256": "ddcda6868bfa8cf10c32695ad68567c9f9a68148bf98d4d7afd1e471594f4965",
+      "bars": 4504,
+      "start": 1674547200,
+      "end": 1690758000,
+      "interval_sec": 3600
+    },
+    "DOTUSDT_4hour_1129_end1690761600000.pkl": {
+      "sha256": "d9f0e996ba3a1d47d80fc9e76e746b00268fe5b79f43506c8738dbf33ae039ba",
+      "bars": 1129,
+      "start": 1674504000,
+      "end": 1690747200,
+      "interval_sec": 14400
+    },
+    "DOTUSDT_1d_192_end1690761600000.pkl": {
+      "sha256": "a169cc9c216e59702d9d854aa9e8938d8e290c3b23faae7bb1f5363944e56855",
+      "bars": 192,
+      "start": 1674172800,
+      "end": 1690675200,
+      "interval_sec": 86400
+    },
+    "XLMUSDT_15min_18000_end1690761600000.pkl": {
+      "sha256": "50656fb24398f46ab50acf7242f436e6c9b42f9e1cb1dfd03ffcec4c27b576b3",
+      "bars": 18000,
+      "start": 1674561600,
+      "end": 1690760700,
+      "interval_sec": 900
+    },
+    "XLMUSDT_1hour_4504_end1690761600000.pkl": {
+      "sha256": "d889bd6bd551f95f19338ddc2040e46e6e687748809bd4eb01d86dc3b1f4b046",
+      "bars": 4504,
+      "start": 1674547200,
+      "end": 1690758000,
+      "interval_sec": 3600
+    },
+    "XLMUSDT_4hour_1129_end1690761600000.pkl": {
+      "sha256": "4bd64e342ae5bb25ae4eafaa19650feede83d5409710f047ded94a40466b21b4",
+      "bars": 1129,
+      "start": 1674504000,
+      "end": 1690747200,
+      "interval_sec": 14400
+    },
+    "XLMUSDT_1d_192_end1690761600000.pkl": {
+      "sha256": "f5357e08662fe3a8451ff31c2cf73f109b1d4af7a5f717e98a86fffbf3a89c79",
+      "bars": 192,
+      "start": 1674172800,
+      "end": 1690675200,
+      "interval_sec": 86400
+    },
+    "LINKUSDT_15min_18000_end1690761600000.pkl": {
+      "sha256": "3c48870c89cd383367bed376a99f9bc748b72621c09480be19c999b27ed65073",
+      "bars": 18000,
+      "start": 1674561600,
+      "end": 1690760700,
+      "interval_sec": 900
+    },
+    "LINKUSDT_1hour_4504_end1690761600000.pkl": {
+      "sha256": "b7909a8e7caf2a4a630e6454b42b3e07aebbe38709811ed6253fe3a381a164e4",
+      "bars": 4504,
+      "start": 1674547200,
+      "end": 1690758000,
+      "interval_sec": 3600
+    },
+    "LINKUSDT_4hour_1129_end1690761600000.pkl": {
+      "sha256": "1da852306157158009b175cdcf923813a7dd515188fcecffed5b60ca8b00f446",
+      "bars": 1129,
+      "start": 1674504000,
+      "end": 1690747200,
+      "interval_sec": 14400
+    },
+    "LINKUSDT_1d_192_end1690761600000.pkl": {
+      "sha256": "28cd2a9c72b7e990c5602f54b094646439e65eee08977cfad86379616d7e0a3e",
+      "bars": 192,
+      "start": 1674172800,
+      "end": 1690675200,
+      "interval_sec": 86400
+    },
+    "SUIUSDT_15min_18000_end1690761600000.pkl": {
+      "sha256": "f4b0607c3b5358bcf7592a3b5d2132e061a6884e7fcfe2c542d0ee9aefb9704d",
+      "bars": 8337,
+      "start": 1683258300,
+      "end": 1690760700,
+      "interval_sec": 900
+    },
+    "SUIUSDT_1hour_4504_end1690761600000.pkl": {
+      "sha256": "32a18c4a15d88782b7f606ad18836bdb6f9f082ab1eba60c94326382927fbf24",
+      "bars": 2085,
+      "start": 1683255600,
+      "end": 1690758000,
+      "interval_sec": 3600
+    },
+    "SUIUSDT_4hour_1129_end1690761600000.pkl": {
+      "sha256": "8342b7405d4803ea192963f2912d58df5a1ec0827a13731898b9dee22d88fa14",
+      "bars": 522,
+      "start": 1683244800,
+      "end": 1690747200,
+      "interval_sec": 14400
+    },
+    "SUIUSDT_1d_192_end1690761600000.pkl": {
+      "sha256": "a8ef2c88ff975ab4efa1545a58dcadbbad5d324ea74e45452d34f2edd17fb994",
+      "bars": 87,
+      "start": 1683244800,
+      "end": 1690675200,
+      "interval_sec": 86400
+    },
+    "AAVEUSDT_15min_18000_end1690761600000.pkl": {
+      "sha256": "8ac5b0ea4c72017b291b2d12c3f622c3dc3a3be6a54b546c872d782dec7fefa7",
+      "bars": 18000,
+      "start": 1674561600,
+      "end": 1690760700,
+      "interval_sec": 900
+    },
+    "AAVEUSDT_1hour_4504_end1690761600000.pkl": {
+      "sha256": "a18c63ade3ca167c0934aa5442b32a2b41fbbd12daabc0d130bf3de52da286b6",
+      "bars": 4504,
+      "start": 1674547200,
+      "end": 1690758000,
+      "interval_sec": 3600
+    },
+    "AAVEUSDT_4hour_1129_end1690761600000.pkl": {
+      "sha256": "c434c1c91fecf35414207fa381293cd4da1f7a422b77bbe9e9da29f713663c9c",
+      "bars": 1129,
+      "start": 1674504000,
+      "end": 1690747200,
+      "interval_sec": 14400
+    },
+    "AAVEUSDT_1d_192_end1690761600000.pkl": {
+      "sha256": "3480395e8ed952f1032b1a1ef04099802a4e0345e0a55a3c18d16cf1c8b630d3",
+      "bars": 192,
+      "start": 1674172800,
+      "end": 1690675200,
+      "interval_sec": 86400
+    },
+    "NEARUSDT_15min_18000_end1690761600000.pkl": {
+      "sha256": "3fb8e73edcf29398edd80364be06c90a7fd0ea0388c0a6f2c3169ebe32a7219c",
+      "bars": 18000,
+      "start": 1674561600,
+      "end": 1690760700,
+      "interval_sec": 900
+    },
+    "NEARUSDT_1hour_4504_end1690761600000.pkl": {
+      "sha256": "2fb81c5c565907a78c507c07731563c5cec8705687aafb8f635105b2e84fea47",
+      "bars": 4504,
+      "start": 1674547200,
+      "end": 1690758000,
+      "interval_sec": 3600
+    },
+    "NEARUSDT_4hour_1129_end1690761600000.pkl": {
+      "sha256": "c6e71a01df01d7324ccf70ea457e0ef34a0113804dad838d768f0af509d9dba2",
+      "bars": 1129,
+      "start": 1674504000,
+      "end": 1690747200,
+      "interval_sec": 14400
+    },
+    "NEARUSDT_1d_192_end1690761600000.pkl": {
+      "sha256": "5649d66fdf1402ffc265e92db3abdfb7165940ac4b46968f9240b7fed3e35151",
+      "bars": 192,
+      "start": 1674172800,
+      "end": 1690675200,
+      "interval_sec": 86400
+    },
+    "ADAUSDT_15min_18000_end1690761600000.pkl": {
+      "sha256": "de3d6b21bb0a9e1ea06c049617c0ed52c7c4d8fc89c02ea98532c0e69782a86f",
+      "bars": 18000,
+      "start": 1674561600,
+      "end": 1690760700,
+      "interval_sec": 900
+    },
+    "ADAUSDT_1hour_4504_end1690761600000.pkl": {
+      "sha256": "057acf1996ab74fc598e5c0a63a1c90f63e4a91718618c56f7beb273c81cc6be",
+      "bars": 4504,
+      "start": 1674547200,
+      "end": 1690758000,
+      "interval_sec": 3600
+    },
+    "ADAUSDT_4hour_1129_end1690761600000.pkl": {
+      "sha256": "1d2deeed9cbae12e6d61c91b6581a1d0d230dd4fc7bcd4e5ec74899719470d24",
+      "bars": 1129,
+      "start": 1674504000,
+      "end": 1690747200,
+      "interval_sec": 14400
+    },
+    "ADAUSDT_1d_192_end1690761600000.pkl": {
+      "sha256": "27b606d6a14d73c6f54341228ed21e572378e7ca91878735c5adcf2f9186e58e",
+      "bars": 192,
+      "start": 1674172800,
+      "end": 1690675200,
+      "interval_sec": 86400
+    },
+    "AVAXUSDT_15min_18000_end1690761600000.pkl": {
+      "sha256": "cb956201dc81c7541826e912ceb15f444a28af4a4c85c6ce2168c95525538277",
+      "bars": 18000,
+      "start": 1674561600,
+      "end": 1690760700,
+      "interval_sec": 900
+    },
+    "AVAXUSDT_1hour_4504_end1690761600000.pkl": {
+      "sha256": "2595bd1f1f0d840c7639ccb9acfbeecd382330d737bd6a8785c14512d96ba2de",
+      "bars": 4504,
+      "start": 1674547200,
+      "end": 1690758000,
+      "interval_sec": 3600
+    },
+    "AVAXUSDT_4hour_1129_end1690761600000.pkl": {
+      "sha256": "15d2f5babb1b91bdf000b6d3fc96707801eb54603d5a0ae6731df6791d67bcdd",
+      "bars": 1129,
+      "start": 1674504000,
+      "end": 1690747200,
+      "interval_sec": 14400
+    },
+    "AVAXUSDT_1d_192_end1690761600000.pkl": {
+      "sha256": "f9454c45308f4c21af316a63eeae39e628505cdd5b9ac6ccdb08b92e7352796c",
+      "bars": 192,
+      "start": 1674172800,
+      "end": 1690675200,
+      "interval_sec": 86400
+    }
+  },
+  "limitations": [
+    "Historical development data; not untouched out-of-sample evidence.",
+    "Estimated execution costs; funding and account fills are not included.",
+    "Drawdown uses closed trades, excludes unrealized intratrade losses.",
+    "Live LLM/news gates and exchange microstructure are not reproduced."
+  ]
+}

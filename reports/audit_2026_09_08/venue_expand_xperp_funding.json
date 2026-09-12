@@ -1,0 +1,44 @@
+{
+  "status": "RESEARCH_ONLY",
+  "trade_sha256": "710dc7637d99efd553c776cdabe5b689cc1dc50c67ec819fd5a2cba27d450419",
+  "funding_sha256": "8d54786ce4029adee942b23c65d77dc1e363dec470acc01b934835f6b7b8a100",
+  "source_sha256": "c33dda4d7b478da2be2d52eb2733bbcbf21954a56adbea002b512bc49d0aad96",
+  "source_trades": 137,
+  "eligible_trades": 114,
+  "excluded_before_funding_coverage": 23,
+  "boundary_events": 5,
+  "strict_interior_events": 124,
+  "funding_r": 0.22075301561067057,
+  "adjusted": {
+    "n": 114,
+    "wr": 64.03508771929825,
+    "wr_lower_95": 54.90074186735065,
+    "net_r": -2.3813677973478957,
+    "mean_r": -0.020889191204806104,
+    "pf": 0.9379629224380667,
+    "dd_r": 14.854531974469463,
+    "active_days": 58,
+    "daily_lcb": -0.41362993477532484,
+    "symbols": 4,
+    "stress_net_r": -8.390006101015192
+  },
+  "pessimistic_boundary": {
+    "n": 114,
+    "wr": 64.03508771929825,
+    "wr_lower_95": 54.90074186735065,
+    "net_r": -2.388208397610064,
+    "mean_r": -0.02094919647026372,
+    "pf": 0.9377847177737109,
+    "dd_r": 14.854531974469465,
+    "active_days": 58,
+    "daily_lcb": -0.41374049670750346,
+    "symbols": 4,
+    "stress_net_r": -8.396846701277362
+  },
+  "limitations": [
+    "Only trades fully inside public funding coverage are included.",
+    "Funding uses entry-notional approximation; actual mark notional is unavailable here.",
+    "Events exactly at entry/exit are excluded in adjusted and only negative impacts included in the pessimistic boundary case.",
+    "Modeled OHLC trades, not account bills or fills."
+  ]
+}

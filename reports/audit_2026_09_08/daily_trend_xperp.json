@@ -1,0 +1,122 @@
+{
+  "status": "RESEARCH_ONLY",
+  "coverage": {
+    "first": "2026-04-01 00:00:00+00:00",
+    "last": "2026-08-25 00:00:00+00:00",
+    "days": 147,
+    "symbols": [
+      "BTCUSDT",
+      "ETHUSDT",
+      "XRPUSDT",
+      "ADAUSDT",
+      "SOLUSDT"
+    ]
+  },
+  "cost_model": {
+    "one_way_bps": 6.0,
+    "round_trip_bps": 12.0
+  },
+  "source_sha256": {
+    "reports\\audit_2026_09_08\\xperp_cache\\BTCUSDT_1d_192.pkl": "fbdfe8047584b08a2af8b043f922f07a4c693d99d76a3ef92b7c88d4d4905fa5",
+    "reports\\audit_2026_09_08\\xperp_cache\\ETHUSDT_1d_192.pkl": "06380531147f27bc01ec1b6de2807e1f0da6ebefe9ab734d39c5dff9910bb4ad",
+    "reports\\audit_2026_09_08\\xperp_cache\\XRPUSDT_1d_192.pkl": "b5095dd43e41797911b217ef1765c3f591f4b85a0b61e5d2520890a108cf8a04",
+    "reports\\audit_2026_09_08\\xperp_cache\\ADAUSDT_1d_192.pkl": "a1e17e9f9d2885d84e551b63385084ac0ab9b94b99ce08ae79d7b8773506d20a",
+    "reports\\audit_2026_09_08\\xperp_cache\\SOLUSDT_1d_192.pkl": "888147c85a6d57c96048346696c6c79395d3e1e375615918efe58ebb19f5fd94"
+  },
+  "results": {
+    "donchian_20_60_120": {
+      "full": {
+        "days": 146,
+        "active_days": 112,
+        "net_return_pct": 2.490799558567658,
+        "max_drawdown_pct": -26.539860463684796,
+        "annualized_sharpe": 0.3516294642894621,
+        "daily_win_rate": 36.986301369863014,
+        "total_cost_pct": 0.7998152299400377,
+        "turnover": 13.330253832333966
+      },
+      "2026": {
+        "days": 146,
+        "active_days": 112,
+        "net_return_pct": 2.490799558567658,
+        "max_drawdown_pct": -26.539860463684796,
+        "annualized_sharpe": 0.3516294642894621,
+        "daily_win_rate": 36.986301369863014,
+        "total_cost_pct": 0.7998152299400377,
+        "turnover": 13.330253832333966
+      }
+    },
+    "donchian_20_60_120_crash_half": {
+      "full": {
+        "days": 146,
+        "active_days": 112,
+        "net_return_pct": 11.406766645938916,
+        "max_drawdown_pct": -13.991464877062521,
+        "annualized_sharpe": 1.1078737018391804,
+        "daily_win_rate": 36.986301369863014,
+        "total_cost_pct": 0.6296094070949542,
+        "turnover": 10.493490118249237
+      },
+      "2026": {
+        "days": 146,
+        "active_days": 112,
+        "net_return_pct": 11.406766645938916,
+        "max_drawdown_pct": -13.991464877062521,
+        "annualized_sharpe": 1.1078737018391804,
+        "daily_win_rate": 36.986301369863014,
+        "total_cost_pct": 0.6296094070949542,
+        "turnover": 10.493490118249237
+      }
+    },
+    "momentum_30d_long_cash": {
+      "full": {
+        "days": 146,
+        "active_days": 74,
+        "net_return_pct": 21.847732964830115,
+        "max_drawdown_pct": -15.65366813581287,
+        "annualized_sharpe": 1.5898953385752328,
+        "daily_win_rate": 27.397260273972602,
+        "total_cost_pct": 1.642067761041667,
+        "turnover": 27.367796017361123
+      },
+      "2026": {
+        "days": 146,
+        "active_days": 74,
+        "net_return_pct": 21.847732964830115,
+        "max_drawdown_pct": -15.65366813581287,
+        "annualized_sharpe": 1.5898953385752328,
+        "daily_win_rate": 27.397260273972602,
+        "total_cost_pct": 1.642067761041667,
+        "turnover": 27.367796017361123
+      }
+    },
+    "momentum_30d_long_cash_crash_half": {
+      "full": {
+        "days": 146,
+        "active_days": 74,
+        "net_return_pct": 17.5337408771848,
+        "max_drawdown_pct": -12.804124565454844,
+        "annualized_sharpe": 1.7149934362768335,
+        "daily_win_rate": 27.397260273972602,
+        "total_cost_pct": 1.0607448383578428,
+        "turnover": 17.679080639297382
+      },
+      "2026": {
+        "days": 146,
+        "active_days": 74,
+        "net_return_pct": 17.5337408771848,
+        "max_drawdown_pct": -12.804124565454844,
+        "annualized_sharpe": 1.7149934362768335,
+        "daily_win_rate": 27.397260273972602,
+        "total_cost_pct": 1.0607448383578428,
+        "turnover": 17.679080639297382
+      }
+    }
+  },
+  "limitations": [
+    "Daily SWAP candles are a signal proxy; they do not prove X-Perp execution quality.",
+    "Funding, tax, borrow constraints and liquidation are excluded.",
+    "The strategy uses no leverage; leveraged deployment would multiply both returns and drawdowns nonlinearly.",
+    "These prespecified hypotheses still require forward paper validation before live use."
+  ]
+}

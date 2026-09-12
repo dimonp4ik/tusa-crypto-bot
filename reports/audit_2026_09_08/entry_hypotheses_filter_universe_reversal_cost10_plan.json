@@ -1,0 +1,25 @@
+{
+  "max_cost_target_fraction": 0.1,
+  "families": [
+    "sweep_reclaim",
+    "exhaustion_reversal"
+  ],
+  "targets": [
+    0.25,
+    0.5,
+    1.0,
+    2.0
+  ],
+  "stop_atr": 2,
+  "timeout_bars": 48,
+  "cost_roundtrip": 0.0004,
+  "manifest_sha256": "a1fbc651fc34e3a5cd145efb1afdccec319a1a5156a0036c6be5fe5905cbd07a",
+  "source_sha256": "ef3db4095fc3864861ec747168e8e8d06e25f63a2f8ae10b4a4fab5c04b3800e",
+  "status": "EXPLORATORY_ONLY",
+  "notes": [
+    "Full final target exit, no partial TP1; alternative to trailing.",
+    "Equal initial R per trade; do not compare totals directly to legacy size-weighted SMC.",
+    "Previously inspected SWAP history, funding excluded, not independent live proof.",
+    "Universe survivorship and historical gaps remain. Portfolio gates reapplied per variant."
+  ]
+}

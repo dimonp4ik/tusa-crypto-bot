@@ -1,0 +1,39 @@
+{
+  "status": "RESEARCH_ONLY",
+  "old_roundtrip_cost": 0.0004,
+  "new_roundtrip_cost": 0.0012,
+  "old": {
+    "n": 984,
+    "wr": 62.19512195121951,
+    "wr_lower_95": 59.12344505329804,
+    "net_r": 51.116995605595754,
+    "mean_r": 0.051948166265849346,
+    "pf": 1.15268455301631,
+    "dd_r": 32.06233824156966,
+    "active_days": 182,
+    "daily_lcb": -0.11286996948301209,
+    "symbols": 18,
+    "stress_net_r": 6.059268361817256
+  },
+  "new": {
+    "n": 984,
+    "wr": 61.99186991869918,
+    "wr_lower_95": 58.917836597394135,
+    "net_r": 15.070813810572957,
+    "mean_r": 0.015315867693671706,
+    "pf": 1.0432740123598245,
+    "dd_r": 36.21479444711466,
+    "active_days": 182,
+    "daily_lcb": -0.3076898149851398,
+    "symbols": 18,
+    "stress_net_r": -29.986913433205544
+  },
+  "raw_sha256": "92670bb77ea2610e5e20fe0d8e598446f8d986bf8d4864522d46afbf5a2fda9f",
+  "source": "https://www.okx.com/en-gb/help/okx-x-perps-eea-fees-overview",
+  "limitations": [
+    "Same historical candidate generation and fills; only estimated cost changed. No account-specific fee confirmation.",
+    "Cost normalization uses original entry notional as in the underlying replay.",
+    "Funding remains excluded; new stress metric adds another 10bps to 12bps total baseline.",
+    "Previously inspected SWAP data, not actual X-Perp account PnL."
+  ]
+}

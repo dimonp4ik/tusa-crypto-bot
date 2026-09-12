@@ -1,0 +1,395 @@
+{
+  "arguments": {
+    "input": "multiyear_taker_raw.csv",
+    "train_end": "2025-01-01",
+    "validation_end": "2026-01-01",
+    "cap": 3
+  },
+  "status": "RESEARCH_ONLY",
+  "training_rows": 3662,
+  "schema": [
+    {
+      "volume_ratio": [
+        2.392591480065538,
+        1.5321185137082456
+      ],
+      "eff_ratio": [
+        0.4215525483369823,
+        0.17237591997461343
+      ],
+      "rsi_directional": [
+        63.25703440742763,
+        5.256127182999148
+      ],
+      "vol_atr_pct": [
+        0.007030495406129664,
+        0.004184835273468837
+      ],
+      "vol_ratio_regime": [
+        1.5899242611974556,
+        0.6922615670238773
+      ],
+      "extension": [
+        1.0682607864554887,
+        0.6870390887238107
+      ],
+      "risk_pct": [
+        0.020957871980444652,
+        0.008259026360311611
+      ],
+      "tp1_r": [
+        0.6725006232690374,
+        0.27102481164479647
+      ],
+      "mtf_score": [
+        15.474877116329875,
+        1.6436486080602382
+      ]
+    },
+    {
+      "direction": [
+        "LONG",
+        "SHORT"
+      ],
+      "entry_source": [
+        "FVG",
+        "OB"
+      ],
+      "trend_1h": [
+        "bearish",
+        "bullish",
+        "neutral"
+      ],
+      "trend_4h": [
+        "bearish",
+        "bullish",
+        "neutral"
+      ],
+      "session": [
+        "DEAD_ZONE",
+        "LONDON",
+        "NEW_YORK",
+        "OFF_HOURS",
+        "OVERLAP"
+      ]
+    }
+  ],
+  "weights": [
+    0.0982872759005117,
+    -0.04715665548991357,
+    0.030893504900877552,
+    -0.04791820743575024,
+    -0.011593213645854385,
+    -0.06576736037895772,
+    0.07057465504153612,
+    0.047998975219367114,
+    -0.19172927706476384,
+    0.06465170200884628,
+    0.062495295008621304,
+    0.014314228174598487,
+    0.05118750485480976,
+    0.025622018328410046,
+    -0.009865637570907807,
+    -0.0551859345274802,
+    0.14186109528160787,
+    -0.027754599057564194,
+    0.08022463730375419,
+    0.024339484937029844,
+    0.1279631650549295,
+    -0.008403412416804269,
+    0.0019019711915449237,
+    0.04576909049143593,
+    -0.09042129113788618
+  ],
+  "thresholds": [
+    {
+      "cutoff": 0.5,
+      "validation": {
+        "n": 720,
+        "wr": 63.05555555555556,
+        "wr_lower_95": 59.46940842462256,
+        "net_r": -3.671490377917386,
+        "mean_r": -0.005099292191551925,
+        "pf": 0.984300387386224,
+        "dd_r": 26.665121473008202,
+        "active_days": 171,
+        "daily_lcb": -0.3441343296304886,
+        "symbols": 12,
+        "stress_net_r": -31.655972338921984
+      }
+    },
+    {
+      "cutoff": 0.55,
+      "validation": {
+        "n": 651,
+        "wr": 63.133640552995395,
+        "wr_lower_95": 59.36062743154187,
+        "net_r": -11.135893019699845,
+        "mean_r": -0.017105826451151836,
+        "pf": 0.946050961428952,
+        "dd_r": 37.934289548760255,
+        "active_days": 167,
+        "daily_lcb": -0.392714890187775,
+        "symbols": 12,
+        "stress_net_r": -35.21082321183336
+      }
+    },
+    {
+      "cutoff": 0.6,
+      "validation": {
+        "n": 321,
+        "wr": 59.19003115264797,
+        "wr_lower_95": 53.73549098049586,
+        "net_r": -21.526550438170794,
+        "mean_r": -0.06706090479180933,
+        "pf": 0.802941035532399,
+        "dd_r": 29.64504508884026,
+        "active_days": 120,
+        "daily_lcb": -0.4636293789911986,
+        "symbols": 12,
+        "stress_net_r": -33.260229489274
+      }
+    },
+    {
+      "cutoff": 0.65,
+      "validation": {
+        "n": 44,
+        "wr": 56.81818181818182,
+        "wr_lower_95": 42.223890740554396,
+        "net_r": -4.446640054404104,
+        "mean_r": -0.1010600012364569,
+        "pf": 0.7143643586469091,
+        "dd_r": 9.470878796912537,
+        "active_days": 28,
+        "daily_lcb": -0.531871523096412,
+        "symbols": 11,
+        "stress_net_r": -5.965732519458123
+      }
+    },
+    {
+      "cutoff": 0.7,
+      "validation": {
+        "n": 0,
+        "wr": 0,
+        "wr_lower_95": 0,
+        "net_r": 0,
+        "mean_r": 0,
+        "pf": null,
+        "dd_r": 0.0,
+        "active_days": 0,
+        "daily_lcb": -1000000000.0,
+        "symbols": 0,
+        "stress_net_r": 0
+      }
+    },
+    {
+      "cutoff": 0.75,
+      "validation": {
+        "n": 0,
+        "wr": 0,
+        "wr_lower_95": 0,
+        "net_r": 0,
+        "mean_r": 0,
+        "pf": null,
+        "dd_r": 0.0,
+        "active_days": 0,
+        "daily_lcb": -1000000000.0,
+        "symbols": 0,
+        "stress_net_r": 0
+      }
+    },
+    {
+      "cutoff": 0.8,
+      "validation": {
+        "n": 0,
+        "wr": 0,
+        "wr_lower_95": 0,
+        "net_r": 0,
+        "mean_r": 0,
+        "pf": null,
+        "dd_r": 0.0,
+        "active_days": 0,
+        "daily_lcb": -1000000000.0,
+        "symbols": 0,
+        "stress_net_r": 0
+      }
+    },
+    {
+      "cutoff": 0.85,
+      "validation": {
+        "n": 0,
+        "wr": 0,
+        "wr_lower_95": 0,
+        "net_r": 0,
+        "mean_r": 0,
+        "pf": null,
+        "dd_r": 0.0,
+        "active_days": 0,
+        "daily_lcb": -1000000000.0,
+        "symbols": 0,
+        "stress_net_r": 0
+      }
+    },
+    {
+      "cutoff": 0.9,
+      "validation": {
+        "n": 0,
+        "wr": 0,
+        "wr_lower_95": 0,
+        "net_r": 0,
+        "mean_r": 0,
+        "pf": null,
+        "dd_r": 0.0,
+        "active_days": 0,
+        "daily_lcb": -1000000000.0,
+        "symbols": 0,
+        "stress_net_r": 0
+      }
+    }
+  ],
+  "chosen": null,
+  "validation_calibration": {
+    "brier": 0.23865666691304957,
+    "bins": [
+      {
+        "range": [
+          0,
+          0.5
+        ],
+        "n": 132,
+        "predicted": 0.4519815623123598,
+        "observed": 0.5606060606060606
+      },
+      {
+        "range": [
+          0.5,
+          0.6
+        ],
+        "n": 1330,
+        "predicted": 0.5641600728196484,
+        "observed": 0.6323308270676692
+      },
+      {
+        "range": [
+          0.6,
+          0.7
+        ],
+        "n": 547,
+        "predicted": 0.6236360808700866,
+        "observed": 0.6051188299817185
+      },
+      {
+        "range": [
+          0.7,
+          0.8
+        ],
+        "n": 0,
+        "predicted": null,
+        "observed": null
+      },
+      {
+        "range": [
+          0.8,
+          0.85
+        ],
+        "n": 0,
+        "predicted": null,
+        "observed": null
+      },
+      {
+        "range": [
+          0.85,
+          0.9
+        ],
+        "n": 0,
+        "predicted": null,
+        "observed": null
+      },
+      {
+        "range": [
+          0.9,
+          1.01
+        ],
+        "n": 0,
+        "predicted": null,
+        "observed": null
+      }
+    ]
+  },
+  "test_calibration": {
+    "brier": 0.23980483946297923,
+    "bins": [
+      {
+        "range": [
+          0,
+          0.5
+        ],
+        "n": 202,
+        "predicted": 0.4486487215885597,
+        "observed": 0.5544554455445545
+      },
+      {
+        "range": [
+          0.5,
+          0.6
+        ],
+        "n": 1972,
+        "predicted": 0.5604691574309776,
+        "observed": 0.6064908722109533
+      },
+      {
+        "range": [
+          0.6,
+          0.7
+        ],
+        "n": 639,
+        "predicted": 0.623048260365929,
+        "observed": 0.6369327073552425
+      },
+      {
+        "range": [
+          0.7,
+          0.8
+        ],
+        "n": 4,
+        "predicted": 0.7138945066515484,
+        "observed": 0.75
+      },
+      {
+        "range": [
+          0.8,
+          0.85
+        ],
+        "n": 0,
+        "predicted": null,
+        "observed": null
+      },
+      {
+        "range": [
+          0.85,
+          0.9
+        ],
+        "n": 0,
+        "predicted": null,
+        "observed": null
+      },
+      {
+        "range": [
+          0.9,
+          1.01
+        ],
+        "n": 0,
+        "predicted": null,
+        "observed": null
+      }
+    ]
+  },
+  "input_sha256": "6cecd14176fd417c911ca644edc4578c5ee20cdb84ccab6e1b33461999af170c",
+  "source_sha256": "6313d753e89deb75a98d7b0b585b0a49a936effba7be9a44c68c6d97cd8587bd",
+  "limitations": [
+    "Previously inspected historical SWAP candidates, no untouched live evidence. Funding omitted.",
+    "No hyperparameter sweep. Standardization and category vocabulary fitted on training only.",
+    "Calibration describes raw candidates, while selected returns use portfolio gates.",
+    "High predicted probabilities are not guarantees; reject models lacking sufficient validation evidence."
+  ]
+}

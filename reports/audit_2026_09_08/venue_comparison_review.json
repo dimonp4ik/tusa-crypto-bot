@@ -1,0 +1,29 @@
+{
+  "status": "SOURCE_PORTABILITY_ONLY",
+  "results": {
+    "venue_swap_matched": {
+      "trades": 155,
+      "win_rate": 61.29032258064516,
+      "net_r": 8.641339447172289,
+      "profit_factor": 1.257064540451026,
+      "closed_equity_drawdown_r": 9.95548518642305,
+      "worst_trade_r": -2.489731006883727
+    },
+    "venue_xperp": {
+      "trades": 135,
+      "win_rate": 54.074074074074076,
+      "net_r": -1.2206776249714253,
+      "profit_factor": 0.9617853784797968,
+      "closed_equity_drawdown_r": 10.548810728706016,
+      "worst_trade_r": -2.2294385820912237
+    }
+  },
+  "limitations": [
+    "Different venue candles generate different entry signals; this does not isolate execution slippage.",
+    "Matched per-instrument timestamps and warmup; limited to BTC/ETH or NVDA/XAU.",
+    "X-Perp historical zero-volume candles can contain stale prices. OHLCV cannot establish executable depth/spread.",
+    "Stocks SPY context matched only at 1h. SPY 15m has one timestamp absent from original SWAP cache and was not used.",
+    "Actual account fills, fees, funding and per-user positions are not reconciled."
+  ],
+  "next": "Implement and test a fresh executable bid/ask and depth pre-entry check, then evaluate unchanged SWAP signals against X-Perp execution history."
+}

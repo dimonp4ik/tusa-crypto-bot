@@ -1,0 +1,32 @@
+{
+  "status": "EXECUTION_DIAGNOSTIC_ONLY",
+  "selection": "First five accepted cost10 trend pullback 0.25R entries per named symbol after 2026-08-01.",
+  "limitations": [
+    "Subset of already accepted trades; portfolio gates not replayed, no strategy return claim.",
+    "Fixed final exit diagnostic, not production trailing validation. SWAP candles, not X-Perp.",
+    "Minute OHLC still has intraminute uncertainty. Same fee/slippage estimate; funding excluded."
+  ],
+  "source_sha256": "f40cd2fc71d3a98b36c3f8890d32c18fd29faec45e79754d0722b537f14934ed",
+  "results": [
+    {
+      "symbol": "BTCUSDT",
+      "entry_time": 1787314500,
+      "minute_net_r": 0.23038340434830343,
+      "fifteen_minute_net_r": 0.23038340434830346,
+      "difference_r": -2.7755575615628914e-17,
+      "minute_outcome": "TP2",
+      "original_outcome": "TP2",
+      "cache_sha256": "47363712e51a4a37e1ab1082f46337c44bfffdce7f8d262578cfdb5af61736df"
+    },
+    {
+      "symbol": "ETHUSDT",
+      "entry_time": 1787314500,
+      "minute_net_r": 0.23029304376128054,
+      "fifteen_minute_net_r": 0.23029304376128054,
+      "difference_r": 0.0,
+      "minute_outcome": "TP2",
+      "original_outcome": "TP2",
+      "cache_sha256": "7807d9fbfb01c3c9e6fdb50c38ce6a532921cb899186295793dcb379644589d8"
+    }
+  ]
+}
