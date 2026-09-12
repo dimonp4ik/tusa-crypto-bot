@@ -3226,11 +3226,6 @@ PULLBACK_LIVE_MAX_DRAWDOWN = float(os.getenv("PULLBACK_LIVE_MAX_DRAWDOWN", "0.15
 # message per signal when price touches the level, one when the signal's take, stop or
 # 48h exit is reached. Owner's choice, 11.09.2026.
 PULLBACK_GROUP_POSTS = os.getenv("PULLBACK_GROUP_POSTS", "1") == "1"
-# Judge each bank signal before it becomes a trade (src/bank_filter.py, models/bank_filter.joblib).
-# Measured on 2025-26, which the model never saw: win rate 84.7 -> 89.2%, +0.056 -> +0.110R per
-# trade, drawdown -11.1 -> -5.0R, at the cost of skipping about half the signals.
-# 0 = off (every signal is taken, as before).
-PULLBACK_FILTER_ENABLED = os.getenv("PULLBACK_FILTER_ENABLED", "0") == "1"
 
 # --- Old SMC signal path ---
 # OFF since 11.09.2026 (owner: "по старой логике не надо сообщений в группе"): no scan, no

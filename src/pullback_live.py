@@ -30,7 +30,6 @@ from datetime import datetime, timezone
 
 import numpy as np
 
-from src import bank_filter
 from src import pullback_bank as PB
 from src.execution_guard import execution_quote
 from src.risk_limits import equity_guard
@@ -98,10 +97,9 @@ class Live:
     def __init__(self, *, symbols, rules_name, ex, inst_id_of, candles, feed_prices, users,
                  dm, load_state, save_state, max_spread, max_slip, slip_min_n, leverage,
                  max_daily_loss, max_drawdown, peak_floor=0.0, sleep=time.sleep, btc_sma=0,
-                 stop_ref=0.0, group=None, filter_on=False):
+                 stop_ref=0.0, group=None):
         self.symbols = list(symbols)
         self.group = group                          # text -> posts to the signals group
-        self.filter_on = filter_on                  # judge each signal before taking it
         self.rules = PB.RULE_SETS[rules_name]
         self.ex, self.inst_id_of, self.candles = ex, inst_id_of, candles
         self.feed_prices, self.users, self.dm = feed_prices, users, dm
@@ -174,12 +172,6 @@ class Live:
                 if ex_ts and now - ex_ts < EXCLUDE_SEC:
                     log.info("pullback live: %s excluded (slippage), signal skipped", sym)
                     continue
-                if self.filter_on:
-                    take, fscore = bank_filter.allow(t, a, bt, ba)
-                    if not take:
-                        log.info("pullback live: %s signal skipped by the filter (score %.4f)",
-                                 sym, fscore)
-                        continue
                 k, level, atr = s
                 self.state["watch"].append(dict(sym=sym, close=close, until=close + WATCH_SEC,
                                                 rule=k, level=level, atr=atr,
@@ -550,8 +542,7 @@ def build_default():
                 slip_min_n=C.PULLBACK_LIVE_SLIP_MIN_N, leverage=C.AUTOTRADE_LEVERAGE,
                 max_daily_loss=C.PULLBACK_LIVE_MAX_DAILY_LOSS,
                 max_drawdown=C.PULLBACK_LIVE_MAX_DRAWDOWN, btc_sma=C.PULLBACK_BTC_SMA,
-                stop_ref=C.PULLBACK_STOP_REF, group=group,
-                filter_on=C.PULLBACK_FILTER_ENABLED)
+                stop_ref=C.PULLBACK_STOP_REF, group=group)
 
 
 def start_default():

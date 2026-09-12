@@ -293,44 +293,5 @@ class ScanTest(unittest.TestCase):
         self.assertEqual(live.state["watch"][0]["until"], NOW + L.WATCH_SEC)
 
 
-class FilterTest(unittest.TestCase):
-    """The judge sits between the signal and the watch, and only when it is switched on."""
-
-    def _scan(self, verdict, **kw):
-        t = NOW - PB.BAR * (4 * (PB.MIN_HOURS + 60)) + np.arange(4 * (PB.MIN_HOURS + 60)) * PB.BAR
-        a = np.c_[np.full((len(t), 4), 100.0), np.ones(len(t))]
-
-        class Store:
-            def get(self, sym, now):
-                return t, a
-        ex = FakeEx(); live, _ = make(ex, **kw)
-        live.candles = Store()
-        sig, seen = PB.hourly_signals, []
-        PB.hourly_signals = lambda *a_, **k: {NOW: (0, 100.0, 1.0)}
-        allow = L.bank_filter.allow
-        L.bank_filter.allow = lambda *a_: (seen.append(1), verdict)[1]
-        try:
-            live.maybe_scan(NOW + 15)
-        finally:
-            PB.hourly_signals = sig
-            L.bank_filter.allow = allow
-        return live, len(seen)
-
-    def test_off_by_default_the_filter_is_never_called(self):
-        live, calls = self._scan((False, 0.0))
-        self.assertEqual(calls, 0)
-        self.assertEqual(len(live.state["watch"]), 1)
-
-    def test_a_rejected_signal_never_becomes_a_watch(self):
-        live, calls = self._scan((False, 0.01), filter_on=True)
-        self.assertEqual(calls, 1)
-        self.assertEqual(live.state["watch"], [])
-
-    def test_an_approved_signal_is_traded_as_before(self):
-        live, calls = self._scan((True, 0.9), filter_on=True)
-        self.assertEqual(calls, 1)
-        self.assertEqual(len(live.state["watch"]), 1)
-
-
 if __name__ == "__main__":
     unittest.main()
