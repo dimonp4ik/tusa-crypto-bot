@@ -210,3 +210,44 @@ off in the first bad stretch - which is the worst of both, a large drawdown *and
 **At 1.5% everything is consistent**: no signal is ever refused for margin, the daily pause costs
 ten entries in four years, the latch never fires, and the drawdown lands at -13.1% against a 15%
 limit. That is the only setting where the measured strategy and the deployed guards agree.
+
+## The live universe is smaller than the backtest's, and that turns out to be fine
+
+Two more gates exist only in the live path. `PULLBACK_LIVE_MAX_SPREAD` (0.05%) skips an entry whose
+X-Perp spread is wider; `PULLBACK_LIVE_MAX_SLIP` (0.03%) excludes a coin for seven days once its
+measured entry slippage averages above that. Neither is in any backtest number.
+
+Measured on the venue's book (seven snapshots, 03-04 UTC - a thin hour, and the sampler now running
+covers a full day, so treat this as the shape rather than the size):
+
+| coin | median spread | snapshots above 0.05% | cost of a $54 order | above 0.03% |
+|---|---|---|---|---|
+| BILL | 0.453% | 100% | 0.327% | 100% |
+| XLM | 0.195% | 100% | 0.106% | 100% |
+| AAVE | 0.110% | 100% | 0.074% | 100% |
+| NEAR | 0.085% | 57% | 0.043% | 57% |
+| DOT | 0.040% | 0% | 0.039% | 71% |
+| TAO / SUI / AVAX / ADA | 0.041-0.048% | 14-43% | 0.020-0.024% | 0-43% |
+| LINK, HYPE, SOL, XRP, ZEC, ETH, BTC | 0.0001-0.026% | 0% | 0.0001-0.020% | 0% |
+
+So the deployed bot would never enter BILL, XLM or AAVE at all, would miss over half of NEAR's
+entries, and would periodically exclude NEAR and DOT for a week at a time. The backtest counts all
+of them, and NEAR alone contributes +17.7R of the +168.6R total.
+
+| universe | per trade | per month | drawdown | ratio |
+|---|---|---|---|---|
+| all sixteen | +0.0606R | +3.24R | -11.2R | 0.29 |
+| the two proposed changes | +0.0633R | +3.37R | -10.0R | 0.34 |
+| minus what the spread gate always blocks | +0.0724R | +3.29R | -10.0R | 0.33 |
+| **the same, plus BTC at half** | **+0.0738R** | **+3.36R** | **-9.6R** | **0.35** |
+| also minus NEAR | +0.0735R | +3.01R | -9.3R | 0.33 |
+| also minus NEAR and DOT | +0.0764R | +2.85R | -8.4R | 0.34 |
+
+**The bank survives its own safety gates**, and in the likeliest case is slightly better for them.
+The reason is not luck: the coins the gates refuse are the ones already sitting at the break-even
+line. XLM returns +2.1R across 177 trades and AAVE returns exactly nothing across 227, while the
+edge lives in the liquid names.
+
+The worst case - losing NEAR and DOT to the seven-day exclusions as well - costs about 15% of the
+monthly R and buys a drawdown of -8.4R instead of -9.6R. Nothing here changes the decision; it
+removes a way for the live result to diverge from the measured one without anyone noticing.
