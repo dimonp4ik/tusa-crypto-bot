@@ -511,3 +511,32 @@ Non-monotone, and the weakest bucket sits directly below the strongest. There is
 
 **With this the bank is audited end to end** - entry, exit, regime, sizing and universe - and every
 parameter it has now rests on a measurement rather than on the history of how it got there.
+
+### The take, checked on the exchange that triggers it
+
+Take 1.0 was chosen and validated entirely on the analysis feed, but the take is a level on the
+X-Perp, whose candles run narrower. A target set further out is, in the venue's own terms, harder
+to reach than the backtest thinks. Run against the cached real X-Perp bars:
+
+| take | filled | win rate | per trade | total | (analysis feed total) |
+|---|---|---|---|---|---|
+| 0.50 | 99 | 93.9% | +0.0894R | +8.9R | +12.9R |
+| **0.75 (deployed)** | 88 | 90.9% | +0.1304R | +11.5R | +14.1R |
+| **1.00 (proposed)** | 82 | **89.0%** | **+0.1814R** | **+14.9R** | +14.4R |
+| 1.25 | 72 | 83.3% | +0.1848R | +13.3R | +17.4R |
+| 1.50 | 67 | 80.6% | +0.2144R | +14.4R | +19.5R |
+
+Two things.
+
+**The change is confirmed on real prices**: +0.1814R against +0.1304R, +14.9R against +11.5R. The
+win rate there is 89.0% rather than the 80% the analysis feed predicted, so on the venue the change
+costs less win rate than the backtest charged it.
+
+**And the venue caps how far it is worth going.** On the analysis feed the total keeps climbing past
+1.0 - 14.4, 17.4, 19.5 - while on the X-Perp it falls back: 14.9, 13.3, 14.4. The narrower candles
+reach a distant target less often, and the analysis feed cannot see it. So 1.0 is not merely the
+first acceptable value, it is close to the optimum where the money actually is, and there is a
+measured reason not to go further.
+
+Six coins over three months, so this confirms a direction rather than measuring a size - but it is
+the direction the mechanism predicted before the data was looked at.
