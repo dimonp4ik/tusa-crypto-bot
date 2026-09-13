@@ -397,3 +397,40 @@ already doing the right thing, for a different reason than assumed.
 With a hundred trades over three months this is not proof the fix would hurt; it is the absence of
 any reason to make it, against a real cost in live-code complexity. Rejected - the twenty-third
 candidate.
+
+### Partial retraction: the venue argument for the BTC trim is not confirmed
+
+Halving BTC was argued on two grounds. First, BTC takes part in 12.4% of the account's worst days
+against an 8.3% average, better in four years of five and seven forward half-years of nine, with
+controls on five other coins failing to reproduce it. Second, its X-Perp feed dips a quarter of a
+candle below the analysis feed in 15.8% of bars against 1-4% elsewhere - a rougher venue, therefore
+more stops.
+
+The second argument was a property of the candles, not of the trades. With real X-Perp bars the
+question can be asked directly - do the same trades stop more often on the venue?
+
+| coin | analysis: trades / stops | X-Perp: trades / stops | change |
+|---|---|---|---|
+| BTC | 17 / **0** (0.0%) | 13 / **0** (0.0%) | +0.0 pp |
+| ETH | 15 / 3 (20.0%) | 13 / 2 (15.4%) | -4.6 pp |
+| XRP | 13 / 1 (7.7%) | 11 / 0 (0.0%) | -7.7 pp |
+| SOL | 19 / 1 (5.3%) | 15 / 0 (0.0%) | -5.3 pp |
+| ADA | 18 / 3 (16.7%) | 18 / 3 (16.7%) | +0.0 pp |
+| AVAX | 14 / 3 (21.4%) | 12 / 3 (25.0%) | +3.6 pp |
+| **all** | 96 / 11 (11.5%) | 82 / 8 (**9.8%**) | **-1.7 pp** |
+
+Two awkward facts. BTC takes zero stops on either venue in this window - 17 and 13 trades without
+one - so the mechanism cannot be tested on the coin it was invented for. And across all six coins
+the X-Perp produces **fewer** stops, not more.
+
+**So the venue half of the case for halving BTC is withdrawn.** A wider candle is not the same thing
+as a stop that fires, and when the claim was finally put to trades rather than to candles it did not
+reproduce.
+
+The trim itself stands, on the evidence that never depended on this: drawdown participation, four
+years of five, seven forward half-years of nine, and controls that fail to reproduce it on other
+coins. It is now a one-legged argument rather than a two-legged one, which is worth knowing when
+deciding whether to take it.
+
+Three months and ninety-odd trades cannot refute the venue claim either - but it was asserted on
+candle geometry and has now failed its first direct test, which is the honest status to record.
