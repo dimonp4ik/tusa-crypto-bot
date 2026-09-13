@@ -635,3 +635,25 @@ the 4h engine's universe is untouched.
 This matters because of a failure already on record here: a parity harness passing 300 of 300 while
 the rule it was testing never fired in the real run, because the harness was fed something the live
 path never sees. The check above is on the exact expressions that would be written.
+
+### The tests are safe for this change - and do not cover the deployed rule set
+
+Checked before applying anything, because a change that breaks the suite at application time is a
+change made in a hurry.
+
+**Safe.** Nothing in `tests/` hard-codes the take, the rule-set name, or BILLUSDT. The three bank
+tests build their own sets - `bank9`, `bank9+short2`, `strict3+short2` - so changing the
+`PULLBACK_RULES` default and the symbol list cannot break them.
+
+**But that is also the gap.** None of those is the set actually deployed (`strict3+short2_wide`),
+and the proposed `strict3+short2_wide10` would be equally uncovered. The 128 green tests exercise
+the bank's machinery on rule sets it does not trade.
+
+That is not a reason to delay - the machinery is what tests should cover, and it is covered - but
+the missing test is worth naming:
+
+    the deployed set has five rules, all take 1.0 ATR and stop 3.0 ATR after the change;
+    a test that asserts that, and that the set is exactly RULES_STRICT + SHORT_RULES with the
+    take replaced, would catch a future edit that changes the deployed geometry by accident.
+
+Not written, like everything else here, until the owner decides.
