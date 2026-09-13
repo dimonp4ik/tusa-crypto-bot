@@ -659,3 +659,28 @@ the price of the venue, not the absence of an edge.
 and supplies the real reason for it: expensive coins have worse nulls, so their edge is larger than
 their totals suggest. Judging a coin by what it returns, rather than by what it returns above a coin
 toss on the same bars, penalises exactly the coins whose venue is hardest.
+
+### BILL held to the same standard
+
+Two coins were just rescued from a wrong judgement by computing their own nulls. The same medicine
+has to be given to the one coin proposed for removal, or the standard is not a standard.
+
+    BILL       16 trades   +-0.2304R    own null -0.1507R    edge -0.0797R   -0.5 sigma
+    XLM       162 trades   +0.0219R     own null -0.0930R    edge +0.1149R    2.7 sigma
+    NEAR      207 trades   +0.0924R     own null -0.0233R    edge +0.1157R    3.3 sigma
+    AAVE      209 trades   -0.0088R     own null -0.0555R    edge +0.0467R    1.2 sigma
+
+    measured entry cost:  BILL 0.290%   XLM 0.112%   AAVE 0.073%   NEAR 0.043%
+
+This is the distinction that was missing. The expensive coins defended above sit **above** their own
+nulls; BILL sits **below** its own. It is not merely expensive - it is the one coin where correcting
+for the venue does not rescue it.
+
+Stated honestly about significance: -0.5 sigma on sixteen trades proves nothing. **The removal rests
+on the measured entry cost - 0.290%, 2.6 times the next worst - not on its results.** The null model
+neither confirms nor contradicts the removal; what it does is separate BILL from the other expensive
+coins by sign, which is exactly what the earlier reasoning lacked.
+
+One caveat on precision: these nulls are sampled, and between runs they move in the second decimal
+(XLM's came out -0.1048 once and -0.0930 another time). The conclusions do not turn on that, but the
+figures are not exact to the last digit.
