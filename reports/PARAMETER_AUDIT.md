@@ -320,3 +320,35 @@ pulls it back to -13.3%. The latch boundary moves only from 1.779% to 1.742%, so
 
 At 1.25% the package returns more than today's setting does at 1.5% ($1,273 against $1,155) with
 two points less drawdown - which is the conservative way to take the same improvement.
+
+### Take 1.0 attacked from four more directions, and the mechanism identified
+
+| attack | result |
+|---|---|
+| coin split | both halves better (+0.0888 vs +0.0666, +0.0728 vs +0.0517) |
+| every rule separately | all five improve - it is geometry, not one scenario's quirk |
+| 22 unpinned coins | neutral (+0.0360 vs +0.0359); no power, as before |
+| **mirror** | stays firmly negative (-0.0400), but improves by +0.0022R |
+
+The mirror moving the same way is the only blemish, and it is a tenth of the real side's +0.0218R.
+It also pointed at the right question: a larger target means fewer trades reach it, so more run to
+the 48h exit - and in a market that mostly rose from 2022 to 2026, holding longer in longs collects
+drift, which is a bet on the next four years rather than an edge.
+
+It is not drift:
+
+| | take 0.75 | take 1.00 |
+|---|---|---|
+| exits at the take | 2,373 (85.2%), +549.7R | 2,056 (80.8%), **+647.7R** |
+| exits at the stop | 347 (12.5%), -354.7R | 396 (15.6%), -404.8R |
+| exits at 48h | 64 (2.3%), **-26.4R** | 93 (3.7%), **-33.3R** |
+| LONG total | +97.2R | **+121.4R (+25%)** |
+| SHORT total | +71.4R | **+88.2R (+24%)** |
+
+Three things settle it. The time-exit bucket loses money at both settings and is 2-4% of trades, so
+the gain is not "hold longer". Longs and shorts improve by the same amount - 25% and 24% - while
+drift would help one and hurt the other. And the cost is visible and paid for: the stop rate rises
+from 12.5% to 15.6%, costing 50R, against 98R more collected at the target.
+
+Median holding time goes from 2.8 to 4.5 hours, nowhere near the 48h cap or the owner's three-day
+limit.
