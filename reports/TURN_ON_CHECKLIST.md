@@ -546,3 +546,39 @@ of what is running today.
 
 The median month is identical at +3.6% in both. The gain is not a better typical month; it is fewer
 bad ones and more room in the good ones.
+
+## Do not pre-emptively drop expensive coins - and watch the slippage threshold
+
+Twenty-three book snapshots per coin (hours 03-07 UTC) put six of the sixteen above the bot's own
+`PULLBACK_LIVE_MAX_SLIP` of 0.03% by median cost of a $54 order:
+
+    BILL 0.290%   XLM 0.112%   AAVE 0.073%   NEAR 0.043%   TAO 0.042%   DOT 0.037%
+    -- below the line --
+    SUI 0.025%  ADA 0.024%  LINK 0.020%  AVAX 0.014%  HYPE 0.008%  SOL 0.005%
+    ZEC 0.004%  XRP 0.004%  ETH 0.0002%  BTC 0.0001%
+
+The obvious move - drop them the way BILL is being dropped - is wrong. At take 1.0 through the live
+guards, each coin charged its own measured cost:
+
+| universe | $120 at 1.40% risk | drawdown | trades |
+|---|---|---|---|
+| all sixteen | $1,595 | -13.6% | 2,533 |
+| **BILL dropped (proposed)** | **$1,672** | -13.5% | 2,517 |
+| only the ten below the threshold | **$1,014** | -13.6% | 1,679 |
+
+At the same drawdown the cheap ten return 40% less money. The five expensive-but-not-absurd coins
+earn more than their cost consumes. BILL is the exception because it is an order of magnitude worse
+than the next one - 0.290% against 0.112%.
+
+**The warning that follows is more important than the finding.** The live threshold sits *below* the
+measured cost of six coins. If realised slippage tracks the cost of walking the book, the bot will
+repeatedly exclude NEAR, TAO and DOT for seven days at a time and give up a large part of the
+result - not because those coins are bad, but because the threshold is set under the venue's own
+price for them.
+
+Stated carefully: the gate measures something different from this table. It compares the fill
+against the best price seen just before the order, while these numbers are the cost of walking the
+book for the whole size. Related, not equal. So this is not a change - it is the first thing to
+check once real fills exist. If per-coin measured slippage comes in near these figures,
+`PULLBACK_LIVE_MAX_SLIP` is too strict and should be raised rather than allowed to shrink the
+universe by 40% of its earnings.
