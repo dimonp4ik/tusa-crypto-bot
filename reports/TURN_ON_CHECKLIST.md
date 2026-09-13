@@ -157,3 +157,56 @@ risk, roughly +4.8% a month rather than +5.4%. The two mechanical fixes more tha
 One caveat on the measurement: the book was read at a single moment. Liquidity varies with the
 hour and with volatility, so treat these as the shape of the cost rather than its exact value -
 but the ranking of the coins, and BILL's position in it, will not change.
+
+## The risk setting and the drawdown latch are one decision, not two
+
+Reading the live module against the backtest turned up three rules that exist only in
+`src/pullback_live.py` and `config.py` and appear in none of the numbers above.
+
+**Sizing is not equal-risk.** `pullback_live.py:254` shrinks the margin only when the stop is
+*wider* than `PULLBACK_STOP_REF` (3.94%); a tighter stop keeps the full margin. Risk per trade is
+therefore capped at the setting and falls proportionally for tight stops, while every report so far
+assumed the same risk on every trade. Simulated on the same path from $120 at a 1.5% setting:
+
+| sizing | $120 becomes | worst drawdown |
+|---|---|---|
+| equal risk (what the reports assume) | $1,292 | -16.4% |
+| **the deployed rule** | **$1,185** | **-13.1%** |
+| fixed margin with no shrink at all | $2,151 | -29.6% |
+
+About 8% less money for 20% less drawdown - and that difference is not cosmetic, because it is what
+keeps the account above the latch described next. With equal-risk sizing the live latch fires on
+4 October 2023 and the account ends at $247.
+
+**A latched drawdown pause at 15% of peak** (`PULLBACK_LIVE_MAX_DRAWDOWN`) and a 3% daily pause
+(`PULLBACK_LIVE_MAX_DAILY_LOSS`). The daily one barely matters - ten skipped entries in 2,784. The
+latched one decides everything, because it does not resume:
+
+| risk setting | trades taken | entries lost to a pause | $120 becomes | latch fires |
+|---|---|---|---|---|
+| 1.50% | 2,774 | 10 | $1,154 | no |
+| 1.75% | 2,769 | 15 | **$1,656** | no |
+| **1.80%** | 1,623 | 1,161 | **$617** | **16.02.2025** |
+| 2.00% | 810 | 1,974 | $320 | 04.10.2023 |
+| 3.00% | 441 | 2,343 | $367 | 02.2023 |
+
+The boundary is **1.779%**. Moving the setting from 1.75% to 1.80% - five hundredths of a
+percentage point - costs two thirds of the money, not because the strategy got worse but because
+the bank switches itself off and never comes back.
+
+The two settings are therefore one decision:
+
+| drawdown limit | at 1.5% risk | at 2% | at 3% |
+|---|---|---|---|
+| 15% (current) | $1,154 | $320, latched | $367, latched |
+| 20% | $1,154 | $2,352 | $492, latched |
+| 30% | $1,154 | $2,352 | $7,795 |
+
+**This is not an argument for raising the limit.** The latch exists to stop a strategy that has
+genuinely broken, and raising it means accepting a deeper real hole before anyone notices. It is an
+argument that a risk setting above ~1.75% with the limit left at 15% is a decision to turn the bank
+off in the first bad stretch - which is the worst of both, a large drawdown *and* no recovery.
+
+**At 1.5% everything is consistent**: no signal is ever refused for margin, the daily pause costs
+ten entries in four years, the latch never fires, and the drawdown lands at -13.1% against a 15%
+limit. That is the only setting where the measured strategy and the deployed guards agree.
