@@ -736,3 +736,33 @@ That also completes the story of why 1.0 and not further:
   * 1.0 is where those three forces balance
 
 Not the first acceptable value out of a sweep - a compromise with a reason behind each side of it.
+
+### What the regime gate is worth, as edge rather than as ratio
+
+The gate was shown earlier to cut noise rather than profit - removing it triples the trades for the
+same R per month at twice the drawdown. That is a portfolio statement. Measured as edge per trade
+against the same null, which survives any change in sizing:
+
+| | trades | win rate | per trade | **edge** | sigma |
+|---|---|---|---|---|---|
+| **the coin's own trend (deployed)** | 2,545 | 81% | +0.0824R | **+0.1180R** | 11.6 |
+| no gate at all | 8,727 | 79% | +0.0449R | **+0.0806R** | **12.9** |
+| BTC's regime instead | 2,545 | 80% | +0.0734R | +0.1090R | 10.6 |
+
+    the gate adds +0.0374R of edge per trade - 1.5x - and costs 71% of the trades
+
+Two things worth saying plainly.
+
+**The rules keep a real edge without the gate.** +0.0806R at 12.9 sigma - higher significance than
+the gated version, because there are three times as many trades. And the ungated version earns more
+total R: 8,727 x 0.0449 = +392R against 2,545 x 0.0824 = +210R.
+
+**So the gate is a risk-efficiency device, not a signal filter.** It raises edge per trade by half
+and throws away almost twice as much money as it keeps. The reason to keep it anyway is the live
+latch: the ungated drawdown is twice as deep (ratio 0.11 against 0.33), which would trip a 15% pause
+that never resumes in the first bad stretch. On an account that could carry the drawdown, the
+ungated version would be the better business.
+
+A coincidence noticed and checked: the own-coin and BTC gates both produce exactly 2,545 trades. The
+sets differ (1,417/1,128 against 1,489/1,056 across the fit and exam windows), so the equal totals
+are chance rather than a bug.
