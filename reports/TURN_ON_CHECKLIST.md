@@ -480,3 +480,33 @@ than a coin weight dressed as a finding:
 
 **The recommendation is take 1.0, BILL dropped, risk 1.40%**: $1,684 against today's $1,155 - 46%
 more money at the same drawdown - with every component validated rather than merely favourable.
+
+## The current proposal against the current settings, month by month
+
+The earlier month-by-month section was computed for a three-change package at 1.5% risk. That
+package no longer exists - the BTC trim is withdrawn and the risk moved to 1.40% - so those figures
+describe something that is not on the table. Recomputed for what is:
+
+| | as deployed | proposed |
+|---|---|---|
+| settings | take 0.75, all coins, 1.5% | take 1.0, BILL dropped, 1.40% |
+| $120 after 4.3 years | $1,155 | **$1,684** |
+| worst drawdown | -13.1% | -13.4% |
+| positive months | 39 of 52 | **43 of 52** |
+| worst month | -7.1% | **-6.6%** |
+| longest run of losing months | **2** | **1** |
+| longest wait for a new high | 5 months | **4 months** |
+| median month | +3.6% | +3.6% |
+| months where it is better | - | **36 of 52** |
+
+Better on almost every axis at once: more money, more positive months, a shallower worst month, a
+shorter losing streak and a shorter wait for a new high. The single thing that is worse is the
+drawdown, by three tenths of a point.
+
+**A correction to an earlier claim.** "Two consecutive losing months has never happened" was written
+about the three-change package. The **deployed** settings have had such a run - two months - and the
+proposal has one. So the off-switch rule stands as written for the proposal, but it was never true
+of what is running today.
+
+The median month is identical at +3.6% in both. The gain is not a better typical month; it is fewer
+bad ones and more room in the good ones.
