@@ -59,3 +59,24 @@ The backtest says roughly 2 trades a day, 85% of them winners, one stop in eight
 Not a losing week, and not a losing month - both are inside the measured distribution. The honest
 triggers are: three consecutive losing months, a win rate under 75% over 100+ trades, or measured
 slippage that stays above 0.06% after the per-coin exclusions have had a chance to work.
+
+## One optional change, if the owner wants it
+
+**Half size on BTC.** Measured on 13.09 and the only candidate of eleven to pass everything:
+
+    ratio 0.32 -> 0.37, drawdown -11.1R -> -9.9R, better in four years of five,
+    while halving any other coin (including AAVE, whose average trade is identical) does not
+    reproduce it.
+
+Two independent reasons: BTC takes part in 12.4% of the account's worst days against an 8.3%
+average, and its execution book dips a quarter of a candle below the analysis feed in 15.8% of
+bars against 1-4% for the rest. The same trim was already adopted in the signal bot in August for
+its own symptoms, which is corroboration from a different engine.
+
+It is a **position weight**, not a removal - BTC keeps trading, at half the money. There is no
+config flag for per-coin weights today, so this needs a small addition to the live sizing path
+(`_margin_for` is where a per-coin multiplier belongs), plus a test. Deliberately not written yet:
+the bank is off, and nothing touches live code before the owner decides.
+
+Without it the bank is exactly what every number in the reports describes. With it, expect roughly
+a tenth less drawdown for the same profit.
