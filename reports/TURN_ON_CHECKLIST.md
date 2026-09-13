@@ -657,3 +657,33 @@ the missing test is worth naming:
     take replaced, would catch a future edit that changes the deployed geometry by accident.
 
 Not written, like everything else here, until the owner decides.
+
+## The bank against a random entry, on the venue's own candles
+
+The signals that never fill were tested for a trade of their own - enter at market instead of
+waiting for the pullback. Both directions came back profitable, which is the signature of a missing
+control, so one was built: random hours on the same coins over the same window, same geometry, same
+costs.
+
+| | trades | win rate | per trade |
+|---|---|---|---|
+| random entry, random side | 2,350 | 72.5% | **-0.0424R** |
+| random entry, always long | 2,347 | 72.3% | -0.0522R |
+| random entry, always short | 2,354 | 75.7% | +0.0057R |
+| **the bank (filled signals)** | 82 | **89.0%** | **+0.1814R** |
+| missed signals, market entry same side | 21 | 95.2% | +0.2496R |
+| missed signals, market entry opposite | 20 | 85.0% | +0.1118R |
+
+**A hypothesis of mine, refuted.** I expected a 1 ATR take against a 3 ATR stop to make any entry
+look profitable - a one-ATR move in some direction being near certain over 48 hours. It does not:
+random entry returns -0.0424R at a 72.5% win rate, because the costs eat it. The harness is sound
+and the geometry is not doing the work.
+
+**Which gives the cleanest statement of the edge produced so far.** The bank returns +0.1814R a
+trade where a random entry on the same candles returns -0.0424R - a gap of 0.22R per trade,
+measured on the exchange where the orders actually go, with no normalisation or modelling in
+between.
+
+**The missed signals are not adopted.** +0.2496R is about two sigma above random on twenty-one
+trades, and the opposite direction is above random too, which points at the period rather than at
+an edge. Written down as a lead for when more X-Perp history exists, not taken.
