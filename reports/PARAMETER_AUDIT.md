@@ -484,3 +484,30 @@ ATR deeper leaves 289 fills of 1,417. The twenty-first candidate.
 **The entry side is now closed.** Hours, thresholds, level and watch window have all been re-picked
 blind, and all four sit where the code already had them. Combined with the exit work, every
 parameter the bank has now has a number behind it rather than a history.
+
+## The regime gate: the last structural question, and it holds
+
+The bank acts only while the 4h trend strategy holds a position on the same coin. That is a
+structural choice rather than a number and had never been re-examined.
+
+| gate | fit trades | fit ratio | exam trades | exam per trade | exam ratio | exam R per month |
+|---|---|---|---|---|---|---|
+| **the coin's own trend (deployed)** | 1,417 | **0.35** | 1,128 | **+0.0685R** | **0.33** | +3.86 |
+| no gate at all | 5,244 | 0.22 | 3,483 | +0.0228R | 0.11 | +3.77 |
+| BTC's regime instead | 1,489 | 0.19 | 1,056 | +0.0568R | 0.18 | +3.00 |
+
+Removing the gate triples the trades and earns **the same money per month** - +3.77R against +3.86R
+- at twice the drawdown. That is the clearest statement of what the gate does: it is not cutting
+profit, it is cutting noise, and the noise is what a drawdown is made of. Gating on BTC's regime
+rather than the coin's own is markedly worse.
+
+Trend age at signal time was also measured, since a pullback into a three-day-old trend is not
+obviously the same trade as one into a three-hour-old trend. Median age 36h, quartiles 8h and 93h:
+
+    0-12h  +0.0718R     24-48h +0.0730R     96-192h +0.0109R
+    12-24h +0.0453R     48-96h +0.0863R     192h+   +0.1568R   (exam)
+
+Non-monotone, and the weakest bucket sits directly below the strongest. There is no filter here.
+
+**With this the bank is audited end to end** - entry, exit, regime, sizing and universe - and every
+parameter it has now rests on a measurement rather than on the history of how it got there.
