@@ -84,6 +84,12 @@ slippage that stays above 0.06% after the per-coin exclusions have had a chance 
 
 ## One optional change, if the owner wants it
 
+> **SUPERSEDED 13.09 - do not act on this section.** Everything below was written under a
+> 0.75 take and is now wrong in its central claim: the control at take 1.0 puts BTC second
+> of fifteen, behind AAVE on both money and drawdown, and the walk-forward falls to four of
+> nine. The trim is withdrawn - see "RETRACTED: halving BTC does not survive the take
+> change" at the end of this file. Kept here as the record of what was believed and why.
+
 **Half size on BTC.** Measured on 13.09 and the only candidate of eleven to pass everything:
 
     ratio 0.32 -> 0.37, drawdown -11.1R -> -9.9R, better in four years of five,
