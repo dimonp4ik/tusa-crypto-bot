@@ -434,3 +434,54 @@ deciding whether to take it.
 
 Three months and ninety-odd trades cannot refute the venue claim either - but it was asserted on
 candle geometry and has now failed its first direct test, which is the honest status to record.
+
+## RETRACTED: halving BTC does not survive the take change
+
+The trim's venue argument was withdrawn earlier today. What remained was its share of the account's
+worst days and a walk-forward of seven forward half-years of nine - but that walk-forward was run
+under a 0.75 take, and the take has moved.
+
+Re-run at take 1.0, BILL dropped, real book costs:
+
+| forward half-year | base | BTC halved | AAVE halved |
+|---|---|---|---|
+| 22-05..22-11 | +4.38 | +4.45 | +4.54 |
+| 22-11..23-05 | +4.16 | +3.86 | +4.54 |
+| 23-05..23-11 | +4.23 | +4.30 | +4.33 |
+| 23-11..24-05 | +3.62 | +3.58 | +3.66 |
+| 24-05..24-11 | +2.92 | +2.82 | +3.42 |
+| 24-11..25-05 | +4.68 | +4.77 | +4.63 |
+| 25-05..25-11 | +3.76 | +3.87 | +3.88 |
+| 25-11..26-05 | +0.92 | +0.89 | +1.07 |
+| 26-05..26-11 | +8.53 | +8.28 | +8.89 |
+| **better than base** | - | **4 of 9** | 8 of 9 |
+
+Four of nine is a coin flip. The control had already put BTC second of fifteen rather than unique,
+behind AAVE on both money and drawdown. **The trim is withdrawn.**
+
+Keeping it because it earns more would be exactly what twenty-three other candidates were refused
+for. And AAVE is not adopted in its place: eight of nine looks strong until you remember it is the
+winner of a fresh in-sample search over fifteen coins, where the best of fifteen will usually manage
+eight of nine by luck. It is written down as a lead for future data, not taken now.
+
+### What the package is now
+
+| change | rests on | status |
+|---|---|---|
+| take 1.0 ATR | ten independent checks, including real X-Perp bars | **keep** |
+| drop BILLUSDT | measured order book: 0.386% to enter, 16 trades in five years | **keep** |
+| ~~BTC at half~~ | walk-forward 4 of 9 at the new take | **withdrawn** |
+
+Without the trim the drawdown at 1.5% risk is -14.3%, which is seven tenths of a point from a latch
+that never resumes. That is too close, and the honest instrument for it is the risk setting rather
+than a coin weight dressed as a finding:
+
+| setting | $120 becomes | drawdown | latch |
+|---|---|---|---|
+| take 1.0, no BILL, 1.50% risk | $2,015 | **-14.3%** | no, but close |
+| **take 1.0, no BILL, 1.40% risk** | **$1,684** | **-13.4%** | no |
+| take 1.0, no BILL, 1.35% risk | $1,539 | -12.9% | no |
+| as deployed today, 1.50% | $1,155 | -13.1% | no |
+
+**The recommendation is take 1.0, BILL dropped, risk 1.40%**: $1,684 against today's $1,155 - 46%
+more money at the same drawdown - with every component validated rather than merely favourable.
