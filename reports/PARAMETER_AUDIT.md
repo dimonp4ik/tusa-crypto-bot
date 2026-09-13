@@ -262,3 +262,61 @@ instead of 84%, cuts the stop rate nearly in half - and costs a third of the mon
 (+0.0317R against +0.0501R). The same thing was established for the signal bot in August; here it
 is proved again on the bank's own data. A win rate bought this way is bought with the money it was
 supposed to represent.
+
+## The take: the one geometry change that survives everything
+
+Widening the stop buys win rate and loses money. The take is the mirror dial, and the deployed
+0.75 ATR was itself a choice (0.5 -> 0.75 on 11.09), so it got the same treatment. Stop held at
+3 ATR, risk constant, real book costs:
+
+| take | fit 2022-24 | exam 2025-26 | exam win rate | average win |
+|---|---|---|---|---|
+| 0.50 | 0.26 | 0.18 | 89% | +0.148R |
+| **0.75 (deployed)** | 0.34 | 0.28 | 84% | +0.231R |
+| **1.00** | **0.35** | **0.33** | 80% | **+0.314R** |
+| 1.25 | 0.26 | 0.34 | 76% | +0.395R |
+| 2.00 | 0.22 | 0.30 | 65% | +0.628R |
+
+The fitting window picks 1.00 and the exam agrees: +0.0685R a trade against +0.0501R, **37% more
+per trade**, at a drawdown of -11.8R against -11.2R.
+
+This time the walk-forward came first, because that is what killed the SMA change after it had
+already been written up. Take 1.00 passes it decisively:
+
+    forward half-years where 1.00 beats 0.75:   9 of 9
+    the rolling choice on trailing data:        1.00, 1.00, 1.00, 1.00 - never wavers
+    R per month forward:  rolling +3.10 | 0.75 +2.47 | 1.00 +3.10
+    better in 4 of 5 years by ratio, 5 of 5 by R per trade
+    monthly bootstrap: +35.6R, at or below zero in 0.0% of draws
+    with 2022 removed: +30.0R, 0.1%
+
+SMA32 managed one forward window of four and a 4.8% bootstrap. This is a different class of
+evidence.
+
+Pairs were also swept. The fitting window's favourite pair is take 1.00 with a 4 ATR stop (ratio
+0.49) and the exam refuses it - 0.30 against 0.33 for take 1.00 with the stop left alone. The
+single knob generalises; the pair overfits.
+
+The cost is win rate: 84% -> 80% on the exam. The take was set to 0.75 partly to honour a 75%
+floor, which 80% still clears.
+
+## All three changes, as money, through the live guards
+
+`$120`, the deployed sizing, the daily 3% pause, the latched 15% drawdown, margin refusing what it
+cannot fund:
+
+| version | risk | $120 becomes | drawdown | latch |
+|---|---|---|---|---|
+| as deployed (take 0.75) | 1.5% | $1,155 | -13.1% | no |
+| drop BILL + BTC at half | 1.5% | $1,246 | -13.3% | no |
+| take 1.0 alone | 1.5% | $1,908 | **-14.6%** | no |
+| **all three** | **1.5%** | **$1,993** | **-13.3%** | **no** |
+| all three | 1.25% | $1,273 | -11.1% | no |
+
+**73% more money at the same drawdown**, and the changes repair each other: take 1.0 alone pushes
+the drawdown to -14.6%, four tenths of a point from a latch that never resumes, and halving BTC
+pulls it back to -13.3%. The latch boundary moves only from 1.779% to 1.742%, so the headroom at a
+1.5% setting is preserved.
+
+At 1.25% the package returns more than today's setting does at 1.5% ($1,273 against $1,155) with
+two points less drawdown - which is the conservative way to take the same improvement.
