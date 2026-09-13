@@ -461,3 +461,26 @@ Eight extra trades from stretching the window eight times longer. The reason is 
 level *is* the hour's close, so the order sits exactly at the market when it is placed - price either
 touches it in the first minutes or leaves decisively. There is nothing to chase and nothing to gain.
 The twentieth candidate, and one less thing that can go wrong live.
+
+## A deeper entry level: rejected, and the entry side is now closed
+
+With a wider target it is fair to ask whether the entry wants more room too - the order sits at the
+hour's close, and a level k ATR below it buys a better price on the fills it gets while losing the
+trades that never come back. Tested at constant risk (the stop stays 3 ATR from the actual fill) and
+paired with the watch window, since a deeper level obviously needs longer to be reached:
+
+| offset | watch | trades (fit) | fit ratio | exam ratio | exam R per month |
+|---|---|---|---|---|---|
+| **0 (deployed)** | 15 min | 1,417 | 0.35 | **0.33** | **+3.86** |
+| -0.10 ATR | 15 min | 1,181 | 0.26 | 0.19 | +2.80 |
+| -0.25 ATR | 15 min | 810 | 0.27 | 0.09 | +1.74 |
+| -0.50 ATR | 60 min | 763 | **0.41** | 0.13 | +1.63 |
+| -0.75 ATR | 60 min | 433 | 0.20 | 0.05 | +0.61 |
+
+Monotone degradation on the exam, and the fitting window's favourite - half an ATR deeper with an
+hour to fill - returns 0.13 against 0.33. The price improvement never covers the trades lost: half an
+ATR deeper leaves 289 fills of 1,417. The twenty-first candidate.
+
+**The entry side is now closed.** Hours, thresholds, level and watch window have all been re-picked
+blind, and all four sit where the code already had them. Combined with the exit work, every
+parameter the bank has now has a number behind it rather than a history.
