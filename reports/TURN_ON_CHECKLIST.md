@@ -374,3 +374,26 @@ Caveats stated plainly: six coins, three months, about a hundred trades. Enough 
 direction and the mechanism, not the size. But this is the first time the bank has been measured on
 the exchange it will actually trade, and the answer is that the venue gap costs trades rather than
 money.
+
+### The missing fifth is a filter, not a loss
+
+The obvious fix for a 79% fill rate is to take the level from the venue that fills it - the X-Perp's
+own hourly close instead of the analysis feed's. The live bot already watches that price every
+second, so it would cost nothing to implement. Same window, same signals:
+
+| level from | filled on | fill rate | win rate | per trade | total |
+|---|---|---|---|---|---|
+| analysis feed | analysis feed | 100% | 86.5% | +0.1496R | +14.4R |
+| analysis feed | X-Perp (what happens live) | 79% | **89.0%** | **+0.1814R** | **+14.9R** |
+| X-Perp | X-Perp (the fix) | 92% | 86.8% | +0.1551R | +14.1R |
+
+The fix does what it promises - 79% to 92% - and the recovered trades are worse than the ones
+already being taken: +0.1551R against +0.1814R, and a smaller total from more trades.
+
+So the miss is selection, not loss. If price never returns to the level on the exchange where the
+money actually is, the move has gone, and that entry was going to be below average. The live bot is
+already doing the right thing, for a different reason than assumed.
+
+With a hundred trades over three months this is not proof the fix would hurt; it is the absence of
+any reason to make it, against a real cost in live-code complexity. Rejected - the twenty-third
+candidate.
