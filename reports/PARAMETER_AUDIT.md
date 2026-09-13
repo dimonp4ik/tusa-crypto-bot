@@ -178,3 +178,44 @@ September.
 measured execution facts. SMA32 rests on a plateau, five years of five, both halves of the pinned
 list, and a bootstrap that is marginal once 2022 is removed. It is worth proposing and worth taking
 last.
+
+## RETRACTED: SMA32 does not survive walking forward
+
+The evidence above was built one way: evaluate the whole history, split once, compare. That answers
+"was 32 better than 50 over these five years". It does not answer the question that actually
+matters - would someone standing at an arbitrary date, seeing only the past, have arrived anywhere
+near 32, and would using it have helped from there on.
+
+Walked forward with a 730-day trailing window and a 182-day step:
+
+| applied to | chosen on trailing data | ratio of the choice | SMA50 | SMA32 |
+|---|---|---|---|---|
+| 24-05 .. 24-11 | SMA32 | 0.34 | 0.34 | 0.34 |
+| 24-11 .. 25-05 | SMA22 | 0.02 | **0.40** | 0.33 |
+| 25-05 .. 25-11 | SMA60 | 0.32 | 0.32 | **0.61** |
+| 25-11 .. 26-05 | SMA60 | 0.01 | 0.05 | 0.05 |
+
+    R per month going forward:  rolling choice +1.50 | SMA50 +2.47 | SMA32 +2.55
+    fixed SMA32 beats SMA50 in 1 window of 4
+
+Three things at once. The optimum does not stay put - the picks are 32, 22, 60, 60, a median of 46
+across a 22-60 range, so there is no stable best length to find. Re-choosing actively destroys
+money: +1.50R a month against +2.47R for leaving the parameter alone. And fixed SMA32 wins one
+window of four, against five years of five on the full history.
+
+That contradiction resolves badly for the change. The forward windows cover 2024-2026, and SMA32's
+advantage is concentrated in 2022-2023 - 2022 alone was 42% of the total gain. **The advantage lives
+in precisely the years that have been ruled out as a basis for decisions, and is absent from the
+recent data.**
+
+SMA32 is withdrawn. It is the fifteenth rejected candidate, and the only one that got as far as
+being written up as a proposal before a further test killed it - which is the argument for running
+the further test before proposing rather than after.
+
+**Two changes remain, both resting on measured execution facts rather than on a search:** drop
+BILLUSDT, and halve BTC's position size. Those give ratio 0.29 -> 0.34, +3.37R a month, drawdown
+-11.2R -> -10.0R; roughly +5.1% a month at 1.5% risk.
+
+A note on method for the next parameter that looks good: a plateau, a win in every year and a
+monthly bootstrap were **not enough**. Only the walk-forward distinguished "better over this
+history" from "better if you had deployed it". It is cheap and should come first, not last.
