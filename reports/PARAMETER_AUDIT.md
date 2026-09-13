@@ -540,3 +540,28 @@ measured reason not to go further.
 
 Six coins over three months, so this confirms a direction rather than measuring a size - but it is
 the direction the mechanism predicted before the data was looked at.
+
+### The take on the universe the live gates actually leave
+
+Take 1.0 was validated on all sixteen pinned coins. The deployed bot will not trade sixteen: the
+spread gate blocks BILL, XLM and AAVE in every book snapshot and NEAR in 57% of them, and the
+slippage gate periodically excludes NEAR and DOT for a week. If the improvement lived in the coins
+the bot will not trade, it would not be an improvement.
+
+| universe | take 0.75 (exam) | take 1.00 (exam) | gain |
+|---|---|---|---|
+| all sixteen | +0.0501R, ratio 0.28 | +0.0685R, ratio 0.33 | +0.0184R |
+| BILL dropped (proposed) | +0.0544R, 0.30 | +0.0728R, **0.41** | +0.0184R |
+| minus what the gate always blocks | +0.0635R, 0.34 | +0.0842R, **0.44** | +0.0207R |
+| also minus NEAR | +0.0676R, 0.36 | +0.0907R, **0.48** | +0.0231R |
+| also minus NEAR and DOT | +0.0718R, 0.37 | +0.0917R, **0.49** | +0.0199R |
+
+It holds everywhere and grows as the universe narrows. On the set the bot will actually trade the
+ratio reaches 0.44-0.49 against 0.34-0.37 for the deployed take - materially better than the
+headline figures, which are computed on coins the gates will refuse.
+
+Dropping BILL is also worth more under the new take than it was under the old one: 0.41 against
+0.33 with all sixteen, where at take 0.75 the same removal moved 0.28 to 0.30.
+
+The eleventh check on the take, and the one that matters most operationally: it is about the coins
+the money will actually be in.
