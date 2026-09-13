@@ -153,3 +153,28 @@ mechanical rather than strategic.
 That ratio is the point. The eleven strategy ideas that died earlier died because they were fitted.
 These thirteen numbers were produced by the same kind of search, and they did **not** die. The
 bank's edge does not rest on its constants being lucky.
+
+## The unpinned coins say nothing either way
+
+SMA32 was chosen on the sixteen pinned coins. Twenty-two others sit in the same data set - DOGE,
+BNB, PEPE, ARB, OP, BCH, LTC, SHIB and the rest - and contributed nothing to the plateau, the
+bootstrap or the yearly table, which makes them the cleanest available test.
+
+| coins | 2024 | 2025 | 2026 | per trade | per month | drawdown | ratio |
+|---|---|---|---|---|---|---|---|
+| unpinned 22, SMA50 | 0.06 | 0.01 | 0.40 | +0.0359R | +2.14R | -21.4R | 0.10 |
+| unpinned 22, SMA32 | 0.05 | 0.05 | 0.34 | +0.0375R | +2.22R | **-18.0R** | 0.12 |
+
+Every aggregate measure favours SMA32, including a drawdown 3.4R smaller. But the yearly count is
+one of three, the two variants disagree on only 25 and 29 trades worth +1.4R between them, and
+these coins have history only from 2024. The test has no power to speak with; it is reported as
+neutral, not as support.
+
+It is also a reminder that the unpinned half is simply a worse place to trade - ratio 0.10-0.12
+against 0.29-0.33 for the pinned sixteen, which is the same gap the live universe showed in
+September.
+
+**So SMA32 is the weakest of the three proposed changes.** Dropping BILL and halving BTC rest on
+measured execution facts. SMA32 rests on a plateau, five years of five, both halves of the pinned
+list, and a bootstrap that is marginal once 2022 is removed. It is worth proposing and worth taking
+last.
