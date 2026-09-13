@@ -708,3 +708,31 @@ its own contribution is nearer +0.0915R.
 
 The rule still works, but its credit was overstated and now it is not. It also explains why the
 search landed on the morning for a short rule: there was a genuine hour effect there to latch onto.
+
+### Is the take's gain earned, or does the null gain the same?
+
+The question that just docked 15% off the short morning rule has to be asked of the headline change.
+A random entry with a 1.0 ATR target is a different bet from one with 0.75, so if the coin toss
+improves as much as the bank does, the change is geometry rather than edge.
+
+| take | bank | null | **edge** |
+|---|---|---|---|
+| 0.50 | +0.0403R (90% wins) | -0.0334R (85%) | +0.0737R |
+| 0.75 | +0.0606R (85% wins) | -0.0366R (78%) | +0.0971R |
+| **1.00** | **+0.0824R (81% wins)** | -0.0356R (73%) | **+0.1180R** |
+| 1.25 | +0.1017R (77% wins) | -0.0359R (69%) | +0.1376R |
+
+    moving 0.75 -> 1.00:   bank +0.0218R,   null +0.0009R,   edge +0.0209R
+
+**96% of the gain is earned.** The null is flat across takes - a random entry does no better with a
+distant target than a near one, because the win rate falls exactly as fast as the payout rises. The
+bank does better, which means it is choosing entries whose moves continue.
+
+That also completes the story of why 1.0 and not further:
+
+  * edge per trade rises monotonically with the take - a distant target captures more of the move
+  * drawdown rises with it, so the portfolio ratio stops improving past 1.0
+  * the X-Perp's narrower candles penalise distant targets, and 1.25 and 1.5 lose there
+  * 1.0 is where those three forces balance
+
+Not the first acceptable value out of a sweep - a compromise with a reason behind each side of it.
