@@ -347,3 +347,30 @@ The ten losing months are the cost of the forty-two. Nothing in that list is a r
 the triggers that are remain the ones above - a second consecutive losing month, a win rate under
 75% over 100+ trades, or measured slippage staying above 0.06% after the per-coin exclusions have
 had their chance.
+
+## Measured on the venue it actually trades
+
+Every number in these reports comes from OKX's global USDT swap. The orders go to the EU X-Perp, a
+different instrument with its own prints. There are 18,000 real X-Perp 15m bars cached for six coins
+- BTC, ETH, XRP, SOL, ADA, AVAX, from 27.05 to 26.08.2026 - so the bank can be run the way it
+actually runs: signals and levels from the analysis feed, fills against the X-Perp's own highs and
+lows.
+
+| | signals | filled | take/stop/time | win rate | per trade | total |
+|---|---|---|---|---|---|---|
+| as the backtest does it | 96 | 96 (**100%**) | 83 / 11 / 2 | 86.5% | +0.1496R | +14.4R |
+| **against real X-Perp bars** | 104 | 82 (**79%**) | 73 / 8 / 1 | **89.0%** | **+0.1814R** | +14.9R |
+
+**The backtest's 100% fill rate is an artefact.** The entry level is the analysis feed's own hourly
+close, so in that feed price starts exactly on it and the touch is guaranteed. On the X-Perp it is a
+foreign price that has to be reached - and one signal in five is not.
+
+So expect roughly 20% fewer trades live than the projections imply. The ones that do fill are
+better: 89.0% against 86.5%, +0.1814R against +0.1496R, and the total over the window is the same
+within noise. The miss behaves as a filter - if price never comes back to the level on the venue
+where the money is, the move has already gone, and that trade was going to be below average.
+
+Caveats stated plainly: six coins, three months, about a hundred trades. Enough to establish the
+direction and the mechanism, not the size. But this is the first time the bank has been measured on
+the exchange it will actually trade, and the answer is that the venue gap costs trades rather than
+money.
