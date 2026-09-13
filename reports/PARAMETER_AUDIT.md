@@ -439,3 +439,25 @@ One correction along the way: the first version of this test armed the trail at 
 take sat at 1.0 ATR, so the take always fired first and the trail never engaged - every variant
 returned the plain take's numbers to four decimals. An inert knob returning identical numbers is a
 result about the test, not about the strategy, and it was rebuilt before being read.
+
+## The 15-minute watch window is not a constraint
+
+The order is placed at the hour's close and given exactly one 15-minute bar to be touched. That is a
+chosen number, and the obvious worry is the one already documented for the signal bot - a longer
+window fills the signals price walked away from and came back to, which is chasing a level that has
+moved.
+
+It turns out not to matter either way:
+
+| watch | trades (fit) | fit ratio | exam ratio | exam R per month |
+|---|---|---|---|---|
+| **15 min (deployed)** | 1,417 | 0.35 | **0.33** | +3.86 |
+| 30 min | 1,421 | 0.35 | 0.33 | +3.88 |
+| 45 min | 1,422 | **0.36** | 0.33 | +3.85 |
+| 60 min | 1,422 | 0.36 | 0.30 | +3.81 |
+| 120 min | 1,425 | 0.35 | 0.30 | +3.89 |
+
+Eight extra trades from stretching the window eight times longer. The reason is mechanical: the
+level *is* the hour's close, so the order sits exactly at the market when it is placed - price either
+touches it in the first minutes or leaves decisively. There is nothing to chase and nothing to gain.
+The twentieth candidate, and one less thing that can go wrong live.
