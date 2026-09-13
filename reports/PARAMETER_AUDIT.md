@@ -352,3 +352,34 @@ from 12.5% to 15.6%, costing 50R, against 98R more collected at the target.
 
 Median holding time goes from 2.8 to 4.5 hours, nowhere near the 48h cap or the owner's three-day
 limit.
+
+### Two follow-ups the take change forced, both negative
+
+**The 48h exit was re-read**, because it had only ever been validated against a 0.75 take and trades
+now live longer (median 4.5h instead of 2.8h, 3.7% reaching the time exit instead of 2.3%):
+
+| hold | fit 2022-24 | exam 2025-26 | R per month on exam |
+|---|---|---|---|
+| 24h | 0.36 | 0.32 | +3.49 |
+| 36h | **0.36** | 0.33 | +3.88 |
+| **48h (deployed)** | 0.35 | **0.33** | +3.86 |
+| 60h | 0.36 | 0.31 | +3.74 |
+| 72h | 0.36 | 0.30 | +3.69 |
+
+The fitting window marginally prefers 36h and the exam cannot tell them apart. The surface is flat.
+48h stands, unchanged.
+
+**Per-rule takes were tested and fail on the fitting window itself.** The original bank gave each
+scenario its own geometry before the wide set flattened all five to 0.75, so it was worth asking
+whether five values beat one:
+
+| | fit | exam | per trade | R per month |
+|---|---|---|---|---|
+| each rule its own take | 0.29 | 0.28 | +0.0896R | +4.70 |
+| **one take of 1.0 for all** | **0.35** | **0.33** | +0.0685R | +3.86 |
+| as deployed (0.75) | 0.34 | 0.28 | +0.0501R | +3.08 |
+
+The rules were tuned one at a time but run as a portfolio, so the collection of individually best
+takes is worse than a single value even on the window that chose it. The per-rule mix does earn more
+per month, but buys it with drawdown - and drawdown is what the live latch spends. Rejected: the
+seventeenth candidate.
