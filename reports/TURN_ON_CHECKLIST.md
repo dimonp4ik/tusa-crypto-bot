@@ -23,26 +23,32 @@ are not a simulation of the R stream - they are the actual historical path, comp
 with margin allowed to refuse a signal the account cannot fund (one position per coin, up to
 sixteen at once, 10x).
 
-| risk per trade | worst drawdown | days underwater | worst month | $120 after 4.3 years | first year |
-|---|---|---|---|---|---|
-| **1.5%** | **-16.4%** | 169 | -7.9% | $1,292 | $231 |
-| 3% | -31.8% | 173 | -16.8% | $9,849 | $401 |
-| 5% | -46.6% | 173 | -26.8% | $177,715 | $1,209 |
+| risk | signals refused | worst drawdown | days underwater | worst month | $120 after 4.3y | first year |
+|---|---|---|---|---|---|---|
+| **1.5%** | **0 of 2,784** | -16.4% | 169 | -7.9% | $1,292 | $231 |
+| 1.75% | 3 | -19.0% | 169 | -9.4% | $1,887 | $255 |
+| **2%** | 9 (0.3%) | -21.6% | 169 | -10.9% | $2,706 | $280 |
+| 2.5% | 32 (1.1%) | -26.8% | 173 | -14.4% | $5,238 | $332 |
+| 3% | 73 (2.6%) | -31.8% | 173 | -16.8% | $9,849 | $401 |
+| 4% | 198 (7.1%) | -42.0% | 173 | -24.1% | $38,082 | $665 |
+| 5% | 359 (12.9%) | -46.6% | 173 | -26.8% | $177,715 | $1,209 |
 
 Three things that table does not say out loud.
 
-**Margin only binds above 1.5%.** At 1.5% not one signal in 2,784 was ever refused, so that column
-is the strategy exactly as it was measured. At 3% it refuses 73, at 5% it refuses 359 - and which
-ones it refuses is decided by arrival order, not by quality.
+**The boundary of perfect funding is 1.55%.** Below it every one of the 2,784 signals is affordable
+and the projection is the backtest exactly. Bisected on the same simulation; an account that
+withdraws its profits instead of compounding gets 1.54%, essentially the same, because the crowding
+that binds happens early while the deposit is still small.
 
-**At 5% the result stops being about the edge.** The same period, the same rules: $773 in the first
-year without the margin cap, $1,209 with it. A 56% difference produced by nothing but which trades
-the account happened to be able to afford. That is not an argument that the cap helps; it is an
-argument that at that size the outcome is decided by accident.
+**Above it the distortion is real but gradual, until it is not.** 2% refuses nine trades of 2,784,
+which is nothing; 3% refuses seventy-three, which is a 2.6% distortion worth naming and not worth
+panicking about. 5% refuses 359 - one signal in eight - and there the outcome stops being about the
+edge: the same period and the same rules give $773 in the first year without the margin cap and
+$1,209 with it, a 56% swing produced by nothing but which trades the account could afford.
 
 **Underwater for about 170 days at every setting.** Almost six months below a previous high is the
-normal shape of this, not a rare episode. The difference between the settings is how deep the hole
-is while you wait, and -46.6% from $120 is $64.
+normal shape of this, not a rare episode. What the risk setting buys is not a shorter wait - it is
+a deeper or shallower hole while you wait, and -46.6% from $120 is $64.
 
 The bank is also flat 77.8% of the time and holds one position for another 11.5%; four or more
 positions happen in 3.1% of hours, and all sixteen happened once, on 21.08.2026.
