@@ -102,3 +102,36 @@ few.
 
 Combined with the BTC trim: ratio 0.37, average trade +0.0696R against +0.0684R for the BTC trim
 alone - the same result, one less way to lose money to the order book.
+
+## The honest numbers, priced from the live order book
+
+Every figure above assumed a flat 0.03% of slippage per side. The execution venue's book was read
+directly and priced for the order a $120 account actually sends (~$54 of notional at 1.5% risk):
+
+    BTC, ETH        0.000%        SUI            0.014%        AAVE   0.077%
+    ZEC             0.002%        TAO, NEAR      0.021%        XLM    0.106%
+    XRP             0.004%        DOT            0.026%        BILL   0.386%
+    SOL             0.005%        AVAX, LINK     0.027-0.029%
+    HYPE            0.006%        ADA            0.033%
+
+Average across all sixteen: 0.047% - half again the assumption. Without BILL: 0.025%, better than
+assumed. BILL alone doubles the basket's execution cost, and 0.386% is nearly half the distance to
+a 0.85% take, paid to the order book on entry.
+
+Re-running the bank with each coin charged its own real cost:
+
+| version | per trade | per month | drawdown | ratio |
+|---|---|---|---|---|
+| as reported (flat 0.03%) | +0.0670R | +3.6R | -11.1R | 0.32 |
+| **real book costs** | **+0.0606R** | **+3.2R** | -11.2R | **0.29** |
+| real, BILL dropped | +0.0625R | +3.3R | -11.2R | 0.30 |
+| **real, BILL dropped + BTC at half** | **+0.0633R** | **+3.4R** | **-10.0R** | **0.34** |
+| real, BILL and XLM dropped + BTC at half | +0.0670R | +3.3R | -10.1R | 0.33 |
+
+**So the honest expectation is about a tenth below every profit figure in these reports** - at 1.5%
+risk, roughly +4.8% a month rather than +5.4%. The two mechanical fixes more than pay that back:
++5.1% a month at a smaller drawdown.
+
+One caveat on the measurement: the book was read at a single moment. Liquidity varies with the
+hour and with volatility, so treat these as the shape of the cost rather than its exact value -
+but the ranking of the coins, and BILL's position in it, will not change.
