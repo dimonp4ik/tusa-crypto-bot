@@ -822,3 +822,58 @@ Also refuted along the way, a claim of mine from earlier in the same session: th
 the binding constraint on everything. It is not. With the limit raised to 25% the uncapped variant
 still loses to the capped one on both money and drawdown ($1,740 at -20.3% against $1,876 at
 -12.2%). The latch was reporting a real concentration problem, not creating it.
+
+## A rule the bank is named after but does not have
+
+The pair search over the 165,000 ignored hours returned 26,866 survivors of roughly 200,000 tested -
+a number that means nothing on its own, since a 7-of-9 bar is passed by chance 9% of the time. What
+mattered was the structure at the top, where one family appeared again and again:
+
+    rsi48 >= 56.38  AND  rsi6 <= 33.79     LONG, inside the existing regime gate
+
+Medium-term strength with short-term weakness. A pullback inside an uptrend - which is what the
+"pullback bank" is called after, and what none of its five rules actually expresses; they are about
+BTC pumping and hours of the day.
+
+**What it does, on its own:**
+
+    346 trades, 85.8% win rate, +0.1420R each, +49.1R total
+    55% of eligible hours become trades (the bank converts 24%, the rejected volatility rule 17%)
+    spread over 41 months, no month holding more than 7%
+    overlap with the bank: ONE trade in 346
+
+**Every attack it has survived:**
+
+| test | result |
+|---|---|
+| rsi48 condition alone | +0.0058R on 5,456 trades - nothing |
+| rsi6 condition alone | -0.0118R on 2,358 trades - nothing |
+| **both inverted** | **-0.0439R on 3,093 trades - the inverse loses** |
+| year by year | 2022 +0.1444, 2023 +0.1359, 2024 +0.1321, 2025 +0.1523, 2026 +0.1505 |
+| by coin | 12 of 14 positive; ADA, SOL, SUI, NEAR at 94-95% win rate |
+| threshold plateau | monotone in both directions, the chosen cell mid-region, not a peak |
+| **walk-forward of the combined system** | **9 forward half-years of 9 on R per month** |
+
+Neither condition does anything alone, together they pay, and inverted they lose. That is the
+signature of a real interaction rather than two decorations around a fitted number.
+
+**As money, through the live guards:**
+
+| | risk | $120 becomes | drawdown |
+|---|---|---|---|
+| bank (proposed take 1.0, no BILL) | 1.25% | $1,284 | -12.0% |
+| | 1.40% | $1,684 | -13.4% |
+| | 1.55% | $2,202 | -14.8% |
+| **bank + pullback rule** | 1.25% | **$1,842** | **-10.6%** |
+| | **1.40%** | **$2,533** | **-11.9%** |
+| | 1.55% | **$3,444** | -13.2% |
+
+More money and a smaller drawdown at every risk setting. Compared at equal pain rather than equal
+risk: the combined system at 1.55% returns $3,444 at -13.2%, against the bank's $1,684 at -13.4% -
+**twice the money for the same hole**, and three times what today's deployed settings return.
+
+**What is not yet established.** It was selected from 26,866 survivors of a 200,000-candidate
+search, which is severe multiplicity; 346 trades is a modest sample; and the walk-forward win is on
+R per month, with drawdown neutral at 4 of 9. The plateau, the inverse test and the five-year
+stability are what argue against it being noise, and they are independent of the selection. It is
+not proposed until the remaining checks are done.
