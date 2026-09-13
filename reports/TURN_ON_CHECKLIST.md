@@ -23,6 +23,15 @@
 >   AAVE. Sections "One optional change" and the retraction at the end.
 > - shortening the BTC daily average to 32 — killed by the same walk-forward (in PARAMETER_AUDIT.md).
 >
+> **The edge, stated plainly:** over five years the bank returns **+0.0824R** a trade against
+> **-0.0312R** for a random entry on the same bars with the same geometry and costs - a gap of
+> **+0.1136R at 11.2 sigma**, steady in every year (+0.129, +0.131, +0.111, +0.090, +0.111).
+>
+> That also settles the win-rate question. A random entry already wins **74%** of the time, because
+> a 1 ATR take against a 3 ATR stop is a bet that usually wins and still loses money. The bank wins
+> 81%. Those seven points over free are the edge; the 88% available by widening the stop costs a
+> third of the money. The number to ask for was never the win rate - it was the points above random.
+>
 > **Two things to hold in mind before reading the numbers:**
 > - the backtest's 100% fill rate is an artefact; live fills ran 79% on real X-Perp bars, so expect
 >   about 20% fewer trades than any projection here implies. The missed ones were below average.

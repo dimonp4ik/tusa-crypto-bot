@@ -565,3 +565,29 @@ Dropping BILL is also worth more under the new take than it was under the old on
 
 The eleventh check on the take, and the one that matters most operationally: it is about the coins
 the money will actually be in.
+
+## The edge against a null, on five years
+
+The X-Perp control gave +0.1814R against -0.0424R for a random entry, but on 82 trades. The same
+comparison on the full analysis-feed history, same geometry, same per-coin costs, same 48h exit -
+only the decision of when and which way replaced by a coin toss:
+
+| year | bank | random | edge |
+|---|---|---|---|
+| 2022 | 82%, +0.1096R (n=288) | 74%, -0.0196R (n=4,504) | **+0.1292R** |
+| 2023 | 82%, +0.0963R (n=590) | 73%, -0.0349R (n=8,235) | **+0.1312R** |
+| 2024 | 82%, +0.0815R (n=539) | 73%, -0.0297R (n=9,007) | **+0.1112R** |
+| 2025 | 80%, +0.0698R (n=586) | 74%, -0.0197R (n=12,080) | **+0.0895R** |
+| 2026 | 81%, +0.0671R (n=542) | 73%, -0.0443R (n=13,397) | **+0.1114R** |
+| **all** | **81%, +0.0824R** (n=2,545) | **74%, -0.0312R** (n=47,223) | **+0.1136R, 11.2 sigma** |
+
+Steady in every year, from +0.089 to +0.131, with no decay across the five.
+
+**And this is where the win-rate argument finally resolves.** A random entry wins 74% of its trades,
+because a 1 ATR take against a 3 ATR stop is a bet that usually wins - and it still loses money once
+costs are paid. The bank wins 81%. Those seven points above free are the whole edge. The 88%
+available by widening the stop to 5 ATR is bought with a third of the money, and the 74% underneath
+is worth nothing at all.
+
+The number worth asking for was never the win rate. It is the points above random, and they are
+seven, stable across five years, at eleven sigma.
