@@ -618,3 +618,44 @@ every measure at once: no hour window, the lowest win rate at 77%, and the small
 
 This is the first time each rule has had a significance of its own rather than being carried by the
 portfolio average.
+
+### Every coin against its own null - and two earlier judgements corrected
+
+A coin returning nothing was called dead weight earlier tonight. That was measured against zero,
+which is the wrong baseline: a random long on the same bars returns about -0.05R, so zero is
+already four or five hundredths of an R above a coin toss. Redone properly, with a null computed on
+each coin's own bars and its own costs:
+
+| coin | trades | per trade | own null | **edge** | sigma | total R |
+|---|---|---|---|---|---|---|
+| SOL | 215 | +0.1590R | -0.0197R | +0.1787R | 6.1 | +34.2 |
+| ADA | 199 | +0.1359R | -0.0476R | +0.1836R | 5.7 | +27.0 |
+| LINK | 200 | +0.1276R | -0.0289R | +0.1564R | 4.9 | +25.5 |
+| BTC | 215 | +0.0995R | -0.0248R | +0.1243R | 3.8 | +21.4 |
+| ETH | 235 | +0.0879R | -0.0180R | +0.1059R | 3.3 | +20.7 |
+| NEAR | 207 | +0.0924R | -0.0177R | +0.1101R | 3.1 | +19.1 |
+| **XLM** | 162 | +0.0219R | **-0.1048R** | **+0.1267R** | **3.0** | **+3.5** |
+| AVAX | 212 | +0.0705R | -0.0335R | +0.1039R | 2.9 | +14.9 |
+| XRP | 139 | +0.0851R | -0.0290R | +0.1141R | 2.7 | +11.8 |
+| DOT | 179 | +0.0752R | -0.0232R | +0.0984R | 2.6 | +13.5 |
+| HYPE | 58 | +0.1383R | +0.0027R | +0.1356R | 2.2 | +8.0 |
+| TAO | 93 | +0.0871R | -0.0262R | +0.1133R | 2.1 | +8.1 |
+| SUI | 165 | +0.0380R | -0.0118R | +0.0498R | 1.2 | +6.3 |
+| **AAVE** | 209 | **-0.0088R** | **-0.0517R** | **+0.0429R** | 1.1 | -1.8 |
+| ZEC | 41 | +0.0249R | -0.0295R | +0.0545R | 0.6 | +1.0 |
+
+**Two corrections.**
+
+*AAVE.* Described earlier as "227 trades returning exactly nothing, a coin sitting at the break-even
+line". Its own null is -0.0517R, so it returns +0.0429R above a coin toss - weak and not significant
+at 1.1 sigma, but not empty.
+
+*XLM.* The worse error. It was called near-worthless on +2.1R across 177 trades. A random entry on
+XLM loses -0.1048R, the worst null of any coin here, because it is the second most expensive to
+trade. Its edge is +0.1267R at 3.0 sigma - among the better ones in the bank. The small total was
+the price of the venue, not the absence of an edge.
+
+**No coin sits below its own null.** That confirms the earlier refusal to trim the universe by cost
+and supplies the real reason for it: expensive coins have worse nulls, so their edge is larger than
+their totals suggest. Judging a coin by what it returns, rather than by what it returns above a coin
+toss on the same bars, penalises exactly the coins whose venue is hardest.
