@@ -766,3 +766,59 @@ ungated version would be the better business.
 A coincidence noticed and checked: the own-coin and BTC gates both produce exactly 2,545 trades. The
 sets differ (1,417/1,128 against 1,489/1,056 across the fit and exam windows), so the equal totals
 are chance rather than a bug.
+
+## The widest search yet, and what it found
+
+The owner asked why the bank trades twice a day when an older system traded eight times, and told
+me to dig deeper. The funnel answers the first part:
+
+    480,248 coin-hours over five years
+    188,845 inside a trend4h position          (39.3%)
+    166,713 after the BTC daily filter         (34.7%)
+      5,927 signals                            (1.23%)
+      2,545 trades                             (0.53%)
+
+Each rule ANDs two conditions that are individually ordinary - BTC up 4.9% happens in 8.4% of hours,
+the evening window in 16.3% - and jointly rare, 1.23%. 165,000 eligible hours have no rule that says
+anything about them.
+
+So a wider search over exactly those hours: 39 features instead of 9 (adding market breadth, volume
+structure and BTC context at four horizons), scored by edge over a side-matched random entry rather
+than by return, with the walk-forward run FIRST instead of last.
+
+**One candidate came out far ahead of the rest.** A long whenever a coin's ATR is at least 1.89
+times its own 720-hour median, inside the existing gate:
+
+    edge +0.1181R over its null - the size of the whole bank's edge
+    nine forward half-years of nine
+    mirror dead: the same condition SHORT returns +0.0052R, so the edge is directional
+    positive in all five years and on both halves of the coin list
+    95% of its hours are ones the bank never touches
+
+**And it cannot be harvested.** Three findings, in order:
+
+*The hours are not trades.* 6,116 eligible hours collapse to 1,067 trades, because volatility
+persists for many consecutive hours and one-position-per-coin takes only the first. An earlier claim
+of "2.4x the trades" counted hours and was wrong.
+
+*Unconstrained, it trips the latch.* Volatility arrives on every coin at once, so the rule opens
+many positions together and their losses land together: $226 instead of $1,684. A cap on concurrent
+positions from the rule fixes that, and with a cap of 3 the combined system looked dominant - $1,876
+against $1,684 at 1.40% risk, drawdown -12.2% against -13.4%, ratio better on both windows.
+
+*The walk-forward refuses it.* On R per month the combined system beats the bank in 6 forward
+half-years of 9, below the 7-of-9 bar this search was built around. And on drawdown - the axis the
+rule actually claims - it wins **2 of 9**. The aggregate improvement from -11.8R to -10.4R is made
+by one or two windows, not by a systematic effect.
+
+Rejected: the twenty-sixth candidate, and the closest any has come.
+
+**What survives from it.** The volatility signal itself is real - the mirror test and 9 of 9 against
+its own null are not in doubt, and it does add trades with positive edge (2,529 to 3,106, R per
+month +4.10 to +4.34). What fails is the combination: the extra R is there, the promised drawdown
+reduction is not reproducible slice by slice.
+
+Also refuted along the way, a claim of mine from earlier in the same session: that the 15% latch is
+the binding constraint on everything. It is not. With the limit raised to 25% the uncapped variant
+still loses to the capped one on both money and drawdown ($1,740 at -20.3% against $1,876 at
+-12.2%). The latch was reporting a real concentration problem, not creating it.
