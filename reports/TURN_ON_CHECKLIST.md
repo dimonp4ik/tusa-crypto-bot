@@ -1,5 +1,35 @@
 # Turning the bank on: what changes, what to watch, what would make me turn it off again
 
+> ## Where this stands, 13.09 — read this first
+>
+> This file grew as the work went, and two of its sections were overtaken by later measurements.
+> Rather than delete them, they are marked and kept, because what was believed and why is part of
+> the record. The current position is here; everything below is the working that led to it.
+>
+> **The proposal is two changes and one setting:**
+>
+> | | |
+> |---|---|
+> | take **1.0 ATR** instead of 0.75 | survived ten independent checks, including a run against real X-Perp candles |
+> | drop **BILLUSDT** | measured order book: 0.386% to enter, 16 trades in five years, −4.5R |
+> | risk **1.40%** | at 1.5% the drawdown reaches −14.3% against a latched 15% limit that never resumes |
+>
+> **What that is worth:** $120 becomes **$1,684** over 4.3 years against **$1,155** on today's
+> settings — 46% more — at a drawdown of −13.4% against −13.1%, with 43 positive months of 52
+> instead of 39 and a worst month of −6.6% instead of −7.1%.
+>
+> **Withdrawn during the work, do not act on:**
+> - halving BTC — walk-forward fell to 4 of 9 once the take moved; BTC is second of fifteen, behind
+>   AAVE. Sections "One optional change" and the retraction at the end.
+> - shortening the BTC daily average to 32 — killed by the same walk-forward (in PARAMETER_AUDIT.md).
+>
+> **Two things to hold in mind before reading the numbers:**
+> - the backtest's 100% fill rate is an artefact; live fills ran 79% on real X-Perp bars, so expect
+>   about 20% fewer trades than any projection here implies. The missed ones were below average.
+> - the −13.4% drawdown happens *within* months, not between them. The chart will show that hole
+>   while the month it falls in can still close positive.
+
+
 Written while the bank is still off, so the decision is a decision and not a scramble. Nothing here
 is done until the owner says so.
 
