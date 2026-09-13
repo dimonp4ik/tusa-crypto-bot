@@ -281,3 +281,41 @@ So the win-rate preference costs nothing here. It happens to coincide with the b
 measure that decides how much an account can actually deploy. Worth knowing in the other direction
 too: if the latch were raised and a much deeper hole accepted, trend4h would be the way to put more
 money to work - it holds positions 81.8% of the time against the bank's 22.2%.
+
+## Exactly what changes, if the answer is yes
+
+Written out so that turning it on is mechanical rather than another round of thinking. Nothing here
+is applied; the bank is off until the owner says otherwise.
+
+**1. The take, 0.75 -> 1.0 ATR.** In `src/pullback_bank.py`, add a new named set rather than
+editing the existing one, so every number ever reported under the old name stays reproducible:
+
+    RULE_SETS["strict3+short2_wide10"] = [dict(r, tp=1.0) for r in RULES_STRICT + SHORT_RULES]
+
+and point `PULLBACK_RULES` at it in `config.py`. The old `strict3+short2_wide` stays untouched.
+
+**2. BILLUSDT out.** `PULLBACK_SYMBOLS` currently defaults to `TREND4H_SYMBOLS`. Give it its own
+default - the same list minus BILLUSDT - so the 4h engine's universe is not affected. Code default,
+no environment variable.
+
+**3. BTC at half size.** This belongs in `src/pullback_live.py`, immediately after the `stop_ref`
+adjustment at line 254:
+
+    margin *= self.coin_weight.get(sym, 1.0)
+
+with `PULLBACK_COIN_WEIGHT` defaulting to `{"BTCUSDT": 0.5}` in `config.py`, wired through
+`build_default()` like the other settings. Plus a test that a BTC signal sizes to half and another
+coin does not.
+
+**Correction to an earlier plan:** this was going to go in `autotrader._margin_for`. That is wrong -
+that function is shared with the old autotrade path and the change would have silently resized the
+other engine's trades too. The bank's own module is the right place.
+
+**4. `PULLBACK_LIVE_ENABLED` 0 -> 1**, and the risk setting is the owner's own (1.25% or 1.5%).
+
+**Order matters for one pair.** Changes 1 and 3 go together or not at all: the take alone runs the
+drawdown to -14.6% against a latch at 15% that never resumes, and halving BTC is what pulls it back
+to -13.3%. Taking the take without the trim is worse than taking neither.
+
+Then `python -m unittest discover -s tests -q` (128 tests, green as of this writing), commit, push.
+The push triggers a Railway redeploy and a restart; it enables nothing by itself.
