@@ -80,3 +80,25 @@ the bank is off, and nothing touches live code before the owner decides.
 
 Without it the bank is exactly what every number in the reports describes. With it, expect roughly
 a tenth less drawdown for the same profit.
+
+## A second, smaller thing found in the venue data: BILL
+
+Extending the venue comparison to all sixteen pinned coins turned up one that is not a strategy
+problem but an execution one:
+
+    BILLUSDT: basis +0.245% (ten times any other coin), and its X-Perp candle range is
+    0.00x the analysis feed's - the instrument barely trades.
+
+Every other coin sits within +-0.083% of basis and 0.66-1.00x of candle width.
+
+In the backtest BILL is irrelevant - 18 trades in five years, and removing it moves the ratio from
+0.32 to 0.33 (one year of five). But live, an order into an empty book pays slippage the model
+never counted, and BILL already has the worst stop rate of any coin (28%).
+
+**The bot already protects itself**: it measures adverse slippage per coin and excludes any coin
+whose average exceeds `PULLBACK_LIVE_MAX_SLIP` for seven days. BILL would be excluded on its own
+after the first few bad fills. Dropping it from `PULLBACK_SYMBOLS` up front just skips those first
+few.
+
+Combined with the BTC trim: ratio 0.37, average trade +0.0696R against +0.0684R for the BTC trim
+alone - the same result, one less way to lose money to the order book.
