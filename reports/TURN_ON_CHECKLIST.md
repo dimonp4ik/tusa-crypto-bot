@@ -319,3 +319,31 @@ to -13.3%. Taking the take without the trim is worse than taking neither.
 
 Then `python -m unittest discover -s tests -q` (128 tests, green as of this writing), commit, push.
 The push triggers a Railway redeploy and a restart; it enables nothing by itself.
+
+## What the next four years would have felt like, month by month
+
+Summaries are what people agree to; months are what they live through, and a working system gets
+switched off in the middle of a stretch the summary already promised. The full package - BILL
+dropped, BTC at half, take 1.0 - on $120 at 1.5% risk with the live guards, read one month at a
+time:
+
+    52 months, 42 positive (81%), 10 negative
+    longest run of losing months: ONE - two in a row never happened
+    worst month: July 2024, -6.9% ($468 -> $436)
+    best month: August 2026, +44.7%
+    median month +4.0%; a quarter of months below +0.8%, a quarter above +8.4%
+    longest wait for a new high: 4 months
+
+**Two consecutive losing months has never happened in 4.3 years.** That sharpens the off-switch
+rule: not "three losing months" but "a second losing month in a row is outside everything measured -
+look immediately".
+
+And a distinction worth holding onto before it is needed: the -13.3% drawdown is **within** months,
+not between them. The account will show that hole on its own chart while the month it happens in can
+still close positive. The bottom of a month and the end of a month are different numbers, and only
+the second one is evidence about the strategy.
+
+The ten losing months are the cost of the forty-two. Nothing in that list is a reason to intervene;
+the triggers that are remain the ones above - a second consecutive losing month, a win rate under
+75% over 100+ trades, or measured slippage staying above 0.06% after the per-coin exclusions have
+had their chance.
