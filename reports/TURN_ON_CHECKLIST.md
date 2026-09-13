@@ -35,16 +35,22 @@ is done until the owner says so.
 
 ## What actually changes
 
-One line of configuration:
+Written first as one line - `PULLBACK_LIVE_ENABLED "0" -> "1"` - because at that point nothing else
+was proposed. Two changes have since been accepted, so it is three:
 
     PULLBACK_LIVE_ENABLED   "0" -> "1"
+    PULLBACK_RULES          -> a new set with the take at 1.0 ATR instead of 0.75
+    PULLBACK_SYMBOLS        -> its own default, the 4h list minus BILLUSDT
 
-That is all. The rules, the coin list, the regime gate, the take and stop, the 48h time exit and
-the touch entry stay exactly as they were measured. `PULLBACK_GROUP_POSTS` is already 1, so signals
-keep going to the group; `SMC_SIGNALS_ENABLED` stays 0, so the old logic stays silent.
+and the owner's own risk setting at 1.40%. Exact edits are under "Exactly what changes, if the
+answer is yes".
+
+Everything else stays as measured: the rules themselves, the regime gate, the stop, the 48h time
+exit, the touch entry. `PULLBACK_GROUP_POSTS` is already 1, so signals keep going to the group;
+`SMC_SIGNALS_ENABLED` stays 0, so the old logic stays silent.
 
 The filter that was withdrawn on 12.09 is gone from the tree - there is nothing to switch on by
-accident.
+accident. The BTC per-coin weight considered during this work was never written, and should not be.
 
 ## What the owner picks
 
