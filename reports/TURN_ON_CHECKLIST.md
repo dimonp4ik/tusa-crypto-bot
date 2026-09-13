@@ -612,3 +612,26 @@ Large relative swings on the cheap coins are misleading - ZEC moves +126% betwee
 0.0004% to 0.0069%, which is nothing in money.
 
 The bank's evening block (21-00 UTC), where a third of its entries happen, is not covered yet.
+
+### The proposed lines verified against what was measured
+
+Checked programmatically rather than by eye, because a plan that looks right and builds something
+slightly different is how a measured result turns into an unmeasured one:
+
+    [dict(r, tp=1.0) for r in RULES_STRICT + SHORT_RULES]
+    == [dict(r, tp=1.0) for r in RULE_SETS["strict3+short2_wide"]]     -> True
+
+Five rules, all at take 1.00 and stop 3.0, conditions untouched:
+
+    btc_pump_evening        LONG   btc24 >= 0.04896   hour in (20,23)
+    coin_run_evening        LONG   ret24 >= 3.864     hour in (20,23)
+    btc_pump_night          LONG   btc24 >= 0.04896   hour in (0,3)
+    short_btc_up_morning    SHORT  btc24 >= 0.01701   hour in (8,11)
+    short_pop_in_downtrend  SHORT  rsi2 >= 71.02      rsi14 <= 35.22
+
+And the symbol change: 18 to 17, removing exactly BILLUSDT, with `TREND4H_SYMBOLS` still at 18 so
+the 4h engine's universe is untouched.
+
+This matters because of a failure already on record here: a parity harness passing 300 of 300 while
+the rule it was testing never fired in the real run, because the harness was fed something the live
+path never sees. The check above is on the exact expressions that would be written.
