@@ -251,3 +251,33 @@ edge lives in the liquid names.
 The worst case - losing NEAR and DOT to the seven-day exclusions as well - costs about 15% of the
 monthly R and buys a drawdown of -8.4R instead of -9.6R. Nothing here changes the decision; it
 removes a way for the live result to diverge from the measured one without anyone noticing.
+
+## The high win-rate requirement is not costing anything
+
+The bank was chosen partly because it wins 85% of its trades. The engine it rides inside - the 4h
+breakout in `src/trend4h.py` - wins about a third, and was set aside for that reason without the
+two ever being put side by side under the same costs and the same account.
+
+| engine | win rate | per trade | total R | R per month | drawdown | ratio |
+|---|---|---|---|---|---|---|
+| the bank | 85% | +0.061R | +168.6R | +3.24R | -11.2R | **0.29** |
+| trend4h | 37% | +0.324R | **+689.6R** | **+13.52R** | -54.9R | 0.25 |
+| both together | 64% | - | +858.2R | +16.50R | -61.4R | 0.27 |
+
+trend4h makes four times the R. It also loses five times as much in its worst stretch, and there is
+only one account. Sized so that each reaches the same 13% drawdown - the most the live latch
+tolerates:
+
+    the bank    risk 1.16% per trade  ->  +3.76% a month
+    trend4h     risk 0.24% per trade  ->  +3.20% a month
+    both        risk 0.21% per trade  ->  +3.49% a month
+
+**At equal drawdown the bank earns more.** trend4h's larger R total is position size, not profit:
+surviving its drawdown on a $120 account means cutting the risk fivefold, and the advantage
+disappears. Running both does not help either - the bank trades inside trend4h's positions, so they
+are correlated, and the pair lands between them at 0.27.
+
+So the win-rate preference costs nothing here. It happens to coincide with the better engine on the
+measure that decides how much an account can actually deploy. Worth knowing in the other direction
+too: if the latch were raised and a much deeper hole accepted, trend4h would be the way to put more
+money to work - it holds positions 81.8% of the time against the bank's 22.2%.
