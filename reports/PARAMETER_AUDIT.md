@@ -591,3 +591,30 @@ is worth nothing at all.
 
 The number worth asking for was never the win rate. It is the points above random, and they are
 seven, stable across five years, at eleven sigma.
+
+### Every rule against a null of its own side
+
+The combined null is -0.0312R, but a random long and a random short are not the same bet, and
+comparing a short rule against a mixed null distorts it. Computed separately over five years:
+
+    random LONG    72.5% win rate,  -0.0464R
+    random SHORT   74.8% win rate,  -0.0159R
+
+Both lose; shorts lose less, because the take/stop geometry dominates any directional drift. That
+refinement matters: measured against the combined -0.0312R the two short rules would have looked
+about 0.015R better than they are.
+
+| rule | side | trades | win rate | per trade | own null | **edge** | sigma |
+|---|---|---|---|---|---|---|---|
+| btc_pump_evening | LONG | 377 | 88% | +0.1698R | -0.0464R | **+0.2162R** | **10.2** |
+| btc_pump_night | LONG | 393 | 87% | +0.1494R | -0.0464R | **+0.1958R** | **8.8** |
+| coin_run_evening | LONG | 955 | 81% | +0.0721R | -0.0464R | **+0.1185R** | **7.1** |
+| short_btc_up_morning | SHORT | 598 | 84% | +0.0920R | -0.0159R | **+0.1079R** | **5.3** |
+| short_pop_in_downtrend | SHORT | 667 | 77% | +0.0578R | -0.0159R | **+0.0737R** | **3.8** |
+
+**All five beat their own null with significance, and none is dead weight.** The weakest is
+`short_pop_in_downtrend` at 3.8 sigma - still sound, but it is the bank's thinnest component on
+every measure at once: no hour window, the lowest win rate at 77%, and the smallest edge.
+
+This is the first time each rule has had a significance of its own rather than being carried by the
+portfolio average.
