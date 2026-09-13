@@ -383,3 +383,28 @@ The rules were tuned one at a time but run as a portfolio, so the collection of 
 takes is worse than a single value even on the window that chose it. The per-rule mix does earn more
 per month, but buys it with drawdown - and drawdown is what the live latch spends. Rejected: the
 seventeenth candidate.
+
+### The audit re-run under the new take
+
+The hour windows and thresholds were all re-picked while the take was 0.75. They are entry
+parameters and the take is an exit parameter, but one-position-per-coin couples them - a
+longer-lived trade occupies its coin and a signal that used to be taken is now skipped - so the
+conclusions are not automatically inherited.
+
+**All four hour windows still hold** under take 1.0, ranking 11th, 1st, 2nd and 1st of 21 on the
+exam. The short morning window, the weakest before, is now first.
+
+**All six thresholds still hold.** Two are the fitting window's own choice again; three others have
+a fit-preferred alternative that the exam refuses (0.32, 0.27 and 0.27 against 0.33).
+
+The sixth is worth recording because it nearly became a candidate. `ret24 >= 4.8` instead of 3.864
+was rejected at take 0.75 (exam 0.26 against 0.28) and passes at take 1.0 (exam 0.35 against 0.33) -
+either a real interaction or a second bite at the same data. The walk-forward answers:
+
+    better in 4 forward half-years of 9 - a coin flip
+    the rolling choice lands on 4.8 every time and delivers +2.98R a month against 3.864's +3.10
+    bootstrap: +4.5R, at or below zero in 30.2% of draws; without 2022, 37.5%
+
+Rejected - the eighteenth candidate. Set beside take 1.0's nine of nine and a 0.0% bootstrap, the
+difference between a finding and a fluctuation is not subtle once the right instrument is used. The
+exam alone called it an improvement; the exam alone is not enough.
