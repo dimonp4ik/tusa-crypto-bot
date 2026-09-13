@@ -219,3 +219,46 @@ BILLUSDT, and halve BTC's position size. Those give ratio 0.29 -> 0.34, +3.37R a
 A note on method for the next parameter that looks good: a plateau, a win in every year and a
 monthly bootstrap were **not enough**. Only the walk-forward distinguished "better over this
 history" from "better if you had deployed it". It is cheap and should come first, not last.
+
+## The stops, one by one - and what the win rate is actually worth
+
+The bank pays -0.934R for a stop and earns +0.231R for a win, so one stop erases four wins. Nothing
+else in the engine has that leverage, which is why the stops deserve looking at individually rather
+than as a rate.
+
+All 337 of them (12.1% of 2,790 trades):
+
+    depth past the stop, in units of the stop's own distance
+      median +0.074      58.8% of stops overshoot by less than 10%
+      90th   +0.281       5.0% overshoot by more than 50%
+    timing: median 10.8h after entry, 19% inside the first four hours
+    price returns to the take inside the original 48h window in 33.5% of them
+
+    booked, with the stop:      -1.0183R each, -343.2R in total
+    the same trades, no stop:   -0.9217R each, -310.6R in total
+    difference: +32.5R, which is 17% of everything the bank makes
+
+Two facts at once. The stop is usually pierced by a sliver - a median of 7% of its own depth - and
+two thirds of stopped trades genuinely never come back, so it is reading the situation correctly.
+Removing it is not an option anyway: the deep group averages -2.29R unstopped, and on the exchange
+a 10x position with no stop is the failure mode already documented in the money-path audit.
+
+So the question is whether it belongs further out. Swept at constant risk - R is divided by each
+trade's own stop distance, so a wider stop is a smaller position rather than a bigger bet:
+
+| stop | fit 2022-24 | exam 2025-26 | stop rate | win rate on exam |
+|---|---|---|---|---|
+| 2.50 | 0.39 | 0.17 | 15.6% | 82% |
+| **3.00 (deployed)** | 0.34 | **0.28** | 13.4% | 84% |
+| 3.50 (fit's choice) | **0.41** | 0.26 | 11.1% | 86% |
+| 4.00 | 0.38 | 0.27 | 9.6% | 87% |
+| 5.00 | 0.37 | 0.20 | 7.2% | 88% |
+
+The fitting window wants 3.50 and the exam refuses it - the sixteenth rejected candidate. The
+deployed 3.00 has the best exam ratio of all eight widths.
+
+**And the win rate is a dial, not an achievement.** Widening the stop to 5 ATR buys 88% on the exam
+instead of 84%, cuts the stop rate nearly in half - and costs a third of the money per trade
+(+0.0317R against +0.0501R). The same thing was established for the signal bot in August; here it
+is proved again on the bank's own data. A win rate bought this way is bought with the money it was
+supposed to represent.
