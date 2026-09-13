@@ -408,3 +408,34 @@ either a real interaction or a second bite at the same data. The walk-forward an
 Rejected - the eighteenth candidate. Set beside take 1.0's nine of nine and a 0.0% bootstrap, the
 difference between a finding and a fluctuation is not subtle once the right instrument is used. The
 exam alone called it an improvement; the exam alone is not enough.
+
+## Trailing exits: tested in every form, rejected in every form
+
+If a bigger target is better, is no target better still? The 4h engine in this repo makes four times
+the bank's R by letting winners run behind a trailing stop, and take 1.25 already earns more per
+trade than 1.0 while losing on ratio - the money is out there and drawdown is what stops the bank
+reaching for it.
+
+Built the way trend4h builds it: the trail level is recomputed from CLOSED bars and checked against
+the NEXT bar, because a trail that moves on the bar it is tested against reads the future.
+
+| exit | fit 2022-24 | exam 2025-26 | exam R per month |
+|---|---|---|---|
+| **fixed take 1.0 (proposed)** | 0.35 | **0.33** | **+3.86** |
+| pure trail 1.5 ATR | **0.39** | 0.03 | +1.11 |
+| trail 1.0 armed at +0.5 | **0.51** | 0.08 | +1.72 |
+| trail 0.75 armed at +0.75 | 0.45 | 0.18 | +2.60 |
+| trail 0.75 armed at +2.0 | 0.21 | 0.17 | +4.82 |
+
+Twenty variants, none within reach of the fixed take on the years that chose nothing. Some earn more
+per month - trail 0.75 armed at +2.0 reaches +4.82R - and buy it entirely with drawdown, which is
+the currency the live latch spends and where there is no headroom.
+
+Look at the fitting column. A trail reached **0.51** there against the fixed take's 0.35. On that
+evidence alone the right move would have been to rebuild the bank's whole exit. The nineteenth
+rejected candidate, and the clearest illustration yet of why the fitting window is not evidence.
+
+One correction along the way: the first version of this test armed the trail at +1.0 ATR while the
+take sat at 1.0 ATR, so the take always fired first and the trail never engaged - every variant
+returned the plain take's numbers to four decimals. An inert knob returning identical numbers is a
+result about the test, not about the strategy, and it was rebuilt before being read.
