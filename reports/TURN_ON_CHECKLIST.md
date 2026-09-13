@@ -582,3 +582,33 @@ book for the whole size. Related, not equal. So this is not a change - it is the
 check once real fills exist. If per-coin measured slippage comes in near these figures,
 `PULLBACK_LIVE_MAX_SLIP` is too strict and should be raised rather than allowed to shrink the
 universe by 40% of its earnings.
+
+### Interim: how much the book cost moves between hours
+
+The first order-book pricing was a single snapshot, with the caveat that "the ranking of the coins
+will not change" but the level might. A sampler has since been running; five hours of twenty-four
+are covered so far (03-07 UTC), twenty-three snapshots per coin.
+
+| coin | 04h | 05h | 06h | 07h | spread across hours |
+|---|---|---|---|---|---|
+| BILL | 0.2893% | 0.2898% | 0.2551% | 0.2926% | +13% |
+| XLM | 0.1071% | 0.1186% | 0.1123% | 0.1389% | +28% |
+| AAVE | 0.0697% | 0.0779% | 0.0641% | 0.0627% | +23% |
+| **DOT** | 0.0522% | 0.0424% | 0.0275% | 0.0245% | **+79%** |
+| NEAR | 0.0319% | 0.0319% | 0.0323% | 0.0432% | +35% |
+| **TAO** | 0.0318% | 0.0422% | 0.0211% | 0.0422% | **+57%** |
+| ADA | 0.0242% | 0.0241% | 0.0241% | 0.0241% | +0% |
+| BTC, ETH | 0.0001% | 0.0001% | 0.0001% | 0.0001% | +0% |
+
+**The ranking is stable** - BILL, then XLM, then AAVE, then DOT/NEAR/TAO, then the rest, in every
+hour measured. The caveat on the original snapshot holds up.
+
+**The level moves about 37%**, and that matters for exactly the coins sitting on the 0.03%
+threshold. DOT runs 0.0245-0.0522% and TAO 0.0211-0.0422%: in some hours the bot will accept them
+and in others its own rule will exclude them for a week. That is the mechanism behind the warning
+above, now with numbers.
+
+Large relative swings on the cheap coins are misleading - ZEC moves +126% between hours, from
+0.0004% to 0.0069%, which is nothing in money.
+
+The bank's evening block (21-00 UTC), where a third of its entries happen, is not covered yet.
