@@ -684,3 +684,27 @@ coins by sign, which is exactly what the earlier reasoning lacked.
 One caveat on precision: these nulls are sampled, and between runs they move in the second decimal
 (XLM's came out -0.1048 once and -0.0930 another time). The conclusions do not turn on that, but the
 figures are not exact to the last digit.
+
+### Are the hour windows earned, or free?
+
+The windows were validated against having no window, which shows they help the rule. It does not
+show the rule earns them: if a random entry in those hours already does better than average, the
+rule is being credited with the clock. Random entries over five years, bucketed by hour:
+
+| window | random entry there | random entry overall | free |
+|---|---|---|---|
+| LONG 20-23 | -0.0468R | -0.0498R | **+0.0030R** |
+| LONG 0-3 | -0.0523R | -0.0498R | **-0.0024R** |
+| **SHORT 8-11** | **-0.0038R** | -0.0202R | **+0.0164R** |
+
+**The two long windows are earned.** A random long in 20-23 returns almost exactly the all-hours
+average, and in 0-3 it does slightly worse. Those rules are not riding a good time of day; whatever
+they find there, they find themselves.
+
+**The short morning window is partly free.** A random short at 8-11 UTC loses -0.0038R against
+-0.0202R across all hours, so +0.0164R of that window is available to anyone. Against the rule's
+measured edge of +0.1079R over its side-matched null, about 15% is the clock rather than the rule -
+its own contribution is nearer +0.0915R.
+
+The rule still works, but its credit was overstated and now it is not. It also explains why the
+search landed on the morning for a short rule: there was a genuine hour effect there to latch onto.
