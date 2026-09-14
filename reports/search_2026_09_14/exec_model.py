@@ -97,17 +97,19 @@ def book(coins, sig, how='рынок'):
                 ht[0] = False
             js = int(np.argmax(hs)) if hs.any() else BIG
             jt = int(np.argmax(ht)) if ht.any() else BIG
-            if js <= jt and js < BIG:                      # stop: market, slips and pays taker
+            # okx_trader.place_protection_oco sends slOrdPx and tpOrdPx as "-1": BOTH legs are
+            # market on trigger, so the take pays the taker fee and slips like the stop does.
+            if js <= jt and js < BIG:
                 jj = js
                 base = min(SL, o[js]) if lg else max(SL, o[js])
                 f_ = base * (1 - slip) if lg else base * (1 + slip)
-                fee_out = FEE_TAKER
-            elif jt < BIG:                                  # take: resting limit, maker, no slip
-                jj, f_, fee_out = jt, TP, FEE_MAKER
-            else:                                           # time exit: market
+            elif jt < BIG:
+                jj = jt
+                f_ = TP * (1 - slip) if lg else TP * (1 + slip)
+            else:
                 jj = HOLD - 1
                 f_ = cc[-1] * (1 - slip) if lg else cc[-1] * (1 + slip)
-                fee_out = FEE_TAKER
+            fee_out = FEE_TAKER
             ret = ((f_ / e - 1) if lg else (1 - f_ / e)) - fee_in - fee_out
             end = int(t15[i + jj]) + 900
             rows.append((close, end, ret / (3.0 * atr / e), 3.0 * atr / e, s, 1.0))
@@ -143,7 +145,8 @@ def show(lbl, rows, missed, ref=None):
     return m
 
 
-print('  комиссия: тейкер %.2f б.п. за ногу, мейкер %.2f б.п.; проскальзывание измеренное'
+print('  тейкер %.2f б.п. за ногу, мейкер %.2f б.п. (только пассивный вход); '
+      'проскальзывание измеренное на ОБЕИХ ногах — тейк и стоп оба рыночные'
       % (10000 * FEE_TAKER, 10000 * FEE_MAKER), flush=True)
 for cl, coins in (('без AAVE и XLM', NOBAD), ('все 15 монет', ALL)):
     print('', flush=True)
