@@ -28,7 +28,7 @@ import nogate_attack as NA
 from src import pullback_bank as PB
 
 CACHE = 'C:/Users/Lenovo/Desktop/Торговля/crypto-bot/reports/audit_2026_09_08/xperp_cache'
-COINS = ['ADAUSDT', 'AVAXUSDT', 'BTCUSDT', 'ETHUSDT', 'SOLUSDT', 'XRPUSDT']
+COINS = ['AAVEUSDT', 'ADAUSDT', 'AVAXUSDT', 'BTCUSDT', 'DOTUSDT', 'ETHUSDT', 'HYPEUSDT', 'LINKUSDT', 'NEARUSDT', 'SOLUSDT', 'SUIUSDT', 'TAOUSDT', 'XLMUSDT', 'XRPUSDT', 'ZECUSDT']
 C = [('rsi48', '>=', 56.3761), ('rsi6', '<=', 33.7947)]
 BIG = 10 ** 9
 COST = 0.0004
