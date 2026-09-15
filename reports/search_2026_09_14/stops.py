@@ -1,0 +1,253 @@
+"""Each of the bank's five rules on its own stop, take and hold.
+
+Geometry was only ever searched for the whole book at once. The five rules fire on different things -
+BTC pumps in the evening, coin runs, the night pump, a morning short, a pop in a downtrend - and there
+is no reason they share an optimum. One rule at a time is varied (stop 2/3/4 ATR, take 0.75/1/1.5/2,
+hold 24/48/72h) while the other four and both pullback sources stay at 3/1/48h.
+
+Book: bank 1h + pullback 1h + pullback 2h, coins without XLM and AAVE, market entry at next 15m open,
+measured costs, stops beyond 10% dropped, one position per coin, bank first. Money under the LIVE
+stop_ref sizing at a 12% drawdown and at a fixed 1.4%. Each rule's geometry is then chosen blind on
+four years and read on the fifth.
+"""
+import collections, csv, datetime, itertools, sys
+import numpy as np
+sys.path.insert(0, 'C:/Users/Lenovo/Desktop/Торговля/crypto-bot')
+import struct_params as SP
+import gauntlet2 as G
+import nogate_attack as NA
+import sim_w
+import live_rules_sim as L
+from src import pullback_bank as PB
+
+cost = collections.defaultdict(list)
+for r in csv.DictReader(open('book_frozen.csv')):
+    cost[r['coin'] + 'USDT'].append(float(r['cost109']))
+SLIP = {k: float(np.median(v)) for k, v in cost.items()}
+SP.SLIP_REAL.update(SLIP); G.FC.clear()
+FEE = 0.0004
+COINS = [s for s in SP.COINS if s not in ('BILLUSDT', 'XLMUSDT', 'AAVEUSDT')]
+PULL = [('rsi48', '>=', 56.3761), ('rsi6', '<=', 33.7947)]
+MAXH = 288
+YT = {y: int(datetime.datetime(y, 1, 1, tzinfo=datetime.UTC).timestamp()) for y in range(2022, 2028)}
+RULES = [dict(r, tp=1.0) for r in SP.BASE]
+
+
+def pull_signals(s, sec):
+    c = SP.CTX[s]
+    T, B = PB.build_bars(c['t15'], c['a15'], sec)
+    cl = B[:, 3]
+    r48, r6, atr = PB._rsi(cl, 48), PB._rsi(cl, 6), PB._atr(B)
+    bdt, bdc = c['bdt'], np.asarray(c['bdc'], dtype=float)
+    sma = PB._sma(bdc, 50)
+    out = []
+    for i in range(200, len(T)):
+        if r48[i] >= 56.3761 and r6[i] <= 33.7947 and np.isfinite(atr[i]):
+            close = int(T[i]) + sec
+            d = np.searchsorted(bdt, close - 86400, side='right') - 1
+            if d >= 49 and bdc[d] < sma[d]:
+                continue
+            out.append((close, float(atr[i])))
+    return out
+
+
+
+BASE_HOLD = {'о1ч': 48, 'о2ч': 72}
+BASE_G = (3.0, 1.0, 48)
+
+
+def make_sig(coins):
+    sig = []
+    for s in coins:
+        c = SP.CTX[s]
+        t15, a15, pos = c['t15'], c['a15'], c['pos']
+        slip = SLIP.get(s, 0.0003)
+        items = [(t, 0, 'r%d' % v[0], RULES[v[0]].get('side', 'LONG') == 'LONG', v[2])
+                 for t, v in SP.bank_signals(RULES, s, 50).items()]
+        items += [(t, 1, 'о1ч', True, a) for t, a in pull_signals(s, 3600)]
+        items += [(t, 2, 'о2ч', True, a) for t, a in pull_signals(s, 7200)]
+        for close, prio, key, lg, atr in items:
+            j = pos.get(close)
+            if j is None or j + MAXH > len(t15) or not np.isfinite(atr) or atr <= 0:
+                continue
+            o, h, l, cc = (a15[j:j + MAXH, x] for x in range(4))
+            e = o[0] * (1 + slip) if lg else o[0] * (1 - slip)
+            fav = (h - e) / atr if lg else (e - l) / atr
+            adv = (e - l) / atr if lg else (h - e) / atr
+            sig.append((close, prio, key, s, e, atr, np.maximum.accumulate(fav), np.maximum.accumulate(adv),
+                        (o - e) / atr if lg else (e - o) / atr, (cc - e) / atr if lg else (e - cc) / atr,
+                        t15[j:j + MAXH], slip))
+    sig.sort(key=lambda x: (x[0], x[1]))
+    return sig
+
+
+def book(sig, geo):
+    busy, out = {}, []
+    for close, prio, key, s, e, atr, Mu, Md, on, cn, tt, slip in sig:
+        if busy.get(s, 0) > close:
+            continue
+        sl, tp, hh = geo.get(key, (3.0, 1.0, BASE_HOLD.get(key, 48)))
+        H = hh * 4
+        sf = sl * atr / e
+        if sf > 0.10:
+            continue
+        js = int(np.searchsorted(Md[:H], sl, side='left'))
+        jt = int(np.searchsorted(Mu[:H], tp, side='left'))
+        if js < H and js <= jt:
+            jj, x = js, min(-sl, on[js])
+        elif jt < H:
+            jj, x = jt, tp
+        else:
+            jj, x = H - 1, cn[H - 1]
+        end = int(tt[jj]) + 900
+        out.append((close, end, (x * atr / e - slip - FEE) / sf, sf, s, 1.0, key))
+        busy[s] = end
+    return out
+
+
+def plain(rows):
+    return [x[:6] for x in rows]
+
+
+def m_dd(rows):
+    return sim_w.money_at_dd(plain(rows), 0.12)[1] if len(rows) >= 80 else float('nan')
+
+
+def m_fix(rows):
+    r = sim_w.simulate(plain(rows), 0.014)
+    return r['eq'], abs(L.dd_of(r['curve']))
+
+
+def per_year(rows):
+    return [sim_w.simulate([x for x in plain(rows) if YT[y] <= x[0] < YT[y + 1]], 0.014)['eq'] for y in range(2022, 2027)]
+
+
+
+import bisect
+GEO = {'r4': (2.0, 1.5, 48)}
+spread = collections.defaultdict(list)
+for r in csv.DictReader(open('book_frozen.csv')):
+    spread[r['coin'] + 'USDT'].append(float(r['spread']))
+SPR = {k: float(np.median(v)) for k, v in spread.items()}
+COINS = [c for c in SP.COINS if c not in ('BILLUSDT', 'XLMUSDT', 'AAVEUSDT')]
+sig = make_sig(COINS)
+
+
+def book_meta(sig, geo):
+    busy, out, last = {}, [], {}
+    for close, prio, key, s, e, atr, Mu, Md, on, cn, tt, slip in sig:
+        if busy.get(s, 0) > close:
+            continue
+        sl, tp, hh = geo.get(key, (3.0, 1.0, BASE_HOLD.get(key, 48)))
+        H = hh * 4
+        sf = sl * atr / e
+        if sf > 0.10:
+            continue
+        js = int(np.searchsorted(Md[:H], sl, side='left'))
+        jt = int(np.searchsorted(Mu[:H], tp, side='left'))
+        if js < H and js <= jt:
+            jj, x, kind = js, min(-sl, on[js]), 'стоп'
+        elif jt < H:
+            jj, x, kind = jt, tp, 'тейк'
+        else:
+            jj, x, kind = H - 1, cn[H - 1], 'время'
+        end = int(tt[jj]) + 900
+        R = (x * atr / e - slip - FEE) / sf
+        c = SP.CTX[s]
+        i1 = int(np.searchsorted(c['T1'], close - 3600))
+        F = c['F']
+        def fget(n):
+            return float(F[n][i1]) if i1 < len(c['T1']) and n in F else float('nan')
+        j = bisect.bisect_right(c['starts'], close) - 1
+        reg = c['iv'][j][2] if j >= 0 and c['iv'][j][0] <= close < c['iv'][j][1] else 'вне'
+        d = datetime.datetime.fromtimestamp(close, datetime.UTC)
+        prev = last.get(s)
+        out.append(dict(close=close, end=end, R=R, sf=sf, coin=s, key=key, kind=kind, bars=jj,
+                        mfe=float(Mu[jj]) / tp, came_back=bool(kind == 'стоп' and Mu[H - 1] >= tp),
+                        hour=d.hour, wd=d.weekday(), year=d.year, reg=reg,
+                        volreg=fget('volreg'), btc24=fget('btc24'), slope=fget('slope'), rsi14=fget('rsi14'),
+                        spread=SPR.get(s, float('nan')),
+                        prev=('нет' if prev is None else prev[0]),
+                        gap_h=(float('nan') if prev is None else (close - prev[1]) / 3600)))
+        busy[s] = end
+        last[s] = (kind, end)
+    return out
+
+
+T = book_meta(sig, GEO)
+N = len(T)
+allstop = np.mean([t['kind'] == 'стоп' for t in T])
+print('  сделок %d, стопов %.1f%%, тейков %.1f%%, по времени %.1f%%, ср R %+.4f'
+      % (N, 100 * allstop, 100 * np.mean([t['kind'] == 'тейк' for t in T]),
+         100 * np.mean([t['kind'] == 'время' for t in T]), np.mean([t['R'] for t in T])), flush=True)
+
+
+def table(title, keyf, order=None, min_n=40):
+    g = collections.defaultdict(list)
+    for t in T:
+        k = keyf(t)
+        if k is not None:
+            g[k].append(t)
+    keys = order if order else sorted(g, key=lambda k: str(k))
+    print('', flush=True)
+    print('  === %s ===' % title, flush=True)
+    print('    %-22s  сделок  стопов   ВР     ср R     сумма R' % '', flush=True)
+    for k in keys:
+        v = g.get(k, [])
+        if len(v) < min_n:
+            continue
+        R = np.array([t['R'] for t in v])
+        st = np.mean([t['kind'] == 'стоп' for t in v])
+        print('    %-22s  %5d   %5.1f%%  %5.1f%%  %+.4f  %+8.1f%s'
+              % (str(k), len(v), 100 * st, 100 * np.mean(R > 0), R.mean(), R.sum(),
+                 '   <<' if st > allstop * 1.3 else ''), flush=True)
+
+
+def qbin(name, q=5):
+    vals = np.array([t[name] for t in T if np.isfinite(t[name])])
+    edges = np.quantile(vals, np.linspace(0, 1, q + 1))
+    def f(t):
+        x = t[name]
+        if not np.isfinite(x):
+            return None
+        k = min(int(np.searchsorted(edges, x, side='right')) - 1, q - 1)
+        return 'Q%d [%.3g..%.3g]' % (k + 1, edges[k], edges[k + 1])
+    return f
+
+
+table('по источнику/правилу', lambda t: t['key'])
+table('по монете', lambda t: t['coin'].replace('USDT', ''))
+table('по году', lambda t: t['year'])
+table('по часу входа (UTC, блоки 4ч)', lambda t: '%02d-%02d' % (t['hour'] // 4 * 4, t['hour'] // 4 * 4 + 3))
+table('по дню недели', lambda t: ['пн', 'вт', 'ср', 'чт', 'пт', 'сб', 'вс'][t['wd']])
+table('по режиму на входе', lambda t: t['reg'])
+table('по волатильности (volreg, квинтили)', qbin('volreg'))
+table('по BTC за 24ч (квинтили)', qbin('btc24'))
+table('по наклону EMA200 (квинтили)', qbin('slope'))
+table('по rsi14 на входе (квинтили)', qbin('rsi14'))
+table('по спреду монеты (терцили)', qbin('spread', 3))
+table('по предыдущей сделке на этой монете', lambda t: t['prev'])
+table('по паузе после прошлой сделки на монете', lambda t: None if not np.isfinite(t['gap_h']) else ('<6ч' if t['gap_h'] < 6 else '6-24ч' if t['gap_h'] < 24 else '>24ч'), order=['<6ч', '6-24ч', '>24ч'])
+
+S = [t for t in T if t['kind'] == 'стоп']
+print('', flush=True)
+print('  === АНАТОМИЯ СТОПОВ (%d) ===' % len(S), flush=True)
+bars = np.array([t['bars'] for t in S])
+print('    до стопа: медиана %.0f свечей 15м (%.1f ч); в первый час %.1f%%, за 1-4ч %.1f%%, 4-12ч %.1f%%, позже %.1f%%'
+      % (np.median(bars), np.median(bars) / 4, 100 * np.mean(bars < 4), 100 * np.mean((bars >= 4) & (bars < 16)),
+         100 * np.mean((bars >= 16) & (bars < 48)), 100 * np.mean(bars >= 48)), flush=True)
+mfe = np.array([t['mfe'] for t in S])
+print('    как близко цена подходила к тейку перед стопом: <25%% пути %.1f%%, 25-50%% %.1f%%, 50-75%% %.1f%%, 75-100%% %.1f%%'
+      % (100 * np.mean(mfe < .25), 100 * np.mean((mfe >= .25) & (mfe < .5)), 100 * np.mean((mfe >= .5) & (mfe < .75)),
+         100 * np.mean(mfe >= .75)), flush=True)
+cb = np.mean([t['came_back'] for t in S])
+print('    после стопа цена всё же дошла до тейка в том же окне: %.1f%% стопов' % (100 * cb), flush=True)
+gap = [t for t in S if t['prev'] == 'стоп']
+print('    стоп сразу после стопа на той же монете: %d из %d (%.1f%%); доля стопов среди сделок после стопа %.1f%% против %.1f%% в среднем'
+      % (len(gap), len(S), 100 * len(gap) / len(S),
+         100 * np.mean([t['kind'] == 'стоп' for t in T if t['prev'] == 'стоп']), 100 * allstop), flush=True)
+lossR = sum(t['R'] for t in S)
+print('    стопы забирают %.1fR; вся книга зарабатывает %+.1fR; тейки дают %+.1fR' % (lossR, sum(t['R'] for t in T),
+      sum(t['R'] for t in T if t['kind'] == 'тейк')), flush=True)
+import pickle
+pickle.dump(T, open('stop_meta.pkl', 'wb'))
