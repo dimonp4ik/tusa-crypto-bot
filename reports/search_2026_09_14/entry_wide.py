@@ -64,13 +64,8 @@ def exit_from(c, j, e, atr, lg, ex_slip):
     return jj, f
 
 
-
 def book(variant):
-    """variant: ('рынок',) or ('лимит', W, q, honest).
-    honest=False: the optimistic model measured before (any fill at min(open, limit), maker fee).
-    honest=True : a bar that OPENS through the limit is a marketable order - taker fee plus measured
-                  slippage at the open; only a touch from the other side earns the maker price, and
-                  with q > 0 the price must trade through the limit by q before the fill counts."""
+    kind = variant[0]
     busy, out, missed = {}, [], 0
     for close, s, prio, lg, lim, atr in SIG:
         if busy.get(s, 0) > close or not np.isfinite(atr) or atr <= 0:
@@ -81,28 +76,33 @@ def book(variant):
         if j0 is None or j0 + H + 16 > len(t15):
             continue
         slip = SLIP.get(s, 0.0003)
-        if variant[0] == 'рынок':
+        if kind == 'рынок':
             j, e, fee = j0, (a15[j0, 0] * (1 + slip) if lg else a15[j0, 0] * (1 - slip)), 0.0004
-        else:
-            W, q, honest = variant[1], variant[2], variant[3]
-            px, j = lim, None
+        elif kind == 'лимит':
+            k, W = variant[1], variant[2]
+            px = lim - k * atr if lg else lim + k * atr
+            j = None
             for w in range(W):
                 o_, h_, l_ = a15[j0 + w, 0], a15[j0 + w, 1], a15[j0 + w, 2]
-                through_open = (o_ <= px) if lg else (o_ >= px)
-                touched = (l_ <= px * (1 - q)) if lg else (h_ >= px * (1 + q))
-                if through_open:
+                if (lg and l_ <= px) or (not lg and h_ >= px):
                     j = j0 + w
-                    if honest:
-                        e, fee = (o_ * (1 + slip) if lg else o_ * (1 - slip)), 0.0004
-                    else:
-                        e, fee = o_, 0.0003
-                    break
-                if touched:
-                    j, e, fee = j0 + w, px, 0.0003
+                    e = min(o_, px) if lg else max(o_, px)
                     break
             if j is None:
                 missed += 1
                 continue
+            fee = 0.0003
+        else:  # подтверждение
+            j = None
+            for w in range(8):
+                o_, c_ = a15[j0 + w, 0], a15[j0 + w, 3]
+                if (lg and c_ > o_) or (not lg and c_ < o_):
+                    j = j0 + w + 1
+                    break
+            if j is None:
+                missed += 1
+                continue
+            e, fee = (a15[j, 0] * (1 + slip) if lg else a15[j, 0] * (1 - slip)), 0.0004
         sf = SL * atr / e
         if sf > 0.10:
             continue
@@ -132,36 +132,38 @@ def money(tr):
     return sim_w.money_at_dd([(a, b, R, sf, s, L.REF / sf) for a, b, R, sf, s in tr], 0.12)
 
 
-VARS = [('рынок',), ('лимит', 16, 0.0, False)]
-for W in (4, 16):
-    for q in (0.0, 0.0005):
-        VARS.append(('лимит', W, q, True))
-names = {('рынок',): 'рынок (сейчас)', ('лимит', 16, 0.0, False): 'лимит 4ч, прежняя модель'}
+VARS = [('рынок',)]
+for k in (0.0, 0.1, 0.25, 0.5, 1.0):
+    for W in (4, 16):
+        VARS.append(('лимит', k, W))
+VARS.append(('подтверждение',))
 res = {}
-print('  вход                              | сделок/год  ВР     ср R    R/мес  просадка R  R/мес/DD  не залито | деньги DD 12%', flush=True)
+print('  вход                    | сделок/год  ВР     ср R    R/мес  просадка R  R/мес/DD  не залито | деньги DD 12%%', flush=True)
 for v in VARS:
     tr, missed = book(v)
     st = stats(tr)
+    if not st:
+        continue
     res[v] = (st, tr)
     rk, m = money(tr)
-    nm = names.get(v) or 'лимит %dч, честно, насквозь %.2f%%' % (v[1] // 4, 100 * v[2])
-    print('  %-33s | %6.0f    %4.1f%%  %+.3f  %+5.2f   %6.1f     %.3f     %5d   | $%7.0f (%.2f%%)'
-          % (nm, st['tpy'], 100 * st['wr'], st['avg'], st['rm'], st['dd'], st['ratio'], missed, m, 100 * rk), flush=True)
+    name = v[0] if len(v) == 1 else '%s %.2fATR %dч' % (v[0], v[1], v[2] // 4)
+    print('  %-23s | %6.0f    %4.1f%%  %+.3f  %+5.2f   %6.1f     %.3f     %5d   | $%7.0f (%.2f%%)'
+          % (name, st['tpy'], 100 * st['wr'], st['avg'], st['rm'], st['dd'], st['ratio'], missed, m, 100 * rk), flush=True)
 
-print('  -- слепой выбор среди ЧЕСТНЫХ вариантов и рынка: 4 года выбор, 5-й замер --', flush=True)
-cands = [v for v in VARS if v != ('лимит', 16, 0.0, False)]
+print('  -- слепой выбор входа: 4 года выбор, 5-й замер --', flush=True)
 wins = seen = 0
 for y in range(2022, 2027):
     lo, hi = YT[y], YT[y + 1]
     best, bk = -1e9, None
-    for v in cands:
-        s2 = stats([x for x in res[v][1] if not (lo <= x[0] < hi)])
+    for v, (st, tr) in res.items():
+        s2 = stats([x for x in tr if not (lo <= x[0] < hi)])
         if s2 and s2['ratio'] > best:
             best, bk = s2['ratio'], v
     pick = [x for x in res[bk][1] if lo <= x[0] < hi]
     base = [x for x in res[('рынок',)][1] if lo <= x[0] < hi]
+    if len(pick) < 30 or len(base) < 30:
+        continue
     mp, mb = money(pick)[1], money(base)[1]
     seen += 1; wins += int(mp > mb)
-    print('    %d выбран %s | слепой год $%.0f против рынка $%.0f  %s'
-          % (y, bk, mp, mb, 'лучше' if mp > mb else ('так же' if mp == mb else 'хуже')), flush=True)
-print('    лучше рынка в %d из %d лет' % (wins, seen), flush=True)
+    print('    %d выбран %s | слепой год $%.0f против рынка $%.0f  %s' % (y, bk, mp, mb, 'лучше' if mp > mb else 'хуже'), flush=True)
+print('    выбранный вслепую вход лучше рыночного в %d из %d лет' % (wins, seen), flush=True)
