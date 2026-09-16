@@ -689,7 +689,9 @@ def get_day_events(max_events: int = 10) -> dict:
         if not p or p["ev_date"] != target:
             continue
         if p["all_day"] or p["when_utc"] is None:
-            passed = (target < now_et.date())
+            # now_et never existed; an all-day event took the day-news button
+            # down with NameError. The target day is picked in Riga time above.
+            passed = (target < now_local.date())
         else:
             passed = p["when_utc"] < now_utc
         parsed.append({**p, "passed": passed})

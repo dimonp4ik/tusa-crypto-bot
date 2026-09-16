@@ -40,6 +40,17 @@ ADMIN_IDS = {671071896}  # super-admin only; others added via bot → DB
 
 # --- Scan settings ---
 SCAN_INTERVAL_MINUTES = int(os.getenv("SCAN_INTERVAL_MINUTES", "5"))
+# Deployment is deliberately fail-closed.  A stale Railway AUTOTRADE_ENABLED=1
+# cannot open an order unless DEPLOYMENT_MODE is explicitly changed to live.
+DEPLOYMENT_MODE = os.getenv("DEPLOYMENT_MODE", "shadow").strip().lower()
+if DEPLOYMENT_MODE not in {"shadow", "live"}:
+    DEPLOYMENT_MODE = "shadow"
+
+REGIME_FILTER_MODE = os.getenv("REGIME_FILTER_MODE", "paper").strip().lower()
+if REGIME_FILTER_MODE not in {"off", "paper", "live"}:
+    REGIME_FILTER_MODE = "paper"
+if DEPLOYMENT_MODE == "shadow":
+    REGIME_FILTER_MODE = "paper"
 TOP_COINS_COUNT = int(os.getenv("TOP_COINS_COUNT", "25"))
 TIMEFRAME = "15m"          # 15m candle → swing signals, hold 2-8h
 # Lookback windows MUST match backtest.py's WINDOW_15M/WINDOW_1H/WINDOW_4H
@@ -1302,13 +1313,14 @@ CLAUDE_MEMORY_LIMIT       = int(os.getenv("CLAUDE_MEMORY_LIMIT", "25"))      # r
 CLAUDE_MAX_RISK_SCORE     = int(os.getenv("CLAUDE_MAX_RISK_SCORE", "7"))     # counter-arg auto-reject if risk >= this (7 = "real concern" per scale)
 
 # Claude as a GATE, or as an observer. 1 = his verdict withholds setups. 0 =
-# SHADOW: he is still called, scored and logged, but the rules filter alone
-# decides what trades. Switchable at runtime from the admin panel; the DB state
-# wins over this default.
+# SHADOW: he is still called, scored and logged, but the rules filter decides
+# what paper signals are published. A signal admitted only because the gate is
+# off is marked ineligible for real-money autotrading. Switchable at runtime
+# from the admin panel; the DB state wins over this default.
 #
-# backtest.py never calls Claude, so with the gate OFF the live bot trades the
-# same population the model measures — the only way to score his verdict against
-# real fills rather than simulated ones.
+# backtest.py never calls Claude, so with the gate OFF the signal tracker sees
+# the same population the model measures. This scores the verdict on forward
+# X-Perp candle outcomes without risking money on rejected setups.
 #
 # ⚠️ Approval here runs 52%, so shadow mode nearly DOUBLES this book. On the
 # stocks desk approval is 80% and the step is a quarter. Treat these very
@@ -1346,7 +1358,9 @@ CLAUDE_BUDGET_RESERVE_USD = float(os.getenv("CLAUDE_BUDGET_RESERVE_USD", "0.05")
 # / +0.931R -- same filter, different resolver. Every rejected-bucket number
 # Claude read before this timestamp is inflated by roughly that much, and
 # the prompt turns a strong rejected bucket into "you are over-rejecting".
-LIVE_HIST_EPOCH_TS = float(os.getenv("LIVE_HIST_EPOCH_TS", "1787670000"))
+LIVE_HIST_EPOCH_TS = float(os.getenv("LIVE_HIST_EPOCH_TS", "1789516800"))
+if DEPLOYMENT_MODE == "shadow":
+    LIVE_HIST_EPOCH_TS = max(LIVE_HIST_EPOCH_TS, 1789516800.0)
 
 # --- Structure-based stops/takes (swing mode, 15m, ~20x leverage) ---
 # SL sits at swing invalidation (recent swing low/high) + ATR buffer, then
@@ -2242,7 +2256,8 @@ BACKTEST_TP_WINDOW      = int(os.getenv("BACKTEST_TP_WINDOW", "192"))
 # Every table recorded before this date was measured with costs 5x too high.
 # Overstated costs bias the model toward fewer trades and wider stops, so
 # cost-sensitive decisions need re-checking, not just re-baselining.
-BACKTEST_FEE_RATE       = float(os.getenv("BACKTEST_FEE_RATE", "0.0001"))
+# Public X-Perp base taker estimate; account-specific fees may differ.
+BACKTEST_FEE_RATE       = float(os.getenv("BACKTEST_FEE_RATE", "0.0005"))
 BACKTEST_SLIPPAGE_RATE  = float(os.getenv("BACKTEST_SLIPPAGE_RATE", "0.0001"))
 # BACKTEST_USE_BTC_FILTER removed 2026-08-03 — dead, and it implied the BTC
 # context was optional in backtest. It is not: since the 2026-07-31 fix
@@ -2252,7 +2267,9 @@ BACKTEST_SLIPPAGE_RATE  = float(os.getenv("BACKTEST_SLIPPAGE_RATE", "0.0001"))
 # went unnoticed for the project's whole life.
 
 # --- Autotrading (real OKX EU orders for allow-listed users) ---
-AUTOTRADE_ENABLED           = os.getenv("AUTOTRADE_ENABLED", "1") != "0"
+AUTOTRADE_ENABLED           = (
+    DEPLOYMENT_MODE == "live" and os.getenv("AUTOTRADE_ENABLED", "0") == "1"
+)
 AUTOTRADE_LEVERAGE          = int(os.getenv("AUTOTRADE_LEVERAGE", "10"))
 AUTOTRADE_BALANCE_THRESHOLD = float(os.getenv("AUTOTRADE_BALANCE_THRESHOLD", "100"))
 # Per-symbol position-size multiplier. Format: "BTCUSDT:0.5,ETHUSDT:1.0".
@@ -3150,3 +3167,15 @@ REJECT_COOLDOWN_HOURS = float(os.getenv("REJECT_COOLDOWN_HOURS", "3"))
 # a circuit breaker for a catastrophic day that is not in this sample. That is
 # the whole reason it is not simply set to 0.
 KILL_SWITCH_SL_STREAK = int(os.getenv("KILL_SWITCH_SL_STREAK", "5"))
+
+# Risk limits introduced by the 2026-09-08 audit. Fractions of account equity.
+# Portfolio cap covers this service's tracked positions, not another Railway DB.
+AUTOTRADE_RISK_PER_TRADE = float(os.getenv("AUTOTRADE_RISK_PER_TRADE", "0.0025"))
+AUTOTRADE_MAX_OPEN_RISK = float(os.getenv("AUTOTRADE_MAX_OPEN_RISK", "0.0075"))
+AUTOTRADE_COST_RESERVE = float(os.getenv("AUTOTRADE_COST_RESERVE", "0.0014"))
+AUTOTRADE_MAX_DAILY_LOSS = float(os.getenv("AUTOTRADE_MAX_DAILY_LOSS", "0.01"))
+AUTOTRADE_MAX_DRAWDOWN = float(os.getenv("AUTOTRADE_MAX_DRAWDOWN", "0.03"))
+# Optional known account high-water mark. Set this on the host when the first
+# guarded deployment happens after an existing drawdown; otherwise the guard
+# can only learn peaks observed from that deployment onward.
+AUTOTRADE_EQUITY_PEAK_FLOOR = float(os.getenv("AUTOTRADE_EQUITY_PEAK_FLOOR", "0"))

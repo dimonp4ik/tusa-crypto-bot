@@ -1026,7 +1026,11 @@ def analyze_coin_smc(candles_15m: dict, candles_1h: dict, symbol: str,
     _cs_bonus = 0
     if COUNTER_STRUCTURE_SCORE_BONUS:
         try:
-            if _is_sniper(ind, price_payload["entry_price"], direction, trend_1h, trend_4h):
+            # price_payload is only built ~80 lines below, so reading it here raised
+            # NameError - and the except swallowed it, meaning this bonus has never
+            # once been applied. Same value, computed from what exists at this point.
+            _cs_price = (entry_zone or {}).get("entry_price") or round(ind["current_close"], 8)
+            if _is_sniper(ind, _cs_price, direction, trend_1h, trend_4h):
                 _cs_bonus = int(COUNTER_STRUCTURE_SCORE_BONUS)
         except Exception:
             _cs_bonus = 0

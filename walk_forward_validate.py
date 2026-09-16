@@ -1,31 +1,7 @@
-"""
-Simple walk-forward validator for exported backtest trades.
-
-FIRST RUN 2026-08-28, and two things came out of it.
-
-1. The book is NOT overfitted. Out of sample, training each month and testing on
-   the next: 944 trades, 71.7% win rate, +296.37R, +0.314 R/trade against +0.329
-   in-sample — 95% survives, every month from March to August positive, R/trade
-   rising through the period. The stocks desk runs +0.638 OOS against +0.621
-   in-sample. After a week of parameter changes this was the open question.
-
-2. Adaptive monthly SELECTION adds nothing, which is worth knowing before anyone
-   builds it:
-     grouping            OOS trades   R/trade
-     none (whole book)        944      +0.314
-     entry_source            1014      +0.316
-     session                 1044      +0.301
-     symbol                   247      +0.300
-   Last month's group performance does not predict next month's. Symbol
-   selection is the clearest failure — it discards three quarters of the book
-   and the survivors are no better per trade. Reading: this strategy's edge is
-   spread evenly rather than pocketed in shifting subsets, which is also why
-   pairs, triples, hour-of-day and day-of-week all came back empty. It justifies
-   AUTO_BLOCK staying a negative-only filter; positive selection would hurt.
-
-For each month after the first, train on the previous month and select groups
-whose train net R/trade and win rate pass thresholds. Then report the next
-month's out-of-sample result for those selected groups.
+"""Chronological group validation on exported trades.
+Training includes only outcomes known before the test month. Historical data
+used to develop rules remains development data: this tool cannot prove the
+absence of overfitting or turn repeatedly tuned history into a fresh holdout.
 """
 
 from __future__ import annotations
@@ -114,7 +90,10 @@ def main() -> int:
     print(f"months={','.join(months)} group={'+'.join(fields)}")
     for prev, cur in zip(months, months[1:]):
         train_groups: dict[tuple[str, ...], Bucket] = defaultdict(Bucket)
+        test_start = datetime.strptime(cur, "%Y-%m").replace(tzinfo=timezone.utc).timestamp()
         for row in by_month[prev]:
+            if not row.get('exit_time') or float(row['exit_time']) >= test_start:
+                continue
             train_groups[group_key(row, fields)].add(row)
 
         selected = {

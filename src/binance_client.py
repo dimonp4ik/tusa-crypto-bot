@@ -382,13 +382,35 @@ def get_klines_xperp(symbol, limit=60, include_forming=False):
     for logic that specifically wants a settled/closed candle's close price.
     """
     try:
+        cache_key = ("xperp", symbol, limit)
+        if not include_forming:
+            cached = _kl_cache_get(cache_key, 15 * 60)
+            if cached is not None:
+                return cached
         inst_id = get_xperp_instruments().get(_base_of(symbol))
         if not inst_id:
             return None
-        raw = _okx_get("/api/v5/market/candles",
-                       {"instId": inst_id, "bar": "15m",
-                        "limit": min(limit + 2, 300)}).get("data", [])
-        raw_newest_first = raw  # OKX order: newest-first
+        want = limit + 2
+        raw_newest_first = []
+        after = None
+        while len(raw_newest_first) < want:
+            params = {"instId": inst_id, "bar": "15m",
+                      "limit": min(want - len(raw_newest_first), 300)}
+            if after is not None:
+                params["after"] = after
+            page = _okx_get("/api/v5/market/candles", params).get("data", [])
+            if not page:
+                break
+            raw_newest_first.extend(page)
+            if len(page) < 300 and len(raw_newest_first) < want:
+                break
+            after = page[-1][0]
+        # A page boundary should not repeat its anchor, but de-duplicate by
+        # timestamp so a feed quirk cannot shift closed-bar feature windows.
+        unique = {}
+        for candle in raw_newest_first:
+            unique.setdefault(candle[0], candle)
+        raw_newest_first = sorted(unique.values(), key=lambda value: int(value[0]), reverse=True)
         closed = [c for c in reversed(raw_newest_first) if len(c) > 8 and c[8] == "1"]
         closed = closed[-limit:]
         candles = list(closed)
@@ -398,7 +420,7 @@ def get_klines_xperp(symbol, limit=60, include_forming=False):
                 candles = candles + [forming]
         if not candles:
             return None
-        return {
+        result = {
             "time":   [int(float(c[0])) // 1000 for c in candles],
             "open":   [float(c[1]) for c in candles],
             "high":   [float(c[2]) for c in candles],
@@ -412,6 +434,9 @@ def get_klines_xperp(symbol, limit=60, include_forming=False):
             # close-confirmation exists to ignore.
             "confirmed": [1 if (len(c) > 8 and c[8] == "1") else 0 for c in candles],
         }
+        if not include_forming:
+            _kl_cache_put(cache_key, result)
+        return result
     except Exception as e:
         _logger.debug(f"get_klines_xperp failed for {symbol}: {e}")
         return None

@@ -73,32 +73,32 @@ WHAT THE SCORES MEAN
 - OB: Order Block (last opposing candle before impulsive move) near entry.
 - SW: liquidity sweep / stop-run — price grabbed liquidity beyond a prior high/low then reversed. High-quality reversal trigger.
 - Z: entry zone source and price band. Price retesting the zone is ideal; far from zone = chasing.
-- RSI: 14-period on 15m. The upstream filter ALREADY drops LONGs above 72 and SHORTs below 28, so a genuinely overextended entry never reaches you — every RSI you see is inside those caps. Inside them the level carries NO measurable edge in either direction, so it is context and never a reason to reject on its own. (It looked strongly positive on 10,300 historical trades — LONGs with RSI>70 at 83.2%, SHORTs with RSI<30 at 86.3% — but that was measured on a population entered at the zone midpoint unconditionally. Since the bot started waiting for price to return to the zone before entering, the same split reads 70.4% / +0.04R against a 73.8% / +0.17R baseline over 1,353 trades: gone. Reported here rather than quietly dropped, because you are shown these numbers to calibrate against and a stale one is worse than none.)
+- RSI: 14-period on 15m. Treat it as current market context; no validated historical expectancy is supplied.
 - V: volume ratio vs recent average. >1.5x = conviction; <1.0x = weak.
 - F: funding rate. Strongly positive = crowded longs (squeeze risk for LONGs); strongly negative = crowded shorts.
 - Sess: trading session at candle time. LONDON/NEW_YORK/OVERLAP = prime liquidity. OFF_HOURS = thinner market (tolerable with strong confluence). DEAD_ZONE (19-24 UTC) = low participation, be stricter.
 - ER (Efficiency Ratio): Kaufman ER, 0–1. ~1.0 = clean directional trend. ~0.0 = choppy range (lots of noise, BOS often false). Already filtered ER>=0.15 upstream. ER<0.25 = marginal, ER>0.45 = clean.
-- 💎PREM: Premium triple-confluence (OB+FVG zones overlap + liquidity sweep). Statistically highest-WR setup in backtests. Favor HIGH confidence when trend and zone also align.
+- 💎PREM: Premium triple-confluence (OB+FVG zones overlap + liquidity sweep). A confluence label; it does not establish a win rate or profitability.
 - Confs: additional confirmations beyond FVG/OB/SW — ChoCH (Change of Character, micro-structure shift), RSI_Div (RSI divergence), MACD_Div, Engulfing, BullWick/BearWick (rejection wick pressure), StochCross (stochastic momentum cross). More = stronger.
 - PRE-FILTERS ALREADY APPLIED: upstream code removed: ER<0.15 (chop), RSI exhaustion, bear-trend hot-vol (overcrowded shorts), BOS-without-RSI-midline (momentum gap). What you see has already passed a strict quality stack.
-- Str: 15m swing structure at signal time. bull = higher-high + higher-low sequence. bear = lower-high + lower-low. range = neither. Use this to gauge whether entry is WITH or AGAINST the short-term structure. COUNTER-structure is NOT a warning here, despite the intuition — it is the single strongest positive marker on this desk, and the only one that has survived every change to how the bot enters. Over 10,300 filtered trades it won 83.1% / +0.55R against 80.7% / +0.44R for structure-aligned entries, better in expectancy every year 2022-2026; re-measured on 1,353 trades after the bot started waiting for price to return to the zone, it still reads 77.3% / +0.29R against a 73.8% / +0.17R baseline, same sign in both test windows. Makes sense mechanically: this strategy enters at an FVG/OB retest, and a retest that cuts against the 15m swing is exactly the deep pullback the zone exists to catch. So do not reject on "counter-structure" alone. It is a description of the entry, not a red flag. (This is separate from HTF trend: fighting a 1h/4h/1d trend IS a real concern and the filter blocks the worst of it upstream.)
-- Hist[...]: YOUR OWN track record on similar past setups (same direction + same symbol or nearby score), measured by what actually happened. Format per bucket: "rejected 8: 5W(2TP2) 2SL 1exp avg+0.31R" = of 8 similar setups you returned NO TRADE on, 5 would have won (reached TP1, of which 2 ran to full TP2), 2 would have hit SL, 1 expired flat, and the AVERAGE realised outcome was +0.31R. W = wins you missed (over-rejection evidence); SL = losses you correctly dodged; exp = harmless no-ops. "sent 6: 4W 2SL avg+0.45R" is the realised quality of ones you approved — your live baseline. **avg±R is expectancy — the single most important number**: a bucket can be 60% wins yet NEGATIVE avg R if the wins are tiny and the losses are full -1R, meaning that setup type LOSES money over time despite "winning often". A high win-count with weak/negative avg R is a trap, not a green light; a modest win-count with strong positive avg R (big runners) is a real edge. avg R shown only when ≥5 samples carry a resolved R. When 2+ 15m structures exist, a per-trend breakdown follows: "[bear:0W/3SL/-1.00R, bull:4W/0SL/+1.8R]" — same setup is a disaster in bear structure, a strong edge in bull. Cross-reference with the current Str= field. Small samples are weak evidence — weigh accordingly. Absent = not enough resolved history yet.
-- BT2022+[...]: historical BASE RATE for entries like this one — the same rule-filter replayed over 2022→present price data, same format as Hist (including avg R expectancy). This is a prior from past market regimes, not your own verdicts: it answers "how do entries of this shape usually resolve on this symbol, and did they actually make money". IMPORTANT: this span includes the 2022 Luna/FTX bear-crash regime mixed with later bull/range regimes — a single aggregate can hide a regime-dependent split, so check the per-trend breakdown (bear/bull/range) and its avg R rather than the headline count, and weigh the bucket matching the current Str= field. A positive headline win-rate with negative avg R in the trend bucket that matches NOW is a red flag. When live Hist and BT2022+ disagree, trust live Hist — it reflects the current regime.
+- Str: observed 15m swing structure: bull, bear or range. It describes context, not a proven profitable regime. Evaluate alongside the closed higher-timeframe data.
+- Hist[...]: descriptive modeled signal history, not verified account PnL. W currently counts TP1 touches, which can still finish at a net loss. avg R may omit actual fees, funding and execution differences. Expiry can gain or lose money. Do not infer profitable missed trades or increase approvals from these counts.
+- Legacy backtest priors are unavailable: their higher-timeframe alignment and execution assumptions failed audit. Do not cite BT2022+, infer expected profit, or infer a win rate from those seeds.
 
 HOW TO DECIDE
 1. Confirm the suggested side only. If you would not take that exact side, return NO TRADE.
 2. Best setups have FVG AND OB AND an active zone retest in the direction of both 1h and 4h trend.
 3. Confluence stacking: FVG + OB + SW aligned with the side = HIGH. Two of three with trend = MEDIUM. One or zero = LOW → usually NO TRADE.
 4. One neutral HTF is tolerable if the other is clearly aligned and confluence is strong → cap at MEDIUM. Both neutral = chop; demand a liquidity sweep or pass.
-5. Do NOT reject on RSI level alone. The overextension caps (LONG>72, SHORT<28) are enforced upstream, so nothing you see has cleared them, and inside the caps the level shows no measurable edge either way (see the RSI field above). "RSI 71 — chasing" and "RSI 29 — exhausted" have been among the most common rejection reasons on this desk, and they are rejecting on a number that does not predict anything. What DOES make an entry a chase is DISTANCE FROM THE ZONE (see Z:), not the oscillator — and the bot now waits for price to come back to the zone before entering at all, so by the time you see a signal that distance is small by construction.
+5. Evaluate RSI jointly with zone distance and closed trend data. No validated historical advantage or disadvantage for an RSI bucket is supplied.
 6. Respect crowded funding: avoid LONGs into strongly positive funding and SHORTs into strongly negative.
 7. Volume below average (V<1.0x) on a breakout setup is a red flag — move lacks conviction.
 8. News overrides structure: BEARISH news → no LONGs; BULLISH news → no SHORTs. Major event live → prefer NO TRADE.
 9. Premium setups (💎PREM) already have OB+FVG overlap + sweep — treat as FVG+OB+SW all effectively confirmed. Lean HIGH confidence when trend and zone also agree.
 10. Low ER (0.15–0.25) with both HTFs neutral = marginal chop even with BOS. Demand sweep confirmation or return NO TRADE.
-11. Learn from Hist[...] when present, and read avg R (expectancy) as the primary signal, win-count as secondary: a strong rejected-similar TP1 rate WITH positive avg R means you have been over-rejecting a profitable setup type — give borderline ones the benefit of the doubt. But a high win-count with weak or negative avg R is NOT a green light — that setup type bleeds out over time (small wins, full-R losses), so keep rejecting it. When Hist/BT shows a per-trend breakdown, prioritize the bucket matching the current Str= field and read BOTH its W/SL and its avg R — e.g. bear:0W/4SL/-1.00R with current Str=bear is a direct, strong warning; bull:5W/1SL/+1.6R with Str=bull is a genuine edge. Never let it override a hard red flag (fighting the HTF trend, hostile news, price far outside its zone); it breaks ties, it does not justify a bad trade. Note "counter-structure" and "extreme RSI" are NOT on that list — both measure better than baseline here, see the Str and RSI field notes.
+11. Hist contains modeled signal outcomes, not verified exchange fills. TP1 touches are not net wins, especially with zero partial close. Small samples and historical averages do not establish an edge. Do not loosen entry standards based on touch frequency.
 
-RISK SCORE (0–10): how dangerous is this trade RIGHT NOW. 0–3 = clean, trend-aligned, well-located. 4–7 = tradeable with a real concern. 8–10 = serious problem (fighting the HTF trend, crowded funding, hostile news, price far outside its zone, no confluence at all). High risk_score should almost always pair with NO TRADE — be honest. Do NOT spend 8-10 on an RSI reading or on counter-structure: measured on this desk, the setups scored 8+ actually won MORE often than the ones scored 6-7, which means the top of the scale is being handed to things that are not really dangerous.
+RISK SCORE (0–10): describe current technical concerns using the supplied data. This is an ordinal judgment, not a calibrated loss probability or expected return. Do not assert historical performance of score buckets without validated evidence.
 
 COUNTER-ARGUMENT: the single best reason this trade fails. Always provide one — every trade has a failure mode. Examples: "4h still bearish, fighting trend", "RSI 74 — chasing", "funding +0.09% — crowded longs", "no retest, price 2% above OB", "volume 0.8x — weak conviction".
 
@@ -110,7 +110,7 @@ WORKED EXAMPLES
 - "BTC-USDT LONG S=13 4h=bull 1h=bull FVG=Y OB=Y SW=N Z=OB:64000-64200 RSI=58 V=1.9x F=+0.01% Sess=LONDON HTF=1h_strong+4h_strong": trend-aligned, two confirmations, strong EMA stack, healthy RSI, prime session. → LONG, HIGH, risk 2, counter "no sweep — relies on OB hold alone".
 - "SOL-USDT LONG S=10 4h=neutral 1h=bull FVG=N OB=Y SW=Y Z=OB:140-142 RSI=49 V=1.6x F=-0.02% Sess=NEW_YORK": one timeframe neutral, OB+sweep, prime session. → LONG, MEDIUM, risk 4, counter "4h neutral — no higher-tf confirmation".
 - "XRP-USDT LONG S=8 4h=bear 1h=neutral FVG=N OB=N SW=N Z=FVG:0.50-0.51 RSI=63 V=0.7x F=+0.08% Sess=OFF_HOURS": fighting 4h, zero confirmations, weak volume, crowded longs. → NO TRADE, LOW, risk 9, counter "no confluence, fighting bearish 4h on crowded longs". (Note what does NOT appear in that list: the RSI. It is elevated but inside the caps, and on its own it would not have justified the rejection.)
-- "PEPE-USDT LONG S=15 1d=bull 4h=bull 1h=bull Str=bear FVG=Y OB=N SW=N Z=FVG:2.78e-06-2.79e-06 RSI=71 V=3.1x F=+0.01% Sess=NEW_YORK HTF=1h_strong": counter-structure with an elevated RSI — the exact pair that used to trigger a reflex NO TRADE. But all three HTFs are aligned, price is IN its zone, volume is 3.1x, and BOTH of those "warnings" measure better than baseline on this desk. → LONG, MEDIUM, risk 4, counter "only FVG confirms — no OB or sweep to back the zone".
+- Counter-structure and elevated RSI require context: weigh closed HTF alignment, location and conflicts. Neither feature has a validated performance advantage in the supplied audit.
 - "LINK-USDT SHORT S=11 4h=bear 1h=bear FVG=Y OB=N SW=Y Z=FVG:13.0-13.2 RSI=41 V=1.7x F=+0.00% Sess=OVERLAP": trend-aligned, FVG+sweep, RSI has room. → SHORT, HIGH, risk 3, counter "broad-market bounce could squeeze shorts".
 
 OUTPUT (LIGHT tier)
@@ -273,7 +273,7 @@ def _self_feedback(s: dict) -> str:
     # Live tier: Claude's own recent verdicts (current regime, weigh higher).
     # Backtest tier: seeded 2024+ priors — same filter, historical outcomes.
     live = [r for r in rows if (r.get("source") or "live") == "live"]
-    bt   = [r for r in rows if r.get("source") == "backtest"]
+    bt = []  # Legacy seeds failed the 2026-09-08 audit; preserve in DB for research only.
 
     rej = [r for r in live if not r.get("sent")]
     snt = [r for r in live if r.get("sent")]
@@ -301,65 +301,12 @@ def _self_feedback(s: dict) -> str:
 
 
 def _global_feedback() -> str:
-    """One-shot macro calibration line for the batch prompt.
+    """TP1-touch frequency cannot establish profitability with a trailing exit.
 
-    Unlike _self_feedback (per-setup, needs ≥6 SIMILAR resolved rows and so stays
-    cold for weeks), this looks at the WHOLE last-30d shadow ledger: if the setups
-    Claude rejected are reaching TP1 meaningfully MORE often than the ones it
-    approved, Claude has been globally too strict — tell it so immediately. Empty
-    until enough rejected samples exist or when there's no meaningful skew.
+    Disable the old approval nudge until calibration uses verified net exits,
+    fees and the user's actual partial-close policy.
     """
-    try:
-        import time as _t
-        # Floored at the parity-fix epoch like every other live-history read
-        # feeding this prompt. get_setup_accuracy itself is NOT floored — the
-        # admin report calls it with a user-chosen window and must still be able
-        # to look at the old era — so the floor belongs here, at the call site
-        # that talks to Claude. Without it the 30-day window reached three weeks
-        # back into the pre-fix bot.
-        acc = get_setup_accuracy(max(_t.time() - 30 * 86400, LIVE_HIST_EPOCH_TS or 0.0))
-    except Exception:
-        return ""
-    snt, rej = acc.get("sent", {}), acc.get("rejected", {})
-    if rej.get("n", 0) < _GLOBAL_FEEDBACK_MIN_REJ:
-        return ""
-
-    # The gap only means something when BOTH sides have samples. There was a
-    # minimum on the rejected side and none on the sent side, so the whole
-    # comparison could rest on 2-3 approved trades — and with the stale-entry
-    # guard withholding most approvals, that is exactly the state it is in.
-    # Two lucky sends read as 100% and silently switch the corrector off at the
-    # moment it is most needed; two unlucky ones fire it on nothing.
-    if snt.get("n", 0) >= _GLOBAL_FEEDBACK_MIN_SENT:
-        gap = rej.get("tp1_pct", 0.0) - snt.get("tp1_pct", 0.0)  # >0 = rejected won more
-        if gap < _GLOBAL_FEEDBACK_MIN_GAP:
-            return ""
-        return (
-            f"\nCALIBRATION — last 30d shadow outcomes of your own verdicts: you REJECTED "
-            f"{rej['n']} setups and {rej['tp1_pct']:.0f}% of them still reached TP1; you "
-            f"APPROVED {snt.get('n', 0)} and only {snt.get('tp1_pct', 0.0):.0f}% reached TP1. "
-            f"The setups you rejected are hitting TP1 ~{gap:.0f}pp MORE often than the ones "
-            f"you approved — you have been TOO STRICT. Every candidate below already passed "
-            f"a strict rule-filter with proven edge. Bias toward CONFIRMING the suggested "
-            f"side; return NO TRADE only on a clear, specific red flag (not vague caution).\n"
-        )
-
-    # Too few approvals to compare against. Fall back to the absolute rate of
-    # the rejected bucket, which needs no second sample: the bracket breaks even
-    # at 1/(1+TP1_R_MULT), so a rejected pool clearing
-    # _GLOBAL_FEEDBACK_MIN_REJ_TP1 is money left on the table regardless of how
-    # the handful of approvals happened to land.
-    if rej.get("tp1_pct", 0.0) < _GLOBAL_FEEDBACK_MIN_REJ_TP1:
-        return ""
-    return (
-        f"\nCALIBRATION — last 30d shadow outcomes of your own verdicts: you REJECTED "
-        f"{rej['n']} setups and {rej['tp1_pct']:.0f}% of them still reached TP1. "
-        f"(Too few approvals to compare against, so this is the absolute rate: this "
-        f"bracket breaks even near {_BREAK_EVEN_TP1_PCT:.0f}%.) You are rejecting a clearly profitable pool "
-        f"— you have been TOO STRICT. Every candidate below already passed a strict "
-        f"rule-filter with proven edge. Bias toward CONFIRMING the suggested side; "
-        f"return NO TRADE only on a clear, specific red flag (not vague caution).\n"
-    )
+    return ""
 
 
 _SCORECARD_MIN_BUCKET = 8    # min resolved rows per bucket before it's shown

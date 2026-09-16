@@ -25,72 +25,41 @@ from apscheduler.events import (EVENT_JOB_MISSED, EVENT_JOB_MAX_INSTANCES,
 import requests as _requests
 
 from config import (
-    SCAN_INTERVAL_MINUTES, SIGNAL_COOLDOWN_HOURS, TELEGRAM_TOKEN, TELEGRAM_CHAT_ID,
-    TRADING_HOURS_START, TRADING_HOURS_END, TRADE_WEEKENDS,
-    MAX_SETUPS_TO_CLAUDE, ALLOWED_SYMBOLS, KLINES_INTERVAL_SEC, SIGNAL_EXPIRY_HOURS,
-    CLAUDE_HEAVY_MIN_SCORE, CLAUDE_HEAVY_MAX_PER_SCAN, CLAUDE_MEMORY_LIMIT,
-    TRAIL_RUNNER_ENABLED, TRAIL_ATR_MULT,
-    STOP_CLOSE_CONFIRM, MAX_SAME_DIRECTION_POSITIONS, STOP_EXCHANGE_BACKSTOP_R,
-    MTF_MIN_SCORE, SHADOW_MIN_SCORE, TP1_R_MULT, LIVE_HIST_EPOCH_TS,
-    ZONE_WATCH_ENABLED, ZONE_WATCH_MINUTES, ZONE_WATCH_POLL_SEC,
-    STALE_ENTRY_GUARD, STALE_ENTRY_ZONE_TOLERANCE, STALE_ENTRY_MAX_RISK_FRAC,
-    STALE_ENTRY_MAX_ADVERSE_PCT, SPREAD_GATE_ENABLED, SPREAD_MAX_BPS,
-    CLAUDE_GATE_ENABLED,
-    RISK_MIN_PCT, RISK_MAX_PCT, SL_ATR_BUFFER, TOP_COINS_COUNT,
-    APPROACH_LOOKBACK_BARS as _APPROACH_LOOKBACK_BARS,
+    SCAN_INTERVAL_MINUTES, TELEGRAM_TOKEN, TRADING_HOURS_START, TRADING_HOURS_END,
+    TRADE_WEEKENDS, KLINES_INTERVAL_SEC, SIGNAL_EXPIRY_HOURS, TRAIL_RUNNER_ENABLED,
+    TRAIL_ATR_MULT, STOP_CLOSE_CONFIRM, MAX_SAME_DIRECTION_POSITIONS,
+    STOP_EXCHANGE_BACKSTOP_R, MTF_MIN_SCORE, SHADOW_MIN_SCORE, TP1_R_MULT,
+    LIVE_HIST_EPOCH_TS, ZONE_WATCH_ENABLED, SPREAD_MAX_BPS, CLAUDE_GATE_ENABLED,
     TP1_CLOSE_FRAC, EXIT_PROFILE,
     POST_TP1_STRONG_TRAIL_ATR_MULT, POST_TP1_WEAK_TRAIL_ATR_MULT,
     POST_TP1_STRONG_CLOSE_PROGRESS, POST_TP1_STRONG_WICK_PROGRESS,
-    POST_TP1_WEAK_CLOSE_PROGRESS,
-    KNN_RISK_OVERLAY, KNN_DEEP_CANDLES, KNN_MAX_HISTORY, KNN_SHAPE_LEN,
-    KNN_HORIZON, KNN_K, KNN_MIN_HISTORY, KNN_HIGH_SCORE, KNN_HIGH_MULT,
-    KNN_LOW_SCORE, KNN_LOW_MULT, KNN_RISK_MAX_MULT, KNN_RISK_MIN_MULT,
+    POST_TP1_WEAK_CLOSE_PROGRESS, REGIME_FILTER_MODE, DEPLOYMENT_MODE,
 )
 from src.binance_client import (
-    get_top_coins, get_klines, get_klines_1h, get_klines_4h, get_klines_1d,
-    get_btc_change_1h, get_btc_change_1d, get_funding_rate, get_current_price,
-    get_open_interest, get_xperp_instruments, get_xperp_price, get_klines_xperp,
-    get_xperp_book, get_xperp_prices_bulk,
+    get_klines, get_current_price, get_xperp_instruments, get_xperp_price, get_klines_xperp,
 )
-from src.signal_filter import analyze_coin_smc
-from src.filter_variants import VARIANTS, compute_variants
-from src.knn_analog import knn_direction_score, knn_risk_mult
-from src.claude_analyzer import analyze_batch_with_claude, analyze_heavy
-from src.telegram_notifier import send_signal, send_status, send_news_alert, send_signal_update, calculate_tp_sl, send_morning_digest, send_weekly_digest, send_daily_prayer, send_commandments, send_evening_prayer, send_evening_ritual, _disp_sym, _esc, _format_price
-from src.news_filter import check_news_sentiment
-from src.news_agent import (
-    get_market_news, detect_major_events, fetch_recent_headlines,
-    get_daily_digest, get_upcoming_high_impact_events, get_day_events,
-    generate_weekly_commentary,
+from src.filter_variants import VARIANTS
+from src.crypto_venue_router import ROBUST_SYMBOLS, venue_setups
+from src.telegram_notifier import (
+    send_signal, send_status, send_signal_update, send_morning_digest, send_weekly_digest,
+    send_daily_prayer, send_commandments, send_evening_prayer, send_evening_ritual,
+    _disp_sym, _esc, _format_price,
 )
-from config import EVENT_WARN_HOURS
+from src.news_agent import get_daily_digest, get_day_events, generate_weekly_commentary
 from src.r_model import blended_r
 from src.db import (
-    init_db, get_open_signals, update_signal_status, get_stats,
-    set_sl_xperp_only, get_sl_wick_stats, get_variant_rows,
-    mark_setup_blocked, get_cap_impact_stats, get_skew_response_stats,
-    get_all_setups_since, get_all_signals_since,
-    auto_block_bad_symbols, is_symbol_auto_blocked, get_active_symbol_blocks,
-    get_recent_outcomes, unblock_symbol, set_symbol_block, get_symbols_performance,
-    upsert_user, get_user_by_id, get_all_users, get_users_count,
-    add_dynamic_admin, remove_dynamic_admin, get_dynamic_admins, is_dynamic_admin,
-    get_dynamic_role,
-    delete_signal, get_recent_signals,
-    get_signals_count, get_signals_page, get_distinct_signal_symbols,
-    get_claude_spend_stats,
-    get_bot_state, set_bot_state,
-    log_setup_candidate, mark_setup_sent, get_setups_by_date,
-    get_unresolved_setups, mark_setup_resolved, get_setup_accuracy,
-    link_setup_to_signal, resolve_sent_setups_from_signals, backfill_setup_signal_links,
-    get_similar_resolved_setups, seed_backtest_outcomes, backfill_backtest_net_r,
-    delete_backtest_seed_rows,
-    get_today_sl_streak,
-    get_weekly_stats,
-    at_add_allowed, at_remove, at_get, at_all_allowed, at_set_keys,
-    at_set_mode, at_set_active, at_set_balance, at_set_mode_prompt,
-    at_set_tp1_close_pct,
-    get_signal_by_id,
-    watch_add, watch_active, watch_resolve, watch_stats,
+    init_db, get_open_signals, update_signal_status, get_stats, set_sl_xperp_only,
+    get_sl_wick_stats, get_variant_rows, mark_setup_blocked, get_cap_impact_stats,
+    get_skew_response_stats, get_all_setups_since, get_all_signals_since,
+    get_active_symbol_blocks, unblock_symbol, set_symbol_block, get_symbols_performance,
+    upsert_user, get_user_by_id, get_all_users, get_users_count, add_dynamic_admin,
+    remove_dynamic_admin, get_dynamic_admins, is_dynamic_admin, get_dynamic_role,
+    delete_signal, get_signals_count, get_signals_page, get_distinct_signal_symbols,
+    get_bot_state, set_bot_state, log_setup_candidate_once, mark_setup_sent,
+    get_setups_by_date, get_setup_accuracy, link_setup_to_signal,
+    resolve_sent_setups_from_signals, backfill_setup_signal_links, get_weekly_stats,
+    at_add_allowed, at_remove, at_get, at_all_allowed, at_set_keys, at_set_mode,
+    at_set_active, at_set_balance, at_set_mode_prompt, at_set_tp1_close_pct, watch_stats,
 )
 from src import autotrader
 from src import okx_trader as _okx
@@ -100,12 +69,14 @@ from src.db import (
 )
 from config import (
     PROFIT_SWEEP_ENABLED, PROFIT_SWEEP_THRESHOLD_USD, PROFIT_SWEEP_PCT,
+    # AUTOTRADE_ENABLED is read by _check_profit_sweeps and was never imported:
+    # the sweep job raised NameError on every run instead of offering anything.
+    AUTOTRADE_ENABLED,
     PROFIT_SWEEP_MIN_GAP_H, PROFIT_SWEEP_MIN_ORDER_USD,
 )
 from src.keystore import keystore_ready, encrypt_secret
 from src import okx_trader as _okx_trade
 from config import ADMIN_IDS, AUTOTRADE_BALANCE_THRESHOLD, AUTOTRADE_CONTACT
-from config import REJECT_COOLDOWN_HOURS, KILL_SWITCH_SL_STREAK
 
 # ── Admin helpers ─────────────────────────────────────────────────────────────
 
@@ -184,7 +155,7 @@ _pending_report_date: dict = {}
 # so results either side of it are not comparable. Deliberately the same value
 # as config.LIVE_HIST_EPOCH_TS: Claude's history and the admin report must draw
 # the line in the same place, or they describe two different bots.
-_CONFIG_CHANGE_LABEL = "13.08"
+_CONFIG_CHANGE_LABEL = "16.09"
 _CONFIG_CHANGE_TS = LIVE_HIST_EPOCH_TS
 
 
@@ -416,7 +387,7 @@ def _build_and_send_report(chat_id: int, message_id: int,
             A(f"  издержки: -{s.get('cost_r', 0)}R  "
               f"(комиссия+спред, посчитаны по {s.get('cost_n', 0)} сделкам)")
             A(f"  ЧИСТЫМИ: {s.get('net_r', 0)}R  "
-              f"({s.get('net_per_trade', 0)}R/сделка)  ← это и есть прибыль")
+              f"({s.get('net_per_trade', 0)}R/сделка)  оценка по сигналам, не PnL счёта OKX")
             _l, _sh = s.get("long") or {}, s.get("short") or {}
             A(f"  LONG  n={_l.get('total', 0)} WR={_l.get('win_rate', 0)}% R={_l.get('total_r', 0)}")
             A(f"  SHORT n={_sh.get('total', 0)} WR={_sh.get('win_rate', 0)}% R={_sh.get('total_r', 0)}")
@@ -523,7 +494,7 @@ def _build_and_send_report(chat_id: int, message_id: int,
         A("## КОНФИГ НА МОМЕНТ ОТЧЁТА")
         A(f"  MTF_MIN_SCORE={MTF_MIN_SCORE}  SHADOW_MIN_SCORE={SHADOW_MIN_SCORE}")
         A(f"  STOP_CLOSE_CONFIRM={STOP_CLOSE_CONFIRM}  BACKSTOP_R={STOP_EXCHANGE_BACKSTOP_R}")
-        A(f"  КЛОД: {'ФИЛЬТР (его вердикт решает)' if _claude_gate_enabled() else 'ТЕНЬ (торгуют правила, вердикт только пишется)'}")
+        A(f"  КЛОД: {'ФИЛЬТР (его вердикт решает)' if _claude_gate_enabled() else 'ТЕНЬ (сигналы правил; отклонённые без автосделок)'}")
         A(f"  MAX_SAME_DIRECTION_POSITIONS={MAX_SAME_DIRECTION_POSITIONS}  "
           f"TP1_R_MULT={TP1_R_MULT}")
 
@@ -661,85 +632,52 @@ ADMIN_PANEL_IMAGE_PATH = os.path.join(
 
 @app.route("/")
 def health():
-    return "Crypto Signal Bot is running.", 200
+    return f"Crypto Signal Bot is running ({DEPLOYMENT_MODE}).", 200
 
 
 @app.route("/status")
 def status():
-    return f"Scanning every {SCAN_INTERVAL_MINUTES} min. Signal cache: {len(_signal_cache)} entries.", 200
+    return (f"Mode: {DEPLOYMENT_MODE}. Strategy: venue filters. "
+            f"Scanning every {SCAN_INTERVAL_MINUTES} min. "
+            f"Signal cache: {len(_signal_cache)} entries."), 200
 
 
 # ── Admin panel helpers ───────────────────────────────────────────────────────
 
-# Persistent bottom-bar keyboards — set once via /start, stay forever in DM.
+# Persistent Telegram menu for the forward paper test.
 _USER_KB = {
     "keyboard": [
-        [{"text": "📋 Открытые сделки"}, {"text": "📈 Результаты"}],
-        [{"text": "🤖 Автотрейдинг"}, {"text": "📰 Новости на сегодня"}],
-        [{"text": "❓ Помощь"}],
+        [{"text": "📋 Paper-сделки"}, {"text": "📈 Paper-результаты"}],
+        [{"text": "🛡 Режим"}, {"text": "❓ Помощь"}],
     ],
-    "resize_keyboard": True,
-    "is_persistent":   True,
+    "resize_keyboard": True, "is_persistent": True,
 }
 _ADMIN_KB = {
     "keyboard": [
         [{"text": "🛠 Админ панель"}],
-        [{"text": "📋 Открытые сделки"}, {"text": "📈 Результаты"}],
-        [{"text": "🤖 Автотрейдинг"}, {"text": "📰 Новости на сегодня"}],
-        [{"text": "❓ Помощь"}],
+        [{"text": "📋 Paper-сделки"}, {"text": "📈 Paper-результаты"}],
+        [{"text": "🛡 Режим"}, {"text": "❓ Помощь"}],
     ],
-    "resize_keyboard": True,
-    "is_persistent":   True,
+    "resize_keyboard": True, "is_persistent": True,
 }
-# Group chats get no autotrade button — it's a DM-only feature. Admins still
-# get the admin panel button there (used to run the panel from the group).
-_GROUP_KB = {
-    "keyboard": [
-        [{"text": "📋 Открытые сделки"}, {"text": "📈 Результаты"}],
-        [{"text": "📰 Новости на сегодня"}],
-        [{"text": "❓ Помощь"}],
-    ],
-    "resize_keyboard": True,
-    "is_persistent":   True,
-}
-_GROUP_ADMIN_KB = {
-    "keyboard": [
-        [{"text": "🛠 Админ панель"}],
-        [{"text": "📋 Открытые сделки"}, {"text": "📈 Результаты"}],
-        [{"text": "📰 Новости на сегодня"}],
-        [{"text": "❓ Помощь"}],
-    ],
-    "resize_keyboard": True,
-    "is_persistent":   True,
-}
+_GROUP_KB = _USER_KB
+_GROUP_ADMIN_KB = _ADMIN_KB
 
-# Inline keyboard shown inside the panel message — 4 section buttons.
-_ADMIN_KEYBOARD = {
-    "inline_keyboard": [[
-        {"text": "📈 Торговля",   "callback_data": "adm_sec_trading"},
-        {"text": "🔧 Настройки", "callback_data": "adm_sec_settings"},
-    ], [
-        {"text": "📊 Аналитика", "callback_data": "adm_sec_analytics"},
-        {"text": "👥 Люди",      "callback_data": "adm_sec_people"},
-    ]]
-}
-
+_ADMIN_KEYBOARD = {"inline_keyboard": [
+    [{"text": "📊 Paper-торговля", "callback_data": "adm_sec_trading"},
+     {"text": "🧩 Фильтры", "callback_data": "adm_sec_settings"}],
+    [{"text": "📈 Аналитика", "callback_data": "adm_sec_analytics"},
+     {"text": "👥 Люди", "callback_data": "adm_sec_people"}],
+]}
 _BACK_ROW = [{"text": "« Назад", "callback_data": "adm_back"}]
-
-_KB_TRADING = {"inline_keyboard": [[
-    {"text": "📊 Статистика",      "callback_data": "adm_stats"},
-    {"text": "📋 Открытые сделки", "callback_data": "adm_open"},
-], [
-    {"text": "🗑 Управление",      "callback_data": "adm_deals"},
-    {"text": "🔍 История сетапов", "callback_data": "adm_setups"},
-], [_BACK_ROW[0]]]}
+_KB_TRADING = {"inline_keyboard": [
+    [{"text": "📊 Paper-статистика", "callback_data": "adm_stats"},
+     {"text": "📋 Paper-сделки", "callback_data": "adm_open"}],
+    [{"text": "🔍 История сигналов", "callback_data": "adm_setups"}],
+    _BACK_ROW,
+]}
 
 def _claude_gate_enabled() -> bool:
-    """Is Claude a GATE, or an observer? DB state wins, config is the default.
-
-    Runtime-switchable so a live experiment can be stopped the moment it looks
-    wrong, without a redeploy.
-    """
     state = get_bot_state("claude_gate_enabled")
     if state is not None:
         return state == "1"
@@ -747,40 +685,23 @@ def _claude_gate_enabled() -> bool:
 
 
 def _kb_settings():
-    """Built per render so the Claude toggle shows its live state."""
-    gate = ("🤖 Клод: ФИЛЬТР ✅" if _claude_gate_enabled()
-            else "🤖 Клод: ТЕНЬ 👁")
-    return {"inline_keyboard": [[
-        {"text": "📊 Фильтры",       "callback_data": "adm_filters"},
-        {"text": "🔒 Блок монет",    "callback_data": "adm_manblock"},
-    ], [
-        {"text": "🚫 Авто-блок",     "callback_data": "adm_blocks"},
-        {"text": "💰 Бюджет Claude", "callback_data": "adm_budget"},
-    ], [
-        {"text": "🩺 Проверка сервисов", "callback_data": "adm_health"},
-    ], [
-        {"text": gate,               "callback_data": "adm_claude_toggle"},
-    ], [_BACK_ROW[0]]]}
+    return {"inline_keyboard": [
+        [{"text": "🧩 Активные фильтры", "callback_data": "adm_shadow_status"}],
+        [{"text": "🩺 Проверка сервисов", "callback_data": "adm_health"}],
+        _BACK_ROW,
+    ]}
 
-_KB_ANALYTICS = {"inline_keyboard": [[
-    {"text": "🏆 Топ монет",     "callback_data": "adm_top"},
-    {"text": "💀 Худшие монеты", "callback_data": "adm_worst"},
-], [
-    {"text": "🎯 Точность ИИ",   "callback_data": "adm_ai_acc"},
-], [
-    {"text": "🧪 Тест фильтров", "callback_data": "adm_variants"},
-], [
-    {"text": "🔗 Кап корреляции", "callback_data": "adm_cap"},
-], [
-    {"text": "📦 Полный отчёт", "callback_data": "adm_fullreport"},
-], [_BACK_ROW[0]]]}
-
-_KB_PEOPLE = {"inline_keyboard": [[
-    {"text": "👥 Пользователи", "callback_data": "adm_users"},
-    {"text": "👮 Админы",       "callback_data": "adm_admins"},
-], [
-    {"text": "🤖 Автотрейдинг", "callback_data": "adm_autotrade"},
-], [_BACK_ROW[0]]]}
+_KB_ANALYTICS = {"inline_keyboard": [
+    [{"text": "🏆 Топ тикеров", "callback_data": "adm_top"},
+     {"text": "💀 Худшие тикеры", "callback_data": "adm_worst"}],
+    [{"text": "📦 Paper-отчёт", "callback_data": "adm_fullreport"}],
+    _BACK_ROW,
+]}
+_KB_PEOPLE = {"inline_keyboard": [
+    [{"text": "👥 Пользователи", "callback_data": "adm_users"},
+     {"text": "👮 Админы", "callback_data": "adm_admins"}],
+    _BACK_ROW,
+]}
 
 
 def _send_persistent_menu(chat_id: int, is_admin: bool = False, is_dm: bool = True):
@@ -1204,33 +1125,32 @@ def _handle_admin_callback(callback_id: str, chat_id: int,
     if not _silent_cb:
         _answer_callback(callback_id)
 
+    if data == "adm_shadow_status":
+        _edit_admin_text(
+            chat_id, message_id,
+            "🧩 *АКТИВНЫЕ ФИЛЬТРЫ*\n\n"
+            "Режим: *SHADOW / PAPER*\n"
+            "Стратегия: 7 замороженных X-Perp модулей\n"
+            "Вход: по текущей рыночной цене\n"
+            "Нейросеть: отключена от решения\n"
+            "Реальные ордера: *ЗАПРЕЩЕНЫ КОДОМ*\n\n"
+            "Все сигналы и исходы записываются для независимой forward-проверки.",
+            _kb_settings(),
+        )
+        return
+    if DEPLOYMENT_MODE == "shadow" and (
+            data == "adm_claude_toggle" or data == "adm_autotrade"
+            or data.startswith("adm_at_")):
+        _edit_admin_text(chat_id, message_id,
+                         "🛡 *Теневой режим*\n\nРеальная торговля и старые AI-настройки отключены.",
+                         _kb_settings())
+        return
+
     if data in ("adm_sec_trading", "adm_sec_settings", "adm_sec_analytics", "adm_sec_people"):
         _admin_section[chat_id] = data
 
     if data == "adm_sec_trading":
-        _edit_admin_text(chat_id, message_id, "📈 *Торговля*\nВыбери раздел:", _KB_TRADING)
-
-    elif data == "adm_claude_toggle":
-        new_val = "0" if _claude_gate_enabled() else "1"
-        set_bot_state("claude_gate_enabled", new_val)
-        _on = [
-            "🤖 Клод: *ФИЛЬТР*",
-            "Его вердикт решает — отклонённые сетапы не торгуются.",
-            "Так бот работал всегда.",
-        ]
-        _off = [
-            "🤖 Клод: *ТЕНЬ*",
-            "Торгуют только правила. Клод считает и пишет вердикт,",
-            "но ничего не задерживает.",
-            "",
-            "⚠️ Здесь он одобряет только 52% — книга почти УДВОИТСЯ.",
-            "На акциях этот же режим добавляет лишь четверть сделок.",
-            "",
-            "Судить не раньше чем через 2 недели.",
-        ]
-        note = "\n".join(_on if new_val == "1" else _off)
-        _edit_admin_text(chat_id, message_id, "🔧 *Настройки*\n\n" + note,
-                         _kb_settings())
+        _edit_admin_text(chat_id, message_id, "📊 *Paper-торговля*\nВыбери раздел:", _KB_TRADING)
 
     elif data == "adm_sec_settings":
         _edit_admin_text(chat_id, message_id, "🔧 *Настройки*\nВыбери раздел:", _kb_settings())
@@ -1265,81 +1185,6 @@ def _handle_admin_callback(callback_id: str, chat_id: int,
                 f"  TP1: {s30['tp1_hit']} ({s30['tp1_rate']}%)  TP2: {s30['tp2_hit']}\n"
                 f"  BE: {s30['breakeven']}  SL: {s30['sl_hit']}  Expired: {s30['expired']}\n"
                 f"  Win rate: *{s30['win_rate']}%*"
-            )
-        except Exception as e:
-            txt = f"Ошибка: {e}"
-        _edit_message(chat_id, message_id, txt)
-
-    elif data == "adm_ai_acc":
-        try:
-            # Clamped to the config change: get_setup_accuracy is deliberately
-            # NOT clamped inside (the full report needs to reach the old era),
-            # so rolling panels clamp at the call site.
-            since7  = max(time.time() - 7 * 86400,  _CONFIG_CHANGE_TS or 0.0)
-            since30 = max(time.time() - 30 * 86400, _CONFIG_CHANGE_TS or 0.0)
-
-            def _acc_block(label, since):
-                a = get_setup_accuracy(since)
-                s, r = a["sent"], a["rejected"]
-                lines = [f"*{label}:*"]
-                lines.append(
-                    f"  📤 Отправлено: {s['n']}"
-                    + (f" · TP1 {s['tp1_pct']:.0f}% · SL {s['sl_pct']:.0f}%" if s['n'] else " · нет данных")
-                )
-                lines.append(
-                    f"  🚫 Отклонено: {r['n']}"
-                    + (f" · TP1 {r['tp1_pct']:.0f}% · SL {r['sl_pct']:.0f}%" if r['n'] else " · нет данных")
-                )
-                # Mirror shadow experiment: flip the rejected setups (levels swapped)
-                m_dec = r.get('mirror_wins', 0) + r.get('mirror_losses', 0)
-                if m_dec:
-                    m_r = r.get('mirror_r', 0.0)
-                    icon = "🟢" if m_r > 0 else ("🔴" if m_r < 0 else "➖")
-                    lines.append(
-                        f"  🔄 Отклон. перевёрнутые: {m_dec}"
-                        f" · WR {r.get('mirror_wr', 0):.0f}%"
-                        f" · {icon} {m_r:+.1f}R ({r.get('mirror_r_avg', 0):+.2f}/сд)"
-                    )
-                else:
-                    lines.append("  🔄 Отклон. перевёрнутые: нет данных")
-                # Verdict: is the rejected bucket actually worse?
-                if s['n'] >= 10 and r['n'] >= 10:
-                    gap = s['tp1_pct'] - r['tp1_pct']
-                    if gap >= 8:
-                        lines.append(f"  ✅ ИИ режет хуже на {gap:.0f}пп TP1 — фильтр работает")
-                    elif gap <= -8:
-                        lines.append(f"  ⚠️ Отклонённые доходят до TP1 на {-gap:.0f}пп *чаще* — ИИ слишком строг")
-                    else:
-                        lines.append(f"  ➖ Разница {gap:+.0f}пп — ИИ почти не отделяет")
-                return "\n".join(lines)
-
-            txt = (
-                "🎯 *ТОЧНОСТЬ ИИ*\n"
-                "_Сравнение исхода отправленных vs отклонённых сетапов "
-                "(теневой трекинг по реальным котировкам)._\n\n"
-                f"{_acc_block('За 7 дней', since7)}\n\n"
-                f"{_acc_block(f'За 30 дней (обрезано до {_CONFIG_CHANGE_LABEL})', since30)}\n\n"
-                "_TP1% = доля дошедших до первого тейка._\n"
-                "_🔄 перевёрнутые = эксперимент: если бы зеркалили отклонённые "
-                "(стоп↔тейк). +R = зеркало в плюс. Нужна выборка ≥20-30 и пару "
-                "недель, прежде чем верить._"
-            )
-
-            # SL-wick diagnostic: how many live stops were thin-X-Perp noise
-            def _wick_line(label, since):
-                w = get_sl_wick_stats(since)
-                if not w["n"]:
-                    return f"*{label}:* нет данных"
-                return (f"*{label}:* стопов {w['n']} · "
-                        f"🌊 X-Perp шум {w['xperp_only']} ({w['xperp_only_pct']:.0f}%) · "
-                        f"📉 реальный разворот {w['confirmed']}")
-            txt += (
-                "\n\n━━━━━━━━━\n"
-                "🎯 *Природа стопов* (X-Perp фитиль vs реальный разворот)\n"
-                f"{_wick_line('7 дней', since7)}\n"
-                f"{_wick_line(f'30 дней (обрезано до {_CONFIG_CHANGE_LABEL})', since30)}\n"
-                "_🌊 = стоп задело только на тонком X-Perp, глубокий рынок нет "
-                "(шум исполнения). Если доля высокая — стоит расширить буфер стопа._"
             )
         except Exception as e:
             txt = f"Ошибка: {e}"
@@ -1453,23 +1298,6 @@ def _handle_admin_callback(callback_id: str, chat_id: int,
             log.warning(f"adm_cap failed: {e}")
             _edit_admin_text(chat_id, message_id, f"❌ Ошибка: {e}", _KB_ANALYTICS)
 
-    elif data == "adm_variants":
-        _edit_admin_text(
-            chat_id, message_id,
-            "🧪 *Тест фильтров*\n\nС какой даты считать?\n"
-            f"_Состав вариантов менялся {_ARMS_CHANGE_LABEL} — до этой даты буквы "
-            "E и I означали другие правила, смешивать нельзя._",
-            {"inline_keyboard": [
-                [{"text": f"⚙️ С {_ARMS_CHANGE_LABEL} (текущие варианты)",
-                  "callback_data": "adm_var_arms"}],
-                [{"text": "7 дней",  "callback_data": "adm_var_7"},
-                 {"text": "30 дней", "callback_data": "adm_var_30"}],
-                [{"text": "📅 Своя дата", "callback_data": "adm_var_date"},
-                 {"text": "🗄 Всё время",  "callback_data": "adm_var_all"}],
-                [{"text": "« Назад", "callback_data": "adm_sec_analytics"}],
-            ]},
-        )
-
     elif data == "adm_var_date":
         _pending_variant_date[chat_id] = message_id
         try:
@@ -1521,7 +1349,6 @@ def _handle_admin_callback(callback_id: str, chat_id: int,
                 txt = "🚫 *Авто-блок*\n\nЗаблокированных монет нет."
                 _edit_message(chat_id, message_id, txt)
             else:
-                import time as _t
                 lines = ["🚫 *Авто-блок*\n"]
                 keyboard_rows = []
                 for b in blocks:
@@ -1899,121 +1726,6 @@ def _handle_admin_callback(callback_id: str, chat_id: int,
         except Exception as e:
             lines.append(f"🛡 Новостной фильтр: ❌ {_esc(str(e))[:90]}")
         _edit_message(chat_id, message_id, chr(10).join(lines))
-    elif data == "adm_budget":
-        try:
-            from config import CLAUDE_DAILY_BUDGET_USD
-            s = get_claude_spend_stats()
-            remaining = max(0.0, round(CLAUDE_DAILY_BUDGET_USD - s["today_usd"], 4))
-            bar_filled = int((s["today_usd"] / CLAUDE_DAILY_BUDGET_USD) * 10) if CLAUDE_DAILY_BUDGET_USD else 0
-            bar_filled = min(bar_filled, 10)
-            bar = "█" * bar_filled + "░" * (10 - bar_filled)
-            txt = (
-                f"💰 *Бюджет Claude*\n\n"
-                f"Лимит: ${CLAUDE_DAILY_BUDGET_USD:.2f}/день\n"
-                f"[{bar}] ${s['today_usd']:.4f}\n"
-                f"Осталось сегодня: *${remaining:.4f}*\n\n"
-                f"*За сегодня:* {s['today_calls']} вызовов · ${s['today_usd']:.4f}\n"
-                f"*За 7 дней:* {s['week_calls']} вызовов · ${s['week_usd']:.4f}\n"
-                f"*Всего:* {s['total_calls']} вызовов · ${s['total_usd']:.4f}"
-            )
-        except Exception as e:
-            txt = f"Ошибка: {e}"
-        _edit_message(chat_id, message_id, txt)
-
-    elif data == "adm_filters":
-        try:
-            from config import (
-                EFF_RATIO_FILTER, EFF_RATIO_MIN,
-                BEAR_TREND_HOT_VOL_GUARD, BEAR_TREND_HOT_VOL_MIN_RATIO,
-                BEAR_TREND_SKIP_SESSIONS,
-                DIRECTIONAL_RSI_MIDLINE_FILTER, RSI_LONG_MIN_MIDLINE, RSI_SHORT_MAX_MIDLINE,
-                OVERLAP_BEARISH_1H_GUARD, MACD_CHOCH_NOISE_FILTER,
-                DAILY_TREND_FILTER, DOUBLE_NEUTRAL_LONG_FILTER, DAILY_TREND_SHORT_FILTER,
-                VOL_REGIME_FILTER, VOL_MIN_ATR_PCT, VOL_MIN_RATIO,
-                SOURCE_EDGE_FILTER, LOW_EDGE_FVG_SYMBOLS,
-                SYMBOL_EDGE_FILTER, LOW_EDGE_SYMBOLS,
-                DIRECTION_EDGE_FILTER, LOW_EDGE_SHORT_SYMBOLS,
-                LONG_RELATIVE_WEAKNESS_FILTER, LONG_RELATIVE_WEAKNESS_MAX_PCT,
-                LONG_NY_COIN_MOMENTUM_FILTER,
-                SHORT_FVG_COIN_MOMENTUM_FILTER,
-                FVG_LONDON_BTC_UP_FILTER, FVG_LONDON_BTC_UP_MIN_PCT,
-                QUALITY_RISK_OVERLAY, QUALITY_RISK_MULT,
-                REL_STRENGTH_RISK_UP, REL_STRENGTH_RISK_UP_MULT,
-                TREND_PAIR_RISK_UP, TREND_PAIR_RISK_UP_MULT,
-                AUTO_BLOCK_ENABLED, AUTO_BLOCK_MIN_TRADES,
-                AUTO_BLOCK_MAX_PROFIT_FACTOR, AUTO_BLOCK_MAX_WIN_RATE,
-                ADAPTIVE_FILTER_PACKS, REQUIRE_STRICT_HTF,
-            )
-            # MTF_MIN_SCORE / SCAN_INTERVAL_MINUTES / TRAIL_RUNNER_ENABLED /
-            # TRAIL_ATR_MULT are imported at module level and MUST NOT be
-            # re-imported here: a name bound anywhere inside this function is
-            # local to ALL of it, so any branch that reads one of them BEFORE
-            # this line raises UnboundLocalError. That is exactly what the
-            # full-report branch hit.
-            import time as _t
-            stats = _last_scan_stats
-            if stats["ts"] > 0:
-                age_min = int((_t.time() - stats["ts"]) / 60)
-                scan_line = (
-                    f"🕐 Последний скан: {age_min} мин назад\n"
-                    f"  Монет в пуле: {stats['coins']}  →  "
-                    f"SMC: {stats['setups']}  →  "
-                    f"Claude: {stats['enriched']}  →  "
-                    f"Отправлено: {stats['sent']}\n\n"
-                )
-            else:
-                scan_line = "🕐 Скан ещё не запускался\n\n"
-
-            def _f(on, label, hint=""):
-                icon = "✅" if on else "⬜"
-                return f"{icon} {label}" + (f"\n   _↳ {hint}_" if hint and on else "")
-            fvg_skip = ", ".join(LOW_EDGE_FVG_SYMBOLS[:3]) or "нет"
-            sym_skip = ", ".join(LOW_EDGE_SYMBOLS[:3]) or "нет"
-            dir_skip = ", ".join(LOW_EDGE_SHORT_SYMBOLS[:3]) or "нет"
-            txt = (
-                f"📊 *Мониторинг фильтров*\n\n"
-                f"{scan_line}"
-
-                f"*🔍 Качество сетапа*\n"
-                f"{_f(EFF_RATIO_FILTER, 'Чистота тренда', f'блокирует боковик — движение должно быть направленным (порог {EFF_RATIO_MIN})')}\n"
-                f"{_f(VOL_REGIME_FILTER, 'Режим волатильности', f'пропускает только живые рынки — не спящие и не взрывные')}\n"
-                f"{_f(DIRECTIONAL_RSI_MIDLINE_FILTER, 'RSI по направлению', f'лонг только при RSI≥{RSI_LONG_MIN_MIDLINE}, шорт при RSI<{RSI_SHORT_MAX_MIDLINE} — отсекает против-тренд')}\n"
-                f"{_f(EFF_RATIO_FILTER, 'Мин. балл сетапа', f'нужно ≥{MTF_MIN_SCORE} подтверждений из разных таймфреймов')}\n"
-
-                f"\n*📅 Тренд и направление*\n"
-                f"{_f(DAILY_TREND_FILTER, 'Дневной тренд (лонг)', 'лонг запрещён если дневная свеча медвежья — не покупаем против дня')}\n"
-                f"{_f(DAILY_TREND_SHORT_FILTER, 'Дневной тренд (шорт)', 'шорт запрещён если дневная свеча бычья — не шортим против дня')}\n"
-                f"{_f(DOUBLE_NEUTRAL_LONG_FILTER, 'Двойной боковик', '4h + дневка оба нейтральны = полный боковик, лонги пропускаем')}\n"
-                f"{_f(OVERLAP_BEARISH_1H_GUARD, 'Защита Overlap-сессии', 'лонг в перекрытие Лондон+Нью-Йорк при медвежьем 1h — пропускаем (опоздавшие входы давят цену)')}\n"
-                f"{_f(BEAR_TREND_HOT_VOL_GUARD, 'Защита шорт-сквиза', f'медвежий тренд + объём ≥{BEAR_TREND_HOT_VOL_MIN_RATIO}x = переполненный шорт, пропускаем')}\n"
-                f"{_f(MACD_CHOCH_NOISE_FILTER, 'Шум MACD/ChoCH', 'блокирует ложные развороты без подтверждения MACD')}\n"
-
-                f"\n*⚡ Моментум монеты*\n"
-                f"{_f(LONG_RELATIVE_WEAKNESS_FILTER, 'Слабость монеты vs BTC', f'лонг пропускаем если монета слабее BTC на ≥{abs(LONG_RELATIVE_WEAKNESS_MAX_PCT)}% за час — нет интереса покупателей')}\n"
-                f"{_f(LONG_NY_COIN_MOMENTUM_FILTER, 'Лонг в Нью-Йорк', 'лонг на Нью-Йоркской сессии только если монета уже растёт — не против моментума')}\n"
-                f"{_f(SHORT_FVG_COIN_MOMENTUM_FILTER, 'Шорт FVG моментум', 'шорт по FVG-зоне только если монета уже падает — не против моментума')}\n"
-                f"{_f(FVG_LONDON_BTC_UP_FILTER, 'FVG Лондон + BTC растёт', f'FVG-шорт в Лондон пропускаем если BTC вырос ≥{FVG_LONDON_BTC_UP_MIN_PCT}% за час — шортить против роста BTC опасно')}\n"
-
-                f"\n*🚫 Заблокированные монеты/стратегии*\n"
-                f"{_f(SYMBOL_EDGE_FILTER, f'Монеты без статистики: {sym_skip}', 'исторически плохие результаты — полностью исключены')}\n"
-                f"{_f(SOURCE_EDGE_FILTER, f'FVG-зоны запрещены: {fvg_skip}', 'у этих монет FVG-сетапы не работают — только OB')}\n"
-                f"{_f(DIRECTION_EDGE_FILTER, f'Шорты запрещены: {dir_skip}', 'у этих монет шорты исторически убыточны')}\n"
-
-                f"\n*💰 Повышение размера позиции*\n"
-                f"{_f(QUALITY_RISK_OVERLAY, f'Бонус за качество ×{QUALITY_RISK_MULT}', 'OB-вход + хороший RSI + объём + топ-монета = увеличиваем риск на 15%')}\n"
-                f"{_f(REL_STRENGTH_RISK_UP, f'Бонус за силу монеты ×{REL_STRENGTH_RISK_UP_MULT}', 'монета сильнее BTC = больше шансов дойти до TP2, берём чуть больше')}\n"
-                f"{_f(TREND_PAIR_RISK_UP, f'Бонус за тренд ×{TREND_PAIR_RISK_UP_MULT}', '1h и 4h оба в одну сторону = сильный тренд, увеличиваем')}\n"
-
-                f"\n*⚙️ Управление сделкой*\n"
-                f"{_f(TRAIL_RUNNER_ENABLED, f'Трейлинг-стоп ATR×{TRAIL_ATR_MULT}', 'после TP1 остаток ведётся скользящим стопом — не даём прибыли уйти в ноль')}\n"
-                f"{_f(AUTO_BLOCK_ENABLED, 'Авто-блок убыточных монет', f'монета с ≥{AUTO_BLOCK_MIN_TRADES} сделками и WR≤{AUTO_BLOCK_MAX_WIN_RATE}% автоматически блокируется')}\n"
-
-                f"\n🕐 Скан каждые {SCAN_INTERVAL_MINUTES} мин  •  мин. балл сетапа: {MTF_MIN_SCORE}"
-            )
-        except Exception as e:
-            txt = f"Ошибка: {e}"
-        _edit_message(chat_id, message_id, txt)
-
     elif data in ("adm_setups", "adm_setups_today"):
         _riga = _riga_tz()
         date_str = datetime.now(_riga).strftime("%d.%m.%Y")
@@ -3002,7 +2714,10 @@ def webhook():
         cb_id      = cb.get("id")
         if cb.get("message", {}).get("photo"):
             _mark_photo_panel_message(chat_id, message_id)
-        if cb_data == "prayer_commandments":
+        if DEPLOYMENT_MODE == "shadow" and cb_data.startswith(("at_", "sw_")):
+            _answer_callback(cb_id, "Теневой режим: реальные операции отключены")
+            _reply(chat_id, "🛡 Сейчас бот только фиксирует paper-сделки. Реальные ордера запрещены.")
+        elif cb_data == "prayer_commandments":
             _answer_callback(cb_id)
             send_commandments(chat_id)
         elif cb_data == "evening_ritual":
@@ -3218,8 +2933,18 @@ def webhook():
             _reply(chat_id, "Нет доступа.")
 
     # 🤖 Автотрейдинг — только в личке, только для допущенных админом
+    elif text == "🛡 режим":
+        _reply(chat_id,
+               "🛡 *ТЕНЕВОЙ РЕЖИМ*\n\n"
+               "Работают только новые детерминированные X-Perp фильтры.\n"
+               "Сигналы входят по рынку и считаются виртуально.\n"
+               "Нейросеть не принимает торговых решений.\n"
+               "Реальные ордера отключены на уровне конфигурации и кода.")
+
     elif text == "🤖 автотрейдинг":
-        if not is_dm:
+        if DEPLOYMENT_MODE == "shadow":
+            _reply(chat_id, "🛡 Автотрейдинг отключён: идёт forward-проверка в paper-режиме.")
+        elif not is_dm:
             _reply(chat_id, "🤖 Автотрейдинг настраивается только в личном чате с ботом.")
         else:
             u = at_get(user_id)
@@ -3235,7 +2960,7 @@ def webhook():
                 _at_begin_keys(chat_id)
 
     # 📋 Открытые сделки
-    elif text == "📋 открытые сделки":
+    elif text in ("📋 открытые сделки", "📋 paper-сделки"):
         try:
             sigs = get_open_signals()
             if not sigs:
@@ -3249,7 +2974,7 @@ def webhook():
             _reply(chat_id, f"Ошибка: {e}")
 
     # 📈 Результаты
-    elif text == "📈 результаты":
+    elif text in ("📈 результаты", "📈 paper-результаты"):
         try:
             # "Today" = since midnight Europe/Riga (calendar day, not rolling 24h)
             _now_riga    = datetime.now(_riga_tz())
@@ -3359,6 +3084,16 @@ def webhook():
     # ❓ Помощь
     elif text == "❓ помощь":
         _reply(chat_id,
+               "❓ *Как читать paper-сигналы*\n\n"
+               "LONG — фильтр ожидает рост, SHORT — снижение.\n"
+               "Вход фиксируется по рыночной цене X-Perp в момент сигнала.\n"
+               "Цель и стоп заданы самим замороженным модулем.\n\n"
+               "🧪 PAPER означает, что Telegram показывает виртуальную сделку: "
+               "биржевой ордер не создаётся. Кнопки результатов считают только "
+               "новые forward-сигналы.")
+
+    elif text == "❓ помощь":
+        _reply(chat_id,
                "❓ *Как читать сигналы*\n\n"
                "*Направление:*\n"
                "  📈 LONG — ожидаем рост, покупаем\n"
@@ -3396,11 +3131,12 @@ def webhook():
     elif text in ("/status", "/старт"):
         _reply(chat_id,
                f"🤖 *TUSA CRYPTO BOT*\n"
-               f"✅ Работает\n"
+               f"🧪 Режим: *{DEPLOYMENT_MODE.upper()}*\n"
                f"⏱ Интервал: {SCAN_INTERVAL_MINUTES} мин\n"
                f"📊 Сигналов в кэше: {len(_signal_cache)}\n"
                f"💾 Данные: OKX\n"
-               f"🧠 AI: Claude Sonnet")
+               f"🧩 Решение: замороженные X-Perp фильтры\n"
+               f"🚫 Реальные ордера отключены")
 
     # /stats — статистика побед/поражений
     elif text in ("/stats", "/статистика"):
@@ -3476,14 +3212,6 @@ _scan_paused: bool = False
 _last_prices: dict[str, float] = {}  # symbol → last known close price
 
 
-def _is_alert_duplicate(name: str) -> bool:
-    if name in _news_alert_cache:
-        age_hours = (time.time() - _news_alert_cache[name]) / 3600
-        if age_hours < _NEWS_ALERT_COOLDOWN_HOURS:
-            return True
-    return False
-
-
 def _cooldowns_load() -> None:
     """Restore both cooldown caches from the DB at boot.
 
@@ -3520,15 +3248,6 @@ def _cooldowns_save() -> None:
         log.warning(f"Cooldown save failed: {e}")
 
 
-def _is_duplicate(symbol: str, direction: str) -> bool:
-    if symbol in _signal_cache:
-        cached_dir, cached_ts = _signal_cache[symbol]
-        age_hours = (time.time() - cached_ts) / 3600
-        if cached_dir == direction and age_hours < SIGNAL_COOLDOWN_HOURS:
-            return True
-    return False
-
-
 def _cache_signal(symbol: str, direction: str):
     _signal_cache[symbol] = (direction, time.time())
     _cooldowns_save()
@@ -3543,155 +3262,6 @@ def _cache_signal(symbol: str, direction: str):
 # entry, for REJECT_COOLDOWN_HOURS. Price escaping the zone = new situation.
 # {(symbol, direction): (rejected_price, atr, ts)}
 _reject_cache: dict = {}
-
-
-def _is_reject_cooled(symbol: str, direction: str, price, atr) -> bool:
-    ent = _reject_cache.get((symbol, direction))
-    if not ent:
-        return False
-    r_price, r_atr, r_ts = ent
-    if (time.time() - r_ts) / 3600 >= REJECT_COOLDOWN_HOURS:
-        _reject_cache.pop((symbol, direction), None)
-        _cooldowns_save()
-        return False
-    eff_atr = float(atr or 0) or r_atr
-    try:
-        if eff_atr > 0 and abs(float(price) - r_price) > eff_atr:
-            _reject_cache.pop((symbol, direction), None)   # left the zone
-            _cooldowns_save()
-            return False
-    except (TypeError, ValueError):
-        pass
-    return True
-
-
-def _cache_rejection(symbol: str, direction: str, price, atr) -> None:
-    try:
-        _reject_cache[(symbol, direction)] = (float(price or 0), float(atr or 0), time.time())
-        _cooldowns_save()
-    except (TypeError, ValueError):
-        pass
-
-
-def _apply_knn_overlay(setup: dict, symbol: str) -> None:
-    """
-    k-NN price-shape analog risk overlay (Kronos-inspired, CPU-only).
-
-    Deep-fetches a ~1000-candle 15m series (paginated OKX) for this already-
-    qualified setup, scores how often the symbol's most-similar past windows
-    moved in the trade direction, and folds the result into setup['risk_mult']
-    as a position-size suggestion. Size up on strong analogs (≥0.55), down on
-    weak ones (<0.50). Never gates — a failure leaves the setup untouched.
-    """
-    setup["knn_score"] = None
-    if not KNN_RISK_OVERLAY:
-        return
-    try:
-        deep = get_klines(symbol, limit=KNN_DEEP_CANDLES)
-        n = len(deep.get("close", []))
-        score = knn_direction_score(
-            deep, n, setup["direction"],
-            shape_len=KNN_SHAPE_LEN, horizon=KNN_HORIZON, k=KNN_K,
-            min_history=KNN_MIN_HISTORY, max_history=KNN_MAX_HISTORY,
-        )
-        setup["knn_score"] = score
-        mult, tag = knn_risk_mult(
-            score,
-            high_score=KNN_HIGH_SCORE, high_mult=KNN_HIGH_MULT,
-            low_score=KNN_LOW_SCORE, low_mult=KNN_LOW_MULT,
-        )
-        if mult != 1.0:
-            base = float(setup.get("risk_mult", 1.0) or 1.0)
-            new  = max(KNN_RISK_MIN_MULT, min(KNN_RISK_MAX_MULT, base * mult))
-            setup["risk_mult"] = round(new, 4)
-            if tag:
-                setup.setdefault("score_tags", []).append(tag)
-                # Refresh the (display-only) "Risk x.." chip rather than duplicate it.
-                sigs = [s for s in setup.get("signals", []) if not str(s).startswith("Risk x")]
-                sigs.append(f"Risk x{new:.2f}")
-                setup["signals"] = sigs
-    except Exception as e:
-        log.warning(f"  kNN overlay skipped {symbol}: {e}")
-
-
-def _entry_is_stale(analysis: dict, live_px: float, direction: str) -> tuple:
-    """Has price left the setup's entry zone before we could publish?
-
-    The edge is entering AT the FVG/OB retest zone; backtest.py fills there by
-    construction. Live, price keeps moving between analysis and publish, and
-    the old guard only capped the distance from the zone MIDPOINT at a flat 3%
-    — so a signal could be published well past the zone edge. Measured cost of
-    that chase is severe (config.py STALE_ENTRY_GUARD has the table: 0.85%
-    adverse entry takes WR 82.8% -> 61.1% and profit to roughly zero).
-
-    Returns (is_stale, reason). Only ADVERSE drift counts: for a LONG, price
-    below the zone is a better fill, not a stale setup.
-    """
-    if not STALE_ENTRY_GUARD:
-        return False, ""
-    lo = analysis.get("entry_low")
-    hi = analysis.get("entry_high")
-    src = str(analysis.get("entry_source") or "").upper()
-    try:
-        lo, hi = float(lo), float(hi)
-    except (TypeError, ValueError):
-        lo = hi = None
-
-    if src in ("FVG", "OB") and lo and hi and hi > lo:
-        width = hi - lo
-        # Tolerance is the LOOSER of "a fraction of the zone" and "a fraction of
-        # price". The zone rule alone is measured in the wrong unit: a narrow 15m
-        # FVG makes 0.25*width ≈ 0.05-0.10% of price, far tighter than anything
-        # in the table above, and on 2026-08-01 it blocked 12 of 12 approved
-        # setups in 32h. A skip returns 0R; the same entries at 0.25% adverse
-        # still return +590R at WR 76%, so only the ruinous chases may be cut.
-        tol = max(width * max(0.0, STALE_ENTRY_ZONE_TOLERANCE),
-                  live_px * max(0.0, STALE_ENTRY_MAX_ADVERSE_PCT))
-        if direction == "LONG" and live_px > hi + tol:
-            return True, f"price {live_px} above zone high {hi} (+tol {tol:.8g})"
-        if direction == "SHORT" and live_px < lo - tol:
-            return True, f"price {live_px} below zone low {lo} (-tol {tol:.8g})"
-        return False, ""
-
-    # No usable zone (MARKET entry): fall back to bounding how much of the
-    # trade's own risk distance the adverse move has already eaten.
-    zone_px = float(analysis.get("current_price") or live_px)
-    atr = float(analysis.get("atr", 0.0) or 0.0)
-    risk = max(zone_px * RISK_MIN_PCT, min(zone_px * RISK_MAX_PCT, atr * SL_ATR_BUFFER)) \
-        if atr > 0 else zone_px * RISK_MAX_PCT
-    if risk <= 0:
-        return False, ""
-    adverse = (live_px - zone_px) if direction == "LONG" else (zone_px - live_px)
-    if adverse > risk * max(0.0, STALE_ENTRY_MAX_RISK_FRAC):
-        return True, (f"adverse move {adverse / risk * 100:.0f}% of risk "
-                      f"> {STALE_ENTRY_MAX_RISK_FRAC * 100:.0f}%")
-    return False, ""
-
-
-def _setup_rank(setup: dict) -> tuple:
-    """Rank setups before Claude so only the strongest spend LLM tokens.
-
-    Ordered by what actually predicts the outcome, measured 2026-07-31 on two
-    independent ~6-month backtest windows (3605 trades):
-
-      volume_ratio  PREDICTS, consistently on both windows:
-        1.5-2.5x -> WR 81.5% / 79.8%      >2.5x -> WR 85.2% / 81.8%
-      mtf_score     does NOT predict above the entry gate:
-        w1: score14 83.7%, 16 82.4%, 18 79.5%, 19 75.0%  (mildly NEGATIVE)
-        w2: score14 79.3%, 16 83.5%, 18 78.5%            (no trend)
-
-    mtf_score was the PRIMARY key and volume the last tiebreak, i.e. selection
-    was driven by a non-predictive feature while the predictive one was ignored.
-    Swapped. Note this says nothing about the MTF_MIN_SCORE>=14 GATE, which is
-    separately validated — only that ABOVE the gate a higher score is not better.
-    Impact is bounded: the ranking only binds when a single scan produces more
-    than MAX_SETUPS_TO_CLAUDE candidates, which is uncommon.
-    """
-    volume_score  = float(setup.get("volume_ratio", 0.0) or 0.0)
-    zone_bonus    = 1 if setup.get("entry_source") in ("OB", "FVG") else 0
-    confirmations = sum(1 for k in ("fvg", "order_block", "liq_sweep") if setup.get(k))
-    mtf_score     = int(setup.get("mtf_score", 0) or 0)
-    return (volume_score, zone_bonus, confirmations, mtf_score)
 
 
 # ── Open-signal monitor (updates TP/SL hits in DB) ────────────────────────────
@@ -3821,8 +3391,23 @@ def _check_open_signals():
             else:
                 trail_atr_mult = max(0.0, float(TRAIL_ATR_MULT))
 
+            from src.live_accounting import trailing_observation, marked_r
+            if not df_all.get('close'):
+                continue
+            latest_quote = float(df_all['close'][-1])
+            if status == 'TP1_PARTIAL' and use_trail:
+                live_trail_stop, crossed = trailing_observation(df, direction=direction,
+                    entry=entry, atr=atr, multiple=trail_atr_mult, quote=latest_quote)
+                resting_tp2_hit = (max(df.get('high') or [latest_quote]) >= tp2
+                    if direction == 'LONG' else min(df.get('low') or [latest_quote]) <= tp2)
+                if resting_tp2_hit or crossed:
+                    new_status = 'TP2_HIT' if resting_tp2_hit else 'TP1_TRAIL'
+                    exit_px = tp2 if resting_tp2_hit else latest_quote
+                    realized_r = marked_r(direction=direction, entry=entry,
+                        exit_price=exit_px, sl=sl, tp1=tp1,
+                        tp1_fraction=tp1_close_frac, reached_tp1=True)
             _conf_flags = df.get("confirmed") or []
-            for i in range(len(df.get("close", []))):
+            for i in range(0 if status == "TP1_PARTIAL" and use_trail else len(df.get("close", []))):
                 high  = float(df["high"][i])
                 low   = float(df["low"][i])
                 close = float(df["close"][i])
@@ -3924,7 +3509,10 @@ def _check_open_signals():
 
             if new_status is None and age_hours > SIGNAL_EXPIRY_HOURS:
                 new_status = "TP1_EXPIRED" if status == "TP1_PARTIAL" else "EXPIRED"
-                realized_r = blended_r(tp1_close_frac, tp1_r, 0.0, 0.0) if status == "TP1_PARTIAL" else 0.0
+                exit_px = latest_quote
+                realized_r = marked_r(direction=direction, entry=entry, exit_price=exit_px,
+                    sl=sl, tp1=tp1, tp1_fraction=tp1_close_frac,
+                    reached_tp1=status == 'TP1_PARTIAL')
 
             # Optional second opinion before closing: the position trades on the
             # X-Perp, but the levels come from the deep feed and so does every
@@ -3940,6 +3528,10 @@ def _check_open_signals():
                     log.info(f"  #{sig['id']} {sig['symbol']} — стоп только на X-Perp, "
                              f"глубокий фид не подтверждает, держим")
                     new_status = None
+            if new_status == 'SL_HIT' and STOP_CLOSE_CONFIRM:
+                exit_px = latest_quote
+                realized_r = marked_r(direction=direction, entry=entry,
+                    exit_price=exit_px, sl=sl, tp1=tp1)
             if new_status:
                 update_signal_status(sig["id"], new_status, exit_px, realized_r=realized_r,
                                      runner_trail_atr_mult=runner_trail_atr_mult)
@@ -3970,1161 +3562,131 @@ def _check_open_signals():
             log.warning(f"  Could not check signal #{sig['id']}: {e}")
 
 
+
 # ── Shadow-outcome tracker (rejected + sent setups) ───────────────────────────
-def _simulate_setup_outcome(direction: str, entry: float, tp1: float, tp2: float,
-                            sl: float, highs: list, lows: list,
-                            closes: list = None, require_fill: bool = True,
-                            wait_bars: int = 4, atr: float = 0.0) -> tuple:
-    """Replay a setup's bracket over forward candles (same order as the validated
-    backtest: SL → TP2 → TP1 each bar). Returns (outcome|None, reached_tp1,
-    reached_tp2). outcome is None while still live (no TP1/SL hit yet).
-
-    After TP1 the stop moves to breakeven (mirrors live TP1=50%→SL-to-BE); the
-    runner either reaches TP2 or exits flat at BE. We only need the categorical
-    result (SL / TP1 / TP2) for the learning signal, not the runner's exact R.
-
-    STOP_CLOSE_CONFIRM must mirror the live position monitor (_check_open_signals)
-    and backtest.py here too — this function is a THIRD, independent place the
-    stop rule is implemented (setup_log / "Точность ИИ" / the mirror experiment).
-    Without this, a setup that is BOTH sent (real position) and logged (setup_log
-    row) gets two different outcomes for the same trade: the live monitor exits
-    late on a closed candle while this function still exits early on a wick —
-    same trade, contradictory numbers in "Живые результаты" vs "Точность ИИ".
-    `closes` is only passed by the shadow tracker's own caller; other call sites
-    (if any) fall back to wick-touch.
-    """
-    tp1_reached = False
-    risk = abs(entry - sl)
-    if risk <= 0:
-        return None, 0, 0
-    # 2026-08-25: the bracket used to start at `entry` on bar 0 whether or not
-    # price ever traded there. That is the same fantasy fill removed from
-    # backtest.py on 2026-08-23, and it inflated every shadow number in the
-    # project. Measured on the live A/B export: INSIDE arm A, setups actually
-    # sent resolved at 71.0% WR / +0.145R while unsent ones — same filter, only
-    # difference is that these were simulated — resolved at 83.6% / +0.931R.
-    # That 12.6pp artefact is bigger than _GLOBAL_FEEDBACK_MIN_GAP (8.0), so the
-    # "you are over-rejecting" line fed to Claude fires on the measurement
-    # method rather than on his judgement. Five of the seven stops on the night
-    # of 2026-08-24 cite exactly that line.
-    start = 0
-    if require_fill:
-        # Not enough bars to have SEEN a fill yet — still live, do not resolve.
-        if min(len(highs), len(lows)) < int(wait_bars) + 1:
-            return None, 0, 0
-        start = -1
-        for i in range(min(int(wait_bars) + 1, len(highs), len(lows))):
-            touched = (lows[i] <= entry) if direction == "LONG" else (highs[i] >= entry)
-            if touched:
-                start = i
-                break
-        if start < 0:
-            return "NO_FILL", 0, 0
-        highs, lows = highs[start:], lows[start:]
-        if closes is not None:
-            closes = closes[start:]
-    # `closes` is indexed by the zip's position, so it must be at least as long
-    # as the shorter of highs/lows — otherwise an IndexError here is swallowed
-    # by the shadow tracker's per-symbol try and that symbol's setups silently
-    # stop resolving. Falling back to wick-touch is wrong but visible; a
-    # length mismatch means the caller handed us misaligned series.
-    use_close = (STOP_CLOSE_CONFIRM and closes is not None
-                 and len(closes) >= min(len(highs), len(lows)))
-    if STOP_CLOSE_CONFIRM and closes is not None and not use_close:
-        log.warning(f"  shadow: closes shorter than highs/lows "
-                    f"({len(closes)} < {min(len(highs), len(lows))}) — wick stop used")
-    # ATR for the post-TP1 trail, from the same candles. True range needs the
-    # prior close, so fall back to the plain high-low range when closes are
-    # absent; both land in the same magnitude and the trail multiplier is tiny.
-    _rng = []
-    for i in range(min(len(highs), len(lows))):
-        r = highs[i] - lows[i]
-        if closes is not None and i > 0 and i < len(closes):
-            r = max(r, abs(highs[i] - closes[i - 1]), abs(lows[i] - closes[i - 1]))
-        _rng.append(r)
-    # The live monitor and backtest both trail on the ATR the strategy measured
-    # at signal time. Estimating one from FORWARD candles instead put this
-    # tracker 13% out of step with the model on synthetic series — always in the
-    # same direction, TP2 in the model against TP1 here. Use the stored value
-    # whenever setup_log has it; the estimate is only a fallback for rows
-    # written before that column existed.
-    _atr = float(atr) if atr and atr > 0 else (
-        (sum(_rng[:14]) / len(_rng[:14])) if _rng else 0.0)
-    _tmult = max(0.0, float(TRAIL_ATR_MULT))
-    _peak = entry
-
-    for idx, (h, l) in enumerate(zip(highs, lows)):
-        if not tp1_reached:
-            if direction == "LONG":
-                _sl_hit = (closes[idx] <= sl) if use_close else (l <= sl)
-                if _sl_hit:   return "SL", 0, 0
-                if h >= tp2:  return "TP2", 1, 1
-                if h >= tp1:  tp1_reached = True
-                # The peak must run from the FILL, not from the TP1 bar. Starting
-                # it at entry when TP1 lands leaves the trail sitting near entry,
-                # so the runner survives pullbacks the real trail would have
-                # closed — 24 of 400 synthetic cases resolved TP2 here against
-                # TP1 in the model, all in that direction.
-                _peak = max(_peak, h)
-            else:
-                _sl_hit = (closes[idx] >= sl) if use_close else (h >= sl)
-                if _sl_hit:   return "SL", 0, 0
-                if l <= tp2:  return "TP2", 1, 1
-                if l <= tp1:  tp1_reached = True
-                _peak = min(_peak, l)
-        else:
-            # Post-TP1 the live runner is TRAILED, not carried to TP2 or
-            # breakeven. Modelling it the old way is why unsent setups resolved
-            # TP2 at 25% against 2% for the ones actually sent — a 12x gap that
-            # made every shadow-vs-live comparison in the report meaningless
-            # (the "Claude rejects better setups than he approves" line among
-            # them). The docstring's "TP1=50% -> SL-to-BE" describes a policy
-            # this bot stopped running when TP1_CLOSE_FRAC went to 0.
-            # Anchor the trail to PRIOR bars only. Updating the peak with THIS
-            # bar's high and then testing THIS bar's low assumes the high
-            # printed first, which OHLC does not record — the same bias
-            # backtest.py removes via BT_TRAIL_LAG, worth ~7% of headline
-            # profit there.
-            _trail = (max(entry, _peak - _atr * _tmult) if direction == "LONG"
-                      else min(entry, _peak + _atr * _tmult))
-            if direction == "LONG":
-                if h >= tp2:    return "TP2", 1, 1
-                if l <= _trail: return "TP1", 1, 0
-                _peak = max(_peak, h)
-            else:
-                if l <= tp2:    return "TP2", 1, 1
-                if h >= _trail: return "TP1", 1, 0
-                _peak = min(_peak, l)
-    # No terminal hit within the candles seen so far.
-    return (None, 1, 0) if tp1_reached else (None, 0, 0)
-
-
-def _track_setup_outcomes():
-    """Resolve shadow outcomes for logged setups (sent AND rejected) so the bot
-    can later learn whether Claude's verdicts matched reality. Runs every 15 min.
-    """
-    try:
-        max_age = SIGNAL_EXPIRY_HOURS * 3600
-        pending = get_unresolved_setups(max_age_sec=max_age, limit=80)
-        if not pending:
-            return
-        # Fetch each symbol's candles once per cycle.
-        by_symbol: dict = {}
-        for s in pending:
-            by_symbol.setdefault(s["symbol"], []).append(s)
-
-        resolved = 0
-        for symbol, rows in by_symbol.items():
-            try:
-                df_all = get_klines(symbol, limit=220)
-            except Exception as e:
-                log.debug(f"  shadow: klines failed {symbol}: {e}")
-                continue
-            if not df_all.get("time"):
-                continue
-            for s in rows:
-                df = _slice_candles_from_open(df_all, float(s["ts"]))
-                highs  = [float(x) for x in df.get("high", [])]
-                lows   = [float(x) for x in df.get("low", [])]
-                closes = [float(x) for x in df.get("close", [])]
-                outcome, r1, r2 = _simulate_setup_outcome(
-                    s["direction"], float(s["entry_price"]),
-                    float(s["tp1"]), float(s["tp2"]), float(s["sl"]),
-                    highs, lows, closes,
-                    atr=float(s["atr"] or 0.0) if "atr" in s.keys() else 0.0,
-                )
-                age_h = (time.time() - float(s["ts"])) / 3600
-                if outcome is None:
-                    # No terminal hit yet — finalise only once the window expired.
-                    if age_h > SIGNAL_EXPIRY_HOURS:
-                        outcome = "TP1" if r1 else "EXPIRED"
-                    else:
-                        continue   # still live, re-check next cycle
-                mark_setup_resolved(s["id"], outcome, r1, r2)
-                resolved += 1
-        if resolved:
-            log.info(f"Shadow tracker: resolved {resolved} setup outcome(s)")
-    except Exception as e:
-        log.warning(f"Shadow tracker failed: {e}")
-
-
 # ── Main scanning function ────────────────────────────────────────────────────
 _OI_MIN_DELTA_PCT = 0.3  # ignore OI moves below this (noise floor)
-
-
-def _attach_book(setup: dict) -> None:
-    """Shadow feature: X-Perp order-book thinness at decision time. NO trade
-    impact, never shown to Claude — written to setup_log so it can be measured.
-
-    Aimed at a failure mode we have actually observed rather than a guess: a
-    third of the stops in the 2026-08-07 report were "X-Perp only" (the deep
-    global feed never confirmed the break), i.e. the stop came from a thin
-    local book. Spread and depth measure exactly that. Live spread ranges from
-    0.01bp (BTC) to ~25bp (PEPE) — a 2000x spread of "how easy is it to wick
-    this instrument through a level".
-    """
-    b = get_xperp_book(setup["symbol"])
-    if not b:
-        return
-    setup["book_spread_bps"] = b["spread_bps"]
-    setup["book_depth_usd"]  = b["depth_usd"]
-    setup["book_imbalance"]  = b["imbalance"]
-
-
-def _next_event_context() -> tuple:
-    """(hours_until, title) of the next high-impact scheduled macro event, or
-    (None, None). Shadow feature, computed ONCE per scan (the calendar is
-    global, not per-symbol) — genuinely absent from candles by construction."""
-    try:
-        evs = get_upcoming_high_impact_events(within_hours=48.0)
-        if not evs:
-            return None, None
-        e = evs[0]
-        return round(float(e.get("hours_until") or 0.0), 2), str(e.get("title") or "")[:80]
-    except Exception as _e:
-        log.debug(f"event context failed: {_e}")
-        return None, None
-
-
-def _attach_oi(setup: dict) -> None:
-    """Shadow feature: tag a setup with its Open-Interest regime. NO trade impact —
-    written to setup_log so we can later correlate OI with reached_tp1.
-
-    OI is paired with the setup's price direction (the BOS):
-      rising OI  = new money behind the break → CONFIRMS the setup
-      falling OI = positions unwinding (short-cover / long-liq) → WARNS
-    Regime label differs by side for readability; oi_confirms is the learning bit.
-    """
-    series = get_open_interest(setup["symbol"])
-    if len(series) < 2 or not series[0]:
-        return
-    delta = (series[-1] - series[0]) / series[0] * 100.0
-    setup["oi_delta_pct"] = round(delta, 3)
-    direction = setup.get("direction", "")
-    if abs(delta) < _OI_MIN_DELTA_PCT:
-        setup["oi_regime"], setup["oi_confirms"] = "flat", 0
-        return
-    if direction == "LONG":
-        regime = "real_up" if delta > 0 else "short_cover"
-    else:  # SHORT
-        regime = "real_down" if delta > 0 else "long_liq"
-    setup["oi_regime"]   = regime
-    setup["oi_confirms"] = 1 if regime in ("real_up", "real_down") else 0
-
-
-def _publish_signal(analysis: dict, decision: str, direction: str,
-                    _dir_open: dict) -> bool:
-    """Publish an approved setup: re-anchor to the live X-Perp price, run the
-    last two guards, send it, link the setup row and mirror into autotrades.
-    Returns True only if a signal actually went out.
-
-    Extracted from run_scan 2026-08-10 so the zone-watch job publishes through
-    exactly this path. Duplicating it would mean two places that must stay in
-    sync on basis rescaling, the stale-entry guard, the spread gate, the
-    setup<->signal link and the autotrade hook.
-    """
-    _sent = False
-    # Snapshot the live X-Perp price (the instrument the user
-    # actually trades on OKX EU) at publish moment — signal
-    # levels re-anchor to it so entry/TP/SL match the user's
-    # chart. Falls back to the analysis feed price if X-Perp
-    # ticker is unavailable.
-    _stale = False
-    try:
-        _xp_px = get_xperp_price(analysis["symbol"])
-        live_px = _xp_px or get_current_price(analysis["symbol"])
-        if live_px and live_px > 0:
-            # Structure (zone bounds, recent high/low, structural
-            # TP levels, ATR) is measured on the DEEP GLOBAL feed,
-            # but the position is opened and monitored on the
-            # X-Perp, which trades at a small persistent discount
-            # (measured 2026-07-31: -0.11%..-0.18%, stdev only
-            # 0.01-0.04pp, stable day and night). Mixing the two
-            # puts the stop ~0.15% off the traded market's real
-            # structure — on a ~2% stop that is ~8% of the whole
-            # stop distance, always in the same direction. Rescale
-            # the global-derived levels into X-Perp space so every
-            # level and the entry live in one price space.
-            _basis = 1.0
-            if _xp_px:
-                try:
-                    _gp = get_current_price(analysis["symbol"])
-                    if _gp and _gp > 0:
-                        _b = _xp_px / _gp
-                        # Sanity-bound: a real basis is fractions of
-                        # a percent. Anything beyond 1% means one of
-                        # the feeds is stale/wrong — skip rescaling
-                        # rather than corrupt every level.
-                        if 0.99 <= _b <= 1.01:
-                            _basis = _b
-                        else:
-                            log.warning(
-                                f"  {analysis['symbol']}: implausible X-Perp basis "
-                                f"{(_b-1)*100:+.2f}% — levels left unscaled"
-                            )
-                except Exception as _be:
-                    log.debug(f"  basis calc failed {analysis['symbol']}: {_be}")
-            if _basis != 1.0:
-                for _k in ("recent_high", "recent_low", "tp1_level",
-                           "tp2_level", "entry_low", "entry_high", "atr"):
-                    try:
-                        _v = analysis.get(_k)
-                        if _v:
-                            analysis[_k] = float(_v) * _basis
-                    except (TypeError, ValueError):
-                        return False
-                log.info(
-                    f"  Levels rescaled to X-Perp space "
-                    f"(basis {(_basis-1)*100:+.3f}%)"
-                )
-            zone_px = float(analysis.get("current_price") or live_px)
-            drift   = abs(live_px - zone_px) / zone_px if zone_px else 0
-            _stale, _why = _entry_is_stale(analysis, live_px, direction)
-            if _stale:
-                log.warning(
-                    f"  Skip {analysis['symbol']} — stale entry: {_why} "
-                    f"(live {live_px}, zone {zone_px}, drift {drift*100:.2f}%)"
-                )
-            else:
-                analysis["zone_entry_price"] = zone_px   # keep zone for reference
-                analysis["current_price"]    = round(live_px, 8)
-                analysis["market_price"]     = round(live_px, 8)
-                log.info(
-                    f"  Entry price updated to live: {live_px} "
-                    f"(zone was {zone_px}, drift {drift*100:.2f}%)"
-                )
-    except Exception as e:
-        log.warning(f"  Live price fetch failed for {analysis['symbol']}: {e}")
-
-    if _stale:
-        # Claude approved it; the setup just went stale before we
-        # could publish. Tag like the caps so it is not counted
-        # as one of Claude's rejections, and so the frequency of
-        # this is measurable (it is NOT observable in backtest —
-        # that always fills at the zone).
-        try:
-            mark_setup_blocked(analysis.get("_setup_log_id"), "stale_entry")
-        except Exception as _mbe:
-            # Losing this tag is not cosmetic: an untagged sent=0 row
-            # reads as a Claude rejection, and that history is fed
-            # back to Claude as his own track record. Seen live on
-            # 2026-07-30 before the tagging existed at all.
-            log.warning(f"mark_setup_blocked failed, setup will look "
-                        f"like a Claude rejection: {_mbe}")
-        return False
-
-    # Execution-quality gate: the bid/ask gap on the X-Perp we
-    # actually trade. Paid in full on entry and again on exit,
-    # before the market has moved at all — so it comes straight
-    # out of a ~2% stop. Not a market prediction: the number is
-    # known exactly at decision time.
-    # Live spreads span 7000x, and global volume does NOT
-    # predict them — BICO is #3 in the world by turnover and
-    # still shows 0.54%, worse than HOME's 0.41% (measured
-    # 2026-08-09, after a HOME trade whose price ran away from
-    # the signal). So ranking the universe by volume, on either
-    # venue, cannot fix this; only the spread itself can.
-    _spr = analysis.get("book_spread_bps")
-    if (SPREAD_GATE_ENABLED and _spr is not None
-            and float(_spr) > SPREAD_MAX_BPS):
-        log.warning(
-            f"  Skip {analysis['symbol']} — spread {float(_spr):.1f}bp "
-            f"> {SPREAD_MAX_BPS:.0f}bp (thin X-Perp book)"
-        )
-        try:
-            mark_setup_blocked(analysis.get("_setup_log_id"), "wide_spread")
-        except Exception as _mbe:
-            # Losing this tag is not cosmetic: an untagged sent=0 row
-            # reads as a Claude rejection, and that history is fed
-            # back to Claude as his own track record. Seen live on
-            # 2026-07-30 before the tagging existed at all.
-            log.warning(f"mark_setup_blocked failed, setup will look "
-                        f"like a Claude rejection: {_mbe}")
-        return False
-
-    if send_signal(analysis):
-        _sent = True
-        _cache_signal(analysis["symbol"], direction)
-        if direction in _dir_open:
-            _dir_open[direction] += 1
-        log.info(f"  Signal sent: {analysis['symbol']} {direction}")
-        try:
-            mark_setup_sent(analysis.get("_setup_log_id"))
-        except Exception as _me:
-            log.warning(f"  mark_setup_sent failed: {_me}")
-        # Fetch the just-written signal row once, shared by the
-        # link below and the autotrade hook further down. Keyed
-        # on the id log_signal returned, not "newest OPEN row
-        # for this symbol" — that was a guess that held only
-        # while one setup per symbol per scan is generated.
-        _sig_row = None
-        try:
-            _sid = analysis.get("_signal_id")
-            if _sid:
-                _sig_row = get_signal_by_id(_sid)
-            else:
-                # No id means log_signal failed BOTH times (see send_signal),
-                # so this signal has no DB row at all. The old fallback here
-                # guessed "newest OPEN row for this symbol" — which in that
-                # exact situation resolves to a DIFFERENT, earlier trade.
-                # Linking the setup to it corrupts the record, and opening a
-                # real leveraged position against it hands that position
-                # another trade's levels and expiry, to be closed when THAT
-                # signal transitions. Announcing a signal we cannot monitor is
-                # bad; trading it against the wrong row is worse.
-                log.error("  signal has no DB row (log_signal failed twice) "
-                          "— not linking it and not auto-trading it")
-        except Exception as _ge:
-            log.warning(f"  Could not fetch new signal row: {_ge}")
-        # Link this setup_log row to its real position: from
-        # here its outcome comes from the real signal's close,
-        # not an independent shadow simulation on a different
-        # feed (found 2026-07-31 — the two disagreed on a real
-        # trade: shadow said TP1, the real position hit SL).
-        # A failure here must be loud: the row stays sent=1 with
-        # no signal_id, and is then excluded from BOTH resolvers
-        # until backfill_setup_signal_links() repairs it.
-        try:
-            if _sig_row:
-                link_setup_to_signal(analysis.get("_setup_log_id"), _sig_row["id"])
-        except Exception as _le:
-            log.warning(f"  link_setup_to_signal failed: {_le}")
-        # Autotrade: mirror the just-published signal into real
-        # OKX positions for onboarded users (async, fail-safe).
-        try:
-            autotrader.open_positions_for_signal(_sig_row)
-        except Exception as _ae:
-            log.warning(f"  Autotrade open hook failed: {_ae}")
-    else:
-        log.warning(
-            f"  Signal NOT sent: {analysis['symbol']} {direction} "
-            f"({analysis.get('confidence','?')}) — send_signal returned False"
-        )
-        # Same accounting gap as the two caps above: a setup
-        # Claude APPROVED that failed to send (Telegram API
-        # error, now retried once — see _send_message) sits at
-        # sent=0 with no block_reason, silently counted as a
-        # Claude rejection. Found 2026-07-30 from a real setup
-        # (PUMPUSDT) that reached TP2 and was approved 3
-        # consecutive scans, never sent, never tagged.
-        try:
-            mark_setup_blocked(analysis.get("_setup_log_id"), "send_failed")
-        except Exception as _mbe:
-            # Losing this tag is not cosmetic: an untagged sent=0 row
-            # reads as a Claude rejection, and that history is fed
-            # back to Claude as his own track record. Seen live on
-            # 2026-07-30 before the tagging existed at all.
-            log.warning(f"mark_setup_blocked failed, setup will look "
-                        f"like a Claude rejection: {_mbe}")
-    return _sent
-
-
-def _check_zone_watch():
-    """Fire parked setups the moment price trades back into their zone.
-
-    Runs every ZONE_WATCH_POLL_SEC. One bulk ticker call covers every watched
-    symbol, so the cost does not grow with the number of setups being watched.
-
-    The caps are re-checked HERE, not at park time: minutes may have passed and
-    the open book has moved. A setup that was inside the direction cap when
-    Claude approved it can be outside it by the time price finally comes back.
-    """
-    if not ZONE_WATCH_ENABLED:
-        return
-    try:
-        rows = watch_active()
-        if not rows:
-            return
-        now = time.time()
-        prices = get_xperp_prices_bulk()
-        # Live book state, for the same caps run_scan applies.
-        _dir_open = {"LONG": 0, "SHORT": 0}
-        _open_syms = set()
-        for _s in get_open_signals():
-            _d = str(_s.get("direction", "")).upper()
-            if _d in _dir_open:
-                _dir_open[_d] += 1
-            _open_syms.add(_s["symbol"])
-
-        for r in rows:
-            try:
-                if now >= float(r["expires_at"]):
-                    watch_resolve(r["id"], "expired")
-                    log.info(f"  Watch expired: {r['symbol']} {r['direction']} "
-                             f"— price never returned to zone")
-                    continue
-                # The symbol may have been blocked, or opened by another route,
-                # while we waited.
-                if r["symbol"] in _open_syms or is_symbol_auto_blocked(r["symbol"]):
-                    watch_resolve(r["id"], "cancelled")
-                    continue
-                px = prices.get(_base_of_symbol(r["symbol"]))
-                if not px:
-                    continue
-                if not (float(r["zone_low"]) <= px <= float(r["zone_high"])):
-                    continue
-
-                analysis = json.loads(r["payload"])
-                direction = str(analysis.get("direction", "")).upper()
-                if (MAX_SAME_DIRECTION_POSITIONS > 0
-                        and _dir_open.get(direction, 0) >= MAX_SAME_DIRECTION_POSITIONS):
-                    watch_resolve(r["id"], "cancelled")
-                    try:
-                        mark_setup_blocked(analysis.get("_setup_log_id"), "dir_cap")
-                    except Exception as _mbe:
-                        # Losing this tag is not cosmetic: an untagged sent=0 row
-                        # reads as a Claude rejection, and that history is fed
-                        # back to Claude as his own track record. Seen live on
-                        # 2026-07-30 before the tagging existed at all.
-                        log.warning(f"mark_setup_blocked failed, setup will look "
-                                    f"like a Claude rejection: {_mbe}")
-                    continue
-
-                log.info(f"  Zone hit: {r['symbol']} {direction} @ {px} "
-                         f"(waited {(now - float(r['created_at']))/60:.0f}min)")
-                if _publish_signal(analysis, analysis.get("decision", direction),
-                                   direction, _dir_open):
-                    watch_resolve(r["id"], "published", px)
-                    # Any other row for this symbol — a duplicate parked before
-                    # the scan-side guard existed, or a genuine opposite-side
-                    # setup — is now stale: the check at the top of this loop
-                    # cancels it on this same pass instead of publishing twice.
-                    _open_syms.add(r["symbol"])
-                else:
-                    # _publish_signal already tagged why (stale/spread/send fail).
-                    watch_resolve(r["id"], "cancelled", px)
-            except Exception as _e:
-                log.warning(f"  watch check failed for {r.get('symbol','?')}: {_e}")
-    except Exception as e:
-        log.warning(f"Zone-watch job failed: {e}")
-
-
-def _attach_approach(setup: dict, df_15m: dict) -> None:
-    """How far price already travelled IN THE TRADE'S DIRECTION before entry.
-
-    Negative means price came INTO the zone against us — the genuine pullback
-    this strategy is built on. Positive means we are joining a move already in
-    progress, i.e. chasing.
-
-    TELEMETRY ONLY. It sizes nothing and filters nothing.
-
-    This docstring used to quote a table where the stop rate quadrupled with
-    run-up, and said the value was used for size. Both were wrong. The sizing
-    rule was built on 2026-08-20 and reverted the same hour: that table was an
-    artifact of locating each trade's candle by a stored bar INDEX against an
-    array that had been refetched and shifted since. Re-measured with bars
-    located by timestamp, the effect is gone — stop rate sits at 12-16% across
-    all six buckets with no monotonicity. config.py APPROACH_LOOKBACK_BARS
-    carries the full account and the honest numbers; read that before building
-    anything on this field again.
-    """
-    try:
-        closes = df_15m.get("close") or []
-        if len(closes) <= _APPROACH_LOOKBACK_BARS:
-            return
-        past = float(closes[-1 - _APPROACH_LOOKBACK_BARS])
-        now = float(setup.get("current_price") or closes[-1])
-        if past <= 0:
-            return
-        move = (now - past) / past * 100.0
-        setup["approach_pct"] = round(
-            move if str(setup.get("direction", "")).upper() == "LONG" else -move, 3
-        )
-    except (TypeError, ValueError, IndexError):
-        return
 
 
 def _base_of_symbol(symbol: str) -> str:
     return symbol[:-4] if symbol.endswith("USDT") else symbol
 
 
-def run_scan():
-    # Phase timing. Publish latency is what drags the fill away from the
-    # zone, and entry drift is the single largest cost in the book, so the
-    # breakdown is logged every scan rather than guessed at.
-    _ph_t0 = time.time()
-    _ph_smc = _ph_light = _ph_fetch = 0.0
+def _venue_analysis(symbol: str, setup: dict, btc_change: float = 0.0) -> dict:
+    """Translate the frozen direct-venue setup into the existing signal schema."""
+    direction = setup["direction"]
+    return {
+        "symbol": symbol, "direction": direction, "decision": direction,
+        "confidence": "HIGH", "risk_score": 1,
+        "reason": f"Frozen X-Perp module: {setup['module']}",
+        "counter": "The active direct-venue regime may change after entry",
+        "current_price": setup["entry"], "market_price": setup["entry"],
+        "atr": setup["atr"], "fixed_stop_atr": 2.0,
+        "fixed_target_r": setup["target_r"], "entry_source": "MARKET",
+        "entry_low": setup["entry"], "entry_high": setup["entry"],
+        "mtf_score": 18, "mtf_score_max": 18, "rsi": 50,
+        "volume_ratio": 1.0, "session": setup["utc_session"],
+        "swing_trend": "bull" if direction == "LONG" else "bear",
+        "signals": [f"Venue module {setup['module']}",
+                    f"BTC regime {setup['btc_regime']}",
+                    f"Fixed target {setup['target_r']:.2f}R"],
+        "source": "venue_regime",
+        "signal_bar_ts": float(setup["signal_bar_ts"]),
+        "eff_ratio": setup["eff_ratio"], "btc_change": btc_change,
+        # Every signal in the current deployment is visible in Telegram and
+        # tracked in the DB, but is permanently ineligible for real orders.
+        "_shadow_only": DEPLOYMENT_MODE == "shadow",
+    }
+
+
+def _run_venue_strategy_scan() -> None:
+    """Fast deterministic production path for the frozen X-Perp portfolio.
+
+    It deliberately skips Claude, news scoring, legacy SMC and adaptive sizing.
+    In shadow deployment it publishes ordinary-looking paper signals while the
+    DB flag prevents every autotrade path from acting on them.
+    """
     now_utc = datetime.now(timezone.utc)
-
-    # TP/SL monitoring moved to dedicated 1-min job (_monitor_open_signals)
-
-    # Weekend filter (Mon=0 ... Sun=6)
     if not TRADE_WEEKENDS and now_utc.weekday() >= 5:
-        log.info(f"Weekend ({now_utc.strftime('%A')}) — new-signal scan skipped")
+        log.info("Venue scan skipped: weekend")
+        return
+    if not (TRADING_HOURS_START <= now_utc.hour < TRADING_HOURS_END):
+        log.info("Venue scan skipped: outside configured hours")
+        return
+    if REGIME_FILTER_MODE == "off":
+        log.warning("Venue scan disabled by REGIME_FILTER_MODE=off")
         return
 
-    # Trading hours filter (UTC)
-    utc_hour = now_utc.hour
-    if not (TRADING_HOURS_START <= utc_hour < TRADING_HOURS_END):
-        log.info(f"Outside trading hours (UTC {utc_hour:02d}:xx) — new-signal scan skipped")
+    available = set(get_xperp_instruments())
+    symbols = sorted(s for s in ROBUST_SYMBOLS if _base_of_symbol(s) in available)
+    if "BTCUSDT" not in symbols:
+        log.warning("Venue scan refused: BTC X-Perp context is unavailable")
         return
 
-    # Daily kill-switch: N consecutive SL among today's closed signals →
-    # stop generating new signals until the next Riga day. Monitoring of
-    # already-open positions continues (separate 1-min job).
-    if KILL_SWITCH_SL_STREAK > 0:
-        try:
-            _now_riga  = datetime.now(_riga_tz())
-            _day_start = _now_riga.replace(hour=0, minute=0, second=0, microsecond=0).timestamp()
-            _streak    = get_today_sl_streak(_day_start)
-            if _streak >= KILL_SWITCH_SL_STREAK:
-                _ks_key = f"kill_switch_notified_{_now_riga.strftime('%Y%m%d')}"
-                if not get_bot_state(_ks_key):
-                    set_bot_state(_ks_key, str(_streak))
-                    send_status(
-                        f"🛑 *Дневной стоп: {_streak} стопа подряд.*\n"
-                        f"Новые сигналы приостановлены до завтра — рынок сегодня "
-                        f"рубит стопы, пересидим. Открытые позиции ведутся как обычно."
-                    )
-                log.warning(f"Kill-switch: {_streak} consecutive SL today — scan skipped")
-                return
-        except Exception as e:
-            log.warning(f"Kill-switch check failed (scan continues): {e}")
-
-    log.info("=== Scan started (SMC mode) ===")
-
-    try:
-        # Step 0a: Global macro news (Groq free tier)
-        news = get_market_news()
-        log.info(
-            f"News: {news['sentiment']} — {news['summary']} "
-            f"({news['headline_count']} headlines)"
-        )
-        if news["pause"]:
-            # Log only — no Telegram notification (user requested silence on pause/resume)
-            trigger = news.get("trigger", "") or news.get("summary", "")
-            log.warning(f"News agent: PAUSE — extreme market event, skipping scan ({trigger})")
-            return
-
-        # Step 0a-2: Detect and broadcast high-impact macro events
-        try:
-            headlines = fetch_recent_headlines()
-            events = detect_major_events(headlines)
-            for ev in events:
-                if not _is_alert_duplicate(ev["name"]):
-                    if send_news_alert(ev):
-                        _news_alert_cache[ev["name"]] = time.time()
-                        log.info(f"News alert sent: {ev['name']} ({ev['direction']} {ev['level']}x)")
-        except Exception as e:
-            log.warning(f"Major event check failed: {e}")
-
-        # Step 0b: BTC 1h change for correlation filter + 1D for Claude macro context
-        btc_change = get_btc_change_1h()
-        btc_change_1d = get_btc_change_1d()
-        log.info(f"BTC change: {btc_change:+.2f}% 1h, {btc_change_1d:+.2f}% 1D")
-
-        # Auto-block symbols with consistently bad stats (local DB, no API calls)
-        new_blocks = auto_block_bad_symbols()
-        for b in new_blocks:
-            log.info(f"  Auto-blocked: {b['reason']}")
-
-        # Step 1: top 25 liquid coins (quality filtered)
-        coins = get_top_coins()
-        before_blocks = len(coins)
-        coins = [s for s in coins if not is_symbol_auto_blocked(s)]
-        if len(coins) != before_blocks:
-            log.info(f"Auto-block: skipped {before_blocks - len(coins)} blocked symbol(s)")
-
-        # OKX EU tradability gate: keep only coins with a live X-Perp contract —
-        # a signal on a coin the user can't open (no X-Perp) is useless.
-        xperp_bases = set(get_xperp_instruments())
-        if xperp_bases:
-            before_xp = len(coins)
-            coins = [s for s in coins if s[:-len("USDT")] in xperp_bases]
-            if len(coins) != before_xp:
-                log.info(f"X-Perp gate: {before_xp} → {len(coins)} coins tradable on OKX EU")
-
-        mode = "whitelist" if ALLOWED_SYMBOLS else "auto top-volume"
-        log.info(f"Fetched {len(coins)} coins ({mode})")
-
-        setups = []
-        shadow_setups = []  # filter-variant D only — never real signals, see below
-        smc_diag = {}  # funnel diagnostics: how many coins reached scoring + best score
-
-        # Step 2: SMC filter — BOS + confirmation + 1h/4h trend + BTC correlation
-        # Candles are fetched CONCURRENTLY (was serial + a 0.2s sleep per coin,
-        # ~56s for 25 coins — the bulk of publish latency, which is what lets
-        # price drift out of the entry zone before the signal goes out). Only
-        # the network wait overlaps; analysis stays on this thread so setups
-        # keep a deterministic order and the diag counters need no locking.
-        # Most scans now hit the candle cache and do no network work at all;
-        # this bounds the cost of the scans that follow a bar close.
-        _SCAN_FETCH_WORKERS = 6      # well under OKX public rate limits
-
-        def _fetch_all(sym):
-            return sym, (get_klines(sym), get_klines_1h(sym),
-                         get_klines_4h(sym), get_klines_1d(sym))
-
-        _t0 = time.time()
-        _fetched = {}
-        with ThreadPoolExecutor(max_workers=_SCAN_FETCH_WORKERS) as _ex:
-            for _fut in as_completed([_ex.submit(_fetch_all, s) for s in coins]):
-                try:
-                    _sym, _dfs = _fut.result()
-                    _fetched[_sym] = _dfs
-                except Exception as e:
-                    log.warning(f"  Fetch failed: {e}")
-        _ph_fetch = time.time() - _t0
-        log.info(f"Candles: {len(_fetched)}/{len(coins)} symbols in {_ph_fetch:.1f}s")
-
-        _ph_t_smc = time.time()
-        for symbol in coins:
-            if symbol not in _fetched:
-                continue
+    fetched = {}
+    def _fetch(symbol: str):
+        return symbol, get_klines_xperp(symbol, limit=400 if symbol == "BTCUSDT" else 120)
+    with ThreadPoolExecutor(max_workers=4) as pool:
+        for future in as_completed([pool.submit(_fetch, symbol) for symbol in symbols]):
             try:
-                df_15m, df_1h, df_4h, df_1d = _fetched[symbol]
-                setup  = analyze_coin_smc(df_15m, df_1h, symbol, df_4h, btc_change, df_1d,
-                                          diag=smc_diag, include_shadow=True)
-                if setup and setup.get("_shadow_only"):
-                    shadow_setups.append(setup)
-                elif setup:
-                    _apply_knn_overlay(setup, symbol)
-                    _attach_approach(setup, df_15m)
-                    log.info(
-                        f"  SMC setup: {symbol:12s}  {setup['direction']}  "
-                        f"1d={setup.get('trend_1d','?')} 4h={setup['trend_4h']} 1h={setup['trend_1h']}  "
-                        f"signals={setup['signals']}"
-                    )
-                    setups.append(setup)
-            except Exception as e:
-                log.warning(f"  Skip {symbol}: {e}")
+                symbol, candles = future.result()
+                if candles:
+                    fetched[symbol] = candles
+            except Exception as exc:
+                log.warning("Venue candle fetch failed: %s", exc)
 
-        log.info(f"SMC filter: {len(setups)} setups from {len(coins)} coins")
-        # Funnel: how many coins survived ALL structural gates to reach scoring,
-        # and the best score seen — distinguishes "strict gate" (close miss) from
-        # "no structure today" (0 reach). best vs MTF_MIN_SCORE shows the gap.
-        from config import MTF_MIN_SCORE as _MTF_MIN
-        log.info(
-            f"  SMC funnel: {smc_diag.get('reached_score', 0)}/{len(coins)} reached scoring · "
-            f"best score {smc_diag.get('best_score', 0)}/{_MTF_MIN} needed "
-            f"({smc_diag.get('best_symbol', '-')}) · "
-            f"{smc_diag.get('score_fail', 0)} missed score gate"
-        )
-        _last_scan_stats["coins"]  = len(coins)
-        _last_scan_stats["setups"] = len(setups)
-        _last_scan_stats["ts"]     = time.time()
-
-        # Step 3: remove duplicates
-        # Also block any symbol that already has an OPEN or TP1_PARTIAL position in DB.
-        # This prevents re-signalling a coin we're already trading (e.g. BNB hit TP1,
-        # still waiting for TP2 — bot must not open a second trade on BNB).
-        _active_now = {sig["symbol"] for sig in get_open_signals()}
-        # A setup parked by zone-watch has NOT been published yet, so it leaves
-        # no trace in _signal_cache or in the open-signal set — the next scan
-        # used to re-find it, pay Claude again, and park a SECOND copy. Both
-        # copies then fired, sending duplicate signals and opening duplicate
-        # positions. Seen live 2026-08-13 (HYPE parked twice, 5 min apart, two
-        # distinct Claude verdicts). Watches live up to ZONE_WATCH_MINUTES, so
-        # the window was wide enough for a dozen copies.
+    btc = fetched.get("BTCUSDT")
+    if not btc:
+        log.warning("Venue scan refused: BTC candles are unavailable")
+        return
+    active = {row["symbol"] for row in get_open_signals()}
+    # Blocked symbols are skipped here too. The admin panel could block a ticker
+    # and this scan would keep publishing it, which made the control a placebo.
+    blocked = {row["symbol"] for row in get_active_symbol_blocks()}
+    if blocked:
+        log.info("Venue scan: %d blocked symbol(s) skipped", len(blocked))
+    published = 0
+    for symbol in symbols:
+        candles = fetched.get(symbol)
+        if not candles or symbol in active or symbol in blocked:
+            continue
         try:
-            # Expired-but-not-yet-resolved rows must NOT block: the watch job
-            # clears them on its own cycle, and until then the setup is dead.
-            _now_ts = time.time()
-            _watching_now = ({w["symbol"] for w in watch_active()
-                              if float(w["expires_at"]) > _now_ts}
-                             if ZONE_WATCH_ENABLED else set())
-        except Exception as _we:
-            log.warning(f"  watch_active failed, dedup falls back to cache only: {_we}")
-            _watching_now = set()
-        def _blocked(s):
-            sym = s["symbol"]
-            if sym in _active_now:
-                log.info(f"  Skip {sym} — already have open position")
-                return True
-            if sym in _watching_now:
-                log.info(f"  Skip {sym} {s['direction']} — already waiting for its zone")
-                return True
-            if _is_reject_cooled(sym, s["direction"], s.get("current_price"), s.get("atr")):
-                log.info(f"  Skip {sym} {s['direction']} — Claude rejected recently, price still in zone")
-                return True
-            return _is_duplicate(sym, s["direction"])
-        fresh = [s for s in setups if not _blocked(s)]
-        log.info(f"After dedup: {len(fresh)} fresh setups")
-        _last_scan_stats["fresh"] = len(fresh)
-
-        # Step 3b: news + funding enrichment
-        enriched = []
-        _news_blind = 0
-        _funding_skips = 0
-        for s in fresh:
-            # News check — block on bad news
-            news = check_news_sentiment(s["symbol"])
-            # A gate that fails open must say so. The CryptoPanic version went
-            # 403 and returned "safe" for every coin for an unknown length of
-            # time, and nothing in the logs showed it (fixed 2026-08-16).
-            if not news.get("checked", True):
-                _news_blind += 1
-            if not news["safe"]:
-                log.info(f"  Skip {s['symbol']} — {news['reason']}")
-                continue
-            # Funding rate — fetch + hard filter crowded positions.
-            # Counted: a skipped setup never reaches setup_log, so this gate
-            # was invisible -- it refuses trades and left no trace to weigh
-            # that against. At the median 1.77% stop, the 0.05% it avoids is
-            # 0.028R; the trade it refuses is worth about +0.296R.
-            fr = get_funding_rate(s["symbol"])
-            s["funding_rate"] = fr
-            if fr is not None:
-                if s["direction"] == "LONG"  and fr >  0.0005:   # >+0.05% = crowded longs
-                    log.info(f"  Skip {s['symbol']} LONG — funding {fr*100:+.3f}% crowded")
-                    _funding_skips += 1
-                    continue
-                if s["direction"] == "SHORT" and fr < -0.0005:   # <-0.05% = crowded shorts
-                    log.info(f"  Skip {s['symbol']} SHORT — funding {fr*100:+.3f}% crowded")
-                    _funding_skips += 1
-                    continue
-            enriched.append(s)
-        if _funding_skips:
-            log.info(f"  Funding gate refused {_funding_skips} setup(s) this scan")
-        if _news_blind:
-            log.warning(
-                f"  News gate BLIND for {_news_blind}/{len(fresh)} setups "
-                f"— feeds unreachable, bad-news filtering did not run"
+            market = get_xperp_price(symbol) or float(candles["close"][-1])
+            rows = venue_setups(
+                candles, btc, entry_time=float(candles["time"][-1]) + KLINES_INTERVAL_SEC,
+                market_price=float(market), symbol=symbol,
             )
-
-        # Sort by quality score, keep only top MAX_SETUPS_TO_CLAUDE (saves tokens)
-        enriched.sort(key=_setup_rank, reverse=True)
-        if len(enriched) > MAX_SETUPS_TO_CLAUDE:
-            log.info(f"Token saver: top {MAX_SETUPS_TO_CLAUDE} of {len(enriched)} → Claude")
-            enriched = enriched[:MAX_SETUPS_TO_CLAUDE]
-
-        log.info(f"After news/funding/ranking: {len(enriched)} setups → sending to Claude")
-        _last_scan_stats["enriched"] = len(enriched)
-
-        # Shadow features — tag only the ≤7 setups that go to Claude (cheap).
-        # NONE of these affect the decision and none are shown to Claude; they
-        # are written to setup_log so their edge can be measured before anyone
-        # decides to use them. Added 2026-08-07 after a walk-forward test showed
-        # the price-shaped features cannot predict a stop at all (AUC 0.52 out
-        # of sample), leaving only non-price candidates — none of which exist in
-        # the historical seed, so the clock on them can only start live.
-        _ev_hours, _ev_name = _next_event_context()
-        for _s in enriched:
-            try:
-                _attach_oi(_s)
-            except Exception as _e:
-                log.debug(f"  OI attach failed {_s.get('symbol','?')}: {_e}")
-            try:
-                _attach_book(_s)
-            except Exception as _e:
-                log.debug(f"  book attach failed {_s.get('symbol','?')}: {_e}")
-            _s["hours_to_event"] = _ev_hours
-            _s["next_event"] = _ev_name
-
-        # Filter-variant experiment (variants D/F/I) — shadow-only setups that
-        # soft-failed exactly one relaxable gate (score/ctxmom/rsi_mid, see
-        # signal_filter.py _soft_fail). NEVER a real signal: separate list,
-        # capped, own Claude call, logged with sent=0/source='shadow'. Does not
-        # touch dedup, _is_reject_cooled, enriched, or anything downstream of it.
-        # Run AFTER the real LIGHT call below (see call site) so a live setup
-        # always gets first claim on the shared daily budget cap — the
-        # experiment must never be able to starve real trading of its verdict.
-        def _run_shadow_batch():
-            if not shadow_setups:
-                return
-            try:
-                shadow_setups.sort(key=_setup_rank, reverse=True)
-                # Per-reason quota: each soft-failed gate feeds its OWN variant
-                # arm, so a frequently-firing gate must not crowd the rarer ones
-                # out of the batch. Best 2 per reason, 8 total.
-                # As of 2026-08-07 only ONE reason is live — "ctxmom" (arm F);
-                # "score" (arm D) was removed on request. So this batch now
-                # costs at most 2 Claude verdicts per scan, not 8, and makes no
-                # call at all when empty (see the early return above).
-                _per_reason, shadow_batch = {}, []
-                for _sh in shadow_setups:
-                    _r = _sh.get("_shadow_reason", "")
-                    if _per_reason.get(_r, 0) >= 2 or len(shadow_batch) >= 8:
-                        continue
-                    _per_reason[_r] = _per_reason.get(_r, 0) + 1
-                    shadow_batch.append(_sh)
-                shadow_ctx = dict(news or {})
-                shadow_ctx["btc_1h"] = btc_change
-                shadow_ctx["btc_1d"] = btc_change_1d
-                shadow_analyses = analyze_batch_with_claude(shadow_batch, news_context=shadow_ctx)
-                for _sa in shadow_analyses:
-                    try:
-                        _sa["variants"] = compute_variants(_sa)
-                        # Keeps these out of AI-accuracy / mirror / Claude memory,
-                        # which all filter source='live'. See log_setup_candidate.
-                        _sa["source"] = "shadow"
-                        log_setup_candidate(_sa)
-                    except Exception as _sve:
-                        log.debug(f"shadow variant log failed: {_sve}")
-                log.info(f"Shadow (D/F/I): {len(shadow_analyses)} logged (no real signal)")
-            except Exception as _se:
-                log.warning(f"Shadow D/F/I batch failed: {_se}")
-
-        if not enriched:
-            # No real setups to prioritize budget for — safe to run shadow now.
-            _run_shadow_batch()
-            log.info("=== Scan complete — 0 signal(s) sent ===\n")
-            return
-
-        # Step 4: LIGHT tier — ONE batch call to Claude (cached rules + news + BTC macro)
-        claude_ctx = dict(news or {})
-        claude_ctx["btc_1h"] = btc_change
-        claude_ctx["btc_1d"] = btc_change_1d
-        _ph_smc = time.time() - _ph_t_smc   # SMC loop + ranking
-        _ph_t_light = time.time()
-        try:
-            analyses = analyze_batch_with_claude(enriched, news_context=claude_ctx)
-        except Exception as e:
-            log.error(f"Claude LIGHT batch call failed: {e}")
-            return
-
-
-        _ph_light = time.time() - _ph_t_light
-
-        # Step 4b: HEAVY tier — Sonnet second opinion on the strongest survivors.
-        # Only setups the LIGHT gate approved (LONG/SHORT, not LOW) with a high
-        # mtf_score qualify; capped per scan to protect the budget. Coin memory
-        # (recent outcomes) is injected so Sonnet learns from this symbol's past.
-        # Run the eligible HEAVY checks CONCURRENTLY. They were sequential, so
-        # up to CLAUDE_HEAVY_MAX_PER_SCAN Sonnet round-trips stacked end to end
-        # — the largest remaining block of publish latency once candle fetching
-        # was cached. The calls are independent, and the cap bounds concurrency,
-        # so this is a straight latency win. Every setup still gets exactly one
-        # HEAVY call; only the waiting overlaps.
-        _heavy_targets = []
-        for analysis in analyses:
-            if len(_heavy_targets) >= CLAUDE_HEAVY_MAX_PER_SCAN:
-                break
-            decision = analysis.get("decision", "NO TRADE")
-            conf     = analysis.get("confidence", "LOW").upper()
-            score    = int(analysis.get("mtf_score", 0) or 0)
-            if decision in ("LONG", "SHORT") and conf != "LOW" and score >= CLAUDE_HEAVY_MIN_SCORE:
-                _heavy_targets.append(analysis)
-
-        def _run_heavy(a):
-            history = get_recent_outcomes(a["symbol"], limit=CLAUDE_MEMORY_LIMIT)
-            return a, analyze_heavy(a, news_context=claude_ctx, history=history)
-
-        if _heavy_targets:
-            _t0 = time.time()
-            with ThreadPoolExecutor(max_workers=len(_heavy_targets)) as _ex:
-                for _fut in as_completed([_ex.submit(_run_heavy, a) for a in _heavy_targets]):
-                    try:
-                        a, heavy = _fut.result()
-                    except Exception as e:
-                        log.warning(f"  HEAVY check failed: {e}")
-                        continue
-                    for k in ("decision", "confidence", "risk_score",
-                              "trend_strength", "reason", "counter"):
-                        if k in heavy:
-                            a[k] = heavy[k]
-                    log.info(
-                        f"  HEAVY: {a['symbol']} → {a['decision']} "
-                        f"({a.get('confidence','?')}) risk={a.get('risk_score','?')} "
-                        f"— {a.get('reason','')}"
-                    )
-            log.info(f"  HEAVY: {len(_heavy_targets)} checks in {time.time()-_t0:.1f}s (parallel)")
-
-        # Book state at judgment time — how many positions in each direction were
-        # already open when Claude saw these setups. Snapshotted once here so the
-        # logged value is what Claude actually reasoned against, and reused as the
-        # starting count for the correlation cap in the send loop below.
-        _dir_open = {"LONG": 0, "SHORT": 0}
-        for _s in get_open_signals():
-            _d = str(_s.get("direction", "")).upper()
-            if _d in _dir_open:
-                _dir_open[_d] += 1
-
-        # Log all Claude-evaluated setups (approved and rejected) for admin history
-        for _a in analyses:
-            try:
-                # Filter-variant A/B: tag which variants would admit this setup,
-                # so each arm can later be replayed against the same verdict.
-                _a["variants"] = compute_variants(_a)
-            except Exception as _ve:
-                log.debug(f"variant tagging failed: {_ve}")
-            _a["open_same_dir"] = _dir_open.get(
-                str(_a.get("direction", "")).upper(), 0
-            )
-            try:
-                _a["_setup_log_id"] = log_setup_candidate(_a)
-            except Exception as _e:
-                log.debug(f"setup_log insert failed: {_e}")
-            # Reject cooldown: remember NO TRADEs so the next scans don't
-            # re-ask the same setup at the same price ("ask until yes").
-            try:
-                if _a.get("decision", "NO TRADE") == "NO TRADE":
-                    _cache_rejection(_a.get("symbol", ""), _a.get("direction", ""),
-                                     _a.get("current_price"), _a.get("atr"))
-            except Exception:
-                pass
-
-        # Upcoming high-impact macro events (CPI/FOMC/NFP) — warn on signals
-        event_warning = ""
-        try:
-            events = get_upcoming_high_impact_events(EVENT_WARN_HOURS)
-            if events:
-                ev = events[0]
-                cc = f"{ev['country']} " if ev.get("country") else ""
-                event_warning = (
-                    f"{cc}{ev['title']} через {ev['hours_until']}ч — "
-                    f"высокая волатильность, осторожно"
-                )
-        except Exception as e:
-            log.warning(f"Calendar check failed: {e}")
-
-        # Step 5: Send signals to Telegram (hard cap: max 3 per scan)
-        # SWEPT 2026-09-03 via the model's BT_LIVE_MAX_PER_SCAN and kept at 3.
-        #             trades      net R      maxDD   worst-ratio  profit/ulcer
-        #   2026-08-26  1570/1575  597.61/592.74  -14.86/-12.98  48.6/52.1  252.8/266.0
-        #   2024-07-31  1175/1186  287.90/291.42   -8.67/-11.22  54.7/37.0  130.7/116.6
-        #   2023-07-31   908/ 910  223.18/220.71   -9.24/-10.16  30.6/27.1   83.6/ 80.4
-        # (left 3, right 6.) On the current window raising it looked like a rare
-        # good trade: give up 0.8% of profit and take 13% less drawdown, with all
-        # three risk measures improving. It does not hold — both other windows,
-        # including the hostile one, move the other way.
-        #
-        # Worth remembering HOW this nearly shipped. The numbers came with a
-        # mechanism that sounded right: the direction cap fixes how many
-        # positions we hold, this one fixes how many we open per pass, so
-        # loosening it should spread entries across more symbols inside the same
-        # exposure. That story explains the one window it was invented on and
-        # nothing else. A mechanism that fits a single window is not evidence.
-        MAX_SIGNALS_PER_SCAN = 3
-        _ph_t_send = time.time()
-        sent_count = 0
-        # Concurrent same-direction exposure. Correlated alts in one direction
-        # do not diversify, they concentrate: one BTC move resolves them all the
-        # same way and 3 stops in a row halt trading for the rest of the day.
-        # _dir_open was seeded above from the open book and grows as this scan
-        # publishes, so the cap counts already-open plus published-this-scan.
-        for analysis in analyses:
-            try:
-                # Attach news context to each analysis for Telegram message
-                analysis["news_sentiment"] = news.get("sentiment", "")
-                analysis["news_summary"]   = news.get("summary", "")
-                analysis["event_warning"]  = event_warning
-
-                log.info(
-                    f"  Claude: {analysis['symbol']} → {analysis['decision']} "
-                    f"({analysis.get('confidence','?')}) — {analysis.get('reason','')}"
-                )
-                decision   = analysis.get("decision", "NO TRADE")
-                direction  = analysis.get("direction")
-                confidence = analysis.get("confidence", "LOW").upper()
-
-                # Guard: Claude must confirm setup direction, not flip it
-                if decision in ("LONG", "SHORT") and decision != direction:
-                    log.warning(f"  Skip {analysis['symbol']} — Claude flipped side blocked")
+            for row in rows:
+                row["signal_bar_ts"] = candles["time"][-1]
+                analysis = _venue_analysis(symbol, row)
+                setup_id = log_setup_candidate_once(analysis)
+                if not setup_id:
                     continue
+                analysis["_setup_log_id"] = setup_id
+                if not send_signal(analysis):
+                    mark_setup_blocked(setup_id, "send_failed")
+                    continue
+                mark_setup_sent(setup_id)
+                _cache_signal(symbol, row["direction"])
+                signal_id = analysis.get("_signal_id")
+                if signal_id:
+                    link_setup_to_signal(setup_id, signal_id)
+                published += 1
+        except Exception as exc:
+            log.warning("Venue strategy failed for %s: %s", symbol, exc)
+    _last_scan_stats.update(coins=len(symbols), setups=published, fresh=published,
+                            ts=time.time())
+    log.info("Venue scan complete: %s symbols, %s paper signals", len(symbols), published)
 
-                # SHADOW MODE: Claude still runs and is still logged, but the
-                # rules filter alone decides. The flipped-side guard stays — a
-                # reversed verdict is a contradiction, not a weaker opinion.
-                _gate = _claude_gate_enabled()
 
-                if confidence == "LOW":
-                    if _gate:
-                        log.info(f"  Skip {analysis['symbol']} — LOW confidence")
-                        continue
-                    log.info(f"  [shadow] {analysis['symbol']} — LOW confidence, trading anyway")
+def run_scan():
+    """Publish paper signals from the frozen X-Perp portfolio.
 
-                if decision == "NO TRADE" and not _gate:
-                    log.info(f"  [shadow] {analysis['symbol']} — Claude said NO TRADE, trading anyway")
-                    # send_signal refuses any NO TRADE outright, so without this the
-                    # shadow toggle silently did nothing for exactly the setups it
-                    # exists to let through: they came back as "send failed".
-                    analysis["_force_send"] = True
-
-                if decision != "NO TRADE" or not _gate:
-                    # Both caps withhold a setup Claude APPROVED. Tag why, so it
-                    # is not later counted as one of Claude's rejections and can
-                    # be judged on its own realised outcome (get_cap_impact_stats).
-                    if sent_count >= MAX_SIGNALS_PER_SCAN:
-                        log.info(f"  Skip {analysis['symbol']} — scan cap {MAX_SIGNALS_PER_SCAN} reached")
-                        try:
-                            mark_setup_blocked(analysis.get("_setup_log_id"), "scan_cap")
-                        except Exception as _mbe:
-                            # Losing this tag is not cosmetic: an untagged sent=0 row
-                            # reads as a Claude rejection, and that history is fed
-                            # back to Claude as his own track record. Seen live on
-                            # 2026-07-30 before the tagging existed at all.
-                            log.warning(f"mark_setup_blocked failed, setup will look "
-                                        f"like a Claude rejection: {_mbe}")
-                        continue
-
-                    if (MAX_SAME_DIRECTION_POSITIONS > 0
-                            and _dir_open.get(decision, 0) >= MAX_SAME_DIRECTION_POSITIONS):
-                        log.info(
-                            f"  Skip {analysis['symbol']} — {_dir_open[decision]} {decision} "
-                            f"already open, correlation cap {MAX_SAME_DIRECTION_POSITIONS} reached"
-                        )
-                        try:
-                            mark_setup_blocked(analysis.get("_setup_log_id"), "dir_cap")
-                        except Exception as _mbe:
-                            # Losing this tag is not cosmetic: an untagged sent=0 row
-                            # reads as a Claude rejection, and that history is fed
-                            # back to Claude as his own track record. Seen live on
-                            # 2026-07-30 before the tagging existed at all.
-                            log.warning(f"mark_setup_blocked failed, setup will look "
-                                        f"like a Claude rejection: {_mbe}")
-                        continue
-
-                    # Zone watch: hold instead of publishing at whatever price
-                    # is showing. The setup's edge is priced AT its zone — see
-                    # config.py ZONE_WATCH_ENABLED for the measurement. The
-                    # publish path itself is unchanged; only its timing moves.
-                    _zl, _zh = analysis.get("entry_low"), analysis.get("entry_high")
-                    if (ZONE_WATCH_ENABLED and _zl and _zh and float(_zh) > float(_zl)):
-                        try:
-                            watch_add(analysis, float(_zl), float(_zh),
-                                      ZONE_WATCH_MINUTES * 60)
-                            log.info(
-                                f"  Watching {analysis['symbol']} {direction} — "
-                                f"zone {_zl}-{_zh}, up to {ZONE_WATCH_MINUTES:.0f}min"
-                            )
-                        except Exception as _we:
-                            log.warning(f"  watch_add failed, publishing now: {_we}")
-                            if _publish_signal(analysis, decision, direction, _dir_open):
-                                sent_count += 1
-                    elif _publish_signal(analysis, decision, direction, _dir_open):
-                        sent_count += 1
-            except Exception as e:
-                log.error(f"  Error sending {analysis.get('symbol','?')}: {e}")
-
-        _last_scan_stats["sent"] = sent_count
-        # Shadow batch runs LAST, off the critical path. It is a Claude
-        # round-trip that cannot affect any real signal, and it used to sit
-        # between the LIGHT verdict and order dispatch - so every live order
-        # waited on it, and the entry drifted further from the zone while it
-        # ran. Real calls still claim the daily budget first, which was the
-        # reason for the old placement; running last satisfies it strictly
-        # better. No early return sits between here and the LIGHT call.
-        _run_shadow_batch()
-
-        log.info(f"Scan phases: fetch {_ph_fetch:.1f}s, smc+rank {_ph_smc:.1f}s, "
-                 f"light {_ph_light:.1f}s, "
-                 f"send {time.time()-_ph_t_send:.1f}s, total {time.time()-_ph_t0:.1f}s")
-        # Persist the breakdown too. The log lives on the host and is not
-        # reachable from where this gets analysed, so without this the timing
-        # could be collected but never read. Last 50 scans, rendered in the
-        # admin report next to the config.
-        try:
-            _ph_hist = json.loads(get_bot_state("scan_phase_ms") or "[]")
-            _ph_hist.append({"t": round(time.time()),
-                             "fetch": round(_ph_fetch, 1),
-                             "smc": round(_ph_smc, 1),
-                             "light": round(_ph_light, 1),
-                             "send": round(time.time() - _ph_t_send, 1),
-                             "total": round(time.time() - _ph_t0, 1),
-                             "fund_skip": _funding_skips,
-                             "sent": sent_count})
-            # 50 records is about four hours. A scan publishes a signal maybe
-            # once in fifty, so filtering to "scans that sent something" left
-            # the crypto report with nothing at all to show. A day of history
-            # costs a few KB.
-            set_bot_state("scan_phase_ms", json.dumps(_ph_hist[-300:]))
-        except Exception as _pe:
-            log.debug(f"scan phase persist failed: {_pe}")
-        log.info(f"=== Scan complete — {sent_count} signal(s) sent ===\n")
-
-    except Exception as e:
-        log.error(f"Scan failed: {e}")
+    The old SMC scan was removed on 2026-09-16. It was not a fallback but a
+    second strategy writing into the same tables, and a flag that can switch it
+    back on is a trapdoor rather than an off switch.
+    """
+    return _run_venue_strategy_scan()
 
 
 # ── Morning digest ────────────────────────────────────────────────────────────
@@ -5243,29 +3805,6 @@ def _monitor_open_signals():
         log.warning(f"Autotrade exchange-close poll failed: {e}")
 
 
-def _shadow_tracker_job():
-    """15-min job: resolve outcomes for logged setups.
-
-    Two disjoint populations, two different sources of truth:
-      - rejected/shadow setups have no real position, so _track_setup_outcomes()
-        simulates their outcome on the deep global feed (the only data available).
-      - sent setups have a REAL position; resolve_sent_setups_from_signals()
-        copies its actual close instead of simulating a second, independent
-        outcome that could contradict it (see get_unresolved_setups' exclusion
-        of signal_id rows and link_setup_to_signal in the send loop).
-    """
-    try:
-        _track_setup_outcomes()
-    except Exception as e:
-        log.warning(f"Shadow tracker job failed: {e}")
-    try:
-        n = resolve_sent_setups_from_signals()
-        if n:
-            log.info(f"Shadow tracker: resolved {n} sent setup(s) from real signal outcomes")
-    except Exception as e:
-        log.warning(f"Sent-setup resolution failed: {e}")
-
-
 # Each (csv, flag) seeds once. Add new batches as new tuples — already-seeded
 # batches skip via their own bot_state flag, so redeploys never re-seed and new
 # batches load independently of old ones.
@@ -5317,63 +3856,6 @@ _BT_SEED_BATCHES = [
 _BT_SEED_GENERATION = "okx_honest_2026_08_25"
 
 
-def maybe_seed_backtest():
-    """One-shot per batch: load backtest trades into setup_log as Claude memory
-    priors (source='backtest'). Each batch gated by its own bot_state flag so
-    redeploys never re-seed and new batches load on top of old ones.
-    """
-    import csv as _csv
-
-    # Generation guard: wipe stale priors before seeding the corrected set.
-    try:
-        if get_bot_state("bt_seed_generation") != _BT_SEED_GENERATION:
-            _purged = delete_backtest_seed_rows()
-            set_bot_state("bt_seed_generation", _BT_SEED_GENERATION)
-            # Clear the per-batch flags too, so the new batch actually loads.
-            for _f in ("bt_seed_2024_done", "bt_seed_2024b_done",
-                       "bt_seed_2022_done", "bt_seed_okx2026_done",
-                       "bt_seed_okx_honest_done"):
-                set_bot_state(_f, "")
-            log.info(f"Claude priors: purged {_purged} stale backtest rows "
-                     f"(generation → {_BT_SEED_GENERATION})")
-    except Exception as e:
-        log.warning(f"Prior purge failed (will retry next boot): {e}")
-    for fname, flag in _BT_SEED_BATCHES:
-        try:
-            if get_bot_state(flag):
-                continue
-            path = os.path.join(_BT_SEED_DIR, fname)
-            if not os.path.exists(path):
-                log.info(f"Seed CSV {fname} not found — skipping")
-                continue
-            with open(path, newline="", encoding="utf-8") as f:
-                rows = list(_csv.DictReader(f))
-            n = seed_backtest_outcomes(rows)
-            set_bot_state(flag, str(n))
-            log.info(f"Claude memory seeded: {n} trades from {fname} → setup_log[source=backtest]")
-        except Exception as e:
-            log.warning(f"Backtest seeding {fname} failed (will retry next boot): {e}")
-
-    # One-shot backfill: rows seeded before the net_r column existed have
-    # net_r=NULL → re-read the CSVs and fill it so expectancy (avg R) works
-    # on the existing priors without a full re-seed. Gated once.
-    if not get_bot_state("bt_net_r_backfilled"):
-        total = 0
-        for fname, _flag in _BT_SEED_BATCHES:
-            try:
-                path = os.path.join(_BT_SEED_DIR, fname)
-                if not os.path.exists(path):
-                    continue
-                with open(path, newline="", encoding="utf-8") as f:
-                    rows = list(_csv.DictReader(f))
-                total += backfill_backtest_net_r(rows)
-            except Exception as e:
-                log.warning(f"net_r backfill {fname} failed (will retry next boot): {e}")
-                return
-        set_bot_state("bt_net_r_backfilled", str(total))
-        log.info(f"Backtest net_r backfilled on {total} seeded rows")
-
-
 def start_bot():
     log.info("Starting Crypto Signal Bot...")
     # Data source diagnostics — OKX public API (EU region: no geoblock, no proxy)
@@ -5389,9 +3871,6 @@ def start_bot():
 
     # Cooldowns survive redeploys (2026-08-03) — must load before the first scan.
     _cooldowns_load()
-
-    # One-shot Claude memory seeding from historical backtest (2024+)
-    maybe_seed_backtest()
 
     # Self-healing backfill (2026-07-31 fix): link any sent setup_log rows from
     # before this fix to their real signal, so their outcome gets corrected
@@ -5431,9 +3910,10 @@ def start_bot():
                 _sched = (f"{_days}, {TRADING_HOURS_START:02d}:00–"
                           f"{TRADING_HOURS_END % 24:02d}:00 UTC")
             send_status(
-                "🤖 *Crypto Signal Bot Online*\n"
-                f"Сканирую топ-{TOP_COINS_COUNT} монет каждые "
-                f"{SCAN_INTERVAL_MINUTES} мин ({_sched})."
+                "🧪 *Crypto Bot Online — SHADOW*\n"
+                f"Детерминированные X-Perp фильтры, скан каждые "
+                f"{SCAN_INTERVAL_MINUTES} мин ({_sched}).\n"
+                "Реальные ордера отключены. Нейросеть не принимает решений."
             )
     except Exception as e:
         log.warning(f"Could not send startup message: {e}")
@@ -5477,28 +3957,9 @@ def start_bot():
         timezone="UTC",
     )
 
-    # Zone watch — fires parked setups the instant price re-enters their zone.
-    # Seconds, not minutes: overpaying 0.05% on entry costs ~27% of the edge
-    # (config.py ZONE_WATCH_ENABLED), so the gap between price touching the
-    # zone and the order going out is itself a cost. One bulk ticker call per
-    # tick, independent of how many setups are waiting.
-    if ZONE_WATCH_ENABLED:
-        scheduler.add_job(
-            _check_zone_watch, "interval",
-            seconds=max(5, ZONE_WATCH_POLL_SEC),
-            max_instances=1, coalesce=True,
-            # A late zone tick IS the bad fill it exists to avoid, so this
-            # one keeps a tight grace rather than the process-wide 60s.
-            misfire_grace_time=max(5, ZONE_WATCH_POLL_SEC),
-        )
-
-    # Shadow-outcome tracker — every 15 min, resolves rejected+sent setup results
-    # so the bot can learn whether Claude's verdicts matched reality.
-    scheduler.add_job(
-        _shadow_tracker_job, "cron",
-        minute="3,18,33,48",
-        timezone="UTC",
-    )
+    # Zone watch and the Claude outcome tracker went with the SMC scan: the venue
+    # path enters at market, so nothing is ever parked in a zone waiting for a
+    # touch, and nothing asks Claude for a verdict that would need scoring later.
 
     # Profit sweep — hourly check, but PROFIT_SWEEP_MIN_GAP_H is what actually
     # decides how often a user hears from it. Offer only; nothing is bought
@@ -5554,7 +4015,8 @@ def start_bot():
         log.info("Self-ping disabled (Railway does not idle-sleep)")
 
 
-start_bot()  # runs at module load — works with gunicorn
+if os.getenv("BOT_STARTUP_ENABLED", "1") != "0":
+    start_bot()  # gunicorn startup; disabled explicitly by offline verification
 
 def _warn_stop_rule_coupling() -> None:
     """Shout if STOP_CLOSE_CONFIRM is off, because it silently changes TWO things.
