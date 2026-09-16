@@ -45,3 +45,13 @@ funding_history.json
 # Backtest trade exports — regenerate with --export-trades, never commit
 raw_*.csv
 honest_*.csv
+
+# Research data stays on disk: reports/audit_*/ holds candle caches and result
+# tables (74 MB and growing). Scripts and write-ups are tracked; the tables they
+# produce are not - re-running the script rebuilds them.
+*.pkl
+*.joblib
+*cache*/
+reports/**/*.csv
+reports/**/*.json
+reports/**/*.log
