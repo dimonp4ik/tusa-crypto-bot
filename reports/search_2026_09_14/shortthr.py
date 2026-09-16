@@ -407,7 +407,7 @@ def short_candidates(coins):
             if j < 0 or not (iv[j][0] <= close < iv[j][1]) or iv[j][2] != 'SHORT':
                 continue
             r2, r14, b24 = float(F['rsi2'][i]), float(F['rsi14'][i]), float(F['btc24'][i])
-            hour = int((close // 3600) % 24)
+            hour = int((int(T1[i]) // 3600) % 24)    # _match читает час НАЧАЛА бара, не закрытия
             pop_ok = r2 >= 65.0 and r14 <= 41.0
             mor_ok = b24 >= 0.010 and 7 <= hour <= 12
             if not (pop_ok or mor_ok):
@@ -427,10 +427,13 @@ def short_candidates(coins):
 def short_entries(cands, a, b, cthr, hlo, hhi):
     out = []
     for row, r2, r14, b24, hour in cands:
-        if r2 >= a and r14 <= b:
-            out.append(row[:2] + ('r%d' % POP,) + row[3:])
-        elif b24 >= cthr and hlo <= hour <= hhi:
-            out.append(row[:2] + ('r%d' % MOR,) + row[3:])
+        pop_ok = r2 >= a and r14 <= b
+        mor_ok = b24 >= cthr and hlo <= hour <= hhi
+        if not (pop_ok or mor_ok):
+            continue
+        # bank_signals берёт ПЕРВОЕ подходящее правило по порядку списка RULES
+        k = min([i for i, ok in ((MOR, mor_ok), (POP, pop_ok)) if ok])
+        out.append(row[:2] + ('r%d' % k,) + row[3:])
     return out
 
 
