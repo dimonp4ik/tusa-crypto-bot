@@ -1,12 +1,8 @@
-"""
-Crypto Signal Bot — entry point.
+"""Crypto paper-trading bot driven by the frozen X-Perp venue router.
 
-Flow every N minutes:
-  1. Fetch top 45 USDT pairs from KuCoin (by 24h volume)
-  2. Run SMC technical filter (BOS + FVG + OB + multi-timeframe)
-  3. Send only strong setups to Claude Sonnet
-  4. Claude returns LONG / SHORT / NO TRADE
-  5. Telegram receives only actionable signals
+Every scan loads the audited symbols from X-Perp, evaluates the seven frozen
+deterministic modules and publishes new market-entry paper signals. No model
+decides whether a setup is accepted and this deployment cannot open an order.
 """
 
 import json
@@ -29,7 +25,7 @@ from config import (
     TRADE_WEEKENDS, KLINES_INTERVAL_SEC, SIGNAL_EXPIRY_HOURS, TRAIL_RUNNER_ENABLED,
     TRAIL_ATR_MULT, STOP_CLOSE_CONFIRM, MAX_SAME_DIRECTION_POSITIONS,
     STOP_EXCHANGE_BACKSTOP_R, MTF_MIN_SCORE, SHADOW_MIN_SCORE, TP1_R_MULT,
-    LIVE_HIST_EPOCH_TS, ZONE_WATCH_ENABLED, SPREAD_MAX_BPS, CLAUDE_GATE_ENABLED,
+    LIVE_HIST_EPOCH_TS, ZONE_WATCH_ENABLED, SPREAD_MAX_BPS,
     TP1_CLOSE_FRAC, EXIT_PROFILE,
     POST_TP1_STRONG_TRAIL_ATR_MULT, POST_TP1_WEAK_TRAIL_ATR_MULT,
     POST_TP1_STRONG_CLOSE_PROGRESS, POST_TP1_STRONG_WICK_PROGRESS,
@@ -494,7 +490,7 @@ def _build_and_send_report(chat_id: int, message_id: int,
         A("## КОНФИГ НА МОМЕНТ ОТЧЁТА")
         A(f"  MTF_MIN_SCORE={MTF_MIN_SCORE}  SHADOW_MIN_SCORE={SHADOW_MIN_SCORE}")
         A(f"  STOP_CLOSE_CONFIRM={STOP_CLOSE_CONFIRM}  BACKSTOP_R={STOP_EXCHANGE_BACKSTOP_R}")
-        A(f"  КЛОД: {'ФИЛЬТР (его вердикт решает)' if _claude_gate_enabled() else 'ТЕНЬ (сигналы правил; отклонённые без автосделок)'}")
+        A("  РЕШЕНИЕ: только замороженный X-Perp router; нейросеть не участвует")
         A(f"  MAX_SAME_DIRECTION_POSITIONS={MAX_SAME_DIRECTION_POSITIONS}  "
           f"TP1_R_MULT={TP1_R_MULT}")
 
@@ -676,13 +672,6 @@ _KB_TRADING = {"inline_keyboard": [
     [{"text": "🔍 История сигналов", "callback_data": "adm_setups"}],
     _BACK_ROW,
 ]}
-
-def _claude_gate_enabled() -> bool:
-    state = get_bot_state("claude_gate_enabled")
-    if state is not None:
-        return state == "1"
-    return CLAUDE_GATE_ENABLED
-
 
 def _kb_settings():
     return {"inline_keyboard": [
@@ -1139,8 +1128,7 @@ def _handle_admin_callback(callback_id: str, chat_id: int,
         )
         return
     if DEPLOYMENT_MODE == "shadow" and (
-            data == "adm_claude_toggle" or data == "adm_autotrade"
-            or data.startswith("adm_at_")):
+            data == "adm_autotrade" or data.startswith("adm_at_")):
         _edit_admin_text(chat_id, message_id,
                          "🛡 *Теневой режим*\n\nРеальная торговля и старые AI-настройки отключены.",
                          _kb_settings())

@@ -44,9 +44,9 @@ class ShadowDeploymentTests(unittest.TestCase):
 
     def test_every_button_has_a_handler(self):
         """A button with no branch does nothing when pressed."""
-        import io
         import re
-        src = io.open("main.py", encoding="utf-8").read()
+        from pathlib import Path
+        src = Path("main.py").read_text(encoding="utf-8")
         buttons = sorted(set(re.findall(r'"callback_data":\s*"([^"{]+)"', src)))
         self.assertTrue(buttons)
         for cb in buttons:

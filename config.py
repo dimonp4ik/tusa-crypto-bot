@@ -33,7 +33,6 @@ load_dotenv()
 # dashboard because the comment was believed over the deploy.
 TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")
 TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")
-CLAUDE_API_KEY = os.getenv("CLAUDE_API_KEY")
 
 # --- Admin panel: Telegram user IDs that can access /admin in DM ---
 ADMIN_IDS = {671071896}  # super-admin only; others added via bot → DB
@@ -643,7 +642,6 @@ RSI_STRETCH_SIZE_MULT = float(os.getenv("RSI_STRETCH_SIZE_MULT", "0.75"))
 RSI_SCORE_SHORT_MIN = float(os.getenv("RSI_SCORE_SHORT_MIN", "32"))
 RSI_SCORE_SHORT_MAX = float(os.getenv("RSI_SCORE_SHORT_MAX", "62"))
 
-MAX_SETUPS_TO_CLAUDE  = int(os.getenv("MAX_SETUPS_TO_CLAUDE", "7"))  # only strongest go to Claude
 
 # --- Entry zone (FVG / Order Block) ---
 # When enabled, setups without an active FVG or OB zone near price are skipped.
@@ -1301,39 +1299,8 @@ STABILITY_MIN_EFF_RATIO     = float(os.getenv("STABILITY_MIN_EFF_RATIO", "0.0"))
 STABILITY_MIN_VOLUME_RATIO  = float(os.getenv("STABILITY_MIN_VOLUME_RATIO", "0.0"))
 STABILITY_MIN_QUALITY_SCORE = float(os.getenv("STABILITY_MIN_QUALITY_SCORE", "0.0"))
 
-# --- Claude tiered analysis (cascade: cheap LIGHT gate + rare deep HEAVY) ---
-# LIGHT  : Haiku validates every passed setup in ONE cached batch call (JSON via tool).
-# HEAVY  : Sonnet re-checks only top setups (score >= HEAVY_MIN_SCORE) with coin memory.
-# Caching: static rules block cached 1h → cheap re-reads on the 5-min scan loop.
-CLAUDE_LIGHT_MODEL        = os.getenv("CLAUDE_LIGHT_MODEL", "claude-sonnet-4-5")
-CLAUDE_HEAVY_MODEL        = os.getenv("CLAUDE_HEAVY_MODEL", "claude-sonnet-4-5")
-CLAUDE_HEAVY_MIN_SCORE    = int(os.getenv("CLAUDE_HEAVY_MIN_SCORE", "9"))    # lowered 10→9: all survivors get Sonnet check
-CLAUDE_HEAVY_MAX_PER_SCAN = int(os.getenv("CLAUDE_HEAVY_MAX_PER_SCAN", "5")) # max HEAVY checks per scan
-CLAUDE_MEMORY_LIMIT       = int(os.getenv("CLAUDE_MEMORY_LIMIT", "25"))      # recent outcomes per coin (HEAVY)
-CLAUDE_MAX_RISK_SCORE     = int(os.getenv("CLAUDE_MAX_RISK_SCORE", "7"))     # counter-arg auto-reject if risk >= this (7 = "real concern" per scale)
-
-# Claude as a GATE, or as an observer. 1 = his verdict withholds setups. 0 =
-# SHADOW: he is still called, scored and logged, but the rules filter decides
-# what paper signals are published. A signal admitted only because the gate is
-# off is marked ineligible for real-money autotrading. Switchable at runtime
-# from the admin panel; the DB state wins over this default.
-#
-# backtest.py never calls Claude, so with the gate OFF the signal tracker sees
-# the same population the model measures. This scores the verdict on forward
-# X-Perp candle outcomes without risking money on rejected setups.
-#
-# ⚠️ Approval here runs 52%, so shadow mode nearly DOUBLES this book. On the
-# stocks desk approval is 80% and the step is a quarter. Treat these very
-# differently.
-CLAUDE_GATE_ENABLED = os.getenv("CLAUDE_GATE_ENABLED", "1") != "0"
-CLAUDE_CACHE_TTL          = os.getenv("CLAUDE_CACHE_TTL", "1h")              # prompt cache TTL ("5m" or "1h")
-CLAUDE_DAILY_BUDGET_USD   = float(os.getenv("CLAUDE_DAILY_BUDGET_USD", "1.00"))  # hard daily cap (real Sonnet usage ~$0.3-0.5/day)
-CLAUDE_BUDGET_RESERVE_USD = float(os.getenv("CLAUDE_BUDGET_RESERVE_USD", "0.05")) # stop when remaining < reserve
-
-# Epoch for every live-history read: Claude's Hist/SCORECARD/coin-memory, the
-# over-strictness corrector, the rolling report windows, the variant arms and
-# the auto-block statistics. Rows before it describe a bot that no longer
-# exists and must not be averaged in with the current one.
+# Epoch for every live-history read. Rows before it describe a different
+# strategy and must not be averaged in with the current venue router.
 #
 # 1786575600 = 2026-08-12 23:00 UTC — ZONE_WATCH shipped. The bot stopped
 # publishing at whatever price was showing and started waiting for price to
