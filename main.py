@@ -21,7 +21,8 @@ from apscheduler.events import (EVENT_JOB_MISSED, EVENT_JOB_MAX_INSTANCES,
 import requests as _requests
 
 from config import (
-    SCAN_INTERVAL_MINUTES, TELEGRAM_TOKEN, TRADING_HOURS_START, TRADING_HOURS_END,
+    SCAN_INTERVAL_MINUTES, VENUE_MAX_SIGNALS_PER_SCAN, TELEGRAM_TOKEN,
+    TRADING_HOURS_START, TRADING_HOURS_END,
     TRADE_WEEKENDS, KLINES_INTERVAL_SEC, SIGNAL_EXPIRY_HOURS, TRAIL_RUNNER_ENABLED,
     TRAIL_ATR_MULT, STOP_CLOSE_CONFIRM, MAX_SAME_DIRECTION_POSITIONS,
     STOP_EXCHANGE_BACKSTOP_R, MTF_MIN_SCORE, SHADOW_MIN_SCORE, TP1_R_MULT,
@@ -442,7 +443,7 @@ def _build_and_send_report(chat_id: int, message_id: int,
         A(f"## ВЛИЯНИЕ ЛИМИТОВ ({window_label})")
         _caps = get_cap_impact_stats(since_ts) or {}
         for code, title in (("dir_cap", f"лимит одной стороны ({MAX_SAME_DIRECTION_POSITIONS})"),
-                            ("scan_cap", "лимит 3 за скан"),
+                            ("scan_cap", f"лимит {VENUE_MAX_SIGNALS_PER_SCAN} за скан"),
                             ("send_failed", "⚠️ СБОЙ ОТПРАВКИ (баг, не лимит — должно быть 0)"),
                             ("stale_entry", "🏃 цена ушла из зоны до публикации"),
                             ("wide_spread", f"📏 широкий спред (>{SPREAD_MAX_BPS:.0f}бп)")):
@@ -635,6 +636,7 @@ def health():
 def status():
     return (f"Mode: {DEPLOYMENT_MODE}. Strategy: venue filters. "
             f"Scanning every {SCAN_INTERVAL_MINUTES} min. "
+            f"Max signals/scan: {VENUE_MAX_SIGNALS_PER_SCAN}. "
             f"Signal cache: {len(_signal_cache)} entries."), 200
 
 
@@ -1121,6 +1123,7 @@ def _handle_admin_callback(callback_id: str, chat_id: int,
             "Режим: *SHADOW / PAPER*\n"
             "Стратегия: 7 замороженных X-Perp модулей\n"
             "Вход: по текущей рыночной цене\n"
+            f"За один скан: максимум {VENUE_MAX_SIGNALS_PER_SCAN} сигнала\n"
             "Нейросеть: отключена от решения\n"
             "Реальные ордера: *ЗАПРЕЩЕНЫ КОДОМ*\n\n"
             "Все сигналы и исходы записываются для независимой forward-проверки.",
@@ -1238,7 +1241,7 @@ def _handle_admin_callback(callback_id: str, chat_id: int,
                      "спасло это деньги или отняло._\n"]
 
             _titles = {"dir_cap": f"Лимит одной стороны ({MAX_SAME_DIRECTION_POSITIONS})",
-                       "scan_cap": "Лимит 3 за скан",
+                       "scan_cap": f"Лимит {VENUE_MAX_SIGNALS_PER_SCAN} за скан",
                        "send_failed": "⚠️ Сбой отправки в Telegram",
                        "stale_entry": "🏃 Цена ушла из зоны (погоня)",
                        "wide_spread": f"📏 Широкий спред (>{SPREAD_MAX_BPS:.0f}бп)"}
@@ -3587,6 +3590,32 @@ def _venue_analysis(symbol: str, setup: dict, btc_change: float = 0.0) -> dict:
     }
 
 
+def _publish_venue_candidates(candidates: list[tuple[dict, int]]) -> int:
+    """Publish a bounded, deterministic slice of one scan's candidates.
+
+    Candidates are already stored in setup_log. Overflow rows are marked so
+    the same closed candle cannot leak another batch into the next scheduler
+    tick five minutes later.
+    """
+    published = 0
+    ordered = sorted(candidates, key=lambda item: (
+        item[0].get("symbol", ""), item[0].get("direction", "")))
+    for analysis, setup_id in ordered:
+        if published >= VENUE_MAX_SIGNALS_PER_SCAN:
+            mark_setup_blocked(setup_id, "scan_cap")
+            continue
+        if not send_signal(analysis):
+            mark_setup_blocked(setup_id, "send_failed")
+            continue
+        mark_setup_sent(setup_id)
+        _cache_signal(analysis["symbol"], analysis["direction"])
+        signal_id = analysis.get("_signal_id")
+        if signal_id:
+            link_setup_to_signal(setup_id, signal_id)
+        published += 1
+    return published
+
+
 def _run_venue_strategy_scan() -> None:
     """Fast deterministic production path for the frozen X-Perp portfolio.
 
@@ -3633,7 +3662,7 @@ def _run_venue_strategy_scan() -> None:
     blocked = {row["symbol"] for row in get_active_symbol_blocks()}
     if blocked:
         log.info("Venue scan: %d blocked symbol(s) skipped", len(blocked))
-    published = 0
+    candidates = []
     for symbol in symbols:
         candles = fetched.get(symbol)
         if not candles or symbol in active or symbol in blocked:
@@ -3651,20 +3680,14 @@ def _run_venue_strategy_scan() -> None:
                 if not setup_id:
                     continue
                 analysis["_setup_log_id"] = setup_id
-                if not send_signal(analysis):
-                    mark_setup_blocked(setup_id, "send_failed")
-                    continue
-                mark_setup_sent(setup_id)
-                _cache_signal(symbol, row["direction"])
-                signal_id = analysis.get("_signal_id")
-                if signal_id:
-                    link_setup_to_signal(setup_id, signal_id)
-                published += 1
+                candidates.append((analysis, setup_id))
         except Exception as exc:
             log.warning("Venue strategy failed for %s: %s", symbol, exc)
+    published = _publish_venue_candidates(candidates)
     _last_scan_stats.update(coins=len(symbols), setups=published, fresh=published,
                             ts=time.time())
-    log.info("Venue scan complete: %s symbols, %s paper signals", len(symbols), published)
+    log.info("Venue scan complete: %s symbols, %s candidates, %s paper signals",
+             len(symbols), len(candidates), published)
 
 
 def run_scan():

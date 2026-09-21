@@ -39,6 +39,11 @@ ADMIN_IDS = {671071896}  # super-admin only; others added via bot → DB
 
 # --- Scan settings ---
 SCAN_INTERVAL_MINUTES = int(os.getenv("SCAN_INTERVAL_MINUTES", "5"))
+# Several symbols can match the same session module on one closed 15m candle.
+# The portfolio replay admitted at most three entries from one scan.
+VENUE_MAX_SIGNALS_PER_SCAN = max(
+    1, min(3, int(os.getenv("VENUE_MAX_SIGNALS_PER_SCAN", "3")))
+)
 # Deployment is deliberately fail-closed.  A stale Railway AUTOTRADE_ENABLED=1
 # cannot open an order unless DEPLOYMENT_MODE is explicitly changed to live.
 DEPLOYMENT_MODE = os.getenv("DEPLOYMENT_MODE", "shadow").strip().lower()
