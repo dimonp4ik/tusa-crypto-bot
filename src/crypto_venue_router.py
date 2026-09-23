@@ -21,9 +21,11 @@ class Module:
     conditions: tuple[tuple[str, str, float], ...]
 
 
-# Order is the frozen venue-calibration priority.  All rules were discovered
+# Order is the frozen venue-calibration priority. The base rules were discovered
 # on 2020-24, validated on 2025 and base-market 2026, then calibrated using
-# X-Perp outcomes strictly before 2026-08-27.
+# X-Perp outcomes strictly before 2026-08-27. The evening-short abs-z ceiling
+# was selected on 2020-23, validated on 2024, and then survived 2025-26 plus
+# direct and later paper-forward venue replays.
 MODULES = (
     Module("pullback_long_bull_europe", "trend_pullback", "LONG", "bull", "06_11", .5,
            (("btc_eff96", "ge", .2), ("btc_eff20", "le", .1))),
@@ -37,7 +39,8 @@ MODULES = (
     Module("rr_short_bear_asia", "range_reversion", "SHORT", "bear", "00_05", .25,
            (("btc_fast_slow_atr", "le", -1.0), ("btc_slow_long_atr", "ge", -2.0))),
     Module("rr_short_bull_evening", "range_reversion", "SHORT", "bull", "18_23", .25,
-           (("btc_fast_slow_atr", "le", 2.0), ("btc_slow_long_atr", "ge", 4.0))),
+           (("btc_fast_slow_atr", "le", 2.0), ("btc_slow_long_atr", "ge", 4.0),
+            ("abs_z", "le", 3.0))),
     Module("breakout_long_bull_pullback_evening", "breakout", "LONG", "bull_pullback",
            "18_23", .25,
            (("btc_slow_long_atr", "le", 2.0), ("btc_fast_slow_atr", "ge", -1.0))),

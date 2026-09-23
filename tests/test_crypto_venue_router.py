@@ -59,6 +59,30 @@ class CryptoVenueRouterTests(unittest.TestCase):
                                           market_price=100.0,
                                           symbol="AAVEUSDT"), [])
 
+    def test_evening_short_rejects_extreme_cross_sectional_extension(self):
+        context = {
+            "btc_regime": "bull", "btc_atr_pct": .004,
+            "btc_return20_atr": -1.8, "btc_fast_slow_atr": 1.0,
+            "btc_slow_long_atr": 4.5, "btc_eff20": .2,
+            "btc_eff96": .2, "btc_return96_atr": 2.0,
+        }
+        base = {"family": "range_reversion", "direction": "SHORT",
+                "atr": 2.0, "eff_ratio": .2}
+        with patch("src.crypto_venue_router.btc_context", return_value=context), \
+                patch("src.crypto_venue_router.family_signals",
+                      return_value=[{**base, "z": 3.0, "abs_z": 3.0}]):
+            accepted = venue_setups({}, {}, entry_time=20 * 3600,
+                                    market_price=100.0, symbol="AAVEUSDT")
+        with patch("src.crypto_venue_router.btc_context", return_value=context), \
+                patch("src.crypto_venue_router.family_signals",
+                      return_value=[{**base, "z": 3.000001,
+                                     "abs_z": 3.000001}]):
+            rejected = venue_setups({}, {}, entry_time=20 * 3600,
+                                    market_price=100.0, symbol="AAVEUSDT")
+        self.assertEqual(len(accepted), 1)
+        self.assertEqual(accepted[0]["module"], "rr_short_bull_evening")
+        self.assertEqual(rejected, [])
+
     def test_robust_symbol_gate_fails_closed(self):
         self.assertEqual(ROBUST_EXCLUDED_SYMBOLS,
                          {"ADAUSDT", "DOTUSDT", "NEARUSDT", "TAOUSDT"})
