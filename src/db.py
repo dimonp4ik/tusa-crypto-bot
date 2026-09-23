@@ -1341,13 +1341,8 @@ def get_stats(days: int = 7, since_ts: float = None) -> dict:
 
 # ── Setup log ─────────────────────────────────────────────────────────────────
 
-def log_setup_candidate(analysis: dict) -> int:
-    """Log a setup that reached Claude (before/after verdict). Returns row id.
-
-    Stores the SAME final TP1/TP2/SL bracket a live trade would use (not the raw
-    zone levels) so the shadow tracker can resolve every setup — sent or rejected
-    — on one consistent basis. Errors in bracket calc fall back to zone levels.
-    """
+def _prepared_setup_candidate(analysis: dict) -> tuple:
+    """Build the immutable setup row before acquiring the SQLite write lock."""
     price = analysis.get("current_price") or 0.0
     tp1 = analysis.get("tp1_level")
     tp2 = analysis.get("tp2_level")
@@ -1362,19 +1357,7 @@ def log_setup_candidate(analysis: dict) -> int:
         # outcome is lost from the learning signal — so it must be visible.
         _log.warning(f"log_setup: bracket calc failed for "
                      f"{analysis.get('symbol','?')} — outcome will not be tracked: {e}")
-    with _conn() as c:
-        cur = c.execute("""
-            INSERT INTO setup_log
-                (ts, symbol, direction, entry_price, tp1, tp2, sl,
-                 mtf_score, decision, confidence, risk_score, reason, sent,
-                 session, entry_source, atr, trend,
-                 oi_delta_pct, oi_regime, oi_confirms, counter, variants, source,
-                 open_same_dir,
-                 book_spread_bps, book_depth_usd, book_imbalance,
-                 hours_to_event, next_event, sniper, funding_rate, signal_bar_ts)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
-                    ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        """, (
+    return (
             time_mod.time(),
             analysis.get("symbol", ""),
             analysis.get("direction", ""),
@@ -1414,23 +1397,59 @@ def log_setup_candidate(analysis: dict) -> int:
             1 if analysis.get("sniper") else 0,
             analysis.get("funding_rate"),
             analysis.get("signal_bar_ts"),
-        ))
-        return cur.lastrowid
+        )
+
+
+def _insert_setup_candidate(c, values: tuple) -> int:
+    cur = c.execute("""
+        INSERT INTO setup_log
+            (ts, symbol, direction, entry_price, tp1, tp2, sl,
+             mtf_score, decision, confidence, risk_score, reason, sent,
+             session, entry_source, atr, trend,
+             oi_delta_pct, oi_regime, oi_confirms, counter, variants, source,
+             open_same_dir,
+             book_spread_bps, book_depth_usd, book_imbalance,
+             hours_to_event, next_event, sniper, funding_rate, signal_bar_ts)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
+                ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    """, values)
+    return cur.lastrowid
+
+
+def log_setup_candidate(analysis: dict) -> int:
+    """Log a setup that reached Claude (before/after verdict). Returns row id.
+
+    Stores the SAME final TP1/TP2/SL bracket a live trade would use (not the raw
+    zone levels) so the shadow tracker can resolve every setup — sent or rejected
+    — on one consistent basis. Errors in bracket calc fall back to zone levels.
+    """
+    values = _prepared_setup_candidate(analysis)
+    with _conn() as c:
+        return _insert_setup_candidate(c, values)
 
 
 def log_setup_candidate_once(analysis: dict) -> int | None:
-    """Log one regime setup per closed signal bar, including across restarts."""
+    """Atomically claim one regime setup per closed bar, including on restart.
+
+    The old SELECT-then-INSERT used two connections.  A startup scan landing on
+    a scheduler tick could let both SELECTs see no row and publish the same
+    market entry twice.  BEGIN IMMEDIATE serialises that claim and insert.
+    """
     signal_bar_ts = analysis.get("signal_bar_ts")
     if signal_bar_ts is None:
         return log_setup_candidate(analysis)
+    values = _prepared_setup_candidate(analysis)
     with _conn() as c:
+        c.execute("BEGIN IMMEDIATE")
         row = c.execute(
             "SELECT id FROM setup_log WHERE source=? AND symbol=? AND direction=? "
             "AND signal_bar_ts=? LIMIT 1",
             (analysis.get("source") or "live", analysis.get("symbol", ""),
              analysis.get("direction", ""), float(signal_bar_ts)),
         ).fetchone()
-    return None if row else log_setup_candidate(analysis)
+        if row:
+            return None
+        return _insert_setup_candidate(c, values)
 
 
 def mark_setup_blocked(setup_log_id: int, reason: str) -> None:
@@ -1454,7 +1473,7 @@ def get_cap_impact_stats(since_ts: float) -> dict:
     """
     out = {}
     with _conn() as c:
-        for reason in ("dir_cap", "scan_cap", "send_failed", "stale_entry"):
+        for reason in ("dir_cap", "scan_cap", "cooldown", "send_failed", "stale_entry"):
             rows = c.execute(
                 """SELECT outcome, reached_tp1 FROM setup_log
                    WHERE resolved=1 AND COALESCE(outcome,'') != 'NO_FILL' AND ts >= ? AND block_reason=?

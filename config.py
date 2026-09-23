@@ -44,6 +44,10 @@ SCAN_INTERVAL_MINUTES = int(os.getenv("SCAN_INTERVAL_MINUTES", "5"))
 VENUE_MAX_SIGNALS_PER_SCAN = max(
     1, min(3, int(os.getenv("VENUE_MAX_SIGNALS_PER_SCAN", "3")))
 )
+# Frozen venue replays pause the rest of a UTC day after three consecutive
+# completed stops.  Keep this separate from the legacy SMC kill switch so the
+# production router cannot silently drift from its audited portfolio gate.
+VENUE_LOSS_PAUSE_STREAK = 3
 # Deployment is deliberately fail-closed.  A stale Railway AUTOTRADE_ENABLED=1
 # cannot open an order unless DEPLOYMENT_MODE is explicitly changed to live.
 DEPLOYMENT_MODE = os.getenv("DEPLOYMENT_MODE", "shadow").strip().lower()
