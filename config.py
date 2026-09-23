@@ -2072,7 +2072,12 @@ STOP_EXCHANGE_BACKSTOP_R = float(os.getenv("STOP_EXCHANGE_BACKSTOP_R", "1.5"))
 # quality trim (SETUP_QUALITY_MIN below) at 0.5, which buys -15% drawdown for
 # -5% profit on the same window -- the trim dominates the cap, so a request for
 # "fewer trades, smaller drawdown" should be answered with the trim, not here.
-MAX_SAME_DIRECTION_POSITIONS = int(os.getenv("MAX_SAME_DIRECTION_POSITIONS", "3"))
+# The frozen venue portfolio was replayed with at most three same-direction
+# positions. Keep the environment knob for lowering exposure, but never let a
+# stale Railway value silently run a larger, unaudited book.
+MAX_SAME_DIRECTION_POSITIONS = max(
+    1, min(3, int(os.getenv("MAX_SAME_DIRECTION_POSITIONS", "3")))
+)
 
 # ---------------------------------------------------------------------------
 # 🕓 HOUR OF DAY — measured 2026-09-06. Real, consistent, and too small to act on.
