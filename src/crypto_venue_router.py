@@ -56,6 +56,13 @@ ROBUST_EXCLUDED_SYMBOLS = frozenset({
 })
 ROBUST_SYMBOLS = AUDITED_SYMBOLS - ROBUST_EXCLUDED_SYMBOLS
 
+# Shadow candidate selected on 2020-23, validated on 2024, then checked on
+# 2025-26 and public X-Perp through 2026-09-30.  The base module stays at
+# 0.25R when BTC is choppy; a directional BTC path gives it room to 0.50R.
+CONDITIONAL_TARGET_MODULE = "rr_short_bull_pullback_asia"
+CONDITIONAL_TARGET_BTC_EFF20_MIN = .1
+CONDITIONAL_TARGET_R = .5
+
 
 def _session(timestamp: float) -> str:
     hour = datetime.fromtimestamp(timestamp, timezone.utc).hour
@@ -166,6 +173,15 @@ def _matches(module: Module, signal: dict, context: dict, session: str) -> bool:
     return True
 
 
+def target_r_for(module: Module, context: dict) -> float:
+    """Choose the audited target from information known before market entry."""
+    if (module.name == CONDITIONAL_TARGET_MODULE
+            and float(context.get("btc_eff20", -math.inf))
+            >= CONDITIONAL_TARGET_BTC_EFF20_MIN):
+        return CONDITIONAL_TARGET_R
+    return module.target_r
+
+
 def venue_setups(candles: dict, btc_candles: dict, *, entry_time: float,
                  market_price: float | None = None,
                  symbol: str | None = None) -> list[dict]:
@@ -187,7 +203,8 @@ def venue_setups(candles: dict, btc_candles: dict, *, entry_time: float,
             risk = 2 * signal["atr"]
             sign = 1 if signal["direction"] == "LONG" else -1
             stop = entry - sign * risk
-            target = entry + sign * risk * module.target_r
+            target_r = target_r_for(module, context)
+            target = entry + sign * risk * target_r
             if risk >= entry or min(stop, target) <= 0:
                 continue
             return [{
@@ -198,7 +215,7 @@ def venue_setups(candles: dict, btc_candles: dict, *, entry_time: float,
                 "entry": entry,
                 "sl": stop,
                 "tp": target,
-                "target_r": module.target_r,
+                "target_r": target_r,
                 "utc_session": session,
             }]
     return []

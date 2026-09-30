@@ -59,6 +59,31 @@ class CryptoVenueRouterTests(unittest.TestCase):
                                           market_price=100.0,
                                           symbol="AAVEUSDT"), [])
 
+    def test_asia_pullback_short_uses_conditional_half_r_target(self):
+        base_context = {
+            "btc_regime": "bull_pullback", "btc_atr_pct": .004,
+            "btc_return20_atr": -2.0, "btc_fast_slow_atr": -1.5,
+            "btc_slow_long_atr": 1.0, "btc_eff96": .2,
+            "btc_return96_atr": 0.0,
+        }
+        signal = {"family": "range_reversion", "direction": "SHORT",
+                  "atr": 2.0, "eff_ratio": .2, "z": 2.2, "abs_z": 2.2}
+
+        def setup(efficiency):
+            context = {**base_context, "btc_eff20": efficiency}
+            with patch("src.crypto_venue_router.btc_context",
+                       return_value=context), patch(
+                       "src.crypto_venue_router.family_signals",
+                       return_value=[signal]):
+                return venue_setups({}, {}, entry_time=3 * 3600,
+                                    market_price=100.0, symbol="AAVEUSDT")[0]
+
+        choppy = setup(.099999)
+        directional = setup(.1)
+        self.assertEqual((choppy["target_r"], choppy["tp"]), (.25, 99.0))
+        self.assertEqual((directional["target_r"], directional["tp"]),
+                         (.5, 98.0))
+
     def test_evening_short_rejects_extreme_cross_sectional_extension(self):
         context = {
             "btc_regime": "bull", "btc_atr_pct": .004,
