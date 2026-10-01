@@ -32,28 +32,13 @@ import time
 
 import requests
 
-from src.risk_limits import bounded_margin, position_risk, equity_guard
+from src.risk_limits import equity_guard
 from config import (
-    AUTOTRADE_RISK_PER_TRADE, AUTOTRADE_MAX_OPEN_RISK, AUTOTRADE_COST_RESERVE,
     AUTOTRADE_MAX_DAILY_LOSS, AUTOTRADE_MAX_DRAWDOWN, AUTOTRADE_EQUITY_PEAK_FLOOR,
     TELEGRAM_TOKEN,
     AUTOTRADE_ENABLED, AUTOTRADE_LEVERAGE, AUTOTRADE_BALANCE_THRESHOLD,
     AUTOTRADE_CONTACT,
-    STOP_CLOSE_CONFIRM, STOP_EXCHANGE_BACKSTOP_R, SYMBOL_SIZE_MULT,
-    SESSION_SIZE_MULT, HTF_NEUTRAL_4H_SIZE_MULT, SYMBOL_TIER_MULT, SIZE_MULT_MAX,
-    LONDON_VOL_MIN, LONDON_THIN_SIZE_MULT,
-    OVERLAP_VOL_MAX, OVERLAP_CALM_SIZE_MULT,
-    CHOP_VOL_MIN, CHOP_EFF_MAX, CHOP_ATR_MIN, CHOP_SIZE_MULT,
-    OPEN_SPACE_ROOM_MIN, OPEN_SPACE_SIZE_MULT,
-    PARABOLIC_ACCEL_MIN, PARABOLIC_SIZE_MULT,
-    RSI_STRETCH_LONG_MIN, RSI_STRETCH_SIZE_MULT,
-    SETUP_QUALITY_MIN, SETUP_QUALITY_TRIM_MULT,
-    DEAD_THIN_VOL_MAX, DEAD_THIN_SIZE_MULT,
-    HTF_NEUTRAL_1H_SIZE_MULT,
-    EXTENSION_ATR_THRESHOLD, EXTENSION_SIZE_MULT,
-    VOL_ATR_BOOST_THRESHOLD, VOL_ATR_BOOST_MULT,
-    COUNTER_STRUCTURE_SIZE_MULT,
-    RISK_NORMALIZED_SIZING, RISK_REFERENCE_PCT, RISK_SIZE_MULT_MIN,
+    STOP_CLOSE_CONFIRM, STOP_EXCHANGE_BACKSTOP_R,
 )
 from src.db import (
     get_bot_state, set_bot_state,
@@ -229,168 +214,6 @@ def _open_for_user_locked(u: dict, sig: dict, inst_id: str, disp: str) -> None:
         log.error("autotrade risk state unavailable; entry refused: %s", exc)
         return
 
-    # Per-symbol size trim (see SYMBOL_SIZE_MULT in config.py). Applied before
-    # the balance and min-contract checks below, so a symbol trimmed under the
-    # exchange minimum is reported as "too small" rather than silently rounded.
-    _size_mult = float(SYMBOL_SIZE_MULT.get(str(sig["symbol"]).upper(), 1.0))
-    _size_mult *= float(SYMBOL_TIER_MULT.get(str(sig["symbol"]).upper(), 1.0))
-    # Counter-structure setups size up — see COUNTER_STRUCTURE_SIZE_MULT.
-    if sig.get("sniper"):
-        _size_mult *= float(COUNTER_STRUCTURE_SIZE_MULT)
-    # Session and HTF-context multipliers — both groups beat base expectancy in
-    # both window halves (see config.py). sig is the DB row, so these read as
-    # None on signals written before the 2026-08-24 migration and fall back to
-    # 1.0 rather than mis-sizing.
-    _sess = str(sig.get("session") or "").upper()
-    _size_mult *= float(SESSION_SIZE_MULT.get(_sess, 1.0))
-    # A CALM overlap rides bigger — the opposite sign to London, see
-    # OVERLAP_VOL_MAX in config.py. Missing volume_ratio means no boost, same
-    # as the London rule below and same as the backtest.
-    if OVERLAP_CALM_SIZE_MULT != 1.0 and _sess == "OVERLAP":
-        try:
-            _ovr = sig.get("volume_ratio")
-            if _ovr is not None and float(_ovr) < OVERLAP_VOL_MAX:
-                _size_mult *= float(OVERLAP_CALM_SIZE_MULT)
-        except (TypeError, ValueError):
-            pass
-    # The London boost only applies where volume confirms — see LONDON_VOL_MIN
-    # in config.py. Note this reverses the fall-through convention used for
-    # bos_extension_atr and vol_atr_pct above: those default to NOT trimming
-    # when the field is missing, but here the missing field would grant a 1.5x
-    # BOOST on no evidence. Signals written before the 2026-08-26 migration
-    # therefore size at 1.0, matching what backtest._size_mult_for does with an
-    # absent volume_ratio — the two paths must agree or the backtest stops
-    # describing production.
-    if LONDON_VOL_MIN > 0 and _sess == "LONDON":
-        try:
-            _vr = sig.get("volume_ratio")
-            if _vr is None or float(_vr) < LONDON_VOL_MIN:
-                _size_mult *= float(LONDON_THIN_SIZE_MULT) / float(
-                    SESSION_SIZE_MULT.get("LONDON", 1.0) or 1.0)
-        except (TypeError, ValueError, ZeroDivisionError):
-            pass
-    if str(sig.get("trend_4h") or "").lower() == "neutral":
-        _size_mult *= float(HTF_NEUTRAL_4H_SIZE_MULT)
-    # 1h-neutral rides bigger too, and on honest data it is the stronger of the
-    # two neutral-context signals — see HTF_NEUTRAL_1H_SIZE_MULT in config.py.
-    # Absent on rows written before the 2026-08-26 migration, which sizes at
-    # 1.0 rather than guessing.
-    if str(sig.get("trend_1h") or "").lower() == "neutral":
-        _size_mult *= float(HTF_NEUTRAL_1H_SIZE_MULT)
-    # Late entries ride smaller — see EXTENSION_ATR_THRESHOLD in config.py.
-    # Reads None on signals written before the 2026-08-25 migration, which
-    # falls through to no trim rather than mis-sizing.
-    try:
-        if float(sig.get("bos_extension_atr") or 0.0) > EXTENSION_ATR_THRESHOLD:
-            _size_mult *= float(EXTENSION_SIZE_MULT)
-    except (TypeError, ValueError):
-        pass
-    # High-volatility boost — see VOL_ATR_BOOST_THRESHOLD in config.py. Reads
-    # None on signals written before the 2026-08-25 migration, which falls
-    # through to no boost rather than mis-sizing.
-    try:
-        if float(sig.get("vol_atr_pct") or 0.0) >= VOL_ATR_BOOST_THRESHOLD:
-            _size_mult *= float(VOL_ATR_BOOST_MULT)
-    except (TypeError, ValueError):
-        pass
-    # Thin dead zone rides smaller — see DEAD_THIN_VOL_MAX in config.py.
-    # Missing volume_ratio means no trim, matching the backtest.
-    if DEAD_THIN_SIZE_MULT != 1.0 and _sess == "DEAD_ZONE":
-        try:
-            _dv = sig.get("volume_ratio")
-            if _dv is not None and float(_dv) < DEAD_THIN_VOL_MAX:
-                _size_mult *= float(DEAD_THIN_SIZE_MULT)
-        except (TypeError, ValueError):
-            pass
-    # Parabolic arc rides smaller — see PARABOLIC_ACCEL_MIN in config.py.
-    # Absent on rows written before the 2026-08-28 migration, which means no
-    # trim rather than a guess.
-    if PARABOLIC_SIZE_MULT != 1.0:
-        try:
-            _ar = sig.get("accel_ratio")
-            if _ar is not None and float(_ar) >= PARABOLIC_ACCEL_MIN:
-                _size_mult *= float(PARABOLIC_SIZE_MULT)
-        except (TypeError, ValueError):
-            pass
-    # Stretched longs ride smaller — see RSI_STRETCH_LONG_MIN in config.py.
-    # Absent rsi means no trim, matching the backtest.
-    if (RSI_STRETCH_SIZE_MULT != 1.0
-            and str(sig.get("direction") or "").upper() == "LONG"):
-        try:
-            _rs = sig.get("rsi")
-            if _rs is not None and float(_rs) >= RSI_STRETCH_LONG_MIN:
-                _size_mult *= float(RSI_STRETCH_SIZE_MULT)
-        except (TypeError, ValueError):
-            pass
-    # Weakest fifth by the fitted quality score rides smaller — see
-    # SETUP_QUALITY_MIN in config.py. The score is IMPORTED from backtest rather
-    # than reimplemented: three standardised weights are exactly the kind of
-    # arithmetic that drifts when it exists twice.
-    if SETUP_QUALITY_TRIM_MULT != 1.0:
-        try:
-            from backtest import _setup_quality as _sq
-            _q = _sq(sig)
-            if _q is not None and _q < SETUP_QUALITY_MIN:
-                _size_mult *= float(SETUP_QUALITY_TRIM_MULT)
-        except (TypeError, ValueError, ImportError):
-            pass
-    # Open space rides smaller — see OPEN_SPACE_ROOM_MIN in config.py. Derived
-    # here from the raw distances exactly as backtest._size_mult_for does:
-    # overhead for a long, underfoot for a short. Absent on rows written before
-    # the 2026-08-27 migration, which means no trim rather than a guess.
-    if OPEN_SPACE_SIZE_MULT != 1.0:
-        try:
-            _d = str(sig.get("direction") or "").upper()
-            _rm = sig.get("overhead_atr") if _d == "LONG" else sig.get("underfoot_atr")
-            if _rm is not None and float(_rm) >= OPEN_SPACE_ROOM_MIN:
-                _size_mult *= float(OPEN_SPACE_SIZE_MULT)
-        except (TypeError, ValueError):
-            pass
-    # Active chop rides bigger — see CHOP_SIZE_MULT in config.py. All three
-    # fields are absent on rows written before the 2026-08-27 migration, and an
-    # absent field means no boost rather than one granted on no evidence.
-    if CHOP_SIZE_MULT != 1.0:
-        try:
-            _vr, _er, _ap = (sig.get("volume_ratio"), sig.get("eff_ratio"),
-                             sig.get("vol_atr_pct"))
-            if (_vr is not None and _er is not None and _ap is not None
-                    and float(_vr) >= CHOP_VOL_MIN
-                    and float(_er) < CHOP_EFF_MAX
-                    and float(_ap) >= CHOP_ATR_MIN):
-                _size_mult *= float(CHOP_SIZE_MULT)
-        except (TypeError, ValueError):
-            pass
-    # Ceiling on the stacked product — see SIZE_MULT_MAX in config.py.
-    _size_mult = min(_size_mult, float(SIZE_MULT_MAX))
-    # Record what this signal actually traded at, HERE — above the risk
-    # normalisation below, which resizes so that 1R costs the same money at
-    # any stop width and therefore does not scale R. These rule multipliers
-    # do scale it, and are what the backtest multiplies gross_r/net_r by.
-    # Best-effort: the trade matters more than the bookkeeping, so a failure
-    # here is logged and the open continues.
-    try:
-        set_signal_size_mult(sig["id"], _size_mult)
-    except Exception as _sm_err:
-        log.warning(f"could not record size_mult for signal {sig.get('id')}: "
-                    f"{_sm_err}")
-    # Risk-normalised sizing: a wide stop gets less size so that 1R costs the
-    # same money regardless of where structure put the stop. Downward only —
-    # see RISK_NORMALIZED_SIZING in config.py. Without this a 3.0% stop risked
-    # 2.5x a 1.2% stop for the same "size", which is also what broke the R
-    # accounting every backtest figure in this project is written in.
-    if RISK_NORMALIZED_SIZING:
-        try:
-            _e, _sl = float(sig["entry_price"]), float(sig["sl"])
-            _risk_pct = abs(_e - _sl) / _e if _e > 0 else 0.0
-            if _risk_pct > RISK_REFERENCE_PCT:
-                _size_mult *= max(RISK_SIZE_MULT_MIN,
-                                  RISK_REFERENCE_PCT / _risk_pct)
-        except (TypeError, ValueError, ZeroDivisionError, KeyError) as _e:
-            # Fails OPEN: without this the multiplier stays 1.0 and a wide-stop
-            # trade goes out at FULL size, which is the case this whole block
-            # exists to prevent. Say so rather than sizing up in silence.
-            log.warning(f"risk-normalised sizing failed for {sig.get('symbol')} "
-                        f"({_e}) — full size used")
     # The client owns position sizing. Strategy/regime fields may decide
     # whether a setup is traded, but they must not change the requested money.
     _size_mult = 1.0
