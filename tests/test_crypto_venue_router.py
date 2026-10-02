@@ -131,13 +131,42 @@ class CryptoVenueRouterTests(unittest.TestCase):
                 {}, {}, entry_time=20 * 3600, market_price=100.0,
                 symbol="AAVEUSDT",
             )
-        self.assertEqual(len(SHADOW_EXPERIMENTAL_MODULES), 1)
+        self.assertEqual(len(SHADOW_EXPERIMENTAL_MODULES), 2)
         self.assertEqual(production, [])
         self.assertEqual(len(shadow), 1)
         self.assertEqual(
             shadow[0]["module"],
             "shadow_pullback_short_bull_pullback_evening",
         )
+        self.assertTrue(shadow[0]["_shadow_experiment"])
+        self.assertEqual((shadow[0]["target_r"], shadow[0]["entry_source"]),
+                         (.25, "MARKET"))
+
+    def test_monthly_complement_is_shadow_only(self):
+        context = {
+            "btc_regime": "bull", "btc_atr_pct": .008,
+            "btc_return20_atr": 0.0, "btc_fast_slow_atr": 1.0,
+            "btc_slow_long_atr": 2.0, "btc_eff20": .2,
+            "btc_eff96": .2, "btc_return96_atr": 1.0,
+        }
+        signal = {"family": "range_reversion", "direction": "LONG",
+                  "atr": 2.0, "eff_ratio": .2, "z": -1.25,
+                  "abs_z": 1.25}
+        with patch("src.crypto_venue_router.btc_context", return_value=context), \
+                patch("src.crypto_venue_router.family_signals",
+                      return_value=[signal]):
+            production = venue_setups(
+                {}, {}, entry_time=2 * 3600, market_price=100.0,
+                symbol="AAVEUSDT",
+            )
+            shadow = shadow_experimental_setups(
+                {}, {}, entry_time=2 * 3600, market_price=100.0,
+                symbol="AAVEUSDT",
+            )
+        self.assertEqual(production, [])
+        self.assertEqual(len(shadow), 1)
+        self.assertEqual(shadow[0]["module"],
+                         "shadow_rr_long_bull_asia_high_vol")
         self.assertTrue(shadow[0]["_shadow_experiment"])
         self.assertEqual((shadow[0]["target_r"], shadow[0]["entry_source"]),
                          (.25, "MARKET"))

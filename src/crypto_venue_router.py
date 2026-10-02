@@ -46,10 +46,9 @@ MODULES = (
            (("btc_slow_long_atr", "le", 2.0), ("btc_fast_slow_atr", "ge", -1.0))),
 )
 
-# Frozen before the 2026-09-14 forward cutoff.  It passed the multi-period
-# historical transfer and has three newly completed direct X-Perp wins, but it
-# has not reached the predeclared 20-trade/two-month activation gate.  Callers
-# must keep this module shadow-only; it is intentionally absent from MODULES.
+# These modules passed chronological transfer checks but have not reached the
+# predeclared 20-trade/two-month unseen activation gate.  Callers must keep
+# them shadow-only; they are intentionally absent from MODULES.
 SHADOW_EXPERIMENTAL_MODULES = (
     Module(
         "shadow_pullback_short_bull_pullback_evening",
@@ -57,6 +56,11 @@ SHADOW_EXPERIMENTAL_MODULES = (
         (("btc_return20_atr", "ge", 2.0),
          ("btc_slow_long_atr", "ge", 4.0),
          ("abs_z", "ge", 1.25)),
+    ),
+    Module(
+        "shadow_rr_long_bull_asia_high_vol",
+        "range_reversion", "LONG", "bull", "00_05", .25,
+        (("btc_atr_pct", "ge", .008),),
     ),
 )
 
