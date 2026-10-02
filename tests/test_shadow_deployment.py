@@ -77,6 +77,26 @@ class ShadowDeploymentTests(unittest.TestCase):
         code = chr(10).join(ln.split("#", 1)[0] for ln in src.splitlines())
         self.assertNotIn("open_positions_for_signal", code)
 
+    def test_experimental_venue_analysis_is_always_shadow_only(self):
+        setup = {
+            "direction": "SHORT", "entry": 100.0, "atr": 2.0,
+            "target_r": .25, "utc_session": "18_23",
+            "btc_regime": "bull_pullback", "eff_ratio": .2,
+            "signal_bar_ts": 123.0,
+            "module": "shadow_pullback_short_bull_pullback_evening",
+            "_shadow_experiment": True,
+        }
+        with patch.object(main, "DEPLOYMENT_MODE", "live"):
+            analysis = main._venue_analysis("AAVEUSDT", setup)
+        self.assertTrue(analysis["_shadow_only"])
+        self.assertEqual(analysis["source"], "venue_shadow_experiment")
+
+    def test_live_scan_source_keeps_shadow_experiment_behind_mode_gate(self):
+        import inspect
+        src = inspect.getsource(main._run_venue_strategy_scan)
+        self.assertIn('DEPLOYMENT_MODE == "shadow"', src)
+        self.assertIn("shadow_experimental_setups", src)
+
     def test_blocked_symbols_are_skipped(self):
         """The admin block list has to reach the scan, or it is a placebo."""
         import inspect

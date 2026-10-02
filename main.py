@@ -37,7 +37,9 @@ from src.binance_client import (
     get_klines, get_current_price, get_xperp_instruments, get_xperp_price, get_klines_xperp,
 )
 from src.filter_variants import VARIANTS
-from src.crypto_venue_router import ROBUST_SYMBOLS, venue_setups
+from src.crypto_venue_router import (
+    ROBUST_SYMBOLS, shadow_experimental_setups, venue_setups,
+)
 from src.telegram_notifier import (
     send_signal, send_status, send_signal_update, send_morning_digest, send_weekly_digest,
     send_daily_prayer, send_commandments, send_evening_prayer, send_evening_ritual,
@@ -3594,10 +3596,13 @@ def _base_of_symbol(symbol: str) -> str:
 def _venue_analysis(symbol: str, setup: dict, btc_change: float = 0.0) -> dict:
     """Translate the frozen direct-venue setup into the existing signal schema."""
     direction = setup["direction"]
+    shadow_experiment = bool(setup.get("_shadow_experiment"))
     return {
         "symbol": symbol, "direction": direction, "decision": direction,
         "confidence": "HIGH", "risk_score": 1,
-        "reason": f"Frozen X-Perp module: {setup['module']}",
+        "reason": (f"Forward X-Perp shadow module: {setup['module']}"
+                   if shadow_experiment
+                   else f"Frozen X-Perp module: {setup['module']}"),
         "counter": "The active direct-venue regime may change after entry",
         "current_price": setup["entry"], "market_price": setup["entry"],
         "atr": setup["atr"], "fixed_stop_atr": 2.0,
@@ -3609,12 +3614,16 @@ def _venue_analysis(symbol: str, setup: dict, btc_change: float = 0.0) -> dict:
         "signals": [f"Venue module {setup['module']}",
                     f"BTC regime {setup['btc_regime']}",
                     f"Fixed target {setup['target_r']:.2f}R"],
-        "source": "venue_regime",
+        "source": ("venue_shadow_experiment" if shadow_experiment
+                   else "venue_regime"),
         "signal_bar_ts": float(setup["signal_bar_ts"]),
         "eff_ratio": setup["eff_ratio"], "btc_change": btc_change,
         # Every signal in the current deployment is visible in Telegram and
         # tracked in the DB, but is permanently ineligible for real orders.
-        "_shadow_only": DEPLOYMENT_MODE == "shadow",
+        # Experimental modules remain untradeable even if the deployment is
+        # later switched to live.  This is a second barrier in addition to the
+        # live-mode scan gate below and autotrader's shadow-only refusal.
+        "_shadow_only": shadow_experiment or DEPLOYMENT_MODE == "shadow",
     }
 
 
@@ -3717,6 +3726,14 @@ def _run_venue_strategy_scan() -> None:
                 candles, btc, entry_time=float(candles["time"][-1]) + KLINES_INTERVAL_SEC,
                 market_price=float(market), symbol=symbol,
             )
+            # The experimental module is collected only in shadow deployment
+            # and only when no production module owns this symbol/candle.
+            if not rows and DEPLOYMENT_MODE == "shadow":
+                rows = shadow_experimental_setups(
+                    candles, btc,
+                    entry_time=float(candles["time"][-1]) + KLINES_INTERVAL_SEC,
+                    market_price=float(market), symbol=symbol,
+                )
             for row in rows:
                 row["signal_bar_ts"] = candles["time"][-1]
                 analysis = _venue_analysis(symbol, row)

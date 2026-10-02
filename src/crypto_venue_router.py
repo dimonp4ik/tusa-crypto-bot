@@ -46,6 +46,20 @@ MODULES = (
            (("btc_slow_long_atr", "le", 2.0), ("btc_fast_slow_atr", "ge", -1.0))),
 )
 
+# Frozen before the 2026-09-14 forward cutoff.  It passed the multi-period
+# historical transfer and has three newly completed direct X-Perp wins, but it
+# has not reached the predeclared 20-trade/two-month activation gate.  Callers
+# must keep this module shadow-only; it is intentionally absent from MODULES.
+SHADOW_EXPERIMENTAL_MODULES = (
+    Module(
+        "shadow_pullback_short_bull_pullback_evening",
+        "trend_pullback", "SHORT", "bull_pullback", "18_23", .25,
+        (("btc_return20_atr", "ge", 2.0),
+         ("btc_slow_long_atr", "ge", 4.0),
+         ("abs_z", "ge", 1.25)),
+    ),
+)
+
 AUDITED_SYMBOLS = frozenset({
     "AAVEUSDT", "ADAUSDT", "AVAXUSDT", "BILLUSDT", "BTCUSDT", "DOTUSDT",
     "ETHUSDT", "HYPEUSDT", "LINKUSDT", "NEARUSDT", "SOLUSDT", "SUIUSDT",
@@ -182,10 +196,11 @@ def target_r_for(module: Module, context: dict) -> float:
     return module.target_r
 
 
-def venue_setups(candles: dict, btc_candles: dict, *, entry_time: float,
-                 market_price: float | None = None,
-                 symbol: str | None = None) -> list[dict]:
-    """Return frozen module matches with fixed-R brackets at a market price."""
+def _setups_for_modules(candles: dict, btc_candles: dict,
+                        modules: tuple[Module, ...], *, entry_time: float,
+                        market_price: float | None = None,
+                        symbol: str | None = None,
+                        shadow_experiment: bool = False) -> list[dict]:
     if not symbol or symbol not in ROBUST_SYMBOLS:
         return []
     context = btc_context(btc_candles)
@@ -196,7 +211,7 @@ def venue_setups(candles: dict, btc_candles: dict, *, entry_time: float,
     if not math.isfinite(entry) or entry <= 0:
         return []
     signals = family_signals(candles)
-    for module in MODULES:
+    for module in modules:
         for signal in signals:
             if not _matches(module, signal, context, session):
                 continue
@@ -210,6 +225,7 @@ def venue_setups(candles: dict, btc_candles: dict, *, entry_time: float,
             return [{
                 **signal, **context,
                 "module": module.name,
+                "_shadow_experiment": shadow_experiment,
                 "direction": signal["direction"],
                 "entry_source": "MARKET",
                 "entry": entry,
@@ -219,3 +235,25 @@ def venue_setups(candles: dict, btc_candles: dict, *, entry_time: float,
                 "utc_session": session,
             }]
     return []
+
+
+def venue_setups(candles: dict, btc_candles: dict, *, entry_time: float,
+                 market_price: float | None = None,
+                 symbol: str | None = None) -> list[dict]:
+    """Return frozen production matches with fixed-R market brackets."""
+    return _setups_for_modules(
+        candles, btc_candles, MODULES, entry_time=entry_time,
+        market_price=market_price, symbol=symbol,
+    )
+
+
+def shadow_experimental_setups(
+        candles: dict, btc_candles: dict, *, entry_time: float,
+        market_price: float | None = None,
+        symbol: str | None = None) -> list[dict]:
+    """Return forward-test setups which are permanently ineligible for orders."""
+    return _setups_for_modules(
+        candles, btc_candles, SHADOW_EXPERIMENTAL_MODULES,
+        entry_time=entry_time, market_price=market_price, symbol=symbol,
+        shadow_experiment=True,
+    )

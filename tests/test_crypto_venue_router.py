@@ -2,7 +2,9 @@ import unittest
 from unittest.mock import patch
 
 from src.crypto_venue_router import (
-    MODULES, ROBUST_EXCLUDED_SYMBOLS, ROBUST_SYMBOLS, btc_context, venue_setups,
+    MODULES, ROBUST_EXCLUDED_SYMBOLS, ROBUST_SYMBOLS,
+    SHADOW_EXPERIMENTAL_MODULES, btc_context, shadow_experimental_setups,
+    venue_setups,
 )
 from src import binance_client
 
@@ -107,6 +109,38 @@ class CryptoVenueRouterTests(unittest.TestCase):
         self.assertEqual(len(accepted), 1)
         self.assertEqual(accepted[0]["module"], "rr_short_bull_evening")
         self.assertEqual(rejected, [])
+
+    def test_frozen_shadow_supplement_is_separate_from_production(self):
+        context = {
+            "btc_regime": "bull_pullback", "btc_atr_pct": .004,
+            "btc_return20_atr": 2.0, "btc_fast_slow_atr": -1.0,
+            "btc_slow_long_atr": 4.0, "btc_eff20": .2,
+            "btc_eff96": .2, "btc_return96_atr": 2.0,
+        }
+        signal = {"family": "trend_pullback", "direction": "SHORT",
+                  "atr": 2.0, "eff_ratio": .2, "z": 1.25,
+                  "abs_z": 1.25}
+        with patch("src.crypto_venue_router.btc_context", return_value=context), \
+                patch("src.crypto_venue_router.family_signals",
+                      return_value=[signal]):
+            production = venue_setups(
+                {}, {}, entry_time=20 * 3600, market_price=100.0,
+                symbol="AAVEUSDT",
+            )
+            shadow = shadow_experimental_setups(
+                {}, {}, entry_time=20 * 3600, market_price=100.0,
+                symbol="AAVEUSDT",
+            )
+        self.assertEqual(len(SHADOW_EXPERIMENTAL_MODULES), 1)
+        self.assertEqual(production, [])
+        self.assertEqual(len(shadow), 1)
+        self.assertEqual(
+            shadow[0]["module"],
+            "shadow_pullback_short_bull_pullback_evening",
+        )
+        self.assertTrue(shadow[0]["_shadow_experiment"])
+        self.assertEqual((shadow[0]["target_r"], shadow[0]["entry_source"]),
+                         (.25, "MARKET"))
 
     def test_robust_symbol_gate_fails_closed(self):
         self.assertEqual(ROBUST_EXCLUDED_SYMBOLS,
