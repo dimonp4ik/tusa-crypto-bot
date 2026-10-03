@@ -30,6 +30,13 @@ class CryptoRegimeFilterTests(unittest.TestCase):
         tp1, tp2, sl = bracket_for_analysis(analysis, 100)
         self.assertEqual((tp1, tp2, sl), (99.0, 99.0, 104.0))
 
+    def test_five_minute_barbell_bracket_separates_lock_and_runner(self):
+        analysis = {"direction": "SHORT", "atr": 2,
+                    "fixed_stop_atr": 2, "fixed_target_r": .25,
+                    "fixed_runner_target_r": 4.0}
+        tp1, tp2, sl = bracket_for_analysis(analysis, 100)
+        self.assertEqual((tp1, tp2, sl), (99.0, 84.0, 104.0))
+
     def test_frozen_short_pullback_rule_and_client_market_entry(self):
         closes = [210 - i for i in range(100)]
         closes += [110 - i * (20 / 17) for i in range(18)] + [101.5, 101.25]

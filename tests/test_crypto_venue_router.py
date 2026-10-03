@@ -131,7 +131,7 @@ class CryptoVenueRouterTests(unittest.TestCase):
                 {}, {}, entry_time=20 * 3600, market_price=100.0,
                 symbol="AAVEUSDT",
             )
-        self.assertEqual(len(SHADOW_EXPERIMENTAL_MODULES), 2)
+        self.assertEqual(len(SHADOW_EXPERIMENTAL_MODULES), 4)
         self.assertEqual(production, [])
         self.assertEqual(len(shadow), 1)
         self.assertEqual(
@@ -167,6 +167,68 @@ class CryptoVenueRouterTests(unittest.TestCase):
         self.assertEqual(len(shadow), 1)
         self.assertEqual(shadow[0]["module"],
                          "shadow_rr_long_bull_asia_high_vol")
+        self.assertTrue(shadow[0]["_shadow_experiment"])
+        self.assertEqual((shadow[0]["target_r"], shadow[0]["entry_source"]),
+                         (.25, "MARKET"))
+
+    def test_asia_trend_pullback_candidate_is_shadow_only(self):
+        context = {
+            "btc_regime": "bull_pullback", "btc_atr_pct": .004,
+            "btc_return20_atr": -2.0, "btc_fast_slow_atr": -1.0,
+            "btc_slow_long_atr": 2.0, "btc_eff20": .2,
+            "btc_eff96": .2, "btc_return96_atr": 0.0,
+        }
+        signal = {"family": "trend_pullback", "direction": "SHORT",
+                  "atr": 2.0, "eff_ratio": .2, "z": 1.0,
+                  "abs_z": 1.0}
+        with patch("src.crypto_venue_router.btc_context", return_value=context), \
+                patch("src.crypto_venue_router.family_signals",
+                      return_value=[signal]):
+            production = venue_setups(
+                {}, {}, entry_time=2 * 3600, market_price=100.0,
+                symbol="AAVEUSDT",
+            )
+            shadow = shadow_experimental_setups(
+                {}, {}, entry_time=2 * 3600, market_price=100.0,
+                symbol="AAVEUSDT",
+            )
+        self.assertEqual(production, [])
+        self.assertEqual(len(shadow), 1)
+        self.assertEqual(
+            shadow[0]["module"],
+            "shadow_pullback_short_bull_pullback_asia_trend",
+        )
+        self.assertTrue(shadow[0]["_shadow_experiment"])
+        self.assertEqual((shadow[0]["target_r"], shadow[0]["entry_source"]),
+                         (.25, "MARKET"))
+
+    def test_evening_slow_btc_pullback_candidate_is_shadow_only(self):
+        context = {
+            "btc_regime": "bull_pullback", "btc_atr_pct": .004,
+            "btc_return20_atr": -2.0, "btc_fast_slow_atr": -1.0,
+            "btc_slow_long_atr": 3.0, "btc_eff20": .2,
+            "btc_eff96": .2, "btc_return96_atr": -4.0,
+        }
+        signal = {"family": "trend_pullback", "direction": "SHORT",
+                  "atr": 2.0, "eff_ratio": .2, "z": 1.0,
+                  "abs_z": 1.0}
+        with patch("src.crypto_venue_router.btc_context", return_value=context), \
+                patch("src.crypto_venue_router.family_signals",
+                      return_value=[signal]):
+            production = venue_setups(
+                {}, {}, entry_time=20 * 3600, market_price=100.0,
+                symbol="AAVEUSDT",
+            )
+            shadow = shadow_experimental_setups(
+                {}, {}, entry_time=20 * 3600, market_price=100.0,
+                symbol="AAVEUSDT",
+            )
+        self.assertEqual(production, [])
+        self.assertEqual(len(shadow), 1)
+        self.assertEqual(
+            shadow[0]["module"],
+            "shadow_pullback_short_bull_pullback_evening_slow_btc",
+        )
         self.assertTrue(shadow[0]["_shadow_experiment"])
         self.assertEqual((shadow[0]["target_r"], shadow[0]["entry_source"]),
                          (.25, "MARKET"))
@@ -208,6 +270,28 @@ class CryptoVenueRouterTests(unittest.TestCase):
         self.assertEqual(len(candles["time"]), 400)
         self.assertEqual(candles["time"], sorted(candles["time"]))
         self.assertEqual(request.call_args_list[1].args[1]["after"], first[-1][0])
+
+    def test_xperp_oi_history_paginates_and_uses_contract_count(self):
+        def row(timestamp):
+            return [str(timestamp * 1000), str(timestamp + .5),
+                    str(timestamp + 1), str((timestamp + .5) * 100)]
+
+        first = [row(timestamp) for timestamp in range(300, 200, -1)]
+        second = [row(timestamp) for timestamp in range(200, 130, -1)]
+        with binance_client._kl_lock:
+            binance_client._xperp_oi_cache.clear()
+        with patch.object(binance_client, "get_xperp_instruments",
+                          return_value={"BTC": "BTC-XPERP"}), \
+                patch.object(binance_client, "_okx_get",
+                             side_effect=[{"data": first}, {"data": second}]) as request:
+            history = binance_client.get_xperp_open_interest_history(
+                "BTCUSDT", limit=170)
+        self.assertEqual(request.call_count, 2)
+        self.assertEqual(len(history["time"]), 170)
+        self.assertEqual(history["time"], sorted(history["time"]))
+        self.assertEqual(history["oi"][0], 131.5)
+        self.assertEqual(request.call_args_list[1].args[1]["end"],
+                         str(201 * 1000 - 1))
 
 
 if __name__ == "__main__":

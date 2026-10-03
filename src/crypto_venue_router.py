@@ -62,6 +62,18 @@ SHADOW_EXPERIMENTAL_MODULES = (
         "range_reversion", "LONG", "bull", "00_05", .25,
         (("btc_atr_pct", "ge", .008),),
     ),
+    Module(
+        "shadow_pullback_short_bull_pullback_asia_trend",
+        "trend_pullback", "SHORT", "bull_pullback", "00_05", .25,
+        (("btc_return96_atr", "ge", 0.0),
+         ("btc_slow_long_atr", "ge", 2.0)),
+    ),
+    Module(
+        "shadow_pullback_short_bull_pullback_evening_slow_btc",
+        "trend_pullback", "SHORT", "bull_pullback", "18_23", .25,
+        (("btc_eff20", "ge", .2),
+         ("btc_return96_atr", "le", -4.0)),
+    ),
 )
 
 AUDITED_SYMBOLS = frozenset({

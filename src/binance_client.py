@@ -46,6 +46,8 @@ _working_host = {"url": None}
 # NOTE: OKX 1D default is UTC+8 aligned — "1Dutc" keeps daily candles on UTC
 # boundaries (same as the old Bybit feed, so the daily trend filter is unmoved).
 TIMEFRAME_MAP = {
+    "5m":     "5m",
+    "5min":   "5m",
     "15min": "15m",
     "1h":    "1H",
     "1hour": "1H",
@@ -362,8 +364,8 @@ def get_klines(symbol, interval=TIMEFRAME_KUCOIN, limit=KLINES_LIMIT,
     return out
 
 
-def get_klines_xperp(symbol, limit=60, include_forming=False):
-    """Closed 15m candles of the X-Perp contract (the user's actual market).
+def get_klines_xperp(symbol, limit=60, include_forming=False, interval="15m"):
+    """Closed candles of the X-Perp contract (the user's actual market).
 
     Used by the open-position monitor so TP/SL hits are judged on the prices
     the user's position actually experiences (X-Perp wicks can differ slightly
@@ -382,9 +384,11 @@ def get_klines_xperp(symbol, limit=60, include_forming=False):
     for logic that specifically wants a settled/closed candle's close price.
     """
     try:
-        cache_key = ("xperp", symbol, limit)
+        bar = TIMEFRAME_MAP.get(interval, interval)
+        interval_seconds = {"5m": 300, "15m": 900, "1H": 3600}.get(bar, 900)
+        cache_key = ("xperp", symbol, bar, limit)
         if not include_forming:
-            cached = _kl_cache_get(cache_key, 15 * 60)
+            cached = _kl_cache_get(cache_key, interval_seconds)
             if cached is not None:
                 return cached
         inst_id = get_xperp_instruments().get(_base_of(symbol))
@@ -394,7 +398,7 @@ def get_klines_xperp(symbol, limit=60, include_forming=False):
         raw_newest_first = []
         after = None
         while len(raw_newest_first) < want:
-            params = {"instId": inst_id, "bar": "15m",
+            params = {"instId": inst_id, "bar": bar,
                       "limit": min(want - len(raw_newest_first), 300)}
             if after is not None:
                 params["after"] = after
@@ -439,6 +443,63 @@ def get_klines_xperp(symbol, limit=60, include_forming=False):
         return result
     except Exception as e:
         _logger.debug(f"get_klines_xperp failed for {symbol}: {e}")
+        return None
+
+
+_xperp_oi_cache: dict[tuple[str, str, int], dict] = {}
+
+
+def get_xperp_open_interest_history(symbol: str, period: str = "1H",
+                                     limit: int = 170) -> dict | None:
+    """Return X-Perp OI snapshots as oldest-first ``time``/``oi`` lists.
+
+    The shadow 5-minute route uses contracts, not USD OI, so a price change
+    cannot masquerade as a positioning change.  Results are cached within the
+    UTC hour; the strategy deliberately reads a snapshot at least one hour old.
+    """
+    try:
+        key = (symbol, period, int(limit))
+        hour = int(time.time() // 3600)
+        with _kl_lock:
+            cached = _xperp_oi_cache.get(key)
+            if cached and cached["hour"] == hour:
+                return cached["data"]
+        inst_id = get_xperp_instruments().get(_base_of(symbol))
+        if not inst_id:
+            return None
+        rows: dict[int, list] = {}
+        end = None
+        while len(rows) < limit:
+            params = {"instId": inst_id, "period": period,
+                      "limit": min(100, limit - len(rows))}
+            if end is not None:
+                params["end"] = str(end)
+            page = _okx_get(
+                "/api/v5/rubik/stat/contracts/open-interest-history",
+                params, timeout=10).get("data", [])
+            if not page:
+                break
+            for row in page:
+                if len(row) >= 2:
+                    rows[int(row[0])] = row
+            oldest = min(int(row[0]) for row in page)
+            if end is not None and oldest >= end:
+                break
+            end = oldest - 1
+            if len(page) < int(params["limit"]):
+                break
+        ordered = [rows[value] for value in sorted(rows)][-limit:]
+        if len(ordered) < limit:
+            return None
+        result = {
+            "time": [int(row[0]) // 1000 for row in ordered],
+            "oi": [float(row[1]) for row in ordered],
+        }
+        with _kl_lock:
+            _xperp_oi_cache[key] = {"hour": hour, "data": result}
+        return result
+    except Exception as e:
+        _logger.debug(f"get_xperp_open_interest_history failed for {symbol}: {e}")
         return None
 
 
