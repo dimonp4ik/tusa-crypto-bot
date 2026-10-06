@@ -3652,12 +3652,22 @@ def _venue_analysis(symbol: str, setup: dict, btc_change: float = 0.0) -> dict:
             f"BTC regime {setup['btc_regime']}",
             f"Fixed target {setup['target_r']:.2f}R"]
     if five_minute_oi:
+        runner_target_r = float(setup.get("runner_target_r") or 4.0)
+        tp1_close_fraction = float(setup.get("tp1_close_fraction") or .70)
         first_target_move_pct = float(setup.get("first_target_move_pct") or (
             100.0 * float(setup["atr"]) * 2.0 * float(setup["target_r"])
             / float(setup["entry"])))
         tags.append(f"Lagged OI 168h {setup['oi_change_168h'] * 100:+.2f}%")
+        if setup.get("observed_atr_pct") is not None:
+            tags.append(f"Observed ATR {float(setup['observed_atr_pct']):.2f}%")
         tags.append(f"First target move {first_target_move_pct:.2f}%")
-        tags.append("Barbell 70% @ 0.25R, runner 30% @ 4.00R")
+        runner_move_pct = (
+            100.0 * float(setup["atr"]) * 2.0 * runner_target_r
+            / float(setup["entry"]))
+        tags.append(
+            f"Barbell {tp1_close_fraction * 100:.0f}% @ "
+            f"+{first_target_move_pct:.2f}%, runner "
+            f"{(1-tp1_close_fraction) * 100:.0f}% @ +{runner_move_pct:.2f}%")
     return {
         "symbol": symbol, "direction": direction, "decision": direction,
         "confidence": "HIGH", "risk_score": 1,
@@ -3668,11 +3678,10 @@ def _venue_analysis(symbol: str, setup: dict, btc_change: float = 0.0) -> dict:
         "current_price": setup["entry"], "market_price": setup["entry"],
         "atr": setup["atr"], "fixed_stop_atr": 2.0,
         "fixed_target_r": setup["target_r"], "entry_source": "MARKET",
-        # Frozen forward-only exit contract selected on dev and confirmed on
-        # validation + untouched hidden data.  These fields are persisted on
-        # the signal row so a restart cannot fall back to the global 15m trail.
-        "fixed_runner_target_r": 4.0 if five_minute_oi else None,
-        "strategy_tp1_close_frac": .70 if five_minute_oi else None,
+        # Persist the shadow module's fixed absolute-move bracket so a restart
+        # cannot fall back to the global 15m trail.
+        "fixed_runner_target_r": runner_target_r if five_minute_oi else None,
+        "strategy_tp1_close_frac": tp1_close_fraction if five_minute_oi else None,
         "strategy_runner_mode": "fixed_be" if five_minute_oi else None,
         "strategy_bar_seconds": 300 if five_minute_oi else None,
         "strategy_entry_bar_ts": (

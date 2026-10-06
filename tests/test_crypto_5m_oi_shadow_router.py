@@ -1,8 +1,8 @@
 import unittest
 
 from src.crypto_5m_oi_shadow_router import (
-    ONDO_SHORT_SESSION_MODULE, SHADOW_ONLY_SYMBOLS,
-    MODULE_NAME, candidate_context, shadow_setup, symbol_context_allowed,
+    SHADOW_ONLY_SYMBOLS, MODULE_NAME, candidate_context, shadow_setup,
+    symbol_context_allowed,
     symbol_context_variant,
 )
 
@@ -14,10 +14,9 @@ class ShadowUniverseSafetyTests(unittest.TestCase):
         self.assertIn("ONDOUSDT", SHADOW_ONLY_SYMBOLS)
         self.assertNotIn("ONDOUSDT", ROBUST_SYMBOLS)
 
-    def test_ondo_uses_only_short_setups_outside_06_11_utc(self):
-        self.assertEqual(symbol_context_variant(
-            "ONDOUSDT", {"direction": "SHORT"}, 12 * 3600),
-            ONDO_SHORT_SESSION_MODULE)
+    def test_ondo_transfer_is_refused_by_absolute_move_route(self):
+        self.assertIsNone(symbol_context_variant(
+            "ONDOUSDT", {"direction": "SHORT"}, 12 * 3600))
         self.assertFalse(symbol_context_allowed(
             "ONDOUSDT", {"direction": "SHORT"}, 8 * 3600))
         self.assertFalse(symbol_context_allowed(
@@ -69,12 +68,14 @@ class FiveMinuteOiShadowRouterTests(unittest.TestCase):
         coin["high"] = [value + 1.0 for value in coin["close"]]
         coin["low"] = [value - 1.0 for value in coin["close"]]
         setup = shadow_setup(
-            coin, btc, oi_history(), entry_time=170 * 3600,
+            coin, btc, oi_history(110.0), entry_time=170 * 3600,
             market_price=182.0, symbol="TESTUSDT")
         self.assertEqual(setup["module"], MODULE_NAME)
         self.assertEqual(setup["entry"], 182.0)
-        self.assertEqual(setup["target_r"], .25)
-        self.assertGreaterEqual(setup["first_target_move_pct"], .5)
+        self.assertEqual(setup["target_r"], .5)
+        self.assertEqual(setup["runner_target_r"], 2.0)
+        self.assertEqual(setup["first_target_move_pct"], .5)
+        self.assertGreaterEqual(setup["observed_atr_pct"], .2)
         self.assertTrue(setup["_shadow_experiment"])
         self.assertTrue(setup["_five_minute_oi_shadow"])
 
@@ -94,8 +95,8 @@ class FiveMinuteOiShadowRouterTests(unittest.TestCase):
     def test_micro_target_is_not_published_even_in_shadow(self):
         coin, btc = qualifying_candles()
         self.assertIsNone(shadow_setup(
-            coin, btc, oi_history(), entry_time=170 * 3600,
-            market_price=182.0, symbol="TESTUSDT"))
+            coin, btc, oi_history(110.0), entry_time=170 * 3600,
+            market_price=1000.0, symbol="TESTUSDT"))
 
     def test_repeated_pullback_flag_is_not_a_new_setup(self):
         coin, btc = qualifying_candles()

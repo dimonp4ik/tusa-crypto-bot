@@ -130,11 +130,13 @@ class ShadowDeploymentTests(unittest.TestCase):
 
     def test_five_minute_oi_analysis_is_permanently_shadow_only(self):
         setup = {
-            "direction": "SHORT", "entry": 100.0, "atr": 2.0,
-            "target_r": .25, "utc_session": "18",
+            "direction": "SHORT", "entry": 100.0, "atr": .5,
+            "target_r": .5, "runner_target_r": 2.0,
+            "tp1_close_fraction": .70, "first_target_move_pct": .5,
+            "observed_atr_pct": .25, "utc_session": "18",
             "btc_regime": "oi_confirmed_trend", "eff_ratio": .2,
-            "signal_bar_ts": 123.0, "oi_change_168h": -.05,
-            "module": "shadow_5m_oi_trend_pullback",
+            "signal_bar_ts": 123.0, "oi_change_168h": .05,
+            "module": "shadow_5m_oi_actual_move",
             "_shadow_experiment": True, "_five_minute_oi_shadow": True,
         }
         with patch.object(main, "DEPLOYMENT_MODE", "live"):
@@ -142,7 +144,8 @@ class ShadowDeploymentTests(unittest.TestCase):
         self.assertTrue(analysis["_shadow_only"])
         self.assertTrue(analysis["_five_minute_oi_shadow"])
         self.assertEqual(analysis["source"], "venue_shadow_5m_oi")
-        self.assertEqual(analysis["fixed_runner_target_r"], 4.0)
+        self.assertEqual(analysis["fixed_target_r"], .5)
+        self.assertEqual(analysis["fixed_runner_target_r"], 2.0)
         self.assertEqual(analysis["strategy_tp1_close_frac"], .70)
         self.assertEqual(analysis["strategy_runner_mode"], "fixed_be")
         self.assertEqual(analysis["strategy_bar_seconds"], 300)
@@ -278,11 +281,13 @@ class ShadowDeploymentTests(unittest.TestCase):
         fifteen = {"time": [900.0], "close": [100.0]}
         five = {"time": [300.0], "close": [99.0]}
         setup = {
-            "direction": "SHORT", "entry": 99.0, "atr": 2.0,
-            "target_r": .25, "utc_session": "00",
+            "direction": "SHORT", "entry": 99.0, "atr": .495,
+            "target_r": .5, "runner_target_r": 2.0,
+            "tp1_close_fraction": .70, "first_target_move_pct": .5,
+            "observed_atr_pct": .25, "utc_session": "00",
             "btc_regime": "oi_confirmed_trend", "eff_ratio": .2,
-            "signal_bar_ts": 300.0, "oi_change_168h": -.05,
-            "module": "shadow_5m_oi_trend_pullback",
+            "signal_bar_ts": 300.0, "oi_change_168h": .05,
+            "module": "shadow_5m_oi_actual_move",
             "_shadow_experiment": True, "_five_minute_oi_shadow": True,
         }
 

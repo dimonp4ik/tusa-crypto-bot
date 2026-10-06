@@ -12,18 +12,23 @@ from datetime import datetime, timezone
 import math
 
 
-MODULE_NAME = "shadow_5m_oi_trend_pullback"
-ONDO_SHORT_SESSION_MODULE = "shadow_5m_oi_ondo_short_outside_06_11"
+MODULE_NAME = "shadow_5m_oi_actual_move"
 # Liquidity-selected transfer candidates live in a separate universe.  They are
 # fetched only while the whole deployment is in shadow mode and never become
 # eligible for the production 15m venue router merely by appearing here.
 SHADOW_ONLY_SYMBOLS = frozenset({"ONDOUSDT"})
 BASE_ROUTE_EXCLUDED_SYMBOLS = frozenset({"HYPEUSDT"})
-OI_168H_MIN = -0.15010500977847596
+OI_168H_MIN = 0.0
+OBSERVED_ATR_MIN_FRACTION = .002
 BTC_RET12_DIR_ATR_MAX = -0.440283
 BTC_MA20_96_DIR_ATR_MIN = 4.93787
 STOP_ATR = 2.0
-TARGET_R = 0.25
+STOP_MOVE_PCT = 1.0
+TARGET_MOVE_PCT = .5
+RUNNER_MOVE_PCT = 2.0
+TARGET_R = TARGET_MOVE_PCT / STOP_MOVE_PCT
+RUNNER_TARGET_R = RUNNER_MOVE_PCT / STOP_MOVE_PCT
+TP1_CLOSE_FRACTION = .70
 MIN_FIRST_TARGET_MOVE_PCT = .50
 
 
@@ -121,10 +126,8 @@ def symbol_context_variant(symbol: str, context: dict,
     """Return the frozen 5m route variant, or None when the symbol is refused."""
     if symbol in BASE_ROUTE_EXCLUDED_SYMBOLS:
         return None
-    hour = datetime.fromtimestamp(entry_time, timezone.utc).hour
-    if (symbol == "ONDOUSDT" and context.get("direction") == "SHORT"
-            and not 6 <= hour <= 11):
-        return ONDO_SHORT_SESSION_MODULE
+    # The absolute-move rule has evidence only on the base eight-symbol
+    # universe.  Earlier ONDO/HYPE transfer ideas used much smaller targets.
     if symbol in SHADOW_ONLY_SYMBOLS:
         return None
     return MODULE_NAME
@@ -163,7 +166,13 @@ def shadow_setup(candles: dict, btc_candles: dict, oi_history: dict,
     entry = float(market_price)
     if not math.isfinite(entry) or entry <= 0:
         return None
-    first_target_move_pct = 100.0 * context["atr"] * STOP_ATR * TARGET_R / entry
+    observed_atr_fraction = context["atr"] / entry
+    if observed_atr_fraction < OBSERVED_ATR_MIN_FRACTION:
+        return None
+    # Encode the audited fixed -1%/+0.5%/+2% bracket in the existing ATR/R
+    # signal schema.  Keep observed ATR separate because it is an entry filter.
+    execution_atr = entry * (STOP_MOVE_PCT / 100.0) / STOP_ATR
+    first_target_move_pct = 100.0 * execution_atr * STOP_ATR * TARGET_R / entry
     if first_target_move_pct < MIN_FIRST_TARGET_MOVE_PCT:
         return None
     return {
@@ -174,8 +183,12 @@ def shadow_setup(candles: dict, btc_candles: dict, oi_history: dict,
         "btc_regime": "oi_confirmed_trend",
         "utc_session": f"{datetime.fromtimestamp(entry_time, timezone.utc).hour:02d}",
         "entry": entry,
-        "atr": context["atr"],
+        "atr": execution_atr,
+        "observed_atr": context["atr"],
+        "observed_atr_pct": 100.0 * observed_atr_fraction,
         "target_r": TARGET_R,
+        "runner_target_r": RUNNER_TARGET_R,
+        "tp1_close_fraction": TP1_CLOSE_FRACTION,
         "eff_ratio": context["eff_ratio"],
         "entry_time": float(entry_time),
         "first_target_move_pct": first_target_move_pct,
