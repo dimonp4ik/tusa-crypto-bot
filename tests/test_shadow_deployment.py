@@ -12,6 +12,19 @@ from src import telegram_notifier as notifier
 
 
 class ShadowDeploymentTests(unittest.TestCase):
+    def test_ondo_scan_candidate_exists_only_in_shadow_mode(self):
+        with patch.object(main, "ROBUST_SYMBOLS", {"BTCUSDT"}), \
+             patch.object(main, "FIVE_MINUTE_OI_SHADOW_SYMBOLS", {"ONDOUSDT"}), \
+             patch.object(main, "DEPLOYMENT_MODE", "shadow"):
+            self.assertEqual(
+                main._venue_scan_universe({"BTC", "ONDO"}),
+                ["BTCUSDT", "ONDOUSDT"])
+        with patch.object(main, "ROBUST_SYMBOLS", {"BTCUSDT"}), \
+             patch.object(main, "FIVE_MINUTE_OI_SHADOW_SYMBOLS", {"ONDOUSDT"}), \
+             patch.object(main, "DEPLOYMENT_MODE", "live"):
+            self.assertEqual(
+                main._venue_scan_universe({"BTC", "ONDO"}), ["BTCUSDT"])
+
     def test_real_orders_fail_closed(self):
         self.assertEqual(config.DEPLOYMENT_MODE, "shadow")
         self.assertFalse(config.AUTOTRADE_ENABLED)

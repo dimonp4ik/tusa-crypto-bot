@@ -43,7 +43,9 @@ from src.crypto_venue_router import (
     shadow_experimental_setups, venue_setups,
 )
 from src.crypto_5m_oi_shadow_router import (
+    SHADOW_ONLY_SYMBOLS as FIVE_MINUTE_OI_SHADOW_SYMBOLS,
     candidate_context as five_minute_oi_candidate_context,
+    symbol_context_allowed as five_minute_oi_symbol_context_allowed,
     shadow_setup as five_minute_oi_shadow_setup,
 )
 from src.telegram_notifier import (
@@ -3650,7 +3652,11 @@ def _venue_analysis(symbol: str, setup: dict, btc_change: float = 0.0) -> dict:
             f"BTC regime {setup['btc_regime']}",
             f"Fixed target {setup['target_r']:.2f}R"]
     if five_minute_oi:
+        first_target_move_pct = float(setup.get("first_target_move_pct") or (
+            100.0 * float(setup["atr"]) * 2.0 * float(setup["target_r"])
+            / float(setup["entry"])))
         tags.append(f"Lagged OI 168h {setup['oi_change_168h'] * 100:+.2f}%")
+        tags.append(f"First target move {first_target_move_pct:.2f}%")
         tags.append("Barbell 70% @ 0.25R, runner 30% @ 4.00R")
     return {
         "symbol": symbol, "direction": direction, "decision": direction,
@@ -3696,17 +3702,31 @@ def _venue_analysis(symbol: str, setup: dict, btc_change: float = 0.0) -> dict:
 def _five_minute_oi_setup(symbol: str, candles_5m: dict | None,
                           btc_5m: dict | None, market: float) -> dict | None:
     """Evaluate the shadow supplement and avoid OI I/O unless price qualifies."""
-    if (DEPLOYMENT_MODE != "shadow" or not candles_5m or not btc_5m
-            or not five_minute_oi_candidate_context(candles_5m, btc_5m)):
+    if DEPLOYMENT_MODE != "shadow" or not candles_5m or not btc_5m:
+        return None
+    context = five_minute_oi_candidate_context(candles_5m, btc_5m)
+    entry_time = float(candles_5m["time"][-1]) + 300
+    if (not context
+            or not five_minute_oi_symbol_context_allowed(
+                symbol, context, entry_time)):
         return None
     oi_history = get_xperp_open_interest_history(symbol, limit=170)
     if not oi_history:
         return None
     return five_minute_oi_shadow_setup(
         candles_5m, btc_5m, oi_history,
-        entry_time=float(candles_5m["time"][-1]) + 300,
+        entry_time=entry_time,
         market_price=float(market), symbol=symbol,
     )
+
+
+def _venue_scan_universe(available: set[str]) -> list[str]:
+    """Return production symbols plus isolated 5m candidates in shadow mode."""
+    scan_universe = set(ROBUST_SYMBOLS)
+    if DEPLOYMENT_MODE == "shadow":
+        scan_universe.update(FIVE_MINUTE_OI_SHADOW_SYMBOLS)
+    return sorted(
+        symbol for symbol in scan_universe if _base_of_symbol(symbol) in available)
 
 
 def _publish_venue_candidates(candidates: list[tuple[dict, int]],
@@ -3787,7 +3807,7 @@ def _run_venue_strategy_scan() -> None:
         return
 
     available = set(get_xperp_instruments())
-    symbols = sorted(s for s in ROBUST_SYMBOLS if _base_of_symbol(s) in available)
+    symbols = _venue_scan_universe(available)
     if "BTCUSDT" not in symbols:
         log.warning("Venue scan refused: BTC X-Perp context is unavailable")
         return

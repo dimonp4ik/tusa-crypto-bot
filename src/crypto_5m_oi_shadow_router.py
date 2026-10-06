@@ -13,11 +13,18 @@ import math
 
 
 MODULE_NAME = "shadow_5m_oi_trend_pullback"
+ONDO_SHORT_SESSION_MODULE = "shadow_5m_oi_ondo_short_outside_06_11"
+# Liquidity-selected transfer candidates live in a separate universe.  They are
+# fetched only while the whole deployment is in shadow mode and never become
+# eligible for the production 15m venue router merely by appearing here.
+SHADOW_ONLY_SYMBOLS = frozenset({"ONDOUSDT"})
+BASE_ROUTE_EXCLUDED_SYMBOLS = frozenset({"HYPEUSDT"})
 OI_168H_MIN = -0.15010500977847596
 BTC_RET12_DIR_ATR_MAX = -0.440283
 BTC_MA20_96_DIR_ATR_MIN = 4.93787
 STOP_ATR = 2.0
 TARGET_R = 0.25
+MIN_FIRST_TARGET_MOVE_PCT = .50
 
 
 def _mean(values: list[float]) -> float:
@@ -83,8 +90,14 @@ def candidate_context(candles: dict, btc_candles: dict) -> dict | None:
     btc_close = [float(value) for value in btc_candles["close"]]
     btc_ma20 = _mean(btc_close[btc_index - 19:btc_index + 1])
     btc_ma96 = _mean(btc_close[btc_index - 95:btc_index + 1])
+    btc_recent = btc_close[btc_index - 19:btc_index + 1]
+    btc_movement = sum(abs(btc_recent[pos] - btc_recent[pos - 1])
+                       for pos in range(1, 20))
+    if not btc_movement:
+        return None
     btc_trend = direction * (btc_ma20 - btc_ma96) / btc_atr
     btc_return = direction * (btc_close[btc_index] - btc_close[btc_index - 12]) / btc_atr
+    btc_eff20 = abs(btc_recent[-1] - btc_recent[0]) / btc_movement
     if (btc_return > BTC_RET12_DIR_ATR_MAX
             or btc_trend <= BTC_MA20_96_DIR_ATR_MIN):
         return None
@@ -99,7 +112,28 @@ def candidate_context(candles: dict, btc_candles: dict) -> dict | None:
         "signal_bar_ts": signal_time,
         "btc_ret12_dir_atr": btc_return,
         "btc_ma20_96_dir_atr": btc_trend,
+        "btc_eff20": btc_eff20,
     }
+
+
+def symbol_context_variant(symbol: str, context: dict,
+                           entry_time: float) -> str | None:
+    """Return the frozen 5m route variant, or None when the symbol is refused."""
+    if symbol in BASE_ROUTE_EXCLUDED_SYMBOLS:
+        return None
+    hour = datetime.fromtimestamp(entry_time, timezone.utc).hour
+    if (symbol == "ONDOUSDT" and context.get("direction") == "SHORT"
+            and not 6 <= hour <= 11):
+        return ONDO_SHORT_SESSION_MODULE
+    if symbol in SHADOW_ONLY_SYMBOLS:
+        return None
+    return MODULE_NAME
+
+
+def symbol_context_allowed(symbol: str, context: dict,
+                           entry_time: float) -> bool:
+    """Apply frozen symbol-transfer constraints before requesting OI."""
+    return symbol_context_variant(symbol, context, entry_time) is not None
 
 
 def _oi_change_168h(oi_history: dict, entry_time: float) -> float | None:
@@ -119,7 +153,9 @@ def shadow_setup(candles: dict, btc_candles: dict, oi_history: dict,
                  *, entry_time: float, market_price: float,
                  symbol: str) -> dict | None:
     context = candidate_context(candles, btc_candles)
-    if context is None or not symbol:
+    variant = (symbol_context_variant(symbol, context, entry_time)
+               if context is not None and symbol else None)
+    if context is None or not symbol or variant is None:
         return None
     oi_change = _oi_change_168h(oi_history, entry_time)
     if oi_change is None or oi_change < OI_168H_MIN:
@@ -127,9 +163,12 @@ def shadow_setup(candles: dict, btc_candles: dict, oi_history: dict,
     entry = float(market_price)
     if not math.isfinite(entry) or entry <= 0:
         return None
+    first_target_move_pct = 100.0 * context["atr"] * STOP_ATR * TARGET_R / entry
+    if first_target_move_pct < MIN_FIRST_TARGET_MOVE_PCT:
+        return None
     return {
         "symbol": symbol,
-        "module": MODULE_NAME,
+        "module": variant,
         "family": "trend_pullback",
         "direction": context["direction"],
         "btc_regime": "oi_confirmed_trend",
@@ -139,6 +178,7 @@ def shadow_setup(candles: dict, btc_candles: dict, oi_history: dict,
         "target_r": TARGET_R,
         "eff_ratio": context["eff_ratio"],
         "entry_time": float(entry_time),
+        "first_target_move_pct": first_target_move_pct,
         "signal_bar_ts": context["signal_bar_ts"],
         "oi_change_168h": oi_change,
         "btc_ret12_dir_atr": context["btc_ret12_dir_atr"],
