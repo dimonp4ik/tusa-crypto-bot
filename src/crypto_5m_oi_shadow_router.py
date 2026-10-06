@@ -13,6 +13,11 @@ import math
 
 
 MODULE_NAME = "shadow_5m_oi_actual_move"
+# The first genuinely post-freeze replay failed (one literal +0.5% touch and
+# three stops).  Keep the implementation available for reproducible research,
+# but fail closed in the running bot until a newly frozen candidate passes its
+# forward gate on enough unseen trades.
+SHADOW_CANDIDATE_ENABLED = False
 # Liquidity-selected transfer candidates live in a separate universe.  They are
 # fetched only while the whole deployment is in shadow mode and never become
 # eligible for the production 15m venue router merely by appearing here.
@@ -124,6 +129,8 @@ def candidate_context(candles: dict, btc_candles: dict) -> dict | None:
 def symbol_context_variant(symbol: str, context: dict,
                            entry_time: float) -> str | None:
     """Return the frozen 5m route variant, or None when the symbol is refused."""
+    if not SHADOW_CANDIDATE_ENABLED:
+        return None
     if symbol in BASE_ROUTE_EXCLUDED_SYMBOLS:
         return None
     # The absolute-move rule has evidence only on the base eight-symbol

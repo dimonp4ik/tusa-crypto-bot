@@ -311,6 +311,8 @@ class ShadowDeploymentTests(unittest.TestCase):
              patch.object(main, "shadow_experimental_setups", return_value=[]), \
              patch.object(main, "five_minute_oi_candidate_context",
                           return_value={"direction": "SHORT"}), \
+             patch.object(main, "five_minute_oi_symbol_context_allowed",
+                          return_value=True), \
              patch.object(main, "get_xperp_open_interest_history",
                           return_value={"time": [1], "oi": [1]}) as oi, \
              patch.object(main, "five_minute_oi_shadow_setup",

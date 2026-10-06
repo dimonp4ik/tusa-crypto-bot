@@ -3651,16 +3651,16 @@ def _venue_analysis(symbol: str, setup: dict, btc_change: float = 0.0) -> dict:
     tags = [f"Venue module {setup['module']}",
             f"BTC regime {setup['btc_regime']}",
             f"Fixed target {setup['target_r']:.2f}R"]
+    first_target_move_pct = float(setup.get("first_target_move_pct") or (
+        100.0 * float(setup["atr"]) * 2.0 * float(setup["target_r"])
+        / float(setup["entry"])))
+    tags.append(f"First target move {first_target_move_pct:.2f}%")
     if five_minute_oi:
         runner_target_r = float(setup.get("runner_target_r") or 4.0)
         tp1_close_fraction = float(setup.get("tp1_close_fraction") or .70)
-        first_target_move_pct = float(setup.get("first_target_move_pct") or (
-            100.0 * float(setup["atr"]) * 2.0 * float(setup["target_r"])
-            / float(setup["entry"])))
         tags.append(f"Lagged OI 168h {setup['oi_change_168h'] * 100:+.2f}%")
         if setup.get("observed_atr_pct") is not None:
             tags.append(f"Observed ATR {float(setup['observed_atr_pct']):.2f}%")
-        tags.append(f"First target move {first_target_move_pct:.2f}%")
         runner_move_pct = (
             100.0 * float(setup["atr"]) * 2.0 * runner_target_r
             / float(setup["entry"]))

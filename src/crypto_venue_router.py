@@ -92,6 +92,7 @@ ROBUST_SYMBOLS = AUDITED_SYMBOLS - ROBUST_EXCLUDED_SYMBOLS
 CONDITIONAL_TARGET_MODULE = "rr_short_bull_pullback_asia"
 CONDITIONAL_TARGET_BTC_EFF20_MIN = .1
 CONDITIONAL_TARGET_R = .5
+MIN_FIRST_TARGET_MOVE_PCT = .50
 
 
 def _session(timestamp: float) -> str:
@@ -236,7 +237,9 @@ def _setups_for_modules(candles: dict, btc_candles: dict,
             stop = entry - sign * risk
             target_r = target_r_for(module, context)
             target = entry + sign * risk * target_r
-            if risk >= entry or min(stop, target) <= 0:
+            first_target_move_pct = 100.0 * risk * target_r / entry
+            if (risk >= entry or min(stop, target) <= 0
+                    or first_target_move_pct < MIN_FIRST_TARGET_MOVE_PCT):
                 continue
             return [{
                 **signal, **context,
@@ -248,6 +251,7 @@ def _setups_for_modules(candles: dict, btc_candles: dict,
                 "sl": stop,
                 "tp": target,
                 "target_r": target_r,
+                "first_target_move_pct": first_target_move_pct,
                 "utc_session": session,
             }]
     return []

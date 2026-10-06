@@ -61,6 +61,24 @@ class CryptoVenueRouterTests(unittest.TestCase):
                                           market_price=100.0,
                                           symbol="AAVEUSDT"), [])
 
+    def test_micro_target_is_never_published(self):
+        context = {
+            "btc_regime": "bear_rally", "btc_atr_pct": .001,
+            "btc_return20_atr": -2.0, "btc_fast_slow_atr": 0.0,
+            "btc_slow_long_atr": 0.0, "btc_eff20": .3,
+            "btc_eff96": .2, "btc_return96_atr": 0.0,
+        }
+        signal = {"family": "range_reversion", "direction": "LONG",
+                  "atr": .1, "eff_ratio": .2, "z": -2.2, "abs_z": 2.2}
+        with patch("src.crypto_venue_router.btc_context", return_value=context), \
+                patch("src.crypto_venue_router.family_signals",
+                      return_value=[signal]):
+            setups = venue_setups(
+                {}, {}, entry_time=8 * 3600, market_price=100.0,
+                symbol="AAVEUSDT",
+            )
+        self.assertEqual(setups, [])
+
     def test_asia_pullback_short_uses_conditional_half_r_target(self):
         base_context = {
             "btc_regime": "bull_pullback", "btc_atr_pct": .004,

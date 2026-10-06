@@ -1,4 +1,7 @@
 import unittest
+from unittest.mock import patch
+
+import src.crypto_5m_oi_shadow_router as router
 
 from src.crypto_5m_oi_shadow_router import (
     SHADOW_ONLY_SYMBOLS, MODULE_NAME, candidate_context, shadow_setup,
@@ -21,7 +24,12 @@ class ShadowUniverseSafetyTests(unittest.TestCase):
             "ONDOUSDT", {"direction": "SHORT"}, 8 * 3600))
         self.assertFalse(symbol_context_allowed(
             "ONDOUSDT", {"direction": "LONG"}, 12 * 3600))
-        self.assertTrue(symbol_context_allowed(
+        self.assertFalse(symbol_context_allowed(
+            "BTCUSDT", {"direction": "LONG"}, 8 * 3600))
+
+    def test_invalidated_candidate_fails_closed(self):
+        self.assertFalse(router.SHADOW_CANDIDATE_ENABLED)
+        self.assertIsNone(symbol_context_variant(
             "BTCUSDT", {"direction": "LONG"}, 8 * 3600))
 
     def test_hype_is_refused_only_by_the_five_minute_route(self):
@@ -67,9 +75,10 @@ class FiveMinuteOiShadowRouterTests(unittest.TestCase):
         self.assertEqual(context["direction"], "SHORT")
         coin["high"] = [value + 1.0 for value in coin["close"]]
         coin["low"] = [value - 1.0 for value in coin["close"]]
-        setup = shadow_setup(
-            coin, btc, oi_history(110.0), entry_time=170 * 3600,
-            market_price=182.0, symbol="TESTUSDT")
+        with patch.object(router, "SHADOW_CANDIDATE_ENABLED", True):
+            setup = shadow_setup(
+                coin, btc, oi_history(110.0), entry_time=170 * 3600,
+                market_price=182.0, symbol="TESTUSDT")
         self.assertEqual(setup["module"], MODULE_NAME)
         self.assertEqual(setup["entry"], 182.0)
         self.assertEqual(setup["target_r"], .5)
@@ -81,22 +90,25 @@ class FiveMinuteOiShadowRouterTests(unittest.TestCase):
 
     def test_crowded_oi_drop_fails_closed(self):
         coin, btc = qualifying_candles()
-        self.assertIsNone(shadow_setup(
-            coin, btc, oi_history(75.0), entry_time=170 * 3600,
-            market_price=182.0, symbol="TESTUSDT"))
+        with patch.object(router, "SHADOW_CANDIDATE_ENABLED", True):
+            self.assertIsNone(shadow_setup(
+                coin, btc, oi_history(75.0), entry_time=170 * 3600,
+                market_price=182.0, symbol="TESTUSDT"))
 
     def test_missing_or_short_oi_fails_closed(self):
         coin, btc = qualifying_candles()
-        for history in ({}, {"time": [0, 3600], "oi": [100, 101]}):
-            self.assertIsNone(shadow_setup(
-                coin, btc, history, entry_time=170 * 3600,
-                market_price=182.0, symbol="TESTUSDT"))
+        with patch.object(router, "SHADOW_CANDIDATE_ENABLED", True):
+            for history in ({}, {"time": [0, 3600], "oi": [100, 101]}):
+                self.assertIsNone(shadow_setup(
+                    coin, btc, history, entry_time=170 * 3600,
+                    market_price=182.0, symbol="TESTUSDT"))
 
     def test_micro_target_is_not_published_even_in_shadow(self):
         coin, btc = qualifying_candles()
-        self.assertIsNone(shadow_setup(
-            coin, btc, oi_history(110.0), entry_time=170 * 3600,
-            market_price=1000.0, symbol="TESTUSDT"))
+        with patch.object(router, "SHADOW_CANDIDATE_ENABLED", True):
+            self.assertIsNone(shadow_setup(
+                coin, btc, oi_history(110.0), entry_time=170 * 3600,
+                market_price=1000.0, symbol="TESTUSDT"))
 
     def test_repeated_pullback_flag_is_not_a_new_setup(self):
         coin, btc = qualifying_candles()
