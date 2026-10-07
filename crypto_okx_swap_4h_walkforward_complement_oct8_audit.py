@@ -74,7 +74,9 @@ def evaluation_passes(value: dict) -> bool:
 
 
 def choose_fold(frame: pd.DataFrame, x: np.ndarray, cascade: pd.DataFrame,
-                selection_year: int, evaluation_year: int) -> tuple[dict, pd.DataFrame]:
+                selection_year: int, evaluation_year: int,
+                family_options: tuple[tuple[str, ...], ...] = FAMILY_OPTIONS,
+                ) -> tuple[dict, pd.DataFrame]:
     train_years = tuple(range(2020, selection_year))
     scored = fit_scores(frame, x, train_years)
     select = scored[scored.year.eq(selection_year)]
@@ -89,7 +91,7 @@ def choose_fold(frame: pd.DataFrame, x: np.ndarray, cascade: pd.DataFrame,
             ].quantile(upgrade_quantile)) for target in (1.0, 1.5, 2.0)}
             routed_all = four.route(
                 scored, entry_threshold, upgrades, tuple(four.FAMILIES))
-            for allowed in FAMILY_OPTIONS:
+            for allowed in family_options:
                 tested += 1
                 if allowed == tuple(four.FAMILIES):
                     routed = routed_all
@@ -180,12 +182,21 @@ def main() -> None:
                           "status": item["status"],
                           "qualified": item.get("qualified", 0)}), flush=True)
     development_pass = all(item["status"] == "PASS" for item in folds)
+    singleton_selections = [set(item.get("allowed_families", ()))
+                            for item in folds
+                            if item["status"] == "PASS"
+                            and len(item.get("allowed_families", ())) == 1]
+    stable_families = (sorted(set.intersection(*singleton_selections))
+                       if len(singleton_selections) == len(DEVELOPMENT_FOLDS)
+                       else [])
     hidden_revealed = False
-    if development_pass:
+    if development_pass and stable_families:
         hidden_revealed = True
+        hidden_family_options = tuple((name,) for name in stable_families)
         for selection_year, evaluation_year in HIDDEN_FOLDS:
             item, routed = choose_fold(
-                frame, x, cascade, selection_year, evaluation_year)
+                frame, x, cascade, selection_year, evaluation_year,
+                hidden_family_options)
             folds.append(item)
             routed_folds.append((evaluation_year, routed))
             print(json.dumps({"stage": "hidden_fold",
@@ -216,6 +227,9 @@ def main() -> None:
             "development_folds": [list(value) for value in DEVELOPMENT_FOLDS],
             "hidden_folds": [list(value) for value in HIDDEN_FOLDS],
             "hidden_revealed": hidden_revealed,
+            "hidden_family_rule": (
+                "single family independently selected in every passing development fold"),
+            "stable_families": stable_families,
             "model": MODEL_CONFIG, "family_options": [list(x) for x in FAMILY_OPTIONS],
             "targets_pct": list(four.TARGETS), "stop_pct": 1.0,
             "holds_hours": target_engine.HOLD,
@@ -228,7 +242,7 @@ def main() -> None:
                     str(STATIC_REPORT): digest(STATIC_REPORT),
                     str(Path(__file__)): digest(Path(__file__))},
         "limitations": [
-            "The method is evaluated after prior static-model research and therefore remains research-biased.",
+            "The stability gate was added after inspecting the first 2025 walk-forward failure; 2026 is the remaining untouched fold.",
             "A full historical pass would still require direct EU X-Perp shadow transfer.",
         ],
     }
