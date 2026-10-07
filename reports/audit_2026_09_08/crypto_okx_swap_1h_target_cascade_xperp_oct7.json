@@ -1,0 +1,123 @@
+{
+  "available_entry_rows": 284,
+  "by_target": {
+    "0.5": {
+      "accepted_alone": 138,
+      "available": 215,
+      "literal_hit_rate_alone": 69.5652,
+      "literal_hits_alone": 96
+    },
+    "1.0": {
+      "accepted_alone": 20,
+      "available": 25,
+      "literal_hit_rate_alone": 50.0,
+      "literal_hits_alone": 10
+    },
+    "1.5": {
+      "accepted_alone": 19,
+      "available": 34,
+      "literal_hit_rate_alone": 52.6316,
+      "literal_hits_alone": 10
+    },
+    "2.0": {
+      "accepted_alone": 4,
+      "available": 10,
+      "literal_hit_rate_alone": 50.0,
+      "literal_hits_alone": 2
+    }
+  },
+  "coverage": {
+    "end_exclusive": 1791266100,
+    "start": 1785062700
+  },
+  "mapped_rows": 284,
+  "protocol": {
+    "entry": "same frozen global OKX hourly timestamps",
+    "hold_hours": {
+      "0.5": 12,
+      "1.0": 24,
+      "1.5": 36,
+      "2.0": 48
+    },
+    "money": "3% current equity margin, fixed 10x gross",
+    "selection": "none on X-Perp",
+    "stop_pct": 1.0,
+    "targets_pct": [
+      0.5,
+      1.0,
+      1.5,
+      2.0
+    ],
+    "venue": "EU X-Perp"
+  },
+  "result": {
+    "active_days": 51,
+    "average_selected_target_pct": 0.6146,
+    "by_module_count": {
+      "literal_regime_router": 144
+    },
+    "by_source_count": {
+      "literal_regime_router": 144
+    },
+    "dd_pct": 2.0858,
+    "literal_target_hit_rate": 65.2778,
+    "literal_target_hits": 94,
+    "max_entries_same_clock_hour": 2,
+    "max_entries_same_rolling_hour": 2,
+    "max_loss_streak": 4,
+    "median_month_pct": 0.2441,
+    "minimum_month_pct": -0.4722,
+    "monthly_return_pct": {
+      "2026-07": 0.863,
+      "2026-08": -0.4722,
+      "2026-09": 3.8866,
+      "2026-10": -0.3748
+    },
+    "months": 4,
+    "months_ge_30pct": 0,
+    "n": 144,
+    "negative_months": 2,
+    "return_pct": 3.8975,
+    "stops": 43,
+    "target_distribution": {
+      "0.5": 122,
+      "1.0": 12,
+      "1.5": 9,
+      "2.0": 1
+    },
+    "target_hits": {
+      "0.5": 82,
+      "1.0": 5,
+      "1.5": 6,
+      "2.0": 1
+    },
+    "timeouts": 7,
+    "trades_per_active_day": 2.824,
+    "trades_per_calendar_day": 2.0,
+    "wr": 66.67
+  },
+  "sources": {
+    "C:\\Users\\Lenovo\\Desktop\\telegram bot\\crypto_okx_swap_1h_target_cascade_xperp_oct7_audit.py": "c47d10c510c55c5567126ff300322f368f53e038bb513695b6c9675b4cc41a77",
+    "C:\\Users\\Lenovo\\Desktop\\telegram bot\\reports\\audit_2026_09_08\\xperp_5m_oct4\\AAVEUSDT_5min_current.pkl": "79aa22c01765a0b0f4bd9b1d76995259e1e988b97a51f448dcf96e0257f3853b",
+    "C:\\Users\\Lenovo\\Desktop\\telegram bot\\reports\\audit_2026_09_08\\xperp_5m_oct4\\AVAXUSDT_5min_current.pkl": "8a3afde1de1a529550ae50404ab805707f18e64a67d5796b09d9c67aa2821d48",
+    "C:\\Users\\Lenovo\\Desktop\\telegram bot\\reports\\audit_2026_09_08\\xperp_5m_oct4\\BTCUSDT_5min_current.pkl": "c1bdcf3731d1f76e96256f0124db1b4b81298390a48e8211b21ce76e44d09c22",
+    "C:\\Users\\Lenovo\\Desktop\\telegram bot\\reports\\audit_2026_09_08\\xperp_5m_oct4\\ETHUSDT_5min_current.pkl": "b0542a447140fc77613ae4c1ca6835a9bdb6c6f6b169946334f25d894222c41d",
+    "C:\\Users\\Lenovo\\Desktop\\telegram bot\\reports\\audit_2026_09_08\\xperp_5m_oct4\\LINKUSDT_5min_current.pkl": "26ca553630b3d5a9d715fa5f7503fc7387523a30a22293df5e0e24a2a440f084",
+    "C:\\Users\\Lenovo\\Desktop\\telegram bot\\reports\\audit_2026_09_08\\xperp_5m_oct4\\SOLUSDT_5min_current.pkl": "3f5678c7f1d1de97297af8181ef4e2427af2565efeb28a1667379c14eb5ec82d",
+    "C:\\Users\\Lenovo\\Desktop\\telegram bot\\reports\\audit_2026_09_08\\xperp_5m_oct4\\XLMUSDT_5min_current.pkl": "a368f86685e9bfd6a61b7cfc078cd8cc5bb9f2eae61e0815891f2e52cb1004dd",
+    "C:\\Users\\Lenovo\\Desktop\\telegram bot\\reports\\audit_2026_09_08\\xperp_5m_oct4\\XRPUSDT_5min_current.pkl": "d8fd50ca28865455f0de2acf1cb424faf03269730789de8972d59383c021caca",
+    "C:\\Users\\Lenovo\\Desktop\\telegram bot\\reports\\audit_2026_09_08\\xperp_5m_oct6_forward\\AAVEUSDT_5min_current.pkl": "b77cc9aa34973e53a833db77ddb452f4802efdbf38e3dadc4c5664742e58e2a9",
+    "C:\\Users\\Lenovo\\Desktop\\telegram bot\\reports\\audit_2026_09_08\\xperp_5m_oct6_forward\\AVAXUSDT_5min_current.pkl": "030155ae7784dce074c11895a3ffcf2f514e6b70d7fb7b8977f0a091b4ff83ab",
+    "C:\\Users\\Lenovo\\Desktop\\telegram bot\\reports\\audit_2026_09_08\\xperp_5m_oct6_forward\\BTCUSDT_5min_current.pkl": "9257f02efb0c9c27a0d4cfb973084fe2d50186c82e0e65eb73fbae866ae293dc",
+    "C:\\Users\\Lenovo\\Desktop\\telegram bot\\reports\\audit_2026_09_08\\xperp_5m_oct6_forward\\ETHUSDT_5min_current.pkl": "37264aaf1d3b3f91911ba5408658aa8459d1a1cb5d1bd679f63cc0b140f9bc40",
+    "C:\\Users\\Lenovo\\Desktop\\telegram bot\\reports\\audit_2026_09_08\\xperp_5m_oct6_forward\\LINKUSDT_5min_current.pkl": "0898c9e58ee6972aac44111748b43a22c3141a6c7450b693ebd1a9ee50ffa4cf",
+    "C:\\Users\\Lenovo\\Desktop\\telegram bot\\reports\\audit_2026_09_08\\xperp_5m_oct6_forward\\SOLUSDT_5min_current.pkl": "be9f3b2eb94556fb4f25f638cb26f9839d08cfc521788cc617007fb9fec293b1",
+    "C:\\Users\\Lenovo\\Desktop\\telegram bot\\reports\\audit_2026_09_08\\xperp_5m_oct6_forward\\XLMUSDT_5min_current.pkl": "753cfd3b6723b4ad3a1b8f6633b8f67ab2b87ae4e441b8d67c9f0e8d58f705d6",
+    "C:\\Users\\Lenovo\\Desktop\\telegram bot\\reports\\audit_2026_09_08\\xperp_5m_oct6_forward\\XRPUSDT_5min_current.pkl": "37c708c7d378f88c3c1c765b8cdea8d9c4769ac127848c39490142034fcd037b",
+    "reports\\audit_2026_09_08\\crypto_okx_swap_1h_target_cascade_oct7.json": "1e66a6d9fbdc00844d8dea4040c52470a93e252a6956dbcc3f3140385f37b6e0",
+    "reports\\audit_2026_09_08\\crypto_okx_swap_1h_target_cascade_oct7.pkl": "e9808c43acba2862ea93de10b96e270284a10eb3c1c2c973fb0bfd6625f71d75",
+    "reports\\audit_2026_09_08\\xperp_5m_oct4\\manifest.json": "19b44dcb46ec9bc5df0726acccf9910f189edefba63bc0bbaf76e20335e44408",
+    "reports\\audit_2026_09_08\\xperp_5m_oct6_forward\\manifest.json": "dc3772e633f608377f22021852d2341b0e9025b14be3ca5fa4359df3f8e7bb45"
+  },
+  "status": "DIRECT_XPERP_CASCADE_CANDIDATE"
+}

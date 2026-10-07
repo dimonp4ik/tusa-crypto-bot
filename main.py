@@ -1142,7 +1142,7 @@ def _handle_admin_callback(callback_id: str, chat_id: int,
             f"Теневая проверка: {len(SHADOW_EXPERIMENTAL_MODULES) + 2} фильтров\n"
             "Вход: по текущей рыночной цене\n"
             f"За один скан: максимум {VENUE_MAX_SIGNALS_PER_SCAN} сигнала\n"
-            "Часовая модель: заморожена, цель 0.5%, стоп 1.0%\n"
+            "Часовая модель: замороженный каскад целей 0.5–2%, стоп 1.0%\n"
             "Генеративная нейросеть: отключена от решения\n"
             "Реальные ордера: *ЗАПРЕЩЕНЫ КОДОМ*\n\n"
             "Все сигналы и исходы записываются для независимой forward-проверки.",
@@ -3670,6 +3670,9 @@ def _venue_analysis(symbol: str, setup: dict, btc_change: float = 0.0) -> dict:
     if hourly_hgb:
         tags.append(f"Frozen HGB quality {float(setup['model_quality']):.4f}")
         tags.append("Families " + ", ".join(setup.get("families") or []))
+        tags.append(
+            f"Target cascade {float(setup.get('selected_target_pct') or .5):.1f}% / "
+            f"{int(setup.get('hold_bars') or 12)}h")
     if five_minute_oi:
         runner_target_r = float(setup.get("runner_target_r") or 4.0)
         tp1_close_fraction = float(setup.get("tp1_close_fraction") or .70)
@@ -3705,8 +3708,9 @@ def _venue_analysis(symbol: str, setup: dict, btc_change: float = 0.0) -> dict:
             if five_minute_oi or hourly_hgb else None),
         "strategy_stop_on_close": (
             False if five_minute_oi or hourly_hgb else None),
-        "strategy_max_bars": (72 if five_minute_oi
-                              else 12 if hourly_hgb else None),
+        "strategy_max_bars": (72 if five_minute_oi else
+                              int(setup.get("hold_bars") or 12)
+                              if hourly_hgb else None),
         "entry_low": setup["entry"], "entry_high": setup["entry"],
         "mtf_score": 18, "mtf_score_max": 18, "rsi": 50,
         "volume_ratio": 1.0, "session": setup["utc_session"],

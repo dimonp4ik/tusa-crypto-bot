@@ -175,6 +175,24 @@ class ShadowDeploymentTests(unittest.TestCase):
         self.assertFalse(analysis["strategy_stop_on_close"])
         self.assertEqual(analysis["strategy_max_bars"], 12)
 
+    def test_hourly_hgb_cascade_persists_two_percent_horizon(self):
+        setup = {
+            "direction": "SHORT", "entry": 100.0, "atr": .5,
+            "target_r": 2.0, "first_target_move_pct": 2.0,
+            "selected_target_pct": 2.0, "hold_bars": 48,
+            "utc_session": "hour_12", "btc_regime": "hourly_hgb",
+            "eff_ratio": .2, "signal_bar_ts": 3_600.0,
+            "module": "shadow_okx_1h_hgb", "model_quality": .81,
+            "families": ["trend"], "_shadow_experiment": True,
+            "_hourly_hgb_shadow": True,
+        }
+        analysis = main._venue_analysis("ETHUSDT", setup)
+        self.assertEqual(analysis["fixed_target_r"], 2.0)
+        self.assertEqual(analysis["strategy_bar_seconds"], 3600)
+        self.assertEqual(analysis["strategy_max_bars"], 48)
+        self.assertTrue(any("Target cascade 2.0% / 48h" in tag
+                            for tag in analysis["signals"]))
+
     def test_five_minute_fixed_runner_uses_5m_bars_and_next_bar_breakeven(self):
         start = 2_000_000_100.0
         frame = {

@@ -3,7 +3,7 @@ import math
 import unittest
 
 from src.crypto_okx_1h_shadow_router import (
-    MODEL_PATH, QUALITY_THRESHOLD, SUPPORTED_SYMBOLS,
+    CASCADE_PATH, MODEL_PATH, QUALITY_THRESHOLD, SUPPORTED_SYMBOLS,
     _symbol_features, shadow_setups,
 )
 
@@ -17,6 +17,10 @@ class CryptoOkxOneHourShadowRouterTests(unittest.TestCase):
         self.assertEqual(model["hold_bars"], 12)
         self.assertEqual(model["quality_threshold"], QUALITY_THRESHOLD)
         self.assertEqual(len(model["features"]), 52)
+        cascade = json.loads(CASCADE_PATH.read_text(encoding="utf-8"))
+        self.assertEqual(sorted(map(float, cascade["models"])), [1.0, 1.5, 2.0])
+        self.assertEqual([cascade["models"][key]["hold_bars"]
+                          for key in ("1.0", "1.5", "2.0")], [24, 36, 48])
 
     def test_incomplete_cross_market_input_fails_closed(self):
         self.assertEqual(shadow_setups({}, {}), {})

@@ -26,6 +26,8 @@ FAMILIES = (
 )
 MODEL_PATH = Path(__file__).with_name("frozen_crypto_okx_1h_hgb.json")
 _MODEL = json.loads(MODEL_PATH.read_text(encoding="utf-8"))
+CASCADE_PATH = Path(__file__).with_name("frozen_crypto_okx_1h_target_cascade.json")
+_CASCADE = json.loads(CASCADE_PATH.read_text(encoding="utf-8"))
 QUALITY_THRESHOLD = float(_MODEL["quality_threshold"])
 TARGET_PCT = float(_MODEL["target_pct"])
 STOP_PCT = float(_MODEL["stop_pct"])
@@ -257,24 +259,37 @@ def shadow_setups(candles_by_symbol: dict[str, dict],
         for direction, families in _family_directions(rows[symbol]).items():
             if not families:
                 continue
-            quality = score_named(
-                _MODEL, _model_row(symbol, rows[symbol], direction, families))
+            feature_row = _model_row(symbol, rows[symbol], direction, families)
+            quality = score_named(_MODEL, feature_row)
             if quality >= QUALITY_THRESHOLD:
-                options.append((quality, direction, families))
+                options.append((quality, direction, families, feature_row))
         if not options:
             continue
-        quality, direction, families = max(options, key=lambda item: item[0])
+        quality, direction, families, feature_row = max(
+            options, key=lambda item: item[0])
+        selected_target = TARGET_PCT
+        hold_bars = HOLD_BARS
+        target_scores = {}
+        for target_text, target_model in sorted(
+                _CASCADE["models"].items(), key=lambda item: float(item[0])):
+            target_quality = score_named(target_model, feature_row)
+            target_scores[target_text] = target_quality
+            if target_quality >= float(target_model["quality_threshold"]):
+                selected_target = float(target_model["target_pct"])
+                hold_bars = int(target_model["hold_bars"])
         label = "LONG" if direction > 0 else "SHORT"
         output[symbol] = {
             "direction": label, "module": "shadow_okx_1h_hgb",
             "btc_regime": "hourly_hgb", "entry": market,
-            "atr": market * STOP_PCT / 200.0, "target_r": .5,
-            "first_target_move_pct": TARGET_PCT,
+            "atr": market * STOP_PCT / 200.0, "target_r": selected_target,
+            "first_target_move_pct": selected_target,
             "sl": market * (1.0 - direction * STOP_PCT / 100.0),
-            "tp": market * (1.0 + direction * TARGET_PCT / 100.0),
+            "tp": market * (1.0 + direction * selected_target / 100.0),
             "utc_session": f"hour_{(signal_time // 3600) % 24:02d}",
             "eff_ratio": rows[symbol]["eff72"],
             "signal_bar_ts": signal_time, "model_quality": quality,
+            "target_model_scores": target_scores,
+            "selected_target_pct": selected_target, "hold_bars": hold_bars,
             "families": sorted(families), "entry_source": "MARKET",
             "_shadow_experiment": True, "_hourly_hgb_shadow": True,
         }
