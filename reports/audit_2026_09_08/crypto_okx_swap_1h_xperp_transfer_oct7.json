@@ -1,0 +1,155 @@
+{
+  "checks": {
+    "conditional": true,
+    "fixed_05": true,
+    "runner_05_20": false
+  },
+  "conditional": {
+    "active_days": 51,
+    "by_module_count": {
+      "literal_regime_router": 152
+    },
+    "by_source_count": {
+      "literal_regime_router": 152
+    },
+    "dd_pct": 2.0867,
+    "first_entry_utc": "2026-07-26T23:00:00+00:00",
+    "last_entry_utc": "2026-10-05T05:00:00+00:00",
+    "literal_target_hit_rate": 68.4211,
+    "literal_target_hits": 104,
+    "max_entries_same_clock_hour": 2,
+    "max_entries_same_rolling_hour": 2,
+    "max_loss_streak": 4,
+    "median_month_pct": 0.2631,
+    "minimum_month_pct": -0.4868,
+    "monthly_return_pct": {
+      "2026-07": 0.7794,
+      "2026-08": -0.2532,
+      "2026-09": 3.1109,
+      "2026-10": -0.4868
+    },
+    "months": 4,
+    "months_ge_30pct": 0,
+    "n": 152,
+    "negative_months": 2,
+    "return_pct": 3.1468,
+    "runner_hit_rate": 4.5775,
+    "stops": 40,
+    "timeouts": 8,
+    "trades_per_active_day": 2.98,
+    "trades_per_calendar_day": 2.111,
+    "wr": 69.74
+  },
+  "fixed_05": {
+    "active_days": 51,
+    "by_module_count": {
+      "literal_regime_router": 154
+    },
+    "by_source_count": {
+      "literal_regime_router": 154
+    },
+    "dd_pct": 2.0858,
+    "first_entry_utc": "2026-07-26T23:00:00+00:00",
+    "last_entry_utc": "2026-10-05T05:00:00+00:00",
+    "literal_target_hit_rate": 68.1818,
+    "literal_target_hits": 105,
+    "max_entries_same_clock_hour": 2,
+    "max_entries_same_rolling_hour": 2,
+    "max_loss_streak": 4,
+    "median_month_pct": 0.2441,
+    "minimum_month_pct": -0.868,
+    "monthly_return_pct": {
+      "2026-07": 0.863,
+      "2026-08": -0.868,
+      "2026-09": 3.74,
+      "2026-10": -0.3748
+    },
+    "months": 4,
+    "months_ge_30pct": 0,
+    "n": 154,
+    "negative_months": 2,
+    "return_pct": 3.3383,
+    "stops": 41,
+    "timeouts": 8,
+    "trades_per_active_day": 3.02,
+    "trades_per_calendar_day": 2.139,
+    "wr": 70.13
+  },
+  "limitations": [
+    "X-Perp contracts expose only a short public history beginning in July 2026.",
+    "The transfer is independent of training but remains too short for live activation.",
+    "All entries and exits are market-price proxies; no limit entry is assumed."
+  ],
+  "protocol": {
+    "entry": "same timestamp X-Perp 5m market open",
+    "execution_venue": "OKX EU X-Perp 5m public candles",
+    "fixed_exit": "0.5% target, 1% stop, 12h maximum",
+    "money": "3% equity margin, fixed 10x gross",
+    "runner_exit": "25% at 0.5%, 75% to 2%, breakeven runner, 48h maximum",
+    "selection_on_transfer_rows": false,
+    "signal_venue": "OKX global USDT swap 1h"
+  },
+  "runner_05_20": {
+    "active_days": 49,
+    "by_module_count": {
+      "literal_regime_router": 135
+    },
+    "by_source_count": {
+      "literal_regime_router": 135
+    },
+    "dd_pct": 2.2666,
+    "first_entry_utc": "2026-07-26T23:00:00+00:00",
+    "last_entry_utc": "2026-10-03T14:00:00+00:00",
+    "literal_target_hit_rate": 68.1481,
+    "literal_target_hits": 92,
+    "max_entries_same_clock_hour": 2,
+    "max_entries_same_rolling_hour": 2,
+    "max_loss_streak": 3,
+    "median_month_pct": 0.8922,
+    "minimum_month_pct": -1.1213,
+    "monthly_return_pct": {
+      "2026-07": 1.1256,
+      "2026-08": 0.6589,
+      "2026-09": 3.7868,
+      "2026-10": -1.1213
+    },
+    "months": 4,
+    "months_ge_30pct": 0,
+    "n": 135,
+    "negative_months": 1,
+    "return_pct": 4.462,
+    "runner_hit_rate": 20.922,
+    "stops": 43,
+    "timeouts": 0,
+    "trades_per_active_day": 2.755,
+    "trades_per_calendar_day": 1.929,
+    "wr": 67.41
+  },
+  "sources": {
+    "C:\\Users\\Lenovo\\Desktop\\telegram bot\\crypto_okx_swap_1h_xperp_transfer_oct7_audit.py": "81b9023512ab8c18a7e127696a153a8c018f049bf8e3c129f3db102dcdde70af",
+    "C:\\Users\\Lenovo\\Desktop\\telegram bot\\reports\\audit_2026_09_08\\xperp_5m_oct4\\AAVEUSDT_5min_current.pkl": "79aa22c01765a0b0f4bd9b1d76995259e1e988b97a51f448dcf96e0257f3853b",
+    "C:\\Users\\Lenovo\\Desktop\\telegram bot\\reports\\audit_2026_09_08\\xperp_5m_oct4\\AVAXUSDT_5min_current.pkl": "8a3afde1de1a529550ae50404ab805707f18e64a67d5796b09d9c67aa2821d48",
+    "C:\\Users\\Lenovo\\Desktop\\telegram bot\\reports\\audit_2026_09_08\\xperp_5m_oct4\\BTCUSDT_5min_current.pkl": "c1bdcf3731d1f76e96256f0124db1b4b81298390a48e8211b21ce76e44d09c22",
+    "C:\\Users\\Lenovo\\Desktop\\telegram bot\\reports\\audit_2026_09_08\\xperp_5m_oct4\\ETHUSDT_5min_current.pkl": "b0542a447140fc77613ae4c1ca6835a9bdb6c6f6b169946334f25d894222c41d",
+    "C:\\Users\\Lenovo\\Desktop\\telegram bot\\reports\\audit_2026_09_08\\xperp_5m_oct4\\LINKUSDT_5min_current.pkl": "26ca553630b3d5a9d715fa5f7503fc7387523a30a22293df5e0e24a2a440f084",
+    "C:\\Users\\Lenovo\\Desktop\\telegram bot\\reports\\audit_2026_09_08\\xperp_5m_oct4\\SOLUSDT_5min_current.pkl": "3f5678c7f1d1de97297af8181ef4e2427af2565efeb28a1667379c14eb5ec82d",
+    "C:\\Users\\Lenovo\\Desktop\\telegram bot\\reports\\audit_2026_09_08\\xperp_5m_oct4\\XLMUSDT_5min_current.pkl": "a368f86685e9bfd6a61b7cfc078cd8cc5bb9f2eae61e0815891f2e52cb1004dd",
+    "C:\\Users\\Lenovo\\Desktop\\telegram bot\\reports\\audit_2026_09_08\\xperp_5m_oct4\\XRPUSDT_5min_current.pkl": "d8fd50ca28865455f0de2acf1cb424faf03269730789de8972d59383c021caca",
+    "C:\\Users\\Lenovo\\Desktop\\telegram bot\\reports\\audit_2026_09_08\\xperp_5m_oct6_forward\\AAVEUSDT_5min_current.pkl": "b77cc9aa34973e53a833db77ddb452f4802efdbf38e3dadc4c5664742e58e2a9",
+    "C:\\Users\\Lenovo\\Desktop\\telegram bot\\reports\\audit_2026_09_08\\xperp_5m_oct6_forward\\AVAXUSDT_5min_current.pkl": "030155ae7784dce074c11895a3ffcf2f514e6b70d7fb7b8977f0a091b4ff83ab",
+    "C:\\Users\\Lenovo\\Desktop\\telegram bot\\reports\\audit_2026_09_08\\xperp_5m_oct6_forward\\BTCUSDT_5min_current.pkl": "9257f02efb0c9c27a0d4cfb973084fe2d50186c82e0e65eb73fbae866ae293dc",
+    "C:\\Users\\Lenovo\\Desktop\\telegram bot\\reports\\audit_2026_09_08\\xperp_5m_oct6_forward\\ETHUSDT_5min_current.pkl": "37264aaf1d3b3f91911ba5408658aa8459d1a1cb5d1bd679f63cc0b140f9bc40",
+    "C:\\Users\\Lenovo\\Desktop\\telegram bot\\reports\\audit_2026_09_08\\xperp_5m_oct6_forward\\LINKUSDT_5min_current.pkl": "0898c9e58ee6972aac44111748b43a22c3141a6c7450b693ebd1a9ee50ffa4cf",
+    "C:\\Users\\Lenovo\\Desktop\\telegram bot\\reports\\audit_2026_09_08\\xperp_5m_oct6_forward\\SOLUSDT_5min_current.pkl": "be9f3b2eb94556fb4f25f638cb26f9839d08cfc521788cc617007fb9fec293b1",
+    "C:\\Users\\Lenovo\\Desktop\\telegram bot\\reports\\audit_2026_09_08\\xperp_5m_oct6_forward\\XLMUSDT_5min_current.pkl": "753cfd3b6723b4ad3a1b8f6633b8f67ab2b87ae4e441b8d67c9f0e8d58f705d6",
+    "C:\\Users\\Lenovo\\Desktop\\telegram bot\\reports\\audit_2026_09_08\\xperp_5m_oct6_forward\\XRPUSDT_5min_current.pkl": "37c708c7d378f88c3c1c765b8cdea8d9c4769ac127848c39490142034fcd037b",
+    "reports\\audit_2026_09_08\\crypto_okx_swap_1h_conditional_exit_oct7.json": "edd58fff258c58f6e77ea1aaa5b3dc60cabf1e7076f11fc5f7b084734957b696",
+    "reports\\audit_2026_09_08\\crypto_okx_swap_1h_conditional_exit_oct7.pkl": "49d916a92efff233afb127f4a1e4c2b1fd950e06700a23d73e700c83a3193245",
+    "reports\\audit_2026_09_08\\crypto_okx_swap_1h_regime_oct7.json": "c85ad438626c3ad2730bfc16dea91fafd4432827e2abc70898bedf94532b0f39",
+    "reports\\audit_2026_09_08\\crypto_okx_swap_1h_regime_oct7.pkl": "a5780780e28e7942b17fc5f1052d6fad941a1b8fd07d6a28453b94b90fc8c3e4",
+    "reports\\audit_2026_09_08\\crypto_okx_swap_1h_runner_oct7.json": "258282016868626c0bc234afcd53469709cc8ef07817c9892c5004115719ce50",
+    "reports\\audit_2026_09_08\\xperp_5m_oct4\\manifest.json": "19b44dcb46ec9bc5df0726acccf9910f189edefba63bc0bbaf76e20335e44408",
+    "reports\\audit_2026_09_08\\xperp_5m_oct6_forward\\manifest.json": "dc3772e633f608377f22021852d2341b0e9025b14be3ca5fa4359df3f8e7bb45"
+  },
+  "status": "DIRECT_XPERP_SHADOW_CANDIDATE"
+}

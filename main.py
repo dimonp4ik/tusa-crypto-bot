@@ -1,8 +1,8 @@
-"""Crypto paper-trading bot driven by the frozen X-Perp venue router.
+"""Crypto paper-trading bot driven by frozen direct-venue strategies.
 
 Every scan loads the audited symbols from X-Perp, evaluates the seven frozen
-deterministic modules and publishes new market-entry paper signals. No model
-decides whether a setup is accepted and this deployment cannot open an order.
+deterministic modules plus the frozen one-hour shadow model, and publishes
+market-entry paper signals. This deployment cannot open an order.
 """
 
 import json
@@ -47,6 +47,10 @@ from src.crypto_5m_oi_shadow_router import (
     candidate_context as five_minute_oi_candidate_context,
     symbol_context_allowed as five_minute_oi_symbol_context_allowed,
     shadow_setup as five_minute_oi_shadow_setup,
+)
+from src.crypto_okx_1h_shadow_router import (
+    SUPPORTED_SYMBOLS as HOURLY_HGB_SYMBOLS,
+    shadow_setups as hourly_hgb_shadow_setups,
 )
 from src.telegram_notifier import (
     send_signal, send_status, send_signal_update, send_morning_digest, send_weekly_digest,
@@ -1135,10 +1139,11 @@ def _handle_admin_callback(callback_id: str, chat_id: int,
             "🧩 *АКТИВНЫЕ ФИЛЬТРЫ*\n\n"
             "Режим: *SHADOW / PAPER*\n"
             f"Боевые фильтры: {len(MODULES)} замороженных X-Perp модулей\n"
-            f"Теневая проверка: {len(SHADOW_EXPERIMENTAL_MODULES) + 1} фильтров\n"
+            f"Теневая проверка: {len(SHADOW_EXPERIMENTAL_MODULES) + 2} фильтров\n"
             "Вход: по текущей рыночной цене\n"
             f"За один скан: максимум {VENUE_MAX_SIGNALS_PER_SCAN} сигнала\n"
-            "Нейросеть: отключена от решения\n"
+            "Часовая модель: заморожена, цель 0.5%, стоп 1.0%\n"
+            "Генеративная нейросеть: отключена от решения\n"
             "Реальные ордера: *ЗАПРЕЩЕНЫ КОДОМ*\n\n"
             "Все сигналы и исходы записываются для независимой forward-проверки.",
             _kb_settings(),
@@ -3352,16 +3357,22 @@ def _check_open_signals():
             # forming 15m candle instead of waiting up to ~15min (avg ~7.5min) for
             # it to close — was causing the SL_HIT notification to lag the real
             # exchange-side stop fill by minutes (found 2026-07-22, live report).
-            interval = "5m" if bar_seconds == 300 else "15m"
+            interval = ("5m" if bar_seconds == 300
+                        else "1h" if bar_seconds == 3600 else "15m")
             df_all = get_klines_xperp(
                 sig["symbol"], limit=candle_lim, include_forming=True,
                 interval=interval)
             if not df_all:
-                df_all = (get_klines(sig["symbol"], interval="5m",
-                                     limit=candle_lim, interval_sec=300,
-                                     closed_only=False)
-                          if bar_seconds == 300
-                          else get_klines(sig["symbol"], limit=candle_lim))
+                if bar_seconds == 300:
+                    df_all = get_klines(
+                        sig["symbol"], interval="5m", limit=candle_lim,
+                        interval_sec=300, closed_only=False)
+                elif bar_seconds == 3600:
+                    df_all = get_klines(
+                        sig["symbol"], interval="1h", limit=candle_lim,
+                        interval_sec=3600, closed_only=False)
+                else:
+                    df_all = get_klines(sig["symbol"], limit=candle_lim)
 
             # Cache last close price — used by "open trades" display (no extra API call)
             if df_all.get("close"):
@@ -3648,6 +3659,7 @@ def _venue_analysis(symbol: str, setup: dict, btc_change: float = 0.0) -> dict:
     direction = setup["direction"]
     shadow_experiment = bool(setup.get("_shadow_experiment"))
     five_minute_oi = bool(setup.get("_five_minute_oi_shadow"))
+    hourly_hgb = bool(setup.get("_hourly_hgb_shadow"))
     tags = [f"Venue module {setup['module']}",
             f"BTC regime {setup['btc_regime']}",
             f"Fixed target {setup['target_r']:.2f}R"]
@@ -3655,6 +3667,9 @@ def _venue_analysis(symbol: str, setup: dict, btc_change: float = 0.0) -> dict:
         100.0 * float(setup["atr"]) * 2.0 * float(setup["target_r"])
         / float(setup["entry"])))
     tags.append(f"First target move {first_target_move_pct:.2f}%")
+    if hourly_hgb:
+        tags.append(f"Frozen HGB quality {float(setup['model_quality']):.4f}")
+        tags.append("Families " + ", ".join(setup.get("families") or []))
     if five_minute_oi:
         runner_target_r = float(setup.get("runner_target_r") or 4.0)
         tp1_close_fraction = float(setup.get("tp1_close_fraction") or .70)
@@ -3683,17 +3698,22 @@ def _venue_analysis(symbol: str, setup: dict, btc_change: float = 0.0) -> dict:
         "fixed_runner_target_r": runner_target_r if five_minute_oi else None,
         "strategy_tp1_close_frac": tp1_close_fraction if five_minute_oi else None,
         "strategy_runner_mode": "fixed_be" if five_minute_oi else None,
-        "strategy_bar_seconds": 300 if five_minute_oi else None,
+        "strategy_bar_seconds": (300 if five_minute_oi
+                                 else 3600 if hourly_hgb else None),
         "strategy_entry_bar_ts": (
-            float(setup["signal_bar_ts"]) + 300 if five_minute_oi else None),
-        "strategy_stop_on_close": False if five_minute_oi else None,
-        "strategy_max_bars": 72 if five_minute_oi else None,
+            float(setup["signal_bar_ts"]) + (300 if five_minute_oi else 3600)
+            if five_minute_oi or hourly_hgb else None),
+        "strategy_stop_on_close": (
+            False if five_minute_oi or hourly_hgb else None),
+        "strategy_max_bars": (72 if five_minute_oi
+                              else 12 if hourly_hgb else None),
         "entry_low": setup["entry"], "entry_high": setup["entry"],
         "mtf_score": 18, "mtf_score_max": 18, "rsi": 50,
         "volume_ratio": 1.0, "session": setup["utc_session"],
         "swing_trend": "bull" if direction == "LONG" else "bear",
         "signals": tags,
-        "source": ("venue_shadow_5m_oi" if five_minute_oi
+        "source": ("venue_shadow_1h_hgb" if hourly_hgb
+                   else "venue_shadow_5m_oi" if five_minute_oi
                    else "venue_shadow_experiment" if shadow_experiment
                    else "venue_regime"),
         "signal_bar_ts": float(setup["signal_bar_ts"]),
@@ -3705,6 +3725,7 @@ def _venue_analysis(symbol: str, setup: dict, btc_change: float = 0.0) -> dict:
         # live-mode scan gate below and autotrader's shadow-only refusal.
         "_shadow_only": shadow_experiment or DEPLOYMENT_MODE == "shadow",
         "_five_minute_oi_shadow": five_minute_oi,
+        "_hourly_hgb_shadow": hourly_hgb,
     }
 
 
@@ -3734,6 +3755,7 @@ def _venue_scan_universe(available: set[str]) -> list[str]:
     scan_universe = set(ROBUST_SYMBOLS)
     if DEPLOYMENT_MODE == "shadow":
         scan_universe.update(FIVE_MINUTE_OI_SHADOW_SYMBOLS)
+        scan_universe.update(HOURLY_HGB_SYMBOLS)
     return sorted(
         symbol for symbol in scan_universe if _base_of_symbol(symbol) in available)
 
@@ -3762,8 +3784,9 @@ def _publish_venue_candidates(candidates: list[tuple[dict, int]],
             recent_hour_count = 2
     source_priority = {
         "venue_regime": 0,
-        "venue_shadow_experiment": 1,
-        "venue_shadow_5m_oi": 2,
+        "venue_shadow_1h_hgb": 1,
+        "venue_shadow_experiment": 2,
+        "venue_shadow_5m_oi": 3,
     }
     ordered = sorted(candidates, key=lambda item: (
         source_priority.get(item[0].get("source", "venue_regime"), 1),
@@ -3820,23 +3843,41 @@ def _run_venue_strategy_scan() -> None:
     if "BTCUSDT" not in symbols:
         log.warning("Venue scan refused: BTC X-Perp context is unavailable")
         return
+    hourly_feed_ready = (DEPLOYMENT_MODE == "shadow"
+                         and all(_base_of_symbol(symbol) in available
+                                 for symbol in HOURLY_HGB_SYMBOLS))
 
     fetched = {}
     fetched_5m = {}
+    fetched_1h = {}
+    market_prices = {}
     def _fetch(symbol: str):
         fifteen = get_klines_xperp(
             symbol, limit=400 if symbol == "BTCUSDT" else 120)
         five = (get_klines_xperp(symbol, limit=110, interval="5m")
                 if DEPLOYMENT_MODE == "shadow" else None)
-        return symbol, fifteen, five
+        hourly = (get_klines(symbol, interval="1h", limit=1000,
+                             interval_sec=3600)
+                  if hourly_feed_ready and symbol in HOURLY_HGB_SYMBOLS
+                  else None)
+        try:
+            market = get_xperp_price(symbol)
+        except Exception as exc:
+            log.warning("Venue market-price fetch failed for %s: %s", symbol, exc)
+            market = None
+        return symbol, fifteen, five, hourly, market
     with ThreadPoolExecutor(max_workers=4) as pool:
         for future in as_completed([pool.submit(_fetch, symbol) for symbol in symbols]):
             try:
-                symbol, candles, candles_5m = future.result()
+                symbol, candles, candles_5m, candles_1h, market = future.result()
                 if candles:
                     fetched[symbol] = candles
                 if candles_5m:
                     fetched_5m[symbol] = candles_5m
+                if candles_1h:
+                    fetched_1h[symbol] = candles_1h
+                if market:
+                    market_prices[symbol] = float(market)
             except Exception as exc:
                 log.warning("Venue candle fetch failed: %s", exc)
 
@@ -3844,6 +3885,14 @@ def _run_venue_strategy_scan() -> None:
     if not btc:
         log.warning("Venue scan refused: BTC candles are unavailable")
         return
+    if DEPLOYMENT_MODE == "shadow":
+        # Market fallback remains X-Perp: the global swap feed supplies model
+        # context only and never supplies an executable entry price.
+        for symbol, candles in fetched.items():
+            market_prices.setdefault(symbol, float(candles["close"][-1]))
+        hourly_rows = hourly_hgb_shadow_setups(fetched_1h, market_prices)
+    else:
+        hourly_rows = {}
     btc_5m = fetched_5m.get("BTCUSDT")
     active_rows = get_open_signals()
     active = {row["symbol"] for row in active_rows}
@@ -3862,13 +3911,19 @@ def _run_venue_strategy_scan() -> None:
         if not candles or symbol in active or symbol in blocked:
             continue
         try:
-            market = get_xperp_price(symbol) or float(candles["close"][-1])
+            market = market_prices.get(symbol) or float(candles["close"][-1])
             rows = venue_setups(
                 candles, btc, entry_time=float(candles["time"][-1]) + KLINES_INTERVAL_SEC,
                 market_price=float(market), symbol=symbol,
             )
-            # The experimental module is collected only in shadow deployment
-            # and only when no production module owns this symbol/candle.
+            # The direct-transfer hourly model owns the first shadow slot when
+            # no production module owns this symbol/candle.
+            if not rows and DEPLOYMENT_MODE == "shadow":
+                hourly = hourly_rows.get(symbol)
+                if hourly:
+                    rows = [hourly]
+            # The deterministic experimental module is collected only when
+            # neither production nor the hourly transfer owns the symbol.
             if not rows and DEPLOYMENT_MODE == "shadow":
                 rows = shadow_experimental_setups(
                     candles, btc,

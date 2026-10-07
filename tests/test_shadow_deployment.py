@@ -153,6 +153,28 @@ class ShadowDeploymentTests(unittest.TestCase):
         self.assertFalse(analysis["strategy_stop_on_close"])
         self.assertEqual(analysis["strategy_max_bars"], 72)
 
+    def test_hourly_hgb_analysis_is_permanently_shadow_only(self):
+        setup = {
+            "direction": "LONG", "entry": 100.0, "atr": .5,
+            "target_r": .5, "first_target_move_pct": .5,
+            "utc_session": "hour_12", "btc_regime": "hourly_hgb",
+            "eff_ratio": .2, "signal_bar_ts": 3_600.0,
+            "module": "shadow_okx_1h_hgb", "model_quality": .81,
+            "families": ["trend", "breadth"],
+            "_shadow_experiment": True, "_hourly_hgb_shadow": True,
+        }
+        with patch.object(main, "DEPLOYMENT_MODE", "live"):
+            analysis = main._venue_analysis("BTCUSDT", setup)
+        self.assertTrue(analysis["_shadow_only"])
+        self.assertTrue(analysis["_hourly_hgb_shadow"])
+        self.assertEqual(analysis["source"], "venue_shadow_1h_hgb")
+        self.assertEqual(analysis["entry_source"], "MARKET")
+        self.assertEqual(analysis["fixed_target_r"], .5)
+        self.assertEqual(analysis["strategy_bar_seconds"], 3600)
+        self.assertEqual(analysis["strategy_entry_bar_ts"], 7_200.0)
+        self.assertFalse(analysis["strategy_stop_on_close"])
+        self.assertEqual(analysis["strategy_max_bars"], 12)
+
     def test_five_minute_fixed_runner_uses_5m_bars_and_next_bar_breakeven(self):
         start = 2_000_000_100.0
         frame = {
@@ -231,6 +253,32 @@ class ShadowDeploymentTests(unittest.TestCase):
              patch.object(main, "send_signal_update"), \
              patch.object(main.autotrader, "mirror_transition"):
             main._check_open_signals()
+        self.assertEqual(update.call_args.args[1], "EXPIRED")
+
+    def test_hourly_target_after_12_bars_is_ignored(self):
+        start = 2_000_100_000.0
+        times = [start + 3600 * index for index in range(13)]
+        frame = {
+            "time": times, "open": [100.0] * 13,
+            "high": [100.4] * 12 + [101.0], "low": [99.5] * 13,
+            "close": [100.0] * 13,
+            "confirmed": [True] * 12 + [False],
+        }
+        signal = {
+            "id": 74, "symbol": "BTCUSDT", "direction": "LONG",
+            "entry_price": 100.0, "sl": 99.0, "tp1": 100.5, "tp2": 100.5,
+            "atr": .5, "opened_at": start, "status": "OPEN",
+            "strategy_bar_seconds": 3600, "strategy_entry_bar_ts": start,
+            "strategy_stop_on_close": 0, "strategy_max_bars": 12,
+        }
+        with patch.object(main, "get_open_signals", return_value=[signal]), \
+             patch.object(main.time, "time", return_value=start + 12 * 3600 + 60), \
+             patch.object(main, "get_klines_xperp", return_value=frame) as candles, \
+             patch.object(main, "update_signal_status") as update, \
+             patch.object(main, "send_signal_update"), \
+             patch.object(main.autotrader, "mirror_transition"):
+            main._check_open_signals()
+        self.assertEqual(candles.call_args.kwargs["interval"], "1h")
         self.assertEqual(update.call_args.args[1], "EXPIRED")
 
     def test_five_minute_oi_shadow_obeys_two_per_hour_cap(self):

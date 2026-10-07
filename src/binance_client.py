@@ -358,6 +358,10 @@ def get_klines(symbol, interval=TIMEFRAME_KUCOIN, limit=KLINES_LIMIT,
         "low":    [float(c[3]) for c in candles],
         "close":  [float(c[4]) for c in candles],
         "volume": [float(c[6]) for c in candles],  # volCcy = base-currency volume
+        # The frozen one-hour cross-market model was trained on quote-currency
+        # turnover (OKX volCcyQuote, index 7).  Keep the legacy base-volume key
+        # untouched and expose the exact training field alongside it.
+        "volume_quote": [float(c[7]) for c in candles],
     }
     if _ck is not None:
         _kl_cache_put(_ck, out)
