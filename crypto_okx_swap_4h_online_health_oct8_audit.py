@@ -118,7 +118,6 @@ def gated_runtime(rows: list[dict], rule: dict) -> tuple[list[dict], dict]:
                 if trigger(history, complement_stop_streak, rule):
                     disabled_until = max(
                         disabled_until, exit_time + rule["pause_days"] * 86400)
-                    history.clear()
                     complement_stop_streak = 0
                     triggers += 1
         while accepted_times and accepted_times[0] <= now - 3600:
@@ -276,7 +275,8 @@ def main() -> None:
             "selection": [2022, 2023, 2024], "validation": 2025,
             "research_biased_final": 2026,
             "gate_observations": "only previously closed accepted complement trades",
-            "re_enable": "clear health window and retry after fixed cooldown",
+            "re_enable": (
+                "retain the rolling health window and admit probe trades after cooldown"),
             "grid": {"windows": list(WINDOWS), "hit_floors": list(HIT_FLOORS),
                      "return_floors": list(RETURN_FLOORS),
                      "stop_streaks": list(STOP_STREAKS),
@@ -300,7 +300,7 @@ def main() -> None:
                     str(WALK_REPORT): digest(WALK_REPORT),
                     str(Path(__file__)): digest(Path(__file__))},
         "limitations": [
-            "2026 had already been inspected before this health-gate hypothesis and is research-biased.",
+            "The sticky-window revision was added after inspecting the resetting gate on 2026 and is research-biased.",
             "Any historical pass still requires direct EU X-Perp forward shadow confirmation.",
         ],
     }
