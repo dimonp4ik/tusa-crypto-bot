@@ -85,6 +85,9 @@ def main() -> None:
     parser.add_argument("--start", default="2020-01-01T00:00:00Z")
     parser.add_argument("--end", default=None)
     parser.add_argument("--workers", type=int, default=2)
+    parser.add_argument(
+        "--symbols", nargs="+", default=list(SYMBOLS),
+        help="symbols such as BTCUSDT; defaults to the frozen eight-symbol set")
     parser.add_argument("--out", type=Path,
                         default=Path("reports/audit_2026_09_08/crypto_okx_swap_1h_history"))
     args = parser.parse_args()
@@ -92,11 +95,16 @@ def main() -> None:
     end_ms = parse(args.end) if args.end else int(time.time() * 1000)
     if start_ms >= end_ms or args.workers < 1:
         parser.error("invalid time range or worker count")
+    symbols_requested = tuple(dict.fromkeys(
+        str(symbol).strip().upper() for symbol in args.symbols))
+    if not symbols_requested or any(
+            not symbol.endswith("USDT") for symbol in symbols_requested):
+        parser.error("symbols must be non-empty USDT symbols")
     args.out.mkdir(parents=True, exist_ok=True)
     symbols = {}
     with ThreadPoolExecutor(max_workers=args.workers) as pool:
         futures = {pool.submit(fetch, symbol, start_ms, end_ms, args.out): symbol
-                   for symbol in SYMBOLS}
+                   for symbol in symbols_requested}
         for future in as_completed(futures):
             symbol, meta = future.result()
             symbols[symbol] = meta
@@ -105,7 +113,7 @@ def main() -> None:
         "status": "RESEARCH_INPUT", "venue": "OKX global USDT swap public API",
         "interval": "1H", "created_at": datetime.now(timezone.utc).isoformat(),
         "requested_start": start_ms // 1000, "requested_end": end_ms // 1000,
-        "symbols": {symbol: symbols[symbol] for symbol in SYMBOLS},
+        "symbols": {symbol: symbols[symbol] for symbol in symbols_requested},
     }
     path = args.out / "manifest.json"
     path.write_text(json.dumps(manifest, indent=2), encoding="utf-8")
