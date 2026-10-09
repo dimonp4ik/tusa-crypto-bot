@@ -1,0 +1,28 @@
+{
+  "causal_availability": "Historical rows expose UTC day labels but no publication time; each value is delayed by 24 hours and stale values expire after 48 hours.",
+  "data_path": "reports\\audit_2026_09_08\\crypto_alternative_fng_daily_oct9\\alternative_fng_daily.pkl",
+  "data_sha256": "3a263a03bf6dffe1541262adcbc99605dfd23498c903ceb098bbaf2ab3e38072",
+  "endpoint": "https://api.alternative.me/fng/",
+  "provider": "Alternative.me Crypto Fear and Greed Index",
+  "quality": {
+    "duplicate_timestamps": 0,
+    "first_source_time": 1517443200,
+    "last_source_time": 1791504000,
+    "maximum_gap_days": 4,
+    "maximum_value": 95,
+    "minimum_value": 5,
+    "missing_days": [
+      "2018-04-14",
+      "2018-04-15",
+      "2018-04-16",
+      "2024-10-26"
+    ],
+    "rows": 3169,
+    "utc_day_aligned": true
+  },
+  "raw_path": "reports\\audit_2026_09_08\\crypto_alternative_fng_daily_oct9\\alternative_fng_response.json",
+  "raw_sha256": "678ba41e3f982ce7fe4de7f1a15be3bc27e4d06afa12ec07e9f1927d9fbab636",
+  "request_url": "https://api.alternative.me/fng/?limit=0&format=json",
+  "retrieved_at_utc": "2026-10-09T20:32:25.798228+00:00",
+  "status": "IMMUTABLE_PUBLIC_RESEARCH_INPUT"
+}
