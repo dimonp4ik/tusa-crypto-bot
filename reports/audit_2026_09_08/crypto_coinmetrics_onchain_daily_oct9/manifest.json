@@ -1,0 +1,70 @@
+{
+  "assets": [
+    "btc",
+    "eth"
+  ],
+  "causal_availability": "A source day is usable only at its AssetEODCompletionTime; rows with availability lag outside 24-72 hours are excluded.",
+  "data_path": "reports\\audit_2026_09_08\\crypto_coinmetrics_onchain_daily_oct9\\btc_eth_onchain_daily.pkl",
+  "data_sha256": "0ad35729235116bc8cb77f0b8c5b489e3c2e7641b82e103ca6d7d1607b2da917",
+  "end": "2025-12-31",
+  "endpoint": "https://community-api.coinmetrics.io/v4/timeseries/asset-metrics",
+  "metrics": [
+    "AssetEODCompletionTime",
+    "AdrActCnt",
+    "TxTfrCnt",
+    "FeeTotNtv",
+    "CapMVRVCur",
+    "SplyCur"
+  ],
+  "provider": "Coin Metrics Community API",
+  "quality": {
+    "btc": {
+      "availability_monotonic": true,
+      "eligible_by_source_year": {
+        "2021": 311,
+        "2022": 365,
+        "2023": 365,
+        "2024": 363,
+        "2025": 363
+      },
+      "eligible_lag_rows": 1767,
+      "lag_hours_max": 10139.131111,
+      "lag_hours_median": 28.8475,
+      "lag_hours_min": 26.023333,
+      "lag_over_72h_rows": 425,
+      "lag_under_24h_rows": 0,
+      "missing_days": [],
+      "rows": 2192
+    },
+    "eth": {
+      "availability_monotonic": true,
+      "eligible_by_source_year": {
+        "2021": 311,
+        "2022": 365,
+        "2023": 361,
+        "2024": 362,
+        "2025": 290
+      },
+      "eligible_lag_rows": 1689,
+      "lag_hours_max": 10138.546944,
+      "lag_hours_median": 26.104306,
+      "lag_hours_min": 25.233611,
+      "lag_over_72h_rows": 503,
+      "lag_under_24h_rows": 0,
+      "missing_days": [],
+      "rows": 2192
+    }
+  },
+  "raw_path": "reports\\audit_2026_09_08\\crypto_coinmetrics_onchain_daily_oct9\\coinmetrics_response.json",
+  "raw_sha256": "58cb2bd578c4f16527d1e811024af4a862ca735da5747b408d547c438599b05f",
+  "request_url": "https://community-api.coinmetrics.io/v4/timeseries/asset-metrics?assets=btc%2Ceth&metrics=AssetEODCompletionTime%2CAdrActCnt%2CTxTfrCnt%2CFeeTotNtv%2CCapMVRVCur%2CSplyCur&frequency=1d&start_time=2020-01-01&end_time=2025-12-31&page_size=10000",
+  "retrieved_at_utc": "2026-10-09T20:25:36.126631+00:00",
+  "reviewable_entity_metrics_excluded": [
+    "FlowInExNtv",
+    "FlowOutExNtv",
+    "SplyExNtv"
+  ],
+  "reviewable_exclusion_reason": "Historical entity labels are backfilled from addresses currently known to belong to exchanges and observed status timestamps were in 2026.",
+  "start": "2020-01-01",
+  "status": "IMMUTABLE_PUBLIC_RESEARCH_INPUT"
+}
