@@ -1,0 +1,2304 @@
+{
+  "confirmation_2024": null,
+  "frozen_before_2024": null,
+  "limitations": [
+    "Daily macro bars cannot describe intraday US-session transitions.",
+    "Public adjusted histories may be revised by the provider.",
+    "Any historical survivor would still require shadow forward evidence."
+  ],
+  "minimum_ideal_hit_rate_for_30pct_month": {
+    "tp1.5_sl0.75": 76.644261,
+    "tp1.5_sl1.0": 78.987727,
+    "tp2.0_sl1.0": 65.872301
+  },
+  "protocol": {
+    "confirmation": "2024 after validation gate",
+    "contracts": [
+      {
+        "hold_bars": 288,
+        "stop_pct": 0.75,
+        "target_pct": 1.5
+      },
+      {
+        "hold_bars": 576,
+        "stop_pct": 1.0,
+        "target_pct": 1.5
+      },
+      {
+        "hold_bars": 576,
+        "stop_pct": 1.0,
+        "target_pct": 2.0
+      },
+      {
+        "hold_bars": 864,
+        "stop_pct": 1.0,
+        "target_pct": 2.0
+      }
+    ],
+    "daily_availability": "session D becomes usable at 00:00 UTC on D+1",
+    "entry": "next hourly 5m perpetual market open",
+    "families": [
+      "risk_continuation",
+      "crypto_catchup",
+      "shock_reversal",
+      "liquidity_trend",
+      "nasdaq_btc_divergence"
+    ],
+    "fees": "excluded",
+    "fit": "2020-04 through 2021; labels must exit before 2022",
+    "model_grid": [
+      {
+        "l2": 6.0,
+        "max_leaf_nodes": 15,
+        "min_samples_leaf": 250
+      },
+      {
+        "l2": 10.0,
+        "max_leaf_nodes": 31,
+        "min_samples_leaf": 450
+      }
+    ],
+    "money": "3% current-equity margin, fixed 10x leverage",
+    "profiles": [
+      "broad",
+      "strict"
+    ],
+    "quantiles": [
+      0.7,
+      0.75,
+      0.8,
+      0.85,
+      0.9,
+      0.925,
+      0.95,
+      0.97,
+      0.98,
+      0.99
+    ],
+    "selection": "2022",
+    "test": "2025 after confirmation gate",
+    "untouched_reveal": "2026 after test gate",
+    "validation": "2023 after selection gate"
+  },
+  "qualified_full_routes_before_2024": 0,
+  "rows": {
+    "contracts": [
+      {
+        "candidate_rows": 124833,
+        "excluded_crossing_gap_or_end": 183,
+        "hold_bars": 288,
+        "stop_pct": 0.75,
+        "target_pct": 1.5
+      },
+      {
+        "candidate_rows": 124729,
+        "excluded_crossing_gap_or_end": 349,
+        "hold_bars": 576,
+        "stop_pct": 1.0,
+        "target_pct": 1.5
+      },
+      {
+        "candidate_rows": 124729,
+        "excluded_crossing_gap_or_end": 349,
+        "hold_bars": 576,
+        "stop_pct": 1.0,
+        "target_pct": 2.0
+      },
+      {
+        "candidate_rows": 124586,
+        "excluded_crossing_gap_or_end": 628,
+        "hold_bars": 864,
+        "stop_pct": 1.0,
+        "target_pct": 2.0
+      }
+    ],
+    "events": 201121,
+    "macro_enriched": 441900,
+    "strict_hourly": 450944
+  },
+  "selection_frontier": [
+    {
+      "hold_bars": 576,
+      "model": {
+        "l2": 6.0,
+        "max_leaf_nodes": 15,
+        "min_samples_leaf": 250
+      },
+      "model_kind": "semantic_price_ranker",
+      "quantile": 0.75,
+      "selection_2022": {
+        "active_days": 317,
+        "by_module_count": {
+          "macro_material_router": 1709
+        },
+        "by_source_count": {
+          "macro_crypto_catchup": 213,
+          "macro_liquidity_trend": 108,
+          "macro_nasdaq_btc_divergence": 801,
+          "macro_risk_continuation": 436,
+          "macro_shock_reversal": 151
+        },
+        "dd_pct": 17.6741,
+        "economic_gate": {
+          "calendar_days_per_month": 30,
+          "frequency_pass": true,
+          "interpretation": "diagnostic projection from observed geometric trade return; not a forecast",
+          "leverage": 10.0,
+          "margin_fraction": 0.03,
+          "mean_signed_price_return_pct": 0.085552,
+          "monthly_target_pct": 30.0,
+          "n": 1709,
+          "observed_trades_per_day": 4.747,
+          "passes": false,
+          "projected_monthly_return_pct": 3.5847,
+          "required_constant_signed_price_return_pct": 0.973137,
+          "required_trades_per_day": 3.0,
+          "return_pass": false
+        },
+        "literal_target_hit_rate": 36.103,
+        "literal_target_hits": 617,
+        "max_entries_same_clock_hour": 2,
+        "max_entries_same_rolling_hour": 2,
+        "max_loss_streak": 22,
+        "monthly_return_pct": {
+          "2022-01": -2.5159,
+          "2022-02": 3.5256,
+          "2022-03": 9.448,
+          "2022-04": 8.7642,
+          "2022-05": 20.0292,
+          "2022-06": 10.4721,
+          "2022-07": -11.4648,
+          "2022-08": 0.3458,
+          "2022-09": -2.6117,
+          "2022-10": 1.8947,
+          "2022-11": -2.822,
+          "2022-12": 10.6136
+        },
+        "months": 12,
+        "months_ge_30pct": 0,
+        "n": 1709,
+        "negative_months": 4,
+        "return_pct": 50.9611,
+        "stops": 1088,
+        "timeouts": 4,
+        "trades_per_active_day": 5.391,
+        "trades_per_calendar_day": 4.747,
+        "wr": 36.22
+      },
+      "stop_pct": 1.0,
+      "target_pct": 2.0,
+      "threshold": 0.3669378096024727
+    },
+    {
+      "hold_bars": 288,
+      "model": {
+        "l2": 6.0,
+        "max_leaf_nodes": 15,
+        "min_samples_leaf": 250
+      },
+      "model_kind": "semantic_price_ranker",
+      "quantile": 0.9,
+      "selection_2022": {
+        "active_days": 302,
+        "by_module_count": {
+          "macro_material_router": 1282
+        },
+        "by_source_count": {
+          "macro_crypto_catchup": 115,
+          "macro_liquidity_trend": 79,
+          "macro_nasdaq_btc_divergence": 668,
+          "macro_risk_continuation": 297,
+          "macro_shock_reversal": 123
+        },
+        "dd_pct": 12.1766,
+        "economic_gate": {
+          "calendar_days_per_month": 30,
+          "frequency_pass": true,
+          "interpretation": "diagnostic projection from observed geometric trade return; not a forecast",
+          "leverage": 10.0,
+          "margin_fraction": 0.03,
+          "mean_signed_price_return_pct": 0.105098,
+          "monthly_target_pct": 30.0,
+          "n": 1282,
+          "observed_trades_per_day": 3.561,
+          "passes": false,
+          "projected_monthly_return_pct": 3.3663,
+          "required_constant_signed_price_return_pct": 0.973137,
+          "required_trades_per_day": 3.0,
+          "return_pass": false
+        },
+        "literal_target_hit_rate": 37.6755,
+        "literal_target_hits": 483,
+        "max_entries_same_clock_hour": 2,
+        "max_entries_same_rolling_hour": 2,
+        "max_loss_streak": 18,
+        "monthly_return_pct": {
+          "2022-01": 4.0492,
+          "2022-02": 2.904,
+          "2022-03": 5.215,
+          "2022-04": 7.6888,
+          "2022-05": 10.5302,
+          "2022-06": 7.3605,
+          "2022-07": 2.8777,
+          "2022-08": 2.6234,
+          "2022-09": 0.3599,
+          "2022-10": -5.5477,
+          "2022-11": -3.2502,
+          "2022-12": 6.3669
+        },
+        "months": 12,
+        "months_ge_30pct": 0,
+        "n": 1282,
+        "negative_months": 2,
+        "return_pct": 48.266,
+        "stops": 791,
+        "timeouts": 8,
+        "trades_per_active_day": 4.245,
+        "trades_per_calendar_day": 3.561,
+        "wr": 38.22
+      },
+      "stop_pct": 0.75,
+      "target_pct": 1.5,
+      "threshold": 0.4030386322067601
+    },
+    {
+      "hold_bars": 576,
+      "model": {
+        "l2": 6.0,
+        "max_leaf_nodes": 15,
+        "min_samples_leaf": 250
+      },
+      "model_kind": "semantic_price_ranker",
+      "quantile": 0.7,
+      "selection_2022": {
+        "active_days": 319,
+        "by_module_count": {
+          "macro_material_router": 1806
+        },
+        "by_source_count": {
+          "macro_crypto_catchup": 219,
+          "macro_liquidity_trend": 112,
+          "macro_nasdaq_btc_divergence": 850,
+          "macro_risk_continuation": 456,
+          "macro_shock_reversal": 169
+        },
+        "dd_pct": 21.7924,
+        "economic_gate": {
+          "calendar_days_per_month": 30,
+          "frequency_pass": true,
+          "interpretation": "diagnostic projection from observed geometric trade return; not a forecast",
+          "leverage": 10.0,
+          "margin_fraction": 0.03,
+          "mean_signed_price_return_pct": 0.075682,
+          "monthly_target_pct": 30.0,
+          "n": 1806,
+          "observed_trades_per_day": 5.017,
+          "passes": false,
+          "projected_monthly_return_pct": 3.3316,
+          "required_constant_signed_price_return_pct": 0.973137,
+          "required_trades_per_day": 3.0,
+          "return_pass": false
+        },
+        "literal_target_hit_rate": 35.7143,
+        "literal_target_hits": 645,
+        "max_entries_same_clock_hour": 2,
+        "max_entries_same_rolling_hour": 2,
+        "max_loss_streak": 19,
+        "monthly_return_pct": {
+          "2022-01": -5.3801,
+          "2022-02": 7.5743,
+          "2022-03": 1.2766,
+          "2022-04": 15.4161,
+          "2022-05": 19.2641,
+          "2022-06": 6.2728,
+          "2022-07": -11.2294,
+          "2022-08": -2.0542,
+          "2022-09": -4.6276,
+          "2022-10": 4.432,
+          "2022-11": 0.3844,
+          "2022-12": 11.1818,
+          "2023-01": 0.4869
+        },
+        "months": 13,
+        "months_ge_30pct": 0,
+        "n": 1806,
+        "negative_months": 4,
+        "return_pct": 46.4598,
+        "stops": 1156,
+        "timeouts": 5,
+        "trades_per_active_day": 5.661,
+        "trades_per_calendar_day": 5.017,
+        "wr": 35.88
+      },
+      "stop_pct": 1.0,
+      "target_pct": 2.0,
+      "threshold": 0.3571705218374764
+    },
+    {
+      "hold_bars": 288,
+      "model": {
+        "l2": 6.0,
+        "max_leaf_nodes": 15,
+        "min_samples_leaf": 250
+      },
+      "model_kind": "semantic_price_ranker",
+      "quantile": 0.85,
+      "selection_2022": {
+        "active_days": 313,
+        "by_module_count": {
+          "macro_material_router": 1519
+        },
+        "by_source_count": {
+          "macro_crypto_catchup": 138,
+          "macro_liquidity_trend": 101,
+          "macro_nasdaq_btc_divergence": 753,
+          "macro_risk_continuation": 391,
+          "macro_shock_reversal": 136
+        },
+        "dd_pct": 18.8737,
+        "economic_gate": {
+          "calendar_days_per_month": 30,
+          "frequency_pass": true,
+          "interpretation": "diagnostic projection from observed geometric trade return; not a forecast",
+          "leverage": 10.0,
+          "margin_fraction": 0.03,
+          "mean_signed_price_return_pct": 0.086934,
+          "monthly_target_pct": 30.0,
+          "n": 1519,
+          "observed_trades_per_day": 4.219,
+          "passes": false,
+          "projected_monthly_return_pct": 3.2865,
+          "required_constant_signed_price_return_pct": 0.973137,
+          "required_trades_per_day": 3.0,
+          "return_pass": false
+        },
+        "literal_target_hit_rate": 36.9322,
+        "literal_target_hits": 561,
+        "max_entries_same_clock_hour": 2,
+        "max_entries_same_rolling_hour": 2,
+        "max_loss_streak": 22,
+        "monthly_return_pct": {
+          "2022-01": 0.8099,
+          "2022-02": 5.9182,
+          "2022-03": 6.1231,
+          "2022-04": 10.0202,
+          "2022-05": 10.2548,
+          "2022-06": 11.5036,
+          "2022-07": 1.7096,
+          "2022-08": -1.6765,
+          "2022-09": -1.9109,
+          "2022-10": -4.2774,
+          "2022-11": -6.0531,
+          "2022-12": 8.4497
+        },
+        "months": 12,
+        "months_ge_30pct": 0,
+        "n": 1519,
+        "negative_months": 4,
+        "return_pct": 46.6251,
+        "stops": 950,
+        "timeouts": 8,
+        "trades_per_active_day": 4.853,
+        "trades_per_calendar_day": 4.219,
+        "wr": 37.39
+      },
+      "stop_pct": 0.75,
+      "target_pct": 1.5,
+      "threshold": 0.38635319370787113
+    },
+    {
+      "hold_bars": 576,
+      "model": {
+        "l2": 10.0,
+        "max_leaf_nodes": 31,
+        "min_samples_leaf": 450
+      },
+      "model_kind": "semantic_price_ranker",
+      "quantile": 0.8,
+      "selection_2022": {
+        "active_days": 319,
+        "by_module_count": {
+          "macro_material_router": 1804
+        },
+        "by_source_count": {
+          "macro_crypto_catchup": 192,
+          "macro_liquidity_trend": 121,
+          "macro_nasdaq_btc_divergence": 841,
+          "macro_risk_continuation": 488,
+          "macro_shock_reversal": 162
+        },
+        "dd_pct": 12.0568,
+        "economic_gate": {
+          "calendar_days_per_month": 30,
+          "frequency_pass": true,
+          "interpretation": "diagnostic projection from observed geometric trade return; not a forecast",
+          "leverage": 10.0,
+          "margin_fraction": 0.03,
+          "mean_signed_price_return_pct": 0.070091,
+          "monthly_target_pct": 30.0,
+          "n": 1804,
+          "observed_trades_per_day": 5.011,
+          "passes": false,
+          "projected_monthly_return_pct": 3.1048,
+          "required_constant_signed_price_return_pct": 0.973137,
+          "required_trades_per_day": 3.0,
+          "return_pass": false
+        },
+        "literal_target_hit_rate": 42.6829,
+        "literal_target_hits": 770,
+        "max_entries_same_clock_hour": 2,
+        "max_entries_same_rolling_hour": 2,
+        "max_loss_streak": 16,
+        "monthly_return_pct": {
+          "2022-01": -1.9086,
+          "2022-02": 6.9695,
+          "2022-03": -2.0981,
+          "2022-04": 8.4086,
+          "2022-05": 6.4723,
+          "2022-06": 12.5225,
+          "2022-07": 1.0276,
+          "2022-08": 1.0196,
+          "2022-09": -5.1758,
+          "2022-10": 8.3981,
+          "2022-11": -10.4653,
+          "2022-12": 14.1963
+        },
+        "months": 12,
+        "months_ge_30pct": 0,
+        "n": 1804,
+        "negative_months": 4,
+        "return_pct": 43.104,
+        "stops": 1029,
+        "timeouts": 5,
+        "trades_per_active_day": 5.655,
+        "trades_per_calendar_day": 5.011,
+        "wr": 42.85
+      },
+      "stop_pct": 1.0,
+      "target_pct": 1.5,
+      "threshold": 0.4676417769137181
+    },
+    {
+      "hold_bars": 576,
+      "model": {
+        "l2": 10.0,
+        "max_leaf_nodes": 31,
+        "min_samples_leaf": 450
+      },
+      "model_kind": "semantic_price_ranker",
+      "quantile": 0.925,
+      "selection_2022": {
+        "active_days": 290,
+        "by_module_count": {
+          "macro_material_router": 1026
+        },
+        "by_source_count": {
+          "macro_crypto_catchup": 135,
+          "macro_liquidity_trend": 57,
+          "macro_nasdaq_btc_divergence": 471,
+          "macro_risk_continuation": 289,
+          "macro_shock_reversal": 74
+        },
+        "dd_pct": 11.9005,
+        "economic_gate": {
+          "calendar_days_per_month": 30,
+          "frequency_pass": false,
+          "interpretation": "diagnostic projection from observed geometric trade return; not a forecast",
+          "leverage": 10.0,
+          "margin_fraction": 0.03,
+          "mean_signed_price_return_pct": 0.115869,
+          "monthly_target_pct": 30.0,
+          "n": 1026,
+          "observed_trades_per_day": 2.85,
+          "passes": false,
+          "projected_monthly_return_pct": 2.9333,
+          "required_constant_signed_price_return_pct": 0.973137,
+          "required_trades_per_day": 3.0,
+          "return_pass": false
+        },
+        "literal_target_hit_rate": 37.037,
+        "literal_target_hits": 380,
+        "max_entries_same_clock_hour": 2,
+        "max_entries_same_rolling_hour": 2,
+        "max_loss_streak": 18,
+        "monthly_return_pct": {
+          "2022-01": -3.3497,
+          "2022-02": 5.4239,
+          "2022-03": 2.6178,
+          "2022-04": 10.5254,
+          "2022-05": 7.2976,
+          "2022-06": 9.5976,
+          "2022-07": -7.8748,
+          "2022-08": 5.0474,
+          "2022-09": 3.1973,
+          "2022-10": 4.4623,
+          "2022-11": -4.4643,
+          "2022-12": 3.8607
+        },
+        "months": 12,
+        "months_ge_30pct": 0,
+        "n": 1026,
+        "negative_months": 3,
+        "return_pct": 40.6781,
+        "stops": 642,
+        "timeouts": 4,
+        "trades_per_active_day": 3.538,
+        "trades_per_calendar_day": 2.85,
+        "wr": 37.23
+      },
+      "stop_pct": 1.0,
+      "target_pct": 2.0,
+      "threshold": 0.44832725417486174
+    },
+    {
+      "hold_bars": 576,
+      "model": {
+        "l2": 6.0,
+        "max_leaf_nodes": 15,
+        "min_samples_leaf": 250
+      },
+      "model_kind": "semantic_price_ranker",
+      "quantile": 0.8,
+      "selection_2022": {
+        "active_days": 312,
+        "by_module_count": {
+          "macro_material_router": 1545
+        },
+        "by_source_count": {
+          "macro_crypto_catchup": 210,
+          "macro_liquidity_trend": 105,
+          "macro_nasdaq_btc_divergence": 713,
+          "macro_risk_continuation": 387,
+          "macro_shock_reversal": 130
+        },
+        "dd_pct": 17.365,
+        "economic_gate": {
+          "calendar_days_per_month": 30,
+          "frequency_pass": true,
+          "interpretation": "diagnostic projection from observed geometric trade return; not a forecast",
+          "leverage": 10.0,
+          "margin_fraction": 0.03,
+          "mean_signed_price_return_pct": 0.075905,
+          "monthly_target_pct": 30.0,
+          "n": 1545,
+          "observed_trades_per_day": 4.292,
+          "passes": false,
+          "projected_monthly_return_pct": 2.8522,
+          "required_constant_signed_price_return_pct": 0.973137,
+          "required_trades_per_day": 3.0,
+          "return_pass": false
+        },
+        "literal_target_hit_rate": 35.7929,
+        "literal_target_hits": 553,
+        "max_entries_same_clock_hour": 2,
+        "max_entries_same_rolling_hour": 2,
+        "max_loss_streak": 25,
+        "monthly_return_pct": {
+          "2022-01": -2.5263,
+          "2022-02": 4.7756,
+          "2022-03": 7.2715,
+          "2022-04": 9.4248,
+          "2022-05": 17.9556,
+          "2022-06": 6.2657,
+          "2022-07": -11.6982,
+          "2022-08": 1.5763,
+          "2022-09": 0.0498,
+          "2022-10": 1.6131,
+          "2022-11": -5.9393,
+          "2022-12": 7.7142
+        },
+        "months": 12,
+        "months_ge_30pct": 0,
+        "n": 1545,
+        "negative_months": 3,
+        "return_pct": 38.8253,
+        "stops": 989,
+        "timeouts": 3,
+        "trades_per_active_day": 4.952,
+        "trades_per_calendar_day": 4.292,
+        "wr": 35.92
+      },
+      "stop_pct": 1.0,
+      "target_pct": 2.0,
+      "threshold": 0.3782517783779364
+    },
+    {
+      "hold_bars": 576,
+      "model": {
+        "l2": 10.0,
+        "max_leaf_nodes": 31,
+        "min_samples_leaf": 450
+      },
+      "model_kind": "semantic_price_ranker",
+      "quantile": 0.85,
+      "selection_2022": {
+        "active_days": 314,
+        "by_module_count": {
+          "macro_material_router": 1607
+        },
+        "by_source_count": {
+          "macro_crypto_catchup": 158,
+          "macro_liquidity_trend": 110,
+          "macro_nasdaq_btc_divergence": 740,
+          "macro_risk_continuation": 437,
+          "macro_shock_reversal": 162
+        },
+        "dd_pct": 18.8595,
+        "economic_gate": {
+          "calendar_days_per_month": 30,
+          "frequency_pass": true,
+          "interpretation": "diagnostic projection from observed geometric trade return; not a forecast",
+          "leverage": 10.0,
+          "margin_fraction": 0.03,
+          "mean_signed_price_return_pct": 0.070594,
+          "monthly_target_pct": 30.0,
+          "n": 1607,
+          "observed_trades_per_day": 4.464,
+          "passes": false,
+          "projected_monthly_return_pct": 2.782,
+          "required_constant_signed_price_return_pct": 0.973137,
+          "required_trades_per_day": 3.0,
+          "return_pass": false
+        },
+        "literal_target_hit_rate": 42.6882,
+        "literal_target_hits": 686,
+        "max_entries_same_clock_hour": 2,
+        "max_entries_same_rolling_hour": 2,
+        "max_loss_streak": 17,
+        "monthly_return_pct": {
+          "2022-01": -2.045,
+          "2022-02": 8.6176,
+          "2022-03": 4.5867,
+          "2022-04": 11.5719,
+          "2022-05": 5.8664,
+          "2022-06": 10.2301,
+          "2022-07": -3.2184,
+          "2022-08": 1.6278,
+          "2022-09": -3.8504,
+          "2022-10": -0.2657,
+          "2022-11": -10.4589,
+          "2022-12": 12.8854
+        },
+        "months": 12,
+        "months_ge_30pct": 0,
+        "n": 1607,
+        "negative_months": 5,
+        "return_pct": 38.1255,
+        "stops": 916,
+        "timeouts": 5,
+        "trades_per_active_day": 5.118,
+        "trades_per_calendar_day": 4.464,
+        "wr": 42.87
+      },
+      "stop_pct": 1.0,
+      "target_pct": 1.5,
+      "threshold": 0.486721277405322
+    },
+    {
+      "hold_bars": 288,
+      "model": {
+        "l2": 6.0,
+        "max_leaf_nodes": 15,
+        "min_samples_leaf": 250
+      },
+      "model_kind": "semantic_price_ranker",
+      "quantile": 0.925,
+      "selection_2022": {
+        "active_days": 292,
+        "by_module_count": {
+          "macro_material_router": 1087
+        },
+        "by_source_count": {
+          "macro_crypto_catchup": 86,
+          "macro_liquidity_trend": 67,
+          "macro_nasdaq_btc_divergence": 575,
+          "macro_risk_continuation": 252,
+          "macro_shock_reversal": 107
+        },
+        "dd_pct": 11.9941,
+        "economic_gate": {
+          "calendar_days_per_month": 30,
+          "frequency_pass": true,
+          "interpretation": "diagnostic projection from observed geometric trade return; not a forecast",
+          "leverage": 10.0,
+          "margin_fraction": 0.03,
+          "mean_signed_price_return_pct": 0.102514,
+          "monthly_target_pct": 30.0,
+          "n": 1087,
+          "observed_trades_per_day": 3.019,
+          "passes": false,
+          "projected_monthly_return_pct": 2.7746,
+          "required_constant_signed_price_return_pct": 0.973137,
+          "required_trades_per_day": 3.0,
+          "return_pass": false
+        },
+        "literal_target_hit_rate": 37.5345,
+        "literal_target_hits": 408,
+        "max_entries_same_clock_hour": 2,
+        "max_entries_same_rolling_hour": 2,
+        "max_loss_streak": 16,
+        "monthly_return_pct": {
+          "2022-01": 1.0775,
+          "2022-02": 1.3111,
+          "2022-03": 8.3416,
+          "2022-04": 7.3854,
+          "2022-05": 6.8919,
+          "2022-06": 7.8523,
+          "2022-07": 3.1258,
+          "2022-08": 1.4879,
+          "2022-09": -2.0628,
+          "2022-10": -5.328,
+          "2022-11": -2.2135,
+          "2022-12": 6.2775
+        },
+        "months": 12,
+        "months_ge_30pct": 0,
+        "n": 1087,
+        "negative_months": 3,
+        "return_pct": 38.515,
+        "stops": 672,
+        "timeouts": 7,
+        "trades_per_active_day": 3.723,
+        "trades_per_calendar_day": 3.019,
+        "wr": 38.09
+      },
+      "stop_pct": 0.75,
+      "target_pct": 1.5,
+      "threshold": 0.41417295945868504
+    },
+    {
+      "hold_bars": 288,
+      "model": {
+        "l2": 10.0,
+        "max_leaf_nodes": 31,
+        "min_samples_leaf": 450
+      },
+      "model_kind": "semantic_price_ranker",
+      "quantile": 0.75,
+      "selection_2022": {
+        "active_days": 318,
+        "by_module_count": {
+          "macro_material_router": 1841
+        },
+        "by_source_count": {
+          "macro_crypto_catchup": 160,
+          "macro_liquidity_trend": 128,
+          "macro_nasdaq_btc_divergence": 896,
+          "macro_risk_continuation": 482,
+          "macro_shock_reversal": 175
+        },
+        "dd_pct": 17.5162,
+        "economic_gate": {
+          "calendar_days_per_month": 30,
+          "frequency_pass": true,
+          "interpretation": "diagnostic projection from observed geometric trade return; not a forecast",
+          "leverage": 10.0,
+          "margin_fraction": 0.03,
+          "mean_signed_price_return_pct": 0.060643,
+          "monthly_target_pct": 30.0,
+          "n": 1841,
+          "observed_trades_per_day": 5.114,
+          "passes": false,
+          "projected_monthly_return_pct": 2.7478,
+          "required_constant_signed_price_return_pct": 0.973137,
+          "required_trades_per_day": 3.0,
+          "return_pass": false
+        },
+        "literal_target_hit_rate": 35.8501,
+        "literal_target_hits": 660,
+        "max_entries_same_clock_hour": 2,
+        "max_entries_same_rolling_hour": 2,
+        "max_loss_streak": 16,
+        "monthly_return_pct": {
+          "2022-01": -3.1811,
+          "2022-02": 11.0282,
+          "2022-03": 10.4422,
+          "2022-04": 7.8062,
+          "2022-05": 4.4495,
+          "2022-06": 7.3815,
+          "2022-07": 0.3307,
+          "2022-08": 3.9535,
+          "2022-09": -8.6842,
+          "2022-10": -3.6947,
+          "2022-11": -1.879,
+          "2022-12": 6.5008
+        },
+        "months": 12,
+        "months_ge_30pct": 0,
+        "n": 1841,
+        "negative_months": 4,
+        "return_pct": 37.5916,
+        "stops": 1174,
+        "timeouts": 7,
+        "trades_per_active_day": 5.789,
+        "trades_per_calendar_day": 5.114,
+        "wr": 36.18
+      },
+      "stop_pct": 0.75,
+      "target_pct": 1.5,
+      "threshold": 0.37519436945245177
+    },
+    {
+      "hold_bars": 576,
+      "model": {
+        "l2": 10.0,
+        "max_leaf_nodes": 31,
+        "min_samples_leaf": 450
+      },
+      "model_kind": "semantic_price_ranker",
+      "quantile": 0.9,
+      "selection_2022": {
+        "active_days": 304,
+        "by_module_count": {
+          "macro_material_router": 1206
+        },
+        "by_source_count": {
+          "macro_crypto_catchup": 157,
+          "macro_liquidity_trend": 69,
+          "macro_nasdaq_btc_divergence": 555,
+          "macro_risk_continuation": 332,
+          "macro_shock_reversal": 93
+        },
+        "dd_pct": 11.3696,
+        "economic_gate": {
+          "calendar_days_per_month": 30,
+          "frequency_pass": true,
+          "interpretation": "diagnostic projection from observed geometric trade return; not a forecast",
+          "leverage": 10.0,
+          "margin_fraction": 0.03,
+          "mean_signed_price_return_pct": 0.088625,
+          "monthly_target_pct": 30.0,
+          "n": 1206,
+          "observed_trades_per_day": 3.35,
+          "passes": false,
+          "projected_monthly_return_pct": 2.6116,
+          "required_constant_signed_price_return_pct": 0.973137,
+          "required_trades_per_day": 3.0,
+          "return_pass": false
+        },
+        "literal_target_hit_rate": 36.1526,
+        "literal_target_hits": 436,
+        "max_entries_same_clock_hour": 2,
+        "max_entries_same_rolling_hour": 2,
+        "max_loss_streak": 14,
+        "monthly_return_pct": {
+          "2022-01": -3.6552,
+          "2022-02": 5.0934,
+          "2022-03": 4.1346,
+          "2022-04": 10.5076,
+          "2022-05": 4.738,
+          "2022-06": 8.2785,
+          "2022-07": -7.8732,
+          "2022-08": 4.7119,
+          "2022-09": 3.1634,
+          "2022-10": 6.6225,
+          "2022-11": -4.4892,
+          "2022-12": 1.0851
+        },
+        "months": 12,
+        "months_ge_30pct": 0,
+        "n": 1206,
+        "negative_months": 3,
+        "return_pct": 35.3737,
+        "stops": 766,
+        "timeouts": 4,
+        "trades_per_active_day": 3.967,
+        "trades_per_calendar_day": 3.35,
+        "wr": 36.32
+      },
+      "stop_pct": 1.0,
+      "target_pct": 2.0,
+      "threshold": 0.43317453027687847
+    },
+    {
+      "hold_bars": 576,
+      "model": {
+        "l2": 10.0,
+        "max_leaf_nodes": 31,
+        "min_samples_leaf": 450
+      },
+      "model_kind": "semantic_price_ranker",
+      "quantile": 0.75,
+      "selection_2022": {
+        "active_days": 319,
+        "by_module_count": {
+          "macro_material_router": 1946
+        },
+        "by_source_count": {
+          "macro_crypto_catchup": 211,
+          "macro_liquidity_trend": 125,
+          "macro_nasdaq_btc_divergence": 890,
+          "macro_risk_continuation": 544,
+          "macro_shock_reversal": 176
+        },
+        "dd_pct": 14.0118,
+        "economic_gate": {
+          "calendar_days_per_month": 30,
+          "frequency_pass": true,
+          "interpretation": "diagnostic projection from observed geometric trade return; not a forecast",
+          "leverage": 10.0,
+          "margin_fraction": 0.03,
+          "mean_signed_price_return_pct": 0.054332,
+          "monthly_target_pct": 30.0,
+          "n": 1946,
+          "observed_trades_per_day": 5.406,
+          "passes": false,
+          "projected_monthly_return_pct": 2.5648,
+          "required_constant_signed_price_return_pct": 0.973137,
+          "required_trades_per_day": 3.0,
+          "return_pass": false
+        },
+        "literal_target_hit_rate": 42.0349,
+        "literal_target_hits": 818,
+        "max_entries_same_clock_hour": 2,
+        "max_entries_same_rolling_hour": 2,
+        "max_loss_streak": 15,
+        "monthly_return_pct": {
+          "2022-01": 0.2783,
+          "2022-02": 5.5336,
+          "2022-03": -2.6641,
+          "2022-04": 10.991,
+          "2022-05": 2.0608,
+          "2022-06": 14.1669,
+          "2022-07": -2.55,
+          "2022-08": -0.1829,
+          "2022-09": -0.8121,
+          "2022-10": 2.5608,
+          "2022-11": -9.0062,
+          "2022-12": 11.9645
+        },
+        "months": 12,
+        "months_ge_30pct": 0,
+        "n": 1946,
+        "negative_months": 5,
+        "return_pct": 34.3001,
+        "stops": 1122,
+        "timeouts": 6,
+        "trades_per_active_day": 6.1,
+        "trades_per_calendar_day": 5.406,
+        "wr": 42.24
+      },
+      "stop_pct": 1.0,
+      "target_pct": 1.5,
+      "threshold": 0.45246909725038886
+    },
+    {
+      "hold_bars": 288,
+      "model": {
+        "l2": 6.0,
+        "max_leaf_nodes": 15,
+        "min_samples_leaf": 250
+      },
+      "model_kind": "semantic_price_ranker",
+      "quantile": 0.95,
+      "selection_2022": {
+        "active_days": 267,
+        "by_module_count": {
+          "macro_material_router": 832
+        },
+        "by_source_count": {
+          "macro_crypto_catchup": 67,
+          "macro_liquidity_trend": 47,
+          "macro_nasdaq_btc_divergence": 448,
+          "macro_risk_continuation": 180,
+          "macro_shock_reversal": 90
+        },
+        "dd_pct": 11.3925,
+        "economic_gate": {
+          "calendar_days_per_month": 30,
+          "frequency_pass": false,
+          "interpretation": "diagnostic projection from observed geometric trade return; not a forecast",
+          "leverage": 10.0,
+          "margin_fraction": 0.03,
+          "mean_signed_price_return_pct": 0.113858,
+          "monthly_target_pct": 30.0,
+          "n": 832,
+          "observed_trades_per_day": 2.311,
+          "passes": false,
+          "projected_monthly_return_pct": 2.358,
+          "required_constant_signed_price_return_pct": 0.973137,
+          "required_trades_per_day": 3.0,
+          "return_pass": false
+        },
+        "literal_target_hit_rate": 37.9808,
+        "literal_target_hits": 316,
+        "max_entries_same_clock_hour": 2,
+        "max_entries_same_rolling_hour": 2,
+        "max_loss_streak": 15,
+        "monthly_return_pct": {
+          "2022-01": 0.8572,
+          "2022-02": 2.242,
+          "2022-03": 9.3397,
+          "2022-04": 4.5285,
+          "2022-05": 6.1993,
+          "2022-06": 6.1993,
+          "2022-07": 3.8381,
+          "2022-08": -0.5148,
+          "2022-09": -0.4902,
+          "2022-10": -5.3079,
+          "2022-11": -2.6939,
+          "2022-12": 4.8797
+        },
+        "months": 12,
+        "months_ge_30pct": 0,
+        "n": 832,
+        "negative_months": 4,
+        "return_pct": 32.044,
+        "stops": 510,
+        "timeouts": 6,
+        "trades_per_active_day": 3.116,
+        "trades_per_calendar_day": 2.311,
+        "wr": 38.58
+      },
+      "stop_pct": 0.75,
+      "target_pct": 1.5,
+      "threshold": 0.4281531658174281
+    },
+    {
+      "hold_bars": 288,
+      "model": {
+        "l2": 10.0,
+        "max_leaf_nodes": 31,
+        "min_samples_leaf": 450
+      },
+      "model_kind": "semantic_price_ranker",
+      "quantile": 0.8,
+      "selection_2022": {
+        "active_days": 318,
+        "by_module_count": {
+          "macro_material_router": 1722
+        },
+        "by_source_count": {
+          "macro_crypto_catchup": 152,
+          "macro_liquidity_trend": 131,
+          "macro_nasdaq_btc_divergence": 846,
+          "macro_risk_continuation": 430,
+          "macro_shock_reversal": 163
+        },
+        "dd_pct": 21.7733,
+        "economic_gate": {
+          "calendar_days_per_month": 30,
+          "frequency_pass": true,
+          "interpretation": "diagnostic projection from observed geometric trade return; not a forecast",
+          "leverage": 10.0,
+          "margin_fraction": 0.03,
+          "mean_signed_price_return_pct": 0.051043,
+          "monthly_target_pct": 30.0,
+          "n": 1722,
+          "observed_trades_per_day": 4.783,
+          "passes": false,
+          "projected_monthly_return_pct": 2.1453,
+          "required_constant_signed_price_return_pct": 0.973137,
+          "required_trades_per_day": 3.0,
+          "return_pass": false
+        },
+        "literal_target_hit_rate": 35.3659,
+        "literal_target_hits": 609,
+        "max_entries_same_clock_hour": 2,
+        "max_entries_same_rolling_hour": 2,
+        "max_loss_streak": 18,
+        "monthly_return_pct": {
+          "2022-01": -4.4852,
+          "2022-02": 5.9149,
+          "2022-03": 14.4922,
+          "2022-04": 11.2794,
+          "2022-05": 6.831,
+          "2022-06": 5.2398,
+          "2022-07": -2.7521,
+          "2022-08": 3.4872,
+          "2022-09": -7.8488,
+          "2022-10": -6.6337,
+          "2022-11": -3.4057,
+          "2022-12": 5.8458
+        },
+        "months": 12,
+        "months_ge_30pct": 0,
+        "n": 1722,
+        "negative_months": 5,
+        "return_pct": 28.2858,
+        "stops": 1105,
+        "timeouts": 8,
+        "trades_per_active_day": 5.415,
+        "trades_per_calendar_day": 4.783,
+        "wr": 35.77
+      },
+      "stop_pct": 0.75,
+      "target_pct": 1.5,
+      "threshold": 0.39035339576469075
+    },
+    {
+      "hold_bars": 288,
+      "model": {
+        "l2": 10.0,
+        "max_leaf_nodes": 31,
+        "min_samples_leaf": 450
+      },
+      "model_kind": "semantic_price_ranker",
+      "quantile": 0.85,
+      "selection_2022": {
+        "active_days": 315,
+        "by_module_count": {
+          "macro_material_router": 1546
+        },
+        "by_source_count": {
+          "macro_crypto_catchup": 129,
+          "macro_liquidity_trend": 107,
+          "macro_nasdaq_btc_divergence": 782,
+          "macro_risk_continuation": 394,
+          "macro_shock_reversal": 134
+        },
+        "dd_pct": 19.7674,
+        "economic_gate": {
+          "calendar_days_per_month": 30,
+          "frequency_pass": true,
+          "interpretation": "diagnostic projection from observed geometric trade return; not a forecast",
+          "leverage": 10.0,
+          "margin_fraction": 0.03,
+          "mean_signed_price_return_pct": 0.056067,
+          "monthly_target_pct": 30.0,
+          "n": 1546,
+          "observed_trades_per_day": 4.294,
+          "passes": false,
+          "projected_monthly_return_pct": 2.1217,
+          "required_constant_signed_price_return_pct": 0.973137,
+          "required_trades_per_day": 3.0,
+          "return_pass": false
+        },
+        "literal_target_hit_rate": 35.6404,
+        "literal_target_hits": 551,
+        "max_entries_same_clock_hour": 2,
+        "max_entries_same_rolling_hour": 2,
+        "max_loss_streak": 19,
+        "monthly_return_pct": {
+          "2022-01": -5.7465,
+          "2022-02": 2.6487,
+          "2022-03": 11.4814,
+          "2022-04": 16.3473,
+          "2022-05": 6.1393,
+          "2022-06": 8.0564,
+          "2022-07": -1.6424,
+          "2022-08": -0.1366,
+          "2022-09": -5.3251,
+          "2022-10": -7.6706,
+          "2022-11": -3.3941,
+          "2022-12": 7.2366
+        },
+        "months": 12,
+        "months_ge_30pct": 0,
+        "n": 1546,
+        "negative_months": 6,
+        "return_pct": 28.0182,
+        "stops": 989,
+        "timeouts": 6,
+        "trades_per_active_day": 4.908,
+        "trades_per_calendar_day": 4.294,
+        "wr": 35.9
+      },
+      "stop_pct": 0.75,
+      "target_pct": 1.5,
+      "threshold": 0.408335839678232
+    },
+    {
+      "hold_bars": 576,
+      "model": {
+        "l2": 6.0,
+        "max_leaf_nodes": 15,
+        "min_samples_leaf": 250
+      },
+      "model_kind": "semantic_price_ranker",
+      "quantile": 0.85,
+      "selection_2022": {
+        "active_days": 311,
+        "by_module_count": {
+          "macro_material_router": 1413
+        },
+        "by_source_count": {
+          "macro_crypto_catchup": 182,
+          "macro_liquidity_trend": 88,
+          "macro_nasdaq_btc_divergence": 669,
+          "macro_risk_continuation": 351,
+          "macro_shock_reversal": 123
+        },
+        "dd_pct": 23.6845,
+        "economic_gate": {
+          "calendar_days_per_month": 30,
+          "frequency_pass": true,
+          "interpretation": "diagnostic projection from observed geometric trade return; not a forecast",
+          "leverage": 10.0,
+          "margin_fraction": 0.03,
+          "mean_signed_price_return_pct": 0.061612,
+          "monthly_target_pct": 30.0,
+          "n": 1413,
+          "observed_trades_per_day": 3.925,
+          "passes": false,
+          "projected_monthly_return_pct": 2.0893,
+          "required_constant_signed_price_return_pct": 0.973137,
+          "required_trades_per_day": 3.0,
+          "return_pass": false
+        },
+        "literal_target_hit_rate": 35.2442,
+        "literal_target_hits": 498,
+        "max_entries_same_clock_hour": 2,
+        "max_entries_same_rolling_hour": 2,
+        "max_loss_streak": 21,
+        "monthly_return_pct": {
+          "2022-01": -3.9718,
+          "2022-02": 3.2223,
+          "2022-03": 9.2054,
+          "2022-04": 11.4351,
+          "2022-05": 20.1328,
+          "2022-06": 1.6267,
+          "2022-07": -11.1595,
+          "2022-08": 3.1423,
+          "2022-09": -1.9736,
+          "2022-10": 1.3172,
+          "2022-11": -8.9663,
+          "2022-12": 4.1657
+        },
+        "months": 12,
+        "months_ge_30pct": 0,
+        "n": 1413,
+        "negative_months": 4,
+        "return_pct": 27.0893,
+        "stops": 910,
+        "timeouts": 5,
+        "trades_per_active_day": 4.543,
+        "trades_per_calendar_day": 3.925,
+        "wr": 35.46
+      },
+      "stop_pct": 1.0,
+      "target_pct": 2.0,
+      "threshold": 0.3914297110129054
+    },
+    {
+      "hold_bars": 576,
+      "model": {
+        "l2": 10.0,
+        "max_leaf_nodes": 31,
+        "min_samples_leaf": 450
+      },
+      "model_kind": "semantic_price_ranker",
+      "quantile": 0.97,
+      "selection_2022": {
+        "active_days": 217,
+        "by_module_count": {
+          "macro_material_router": 533
+        },
+        "by_source_count": {
+          "macro_crypto_catchup": 93,
+          "macro_liquidity_trend": 22,
+          "macro_nasdaq_btc_divergence": 231,
+          "macro_risk_continuation": 155,
+          "macro_shock_reversal": 32
+        },
+        "dd_pct": 9.4515,
+        "economic_gate": {
+          "calendar_days_per_month": 30,
+          "frequency_pass": false,
+          "interpretation": "diagnostic projection from observed geometric trade return; not a forecast",
+          "leverage": 10.0,
+          "margin_fraction": 0.03,
+          "mean_signed_price_return_pct": 0.157394,
+          "monthly_target_pct": 30.0,
+          "n": 533,
+          "observed_trades_per_day": 1.481,
+          "passes": false,
+          "projected_monthly_return_pct": 2.0763,
+          "required_constant_signed_price_return_pct": 0.973137,
+          "required_trades_per_day": 3.0,
+          "return_pass": false
+        },
+        "literal_target_hit_rate": 38.4615,
+        "literal_target_hits": 205,
+        "max_entries_same_clock_hour": 2,
+        "max_entries_same_rolling_hour": 2,
+        "max_loss_streak": 29,
+        "monthly_return_pct": {
+          "2022-01": -2.4231,
+          "2022-02": 2.695,
+          "2022-03": 1.1518,
+          "2022-04": 8.6406,
+          "2022-05": 6.3995,
+          "2022-06": 7.0628,
+          "2022-07": -5.6021,
+          "2022-08": 2.0321,
+          "2022-09": 3.2991,
+          "2022-10": 0.2454,
+          "2022-11": -3.281,
+          "2022-12": 5.4899
+        },
+        "months": 12,
+        "months_ge_30pct": 0,
+        "n": 533,
+        "negative_months": 3,
+        "return_pct": 27.6506,
+        "stops": 326,
+        "timeouts": 2,
+        "trades_per_active_day": 2.456,
+        "trades_per_calendar_day": 1.481,
+        "wr": 38.46
+      },
+      "stop_pct": 1.0,
+      "target_pct": 2.0,
+      "threshold": 0.48965625076681774
+    },
+    {
+      "hold_bars": 288,
+      "model": {
+        "l2": 6.0,
+        "max_leaf_nodes": 15,
+        "min_samples_leaf": 250
+      },
+      "model_kind": "semantic_price_macro_ranker",
+      "quantile": 0.925,
+      "selection_2022": {
+        "active_days": 198,
+        "by_module_count": {
+          "macro_material_router": 749
+        },
+        "by_source_count": {
+          "macro_crypto_catchup": 95,
+          "macro_liquidity_trend": 23,
+          "macro_nasdaq_btc_divergence": 383,
+          "macro_risk_continuation": 82,
+          "macro_shock_reversal": 166
+        },
+        "dd_pct": 10.113,
+        "economic_gate": {
+          "calendar_days_per_month": 30,
+          "frequency_pass": false,
+          "interpretation": "diagnostic projection from observed geometric trade return; not a forecast",
+          "leverage": 10.0,
+          "margin_fraction": 0.03,
+          "mean_signed_price_return_pct": 0.106226,
+          "monthly_target_pct": 30.0,
+          "n": 749,
+          "observed_trades_per_day": 2.092,
+          "passes": false,
+          "projected_monthly_return_pct": 1.9857,
+          "required_constant_signed_price_return_pct": 0.973137,
+          "required_trades_per_day": 3.0,
+          "return_pass": false
+        },
+        "literal_target_hit_rate": 37.7837,
+        "literal_target_hits": 283,
+        "max_entries_same_clock_hour": 2,
+        "max_entries_same_rolling_hour": 2,
+        "max_loss_streak": 22,
+        "monthly_return_pct": {
+          "2022-01": 0.6308,
+          "2022-02": 1.3269,
+          "2022-03": 13.3295,
+          "2022-04": 7.3524,
+          "2022-05": 2.244,
+          "2022-06": 2.6814,
+          "2022-07": 0.3743,
+          "2022-08": 3.8082,
+          "2022-09": 2.0542,
+          "2022-10": -3.3454,
+          "2022-11": -3.0171,
+          "2022-12": -2.8093
+        },
+        "months": 12,
+        "months_ge_30pct": 0,
+        "n": 749,
+        "negative_months": 3,
+        "return_pct": 26.1733,
+        "stops": 462,
+        "timeouts": 4,
+        "trades_per_active_day": 3.783,
+        "trades_per_calendar_day": 2.092,
+        "wr": 38.32
+      },
+      "stop_pct": 0.75,
+      "target_pct": 1.5,
+      "threshold": 0.42122255785980556
+    },
+    {
+      "hold_bars": 288,
+      "model": {
+        "l2": 6.0,
+        "max_leaf_nodes": 15,
+        "min_samples_leaf": 250
+      },
+      "model_kind": "semantic_price_ranker",
+      "quantile": 0.8,
+      "selection_2022": {
+        "active_days": 317,
+        "by_module_count": {
+          "macro_material_router": 1652
+        },
+        "by_source_count": {
+          "macro_crypto_catchup": 143,
+          "macro_liquidity_trend": 96,
+          "macro_nasdaq_btc_divergence": 811,
+          "macro_risk_continuation": 460,
+          "macro_shock_reversal": 142
+        },
+        "dd_pct": 23.9291,
+        "economic_gate": {
+          "calendar_days_per_month": 30,
+          "frequency_pass": true,
+          "interpretation": "diagnostic projection from observed geometric trade return; not a forecast",
+          "leverage": 10.0,
+          "margin_fraction": 0.03,
+          "mean_signed_price_return_pct": 0.046695,
+          "monthly_target_pct": 30.0,
+          "n": 1652,
+          "observed_trades_per_day": 4.589,
+          "passes": false,
+          "projected_monthly_return_pct": 1.8745,
+          "required_constant_signed_price_return_pct": 0.973137,
+          "required_trades_per_day": 3.0,
+          "return_pass": false
+        },
+        "literal_target_hit_rate": 35.1695,
+        "literal_target_hits": 581,
+        "max_entries_same_clock_hour": 2,
+        "max_entries_same_rolling_hour": 2,
+        "max_loss_streak": 23,
+        "monthly_return_pct": {
+          "2022-01": 2.6142,
+          "2022-02": 3.5559,
+          "2022-03": 3.7629,
+          "2022-04": 8.2991,
+          "2022-05": 9.2692,
+          "2022-06": 8.0552,
+          "2022-07": 2.8164,
+          "2022-08": -2.5809,
+          "2022-09": -8.2694,
+          "2022-10": -3.2156,
+          "2022-11": -7.0282,
+          "2022-12": 6.6061
+        },
+        "months": 12,
+        "months_ge_30pct": 0,
+        "n": 1652,
+        "negative_months": 4,
+        "return_pct": 24.266,
+        "stops": 1063,
+        "timeouts": 8,
+        "trades_per_active_day": 5.211,
+        "trades_per_calendar_day": 4.589,
+        "wr": 35.53
+      },
+      "stop_pct": 0.75,
+      "target_pct": 1.5,
+      "threshold": 0.3730875706353933
+    },
+    {
+      "hold_bars": 576,
+      "model": {
+        "l2": 10.0,
+        "max_leaf_nodes": 31,
+        "min_samples_leaf": 450
+      },
+      "model_kind": "semantic_price_macro_ranker",
+      "quantile": 0.85,
+      "selection_2022": {
+        "active_days": 254,
+        "by_module_count": {
+          "macro_material_router": 1144
+        },
+        "by_source_count": {
+          "macro_crypto_catchup": 149,
+          "macro_liquidity_trend": 62,
+          "macro_nasdaq_btc_divergence": 588,
+          "macro_risk_continuation": 131,
+          "macro_shock_reversal": 214
+        },
+        "dd_pct": 12.8282,
+        "economic_gate": {
+          "calendar_days_per_month": 30,
+          "frequency_pass": true,
+          "interpretation": "diagnostic projection from observed geometric trade return; not a forecast",
+          "leverage": 10.0,
+          "margin_fraction": 0.03,
+          "mean_signed_price_return_pct": 0.066434,
+          "monthly_target_pct": 30.0,
+          "n": 1144,
+          "observed_trades_per_day": 3.178,
+          "passes": false,
+          "projected_monthly_return_pct": 1.8514,
+          "required_constant_signed_price_return_pct": 0.973137,
+          "required_trades_per_day": 3.0,
+          "return_pass": false
+        },
+        "literal_target_hit_rate": 42.6573,
+        "literal_target_hits": 488,
+        "max_entries_same_clock_hour": 2,
+        "max_entries_same_rolling_hour": 2,
+        "max_loss_streak": 13,
+        "monthly_return_pct": {
+          "2022-01": 5.1601,
+          "2022-02": 9.0897,
+          "2022-03": 10.1055,
+          "2022-04": -3.4811,
+          "2022-05": 2.4812,
+          "2022-06": 2.7649,
+          "2022-07": -5.0862,
+          "2022-08": 4.1261,
+          "2022-09": -3.8816,
+          "2022-10": -0.8751,
+          "2022-11": -0.3518,
+          "2022-12": 2.481,
+          "2023-01": 0.4493
+        },
+        "months": 13,
+        "months_ge_30pct": 0,
+        "n": 1144,
+        "negative_months": 5,
+        "return_pct": 24.0175,
+        "stops": 656,
+        "timeouts": 0,
+        "trades_per_active_day": 4.504,
+        "trades_per_calendar_day": 3.178,
+        "wr": 42.66
+      },
+      "stop_pct": 1.0,
+      "target_pct": 1.5,
+      "threshold": 0.48863357674259356
+    },
+    {
+      "hold_bars": 288,
+      "model": {
+        "l2": 6.0,
+        "max_leaf_nodes": 15,
+        "min_samples_leaf": 250
+      },
+      "model_kind": "semantic_price_macro_ranker",
+      "quantile": 0.85,
+      "selection_2022": {
+        "active_days": 260,
+        "by_module_count": {
+          "macro_material_router": 1162
+        },
+        "by_source_count": {
+          "macro_crypto_catchup": 150,
+          "macro_liquidity_trend": 55,
+          "macro_nasdaq_btc_divergence": 585,
+          "macro_risk_continuation": 150,
+          "macro_shock_reversal": 222
+        },
+        "dd_pct": 9.3994,
+        "economic_gate": {
+          "calendar_days_per_month": 30,
+          "frequency_pass": true,
+          "interpretation": "diagnostic projection from observed geometric trade return; not a forecast",
+          "leverage": 10.0,
+          "margin_fraction": 0.03,
+          "mean_signed_price_return_pct": 0.062754,
+          "monthly_target_pct": 30.0,
+          "n": 1162,
+          "observed_trades_per_day": 3.228,
+          "passes": false,
+          "projected_monthly_return_pct": 1.7881,
+          "required_constant_signed_price_return_pct": 0.973137,
+          "required_trades_per_day": 3.0,
+          "return_pass": false
+        },
+        "literal_target_hit_rate": 35.9725,
+        "literal_target_hits": 418,
+        "max_entries_same_clock_hour": 2,
+        "max_entries_same_rolling_hour": 2,
+        "max_loss_streak": 17,
+        "monthly_return_pct": {
+          "2022-01": 0.6105,
+          "2022-02": 1.963,
+          "2022-03": 15.3328,
+          "2022-04": -1.6176,
+          "2022-05": -0.2723,
+          "2022-06": 8.3275,
+          "2022-07": -1.6649,
+          "2022-08": 0.3492,
+          "2022-09": 7.1336,
+          "2022-10": -1.8365,
+          "2022-11": -3.6709,
+          "2022-12": -1.9228
+        },
+        "months": 12,
+        "months_ge_30pct": 0,
+        "n": 1162,
+        "negative_months": 6,
+        "return_pct": 23.2917,
+        "stops": 741,
+        "timeouts": 3,
+        "trades_per_active_day": 4.469,
+        "trades_per_calendar_day": 3.228,
+        "wr": 36.23
+      },
+      "stop_pct": 0.75,
+      "target_pct": 1.5,
+      "threshold": 0.3913423923882349
+    },
+    {
+      "hold_bars": 576,
+      "model": {
+        "l2": 10.0,
+        "max_leaf_nodes": 31,
+        "min_samples_leaf": 450
+      },
+      "model_kind": "semantic_price_ranker",
+      "quantile": 0.98,
+      "selection_2022": {
+        "active_days": 183,
+        "by_module_count": {
+          "macro_material_router": 374
+        },
+        "by_source_count": {
+          "macro_crypto_catchup": 73,
+          "macro_liquidity_trend": 13,
+          "macro_nasdaq_btc_divergence": 156,
+          "macro_risk_continuation": 106,
+          "macro_shock_reversal": 26
+        },
+        "dd_pct": 8.3551,
+        "economic_gate": {
+          "calendar_days_per_month": 30,
+          "frequency_pass": false,
+          "interpretation": "diagnostic projection from observed geometric trade return; not a forecast",
+          "leverage": 10.0,
+          "margin_fraction": 0.03,
+          "mean_signed_price_return_pct": 0.192222,
+          "monthly_target_pct": 30.0,
+          "n": 374,
+          "observed_trades_per_day": 1.042,
+          "passes": false,
+          "projected_monthly_return_pct": 1.7878,
+          "required_constant_signed_price_return_pct": 0.973137,
+          "required_trades_per_day": 3.0,
+          "return_pass": false
+        },
+        "literal_target_hit_rate": 39.5722,
+        "literal_target_hits": 148,
+        "max_entries_same_clock_hour": 2,
+        "max_entries_same_rolling_hour": 2,
+        "max_loss_streak": 26,
+        "monthly_return_pct": {
+          "2022-01": -1.2265,
+          "2022-02": 0.5649,
+          "2022-03": 0.5747,
+          "2022-04": 5.777,
+          "2022-05": 4.5434,
+          "2022-06": 5.1867,
+          "2022-07": -5.5818,
+          "2022-08": 3.6053,
+          "2022-09": 3.0048,
+          "2022-10": 1.4701,
+          "2022-11": -2.977,
+          "2022-12": 7.0857
+        },
+        "months": 12,
+        "months_ge_30pct": 0,
+        "n": 374,
+        "negative_months": 3,
+        "return_pct": 23.4422,
+        "stops": 224,
+        "timeouts": 2,
+        "trades_per_active_day": 2.044,
+        "trades_per_calendar_day": 1.042,
+        "wr": 39.57
+      },
+      "stop_pct": 1.0,
+      "target_pct": 2.0,
+      "threshold": 0.5057103538495129
+    },
+    {
+      "hold_bars": 576,
+      "model": {
+        "l2": 10.0,
+        "max_leaf_nodes": 31,
+        "min_samples_leaf": 450
+      },
+      "model_kind": "semantic_price_ranker",
+      "quantile": 0.925,
+      "selection_2022": {
+        "active_days": 292,
+        "by_module_count": {
+          "macro_material_router": 1112
+        },
+        "by_source_count": {
+          "macro_crypto_catchup": 106,
+          "macro_liquidity_trend": 68,
+          "macro_nasdaq_btc_divergence": 520,
+          "macro_risk_continuation": 312,
+          "macro_shock_reversal": 106
+        },
+        "dd_pct": 11.5687,
+        "economic_gate": {
+          "calendar_days_per_month": 30,
+          "frequency_pass": true,
+          "interpretation": "diagnostic projection from observed geometric trade return; not a forecast",
+          "leverage": 10.0,
+          "margin_fraction": 0.03,
+          "mean_signed_price_return_pct": 0.065744,
+          "monthly_target_pct": 30.0,
+          "n": 1112,
+          "observed_trades_per_day": 3.089,
+          "passes": false,
+          "projected_monthly_return_pct": 1.7798,
+          "required_constant_signed_price_return_pct": 0.973137,
+          "required_trades_per_day": 3.0,
+          "return_pass": false
+        },
+        "literal_target_hit_rate": 42.446,
+        "literal_target_hits": 472,
+        "max_entries_same_clock_hour": 2,
+        "max_entries_same_rolling_hour": 2,
+        "max_loss_streak": 15,
+        "monthly_return_pct": {
+          "2022-01": 0.0613,
+          "2022-02": 2.9752,
+          "2022-03": 2.0146,
+          "2022-04": 5.7612,
+          "2022-05": 6.8881,
+          "2022-06": 3.1047,
+          "2022-07": -2.7389,
+          "2022-08": -1.3184,
+          "2022-09": 4.7954,
+          "2022-10": -3.1898,
+          "2022-11": -6.8706,
+          "2022-12": 10.8065
+        },
+        "months": 12,
+        "months_ge_30pct": 0,
+        "n": 1112,
+        "negative_months": 4,
+        "return_pct": 23.1081,
+        "stops": 636,
+        "timeouts": 4,
+        "trades_per_active_day": 3.808,
+        "trades_per_calendar_day": 3.089,
+        "wr": 42.72
+      },
+      "stop_pct": 1.0,
+      "target_pct": 1.5,
+      "threshold": 0.5234436632851892
+    },
+    {
+      "hold_bars": 288,
+      "model": {
+        "l2": 10.0,
+        "max_leaf_nodes": 31,
+        "min_samples_leaf": 450
+      },
+      "model_kind": "semantic_price_ranker",
+      "quantile": 0.925,
+      "selection_2022": {
+        "active_days": 299,
+        "by_module_count": {
+          "macro_material_router": 1084
+        },
+        "by_source_count": {
+          "macro_crypto_catchup": 94,
+          "macro_liquidity_trend": 63,
+          "macro_nasdaq_btc_divergence": 562,
+          "macro_risk_continuation": 279,
+          "macro_shock_reversal": 86
+        },
+        "dd_pct": 10.7196,
+        "economic_gate": {
+          "calendar_days_per_month": 30,
+          "frequency_pass": true,
+          "interpretation": "diagnostic projection from observed geometric trade return; not a forecast",
+          "leverage": 10.0,
+          "margin_fraction": 0.03,
+          "mean_signed_price_return_pct": 0.065967,
+          "monthly_target_pct": 30.0,
+          "n": 1084,
+          "observed_trades_per_day": 3.011,
+          "passes": false,
+          "projected_monthly_return_pct": 1.7555,
+          "required_constant_signed_price_return_pct": 0.973137,
+          "required_trades_per_day": 3.0,
+          "return_pass": false
+        },
+        "literal_target_hit_rate": 35.9779,
+        "literal_target_hits": 390,
+        "max_entries_same_clock_hour": 2,
+        "max_entries_same_rolling_hour": 2,
+        "max_loss_streak": 22,
+        "monthly_return_pct": {
+          "2022-01": -1.1639,
+          "2022-02": 2.9026,
+          "2022-03": 5.9439,
+          "2022-04": 6.1587,
+          "2022-05": 2.8962,
+          "2022-06": 6.4184,
+          "2022-07": 0.1593,
+          "2022-08": 1.2672,
+          "2022-09": -2.0304,
+          "2022-10": -5.3171,
+          "2022-11": -1.6205,
+          "2022-12": 5.9706
+        },
+        "months": 12,
+        "months_ge_30pct": 0,
+        "n": 1084,
+        "negative_months": 4,
+        "return_pct": 22.8577,
+        "stops": 687,
+        "timeouts": 7,
+        "trades_per_active_day": 3.625,
+        "trades_per_calendar_day": 3.011,
+        "wr": 36.44
+      },
+      "stop_pct": 0.75,
+      "target_pct": 1.5,
+      "threshold": 0.4441521417145041
+    },
+    {
+      "hold_bars": 576,
+      "model": {
+        "l2": 10.0,
+        "max_leaf_nodes": 31,
+        "min_samples_leaf": 450
+      },
+      "model_kind": "semantic_price_ranker",
+      "quantile": 0.95,
+      "selection_2022": {
+        "active_days": 262,
+        "by_module_count": {
+          "macro_material_router": 792
+        },
+        "by_source_count": {
+          "macro_crypto_catchup": 120,
+          "macro_liquidity_trend": 35,
+          "macro_nasdaq_btc_divergence": 356,
+          "macro_risk_continuation": 227,
+          "macro_shock_reversal": 54
+        },
+        "dd_pct": 12.0045,
+        "economic_gate": {
+          "calendar_days_per_month": 30,
+          "frequency_pass": false,
+          "interpretation": "diagnostic projection from observed geometric trade return; not a forecast",
+          "leverage": 10.0,
+          "margin_fraction": 0.03,
+          "mean_signed_price_return_pct": 0.086897,
+          "monthly_target_pct": 30.0,
+          "n": 792,
+          "observed_trades_per_day": 2.2,
+          "passes": false,
+          "projected_monthly_return_pct": 1.6728,
+          "required_constant_signed_price_return_pct": 0.973137,
+          "required_trades_per_day": 3.0,
+          "return_pass": false
+        },
+        "literal_target_hit_rate": 36.1111,
+        "literal_target_hits": 286,
+        "max_entries_same_clock_hour": 2,
+        "max_entries_same_rolling_hour": 2,
+        "max_loss_streak": 19,
+        "monthly_return_pct": {
+          "2022-01": -4.7619,
+          "2022-02": 4.2037,
+          "2022-03": 4.8101,
+          "2022-04": 8.6136,
+          "2022-05": 5.7392,
+          "2022-06": 6.4051,
+          "2022-07": -8.9515,
+          "2022-08": 1.6814,
+          "2022-09": 3.5532,
+          "2022-10": 0.5172,
+          "2022-11": -6.1543,
+          "2022-12": 5.7519
+        },
+        "months": 12,
+        "months_ge_30pct": 0,
+        "n": 792,
+        "negative_months": 3,
+        "return_pct": 21.5627,
+        "stops": 503,
+        "timeouts": 3,
+        "trades_per_active_day": 3.023,
+        "trades_per_calendar_day": 2.2,
+        "wr": 36.24
+      },
+      "stop_pct": 1.0,
+      "target_pct": 2.0,
+      "threshold": 0.46768782134950654
+    },
+    {
+      "hold_bars": 576,
+      "model": {
+        "l2": 6.0,
+        "max_leaf_nodes": 15,
+        "min_samples_leaf": 250
+      },
+      "model_kind": "semantic_price_macro_ranker",
+      "quantile": 0.7,
+      "selection_2022": {
+        "active_days": 288,
+        "by_module_count": {
+          "macro_material_router": 1590
+        },
+        "by_source_count": {
+          "macro_crypto_catchup": 184,
+          "macro_liquidity_trend": 110,
+          "macro_nasdaq_btc_divergence": 774,
+          "macro_risk_continuation": 239,
+          "macro_shock_reversal": 283
+        },
+        "dd_pct": 12.1872,
+        "economic_gate": {
+          "calendar_days_per_month": 30,
+          "frequency_pass": true,
+          "interpretation": "diagnostic projection from observed geometric trade return; not a forecast",
+          "leverage": 10.0,
+          "margin_fraction": 0.03,
+          "mean_signed_price_return_pct": 0.043251,
+          "monthly_target_pct": 30.0,
+          "n": 1590,
+          "observed_trades_per_day": 4.417,
+          "passes": false,
+          "projected_monthly_return_pct": 1.6421,
+          "required_constant_signed_price_return_pct": 0.973137,
+          "required_trades_per_day": 3.0,
+          "return_pass": false
+        },
+        "literal_target_hit_rate": 41.6981,
+        "literal_target_hits": 663,
+        "max_entries_same_clock_hour": 2,
+        "max_entries_same_rolling_hour": 2,
+        "max_loss_streak": 16,
+        "monthly_return_pct": {
+          "2022-01": -8.8159,
+          "2022-02": 1.0568,
+          "2022-03": 10.1978,
+          "2022-04": 2.5775,
+          "2022-05": 13.3898,
+          "2022-06": 5.788,
+          "2022-07": -5.1212,
+          "2022-08": 9.9564,
+          "2022-09": -2.1739,
+          "2022-10": -5.9273,
+          "2022-11": -0.1058,
+          "2022-12": 0.7378
+        },
+        "months": 12,
+        "months_ge_30pct": 0,
+        "n": 1590,
+        "negative_months": 5,
+        "return_pct": 20.7148,
+        "stops": 926,
+        "timeouts": 1,
+        "trades_per_active_day": 5.521,
+        "trades_per_calendar_day": 4.417,
+        "wr": 41.76
+      },
+      "stop_pct": 1.0,
+      "target_pct": 1.5,
+      "threshold": 0.4273896752243321
+    },
+    {
+      "hold_bars": 288,
+      "model": {
+        "l2": 6.0,
+        "max_leaf_nodes": 15,
+        "min_samples_leaf": 250
+      },
+      "model_kind": "semantic_price_ranker",
+      "quantile": 0.97,
+      "selection_2022": {
+        "active_days": 226,
+        "by_module_count": {
+          "macro_material_router": 550
+        },
+        "by_source_count": {
+          "macro_crypto_catchup": 41,
+          "macro_liquidity_trend": 23,
+          "macro_nasdaq_btc_divergence": 319,
+          "macro_risk_continuation": 114,
+          "macro_shock_reversal": 53
+        },
+        "dd_pct": 8.4549,
+        "economic_gate": {
+          "calendar_days_per_month": 30,
+          "frequency_pass": false,
+          "interpretation": "diagnostic projection from observed geometric trade return; not a forecast",
+          "leverage": 10.0,
+          "margin_fraction": 0.03,
+          "mean_signed_price_return_pct": 0.119298,
+          "monthly_target_pct": 30.0,
+          "n": 550,
+          "observed_trades_per_day": 1.528,
+          "passes": false,
+          "projected_monthly_return_pct": 1.6289,
+          "required_constant_signed_price_return_pct": 0.973137,
+          "required_trades_per_day": 3.0,
+          "return_pass": false
+        },
+        "literal_target_hit_rate": 38.1818,
+        "literal_target_hits": 210,
+        "max_entries_same_clock_hour": 2,
+        "max_entries_same_rolling_hour": 2,
+        "max_loss_streak": 18,
+        "monthly_return_pct": {
+          "2022-01": -0.4742,
+          "2022-02": 5.5102,
+          "2022-03": 4.5485,
+          "2022-04": 3.3979,
+          "2022-05": 3.1699,
+          "2022-06": 3.8616,
+          "2022-07": 0.4241,
+          "2022-08": 1.996,
+          "2022-09": 0.1972,
+          "2022-10": -3.7879,
+          "2022-11": -3.1195,
+          "2022-12": 4.2192
+        },
+        "months": 12,
+        "months_ge_30pct": 0,
+        "n": 550,
+        "negative_months": 3,
+        "return_pct": 21.2713,
+        "stops": 335,
+        "timeouts": 5,
+        "trades_per_active_day": 2.434,
+        "trades_per_calendar_day": 1.528,
+        "wr": 38.73
+      },
+      "stop_pct": 0.75,
+      "target_pct": 1.5,
+      "threshold": 0.44465599364644964
+    },
+    {
+      "hold_bars": 288,
+      "model": {
+        "l2": 6.0,
+        "max_leaf_nodes": 15,
+        "min_samples_leaf": 250
+      },
+      "model_kind": "semantic_price_ranker",
+      "quantile": 0.98,
+      "selection_2022": {
+        "active_days": 189,
+        "by_module_count": {
+          "macro_material_router": 391
+        },
+        "by_source_count": {
+          "macro_crypto_catchup": 30,
+          "macro_liquidity_trend": 17,
+          "macro_nasdaq_btc_divergence": 228,
+          "macro_risk_continuation": 75,
+          "macro_shock_reversal": 41
+        },
+        "dd_pct": 4.6687,
+        "economic_gate": {
+          "calendar_days_per_month": 30,
+          "frequency_pass": false,
+          "interpretation": "diagnostic projection from observed geometric trade return; not a forecast",
+          "leverage": 10.0,
+          "margin_fraction": 0.03,
+          "mean_signed_price_return_pct": 0.165287,
+          "monthly_target_pct": 30.0,
+          "n": 391,
+          "observed_trades_per_day": 1.086,
+          "passes": false,
+          "projected_monthly_return_pct": 1.6102,
+          "required_constant_signed_price_return_pct": 0.973137,
+          "required_trades_per_day": 3.0,
+          "return_pass": false
+        },
+        "literal_target_hit_rate": 40.1535,
+        "literal_target_hits": 157,
+        "max_entries_same_clock_hour": 2,
+        "max_entries_same_rolling_hour": 2,
+        "max_loss_streak": 12,
+        "monthly_return_pct": {
+          "2022-01": -0.0126,
+          "2022-02": 5.5139,
+          "2022-03": 3.8674,
+          "2022-04": 1.5642,
+          "2022-05": 3.6384,
+          "2022-06": 0.8837,
+          "2022-07": 0.8822,
+          "2022-08": 3.8617,
+          "2022-09": -0.694,
+          "2022-10": -1.1448,
+          "2022-11": -1.7973,
+          "2022-12": 2.98
+        },
+        "months": 12,
+        "months_ge_30pct": 0,
+        "n": 391,
+        "negative_months": 4,
+        "return_pct": 21.0422,
+        "stops": 230,
+        "timeouts": 4,
+        "trades_per_active_day": 2.069,
+        "trades_per_calendar_day": 1.086,
+        "wr": 40.92
+      },
+      "stop_pct": 0.75,
+      "target_pct": 1.5,
+      "threshold": 0.4572467882850449
+    },
+    {
+      "hold_bars": 576,
+      "model": {
+        "l2": 10.0,
+        "max_leaf_nodes": 31,
+        "min_samples_leaf": 450
+      },
+      "model_kind": "semantic_price_ranker",
+      "quantile": 0.7,
+      "selection_2022": {
+        "active_days": 318,
+        "by_module_count": {
+          "macro_material_router": 2011
+        },
+        "by_source_count": {
+          "macro_crypto_catchup": 204,
+          "macro_liquidity_trend": 139,
+          "macro_nasdaq_btc_divergence": 916,
+          "macro_risk_continuation": 563,
+          "macro_shock_reversal": 189
+        },
+        "dd_pct": 20.1124,
+        "economic_gate": {
+          "calendar_days_per_month": 30,
+          "frequency_pass": true,
+          "interpretation": "diagnostic projection from observed geometric trade return; not a forecast",
+          "leverage": 10.0,
+          "margin_fraction": 0.03,
+          "mean_signed_price_return_pct": 0.033976,
+          "monthly_target_pct": 30.0,
+          "n": 2011,
+          "observed_trades_per_day": 5.586,
+          "passes": false,
+          "projected_monthly_return_pct": 1.6068,
+          "required_constant_signed_price_return_pct": 0.973137,
+          "required_trades_per_day": 3.0,
+          "return_pass": false
+        },
+        "literal_target_hit_rate": 41.273,
+        "literal_target_hits": 830,
+        "max_entries_same_clock_hour": 2,
+        "max_entries_same_rolling_hour": 2,
+        "max_loss_streak": 17,
+        "monthly_return_pct": {
+          "2022-01": -4.5352,
+          "2022-02": 6.7993,
+          "2022-03": -0.9201,
+          "2022-04": 11.8099,
+          "2022-05": 0.9719,
+          "2022-06": 13.6483,
+          "2022-07": -1.8302,
+          "2022-08": 0.6899,
+          "2022-09": -3.4459,
+          "2022-10": -0.3372,
+          "2022-11": -9.2917,
+          "2022-12": 7.2053
+        },
+        "months": 12,
+        "months_ge_30pct": 0,
+        "n": 2011,
+        "negative_months": 6,
+        "return_pct": 19.887,
+        "stops": 1177,
+        "timeouts": 4,
+        "trades_per_active_day": 6.324,
+        "trades_per_calendar_day": 5.586,
+        "wr": 41.42
+      },
+      "stop_pct": 1.0,
+      "target_pct": 1.5,
+      "threshold": 0.439073040151569
+    },
+    {
+      "hold_bars": 288,
+      "model": {
+        "l2": 10.0,
+        "max_leaf_nodes": 31,
+        "min_samples_leaf": 450
+      },
+      "model_kind": "semantic_price_macro_ranker",
+      "quantile": 0.7,
+      "selection_2022": {
+        "active_days": 303,
+        "by_module_count": {
+          "macro_material_router": 1591
+        },
+        "by_source_count": {
+          "macro_crypto_catchup": 193,
+          "macro_liquidity_trend": 118,
+          "macro_nasdaq_btc_divergence": 822,
+          "macro_risk_continuation": 260,
+          "macro_shock_reversal": 198
+        },
+        "dd_pct": 10.8047,
+        "economic_gate": {
+          "calendar_days_per_month": 30,
+          "frequency_pass": true,
+          "interpretation": "diagnostic projection from observed geometric trade return; not a forecast",
+          "leverage": 10.0,
+          "margin_fraction": 0.03,
+          "mean_signed_price_return_pct": 0.040946,
+          "monthly_target_pct": 30.0,
+          "n": 1591,
+          "observed_trades_per_day": 4.419,
+          "passes": false,
+          "projected_monthly_return_pct": 1.572,
+          "required_constant_signed_price_return_pct": 0.973137,
+          "required_trades_per_day": 3.0,
+          "return_pass": false
+        },
+        "literal_target_hit_rate": 35.0094,
+        "literal_target_hits": 557,
+        "max_entries_same_clock_hour": 2,
+        "max_entries_same_rolling_hour": 2,
+        "max_loss_streak": 19,
+        "monthly_return_pct": {
+          "2022-01": -2.9535,
+          "2022-02": 3.5277,
+          "2022-03": 7.3051,
+          "2022-04": -2.0984,
+          "2022-05": 6.1308,
+          "2022-06": -0.7843,
+          "2022-07": -4.7338,
+          "2022-08": 10.1744,
+          "2022-09": 1.3071,
+          "2022-10": -1.8978,
+          "2022-11": -2.0933,
+          "2022-12": 5.5959
+        },
+        "months": 12,
+        "months_ge_30pct": 0,
+        "n": 1591,
+        "negative_months": 6,
+        "return_pct": 19.8579,
+        "stops": 1030,
+        "timeouts": 4,
+        "trades_per_active_day": 5.251,
+        "trades_per_calendar_day": 4.419,
+        "wr": 35.26
+      },
+      "stop_pct": 0.75,
+      "target_pct": 1.5,
+      "threshold": 0.35857695239632975
+    }
+  ],
+  "sources": {
+    "C:\\Users\\Lenovo\\Desktop\\telegram bot\\crypto_macro_material_regime_oct9_audit.py": "9cb349e266e93883e7c7b1883855f8a18cf862c70d435bbb5e01e8605931c34e",
+    "reports\\audit_2026_09_08\\crypto_futures_flow_history\\AAVEUSDT_flow_5min_2020_2026.pkl": "81a417ec745175073535e88db8d9ae9f187b54680d32965200a2de4a48df48ce",
+    "reports\\audit_2026_09_08\\crypto_futures_flow_history\\AVAXUSDT_flow_5min_2020_2026.pkl": "39a4e101743797cd980e6bd13c9f1df40eba4394dd846bb64354b672176ab1fd",
+    "reports\\audit_2026_09_08\\crypto_futures_flow_history\\BTCUSDT_flow_5min_2020_2026.pkl": "44981189752b5891786a90499813b247e81b33fab505101070c6e79487d4b8a0",
+    "reports\\audit_2026_09_08\\crypto_futures_flow_history\\ETHUSDT_flow_5min_2020_2026.pkl": "758b13adea9709b46073e264898ad383f8283aa838a496b1ab6f6406c7d14dad",
+    "reports\\audit_2026_09_08\\crypto_futures_flow_history\\LINKUSDT_flow_5min_2020_2026.pkl": "89b7fb7909826589d5af7c79693f0f25f7c09792e2e3992c63ea31df1ccb13df",
+    "reports\\audit_2026_09_08\\crypto_futures_flow_history\\SOLUSDT_flow_5min_2020_2026.pkl": "3d803a9339a224e1763b1ff5df22c0a63b289c7f0d6d1ea5cab5a6de7064665c",
+    "reports\\audit_2026_09_08\\crypto_futures_flow_history\\XLMUSDT_flow_5min_2020_2026.pkl": "aefb7866141c82f236531429e67465ddf645960d8fb802b5efb70b986d42db9d",
+    "reports\\audit_2026_09_08\\crypto_futures_flow_history\\XRPUSDT_flow_5min_2020_2026.pkl": "65cd3b6b099dd96df1d5a17c6b10d88478f46cda5ad128da7e962a7750d092f0",
+    "reports\\audit_2026_09_08\\crypto_futures_flow_history\\manifest.json": "5df6f6730e8a36366c7a4941f22736535282fc7a95a3931df84bd6b0cdf4f5d6",
+    "reports\\audit_2026_09_08\\crypto_macro_daily_history_oct9\\dxy_daily.pkl": "9ae69c6e8d33d2fe517bb1057f4746b65952697176841b7656d583fe27b5e94e",
+    "reports\\audit_2026_09_08\\crypto_macro_daily_history_oct9\\gold_daily.pkl": "9d58977a97a99b4f8a510521a0a220d7e7bb583161dee083a4b33c103abf588a",
+    "reports\\audit_2026_09_08\\crypto_macro_daily_history_oct9\\manifest.json": "458d21e22a7b2b95f2325a078fb798b785f78caebe39b5daf7511de5452f6114",
+    "reports\\audit_2026_09_08\\crypto_macro_daily_history_oct9\\qqq_daily.pkl": "a258d4f50add0cf3cf450cf91c3c4e56ff8121191aab2216e4c2333848e66800",
+    "reports\\audit_2026_09_08\\crypto_macro_daily_history_oct9\\us10y_daily.pkl": "90c8aa24f136b1b8e96f61987b2635db634aa6d9d01fd8a8de6083343bedf57c",
+    "reports\\audit_2026_09_08\\crypto_macro_daily_history_oct9\\vix_daily.pkl": "7b282d3d72258e0a20a557d9260faef7429f925821e275808aa8e333a6a48d50"
+  },
+  "status": "REJECTED",
+  "test_2025": null,
+  "untouched_2026": null
+}
