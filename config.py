@@ -1433,6 +1433,10 @@ SL_ATR_BUFFER = float(os.getenv("SL_ATR_BUFFER", "1.0"))
 # warning the ceiling carries.
 RISK_MIN_PCT  = float(os.getenv("RISK_MIN_PCT", "0.012"))  # min SL distance = 1.2%
 RISK_MAX_PCT  = float(os.getenv("RISK_MAX_PCT", "0.035"))  # max SL distance = 3.5%
+# Independent material-move contract.  The normal crypto geometry currently
+# clears this through RISK_MIN_PCT * TP1_R_MULT, but the floor prevents a future
+# environment override or tuning pass from silently producing micro targets.
+MIN_TP1_MOVE_PCT = 0.005
 # 🔁 RE-SWEPT 2026-08-28 in BOTH directions under the new exit (trail 0.02,
 # TP2 3.0R). Reason to re-check: stop width sets the R unit, and TP1, the trail
 # arming point and TP2 are all R multiples — two of the three had just changed.

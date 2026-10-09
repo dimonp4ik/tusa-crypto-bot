@@ -15,7 +15,8 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from config import (
     LEVELS_FROM_STRUCTURE,
     TELEGRAM_TOKEN, TELEGRAM_CHAT_ID,
-    SL_ATR_BUFFER, RISK_MIN_PCT, RISK_MAX_PCT, TP1_R_MULT, TP2_R_MULT,
+    SL_ATR_BUFFER, RISK_MIN_PCT, RISK_MAX_PCT, MIN_TP1_MOVE_PCT,
+    TP1_R_MULT, TP2_R_MULT,
 )
 
 TELEGRAM_API = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}"
@@ -64,6 +65,7 @@ def calculate_tp_sl(price: float, direction: str, atr: float = 0.0,
           to RISK_MIN_PCT..RISK_MAX_PCT of price for safe leverage.
 
     TP1 — nearest confirmed swing high/low (tp1_level) when it gives ≥ 1.0R
+          and moves price by at least 0.5%.
           (the code below, and backtest.py's copy, both test 1.0 — this line
           said 1.5 and was simply wrong).
           Falls back to price ± risk * TP1_R_MULT.
@@ -78,6 +80,7 @@ def calculate_tp_sl(price: float, direction: str, atr: float = 0.0,
     """
     min_risk = price * RISK_MIN_PCT
     max_risk = price * RISK_MAX_PCT
+    min_tp1_distance = price * MIN_TP1_MOVE_PCT
     buf      = atr * SL_ATR_BUFFER if (atr and atr > 0) else 0.0
 
     if direction == "LONG":
@@ -87,10 +90,11 @@ def calculate_tp_sl(price: float, direction: str, atr: float = 0.0,
         sl   = price - risk
 
         # TP1: structural swing high if valid (min 1.0R away, above price)
-        if tp1_level and tp1_level > price * 1.001 and (tp1_level - price) >= risk * 1.0:
+        if (tp1_level and (tp1_level - price) >= min_tp1_distance
+                and (tp1_level - price) >= risk * 1.0):
             tp1 = tp1_level
         else:
-            tp1 = price + risk * TP1_R_MULT
+            tp1 = price + max(risk * TP1_R_MULT, min_tp1_distance)
 
         # TP2: next structural level above TP1 AND at least 1.5R from entry
         if tp2_level and tp2_level > tp1 * 1.001 and (tp2_level - price) >= risk * 1.5:
@@ -107,10 +111,11 @@ def calculate_tp_sl(price: float, direction: str, atr: float = 0.0,
         sl   = price + risk
 
         # TP1: structural swing low if valid (min 1.0R away, below price)
-        if tp1_level and tp1_level < price * 0.999 and (price - tp1_level) >= risk * 1.0:
+        if (tp1_level and (price - tp1_level) >= min_tp1_distance
+                and (price - tp1_level) >= risk * 1.0):
             tp1 = tp1_level
         else:
-            tp1 = price - risk * TP1_R_MULT
+            tp1 = price - max(risk * TP1_R_MULT, min_tp1_distance)
 
         # TP2: next structural level below TP1 AND at least 1.5R from entry
         if tp2_level and tp2_level < tp1 * 0.999 and (price - tp2_level) >= risk * 1.5:

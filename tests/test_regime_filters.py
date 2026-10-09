@@ -8,6 +8,20 @@ from src.telegram_notifier import bracket_for_analysis
 
 
 class CryptoRegimeFilterTests(unittest.TestCase):
+    def test_generic_bracket_keeps_material_target_after_risk_override(self):
+        with patch("src.telegram_notifier.RISK_MIN_PCT", .004), patch(
+                "src.telegram_notifier.RISK_MAX_PCT", .015):
+            long_tp1, _, _ = bracket_for_analysis({
+                "direction": "LONG", "atr": 0, "recent_low": 99.9,
+                "tp1_level": 100.4,
+            }, 100)
+            short_tp1, _, _ = bracket_for_analysis({
+                "direction": "SHORT", "atr": 0, "recent_high": 100.1,
+                "tp1_level": 99.6,
+            }, 100)
+        self.assertEqual(long_tp1, 100.5)
+        self.assertEqual(short_tp1, 99.5)
+
     def test_regime_paper_row_is_logged_once_with_exact_bracket(self):
         from src import db
         with tempfile.TemporaryDirectory() as tmp, patch.object(
