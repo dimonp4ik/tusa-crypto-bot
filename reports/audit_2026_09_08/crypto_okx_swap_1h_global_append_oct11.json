@@ -1,0 +1,237 @@
+{
+  "fresh_candidates": {
+    "clustered_entry_hours": {},
+    "max_selected_same_entry_hour": 1,
+    "pending_rows": [
+      {
+        "direction": "SHORT",
+        "entry_time": 1791626400,
+        "hold_bars": 12,
+        "model_quality": 0.741038926481346,
+        "selected_target_pct": 0.5,
+        "symbol": "SOLUSDT"
+      },
+      {
+        "direction": "SHORT",
+        "entry_time": 1791651600,
+        "hold_bars": 36,
+        "model_quality": 0.7411098748799934,
+        "selected_target_pct": 1.5,
+        "symbol": "SOLUSDT"
+      }
+    ],
+    "pending_selected_rows": 2,
+    "proposal_rows": 271,
+    "resolved_rows": [
+      {
+        "direction": "SHORT",
+        "entry_time": 1791496800,
+        "exit_reason": 1,
+        "exit_time": 1791507600,
+        "selected_target_pct": 0.5,
+        "signed_price_return_pct": 0.5,
+        "symbol": "LINKUSDT",
+        "target_hit": true
+      },
+      {
+        "direction": "SHORT",
+        "entry_time": 1791590400,
+        "exit_reason": 0,
+        "exit_time": 1791601200,
+        "selected_target_pct": 0.5,
+        "signed_price_return_pct": -1.0,
+        "symbol": "AVAXUSDT",
+        "target_hit": false
+      }
+    ],
+    "resolved_selected_rows": 2,
+    "rows": [
+      {
+        "direction": "SHORT",
+        "entry_time": 1791496800,
+        "hold_bars": 12,
+        "model_quality": 0.7422210464460596,
+        "selected_target_pct": 0.5,
+        "symbol": "LINKUSDT"
+      },
+      {
+        "direction": "SHORT",
+        "entry_time": 1791590400,
+        "hold_bars": 12,
+        "model_quality": 0.7595995756042897,
+        "selected_target_pct": 0.5,
+        "symbol": "AVAXUSDT"
+      },
+      {
+        "direction": "SHORT",
+        "entry_time": 1791626400,
+        "hold_bars": 12,
+        "model_quality": 0.741038926481346,
+        "selected_target_pct": 0.5,
+        "symbol": "SOLUSDT"
+      },
+      {
+        "direction": "SHORT",
+        "entry_time": 1791651600,
+        "hold_bars": 36,
+        "model_quality": 0.7411098748799934,
+        "selected_target_pct": 1.5,
+        "symbol": "SOLUSDT"
+      }
+    ],
+    "selected_rows": 4,
+    "selected_target_distribution": {
+      "0.5": 3,
+      "1.5": 1
+    }
+  },
+  "fresh_resolved_after_portfolio_rails": {
+    "active_days": 2,
+    "by_module_count": {
+      "literal_regime_router": 2
+    },
+    "by_source_count": {
+      "literal_regime_router": 2
+    },
+    "dd_pct": 0.3,
+    "first_entry_utc": "2026-10-08T22:00:00+00:00",
+    "last_entry_utc": "2026-10-10T00:00:00+00:00",
+    "literal_target_hit_rate": 50.0,
+    "literal_target_hits": 1,
+    "max_entries_same_clock_hour": 1,
+    "max_entries_same_rolling_hour": 2,
+    "max_loss_streak": 1,
+    "monthly_return_pct": {
+      "2026-10": -0.1504
+    },
+    "n": 2,
+    "negative_months": 1,
+    "return_pct": -0.1504,
+    "stops": 1,
+    "target_distribution": {
+      "0.5": 2
+    },
+    "target_hits": {
+      "0.5": 1
+    },
+    "timeouts": 0,
+    "trades_per_active_day": 1.0,
+    "trades_per_calendar_day": 0.667,
+    "wr": 50.0
+  },
+  "integrity": {
+    "coverage": {
+      "AAVEUSDT": {
+        "bars": 51137,
+        "end": 1791662400,
+        "start": 1607572800
+      },
+      "AVAXUSDT": {
+        "bars": 53009,
+        "end": 1791662400,
+        "start": 1600833600
+      },
+      "BTCUSDT": {
+        "bars": 59397,
+        "end": 1791662400,
+        "start": 1577836800
+      },
+      "ETHUSDT": {
+        "bars": 59397,
+        "end": 1791662400,
+        "start": 1577836800
+      },
+      "LINKUSDT": {
+        "bars": 57826,
+        "end": 1791662400,
+        "start": 1583492400
+      },
+      "SOLUSDT": {
+        "bars": 50103,
+        "end": 1791662400,
+        "start": 1611295200
+      },
+      "XLMUSDT": {
+        "bars": 56250,
+        "end": 1791662400,
+        "start": 1589166000
+      },
+      "XRPUSDT": {
+        "bars": 59397,
+        "end": 1791662400,
+        "start": 1577836800
+      }
+    },
+    "frozen_scoring_parity": {
+      "expected_selected": 172,
+      "missing_keys": 0,
+      "period_end_inclusive": 1791342000,
+      "period_start": 1788220800,
+      "rescored_selected": 172,
+      "target_mismatches": 0,
+      "unexpected_keys": 0
+    },
+    "new_manifest_sha256": "a108c54238a6d9f1cb6c7bc14a873f3f2af034508303b5c0ed51ed9010e6ac9b",
+    "old_manifest_sha256": "47a3f3b876ff71d637a66a52299f77507c483cc69e5ec53abc4461a9b8129693"
+  },
+  "limitations": [
+    "This is a global-OKX signal diagnostic, not direct EU X-Perp execution evidence.",
+    "Incomplete trades are reported as pending and excluded from performance.",
+    "The forward window remains too short to establish a stable win rate.",
+    "The 30-200% monthly objective remains unproven."
+  ],
+  "protocol": {
+    "entry_model": "exported frozen OKX global 1H HGB and target cascade",
+    "execution_data": "OKX global USDT swap 1H candles",
+    "fees": "excluded by user instruction",
+    "fit_or_retune": false,
+    "money": "3% current equity margin, fixed 10x gross",
+    "stop_pct": 1.0,
+    "targets_pct": [
+      0.5,
+      1.0,
+      1.5,
+      2.0
+    ],
+    "universe": [
+      "AAVEUSDT",
+      "AVAXUSDT",
+      "BTCUSDT",
+      "ETHUSDT",
+      "LINKUSDT",
+      "SOLUSDT",
+      "XLMUSDT",
+      "XRPUSDT"
+    ]
+  },
+  "readiness": {
+    "fresh_resolved_accepted_minimum": 30,
+    "fresh_resolved_accepted_observed": 2,
+    "live_activation_allowed": false,
+    "objective_proven": false,
+    "statistically_ready": false
+  },
+  "sources": {
+    "C:\\Users\\Lenovo\\Desktop\\telegram bot\\crypto_okx_swap_1h_global_append_oct11_audit.py": "c4f7a5a414438d6ddc3b1f4784488f239541422264b2a2fc49a440fd99cd534e",
+    "C:\\Users\\Lenovo\\Desktop\\telegram bot\\reports\\audit_2026_09_08\\crypto_okx_swap_1h_expanded_oct11\\AAVEUSDT_1h_2020_2026.pkl": "8ce4a640036eee8b071f1760c76dfedaac6e563376d4b56b24653d778fe903d6",
+    "C:\\Users\\Lenovo\\Desktop\\telegram bot\\reports\\audit_2026_09_08\\crypto_okx_swap_1h_expanded_oct11\\AVAXUSDT_1h_2020_2026.pkl": "2e62aa965e4afb6cdb36f3235859ef947a19281cc55dc09652d3db88bd79da8b",
+    "C:\\Users\\Lenovo\\Desktop\\telegram bot\\reports\\audit_2026_09_08\\crypto_okx_swap_1h_expanded_oct11\\BTCUSDT_1h_2020_2026.pkl": "f64016826f5632c546d74cee6a0f2d90f623566f9a7137d5b863e96e83db91ad",
+    "C:\\Users\\Lenovo\\Desktop\\telegram bot\\reports\\audit_2026_09_08\\crypto_okx_swap_1h_expanded_oct11\\ETHUSDT_1h_2020_2026.pkl": "4d48ca685e4bd68dfef63d6221b630b47ba398bf5b6b9bbb605b353030dddedd",
+    "C:\\Users\\Lenovo\\Desktop\\telegram bot\\reports\\audit_2026_09_08\\crypto_okx_swap_1h_expanded_oct11\\LINKUSDT_1h_2020_2026.pkl": "016dc9af8327af77e19d8d8d25a0500d0655f409eff39ca1473c1beeeb6eb14f",
+    "C:\\Users\\Lenovo\\Desktop\\telegram bot\\reports\\audit_2026_09_08\\crypto_okx_swap_1h_expanded_oct11\\SOLUSDT_1h_2020_2026.pkl": "fabe174359e29685177fa9e268fa4bde36df9dfe898cc7677fd960d58c12154b",
+    "C:\\Users\\Lenovo\\Desktop\\telegram bot\\reports\\audit_2026_09_08\\crypto_okx_swap_1h_expanded_oct11\\XLMUSDT_1h_2020_2026.pkl": "0823dbc26a677d0ac43d63ca5439ee5a621f9b195e7b5f6493a5f56542ab7f94",
+    "C:\\Users\\Lenovo\\Desktop\\telegram bot\\reports\\audit_2026_09_08\\crypto_okx_swap_1h_expanded_oct11\\XRPUSDT_1h_2020_2026.pkl": "a0c0aaecf8c1dea597a5fe01a9454aff7187df5702836a39c6b8425aa8aa7142",
+    "C:\\Users\\Lenovo\\Desktop\\telegram bot\\src\\frozen_crypto_okx_1h_hgb.json": "beadcba8d5ee7b77b454bce4a87dd2c164029203a9b6bdbf41e34861f14f2c7b",
+    "C:\\Users\\Lenovo\\Desktop\\telegram bot\\src\\frozen_crypto_okx_1h_target_cascade.json": "0fcd1a9121e8a9d94aa68aa70481e68da4bb763b60ed354ba039639736957674",
+    "reports\\audit_2026_09_08\\crypto_okx_swap_1h_expanded_oct11\\manifest.json": "a108c54238a6d9f1cb6c7bc14a873f3f2af034508303b5c0ed51ed9010e6ac9b",
+    "reports\\audit_2026_09_08\\crypto_okx_swap_1h_target_cascade_oct7.pkl": "e9808c43acba2862ea93de10b96e270284a10eb3c1c2c973fb0bfd6625f71d75"
+  },
+  "status": "FROZEN_GLOBAL_FORWARD_DIAGNOSTIC",
+  "window": {
+    "fresh_closed_hours": 47,
+    "new_snapshot_last_closed_bar": 1791662400,
+    "new_snapshot_last_closed_bar_utc": "2026-10-10T20:00:00+00:00",
+    "old_snapshot_last_closed_bar": 1791493200,
+    "old_snapshot_last_closed_bar_utc": "2026-10-08T21:00:00+00:00"
+  }
+}
