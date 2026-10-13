@@ -1,0 +1,631 @@
+{
+  "base_entries": 127866,
+  "decision": "No runtime change. Event-specific taker imbalance is rejected unless expectancy remains positive in every 2020-2024 year.",
+  "limitations": [
+    "Kline taker flow is aggregated and does not reconstruct queue depth.",
+    "2025-2026 are previously observed diagnostic periods.",
+    "A negative raw price expectancy cannot be repaired by sizing."
+  ],
+  "protocol": {
+    "annual_diagnostic": [
+      2020,
+      2021,
+      2022,
+      2023,
+      2024,
+      2025,
+      2026
+    ],
+    "base_entry": [
+      24,
+      0.1,
+      0.5,
+      1.25,
+      0.25
+    ],
+    "collision_policy": "stop first",
+    "delayed_entry": "market-open proxy after one closed flow confirmation",
+    "flow": "5m taker-buy quote share transformed to signed imbalance",
+    "immediate_entry": "next 5m market-open proxy",
+    "maximum_hold_bars": 24,
+    "money": "price-path diagnostic; no position-size optimization",
+    "stop_pct": 0.5,
+    "target_pct": 1.0,
+    "venue": "Binance USD-M futures"
+  },
+  "qualified_2020_2024": [],
+  "raw_sweeps": 460867,
+  "ready_for_live_orders": false,
+  "results": {
+    "delayed_absorption01_confirmation0": {
+      "annual": {
+        "2020": {
+          "mean_signed_price_return_pct": 0.006421,
+          "n": 3750,
+          "sum_signed_price_return_pct": 24.077389,
+          "win_rate_pct": 40.72
+        },
+        "2021": {
+          "mean_signed_price_return_pct": -0.010613,
+          "n": 4333,
+          "sum_signed_price_return_pct": -45.985824,
+          "win_rate_pct": 34.9642
+        },
+        "2022": {
+          "mean_signed_price_return_pct": 0.001937,
+          "n": 4791,
+          "sum_signed_price_return_pct": 9.28063,
+          "win_rate_pct": 40.0543
+        },
+        "2023": {
+          "mean_signed_price_return_pct": -0.018556,
+          "n": 4648,
+          "sum_signed_price_return_pct": -86.248701,
+          "win_rate_pct": 42.9002
+        },
+        "2024": {
+          "mean_signed_price_return_pct": -0.011863,
+          "n": 4558,
+          "sum_signed_price_return_pct": -54.070099,
+          "win_rate_pct": 40.4783
+        },
+        "2025": {
+          "mean_signed_price_return_pct": -0.020405,
+          "n": 5019,
+          "sum_signed_price_return_pct": -102.411663,
+          "win_rate_pct": 38.7129
+        },
+        "2026": {
+          "mean_signed_price_return_pct": 0.001471,
+          "n": 4519,
+          "sum_signed_price_return_pct": 6.647616,
+          "win_rate_pct": 43.3946
+        }
+      },
+      "entries": 31618,
+      "positive_mean_all_2020_2024": false
+    },
+    "delayed_absorption01_flow_flip02": {
+      "annual": {
+        "2020": {
+          "mean_signed_price_return_pct": 0.005673,
+          "n": 4199,
+          "sum_signed_price_return_pct": 23.822303,
+          "win_rate_pct": 40.9145
+        },
+        "2021": {
+          "mean_signed_price_return_pct": 0.001521,
+          "n": 4313,
+          "sum_signed_price_return_pct": 6.561576,
+          "win_rate_pct": 35.961
+        },
+        "2022": {
+          "mean_signed_price_return_pct": 0.006656,
+          "n": 4742,
+          "sum_signed_price_return_pct": 31.560549,
+          "win_rate_pct": 40.4682
+        },
+        "2023": {
+          "mean_signed_price_return_pct": -0.018223,
+          "n": 4525,
+          "sum_signed_price_return_pct": -82.457799,
+          "win_rate_pct": 43.1823
+        },
+        "2024": {
+          "mean_signed_price_return_pct": -0.00889,
+          "n": 4605,
+          "sum_signed_price_return_pct": -40.938951,
+          "win_rate_pct": 41.0858
+        },
+        "2025": {
+          "mean_signed_price_return_pct": -0.022333,
+          "n": 5253,
+          "sum_signed_price_return_pct": -117.313124,
+          "win_rate_pct": 38.8921
+        },
+        "2026": {
+          "mean_signed_price_return_pct": 0.001946,
+          "n": 5043,
+          "sum_signed_price_return_pct": 9.812646,
+          "win_rate_pct": 43.4067
+        }
+      },
+      "entries": 32680,
+      "positive_mean_all_2020_2024": false
+    },
+    "delayed_absorption02_confirmation01": {
+      "annual": {
+        "2020": {
+          "mean_signed_price_return_pct": -0.002699,
+          "n": 1824,
+          "sum_signed_price_return_pct": -4.922857,
+          "win_rate_pct": 40.3509
+        },
+        "2021": {
+          "mean_signed_price_return_pct": 0.008118,
+          "n": 1178,
+          "sum_signed_price_return_pct": 9.56264,
+          "win_rate_pct": 36.7572
+        },
+        "2022": {
+          "mean_signed_price_return_pct": -0.016254,
+          "n": 1406,
+          "sum_signed_price_return_pct": -22.852992,
+          "win_rate_pct": 39.1181
+        },
+        "2023": {
+          "mean_signed_price_return_pct": -0.013322,
+          "n": 1328,
+          "sum_signed_price_return_pct": -17.691,
+          "win_rate_pct": 44.8795
+        },
+        "2024": {
+          "mean_signed_price_return_pct": -0.011471,
+          "n": 1454,
+          "sum_signed_price_return_pct": -16.678507,
+          "win_rate_pct": 42.5722
+        },
+        "2025": {
+          "mean_signed_price_return_pct": 0.005493,
+          "n": 1753,
+          "sum_signed_price_return_pct": 9.629368,
+          "win_rate_pct": 42.0422
+        },
+        "2026": {
+          "mean_signed_price_return_pct": -0.003544,
+          "n": 1917,
+          "sum_signed_price_return_pct": -6.793531,
+          "win_rate_pct": 43.662
+        }
+      },
+      "entries": 10860,
+      "positive_mean_all_2020_2024": false
+    },
+    "delayed_absorption0_confirmation0": {
+      "annual": {
+        "2020": {
+          "mean_signed_price_return_pct": 0.001611,
+          "n": 5178,
+          "sum_signed_price_return_pct": 8.341231,
+          "win_rate_pct": 40.2472
+        },
+        "2021": {
+          "mean_signed_price_return_pct": -0.016076,
+          "n": 7445,
+          "sum_signed_price_return_pct": -119.68727,
+          "win_rate_pct": 34.7079
+        },
+        "2022": {
+          "mean_signed_price_return_pct": 0.001605,
+          "n": 8165,
+          "sum_signed_price_return_pct": 13.10571,
+          "win_rate_pct": 39.5346
+        },
+        "2023": {
+          "mean_signed_price_return_pct": -0.019741,
+          "n": 8173,
+          "sum_signed_price_return_pct": -161.341545,
+          "win_rate_pct": 41.8206
+        },
+        "2024": {
+          "mean_signed_price_return_pct": -0.014965,
+          "n": 7645,
+          "sum_signed_price_return_pct": -114.409845,
+          "win_rate_pct": 39.6207
+        },
+        "2025": {
+          "mean_signed_price_return_pct": -0.015963,
+          "n": 7988,
+          "sum_signed_price_return_pct": -127.509888,
+          "win_rate_pct": 38.5829
+        },
+        "2026": {
+          "mean_signed_price_return_pct": 0.008707,
+          "n": 6343,
+          "sum_signed_price_return_pct": 55.229442,
+          "win_rate_pct": 43.749
+        }
+      },
+      "entries": 50937,
+      "positive_mean_all_2020_2024": false
+    },
+    "delayed_flow_flip02": {
+      "annual": {
+        "2020": {
+          "mean_signed_price_return_pct": 0.003308,
+          "n": 5627,
+          "sum_signed_price_return_pct": 18.6131,
+          "win_rate_pct": 40.4834
+        },
+        "2021": {
+          "mean_signed_price_return_pct": 0.000107,
+          "n": 6071,
+          "sum_signed_price_return_pct": 0.652449,
+          "win_rate_pct": 36.0072
+        },
+        "2022": {
+          "mean_signed_price_return_pct": 0.004292,
+          "n": 6809,
+          "sum_signed_price_return_pct": 29.223027,
+          "win_rate_pct": 40.2409
+        },
+        "2023": {
+          "mean_signed_price_return_pct": -0.022532,
+          "n": 6434,
+          "sum_signed_price_return_pct": -144.971589,
+          "win_rate_pct": 42.6951
+        },
+        "2024": {
+          "mean_signed_price_return_pct": -0.010491,
+          "n": 6800,
+          "sum_signed_price_return_pct": -71.340404,
+          "win_rate_pct": 40.9118
+        },
+        "2025": {
+          "mean_signed_price_return_pct": -0.015006,
+          "n": 7379,
+          "sum_signed_price_return_pct": -110.7288,
+          "win_rate_pct": 39.1652
+        },
+        "2026": {
+          "mean_signed_price_return_pct": 0.007301,
+          "n": 6597,
+          "sum_signed_price_return_pct": 48.165305,
+          "win_rate_pct": 43.7623
+        }
+      },
+      "entries": 45717,
+      "positive_mean_all_2020_2024": false
+    },
+    "immediate_absorption_ge_0.0": {
+      "annual": {
+        "2020": {
+          "mean_signed_price_return_pct": 0.018784,
+          "n": 9633,
+          "sum_signed_price_return_pct": 180.947419,
+          "win_rate_pct": 41.3475
+        },
+        "2021": {
+          "mean_signed_price_return_pct": 0.001161,
+          "n": 13491,
+          "sum_signed_price_return_pct": 15.665385,
+          "win_rate_pct": 35.7868
+        },
+        "2022": {
+          "mean_signed_price_return_pct": 0.00686,
+          "n": 14135,
+          "sum_signed_price_return_pct": 96.964967,
+          "win_rate_pct": 39.5543
+        },
+        "2023": {
+          "mean_signed_price_return_pct": -0.008187,
+          "n": 14853,
+          "sum_signed_price_return_pct": -121.600751,
+          "win_rate_pct": 42.382
+        },
+        "2024": {
+          "mean_signed_price_return_pct": -0.003653,
+          "n": 13150,
+          "sum_signed_price_return_pct": -48.039646,
+          "win_rate_pct": 39.9087
+        },
+        "2025": {
+          "mean_signed_price_return_pct": -0.013275,
+          "n": 14364,
+          "sum_signed_price_return_pct": -190.687843,
+          "win_rate_pct": 38.694
+        },
+        "2026": {
+          "mean_signed_price_return_pct": 0.003774,
+          "n": 11649,
+          "sum_signed_price_return_pct": 43.962092,
+          "win_rate_pct": 43.2741
+        }
+      },
+      "entries": 91275,
+      "positive_mean_all_2020_2024": false
+    },
+    "immediate_absorption_ge_0.1": {
+      "annual": {
+        "2020": {
+          "mean_signed_price_return_pct": 0.020205,
+          "n": 7089,
+          "sum_signed_price_return_pct": 143.230299,
+          "win_rate_pct": 41.7548
+        },
+        "2021": {
+          "mean_signed_price_return_pct": 0.004703,
+          "n": 8041,
+          "sum_signed_price_return_pct": 37.817538,
+          "win_rate_pct": 36.2144
+        },
+        "2022": {
+          "mean_signed_price_return_pct": 0.003137,
+          "n": 8366,
+          "sum_signed_price_return_pct": 26.240007,
+          "win_rate_pct": 39.7681
+        },
+        "2023": {
+          "mean_signed_price_return_pct": -0.009098,
+          "n": 8576,
+          "sum_signed_price_return_pct": -78.027678,
+          "win_rate_pct": 43.2952
+        },
+        "2024": {
+          "mean_signed_price_return_pct": 0.000839,
+          "n": 7930,
+          "sum_signed_price_return_pct": 6.651872,
+          "win_rate_pct": 41.1097
+        },
+        "2025": {
+          "mean_signed_price_return_pct": -0.017865,
+          "n": 9248,
+          "sum_signed_price_return_pct": -165.212984,
+          "win_rate_pct": 38.8733
+        },
+        "2026": {
+          "mean_signed_price_return_pct": 0.005478,
+          "n": 8439,
+          "sum_signed_price_return_pct": 46.228905,
+          "win_rate_pct": 43.8204
+        }
+      },
+      "entries": 57689,
+      "positive_mean_all_2020_2024": false
+    },
+    "immediate_absorption_ge_0.2": {
+      "annual": {
+        "2020": {
+          "mean_signed_price_return_pct": 0.026379,
+          "n": 4463,
+          "sum_signed_price_return_pct": 117.730489,
+          "win_rate_pct": 42.6619
+        },
+        "2021": {
+          "mean_signed_price_return_pct": 0.012702,
+          "n": 3622,
+          "sum_signed_price_return_pct": 46.005322,
+          "win_rate_pct": 37.0237
+        },
+        "2022": {
+          "mean_signed_price_return_pct": -0.008612,
+          "n": 3649,
+          "sum_signed_price_return_pct": -31.426733,
+          "win_rate_pct": 39.4903
+        },
+        "2023": {
+          "mean_signed_price_return_pct": -0.007102,
+          "n": 3594,
+          "sum_signed_price_return_pct": -25.524716,
+          "win_rate_pct": 44.1569
+        },
+        "2024": {
+          "mean_signed_price_return_pct": 0.003762,
+          "n": 3685,
+          "sum_signed_price_return_pct": 13.861283,
+          "win_rate_pct": 42.4423
+        },
+        "2025": {
+          "mean_signed_price_return_pct": -0.011075,
+          "n": 4758,
+          "sum_signed_price_return_pct": -52.696771,
+          "win_rate_pct": 40.206
+        },
+        "2026": {
+          "mean_signed_price_return_pct": 0.001508,
+          "n": 5109,
+          "sum_signed_price_return_pct": 7.706886,
+          "win_rate_pct": 43.8833
+        }
+      },
+      "entries": 28880,
+      "positive_mean_all_2020_2024": false
+    },
+    "immediate_absorption_ge_0.3": {
+      "annual": {
+        "2020": {
+          "mean_signed_price_return_pct": 0.031836,
+          "n": 2587,
+          "sum_signed_price_return_pct": 82.359339,
+          "win_rate_pct": 43.4094
+        },
+        "2021": {
+          "mean_signed_price_return_pct": 0.008588,
+          "n": 1366,
+          "sum_signed_price_return_pct": 11.730542,
+          "win_rate_pct": 36.9693
+        },
+        "2022": {
+          "mean_signed_price_return_pct": 0.005939,
+          "n": 1246,
+          "sum_signed_price_return_pct": 7.399657,
+          "win_rate_pct": 40.4494
+        },
+        "2023": {
+          "mean_signed_price_return_pct": -0.007827,
+          "n": 1273,
+          "sum_signed_price_return_pct": -9.964175,
+          "win_rate_pct": 44.619
+        },
+        "2024": {
+          "mean_signed_price_return_pct": 0.004991,
+          "n": 1479,
+          "sum_signed_price_return_pct": 7.382298,
+          "win_rate_pct": 44.0162
+        },
+        "2025": {
+          "mean_signed_price_return_pct": -0.008645,
+          "n": 2011,
+          "sum_signed_price_return_pct": -17.385199,
+          "win_rate_pct": 41.1735
+        },
+        "2026": {
+          "mean_signed_price_return_pct": -0.009588,
+          "n": 2552,
+          "sum_signed_price_return_pct": -24.46794,
+          "win_rate_pct": 43.8088
+        }
+      },
+      "entries": 12514,
+      "positive_mean_all_2020_2024": false
+    },
+    "immediate_aligned_flow_ge_0.0": {
+      "annual": {
+        "2020": {
+          "mean_signed_price_return_pct": 0.02234,
+          "n": 3544,
+          "sum_signed_price_return_pct": 79.173413,
+          "win_rate_pct": 39.8984
+        },
+        "2021": {
+          "mean_signed_price_return_pct": -0.013102,
+          "n": 5490,
+          "sum_signed_price_return_pct": -71.928135,
+          "win_rate_pct": 34.2077
+        },
+        "2022": {
+          "mean_signed_price_return_pct": 0.000153,
+          "n": 5820,
+          "sum_signed_price_return_pct": 0.887881,
+          "win_rate_pct": 38.2131
+        },
+        "2023": {
+          "mean_signed_price_return_pct": -0.005456,
+          "n": 5609,
+          "sum_signed_price_return_pct": -30.601386,
+          "win_rate_pct": 42.0039
+        },
+        "2024": {
+          "mean_signed_price_return_pct": -0.004185,
+          "n": 6351,
+          "sum_signed_price_return_pct": -26.579278,
+          "win_rate_pct": 39.6945
+        },
+        "2025": {
+          "mean_signed_price_return_pct": -0.004128,
+          "n": 5797,
+          "sum_signed_price_return_pct": -23.932411,
+          "win_rate_pct": 38.3647
+        },
+        "2026": {
+          "mean_signed_price_return_pct": 0.014484,
+          "n": 3980,
+          "sum_signed_price_return_pct": 57.645002,
+          "win_rate_pct": 43.7186
+        }
+      },
+      "entries": 36591,
+      "positive_mean_all_2020_2024": false
+    },
+    "immediate_aligned_flow_ge_0.1": {
+      "annual": {
+        "2020": {
+          "mean_signed_price_return_pct": 0.038411,
+          "n": 1862,
+          "sum_signed_price_return_pct": 71.522106,
+          "win_rate_pct": 41.4608
+        },
+        "2021": {
+          "mean_signed_price_return_pct": -0.024743,
+          "n": 1971,
+          "sum_signed_price_return_pct": -48.767531,
+          "win_rate_pct": 33.6377
+        },
+        "2022": {
+          "mean_signed_price_return_pct": 0.003869,
+          "n": 2146,
+          "sum_signed_price_return_pct": 8.301877,
+          "win_rate_pct": 39.2824
+        },
+        "2023": {
+          "mean_signed_price_return_pct": 0.004119,
+          "n": 2048,
+          "sum_signed_price_return_pct": 8.436585,
+          "win_rate_pct": 44.1895
+        },
+        "2024": {
+          "mean_signed_price_return_pct": -0.006018,
+          "n": 2673,
+          "sum_signed_price_return_pct": -16.084894,
+          "win_rate_pct": 40.5537
+        },
+        "2025": {
+          "mean_signed_price_return_pct": -0.008923,
+          "n": 2406,
+          "sum_signed_price_return_pct": -21.469326,
+          "win_rate_pct": 38.8612
+        },
+        "2026": {
+          "mean_signed_price_return_pct": 0.037308,
+          "n": 1861,
+          "sum_signed_price_return_pct": 69.429359,
+          "win_rate_pct": 46.1042
+        }
+      },
+      "entries": 14967,
+      "positive_mean_all_2020_2024": false
+    },
+    "immediate_aligned_flow_ge_0.2": {
+      "annual": {
+        "2020": {
+          "mean_signed_price_return_pct": 0.051312,
+          "n": 975,
+          "sum_signed_price_return_pct": 50.029204,
+          "win_rate_pct": 42.2564
+        },
+        "2021": {
+          "mean_signed_price_return_pct": -0.031346,
+          "n": 655,
+          "sum_signed_price_return_pct": -20.531319,
+          "win_rate_pct": 33.1298
+        },
+        "2022": {
+          "mean_signed_price_return_pct": 0.015779,
+          "n": 825,
+          "sum_signed_price_return_pct": 13.017748,
+          "win_rate_pct": 40.0
+        },
+        "2023": {
+          "mean_signed_price_return_pct": -0.000733,
+          "n": 754,
+          "sum_signed_price_return_pct": -0.552862,
+          "win_rate_pct": 43.634
+        },
+        "2024": {
+          "mean_signed_price_return_pct": -0.006446,
+          "n": 1078,
+          "sum_signed_price_return_pct": -6.949244,
+          "win_rate_pct": 42.115
+        },
+        "2025": {
+          "mean_signed_price_return_pct": -0.011748,
+          "n": 868,
+          "sum_signed_price_return_pct": -10.197277,
+          "win_rate_pct": 38.5945
+        },
+        "2026": {
+          "mean_signed_price_return_pct": 0.024819,
+          "n": 842,
+          "sum_signed_price_return_pct": 20.897405,
+          "win_rate_pct": 46.0808
+        }
+      },
+      "entries": 5997,
+      "positive_mean_all_2020_2024": false
+    }
+  },
+  "sources": {
+    "C:\\Users\\Lenovo\\Desktop\\telegram bot\\crypto_5m_liquidation_sweep_actual_oct5_audit.py": "82b0e16b345b6added6f09fb77f4ec85c78effa61257a804c4ba94c38a84427e",
+    "C:\\Users\\Lenovo\\Desktop\\telegram bot\\crypto_5m_sweep_taker_flow_oct14_audit.py": "cd28271f3253bef90d06cb647ba7c2350d39c76de6b8369883306e35e47b0e6a",
+    "reports\\audit_2026_09_08\\crypto_futures_flow_history\\AAVEUSDT_flow_5min_2020_2026.pkl": "81a417ec745175073535e88db8d9ae9f187b54680d32965200a2de4a48df48ce",
+    "reports\\audit_2026_09_08\\crypto_futures_flow_history\\AVAXUSDT_flow_5min_2020_2026.pkl": "39a4e101743797cd980e6bd13c9f1df40eba4394dd846bb64354b672176ab1fd",
+    "reports\\audit_2026_09_08\\crypto_futures_flow_history\\BTCUSDT_flow_5min_2020_2026.pkl": "44981189752b5891786a90499813b247e81b33fab505101070c6e79487d4b8a0",
+    "reports\\audit_2026_09_08\\crypto_futures_flow_history\\ETHUSDT_flow_5min_2020_2026.pkl": "758b13adea9709b46073e264898ad383f8283aa838a496b1ab6f6406c7d14dad",
+    "reports\\audit_2026_09_08\\crypto_futures_flow_history\\LINKUSDT_flow_5min_2020_2026.pkl": "89b7fb7909826589d5af7c79693f0f25f7c09792e2e3992c63ea31df1ccb13df",
+    "reports\\audit_2026_09_08\\crypto_futures_flow_history\\SOLUSDT_flow_5min_2020_2026.pkl": "3d803a9339a224e1763b1ff5df22c0a63b289c7f0d6d1ea5cab5a6de7064665c",
+    "reports\\audit_2026_09_08\\crypto_futures_flow_history\\XLMUSDT_flow_5min_2020_2026.pkl": "aefb7866141c82f236531429e67465ddf645960d8fb802b5efb70b986d42db9d",
+    "reports\\audit_2026_09_08\\crypto_futures_flow_history\\XRPUSDT_flow_5min_2020_2026.pkl": "65cd3b6b099dd96df1d5a17c6b10d88478f46cda5ad128da7e962a7750d092f0",
+    "reports\\audit_2026_09_08\\crypto_futures_flow_history\\manifest.json": "5df6f6730e8a36366c7a4941f22736535282fc7a95a3931df84bd6b0cdf4f5d6"
+  },
+  "status": "REJECTED_TAKER_FLOW"
+}
