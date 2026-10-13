@@ -9,7 +9,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-import crypto_5m_liquidation_sweep_actual_oct5_audit as sweep
+from src import research_crypto_replay as sweep
 
 
 ROOT = Path("reports/audit_2026_09_08")
