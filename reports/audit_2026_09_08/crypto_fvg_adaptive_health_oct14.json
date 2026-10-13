@@ -1,0 +1,69 @@
+{
+  "decision": "Do not add adaptive health gating to runtime unless its frozen configuration survives both later regimes and the full objective.",
+  "exact_frozen_portfolio": null,
+  "frozen_before_2025": null,
+  "limitations": [
+    "The monitor assumes every rejected route remains shadow-scored after its exit.",
+    "Historical slices cover roughly six months per labeled year.",
+    "A year reset is conservative and reduces initial trade frequency."
+  ],
+  "objective_checks": null,
+  "protocol": {
+    "development": 2023,
+    "grid": {
+      "base_variants": [
+        "base",
+        "confirmed",
+        "extended_confirmed"
+      ],
+      "cold_starts": [
+        "pass",
+        "shadow_warmup"
+      ],
+      "lookbacks": [
+        20,
+        40,
+        80
+      ],
+      "mean_thresholds": [
+        0.0,
+        0.0005
+      ],
+      "minimum_observations": [
+        10,
+        20
+      ],
+      "route_modes": [
+        "global",
+        "trend4",
+        "trend_pair",
+        "trend_direction",
+        "session_trend"
+      ],
+      "win_rate_thresholds": [
+        0.5,
+        0.55,
+        0.6
+      ]
+    },
+    "health_information": "only shadow signals whose exit_time is strictly before the new entry",
+    "health_updates": "all causally closed candidate outcomes, including signals not traded; this is implementable as a shadow route monitor",
+    "holdout": 2025,
+    "observed": 2026,
+    "orders": "market-entry records only",
+    "position": "3% current-equity margin, fixed 10x gross",
+    "validation": 2024,
+    "year_reset": "health histories restart at each historical slice"
+  },
+  "qualified_before_2025": 0,
+  "ready_for_live_orders": false,
+  "sources": {
+    "C:\\Users\\Lenovo\\Desktop\\telegram bot\\crypto_fvg_adaptive_health_oct14_audit.py": "fbd1e9080642c87dd1a45f22339b858a3f3ae83ebbdce92dd5c80b182e76108f",
+    "C:\\Users\\Lenovo\\Desktop\\telegram bot\\crypto_fvg_causal_stop_oct14_audit.py": "708a0403fe2f7bd29b81295fe2d16943ff88e88db7240ccadcf8b9d3815d8225",
+    "reports\\audit_2026_09_08\\multiyear_taker_raw.csv": "6cecd14176fd417c911ca644edc4578c5ee20cdb84ccab6e1b33461999af170c"
+  },
+  "status": "REJECTED_PRETEST",
+  "tested_development_configurations": 353,
+  "top_pretest": [],
+  "validation_shortlist": 100
+}
