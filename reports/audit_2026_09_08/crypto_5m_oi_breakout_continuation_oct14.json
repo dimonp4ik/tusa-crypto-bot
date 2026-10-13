@@ -1,0 +1,795 @@
+{
+  "decision": "No runtime change. The entire OI-expansion continuation family is rejected when no bounded exit geometry survives pretest.",
+  "entry_rows": 167647,
+  "limitations": [
+    "Open interest and taker flow are five-minute aggregates.",
+    "The bounded 144-combination grid still creates selection risk.",
+    "2025-2026 are reported transparently after prior diagnostic access."
+  ],
+  "protocol": {
+    "entry": "next 5m market-open proxy",
+    "event": "closed 24-bar range breakout with >=0.1 ATR depth, >=0.7 directional close location, >=1 ATR range and >=1.25x volume",
+    "hold_bars": [
+      24,
+      48,
+      72
+    ],
+    "money": "price-path diagnostic; no position-size optimization",
+    "observed": 2026,
+    "pretest_gate": ">=500 rows and positive raw expectancy in every 2022-2024 year",
+    "selection": [
+      2022,
+      2023
+    ],
+    "stops_pct": [
+      0.5,
+      0.75,
+      1.0
+    ],
+    "targets_pct": [
+      0.5,
+      1.0,
+      1.5,
+      2.0
+    ],
+    "test_if_pretest_passes": 2025,
+    "validation": 2024,
+    "variants": [
+      "base",
+      "aligned_flow_ge_02",
+      "oi1_ge_001",
+      "oi1_ge_001_and_flow_ge_0"
+    ],
+    "venue": "Binance USD-M futures"
+  },
+  "qualified_before_2025": 0,
+  "ready_for_live_orders": false,
+  "sources": {
+    "C:\\Users\\Lenovo\\Desktop\\telegram bot\\crypto_5m_liquidation_sweep_actual_oct5_audit.py": "82b0e16b345b6added6f09fb77f4ec85c78effa61257a804c4ba94c38a84427e",
+    "C:\\Users\\Lenovo\\Desktop\\telegram bot\\crypto_5m_oi_breakout_continuation_oct14_audit.py": "394a2be488085eef5adf8c9fcda19233c441ac82038a5ae140c46adac3b582de",
+    "C:\\Users\\Lenovo\\Desktop\\telegram bot\\crypto_5m_sweep_oi_flush_oct14_audit.py": "906bb748eea532fe749da90f08c6a4cccfdcc7abece529ddeed52e742db93a83",
+    "C:\\Users\\Lenovo\\Desktop\\telegram bot\\crypto_5m_sweep_taker_flow_oct14_audit.py": "cd28271f3253bef90d06cb647ba7c2350d39c76de6b8369883306e35e47b0e6a",
+    "reports\\audit_2026_09_08\\crypto_futures_flow_history\\AAVEUSDT_flow_5min_2020_2026.pkl": "81a417ec745175073535e88db8d9ae9f187b54680d32965200a2de4a48df48ce",
+    "reports\\audit_2026_09_08\\crypto_futures_flow_history\\AVAXUSDT_flow_5min_2020_2026.pkl": "39a4e101743797cd980e6bd13c9f1df40eba4394dd846bb64354b672176ab1fd",
+    "reports\\audit_2026_09_08\\crypto_futures_flow_history\\BTCUSDT_flow_5min_2020_2026.pkl": "44981189752b5891786a90499813b247e81b33fab505101070c6e79487d4b8a0",
+    "reports\\audit_2026_09_08\\crypto_futures_flow_history\\ETHUSDT_flow_5min_2020_2026.pkl": "758b13adea9709b46073e264898ad383f8283aa838a496b1ab6f6406c7d14dad",
+    "reports\\audit_2026_09_08\\crypto_futures_flow_history\\LINKUSDT_flow_5min_2020_2026.pkl": "89b7fb7909826589d5af7c79693f0f25f7c09792e2e3992c63ea31df1ccb13df",
+    "reports\\audit_2026_09_08\\crypto_futures_flow_history\\SOLUSDT_flow_5min_2020_2026.pkl": "3d803a9339a224e1763b1ff5df22c0a63b289c7f0d6d1ea5cab5a6de7064665c",
+    "reports\\audit_2026_09_08\\crypto_futures_flow_history\\XLMUSDT_flow_5min_2020_2026.pkl": "aefb7866141c82f236531429e67465ddf645960d8fb802b5efb70b986d42db9d",
+    "reports\\audit_2026_09_08\\crypto_futures_flow_history\\XRPUSDT_flow_5min_2020_2026.pkl": "65cd3b6b099dd96df1d5a17c6b10d88478f46cda5ad128da7e962a7750d092f0",
+    "reports\\audit_2026_09_08\\crypto_futures_flow_history\\manifest.json": "5df6f6730e8a36366c7a4941f22736535282fc7a95a3931df84bd6b0cdf4f5d6",
+    "reports\\audit_2026_09_08\\crypto_futures_metrics_history\\AAVEUSDT_metrics_2022_2026.pkl": "46e15fd58495d1de0e985368e8d192c4676b6d16734fbbb50d3df5645e32611d",
+    "reports\\audit_2026_09_08\\crypto_futures_metrics_history\\AVAXUSDT_metrics_2022_2026.pkl": "a6589b9630b39de426e271d63af774b66a6a1935eb8fee62e4c7d34082e84a6b",
+    "reports\\audit_2026_09_08\\crypto_futures_metrics_history\\BTCUSDT_metrics_2022_2026.pkl": "d1ed0fa5bf771dc91496cfd36a462a0fea8d4282f1d639dfc93a6d10598d486e",
+    "reports\\audit_2026_09_08\\crypto_futures_metrics_history\\ETHUSDT_metrics_2022_2026.pkl": "2d46fc2795d99c07e71972829bc3a04147f9740030f5fcb4f4c8260ba47c5f54",
+    "reports\\audit_2026_09_08\\crypto_futures_metrics_history\\LINKUSDT_metrics_2022_2026.pkl": "682306371323ef92c6a95d6e3f8c25ab2cbadd26f6f40f2c49d9c1722e463cc1",
+    "reports\\audit_2026_09_08\\crypto_futures_metrics_history\\SOLUSDT_metrics_2022_2026.pkl": "82bb3c32536f80e8e8a0cdc2f70483cb37ed8974d86f1f8a0c22a597c0f6af17",
+    "reports\\audit_2026_09_08\\crypto_futures_metrics_history\\XLMUSDT_metrics_2022_2026.pkl": "f2d92a9a34e999772efedbe931e473252724f4f752093406b8f47fe8e63d703b",
+    "reports\\audit_2026_09_08\\crypto_futures_metrics_history\\XRPUSDT_metrics_2022_2026.pkl": "e56e84487cb1c8985abac6bf7269369d59b8a836b343cef7057d4b84e1c26930",
+    "reports\\audit_2026_09_08\\crypto_futures_metrics_history\\manifest.json": "27ad65fe8a36af4153219e463e92bebc134de6d0fc7167be06fb1edf43dd6894"
+  },
+  "status": "REJECTED_PRETEST",
+  "tested_combinations": 144,
+  "top_frontier": [
+    {
+      "annual": {
+        "2022": {
+          "mean_signed_price_return_pct": -0.010822,
+          "n": 33892,
+          "win_rate_pct": 22.5068
+        },
+        "2023": {
+          "mean_signed_price_return_pct": -0.007402,
+          "n": 30643,
+          "win_rate_pct": 27.1155
+        },
+        "2024": {
+          "mean_signed_price_return_pct": -0.012785,
+          "n": 38390,
+          "win_rate_pct": 24.4777
+        },
+        "2025": {
+          "mean_signed_price_return_pct": 0.002101,
+          "n": 38832,
+          "win_rate_pct": 25.1313
+        },
+        "2026": {
+          "mean_signed_price_return_pct": -0.015501,
+          "n": 25890,
+          "win_rate_pct": 26.5662
+        }
+      },
+      "hold_bars": 72,
+      "pretest_minimum_mean_pct": -0.012785,
+      "pretest_minimum_win_rate_pct": 22.5068,
+      "qualified_before_2025": false,
+      "stop_pct": 0.5,
+      "target_pct": 2.0,
+      "variant": "base"
+    },
+    {
+      "annual": {
+        "2022": {
+          "mean_signed_price_return_pct": -0.010998,
+          "n": 33892,
+          "win_rate_pct": 24.3066
+        },
+        "2023": {
+          "mean_signed_price_return_pct": -0.009917,
+          "n": 30643,
+          "win_rate_pct": 29.4945
+        },
+        "2024": {
+          "mean_signed_price_return_pct": -0.01461,
+          "n": 38390,
+          "win_rate_pct": 26.8039
+        },
+        "2025": {
+          "mean_signed_price_return_pct": -0.001551,
+          "n": 38832,
+          "win_rate_pct": 27.2636
+        },
+        "2026": {
+          "mean_signed_price_return_pct": -0.01109,
+          "n": 25890,
+          "win_rate_pct": 29.579
+        }
+      },
+      "hold_bars": 48,
+      "pretest_minimum_mean_pct": -0.01461,
+      "pretest_minimum_win_rate_pct": 24.3066,
+      "qualified_before_2025": false,
+      "stop_pct": 0.5,
+      "target_pct": 2.0,
+      "variant": "base"
+    },
+    {
+      "annual": {
+        "2022": {
+          "mean_signed_price_return_pct": 0.004565,
+          "n": 7093,
+          "win_rate_pct": 21.8666
+        },
+        "2023": {
+          "mean_signed_price_return_pct": -0.015412,
+          "n": 5458,
+          "win_rate_pct": 24.1664
+        },
+        "2024": {
+          "mean_signed_price_return_pct": -0.015228,
+          "n": 6693,
+          "win_rate_pct": 22.4414
+        },
+        "2025": {
+          "mean_signed_price_return_pct": 0.017601,
+          "n": 5738,
+          "win_rate_pct": 23.5448
+        },
+        "2026": {
+          "mean_signed_price_return_pct": 0.018216,
+          "n": 2964,
+          "win_rate_pct": 24.6289
+        }
+      },
+      "hold_bars": 72,
+      "pretest_minimum_mean_pct": -0.015412,
+      "pretest_minimum_win_rate_pct": 21.8666,
+      "qualified_before_2025": false,
+      "stop_pct": 0.5,
+      "target_pct": 2.0,
+      "variant": "oi1_ge_001_and_flow_ge_0"
+    },
+    {
+      "annual": {
+        "2022": {
+          "mean_signed_price_return_pct": -0.016344,
+          "n": 33892,
+          "win_rate_pct": 25.8232
+        },
+        "2023": {
+          "mean_signed_price_return_pct": -0.009848,
+          "n": 30643,
+          "win_rate_pct": 29.3835
+        },
+        "2024": {
+          "mean_signed_price_return_pct": -0.015568,
+          "n": 38390,
+          "win_rate_pct": 27.3014
+        },
+        "2025": {
+          "mean_signed_price_return_pct": 0.000328,
+          "n": 38832,
+          "win_rate_pct": 28.0027
+        },
+        "2026": {
+          "mean_signed_price_return_pct": -0.012672,
+          "n": 25890,
+          "win_rate_pct": 28.9262
+        }
+      },
+      "hold_bars": 72,
+      "pretest_minimum_mean_pct": -0.016344,
+      "pretest_minimum_win_rate_pct": 25.8232,
+      "qualified_before_2025": false,
+      "stop_pct": 0.5,
+      "target_pct": 1.5,
+      "variant": "base"
+    },
+    {
+      "annual": {
+        "2022": {
+          "mean_signed_price_return_pct": 0.002661,
+          "n": 7619,
+          "win_rate_pct": 21.7089
+        },
+        "2023": {
+          "mean_signed_price_return_pct": -0.016352,
+          "n": 5903,
+          "win_rate_pct": 24.1911
+        },
+        "2024": {
+          "mean_signed_price_return_pct": -0.015814,
+          "n": 7413,
+          "win_rate_pct": 22.4471
+        },
+        "2025": {
+          "mean_signed_price_return_pct": 0.014395,
+          "n": 6323,
+          "win_rate_pct": 23.3908
+        },
+        "2026": {
+          "mean_signed_price_return_pct": 0.013445,
+          "n": 3218,
+          "win_rate_pct": 24.363
+        }
+      },
+      "hold_bars": 72,
+      "pretest_minimum_mean_pct": -0.016352,
+      "pretest_minimum_win_rate_pct": 21.7089,
+      "qualified_before_2025": false,
+      "stop_pct": 0.5,
+      "target_pct": 2.0,
+      "variant": "oi1_ge_001"
+    },
+    {
+      "annual": {
+        "2022": {
+          "mean_signed_price_return_pct": -0.016146,
+          "n": 33892,
+          "win_rate_pct": 37.6313
+        },
+        "2023": {
+          "mean_signed_price_return_pct": -0.008556,
+          "n": 30643,
+          "win_rate_pct": 40.6096
+        },
+        "2024": {
+          "mean_signed_price_return_pct": -0.016638,
+          "n": 38390,
+          "win_rate_pct": 39.4842
+        },
+        "2025": {
+          "mean_signed_price_return_pct": -0.004049,
+          "n": 38832,
+          "win_rate_pct": 40.6778
+        },
+        "2026": {
+          "mean_signed_price_return_pct": -0.021685,
+          "n": 25890,
+          "win_rate_pct": 40.3824
+        }
+      },
+      "hold_bars": 24,
+      "pretest_minimum_mean_pct": -0.016638,
+      "pretest_minimum_win_rate_pct": 37.6313,
+      "qualified_before_2025": false,
+      "stop_pct": 0.75,
+      "target_pct": 1.5,
+      "variant": "base"
+    },
+    {
+      "annual": {
+        "2022": {
+          "mean_signed_price_return_pct": -0.016431,
+          "n": 33892,
+          "win_rate_pct": 26.9975
+        },
+        "2023": {
+          "mean_signed_price_return_pct": -0.01085,
+          "n": 30643,
+          "win_rate_pct": 31.2926
+        },
+        "2024": {
+          "mean_signed_price_return_pct": -0.016992,
+          "n": 38390,
+          "win_rate_pct": 29.031
+        },
+        "2025": {
+          "mean_signed_price_return_pct": -0.003054,
+          "n": 38832,
+          "win_rate_pct": 29.5555
+        },
+        "2026": {
+          "mean_signed_price_return_pct": -0.009966,
+          "n": 25890,
+          "win_rate_pct": 31.3055
+        }
+      },
+      "hold_bars": 48,
+      "pretest_minimum_mean_pct": -0.016992,
+      "pretest_minimum_win_rate_pct": 26.9975,
+      "qualified_before_2025": false,
+      "stop_pct": 0.5,
+      "target_pct": 1.5,
+      "variant": "base"
+    },
+    {
+      "annual": {
+        "2022": {
+          "mean_signed_price_return_pct": -0.017069,
+          "n": 33892,
+          "win_rate_pct": 27.9505
+        },
+        "2023": {
+          "mean_signed_price_return_pct": -0.011433,
+          "n": 30643,
+          "win_rate_pct": 33.4922
+        },
+        "2024": {
+          "mean_signed_price_return_pct": -0.014739,
+          "n": 38390,
+          "win_rate_pct": 31.0211
+        },
+        "2025": {
+          "mean_signed_price_return_pct": -0.001021,
+          "n": 38832,
+          "win_rate_pct": 32.1487
+        },
+        "2026": {
+          "mean_signed_price_return_pct": -0.015571,
+          "n": 25890,
+          "win_rate_pct": 33.538
+        }
+      },
+      "hold_bars": 24,
+      "pretest_minimum_mean_pct": -0.017069,
+      "pretest_minimum_win_rate_pct": 27.9505,
+      "qualified_before_2025": false,
+      "stop_pct": 0.5,
+      "target_pct": 2.0,
+      "variant": "base"
+    },
+    {
+      "annual": {
+        "2022": {
+          "mean_signed_price_return_pct": -0.003112,
+          "n": 33892,
+          "win_rate_pct": 30.8598
+        },
+        "2023": {
+          "mean_signed_price_return_pct": -0.002805,
+          "n": 30643,
+          "win_rate_pct": 35.0814
+        },
+        "2024": {
+          "mean_signed_price_return_pct": -0.017651,
+          "n": 38390,
+          "win_rate_pct": 32.558
+        },
+        "2025": {
+          "mean_signed_price_return_pct": 0.002917,
+          "n": 38832,
+          "win_rate_pct": 33.3591
+        },
+        "2026": {
+          "mean_signed_price_return_pct": -0.023389,
+          "n": 25890,
+          "win_rate_pct": 34.411
+        }
+      },
+      "hold_bars": 72,
+      "pretest_minimum_mean_pct": -0.017651,
+      "pretest_minimum_win_rate_pct": 30.8598,
+      "qualified_before_2025": false,
+      "stop_pct": 0.75,
+      "target_pct": 2.0,
+      "variant": "base"
+    },
+    {
+      "annual": {
+        "2022": {
+          "mean_signed_price_return_pct": -0.013558,
+          "n": 33892,
+          "win_rate_pct": 35.6662
+        },
+        "2023": {
+          "mean_signed_price_return_pct": -0.008349,
+          "n": 30643,
+          "win_rate_pct": 39.4315
+        },
+        "2024": {
+          "mean_signed_price_return_pct": -0.01769,
+          "n": 38390,
+          "win_rate_pct": 37.8979
+        },
+        "2025": {
+          "mean_signed_price_return_pct": -0.001094,
+          "n": 38832,
+          "win_rate_pct": 39.3335
+        },
+        "2026": {
+          "mean_signed_price_return_pct": -0.023607,
+          "n": 25890,
+          "win_rate_pct": 39.3511
+        }
+      },
+      "hold_bars": 24,
+      "pretest_minimum_mean_pct": -0.01769,
+      "pretest_minimum_win_rate_pct": 35.6662,
+      "qualified_before_2025": false,
+      "stop_pct": 0.75,
+      "target_pct": 2.0,
+      "variant": "base"
+    },
+    {
+      "annual": {
+        "2022": {
+          "mean_signed_price_return_pct": -0.008468,
+          "n": 33892,
+          "win_rate_pct": 34.7752
+        },
+        "2023": {
+          "mean_signed_price_return_pct": -0.005274,
+          "n": 30643,
+          "win_rate_pct": 37.6367
+        },
+        "2024": {
+          "mean_signed_price_return_pct": -0.01843,
+          "n": 38390,
+          "win_rate_pct": 35.7984
+        },
+        "2025": {
+          "mean_signed_price_return_pct": -0.000675,
+          "n": 38832,
+          "win_rate_pct": 36.5085
+        },
+        "2026": {
+          "mean_signed_price_return_pct": -0.017889,
+          "n": 25890,
+          "win_rate_pct": 37.0375
+        }
+      },
+      "hold_bars": 72,
+      "pretest_minimum_mean_pct": -0.01843,
+      "pretest_minimum_win_rate_pct": 34.7752,
+      "qualified_before_2025": false,
+      "stop_pct": 0.75,
+      "target_pct": 1.5,
+      "variant": "base"
+    },
+    {
+      "annual": {
+        "2022": {
+          "mean_signed_price_return_pct": 0.013083,
+          "n": 7619,
+          "win_rate_pct": 29.8858
+        },
+        "2023": {
+          "mean_signed_price_return_pct": -0.005536,
+          "n": 5903,
+          "win_rate_pct": 32.7122
+        },
+        "2024": {
+          "mean_signed_price_return_pct": -0.01877,
+          "n": 7413,
+          "win_rate_pct": 30.514
+        },
+        "2025": {
+          "mean_signed_price_return_pct": 0.021023,
+          "n": 6323,
+          "win_rate_pct": 31.6306
+        },
+        "2026": {
+          "mean_signed_price_return_pct": 0.000127,
+          "n": 3218,
+          "win_rate_pct": 32.0696
+        }
+      },
+      "hold_bars": 72,
+      "pretest_minimum_mean_pct": -0.01877,
+      "pretest_minimum_win_rate_pct": 29.8858,
+      "qualified_before_2025": false,
+      "stop_pct": 0.75,
+      "target_pct": 2.0,
+      "variant": "oi1_ge_001"
+    },
+    {
+      "annual": {
+        "2022": {
+          "mean_signed_price_return_pct": -0.018957,
+          "n": 33892,
+          "win_rate_pct": 39.8914
+        },
+        "2023": {
+          "mean_signed_price_return_pct": -0.007978,
+          "n": 30643,
+          "win_rate_pct": 42.1923
+        },
+        "2024": {
+          "mean_signed_price_return_pct": -0.01614,
+          "n": 38390,
+          "win_rate_pct": 41.6723
+        },
+        "2025": {
+          "mean_signed_price_return_pct": -0.004406,
+          "n": 38832,
+          "win_rate_pct": 43.0856
+        },
+        "2026": {
+          "mean_signed_price_return_pct": -0.030334,
+          "n": 25890,
+          "win_rate_pct": 42.0317
+        }
+      },
+      "hold_bars": 24,
+      "pretest_minimum_mean_pct": -0.018957,
+      "pretest_minimum_win_rate_pct": 39.8914,
+      "qualified_before_2025": false,
+      "stop_pct": 1.0,
+      "target_pct": 2.0,
+      "variant": "base"
+    },
+    {
+      "annual": {
+        "2022": {
+          "mean_signed_price_return_pct": -0.013779,
+          "n": 17723,
+          "win_rate_pct": 26.3894
+        },
+        "2023": {
+          "mean_signed_price_return_pct": -0.007248,
+          "n": 15728,
+          "win_rate_pct": 30.8939
+        },
+        "2024": {
+          "mean_signed_price_return_pct": -0.019078,
+          "n": 19949,
+          "win_rate_pct": 27.9713
+        },
+        "2025": {
+          "mean_signed_price_return_pct": 0.004264,
+          "n": 22129,
+          "win_rate_pct": 28.7903
+        },
+        "2026": {
+          "mean_signed_price_return_pct": -0.022112,
+          "n": 16818,
+          "win_rate_pct": 29.0225
+        }
+      },
+      "hold_bars": 72,
+      "pretest_minimum_mean_pct": -0.019078,
+      "pretest_minimum_win_rate_pct": 26.3894,
+      "qualified_before_2025": false,
+      "stop_pct": 0.5,
+      "target_pct": 1.5,
+      "variant": "aligned_flow_ge_02"
+    },
+    {
+      "annual": {
+        "2022": {
+          "mean_signed_price_return_pct": -0.019292,
+          "n": 33892,
+          "win_rate_pct": 29.7061
+        },
+        "2023": {
+          "mean_signed_price_return_pct": -0.011308,
+          "n": 30643,
+          "win_rate_pct": 34.6082
+        },
+        "2024": {
+          "mean_signed_price_return_pct": -0.015521,
+          "n": 38390,
+          "win_rate_pct": 32.4069
+        },
+        "2025": {
+          "mean_signed_price_return_pct": -0.004079,
+          "n": 38832,
+          "win_rate_pct": 33.3823
+        },
+        "2026": {
+          "mean_signed_price_return_pct": -0.015074,
+          "n": 25890,
+          "win_rate_pct": 34.4844
+        }
+      },
+      "hold_bars": 24,
+      "pretest_minimum_mean_pct": -0.019292,
+      "pretest_minimum_win_rate_pct": 29.7061,
+      "qualified_before_2025": false,
+      "stop_pct": 0.5,
+      "target_pct": 1.5,
+      "variant": "base"
+    },
+    {
+      "annual": {
+        "2022": {
+          "mean_signed_price_return_pct": -0.010091,
+          "n": 33892,
+          "win_rate_pct": 41.529
+        },
+        "2023": {
+          "mean_signed_price_return_pct": -0.006815,
+          "n": 30643,
+          "win_rate_pct": 42.8483
+        },
+        "2024": {
+          "mean_signed_price_return_pct": -0.019345,
+          "n": 38390,
+          "win_rate_pct": 42.4407
+        },
+        "2025": {
+          "mean_signed_price_return_pct": -0.006855,
+          "n": 38832,
+          "win_rate_pct": 43.0341
+        },
+        "2026": {
+          "mean_signed_price_return_pct": -0.019824,
+          "n": 25890,
+          "win_rate_pct": 43.1286
+        }
+      },
+      "hold_bars": 48,
+      "pretest_minimum_mean_pct": -0.019345,
+      "pretest_minimum_win_rate_pct": 41.529,
+      "qualified_before_2025": false,
+      "stop_pct": 1.0,
+      "target_pct": 1.5,
+      "variant": "base"
+    },
+    {
+      "annual": {
+        "2022": {
+          "mean_signed_price_return_pct": 0.003813,
+          "n": 7093,
+          "win_rate_pct": 23.1637
+        },
+        "2023": {
+          "mean_signed_price_return_pct": -0.019347,
+          "n": 5458,
+          "win_rate_pct": 25.8886
+        },
+        "2024": {
+          "mean_signed_price_return_pct": -0.017629,
+          "n": 6693,
+          "win_rate_pct": 24.0849
+        },
+        "2025": {
+          "mean_signed_price_return_pct": 0.014952,
+          "n": 5738,
+          "win_rate_pct": 24.8693
+        },
+        "2026": {
+          "mean_signed_price_return_pct": 0.017951,
+          "n": 2964,
+          "win_rate_pct": 26.7881
+        }
+      },
+      "hold_bars": 48,
+      "pretest_minimum_mean_pct": -0.019347,
+      "pretest_minimum_win_rate_pct": 23.1637,
+      "qualified_before_2025": false,
+      "stop_pct": 0.5,
+      "target_pct": 2.0,
+      "variant": "oi1_ge_001_and_flow_ge_0"
+    },
+    {
+      "annual": {
+        "2022": {
+          "mean_signed_price_return_pct": -0.019064,
+          "n": 33892,
+          "win_rate_pct": 47.1527
+        },
+        "2023": {
+          "mean_signed_price_return_pct": -0.010369,
+          "n": 30643,
+          "win_rate_pct": 46.5685
+        },
+        "2024": {
+          "mean_signed_price_return_pct": -0.019564,
+          "n": 38390,
+          "win_rate_pct": 47.179
+        },
+        "2025": {
+          "mean_signed_price_return_pct": -0.010097,
+          "n": 38832,
+          "win_rate_pct": 48.1433
+        },
+        "2026": {
+          "mean_signed_price_return_pct": -0.023175,
+          "n": 25890,
+          "win_rate_pct": 46.1954
+        }
+      },
+      "hold_bars": 24,
+      "pretest_minimum_mean_pct": -0.019564,
+      "pretest_minimum_win_rate_pct": 46.5685,
+      "qualified_before_2025": false,
+      "stop_pct": 1.0,
+      "target_pct": 1.0,
+      "variant": "base"
+    },
+    {
+      "annual": {
+        "2022": {
+          "mean_signed_price_return_pct": -0.005874,
+          "n": 33892,
+          "win_rate_pct": 38.3011
+        },
+        "2023": {
+          "mean_signed_price_return_pct": -0.005017,
+          "n": 30643,
+          "win_rate_pct": 40.8641
+        },
+        "2024": {
+          "mean_signed_price_return_pct": -0.019598,
+          "n": 38390,
+          "win_rate_pct": 39.763
+        },
+        "2025": {
+          "mean_signed_price_return_pct": -0.006154,
+          "n": 38832,
+          "win_rate_pct": 40.4074
+        },
+        "2026": {
+          "mean_signed_price_return_pct": -0.024415,
+          "n": 25890,
+          "win_rate_pct": 41.1858
+        }
+      },
+      "hold_bars": 48,
+      "pretest_minimum_mean_pct": -0.019598,
+      "pretest_minimum_win_rate_pct": 38.3011,
+      "qualified_before_2025": false,
+      "stop_pct": 1.0,
+      "target_pct": 2.0,
+      "variant": "base"
+    },
+    {
+      "annual": {
+        "2022": {
+          "mean_signed_price_return_pct": -0.006991,
+          "n": 33892,
+          "win_rate_pct": 36.7137
+        },
+        "2023": {
+          "mean_signed_price_return_pct": -0.000136,
+          "n": 30643,
+          "win_rate_pct": 40.0711
+        },
+        "2024": {
+          "mean_signed_price_return_pct": -0.019694,
+          "n": 38390,
+          "win_rate_pct": 38.1662
+        },
+        "2025": {
+          "mean_signed_price_return_pct": 0.003811,
+          "n": 38832,
+          "win_rate_pct": 39.1996
+        },
+        "2026": {
+          "mean_signed_price_return_pct": -0.028271,
+          "n": 25890,
+          "win_rate_pct": 39.4747
+        }
+      },
+      "hold_bars": 72,
+      "pretest_minimum_mean_pct": -0.019694,
+      "pretest_minimum_win_rate_pct": 36.7137,
+      "qualified_before_2025": false,
+      "stop_pct": 1.0,
+      "target_pct": 2.0,
+      "variant": "base"
+    }
+  ]
+}
