@@ -1,0 +1,733 @@
+{
+  "status": "REJECTED_PRETEST",
+  "ready_for_live_orders": false,
+  "decision": "No runtime change unless every chronological objective passes.",
+  "protocol": {
+    "mechanism": "actual last fully closed 15m bar before FVG entry",
+    "development": 2023,
+    "validation": 2024,
+    "holdout": 2025,
+    "observed": 2026,
+    "entry": "existing market-entry record; confirmation uses entry_time-900s",
+    "targets": "existing literal 0.5-2% FVG targets",
+    "position": "3% current-equity margin, fixed 10x gross",
+    "configs_predeclared": 12
+  },
+  "rows": 5092,
+  "coverage_days": {
+    "2023": 183,
+    "2024": 183,
+    "2025": 181,
+    "2026": 183
+  },
+  "development": [
+    {
+      "config": {
+        "name": "sweep8_wick20",
+        "sweep": true,
+        "wick": 0.2
+      },
+      "development_2023": {
+        "n": 9,
+        "wr": 66.67,
+        "return_pct": 1.5612,
+        "dd_pct": 0.4865,
+        "max_loss_streak": 1,
+        "negative_months": 0,
+        "monthly_return_pct": {
+          "2023-02": 0.3281,
+          "2023-03": 0.2509,
+          "2023-04": 0.3984,
+          "2023-06": 0.3462,
+          "2023-07": 0.228
+        },
+        "active_days": 8,
+        "trades_per_calendar_day": 0.049,
+        "trades_per_active_day": 1.125,
+        "max_entries_same_rolling_hour": 2,
+        "max_entries_same_clock_hour": 1,
+        "by_source_count": {
+          "historical_fvg": 9
+        },
+        "by_module_count": {
+          "historical_fvg": 9
+        },
+        "coverage_days": 183,
+        "mean_signed_price_return_pct": 0.576354,
+        "mean_winning_price_move_pct": 1.248268,
+        "economic_gate": {
+          "n": 9,
+          "margin_fraction": 0.03,
+          "leverage": 10.0,
+          "observed_trades_per_day": 0.049,
+          "required_trades_per_day": 3.0,
+          "calendar_days_per_month": 30,
+          "monthly_target_pct": 30.0,
+          "mean_signed_price_return_pct": 0.576354,
+          "required_constant_signed_price_return_pct": 0.973137,
+          "projected_monthly_return_pct": 0.2533,
+          "frequency_pass": false,
+          "return_pass": false,
+          "passes": false,
+          "interpretation": "diagnostic projection from observed geometric trade return; not a forecast"
+        }
+      }
+    },
+    {
+      "config": {
+        "name": "sweep8_wick20_bos3",
+        "sweep": true,
+        "wick": 0.2,
+        "bos_age": 3
+      },
+      "development_2023": {
+        "n": 6,
+        "wr": 66.67,
+        "return_pct": 1.1881,
+        "dd_pct": 0.2042,
+        "max_loss_streak": 2,
+        "negative_months": 1,
+        "monthly_return_pct": {
+          "2023-02": 0.074,
+          "2023-03": 0.2509,
+          "2023-04": -0.2042,
+          "2023-06": 0.3462,
+          "2023-07": 0.718
+        },
+        "active_days": 6,
+        "trades_per_calendar_day": 0.033,
+        "trades_per_active_day": 1.0,
+        "max_entries_same_rolling_hour": 2,
+        "max_entries_same_clock_hour": 1,
+        "by_source_count": {
+          "historical_fvg": 6
+        },
+        "by_module_count": {
+          "historical_fvg": 6
+        },
+        "coverage_days": 183,
+        "mean_signed_price_return_pct": 0.658248,
+        "mean_winning_price_move_pct": 1.157571,
+        "economic_gate": {
+          "n": 6,
+          "margin_fraction": 0.03,
+          "leverage": 10.0,
+          "observed_trades_per_day": 0.033,
+          "required_trades_per_day": 3.0,
+          "calendar_days_per_month": 30,
+          "monthly_target_pct": 30.0,
+          "mean_signed_price_return_pct": 0.658248,
+          "required_constant_signed_price_return_pct": 0.973137,
+          "projected_monthly_return_pct": 0.1951,
+          "frequency_pass": false,
+          "return_pass": false,
+          "passes": false,
+          "interpretation": "diagnostic projection from observed geometric trade return; not a forecast"
+        }
+      }
+    },
+    {
+      "config": {
+        "name": "wick20_close75",
+        "wick": 0.2,
+        "close": 0.75
+      },
+      "development_2023": {
+        "n": 79,
+        "wr": 59.49,
+        "return_pct": -0.036,
+        "dd_pct": 3.6025,
+        "max_loss_streak": 3,
+        "negative_months": 3,
+        "monthly_return_pct": {
+          "2023-01": 0.2202,
+          "2023-02": -1.5166,
+          "2023-03": 2.2682,
+          "2023-04": 1.526,
+          "2023-05": -2.0112,
+          "2023-06": -1.0364,
+          "2023-07": 0.5902
+        },
+        "active_days": 57,
+        "trades_per_calendar_day": 0.432,
+        "trades_per_active_day": 1.386,
+        "max_entries_same_rolling_hour": 2,
+        "max_entries_same_clock_hour": 2,
+        "by_source_count": {
+          "historical_fvg": 79
+        },
+        "by_module_count": {
+          "historical_fvg": 79
+        },
+        "coverage_days": 183,
+        "mean_signed_price_return_pct": 0.001748,
+        "mean_winning_price_move_pct": 0.954198,
+        "economic_gate": {
+          "n": 79,
+          "margin_fraction": 0.03,
+          "leverage": 10.0,
+          "observed_trades_per_day": 0.432,
+          "required_trades_per_day": 3.0,
+          "calendar_days_per_month": 30,
+          "monthly_target_pct": 30.0,
+          "mean_signed_price_return_pct": 0.001748,
+          "required_constant_signed_price_return_pct": 0.973137,
+          "projected_monthly_return_pct": -0.0059,
+          "frequency_pass": false,
+          "return_pass": false,
+          "passes": false,
+          "interpretation": "diagnostic projection from observed geometric trade return; not a forecast"
+        }
+      }
+    },
+    {
+      "config": {
+        "name": "sweep8_close60",
+        "sweep": true,
+        "close": 0.6
+      },
+      "development_2023": {
+        "n": 6,
+        "wr": 50.0,
+        "return_pct": -0.127,
+        "dd_pct": 0.5969,
+        "max_loss_streak": 1,
+        "negative_months": 2,
+        "monthly_return_pct": {
+          "2023-02": 0.074,
+          "2023-04": 0.3984,
+          "2023-06": -0.111,
+          "2023-07": -0.4865
+        },
+        "active_days": 5,
+        "trades_per_calendar_day": 0.033,
+        "trades_per_active_day": 1.2,
+        "max_entries_same_rolling_hour": 2,
+        "max_entries_same_clock_hour": 1,
+        "by_source_count": {
+          "historical_fvg": 6
+        },
+        "by_module_count": {
+          "historical_fvg": 6
+        },
+        "coverage_days": 183,
+        "mean_signed_price_return_pct": -0.06791,
+        "mean_winning_price_move_pct": 1.137904,
+        "economic_gate": {
+          "n": 6,
+          "margin_fraction": 0.03,
+          "leverage": 10.0,
+          "observed_trades_per_day": 0.033,
+          "required_trades_per_day": 3.0,
+          "calendar_days_per_month": 30,
+          "monthly_target_pct": 30.0,
+          "mean_signed_price_return_pct": -0.06791,
+          "required_constant_signed_price_return_pct": 0.973137,
+          "projected_monthly_return_pct": -0.021,
+          "frequency_pass": false,
+          "return_pass": false,
+          "passes": false,
+          "interpretation": "diagnostic projection from observed geometric trade return; not a forecast"
+        }
+      }
+    },
+    {
+      "config": {
+        "name": "wick35_close60_body",
+        "wick": 0.35,
+        "close": 0.6,
+        "body": 0.0
+      },
+      "development_2023": {
+        "n": 69,
+        "wr": 53.62,
+        "return_pct": -2.576,
+        "dd_pct": 4.7896,
+        "max_loss_streak": 5,
+        "negative_months": 4,
+        "monthly_return_pct": {
+          "2023-01": 0.2844,
+          "2023-02": -0.6354,
+          "2023-03": 0.019,
+          "2023-04": 0.6378,
+          "2023-05": -0.629,
+          "2023-06": -1.4357,
+          "2023-07": -0.8306
+        },
+        "active_days": 54,
+        "trades_per_calendar_day": 0.377,
+        "trades_per_active_day": 1.278,
+        "max_entries_same_rolling_hour": 2,
+        "max_entries_same_clock_hour": 2,
+        "by_source_count": {
+          "historical_fvg": 69
+        },
+        "by_module_count": {
+          "historical_fvg": 69
+        },
+        "coverage_days": 183,
+        "mean_signed_price_return_pct": -0.122445,
+        "mean_winning_price_move_pct": 1.022799,
+        "economic_gate": {
+          "n": 69,
+          "margin_fraction": 0.03,
+          "leverage": 10.0,
+          "observed_trades_per_day": 0.377,
+          "required_trades_per_day": 3.0,
+          "calendar_days_per_month": 30,
+          "monthly_target_pct": 30.0,
+          "mean_signed_price_return_pct": -0.122445,
+          "required_constant_signed_price_return_pct": 0.973137,
+          "projected_monthly_return_pct": -0.4263,
+          "frequency_pass": false,
+          "return_pass": false,
+          "passes": false,
+          "interpretation": "diagnostic projection from observed geometric trade return; not a forecast"
+        }
+      }
+    },
+    {
+      "config": {
+        "name": "wick35_close75",
+        "wick": 0.35,
+        "close": 0.75
+      },
+      "development_2023": {
+        "n": 57,
+        "wr": 54.39,
+        "return_pct": -3.0044,
+        "dd_pct": 4.5681,
+        "max_loss_streak": 4,
+        "negative_months": 4,
+        "monthly_return_pct": {
+          "2023-01": 0.2202,
+          "2023-02": -2.4012,
+          "2023-03": 1.3857,
+          "2023-04": 1.6374,
+          "2023-05": -1.8493,
+          "2023-06": -1.7645,
+          "2023-07": -0.1932
+        },
+        "active_days": 46,
+        "trades_per_calendar_day": 0.311,
+        "trades_per_active_day": 1.239,
+        "max_entries_same_rolling_hour": 2,
+        "max_entries_same_clock_hour": 2,
+        "by_source_count": {
+          "historical_fvg": 57
+        },
+        "by_module_count": {
+          "historical_fvg": 57
+        },
+        "coverage_days": 183,
+        "mean_signed_price_return_pct": -0.174264,
+        "mean_winning_price_move_pct": 1.033679,
+        "economic_gate": {
+          "n": 57,
+          "margin_fraction": 0.03,
+          "leverage": 10.0,
+          "observed_trades_per_day": 0.311,
+          "required_trades_per_day": 3.0,
+          "calendar_days_per_month": 30,
+          "monthly_target_pct": 30.0,
+          "mean_signed_price_return_pct": -0.174264,
+          "required_constant_signed_price_return_pct": 0.973137,
+          "projected_monthly_return_pct": -0.4978,
+          "frequency_pass": false,
+          "return_pass": false,
+          "passes": false,
+          "interpretation": "diagnostic projection from observed geometric trade return; not a forecast"
+        }
+      }
+    },
+    {
+      "config": {
+        "name": "wick50_close75",
+        "wick": 0.5,
+        "close": 0.75
+      },
+      "development_2023": {
+        "n": 43,
+        "wr": 48.84,
+        "return_pct": -3.4991,
+        "dd_pct": 4.3103,
+        "max_loss_streak": 3,
+        "negative_months": 4,
+        "monthly_return_pct": {
+          "2023-02": -2.1997,
+          "2023-03": 0.8366,
+          "2023-04": 1.8136,
+          "2023-05": -1.8493,
+          "2023-06": -1.4135,
+          "2023-07": -0.6756
+        },
+        "active_days": 38,
+        "trades_per_calendar_day": 0.235,
+        "trades_per_active_day": 1.132,
+        "max_entries_same_rolling_hour": 2,
+        "max_entries_same_clock_hour": 2,
+        "by_source_count": {
+          "historical_fvg": 43
+        },
+        "by_module_count": {
+          "historical_fvg": 43
+        },
+        "coverage_days": 183,
+        "mean_signed_price_return_pct": -0.271988,
+        "mean_winning_price_move_pct": 1.054811,
+        "economic_gate": {
+          "n": 43,
+          "margin_fraction": 0.03,
+          "leverage": 10.0,
+          "observed_trades_per_day": 0.235,
+          "required_trades_per_day": 3.0,
+          "calendar_days_per_month": 30,
+          "monthly_target_pct": 30.0,
+          "mean_signed_price_return_pct": -0.271988,
+          "required_constant_signed_price_return_pct": 0.973137,
+          "projected_monthly_return_pct": -0.5823,
+          "frequency_pass": false,
+          "return_pass": false,
+          "passes": false,
+          "interpretation": "diagnostic projection from observed geometric trade return; not a forecast"
+        }
+      }
+    },
+    {
+      "config": {
+        "name": "wick20_close60",
+        "wick": 0.2,
+        "close": 0.6
+      },
+      "development_2023": {
+        "n": 137,
+        "wr": 53.28,
+        "return_pct": -5.572,
+        "dd_pct": 6.312,
+        "max_loss_streak": 5,
+        "negative_months": 4,
+        "monthly_return_pct": {
+          "2023-01": 0.0759,
+          "2023-02": -3.3103,
+          "2023-03": 1.138,
+          "2023-04": 1.1261,
+          "2023-05": -1.0379,
+          "2023-06": -3.0859,
+          "2023-07": -0.515
+        },
+        "active_days": 85,
+        "trades_per_calendar_day": 0.749,
+        "trades_per_active_day": 1.612,
+        "max_entries_same_rolling_hour": 2,
+        "max_entries_same_clock_hour": 2,
+        "by_source_count": {
+          "historical_fvg": 137
+        },
+        "by_module_count": {
+          "historical_fvg": 137
+        },
+        "coverage_days": 183,
+        "mean_signed_price_return_pct": -0.135652,
+        "mean_winning_price_move_pct": 0.978108,
+        "economic_gate": {
+          "n": 137,
+          "margin_fraction": 0.03,
+          "leverage": 10.0,
+          "observed_trades_per_day": 0.749,
+          "required_trades_per_day": 3.0,
+          "calendar_days_per_month": 30,
+          "monthly_target_pct": 30.0,
+          "mean_signed_price_return_pct": -0.135652,
+          "required_constant_signed_price_return_pct": 0.973137,
+          "projected_monthly_return_pct": -0.9337,
+          "frequency_pass": false,
+          "return_pass": false,
+          "passes": false,
+          "interpretation": "diagnostic projection from observed geometric trade return; not a forecast"
+        }
+      }
+    },
+    {
+      "config": {
+        "name": "wick35_close60_volume15",
+        "wick": 0.35,
+        "close": 0.6,
+        "volume": 1.5
+      },
+      "development_2023": {
+        "n": 75,
+        "wr": 50.67,
+        "return_pct": -5.98,
+        "dd_pct": 6.5089,
+        "max_loss_streak": 5,
+        "negative_months": 6,
+        "monthly_return_pct": {
+          "2023-01": -0.7536,
+          "2023-02": -2.2123,
+          "2023-03": -0.8448,
+          "2023-04": -0.1302,
+          "2023-05": 0.6223,
+          "2023-06": -1.201,
+          "2023-07": -1.5932
+        },
+        "active_days": 56,
+        "trades_per_calendar_day": 0.41,
+        "trades_per_active_day": 1.339,
+        "max_entries_same_rolling_hour": 2,
+        "max_entries_same_clock_hour": 2,
+        "by_source_count": {
+          "historical_fvg": 75
+        },
+        "by_module_count": {
+          "historical_fvg": 75
+        },
+        "coverage_days": 183,
+        "mean_signed_price_return_pct": -0.27015,
+        "mean_winning_price_move_pct": 0.989321,
+        "economic_gate": {
+          "n": 75,
+          "margin_fraction": 0.03,
+          "leverage": 10.0,
+          "observed_trades_per_day": 0.41,
+          "required_trades_per_day": 3.0,
+          "calendar_days_per_month": 30,
+          "monthly_target_pct": 30.0,
+          "mean_signed_price_return_pct": -0.27015,
+          "required_constant_signed_price_return_pct": 0.973137,
+          "projected_monthly_return_pct": -1.0063,
+          "frequency_pass": false,
+          "return_pass": false,
+          "passes": false,
+          "interpretation": "diagnostic projection from observed geometric trade return; not a forecast"
+        }
+      }
+    },
+    {
+      "config": {
+        "name": "wick35_close60",
+        "wick": 0.35,
+        "close": 0.6
+      },
+      "development_2023": {
+        "n": 110,
+        "wr": 49.09,
+        "return_pct": -8.7647,
+        "dd_pct": 9.4283,
+        "max_loss_streak": 5,
+        "negative_months": 5,
+        "monthly_return_pct": {
+          "2023-01": 0.0759,
+          "2023-02": -4.1856,
+          "2023-03": -0.1663,
+          "2023-04": 1.2867,
+          "2023-05": -1.1068,
+          "2023-06": -3.5368,
+          "2023-07": -1.3619
+        },
+        "active_days": 72,
+        "trades_per_calendar_day": 0.601,
+        "trades_per_active_day": 1.528,
+        "max_entries_same_rolling_hour": 2,
+        "max_entries_same_clock_hour": 2,
+        "by_source_count": {
+          "historical_fvg": 110
+        },
+        "by_module_count": {
+          "historical_fvg": 110
+        },
+        "coverage_days": 183,
+        "mean_signed_price_return_pct": -0.273595,
+        "mean_winning_price_move_pct": 1.004206,
+        "economic_gate": {
+          "n": 110,
+          "margin_fraction": 0.03,
+          "leverage": 10.0,
+          "observed_trades_per_day": 0.601,
+          "required_trades_per_day": 3.0,
+          "calendar_days_per_month": 30,
+          "monthly_target_pct": 30.0,
+          "mean_signed_price_return_pct": -0.273595,
+          "required_constant_signed_price_return_pct": 0.973137,
+          "projected_monthly_return_pct": -1.4897,
+          "frequency_pass": false,
+          "return_pass": false,
+          "passes": false,
+          "interpretation": "diagnostic projection from observed geometric trade return; not a forecast"
+        }
+      }
+    },
+    {
+      "config": {
+        "name": "wick35_close60_bos3",
+        "wick": 0.35,
+        "close": 0.6,
+        "bos_age": 3
+      },
+      "development_2023": {
+        "n": 85,
+        "wr": 47.06,
+        "return_pct": -9.729,
+        "dd_pct": 10.3532,
+        "max_loss_streak": 6,
+        "negative_months": 5,
+        "monthly_return_pct": {
+          "2023-01": 0.14,
+          "2023-02": -4.1872,
+          "2023-03": -2.5246,
+          "2023-04": 0.3034,
+          "2023-05": -0.5034,
+          "2023-06": -2.328,
+          "2023-07": -0.9789
+        },
+        "active_days": 60,
+        "trades_per_calendar_day": 0.464,
+        "trades_per_active_day": 1.417,
+        "max_entries_same_rolling_hour": 2,
+        "max_entries_same_clock_hour": 2,
+        "by_source_count": {
+          "historical_fvg": 85
+        },
+        "by_module_count": {
+          "historical_fvg": 85
+        },
+        "coverage_days": 183,
+        "mean_signed_price_return_pct": -0.397205,
+        "mean_winning_price_move_pct": 0.893863,
+        "economic_gate": {
+          "n": 85,
+          "margin_fraction": 0.03,
+          "leverage": 10.0,
+          "observed_trades_per_day": 0.464,
+          "required_trades_per_day": 3.0,
+          "calendar_days_per_month": 30,
+          "monthly_target_pct": 30.0,
+          "mean_signed_price_return_pct": -0.397205,
+          "required_constant_signed_price_return_pct": 0.973137,
+          "projected_monthly_return_pct": -1.661,
+          "frequency_pass": false,
+          "return_pass": false,
+          "passes": false,
+          "interpretation": "diagnostic projection from observed geometric trade return; not a forecast"
+        }
+      }
+    },
+    {
+      "config": {
+        "name": "wick50_close60",
+        "wick": 0.5,
+        "close": 0.6
+      },
+      "development_2023": {
+        "n": 84,
+        "wr": 44.05,
+        "return_pct": -10.3854,
+        "dd_pct": 10.4746,
+        "max_loss_streak": 6,
+        "negative_months": 6,
+        "monthly_return_pct": {
+          "2023-01": -1.1143,
+          "2023-02": -4.2673,
+          "2023-03": -1.0129,
+          "2023-04": 1.398,
+          "2023-05": -2.2326,
+          "2023-06": -2.3531,
+          "2023-07": -1.2076
+        },
+        "active_days": 60,
+        "trades_per_calendar_day": 0.459,
+        "trades_per_active_day": 1.4,
+        "max_entries_same_rolling_hour": 2,
+        "max_entries_same_clock_hour": 2,
+        "by_source_count": {
+          "historical_fvg": 84
+        },
+        "by_module_count": {
+          "historical_fvg": 84
+        },
+        "coverage_days": 183,
+        "mean_signed_price_return_pct": -0.430733,
+        "mean_winning_price_move_pct": 0.921361,
+        "economic_gate": {
+          "n": 84,
+          "margin_fraction": 0.03,
+          "leverage": 10.0,
+          "observed_trades_per_day": 0.459,
+          "required_trades_per_day": 3.0,
+          "calendar_days_per_month": 30,
+          "monthly_target_pct": 30.0,
+          "mean_signed_price_return_pct": -0.430733,
+          "required_constant_signed_price_return_pct": 0.973137,
+          "projected_monthly_return_pct": -1.7794,
+          "frequency_pass": false,
+          "return_pass": false,
+          "passes": false,
+          "interpretation": "diagnostic projection from observed geometric trade return; not a forecast"
+        }
+      }
+    }
+  ],
+  "qualified_before_2025": 0,
+  "frozen_before_2025": null,
+  "exact_frozen_portfolio": null,
+  "objective_checks": null,
+  "sources": {
+    "reports\\audit_2026_09_08\\multiyear_taker_raw.csv": "6cecd14176fd417c911ca644edc4578c5ee20cdb84ccab6e1b33461999af170c",
+    "C:\\Users\\Lenovo\\Desktop\\telegram bot\\crypto_fvg_causal_stop_oct14_audit.py": "708a0403fe2f7bd29b81295fe2d16943ff88e88db7240ccadcf8b9d3815d8225",
+    "C:\\Users\\Lenovo\\Desktop\\telegram bot\\crypto_fvg_price_confirmation_oct15_audit.py": "dd0a8d094f8843b4577fae2073b01d0cf1f2d534b9ff588b5c95fd0b47e63a0f",
+    "backtest_cache\\AAVEUSDT_15min_18000_end1690761600000.pkl": "8ac5b0ea4c72017b291b2d12c3f622c3dc3a3be6a54b546c872d782dec7fefa7",
+    "backtest_cache\\ADAUSDT_15min_18000_end1690761600000.pkl": "de3d6b21bb0a9e1ea06c049617c0ed52c7c4d8fc89c02ea98532c0e69782a86f",
+    "backtest_cache\\AVAXUSDT_15min_18000_end1690761600000.pkl": "cb956201dc81c7541826e912ceb15f444a28af4a4c85c6ce2168c95525538277",
+    "backtest_cache\\BTCUSDT_15min_18000_end1690761600000.pkl": "57a415a1350f5bd6d966df45f6f553b2cd23aa15f8bb833481efb06cc4c7e00b",
+    "backtest_cache\\DOTUSDT_15min_18000_end1690761600000.pkl": "2dd0852ad800cf990eb2bc7b0a183ab9d811c54f36ceaac9860543bdebf2feb3",
+    "backtest_cache\\ETHUSDT_15min_18000_end1690761600000.pkl": "29df6d14fdc54cb2b95db32c986337fd8c65dedc89878a07d1c76853baefd149",
+    "backtest_cache\\LINKUSDT_15min_18000_end1690761600000.pkl": "3c48870c89cd383367bed376a99f9bc748b72621c09480be19c999b27ed65073",
+    "backtest_cache\\SOLUSDT_15min_18000_end1690761600000.pkl": "6cef1a0f4dc4e047b9e3dfd46a3184a457f30390ad9b2f612b78491a94d89d78",
+    "backtest_cache\\SUIUSDT_15min_18000_end1690761600000.pkl": "f4b0607c3b5358bcf7592a3b5d2132e061a6884e7fcfe2c542d0ee9aefb9704d",
+    "backtest_cache\\XLMUSDT_15min_18000_end1690761600000.pkl": "50656fb24398f46ab50acf7242f436e6c9b42f9e1cb1dfd03ffcec4c27b576b3",
+    "backtest_cache\\XRPUSDT_15min_18000_end1690761600000.pkl": "2cd00e089fb16fc6cf63f2c5fd1813e7432ddb03c48612759c00b89df2cc8df7",
+    "backtest_cache\\AAVEUSDT_15min_18000_end1722384000000.pkl": "15aa37791d6a69f49a0d3d8e5f7b726ca3342eb76d84a4f63ffeadc3add65f47",
+    "backtest_cache\\ADAUSDT_15min_18000_end1722384000000.pkl": "a742da3ac0c1ca99bdf866df8656cceccc05dc00f3d8e2574676c14b199a96c7",
+    "backtest_cache\\AVAXUSDT_15min_18000_end1722384000000.pkl": "d4a0a50b1793923e19e7d9ea948bdba0a0d3785457b5eb91b439dfc5e6c7301e",
+    "backtest_cache\\BTCUSDT_15min_18000_end1722384000000.pkl": "54d7ba0fcf6e3fa3cc5c483ffabc29decbfc55d987fea499c66c115bdc8a9600",
+    "backtest_cache\\DOTUSDT_15min_18000_end1722384000000.pkl": "aa3866ecdef7f83a3e8e0dbc2a59781e6a9a83ea811033bcffdd93892477970a",
+    "backtest_cache\\ETHUSDT_15min_18000_end1722384000000.pkl": "2710207140ce83b2c59ee828591c7fdff82b0d7de6c82073583bf8a883074d93",
+    "backtest_cache\\LINKUSDT_15min_18000_end1722384000000.pkl": "62e274bd77ff9e2beb1dab678d032687829ee1e749609025112525835beaa71a",
+    "backtest_cache\\SOLUSDT_15min_18000_end1722384000000.pkl": "217903ed33601626307eadf875af4dd9c34be2c36da6b93a205b424c52d80af2",
+    "backtest_cache\\SUIUSDT_15min_18000_end1722384000000.pkl": "6e8e4218bdac6c3516cd0e66995f6188510dcbc5a0e719226955eb4f12275a4a",
+    "backtest_cache\\XLMUSDT_15min_18000_end1722384000000.pkl": "f39352e274ead4ac15ef3513c4be39c4762fa9c2ac3f0ffdf93e64881a99dd7f",
+    "backtest_cache\\XRPUSDT_15min_18000_end1722384000000.pkl": "e3a93bdd23f18b936c3dbafff53c1e2a780b9d3f82633daf7447c02eec193055",
+    "backtest_cache\\AAVEUSDT_15min_18000_end1753920000000.pkl": "2267edf0c78f49978397bbc35eba82e2a3efaab98e38498d2982259eee83e89a",
+    "backtest_cache\\ADAUSDT_15min_18000_end1753920000000.pkl": "c6e8b19e1fe62a35775ae6212b0077d8213f7ccae2f8f6d22998fc89ab98d4c4",
+    "backtest_cache\\AVAXUSDT_15min_18000_end1753920000000.pkl": "42f196e3b7b85f177c65424df2bdd6d039867d7ee1486a54d8030e379a889b5e",
+    "backtest_cache\\BTCUSDT_15min_18000_end1753920000000.pkl": "45c2c1c476e0f5c25a95e92b3cfef62fba51a83e0583f912c60869bf526ec7fe",
+    "backtest_cache\\DOTUSDT_15min_18000_end1753920000000.pkl": "e0a1ef66415cc79ac882092ff2ddc19b5c85b6caa88307eac0850d5682c847f1",
+    "backtest_cache\\ETHUSDT_15min_18000_end1753920000000.pkl": "fa39de96a7a0e2ba4cb4ba29c50313ed34d76d998ae45f2abcc7a3cd34bb5c6e",
+    "backtest_cache\\LINKUSDT_15min_18000_end1753920000000.pkl": "7d7f5bdaa54e386971560d20a0bdce96785e3547c73181b2d8bf0c409afce2da",
+    "backtest_cache\\SOLUSDT_15min_18000_end1753920000000.pkl": "8613ed6259d6eaf89d2da16be633f6beb07aa34dcadf7ce64841ed09fd0aa2e2",
+    "backtest_cache\\SUIUSDT_15min_18000_end1753920000000.pkl": "2e952da6d734e20ee7e8ffdd17417c99bac13341354f12f73aab34ca346cfa69",
+    "backtest_cache\\XLMUSDT_15min_18000_end1753920000000.pkl": "e15dbf286577e84cce8c4f47fdc40b68f45a94a01042452f89a56a265e9a6b83",
+    "backtest_cache\\XRPUSDT_15min_18000_end1753920000000.pkl": "39a373e3bd1607a0a8fcc62028bde775cb16050752d80f8dba7049996c26cb81",
+    "backtest_cache\\AAVEUSDT_15min_18000_end1787702400000.pkl": "02dc56b729a039871d69cec07be221a12e7ca72876cde44e49eaf9badbac7dd1",
+    "backtest_cache\\ADAUSDT_15min_18000_end1787702400000.pkl": "e53cd4ac5531f17b843df39ec5231b72e60eb9f55c299ef86327c450e2f5421c",
+    "backtest_cache\\AVAXUSDT_15min_18000_end1787702400000.pkl": "05a7752b4bfcb03d8cfc7f41cd8cbcd2603a22e76e41ea6b402c1f57a4df2a63",
+    "backtest_cache\\BILLUSDT_15min_18000_end1787702400000.pkl": "edfba9d01682adb9370962106784be546da63486a8541eac4268a13e5062b627",
+    "backtest_cache\\BTCUSDT_15min_18000_end1787702400000.pkl": "0d15f3bd91e6067d5be4a3c74e76dcb02d2127f2b4e2d2a202af5efcfbeab48d",
+    "backtest_cache\\DOTUSDT_15min_18000_end1787702400000.pkl": "5fda36dd1557a4b5dca54103a5854a6ad198cf7af3b03e100f7c35ce7c40518a",
+    "backtest_cache\\ETHUSDT_15min_18000_end1787702400000.pkl": "48a43a30e063c2b6fcc628cbacafc06c312b8920de60a1e0cb1da269a6bbfc40",
+    "backtest_cache\\HYPEUSDT_15min_18000_end1787702400000.pkl": "dfbb034d1ec83e91dcd15dcc1fa4e741d4e8e3f22da5b88937f78a167981bc23",
+    "backtest_cache\\LABUSDT_15min_18000_end1787702400000.pkl": "e6eea76dbc97b9e80f37a7bd1a404904d65aaafbb467abdeaba78f1b7a108a57",
+    "backtest_cache\\LINKUSDT_15min_18000_end1787702400000.pkl": "9d5c5b30025d90d2095b0fb39f1fdd236b919abd4acabce0e097a6fa240c13e6",
+    "backtest_cache\\SEIUSDT_15min_18000_end1787702400000.pkl": "aef05d272b1cb6db43c4d5e9b1a290ab28d49dbcc8ff0bd9422b1f61984a47d4",
+    "backtest_cache\\SOLUSDT_15min_18000_end1787702400000.pkl": "185549ba3e0a2afb7bf8916fded893f3c6889006a999347125372ab7d60800ce",
+    "backtest_cache\\SUIUSDT_15min_18000_end1787702400000.pkl": "89a44e61c3d2dab96a915761a76641c07ea3e65f72749f65e511c960549a6bed",
+    "backtest_cache\\TAOUSDT_15min_18000_end1787702400000.pkl": "9fbfb7097969305450622dd0b5007d7fa0be38a8e04970b10c0debbd2fd73471",
+    "backtest_cache\\XLMUSDT_15min_18000_end1787702400000.pkl": "c848c238ac672887ec72afef0c3faaa2f580bf12b6a22bb731523b188198f037",
+    "backtest_cache\\XRPUSDT_15min_18000_end1787702400000.pkl": "94db6fd0ae529d2a724c43ca43e221dc120ca6ee9c5d8dc6a4131e679c00921f",
+    "backtest_cache\\ZECUSDT_15min_18000_end1787702400000.pkl": "f9a782022945a379af0fa3d8977643e98e13520b05183b908988ce6464a9e5a6"
+  },
+  "limitations": [
+    "The underlying FVG generator predates this filter audit.",
+    "Binance spot candles are a structural proxy, not OKX X-Perp fills.",
+    "Closed-bar confirmation can filter entries but cannot add frequency."
+  ]
+}
