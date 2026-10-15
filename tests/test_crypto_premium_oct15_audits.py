@@ -6,6 +6,8 @@ import pandas as pd
 import crypto_premium_dislocation_oct15_audit as premium
 import crypto_premium_exit_geometry_oct15_audit as geometry
 import crypto_futures_funding_regime_oct6_audit as funding
+import crypto_btc_bookdepth_router_oct15_audit as bookdepth_audit
+import download_crypto_btc_bookdepth_history as bookdepth_download
 
 
 class PremiumAuditCausalityTests(unittest.TestCase):
@@ -52,6 +54,25 @@ class PremiumAuditCausalityTests(unittest.TestCase):
         self.assertEqual(exits[0], 300)
         self.assertEqual(hits[0], 0)
         self.assertEqual(reasons[0], 0)
+
+    def test_bookdepth_epoch_conversion_is_resolution_independent(self):
+        expected = np.array([1672531200, 1672531500], dtype=np.int64)
+        for unit in ("s", "ms", "us", "ns"):
+            index = pd.DatetimeIndex(expected, dtype=f"datetime64[{unit}]")
+            # Construction above interprets integers in the requested unit;
+            # normalize the same instants explicitly for the lower resolutions.
+            if unit != "s":
+                scale = {"ms": 1_000, "us": 1_000_000, "ns": 1_000_000_000}[unit]
+                index = pd.DatetimeIndex(expected*scale, dtype=f"datetime64[{unit}]")
+            np.testing.assert_array_equal(
+                bookdepth_download.epoch_seconds(index), expected)
+
+    def test_bookdepth_stale_counter_resets_on_time_gap(self):
+        values = pd.Series([10.0, 10.0, 10.0, 10.0])
+        times = pd.Series([0, 300, 600, 1200])
+        np.testing.assert_array_equal(
+            bookdepth_audit.consecutive_same(values, times).to_numpy(),
+            np.array([0, 1, 2, 0]))
 
 
 if __name__ == "__main__":
