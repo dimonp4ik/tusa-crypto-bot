@@ -11,7 +11,8 @@ def test_material_price_move_ranges_are_enforced():
 
 
 def test_profit_first_grid_keeps_most_size_for_runner():
-    assert min(audit.FRACTIONS) == .10
+    assert min(audit.FRACTIONS) == 0
+    assert .05 in audit.FRACTIONS
     assert .30 in audit.FRACTIONS
 
 
