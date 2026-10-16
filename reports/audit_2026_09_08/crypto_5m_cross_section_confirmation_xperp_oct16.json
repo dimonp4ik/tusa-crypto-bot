@@ -1,0 +1,114 @@
+{
+  "candidate_signals_all_source_history": 5050,
+  "decision": "Do not change runtime. A positive transfer only preserves this variant as a shadow candidate; a new untouched time window is still required.",
+  "mapped_overlap_signals": 116,
+  "objective_checks": {
+    "at_least_3_calendar_trades_per_day": false,
+    "drawdown_at_most_5pct": true,
+    "no_negative_months": true,
+    "return_at_least_30pct_per_month": false,
+    "win_rate_75_to_95": false
+  },
+  "overlap_end": 1790780400,
+  "overlap_start": 1786140000,
+  "paired_raw_outcomes": {
+    "literal_target_agreement_pct": 93.9655,
+    "mean_xperp_minus_source_bps": -2.3128,
+    "n": 116,
+    "positive_sign_agreement_pct": 93.1034,
+    "source_mean_signed_price_return_pct": 0.128113,
+    "xperp_mean_signed_price_return_pct": 0.104985
+  },
+  "protocol": {
+    "execution_transfer": "native OKX X-Perp next 5m market open",
+    "exit": "0.5% literal target, 1.0% stop, stop-first, 24 bars",
+    "important": "The variant was derived after viewing 2025-2026 source outcomes; this is cross-venue transfer, not untouched forward validation.",
+    "portfolio": "shared causal runtime gate, 3% current-equity margin, 10x",
+    "signal_features": "frozen Binance futures archive through 2026-09-30"
+  },
+  "ready_for_live_orders": false,
+  "source_accepted_entries": 105,
+  "source_exact_portfolio": {
+    "active_days": 41,
+    "by_module_count": {
+      "cross_section_oi": 105
+    },
+    "by_source_count": {
+      "cross_section_oi": 105
+    },
+    "dd_pct": 1.3813,
+    "max_entries_same_clock_hour": 2,
+    "max_entries_same_rolling_hour": 2,
+    "max_loss_streak": 4,
+    "monthly_return_pct": {
+      "2026-08": 0.8203,
+      "2026-09": 3.1419
+    },
+    "n": 105,
+    "negative_months": 0,
+    "return_pct": 3.988,
+    "trades_per_active_day": 2.561,
+    "trades_per_calendar_day": 1.909,
+    "wr": 69.52
+  },
+  "sources": {
+    "C:\\Users\\Lenovo\\Desktop\\telegram bot\\crypto_5m_cross_section_confirmation_oct14_audit.py": "8c6e396a64b34b9c01ab2babd1a90b1a0449102cf2bd418c185d1b518ab22a34",
+    "C:\\Users\\Lenovo\\Desktop\\telegram bot\\crypto_5m_cross_section_confirmation_xperp_oct16_audit.py": "6b8d4fd49e98abeb3b77e3d3ce7cae8e96918b94b634e5692f668a61acbb1b59",
+    "C:\\Users\\Lenovo\\Desktop\\telegram bot\\crypto_5m_cross_section_oi_router_oct14_audit.py": "86091943172931ad853c4e10b479e900c4a97a4cd9cd54cc272b142057b23239",
+    "C:\\Users\\Lenovo\\Desktop\\telegram bot\\crypto_5m_cross_section_regime_oct14_audit.py": "a2d368a645605f1c11898f347f1bbf5f0f899580387dd5666ae954c4f8d646cf",
+    "C:\\Users\\Lenovo\\Desktop\\telegram bot\\src\\research_crypto_replay.py": "0c2b72c0cc139a6f9caa38fb1e8fed8b47f4c7e1d48a47282e17e2033bb1a612",
+    "reports\\audit_2026_09_08\\crypto_futures_flow_history\\AAVEUSDT_flow_5min_2020_2026.pkl": "81a417ec745175073535e88db8d9ae9f187b54680d32965200a2de4a48df48ce",
+    "reports\\audit_2026_09_08\\crypto_futures_flow_history\\AVAXUSDT_flow_5min_2020_2026.pkl": "39a4e101743797cd980e6bd13c9f1df40eba4394dd846bb64354b672176ab1fd",
+    "reports\\audit_2026_09_08\\crypto_futures_flow_history\\BTCUSDT_flow_5min_2020_2026.pkl": "44981189752b5891786a90499813b247e81b33fab505101070c6e79487d4b8a0",
+    "reports\\audit_2026_09_08\\crypto_futures_flow_history\\ETHUSDT_flow_5min_2020_2026.pkl": "758b13adea9709b46073e264898ad383f8283aa838a496b1ab6f6406c7d14dad",
+    "reports\\audit_2026_09_08\\crypto_futures_flow_history\\LINKUSDT_flow_5min_2020_2026.pkl": "89b7fb7909826589d5af7c79693f0f25f7c09792e2e3992c63ea31df1ccb13df",
+    "reports\\audit_2026_09_08\\crypto_futures_flow_history\\SOLUSDT_flow_5min_2020_2026.pkl": "3d803a9339a224e1763b1ff5df22c0a63b289c7f0d6d1ea5cab5a6de7064665c",
+    "reports\\audit_2026_09_08\\crypto_futures_flow_history\\XLMUSDT_flow_5min_2020_2026.pkl": "aefb7866141c82f236531429e67465ddf645960d8fb802b5efb70b986d42db9d",
+    "reports\\audit_2026_09_08\\crypto_futures_flow_history\\XRPUSDT_flow_5min_2020_2026.pkl": "65cd3b6b099dd96df1d5a17c6b10d88478f46cda5ad128da7e962a7750d092f0",
+    "reports\\audit_2026_09_08\\crypto_futures_flow_history\\manifest.json": "5df6f6730e8a36366c7a4941f22736535282fc7a95a3931df84bd6b0cdf4f5d6",
+    "reports\\audit_2026_09_08\\crypto_futures_metrics_history\\AAVEUSDT_metrics_2022_2026.pkl": "46e15fd58495d1de0e985368e8d192c4676b6d16734fbbb50d3df5645e32611d",
+    "reports\\audit_2026_09_08\\crypto_futures_metrics_history\\AVAXUSDT_metrics_2022_2026.pkl": "a6589b9630b39de426e271d63af774b66a6a1935eb8fee62e4c7d34082e84a6b",
+    "reports\\audit_2026_09_08\\crypto_futures_metrics_history\\BTCUSDT_metrics_2022_2026.pkl": "d1ed0fa5bf771dc91496cfd36a462a0fea8d4282f1d639dfc93a6d10598d486e",
+    "reports\\audit_2026_09_08\\crypto_futures_metrics_history\\ETHUSDT_metrics_2022_2026.pkl": "2d46fc2795d99c07e71972829bc3a04147f9740030f5fcb4f4c8260ba47c5f54",
+    "reports\\audit_2026_09_08\\crypto_futures_metrics_history\\LINKUSDT_metrics_2022_2026.pkl": "682306371323ef92c6a95d6e3f8c25ab2cbadd26f6f40f2c49d9c1722e463cc1",
+    "reports\\audit_2026_09_08\\crypto_futures_metrics_history\\SOLUSDT_metrics_2022_2026.pkl": "82bb3c32536f80e8e8a0cdc2f70483cb37ed8974d86f1f8a0c22a597c0f6af17",
+    "reports\\audit_2026_09_08\\crypto_futures_metrics_history\\XLMUSDT_metrics_2022_2026.pkl": "f2d92a9a34e999772efedbe931e473252724f4f752093406b8f47fe8e63d703b",
+    "reports\\audit_2026_09_08\\crypto_futures_metrics_history\\XRPUSDT_metrics_2022_2026.pkl": "e56e84487cb1c8985abac6bf7269369d59b8a836b343cef7057d4b84e1c26930",
+    "reports\\audit_2026_09_08\\crypto_futures_metrics_history\\manifest.json": "27ad65fe8a36af4153219e463e92bebc134de6d0fc7167be06fb1edf43dd6894",
+    "reports\\audit_2026_09_08\\xperp_5m_oct16_forward\\AAVEUSDT_5min_current.pkl": "ec640d512af40fb0127912b2b6152753701437aa3c58d6f741e74734935d1e1b",
+    "reports\\audit_2026_09_08\\xperp_5m_oct16_forward\\AVAXUSDT_5min_current.pkl": "0279d7f3fa63de6b1adf546ff34edfc3e8dff8ef42f4b2ef55b732e5f8a2c567",
+    "reports\\audit_2026_09_08\\xperp_5m_oct16_forward\\BTCUSDT_5min_current.pkl": "dcb52fc04edd4273a34a3f2036955238d22de58f8a0e328c6aaccb5eb2d59c15",
+    "reports\\audit_2026_09_08\\xperp_5m_oct16_forward\\ETHUSDT_5min_current.pkl": "1599b6547a5d94d11c38afda41804d5bcb29aab824f309ccbbb756d2953b5006",
+    "reports\\audit_2026_09_08\\xperp_5m_oct16_forward\\LINKUSDT_5min_current.pkl": "2ea760c5e1537e39f9ca99bc412bb1b47a8a9312a79bc3e3dece5e1d41ca6aa2",
+    "reports\\audit_2026_09_08\\xperp_5m_oct16_forward\\SOLUSDT_5min_current.pkl": "059a5f26d734fbaca706e9da01ef7b95f2cd157244dca42abaaf8fcabb5cb246",
+    "reports\\audit_2026_09_08\\xperp_5m_oct16_forward\\XLMUSDT_5min_current.pkl": "c650e4291be3e05f670fc4b69198710d4a24a04003148244237e711ce3182f11",
+    "reports\\audit_2026_09_08\\xperp_5m_oct16_forward\\XRPUSDT_5min_current.pkl": "b9db269329e5dde61f331c0450ae38216eefa871b84789d70d371758b354e89e",
+    "reports\\audit_2026_09_08\\xperp_5m_oct16_forward\\manifest.json": "fdb3f512f9f3881a7f2aed319bc70538f3784243614f59cf239397937f25abe7"
+  },
+  "status": "TRANSFER_COMPONENT",
+  "variant": "price_001_no_extreme",
+  "xperp_accepted_entries": 106,
+  "xperp_exact_portfolio": {
+    "active_days": 41,
+    "by_module_count": {
+      "cross_section_oi": 106
+    },
+    "by_source_count": {
+      "cross_section_oi": 106
+    },
+    "dd_pct": 1.0894,
+    "max_entries_same_clock_hour": 2,
+    "max_entries_same_rolling_hour": 2,
+    "max_loss_streak": 3,
+    "monthly_return_pct": {
+      "2026-08": 0.6108,
+      "2026-09": 3.6178
+    },
+    "n": 106,
+    "negative_months": 0,
+    "return_pct": 4.2507,
+    "trades_per_active_day": 2.585,
+    "trades_per_calendar_day": 1.927,
+    "wr": 71.7
+  }
+}

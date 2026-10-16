@@ -1,0 +1,129 @@
+{
+  "decision": "Keep as a shadow candidate only; the holdout is positive but too short and does not satisfy the requested frequency, win rate or return.",
+  "holdout_end": 1791968400,
+  "holdout_start": 1790839800,
+  "objective_checks": {
+    "at_least_3_calendar_trades_per_day": false,
+    "drawdown_at_most_5pct": true,
+    "no_negative_months": true,
+    "return_at_least_30pct_per_month": false,
+    "win_rate_75_to_95": false
+  },
+  "paired_holdout_signals": 22,
+  "paired_raw_outcomes": {
+    "literal_target_agreement_pct": 95.4545,
+    "mean_xperp_minus_source_bps": -0.9871,
+    "n": 22,
+    "positive_sign_agreement_pct": 95.4545,
+    "source_mean_signed_price_return_pct": 0.270842,
+    "xperp_mean_signed_price_return_pct": 0.260971
+  },
+  "protocol": {
+    "execution": "native OKX X-Perp next 5m market open",
+    "exit": "0.5% target, 1.0% stop, stop-first, 24 bars",
+    "holdout": "2026-10-01 through last complete Binance archive day",
+    "loaded_after_rule_was_frozen": true,
+    "portfolio": "causal shared rails; 3% current-equity margin; fixed 10x",
+    "qualification": "unseen archive holdout, not live-forward time after the rule was formulated"
+  },
+  "raw_holdout_signals": 22,
+  "ready_for_live_orders": false,
+  "selection_provenance": {
+    "frozen_commit": "a364f80",
+    "frozen_report": "reports\\audit_2026_09_08\\crypto_5m_cross_section_confirmation_oct14.json",
+    "selection_data_ended": "2026-09-30",
+    "variant": "price_001_no_extreme"
+  },
+  "source_exact_portfolio": {
+    "active_days": 11,
+    "by_module_count": {
+      "cross_section_oi": 21
+    },
+    "by_source_count": {
+      "cross_section_oi": 21
+    },
+    "dd_pct": 0.2944,
+    "max_entries_same_clock_hour": 2,
+    "max_entries_same_rolling_hour": 2,
+    "max_loss_streak": 2,
+    "monthly_return_pct": {
+      "2026-10": 1.6491
+    },
+    "n": 21,
+    "negative_months": 0,
+    "return_pct": 1.6491,
+    "trades_per_active_day": 1.909,
+    "trades_per_calendar_day": 1.5,
+    "wr": 71.43
+  },
+  "sources": {
+    "C:\\Users\\Lenovo\\Desktop\\telegram bot\\crypto_5m_cross_section_confirmation_holdout_oct16_audit.py": "85cea9501405694dfc7a152b0244a23e834eecdc5630d52c3977a1ef36601000",
+    "reports\\audit_2026_09_08\\crypto_futures_flow_history\\AAVEUSDT_flow_5min_2020_2026.pkl": "81a417ec745175073535e88db8d9ae9f187b54680d32965200a2de4a48df48ce",
+    "reports\\audit_2026_09_08\\crypto_futures_flow_history\\AVAXUSDT_flow_5min_2020_2026.pkl": "39a4e101743797cd980e6bd13c9f1df40eba4394dd846bb64354b672176ab1fd",
+    "reports\\audit_2026_09_08\\crypto_futures_flow_history\\BTCUSDT_flow_5min_2020_2026.pkl": "44981189752b5891786a90499813b247e81b33fab505101070c6e79487d4b8a0",
+    "reports\\audit_2026_09_08\\crypto_futures_flow_history\\ETHUSDT_flow_5min_2020_2026.pkl": "758b13adea9709b46073e264898ad383f8283aa838a496b1ab6f6406c7d14dad",
+    "reports\\audit_2026_09_08\\crypto_futures_flow_history\\LINKUSDT_flow_5min_2020_2026.pkl": "89b7fb7909826589d5af7c79693f0f25f7c09792e2e3992c63ea31df1ccb13df",
+    "reports\\audit_2026_09_08\\crypto_futures_flow_history\\SOLUSDT_flow_5min_2020_2026.pkl": "3d803a9339a224e1763b1ff5df22c0a63b289c7f0d6d1ea5cab5a6de7064665c",
+    "reports\\audit_2026_09_08\\crypto_futures_flow_history\\XLMUSDT_flow_5min_2020_2026.pkl": "aefb7866141c82f236531429e67465ddf645960d8fb802b5efb70b986d42db9d",
+    "reports\\audit_2026_09_08\\crypto_futures_flow_history\\XRPUSDT_flow_5min_2020_2026.pkl": "65cd3b6b099dd96df1d5a17c6b10d88478f46cda5ad128da7e962a7750d092f0",
+    "reports\\audit_2026_09_08\\crypto_futures_flow_history\\manifest.json": "5df6f6730e8a36366c7a4941f22736535282fc7a95a3931df84bd6b0cdf4f5d6",
+    "reports\\audit_2026_09_08\\crypto_futures_metrics_history\\AAVEUSDT_metrics_2022_2026.pkl": "46e15fd58495d1de0e985368e8d192c4676b6d16734fbbb50d3df5645e32611d",
+    "reports\\audit_2026_09_08\\crypto_futures_metrics_history\\AVAXUSDT_metrics_2022_2026.pkl": "a6589b9630b39de426e271d63af774b66a6a1935eb8fee62e4c7d34082e84a6b",
+    "reports\\audit_2026_09_08\\crypto_futures_metrics_history\\BTCUSDT_metrics_2022_2026.pkl": "d1ed0fa5bf771dc91496cfd36a462a0fea8d4282f1d639dfc93a6d10598d486e",
+    "reports\\audit_2026_09_08\\crypto_futures_metrics_history\\ETHUSDT_metrics_2022_2026.pkl": "2d46fc2795d99c07e71972829bc3a04147f9740030f5fcb4f4c8260ba47c5f54",
+    "reports\\audit_2026_09_08\\crypto_futures_metrics_history\\LINKUSDT_metrics_2022_2026.pkl": "682306371323ef92c6a95d6e3f8c25ab2cbadd26f6f40f2c49d9c1722e463cc1",
+    "reports\\audit_2026_09_08\\crypto_futures_metrics_history\\SOLUSDT_metrics_2022_2026.pkl": "82bb3c32536f80e8e8a0cdc2f70483cb37ed8974d86f1f8a0c22a597c0f6af17",
+    "reports\\audit_2026_09_08\\crypto_futures_metrics_history\\XLMUSDT_metrics_2022_2026.pkl": "f2d92a9a34e999772efedbe931e473252724f4f752093406b8f47fe8e63d703b",
+    "reports\\audit_2026_09_08\\crypto_futures_metrics_history\\XRPUSDT_metrics_2022_2026.pkl": "e56e84487cb1c8985abac6bf7269369d59b8a836b343cef7057d4b84e1c26930",
+    "reports\\audit_2026_09_08\\crypto_futures_metrics_history\\manifest.json": "27ad65fe8a36af4153219e463e92bebc134de6d0fc7167be06fb1edf43dd6894",
+    "reports\\audit_2026_09_08\\crypto_futures_oct16_holdout\\AAVEUSDT_flow_5m_holdout.pkl": "656f078958dfe51bbd8d028460a9191045589c73a66d5f8d2f364d660c8f349b",
+    "reports\\audit_2026_09_08\\crypto_futures_oct16_holdout\\AAVEUSDT_metrics_holdout.pkl": "2ae42aa5e81b0d37fb929e884070a108acd06c623d7d69e9e0f616ac1c7d8c7d",
+    "reports\\audit_2026_09_08\\crypto_futures_oct16_holdout\\AVAXUSDT_flow_5m_holdout.pkl": "3fc5da89a476e3aca9015bb02f901fa9c92fcc8a568f68a9ed8fdf3d270f83c4",
+    "reports\\audit_2026_09_08\\crypto_futures_oct16_holdout\\AVAXUSDT_metrics_holdout.pkl": "1a74a6b4f930ea8c2b217581ff009460bac9aa508e984414850e70f6f9b86d5a",
+    "reports\\audit_2026_09_08\\crypto_futures_oct16_holdout\\BTCUSDT_flow_5m_holdout.pkl": "1acf0a0a60b144c292c5c3b36042e4d24f1b4613b65fda0aed6fb23e38dfefb7",
+    "reports\\audit_2026_09_08\\crypto_futures_oct16_holdout\\BTCUSDT_metrics_holdout.pkl": "e6c553fd9d569c447aaa51d381d93edce3dcaeb225133e4f90155c475b2df4e6",
+    "reports\\audit_2026_09_08\\crypto_futures_oct16_holdout\\ETHUSDT_flow_5m_holdout.pkl": "e7d60609f338f390a02c2561dd1b3955422aa4e5bda0c1cc03237b3f20176623",
+    "reports\\audit_2026_09_08\\crypto_futures_oct16_holdout\\ETHUSDT_metrics_holdout.pkl": "aa1d1201d11660aabb143ee3bdef1febf140bf22747d273fc6ef8c09f8f47faa",
+    "reports\\audit_2026_09_08\\crypto_futures_oct16_holdout\\LINKUSDT_flow_5m_holdout.pkl": "425897fc2dfe3612185008054e9b513b7d1d80bfbcd39a60eea869312dc21c98",
+    "reports\\audit_2026_09_08\\crypto_futures_oct16_holdout\\LINKUSDT_metrics_holdout.pkl": "336ff686a55e199c3550a7c0611d853b6e69464d903f96c8b4027a6db2db861b",
+    "reports\\audit_2026_09_08\\crypto_futures_oct16_holdout\\SOLUSDT_flow_5m_holdout.pkl": "cc3b8a445360fe90ade2d2668666bdf8f4796e882aa4837bb9b9c6468c7e0ef8",
+    "reports\\audit_2026_09_08\\crypto_futures_oct16_holdout\\SOLUSDT_metrics_holdout.pkl": "7c5dfca8cadc706558f99f1f64fbeacd3b4b4de84ba724b071665813b18d945d",
+    "reports\\audit_2026_09_08\\crypto_futures_oct16_holdout\\XLMUSDT_flow_5m_holdout.pkl": "bc9f25e70ab157dad7415f83e2357e5095cd1d3a24506277e8b3726f753171ef",
+    "reports\\audit_2026_09_08\\crypto_futures_oct16_holdout\\XLMUSDT_metrics_holdout.pkl": "0465aa32b0d5fbd63d67c54b9a317241d774c2b134d78b6f8467a81a0a0c93a6",
+    "reports\\audit_2026_09_08\\crypto_futures_oct16_holdout\\XRPUSDT_flow_5m_holdout.pkl": "deb4027eb9338b4b8eb85504ae38c73e415d78acb1b350ef653e8ccf2c4afba9",
+    "reports\\audit_2026_09_08\\crypto_futures_oct16_holdout\\XRPUSDT_metrics_holdout.pkl": "09c8b0aacb6d93b26cf7ed4ac701b12f8b78b989edfe8b8f0aed5e0e9a9e83bf",
+    "reports\\audit_2026_09_08\\crypto_futures_oct16_holdout\\manifest.json": "27c4d92e7e392e703a3b1aaa94b8ffb4377071adef32fb5e9c836cc5946467a1",
+    "reports\\audit_2026_09_08\\xperp_5m_oct16_forward\\AAVEUSDT_5min_current.pkl": "ec640d512af40fb0127912b2b6152753701437aa3c58d6f741e74734935d1e1b",
+    "reports\\audit_2026_09_08\\xperp_5m_oct16_forward\\AVAXUSDT_5min_current.pkl": "0279d7f3fa63de6b1adf546ff34edfc3e8dff8ef42f4b2ef55b732e5f8a2c567",
+    "reports\\audit_2026_09_08\\xperp_5m_oct16_forward\\BTCUSDT_5min_current.pkl": "dcb52fc04edd4273a34a3f2036955238d22de58f8a0e328c6aaccb5eb2d59c15",
+    "reports\\audit_2026_09_08\\xperp_5m_oct16_forward\\ETHUSDT_5min_current.pkl": "1599b6547a5d94d11c38afda41804d5bcb29aab824f309ccbbb756d2953b5006",
+    "reports\\audit_2026_09_08\\xperp_5m_oct16_forward\\LINKUSDT_5min_current.pkl": "2ea760c5e1537e39f9ca99bc412bb1b47a8a9312a79bc3e3dece5e1d41ca6aa2",
+    "reports\\audit_2026_09_08\\xperp_5m_oct16_forward\\SOLUSDT_5min_current.pkl": "059a5f26d734fbaca706e9da01ef7b95f2cd157244dca42abaaf8fcabb5cb246",
+    "reports\\audit_2026_09_08\\xperp_5m_oct16_forward\\XLMUSDT_5min_current.pkl": "c650e4291be3e05f670fc4b69198710d4a24a04003148244237e711ce3182f11",
+    "reports\\audit_2026_09_08\\xperp_5m_oct16_forward\\XRPUSDT_5min_current.pkl": "b9db269329e5dde61f331c0450ae38216eefa871b84789d70d371758b354e89e",
+    "reports\\audit_2026_09_08\\xperp_5m_oct16_forward\\manifest.json": "fdb3f512f9f3881a7f2aed319bc70538f3784243614f59cf239397937f25abe7"
+  },
+  "status": "HOLDOUT_POSITIVE_LIMITED",
+  "xperp_exact_portfolio": {
+    "active_days": 11,
+    "by_module_count": {
+      "cross_section_oi": 21
+    },
+    "by_source_count": {
+      "cross_section_oi": 21
+    },
+    "dd_pct": 0.2812,
+    "max_entries_same_clock_hour": 2,
+    "max_entries_same_rolling_hour": 2,
+    "max_loss_streak": 2,
+    "monthly_return_pct": {
+      "2026-10": 1.5831
+    },
+    "n": 21,
+    "negative_months": 0,
+    "return_pct": 1.5831,
+    "trades_per_active_day": 1.909,
+    "trades_per_calendar_day": 1.5,
+    "wr": 66.67
+  }
+}
