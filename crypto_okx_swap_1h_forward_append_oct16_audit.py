@@ -230,11 +230,12 @@ def stop_cause_diagnostics(prior_rows: list[dict], fresh_rows: list[dict]) -> di
             if losers else None,
         },
         "interpretation": (
-            "Five of the eight fresh stops came from pullbacks whose frozen 168h "
-            "direction opposed the most recent 24h return. The same mismatch was "
-            "profitable before the append, so this is evidence of regime drift, not "
-            "a validated support/resistance or liquidity filter. Fresh winners had "
-            "higher volume on average, but the sample is too small to freeze a gate."),
+            f"{len(fresh_mismatch)} of the {len(losers)} fresh stops came from "
+            "pullbacks whose frozen 168h direction opposed the most recent 24h "
+            "return. The same mismatch was profitable before the append, so this "
+            "is evidence of regime drift, not a validated support/resistance or "
+            "liquidity filter. Fresh winners had higher volume on average, but the "
+            "sample is too small to freeze a gate."),
     }
 
 
