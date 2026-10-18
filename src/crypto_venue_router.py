@@ -147,6 +147,7 @@ def btc_context(candles: dict) -> dict | None:
         "btc_eff20": abs(recent[-1] - recent[0]) / movement20,
         "btc_eff96": abs(slow[-1] - slow[0]) / movement96,
         "btc_return20_atr": (recent[-1] - recent[0]) / atr,
+        "btc_z20": (recent[-1] - fast_mean) / deviation,
         "btc_return96_atr": (slow[-1] - slow[0]) / atr,
         "btc_atr_pct": atr / recent[-1],
     }

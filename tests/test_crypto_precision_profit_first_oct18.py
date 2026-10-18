@@ -43,3 +43,17 @@ def test_direct_target_paths_reject_duplicate_signal(tmp_path, monkeypatch):
 
     with pytest.raises(ValueError, match="duplicate signal identities"):
         audit.direct_frame()
+
+
+def test_canonical_history_assigns_overlap_to_later_period():
+    rows = _far_rows()
+    earlier = rows.iloc[[0]].assign(period="2021h2")
+    later = rows.iloc[[0]].assign(period="2022h1")
+    unique = rows.iloc[[1]].assign(period="2021h2")
+
+    result = audit.canonical_history(pd.concat(
+        [later, unique, earlier], ignore_index=True))
+
+    overlap = result[result.symbol.eq("BTCUSDT")]
+    assert overlap.period.tolist() == ["2022h1"]
+    assert result.attrs["duplicate_rows_removed"] == 1

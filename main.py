@@ -1,8 +1,8 @@
 """Crypto paper-trading bot driven by frozen direct-venue strategies.
 
-Every scan loads the audited symbols from X-Perp, evaluates the seven frozen
-deterministic modules plus the frozen one-hour shadow model, and publishes
-market-entry paper signals. This deployment cannot open an order.
+Every shadow scan loads the audited symbols from X-Perp, evaluates the frozen
+15-minute profit-first precision model, and publishes market-entry paper
+signals. This deployment cannot open an order.
 """
 
 import json
@@ -51,6 +51,9 @@ from src.crypto_5m_oi_shadow_router import (
 from src.crypto_okx_1h_shadow_router import (
     SUPPORTED_SYMBOLS as HOURLY_HGB_SYMBOLS,
     shadow_setups as hourly_hgb_shadow_setups,
+)
+from src.crypto_precision_profit_first_shadow import (
+    shadow_setups as precision_profit_first_shadow_setups,
 )
 from src.telegram_notifier import (
     send_signal, send_status, send_signal_update, send_morning_digest, send_weekly_digest,
@@ -651,7 +654,7 @@ def health():
 
 @app.route("/status")
 def status():
-    return (f"Mode: {DEPLOYMENT_MODE}. Strategy: venue filters. "
+    return (f"Mode: {DEPLOYMENT_MODE}. Strategy: frozen 15m profit-first HGB. "
             f"Scanning every {SCAN_INTERVAL_MINUTES} min. "
             f"Max signals/scan: {VENUE_MAX_SIGNALS_PER_SCAN}. "
             f"Signal cache: {len(_signal_cache)} entries."), 200
@@ -680,7 +683,7 @@ _GROUP_ADMIN_KB = _ADMIN_KB
 
 _ADMIN_KEYBOARD = {"inline_keyboard": [
     [{"text": "📊 Paper-торговля", "callback_data": "adm_sec_trading"},
-     {"text": "🧩 Фильтры", "callback_data": "adm_sec_settings"}],
+     {"text": "🧩 Стратегия", "callback_data": "adm_sec_settings"}],
     [{"text": "📈 Аналитика", "callback_data": "adm_sec_analytics"},
      {"text": "👥 Люди", "callback_data": "adm_sec_people"}],
 ]}
@@ -694,7 +697,7 @@ _KB_TRADING = {"inline_keyboard": [
 
 def _kb_settings():
     return {"inline_keyboard": [
-        [{"text": "🧩 Активные фильтры", "callback_data": "adm_shadow_status"}],
+        [{"text": "🧩 Активная стратегия", "callback_data": "adm_shadow_status"}],
         [{"text": "🩺 Проверка сервисов", "callback_data": "adm_health"}],
         _BACK_ROW,
     ]}
@@ -1136,13 +1139,13 @@ def _handle_admin_callback(callback_id: str, chat_id: int,
     if data == "adm_shadow_status":
         _edit_admin_text(
             chat_id, message_id,
-            "🧩 *АКТИВНЫЕ ФИЛЬТРЫ*\n\n"
+            "🧩 *АКТИВНАЯ СТРАТЕГИЯ*\n\n"
             "Режим: *SHADOW / PAPER*\n"
-            f"Боевые фильтры: {len(MODULES)} замороженных X-Perp модулей\n"
-            f"Теневая проверка: {len(SHADOW_EXPERIMENTAL_MODULES) + 2} фильтров\n"
+            "Модель: замороженный 15m Profit-First HGB\n"
             "Вход: по текущей рыночной цене\n"
-            f"За один скан: максимум {VENUE_MAX_SIGNALS_PER_SCAN} сигнала\n"
-            "Часовая модель: замороженный каскад целей 0.5–2%, стоп 1.0%\n"
+            "Выход: 10% на 0.25R, 90% на 2R; стоп 1R\n"
+            "Горизонт: 48 свечей по 15 минут\n"
+            "Защитные ограничения: 2 входа/час, пауза после 4 SL за день\n"
             "Генеративная нейросеть: отключена от решения\n"
             "Реальные ордера: *ЗАПРЕЩЕНЫ КОДОМ*\n\n"
             "Все сигналы и исходы записываются для независимой forward-проверки.",
@@ -2911,7 +2914,7 @@ def webhook():
     elif text == "🛡 режим":
         _reply(chat_id,
                "🛡 *ТЕНЕВОЙ РЕЖИМ*\n\n"
-               "Работают только новые детерминированные X-Perp фильтры.\n"
+               "Работает замороженная 15m Profit-First модель X-Perp.\n"
                "Сигналы входят по рынку и считаются виртуально.\n"
                "Нейросеть не принимает торговых решений.\n"
                "Реальные ордера отключены на уровне конфигурации и кода.")
@@ -3065,38 +3068,12 @@ def webhook():
                "❓ *Как читать paper-сигналы*\n\n"
                "LONG — фильтр ожидает рост, SHORT — снижение.\n"
                "Вход фиксируется по рыночной цене X-Perp в момент сигнала.\n"
-               "Цель и стоп заданы самим замороженным модулем.\n\n"
+               "Стоп равен 1R. На первой цели 0.25R фиксируется 10%, "
+               "остальные 90% идут к 2R со стопом в безубытке после первой цели.\n"
+               "Если за 48 свечей цель не достигнута, сделка закрывается по правилам стратегии.\n\n"
                "🧪 PAPER означает, что Telegram показывает виртуальную сделку: "
                "биржевой ордер не создаётся. Кнопки результатов считают только "
                "новые forward-сигналы.")
-
-    elif text == "❓ помощь":
-        _reply(chat_id,
-               "❓ *Как читать сигналы*\n\n"
-               "*Направление:*\n"
-               "  📈 LONG — ожидаем рост, покупаем\n"
-               "  📉 SHORT — ожидаем падение, продаём\n\n"
-               "*Уровни:*\n"
-               "  🎯 *TP1* — первая цель. Позиция НЕ закрывается, включается трейлинг-стоп\n"
-               "  🎯 *TP2* — вторая цель. Потолок для всей позиции\n"
-               "  🛑 *SL* — стоп-лосс. Выход если цена пошла против\n\n"
-               "*Как работает сделка:*\n"
-               "  1. Сигнал открыт — бот ждёт TP1 или SL\n"
-               "  2. TP1 взят — вся позиция остаётся открытой\n"
-               "  3. Дальше сделка ведётся *трейлинг-стопом*: стоп ползёт\n"
-               "     за ценой (сила трейла зависит от силы движения после TP1)\n"
-               "     и никогда не опускается ниже входа\n"
-               "  4. Закрывается по трейлингу или при достижении TP2\n\n"
-               "*Исходы сделки:*\n"
-               "  ✅ `TP1_TRAIL` — TP1 взят, раннер закрыт трейлингом (прибыль)\n"
-               "  🏆 `TP2_HIT` — TP1 + TP2 оба взяты (максимум)\n"
-               "  ⚖️ *BE* — TP1 взят, остаток закрыт в безубыток\n"
-               "  ❌ *SL* — убыток \\(до TP1 не дошло\\)\n"
-               "  ⏱ *Expired* — время вышло, закрыто без результата\n\n"
-               "*Win rate* — % прибыльных от закрытых.\n"
-               "Норма для SMC стратегии: 38–45% при высоком R\\:R.\n\n"
-               "💎 *PREMIUM* — тройное совпадение зон \\(OB \\+ FVG \\+ свип\\),\n"
-               "повышенная вероятность успеха.")
 
     # /admin works in groups too; group privacy mode still delivers commands.
     elif text.startswith("/admin") or text in ("admin", "admin panel", "panel"):
@@ -3113,7 +3090,7 @@ def webhook():
                f"⏱ Интервал: {SCAN_INTERVAL_MINUTES} мин\n"
                f"📊 Сигналов в кэше: {len(_signal_cache)}\n"
                f"💾 Данные: OKX\n"
-               f"🧩 Решение: замороженные X-Perp фильтры\n"
+               f"🧩 Решение: 15m Profit-First HGB\n"
                f"🚫 Реальные ордера отключены")
 
     # /stats — статистика побед/поражений
@@ -3588,11 +3565,20 @@ def _check_open_signals():
                               and age_hours > SIGNAL_EXPIRY_HOURS)
             if new_status is None and (strategy_expired or global_expired):
                 new_status = "TP1_EXPIRED" if status == "TP1_PARTIAL" else "EXPIRED"
-                exit_px = (float(df["close"][-1])
-                           if strategy_expired and df.get("close") else latest_quote)
-                realized_r = marked_r(direction=direction, entry=entry, exit_price=exit_px,
-                    sl=sl, tp1=tp1, tp1_fraction=tp1_close_frac,
-                    reached_tp1=status == 'TP1_PARTIAL')
+                if fixed_be_runner and status == "TP1_PARTIAL":
+                    # The audited barbell assigns zero to a runner that reaches
+                    # neither 2R nor the original stop within the horizon.
+                    # A final mark would silently change that tested outcome.
+                    exit_px = entry
+                    realized_r = blended_r(
+                        tp1_close_frac, tp1_r, 0.0, 0.0)
+                else:
+                    exit_px = (float(df["close"][-1])
+                               if strategy_expired and df.get("close") else latest_quote)
+                    realized_r = marked_r(
+                        direction=direction, entry=entry, exit_price=exit_px,
+                        sl=sl, tp1=tp1, tp1_fraction=tp1_close_frac,
+                        reached_tp1=status == 'TP1_PARTIAL')
 
             # Optional second opinion before closing: the position trades on the
             # X-Perp, but the levels come from the deep feed and so does every
@@ -3660,6 +3646,8 @@ def _venue_analysis(symbol: str, setup: dict, btc_change: float = 0.0) -> dict:
     shadow_experiment = bool(setup.get("_shadow_experiment"))
     five_minute_oi = bool(setup.get("_five_minute_oi_shadow"))
     hourly_hgb = bool(setup.get("_hourly_hgb_shadow"))
+    precision_profit_first = bool(
+        setup.get("_precision_profit_first_shadow"))
     tags = [f"Venue module {setup['module']}",
             f"BTC regime {setup['btc_regime']}",
             f"Fixed target {setup['target_r']:.2f}R"]
@@ -3673,19 +3661,32 @@ def _venue_analysis(symbol: str, setup: dict, btc_change: float = 0.0) -> dict:
         tags.append(
             f"Target cascade {float(setup.get('selected_target_pct') or .5):.1f}% / "
             f"{int(setup.get('hold_bars') or 12)}h")
-    if five_minute_oi:
+    if five_minute_oi or precision_profit_first:
         runner_target_r = float(setup.get("runner_target_r") or 4.0)
-        tp1_close_fraction = float(setup.get("tp1_close_fraction") or .70)
-        tags.append(f"Lagged OI 168h {setup['oi_change_168h'] * 100:+.2f}%")
-        if setup.get("observed_atr_pct") is not None:
-            tags.append(f"Observed ATR {float(setup['observed_atr_pct']):.2f}%")
+        tp1_close_fraction = float(
+            setup.get("near_close_fraction") if precision_profit_first
+            else setup.get("tp1_close_fraction") or .70)
+        if precision_profit_first:
+            tags.append(
+                f"Frozen HGB quality {float(setup['model_quality']):.4f}")
+            tags.append(
+                f"Profit-first barbell {tp1_close_fraction * 100:.0f}% @ "
+                f"{float(setup['target_r']):.2f}R / "
+                f"{(1-tp1_close_fraction) * 100:.0f}% @ "
+                f"{runner_target_r:.2f}R")
+        if five_minute_oi:
+            tags.append(
+                f"Lagged OI 168h {setup['oi_change_168h'] * 100:+.2f}%")
+            if setup.get("observed_atr_pct") is not None:
+                tags.append(f"Observed ATR {float(setup['observed_atr_pct']):.2f}%")
         runner_move_pct = (
             100.0 * float(setup["atr"]) * 2.0 * runner_target_r
             / float(setup["entry"]))
-        tags.append(
-            f"Barbell {tp1_close_fraction * 100:.0f}% @ "
-            f"+{first_target_move_pct:.2f}%, runner "
-            f"{(1-tp1_close_fraction) * 100:.0f}% @ +{runner_move_pct:.2f}%")
+        if five_minute_oi:
+            tags.append(
+                f"Barbell {tp1_close_fraction * 100:.0f}% @ "
+                f"+{first_target_move_pct:.2f}%, runner "
+                f"{(1-tp1_close_fraction) * 100:.0f}% @ +{runner_move_pct:.2f}%")
     return {
         "symbol": symbol, "direction": direction, "decision": direction,
         "confidence": "HIGH", "risk_score": 1,
@@ -3698,17 +3699,28 @@ def _venue_analysis(symbol: str, setup: dict, btc_change: float = 0.0) -> dict:
         "fixed_target_r": setup["target_r"], "entry_source": "MARKET",
         # Persist the shadow module's fixed absolute-move bracket so a restart
         # cannot fall back to the global 15m trail.
-        "fixed_runner_target_r": runner_target_r if five_minute_oi else None,
-        "strategy_tp1_close_frac": tp1_close_fraction if five_minute_oi else None,
-        "strategy_runner_mode": "fixed_be" if five_minute_oi else None,
-        "strategy_bar_seconds": (300 if five_minute_oi
+        "fixed_runner_target_r": (runner_target_r
+                                  if five_minute_oi or precision_profit_first
+                                  else None),
+        "strategy_tp1_close_frac": (tp1_close_fraction
+                                    if five_minute_oi or precision_profit_first
+                                    else None),
+        "strategy_runner_mode": ("fixed_be"
+                                 if five_minute_oi or precision_profit_first
+                                 else None),
+        "strategy_bar_seconds": (300 if five_minute_oi else 900
+                                 if precision_profit_first
                                  else 3600 if hourly_hgb else None),
         "strategy_entry_bar_ts": (
-            float(setup["signal_bar_ts"]) + (300 if five_minute_oi else 3600)
-            if five_minute_oi or hourly_hgb else None),
+            float(setup["signal_bar_ts"]) + (300 if five_minute_oi else 900
+                                             if precision_profit_first else 3600)
+            if five_minute_oi or precision_profit_first or hourly_hgb else None),
         "strategy_stop_on_close": (
-            False if five_minute_oi or hourly_hgb else None),
+            False if five_minute_oi or precision_profit_first or hourly_hgb
+            else None),
         "strategy_max_bars": (72 if five_minute_oi else
+                              int(setup.get("hold_bars") or 48)
+                              if precision_profit_first else
                               int(setup.get("hold_bars") or 12)
                               if hourly_hgb else None),
         "entry_low": setup["entry"], "entry_high": setup["entry"],
@@ -3716,7 +3728,9 @@ def _venue_analysis(symbol: str, setup: dict, btc_change: float = 0.0) -> dict:
         "volume_ratio": 1.0, "session": setup["utc_session"],
         "swing_trend": "bull" if direction == "LONG" else "bear",
         "signals": tags,
-        "source": ("venue_shadow_1h_hgb" if hourly_hgb
+        "source": ("venue_shadow_precision_profit_first"
+                   if precision_profit_first
+                   else "venue_shadow_1h_hgb" if hourly_hgb
                    else "venue_shadow_5m_oi" if five_minute_oi
                    else "venue_shadow_experiment" if shadow_experiment
                    else "venue_regime"),
@@ -3730,6 +3744,7 @@ def _venue_analysis(symbol: str, setup: dict, btc_change: float = 0.0) -> dict:
         "_shadow_only": shadow_experiment or DEPLOYMENT_MODE == "shadow",
         "_five_minute_oi_shadow": five_minute_oi,
         "_hourly_hgb_shadow": hourly_hgb,
+        "_precision_profit_first_shadow": precision_profit_first,
     }
 
 
@@ -3755,11 +3770,8 @@ def _five_minute_oi_setup(symbol: str, candles_5m: dict | None,
 
 
 def _venue_scan_universe(available: set[str]) -> list[str]:
-    """Return production symbols plus isolated 5m candidates in shadow mode."""
+    """Return the frozen profit-first universe supported by X-Perp."""
     scan_universe = set(ROBUST_SYMBOLS)
-    if DEPLOYMENT_MODE == "shadow":
-        scan_universe.update(FIVE_MINUTE_OI_SHADOW_SYMBOLS)
-        scan_universe.update(HOURLY_HGB_SYMBOLS)
     return sorted(
         symbol for symbol in scan_universe if _base_of_symbol(symbol) in available)
 
@@ -3787,10 +3799,11 @@ def _publish_venue_candidates(candidates: list[tuple[dict, int]],
             log.warning("Venue portfolio hourly count unavailable: %s", exc)
             recent_hour_count = 2
     source_priority = {
-        "venue_regime": 0,
-        "venue_shadow_1h_hgb": 1,
-        "venue_shadow_experiment": 2,
-        "venue_shadow_5m_oi": 3,
+        "venue_shadow_precision_profit_first": 0,
+        "venue_regime": 1,
+        "venue_shadow_1h_hgb": 2,
+        "venue_shadow_experiment": 3,
+        "venue_shadow_5m_oi": 4,
     }
     ordered = sorted(candidates, key=lambda item: (
         source_priority.get(item[0].get("source", "venue_regime"), 1),
@@ -3821,7 +3834,7 @@ def _publish_venue_candidates(candidates: list[tuple[dict, int]],
 
 
 def _run_venue_strategy_scan() -> None:
-    """Fast deterministic production path for the frozen X-Perp portfolio.
+    """Fast deterministic path for the frozen X-Perp precision portfolio.
 
     It deliberately skips Claude, news scoring, legacy SMC and adaptive sizing.
     In shadow deployment it publishes ordinary-looking paper signals while the
@@ -3847,39 +3860,23 @@ def _run_venue_strategy_scan() -> None:
     if "BTCUSDT" not in symbols:
         log.warning("Venue scan refused: BTC X-Perp context is unavailable")
         return
-    hourly_feed_ready = (DEPLOYMENT_MODE == "shadow"
-                         and all(_base_of_symbol(symbol) in available
-                                 for symbol in HOURLY_HGB_SYMBOLS))
-
     fetched = {}
-    fetched_5m = {}
-    fetched_1h = {}
     market_prices = {}
     def _fetch(symbol: str):
         fifteen = get_klines_xperp(
             symbol, limit=400 if symbol == "BTCUSDT" else 120)
-        five = (get_klines_xperp(symbol, limit=110, interval="5m")
-                if DEPLOYMENT_MODE == "shadow" else None)
-        hourly = (get_klines(symbol, interval="1h", limit=1000,
-                             interval_sec=3600)
-                  if hourly_feed_ready and symbol in HOURLY_HGB_SYMBOLS
-                  else None)
         try:
             market = get_xperp_price(symbol)
         except Exception as exc:
             log.warning("Venue market-price fetch failed for %s: %s", symbol, exc)
             market = None
-        return symbol, fifteen, five, hourly, market
+        return symbol, fifteen, market
     with ThreadPoolExecutor(max_workers=4) as pool:
         for future in as_completed([pool.submit(_fetch, symbol) for symbol in symbols]):
             try:
-                symbol, candles, candles_5m, candles_1h, market = future.result()
+                symbol, candles, market = future.result()
                 if candles:
                     fetched[symbol] = candles
-                if candles_5m:
-                    fetched_5m[symbol] = candles_5m
-                if candles_1h:
-                    fetched_1h[symbol] = candles_1h
                 if market:
                     market_prices[symbol] = float(market)
             except Exception as exc:
@@ -3889,15 +3886,10 @@ def _run_venue_strategy_scan() -> None:
     if not btc:
         log.warning("Venue scan refused: BTC candles are unavailable")
         return
-    if DEPLOYMENT_MODE == "shadow":
-        # Market fallback remains X-Perp: the global swap feed supplies model
-        # context only and never supplies an executable entry price.
-        for symbol, candles in fetched.items():
-            market_prices.setdefault(symbol, float(candles["close"][-1]))
-        hourly_rows = hourly_hgb_shadow_setups(fetched_1h, market_prices)
-    else:
-        hourly_rows = {}
-    btc_5m = fetched_5m.get("BTCUSDT")
+    # Market fallback remains X-Perp and is used only when the public ticker
+    # endpoint is temporarily unavailable.
+    for symbol, candles in fetched.items():
+        market_prices.setdefault(symbol, float(candles["close"][-1]))
     active_rows = get_open_signals()
     active = {row["symbol"] for row in active_rows}
     open_direction_counts = {
@@ -3916,33 +3908,19 @@ def _run_venue_strategy_scan() -> None:
             continue
         try:
             market = market_prices.get(symbol) or float(candles["close"][-1])
-            rows = venue_setups(
-                candles, btc, entry_time=float(candles["time"][-1]) + KLINES_INTERVAL_SEC,
-                market_price=float(market), symbol=symbol,
-            )
-            # The direct-transfer hourly model owns the first shadow slot when
-            # no production module owns this symbol/candle.
-            if not rows and DEPLOYMENT_MODE == "shadow":
-                hourly = hourly_rows.get(symbol)
-                if hourly:
-                    rows = [hourly]
-            # The deterministic experimental module is collected only when
-            # neither production nor the hourly transfer owns the symbol.
-            if not rows and DEPLOYMENT_MODE == "shadow":
-                rows = shadow_experimental_setups(
+            rows = []
+            if DEPLOYMENT_MODE == "shadow":
+                rows = precision_profit_first_shadow_setups(
                     candles, btc,
                     entry_time=float(candles["time"][-1]) + KLINES_INTERVAL_SEC,
                     market_price=float(market), symbol=symbol,
                 )
-            # Independent high-frequency supplement.  The inexpensive candle
-            # rule runs first; the two-page OI request is made only for a real
-            # candidate. Existing production/15m-shadow ownership wins.
-            candles_5m = fetched_5m.get(symbol)
-            if not rows:
-                five_minute = _five_minute_oi_setup(
-                    symbol, candles_5m, btc_5m, float(market))
-                if five_minute:
-                    rows = [five_minute]
+            else:
+                rows = venue_setups(
+                    candles, btc,
+                    entry_time=float(candles["time"][-1]) + KLINES_INTERVAL_SEC,
+                    market_price=float(market), symbol=symbol,
+                )
             for row in rows:
                 # The 5m supplement already carries its own bar timestamp.
                 # Production 15m rows do not, so only fill a missing value.
@@ -3966,7 +3944,7 @@ def _run_venue_strategy_scan() -> None:
 
 
 def run_scan():
-    """Publish paper signals from the frozen X-Perp portfolio.
+    """Publish paper signals from the frozen X-Perp precision portfolio.
 
     The old SMC scan was removed on 2026-09-16. It was not a fallback but a
     second strategy writing into the same tables, and a flag that can switch it
@@ -4207,7 +4185,7 @@ def start_bot():
                           f"{TRADING_HOURS_END % 24:02d}:00 UTC")
             send_status(
                 "🧪 *Crypto Bot Online — SHADOW*\n"
-                f"Детерминированные X-Perp фильтры, скан каждые "
+                f"15m Profit-First X-Perp, скан каждые "
                 f"{SCAN_INTERVAL_MINUTES} мин ({_sched}).\n"
                 "Реальные ордера отключены. Нейросеть не принимает решений."
             )

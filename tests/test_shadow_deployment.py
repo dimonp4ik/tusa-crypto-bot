@@ -12,13 +12,13 @@ from src import telegram_notifier as notifier
 
 
 class ShadowDeploymentTests(unittest.TestCase):
-    def test_ondo_scan_candidate_exists_only_in_shadow_mode(self):
+    def test_scan_universe_contains_only_frozen_profit_first_symbols(self):
         with patch.object(main, "ROBUST_SYMBOLS", {"BTCUSDT"}), \
              patch.object(main, "FIVE_MINUTE_OI_SHADOW_SYMBOLS", {"ONDOUSDT"}), \
              patch.object(main, "DEPLOYMENT_MODE", "shadow"):
             self.assertEqual(
                 main._venue_scan_universe({"BTC", "ONDO"}),
-                ["BTCUSDT", "ONDOUSDT"])
+                ["BTCUSDT"])
         with patch.object(main, "ROBUST_SYMBOLS", {"BTCUSDT"}), \
              patch.object(main, "FIVE_MINUTE_OI_SHADOW_SYMBOLS", {"ONDOUSDT"}), \
              patch.object(main, "DEPLOYMENT_MODE", "live"):
@@ -122,11 +122,12 @@ class ShadowDeploymentTests(unittest.TestCase):
         self.assertTrue(analysis["_shadow_only"])
         self.assertEqual(analysis["source"], "venue_shadow_experiment")
 
-    def test_live_scan_source_keeps_shadow_experiment_behind_mode_gate(self):
+    def test_live_scan_keeps_profit_first_model_behind_shadow_gate(self):
         import inspect
         src = inspect.getsource(main._run_venue_strategy_scan)
         self.assertIn('DEPLOYMENT_MODE == "shadow"', src)
-        self.assertIn("shadow_experimental_setups", src)
+        self.assertIn("precision_profit_first_shadow_setups", src)
+        self.assertIn("else:\n                rows = venue_setups", src)
 
     def test_five_minute_oi_analysis_is_permanently_shadow_only(self):
         setup = {
@@ -273,6 +274,33 @@ class ShadowDeploymentTests(unittest.TestCase):
             main._check_open_signals()
         self.assertEqual(update.call_args.args[1], "EXPIRED")
 
+    def test_fixed_be_runner_expiry_uses_audited_zero_runner_value(self):
+        start = 2_000_050_000.0
+        frame = {
+            "time": [start + 900 * index for index in range(48)],
+            "open": [101.0] * 48, "high": [103.0] * 48,
+            "low": [100.1] * 48, "close": [102.5] * 48,
+            "confirmed": [True] * 48,
+        }
+        signal = {
+            "id": 731, "symbol": "BTCUSDT", "direction": "LONG",
+            "entry_price": 100.0, "sl": 98.0, "tp1": 100.5, "tp2": 104.0,
+            "atr": 1.0, "opened_at": start - 60, "status": "TP1_PARTIAL",
+            "tp1_hit_at": start - 30, "runner_activation_bar_ts": start - 30,
+            "strategy_tp1_close_frac": .10, "strategy_runner_mode": "fixed_be",
+            "strategy_bar_seconds": 900, "strategy_entry_bar_ts": start,
+            "strategy_stop_on_close": 0, "strategy_max_bars": 48,
+        }
+        with patch.object(main, "get_open_signals", return_value=[signal]), \
+             patch.object(main.time, "time", return_value=start + 48 * 900), \
+             patch.object(main, "get_klines_xperp", return_value=frame), \
+             patch.object(main, "update_signal_status") as update, \
+             patch.object(main, "send_signal_update"), \
+             patch.object(main.autotrader, "mirror_transition"):
+            main._check_open_signals()
+        self.assertEqual(update.call_args.args[1], "TP1_EXPIRED")
+        self.assertAlmostEqual(update.call_args.kwargs["realized_r"], .025)
+
     def test_hourly_target_after_12_bars_is_ignored(self):
         start = 2_000_100_000.0
         times = [start + 3600 * index for index in range(13)]
@@ -343,22 +371,19 @@ class ShadowDeploymentTests(unittest.TestCase):
         self.assertEqual(send.call_args.args[0]["source"], "venue_regime")
         blocked.assert_called_once_with(9, "hour_cap")
 
-    def test_scan_preserves_five_minute_bar_time_and_lazily_fetches_oi(self):
+    def test_scan_uses_only_precision_profit_first_in_shadow_mode(self):
         fifteen = {"time": [900.0], "close": [100.0]}
-        five = {"time": [300.0], "close": [99.0]}
         setup = {
             "direction": "SHORT", "entry": 99.0, "atr": .495,
-            "target_r": .5, "runner_target_r": 2.0,
-            "tp1_close_fraction": .70, "first_target_move_pct": .5,
-            "observed_atr_pct": .25, "utc_session": "00",
-            "btc_regime": "oi_confirmed_trend", "eff_ratio": .2,
-            "signal_bar_ts": 300.0, "oi_change_168h": .05,
-            "module": "shadow_5m_oi_actual_move",
-            "_shadow_experiment": True, "_five_minute_oi_shadow": True,
+            "target_r": .25, "runner_target_r": 2.0,
+            "near_close_fraction": .10, "first_target_move_pct": .2475,
+            "utc_session": "00_05", "btc_regime": "bear",
+            "eff_ratio": .2, "model_quality": .75,
+            "signal_bar_ts": 900.0,
+            "module": "shadow_precision_profit_first_025_2r",
+            "_shadow_experiment": True,
+            "_precision_profit_first_shadow": True,
         }
-
-        def klines(_symbol, **kwargs):
-            return five if kwargs.get("interval") == "5m" else fifteen
 
         with patch.object(main, "ROBUST_SYMBOLS", {"BTCUSDT"}), \
              patch.object(main, "DEPLOYMENT_MODE", "shadow"), \
@@ -369,29 +394,28 @@ class ShadowDeploymentTests(unittest.TestCase):
              patch.object(main, "_venue_daily_loss_pause", return_value=False), \
              patch.object(main, "get_xperp_instruments",
                           return_value={"BTC": "BTC-XPERP"}), \
-             patch.object(main, "get_klines_xperp", side_effect=klines), \
+             patch.object(main, "get_klines_xperp", return_value=fifteen), \
              patch.object(main, "get_xperp_price", return_value=99.0), \
              patch.object(main, "get_open_signals", return_value=[]), \
              patch.object(main, "get_active_symbol_blocks", return_value=[]), \
-             patch.object(main, "venue_setups", return_value=[]), \
-             patch.object(main, "shadow_experimental_setups", return_value=[]), \
-             patch.object(main, "five_minute_oi_candidate_context",
-                          return_value={"direction": "SHORT"}), \
-             patch.object(main, "five_minute_oi_symbol_context_allowed",
-                          return_value=True), \
-             patch.object(main, "get_xperp_open_interest_history",
-                          return_value={"time": [1], "oi": [1]}) as oi, \
-             patch.object(main, "five_minute_oi_shadow_setup",
-                          return_value=setup), \
+             patch.object(main, "precision_profit_first_shadow_setups",
+                          return_value=[setup]) as precision, \
+             patch.object(main, "venue_setups") as old_router, \
+             patch.object(main, "get_xperp_open_interest_history") as oi, \
              patch.object(main, "log_setup_candidate_once", return_value=11), \
              patch.object(main, "_venue_signal_on_cooldown", return_value=False), \
              patch.object(main, "_publish_venue_candidates", return_value=1) as publish:
             main._run_venue_strategy_scan()
 
-        oi.assert_called_once_with("BTCUSDT", limit=170)
+        precision.assert_called_once()
+        old_router.assert_not_called()
+        oi.assert_not_called()
         analysis = publish.call_args.args[0][0][0]
-        self.assertEqual(analysis["signal_bar_ts"], 300.0)
-        self.assertEqual(analysis["source"], "venue_shadow_5m_oi")
+        self.assertEqual(analysis["signal_bar_ts"], 900.0)
+        self.assertEqual(
+            analysis["source"], "venue_shadow_precision_profit_first")
+        self.assertEqual(analysis["strategy_bar_seconds"], 900)
+        self.assertEqual(analysis["strategy_max_bars"], 48)
 
     def test_scan_does_not_fetch_oi_without_price_candidate(self):
         with patch.object(main, "DEPLOYMENT_MODE", "shadow"), \

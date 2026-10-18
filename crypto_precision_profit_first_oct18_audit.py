@@ -27,6 +27,7 @@ FRESH_FAR = ROOT / "crypto_xperp_raw_router_audit_2_0_oct17_material_raw_raw_fam
 FRESH_NEAR = ROOT / "crypto_xperp_raw_router_audit_0_25_oct17_material_raw_raw_families.csv"
 QUANTILES = tuple(float(value) for value in np.arange(.50, .976, .025))
 FRACTIONS = (0.0, .10, .20, .30, .40, .50, .60, .70)
+LOSS_PAUSES = (1, 2, 3, 4, 5)
 DIRECT_KEYS = ("symbol", "entry_time", "direction", "family")
 
 
@@ -34,12 +35,33 @@ def digest(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
+def canonical_history(frame: pd.DataFrame) -> pd.DataFrame:
+    """Remove overlap between adjacent cache periods without leaking into fit.
+
+    Some six-month source caches overlap by roughly two days.  Keeping the
+    later period assignment ensures a row shared by FIT and SELECT belongs to
+    SELECT only, so its outcome cannot enter model fitting.
+    """
+    order = {period: index for index, period in enumerate(base.PERIODS)}
+    result = frame.copy()
+    result["_period_order"] = result.period.map(order)
+    if result["_period_order"].isna().any():
+        raise ValueError("unknown historical period during canonicalization")
+    result = result.sort_values([*DIRECT_KEYS, "_period_order"])
+    duplicate_extra = int(result.duplicated(list(DIRECT_KEYS)).sum())
+    result = result.drop_duplicates(list(DIRECT_KEYS), keep="last")
+    result = result.drop(columns="_period_order").reset_index(drop=True)
+    result.attrs["duplicate_rows_removed"] = duplicate_extra
+    return result
+
+
 def evaluate(scored: pd.DataFrame, periods: tuple[str, ...], threshold: float,
-             fraction: float, margin: float) -> dict:
+             fraction: float, margin: float, loss_pause: int = 3) -> dict:
     chosen = base.stage(scored, periods)
     chosen = chosen[chosen.model_probability >= threshold].copy()
     chosen = precision.barbell_frame(chosen, fraction)
-    rows = runtime_gate(base.standardized(chosen, "precision_profit_first"))
+    rows = runtime_gate(base.standardized(chosen, "precision_profit_first"),
+                        loss_pause=loss_pause, hourly_cap=2)
     return money(rows, margin)
 
 
@@ -76,16 +98,18 @@ def direct_frame() -> pd.DataFrame:
 
 
 def direct_rows(scored: pd.DataFrame, threshold: float,
-                fraction: float) -> list[dict]:
+                fraction: float, loss_pause: int) -> list[dict]:
     chosen = scored[scored.model_probability >= threshold].copy()
     chosen = precision.barbell_frame(chosen, fraction)
-    return runtime_gate(base.standardized(chosen, "precision_profit_first"))
+    return runtime_gate(base.standardized(chosen, "precision_profit_first"),
+                        loss_pause=loss_pause, hourly_cap=2)
 
 
 def main() -> None:
     previous = json.loads(OLD_REPORT.read_text())
     previous_frozen = previous["frozen_before_2024"]
-    historical = precision.load_joined()
+    historical_raw = precision.load_joined()
+    historical = canonical_history(historical_raw)
     fit = base.stage(historical, precision.FIT)
     schema = base.design(fit)
     model = HistGradientBoostingClassifier(
@@ -116,6 +140,31 @@ def main() -> None:
             })
     candidates.sort(key=lambda item: item["score"], reverse=True)
     frozen = candidates[0] if candidates else None
+    rail_candidates = []
+    if frozen:
+        threshold = float(frozen["threshold"])
+        fraction = float(frozen["near_fraction"])
+        for loss_pause in LOSS_PAUSES:
+            selection = evaluate(scored, precision.SELECT, threshold, fraction,
+                                 .03, loss_pause)
+            confirmation = evaluate(scored, precision.CONFIRM, threshold,
+                                    fraction, .03, loss_pause)
+            if not qualifies(selection, confirmation):
+                continue
+            rail_candidates.append({
+                "loss_pause": loss_pause,
+                "selection_2022h1": selection,
+                "confirmation_2022h2_2023": confirmation,
+                "score": round(selection["return_pct"]
+                               - .5 * selection["dd_pct"], 8),
+            })
+        rail_candidates.sort(key=lambda item: item["score"], reverse=True)
+        if rail_candidates:
+            rail = rail_candidates[0]
+            frozen = {**frozen, "loss_pause": rail["loss_pause"],
+                      "rail_selection": rail["selection_2022h1"],
+                      "rail_confirmation": rail[
+                          "confirmation_2022h2_2023"]}
     report = {
         "status": "REJECTED_DEVELOPMENT",
         "ready_for_live_orders": False,
@@ -132,32 +181,47 @@ def main() -> None:
             "threshold_quantiles": list(QUANTILES),
             "near_target_r": .25, "runner_target_r": 2.0,
             "near_fractions": list(FRACTIONS),
+            "loss_pause_candidates": list(LOSS_PAUSES),
+            "loss_pause_selection": (
+                "maximize 2022h1 return minus half drawdown; require the same "
+                "profit, drawdown, frequency and nonnegative-month gates on "
+                "2022h1 and 2022h2-2023"),
             "entry": "next 15-minute market open",
             "money": "client 3% or 5% current-equity margin; fixed 10x gross",
             "priority": "account return first; win rate diagnostic only",
         },
         "eligible_development_candidates": len(candidates),
         "top_development_candidates": candidates[:10],
+        "eligible_rail_candidates": rail_candidates,
         "frozen_before_2024": frozen,
+        "history_integrity": {
+            "raw_rows": len(historical_raw),
+            "canonical_rows": len(historical),
+            "overlap_duplicates_removed": historical.attrs[
+                "duplicate_rows_removed"],
+            "dedupe_identity": list(DIRECT_KEYS),
+            "overlap_assignment": "later chronological period",
+        },
     }
     if frozen:
         threshold = float(frozen["threshold"])
         fraction = float(frozen["near_fraction"])
+        loss_pause = int(frozen["loss_pause"])
         validation = {
             "margin_3pct": evaluate(scored, precision.VALIDATION,
-                                    threshold, fraction, .03),
+                                    threshold, fraction, .03, loss_pause),
             "margin_5pct": evaluate(scored, precision.VALIDATION,
-                                    threshold, fraction, .05),
+                                    threshold, fraction, .05, loss_pause),
         }
         later = {
             "margin_3pct": evaluate(scored, precision.HIDDEN,
-                                    threshold, fraction, .03),
+                                    threshold, fraction, .03, loss_pause),
             "margin_5pct": evaluate(scored, precision.HIDDEN,
-                                    threshold, fraction, .05),
+                                    threshold, fraction, .05, loss_pause),
         }
         direct = direct_frame()
         direct_scored = precision.scored(direct, model, schema)
-        rows = direct_rows(direct_scored, threshold, fraction)
+        rows = direct_rows(direct_scored, threshold, fraction, loss_pause)
         pd.DataFrame(rows).to_pickle(ROWS_OUT)
         old_end = float(pd.read_csv(base.direct_path(2.0)).entry_time.max())
         forward_rows = [row for row in rows
@@ -178,6 +242,18 @@ def main() -> None:
                        fresh["margin_5pct"]["monthly_return_pct"].items()
                        if key in ("2026-05", "2026-06", "2026-07",
                                   "2026-08", "2026-09")}
+        full_months_3pct = {key: value for key, value in
+                            fresh["margin_3pct"]["monthly_return_pct"].items()
+                            if key in full_months}
+        holdout_complete_months = {
+            **{key: validation["margin_5pct"]["monthly_return_pct"][key]
+               for key in ("2024-02", "2024-03", "2024-04", "2024-05",
+                           "2024-06")},
+            **{key: later["margin_5pct"]["monthly_return_pct"][key]
+               for key in ("2025-02", "2025-03", "2025-04", "2025-05",
+                           "2025-06", "2026-03", "2026-04", "2026-05",
+                           "2026-06", "2026-07")},
+        }
         objective = {
             "all_complete_direct_months_at_least_30pct": bool(
                 full_months and all(value >= 30 for value in full_months.values())),
@@ -185,12 +261,23 @@ def main() -> None:
             "direct_at_least_3_trades_per_day": (
                 fresh["margin_5pct"]["trades_per_calendar_day"] >= 3),
             "later_drawdown_at_most_10pct": later["margin_5pct"]["dd_pct"] <= 10,
+            "all_complete_holdout_months_at_least_30pct_5pct_margin": bool(
+                holdout_complete_months and all(
+                    value >= 30 for value in holdout_complete_months.values())),
+            "all_complete_direct_months_at_least_30pct_3pct_margin": bool(
+                full_months_3pct and all(
+                    value >= 30 for value in full_months_3pct.values())),
         }
         report.update({
-            "status": ("PROFIT_FIRST_SHADOW_CANDIDATE_OBJECTIVE_NOT_MET"
-                       if all((objective["direct_drawdown_at_most_10pct"],
-                               objective["direct_at_least_3_trades_per_day"]))
-                       else "REJECTED_RISK"),
+            "status": ("PROFIT_FIRST_5PCT_SHADOW_CANDIDATE"
+                       if all((objective[
+                           "all_complete_direct_months_at_least_30pct"],
+                           objective[
+                           "all_complete_holdout_months_at_least_30pct_5pct_margin"],
+                           objective["direct_drawdown_at_most_10pct"],
+                           objective["later_drawdown_at_most_10pct"],
+                           objective["direct_at_least_3_trades_per_day"]))
+                       else "PROFIT_FIRST_SHADOW_CANDIDATE_OBJECTIVE_NOT_MET"),
             "validation_2024": validation,
             "later_2025_2026": later,
             "fresh_direct_xperp": fresh,
@@ -211,6 +298,8 @@ def main() -> None:
             },
             "objective_checks": objective,
             "complete_direct_months_5pct": full_months,
+            "complete_direct_months_3pct": full_months_3pct,
+            "complete_holdout_months_5pct": holdout_complete_months,
         })
     report["sources"] = {
         str(OLD_REPORT): digest(OLD_REPORT),
@@ -221,7 +310,7 @@ def main() -> None:
     report["limitations"] = [
         "The April and October direct months are partial calendar months.",
         "The same historical model family was previously inspected; 2024 and later are transfer evidence, not pristine data.",
-        "The result is a shadow candidate because May remains below the 30% monthly goal.",
+        "At 3% margin May remains below the 30% monthly goal; the complete-month gate passes at 5% only.",
         "Large total returns are theoretical compounding results, not a live-profit guarantee.",
         "Gross returns exclude fees at user request.",
     ]
