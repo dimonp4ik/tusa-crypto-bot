@@ -34,6 +34,9 @@ FIELD_SETS = (
     ("family", "direction_name", "btc_trend", "btc_eff_regime", "vol_regime"),
     ("family", "session", "btc_trend", "btc_impulse", "vol_regime"),
     ("family", "direction_name", "session", "self_trend", "btc_trend"),
+    ("family", "direction_name", "session", "breadth_alignment", "market_impulse_alignment"),
+    ("family", "direction_name", "btc_eff_regime", "breadth_alignment", "dispersion_regime"),
+    ("family", "session", "btc_trend", "breadth_alignment", "trend_breadth_alignment"),
 )
 MIN_COUNTS = (10, 25)
 MIN_YEAR_MEANS = (0.0, .0001)
@@ -44,7 +47,38 @@ def digest(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
-def add_regimes(events: pd.DataFrame) -> pd.DataFrame:
+def market_context(candles: dict[str, dict]) -> pd.DataFrame:
+    returns = []
+    trends = []
+    for symbol, raw in candles.items():
+        index = pd.Index(np.asarray(raw["time"], dtype=np.int64), name="signal_time")
+        close = pd.Series(np.asarray(raw["close"], dtype=float), index=index)
+        high = pd.Series(np.asarray(raw["high"], dtype=float), index=index)
+        low = pd.Series(np.asarray(raw["low"], dtype=float), index=index)
+        previous = close.shift(1)
+        tr = pd.concat(((high-low), (high-previous).abs(),
+                        (low-previous).abs()), axis=1).max(axis=1)
+        atr = tr.rolling(14).mean().replace(0, np.nan)
+        returns.append(((close-close.shift(12))/atr).rename(symbol))
+        trends.append(((close.rolling(20).mean()-close.rolling(96).mean())
+                       / atr).rename(symbol))
+    return_table = pd.concat(returns, axis=1)
+    trend_table = pd.concat(trends, axis=1)
+    count = return_table.notna().sum(axis=1)
+    context = pd.DataFrame({
+        "market_universe": count,
+        "market_breadth_positive": (return_table > 0).sum(axis=1)
+                                   / count.replace(0, np.nan),
+        "market_ret12_median": return_table.median(axis=1),
+        "market_ret12_dispersion": return_table.std(axis=1),
+        "market_trend_positive": (trend_table > 0).sum(axis=1)
+                                 / trend_table.notna().sum(axis=1).replace(0, np.nan),
+    })
+    return context[context.market_universe >= 5].reset_index()
+
+
+def add_regimes(events: pd.DataFrame,
+                candles: dict[str, dict] | None = None) -> pd.DataFrame:
     result = causal.prepare(events)
     direction = result.direction.astype(float)
     raw_btc_trend = result.btc_ma20_96_dir_atr * direction
@@ -61,6 +95,28 @@ def add_regimes(events: pd.DataFrame) -> pd.DataFrame:
     result["vol_regime"] = pd.cut(
         result.atr_pct, [-np.inf, .003, .006, np.inf],
         labels=["low", "normal", "high"]).astype(str)
+    if candles is not None:
+        result["signal_time"] = result.entry_time.astype(np.int64) - 300
+        result = result.merge(market_context(candles), on="signal_time",
+                              how="left", validate="many_to_one")
+        direction = result.direction.astype(float)
+        breadth = np.where(direction > 0, result.market_breadth_positive,
+                           1-result.market_breadth_positive)
+        trend_breadth = np.where(direction > 0, result.market_trend_positive,
+                                 1-result.market_trend_positive)
+        aligned_impulse = direction * result.market_ret12_median
+        result["breadth_alignment"] = pd.cut(
+            breadth, [-np.inf, .4, .6, np.inf],
+            labels=["adverse", "mixed", "supportive"]).astype(str)
+        result["trend_breadth_alignment"] = pd.cut(
+            trend_breadth, [-np.inf, .4, .6, np.inf],
+            labels=["adverse", "mixed", "supportive"]).astype(str)
+        result["market_impulse_alignment"] = pd.cut(
+            aligned_impulse, [-np.inf, -.5, .5, np.inf],
+            labels=["adverse", "flat", "supportive"]).astype(str)
+        result["dispersion_regime"] = pd.cut(
+            result.market_ret12_dispersion, [-np.inf, 1.0, 2.0, np.inf],
+            labels=["low", "normal", "high"]).astype(str)
     return result
 
 
@@ -102,7 +158,8 @@ def stable_experts(frames: dict[str, pd.DataFrame], fields: tuple[str, ...],
 
 
 def route(frames: dict[str, pd.DataFrame], fields: tuple[str, ...],
-          experts: pd.DataFrame) -> list[dict]:
+          experts: pd.DataFrame, *, loss_pause: int = 3,
+          hourly_cap: int = 2) -> list[dict]:
     if experts.empty:
         return []
     experts = experts.reset_index(drop=True)
@@ -127,7 +184,7 @@ def route(frames: dict[str, pd.DataFrame], fields: tuple[str, ...],
                 "module": f"{row['family']}:{row['geometry']}",
                 "module_priority": int(row["expert_priority"]),
             })
-    return runtime_gate(output, loss_pause=3, hourly_cap=2)
+    return runtime_gate(output, loss_pause=loss_pause, hourly_cap=hourly_cap)
 
 
 def stage(rows: list[dict], years: tuple[int, ...], margin: float) -> dict:
@@ -153,7 +210,7 @@ def development_rank(item: dict) -> tuple:
 
 def main() -> None:
     candles, sources = events_base.load()
-    events = add_regimes(events_base.build_events(candles))
+    events = add_regimes(events_base.build_events(candles), candles)
     frames = {name: causal.geometry_frame(events, name)
               for name in causal.GEOMETRIES}
     candidates = []
@@ -175,10 +232,23 @@ def main() -> None:
         if index % 10 == 0:
             print(json.dumps({"phase": "cross_era", "done": index}), flush=True)
     candidates.sort(key=development_rank, reverse=True)
-    finalists = candidates[:10]
-    for item in finalists:
-        item["confirmation_2024_3pct"] = stage(
-            item["_rows"], CONFIRMATION_YEARS, .03)
+    expert_finalists = candidates[:10]
+    finalists = []
+    for item in expert_finalists:
+        fields = tuple(item["fields"])
+        experts = pd.DataFrame(item["experts"])
+        for loss_pause, hourly_cap in itertools.product((1, 2, 3), (1, 2)):
+            rows = route(frames, fields, experts, loss_pause=loss_pause,
+                         hourly_cap=hourly_cap)
+            finalists.append({
+                **{key: value for key, value in item.items()
+                   if key not in {"_rows", "development_3pct"}},
+                "loss_pause": loss_pause, "hourly_cap": hourly_cap,
+                "development_3pct": stage(rows, DEVELOPMENT_YEARS, .03),
+                "confirmation_2024_3pct": stage(
+                    rows, CONFIRMATION_YEARS, .03),
+                "_rows": rows,
+            })
     finalists.sort(key=lambda item: (
         item["confirmation_2024_3pct"]["negative_months"] == 0,
         month_floor(item["confirmation_2024_3pct"]),
@@ -227,6 +297,7 @@ def main() -> None:
         "event_count": len(events),
         "geometry_event_counts": {key: len(value) for key, value in frames.items()},
         "candidate_count": len(candidates),
+        "rail_finalist_count": len(finalists),
         "frozen_after_2024_confirmation": public_frozen,
         "development_5pct": development_5pct,
         "confirmation_2024_5pct": confirmation_5pct,
@@ -234,7 +305,7 @@ def main() -> None:
         "objective_checks": objective,
         "top10_development_before_confirmation": [
             {key: value for key, value in item.items() if key != "_rows"}
-            for item in candidates[:10]],
+            for item in expert_finalists],
         "sources": {
             **sources,
             str(Path(__file__).resolve()): digest(Path(__file__).resolve()),

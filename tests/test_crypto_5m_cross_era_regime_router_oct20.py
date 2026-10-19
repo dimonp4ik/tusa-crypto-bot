@@ -39,3 +39,20 @@ def test_stable_experts_choose_best_worst_year_geometry():
         min_year_mean=0, min_year_win_rate=.5)
 
     assert result.geometry.tolist() == ["fast"]
+
+
+def test_market_context_uses_only_same_and_prior_closes():
+    times = [300 * index for index in range(120)]
+    candles = {}
+    for number, symbol in enumerate(("A", "B", "C", "D", "E"), 1):
+        close = [100 + number + .1 * index for index in range(120)]
+        candles[symbol] = {
+            "time": times, "close": close,
+            "high": [value + .2 for value in close],
+            "low": [value - .2 for value in close],
+        }
+
+    context = audit.market_context(candles).set_index("signal_time")
+
+    assert context.loc[times[-1], "market_universe"] == 5
+    assert context.loc[times[-1], "market_breadth_positive"] == 1.0
