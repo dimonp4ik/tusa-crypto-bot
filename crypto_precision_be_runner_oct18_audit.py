@@ -75,7 +75,9 @@ def load_candles(path: Path) -> dict:
 
 
 def _runtime_runner(candles: dict, index: int, *, direction: str,
-                    entry: float, sl: float) -> tuple[str, float, float]:
+                    entry: float, sl: float,
+                    activation_r: float = ACTIVATION_R,
+                    runner_r: float = RUNNER_R) -> tuple[str, float, float]:
     """Replay the live 0.25R-to-BE/2R contract on 48 execution bars.
 
     Resting stops win ambiguous bars.  On the activation bar the original stop
@@ -83,8 +85,8 @@ def _runtime_runner(candles: dict, index: int, *, direction: str,
     """
     sign = 1.0 if direction == "LONG" else -1.0
     risk = abs(entry - sl)
-    activation = entry + sign * risk * ACTIVATION_R
-    target = entry + sign * risk * RUNNER_R
+    activation = entry + sign * risk * activation_r
+    target = entry + sign * risk * runner_r
     active = False
     last_index = min(index + 47, len(candles["time"]) - 1)
     for bar in range(index, last_index + 1):
@@ -98,7 +100,7 @@ def _runtime_runner(candles: dict, index: int, *, direction: str,
                 return "SL", sign * (fill - entry) / risk, float(candles["time"][bar]) + 900
             target_hit = high >= target if sign > 0 else low <= target
             if target_hit:
-                return "TP2", RUNNER_R, float(candles["time"][bar]) + 900
+                return "TP2", runner_r, float(candles["time"][bar]) + 900
             activation_hit = high >= activation if sign > 0 else low <= activation
             if activation_hit:
                 active = True
@@ -110,14 +112,16 @@ def _runtime_runner(candles: dict, index: int, *, direction: str,
                 return "BE", sign * (fill - entry) / risk, float(candles["time"][bar]) + 900
             target_hit = high >= target if sign > 0 else low <= target
             if target_hit:
-                return "TP2", RUNNER_R, float(candles["time"][bar]) + 900
+                return "TP2", runner_r, float(candles["time"][bar]) + 900
     if active:
         return "BE", 0.0, float(candles["time"][last_index]) + 900
     close = float(candles["close"][last_index])
     return "EXPIRED", sign * (close - entry) / risk, float(candles["time"][last_index]) + 900
 
 
-def attach_runtime_runner(frame: pd.DataFrame, *, direct: bool) -> pd.DataFrame:
+def attach_runtime_runner(frame: pd.DataFrame, *, direct: bool,
+                          activation_r: float = ACTIVATION_R,
+                          runner_r: float = RUNNER_R) -> pd.DataFrame:
     """Attach outcomes from raw OHLC instead of combining two target labels."""
     result = frame.copy().reset_index(drop=True)
     outcomes: dict[int, tuple[str, float, float]] = {}
@@ -139,7 +143,8 @@ def attach_runtime_runner(frame: pd.DataFrame, *, direct: bool) -> pd.DataFrame:
                     f"runner candle window missing: {row.symbol} {row.entry_time}")
             outcomes[int(row.Index)] = _runtime_runner(
                 candles, index, direction=str(row.direction),
-                entry=float(row.entry), sl=float(row.sl))
+                entry=float(row.entry), sl=float(row.sl),
+                activation_r=activation_r, runner_r=runner_r)
     if len(outcomes) != len(result):
         raise RuntimeError("runner replay did not cover every candidate")
     ordered = [outcomes[int(index)] for index in result.index]
@@ -161,8 +166,9 @@ def rows_for(frame: pd.DataFrame, module: str) -> list[dict]:
     rows = base.standardized(runner_frame(frame), module)
     for row in rows:
         # A BE is not a loss and must reset the causal daily loss streak even
-        # though it contributes zero to account return.
-        row["outcome"] = "SL" if row["runner_outcome"] == "SL" else "TP"
+        # though it contributes zero to account return.  A time-expired trade
+        # with negative R is still a loss and must advance the pause rail.
+        row["outcome"] = "SL" if float(row["net_r"]) < 0 else "TP"
     return rows
 
 
@@ -219,7 +225,7 @@ def maximum_stop_streak(rows: list[dict]) -> int:
     for row in sorted(rows, key=lambda item: (
             float(item["exit_time"]), float(item["entry_time"]),
             str(item["symbol"]))):
-        current = current + 1 if row["runner_outcome"] == "SL" else 0
+        current = current + 1 if float(row["net_r"]) < 0 else 0
         result = max(result, current)
     return result
 
