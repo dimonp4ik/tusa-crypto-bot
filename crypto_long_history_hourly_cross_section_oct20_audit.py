@@ -175,6 +175,14 @@ def main() -> None:
     candidates.sort(
         key=lambda item: rank(item["development_2020_2022_3pct"]),
         reverse=True)
+    diverse = {}
+    for item in candidates:
+        family_key = (
+            int(item["lookback_hours"]), str(item["style"]),
+            float(item["target_pct"]), float(item["stop_pct"]),
+            int(item["hold_bars_5m"]),
+        )
+        diverse.setdefault(family_key, item)
     finalists = []
     for item in candidates[:20]:
         geometry = (float(item["target_pct"]), float(item["stop_pct"]),
@@ -230,6 +238,8 @@ def main() -> None:
         "candidate_count": len(candidates),
         "selected_before_hidden_reveal": public(selected),
         "development_frontier": [public(item) for item in candidates[:20]],
+        "development_diverse_library": [
+            public(item) for item in diverse.values()],
         "confirmation_frontier": [public(item) for item in finalists[:20]],
         "hidden_2025_2026": holdouts,
         "objective_pass": objective,
