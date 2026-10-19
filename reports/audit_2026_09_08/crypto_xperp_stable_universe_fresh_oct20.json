@@ -1,0 +1,173 @@
+{
+  "accepted_fresh_signals": 33,
+  "fresh": {
+    "margin_3pct": {
+      "active_days": 3,
+      "by_module_count": {
+        "raw_hourly_direction": 33
+      },
+      "by_source_count": {
+        "raw_hourly_direction": 33
+      },
+      "dd_pct": 1.9162,
+      "max_entries_same_clock_hour": 2,
+      "max_entries_same_rolling_hour": 2,
+      "max_loss_streak": 7,
+      "monthly_return_pct": {
+        "2026-10": -0.7879
+      },
+      "n": 33,
+      "negative_months": 1,
+      "return_pct": -0.7879,
+      "trades_per_active_day": 11.0,
+      "trades_per_calendar_day": 11.0,
+      "wr": 33.33
+    },
+    "margin_5pct": {
+      "active_days": 3,
+      "by_module_count": {
+        "raw_hourly_direction": 33
+      },
+      "by_source_count": {
+        "raw_hourly_direction": 33
+      },
+      "dd_pct": 3.1782,
+      "max_entries_same_clock_hour": 2,
+      "max_entries_same_rolling_hour": 2,
+      "max_loss_streak": 7,
+      "monthly_return_pct": {
+        "2026-10": -1.3174
+      },
+      "n": 33,
+      "negative_months": 1,
+      "return_pct": -1.3174,
+      "trades_per_active_day": 11.0,
+      "trades_per_calendar_day": 11.0,
+      "wr": 33.33
+    }
+  },
+  "limitations": [
+    "The fresh window spans only about three days and cannot validate a monthly target.",
+    "This strategy had already failed the earlier monthly objective.",
+    "Gross returns exclude fees at user request.",
+    "No backtest guarantees future returns."
+  ],
+  "objective_pass": false,
+  "protocol": {
+    "collision": "stop first",
+    "entry": "next 15-minute market open",
+    "fresh_entry_after": 1792188000,
+    "money": "client 3% or 5% current-equity margin; fixed 10x",
+    "orders": "market only",
+    "parameters_frozen_before_fresh_data": {
+      "admissible": true,
+      "confirmation": {
+        "2026-06": {
+          "active_days": 30,
+          "by_module_count": {
+            "raw_hourly_direction": 522
+          },
+          "by_source_count": {
+            "raw_hourly_direction": 522
+          },
+          "dd_pct": 3.7446,
+          "literal_tp_rate_pct": 34.1,
+          "max_entries_same_clock_hour": 2,
+          "max_entries_same_rolling_hour": 2,
+          "max_entries_same_timestamp": 1,
+          "max_loss_streak": 10,
+          "monthly_return_pct": {
+            "2026-06": 9.21,
+            "2026-07": 0.6765
+          },
+          "n": 522,
+          "negative_months": 0,
+          "profitable_exit_rate_pct": 37.93,
+          "return_pct": 9.9488,
+          "trades_per_active_day": 17.4,
+          "trades_per_calendar_day": 17.4,
+          "wr": 37.93
+        },
+        "2026-07": {
+          "active_days": 31,
+          "by_module_count": {
+            "raw_hourly_direction": 397
+          },
+          "by_source_count": {
+            "raw_hourly_direction": 397
+          },
+          "dd_pct": 3.3611,
+          "literal_tp_rate_pct": 28.46,
+          "max_entries_same_clock_hour": 2,
+          "max_entries_same_rolling_hour": 2,
+          "max_entries_same_timestamp": 1,
+          "max_loss_streak": 10,
+          "monthly_return_pct": {
+            "2026-07": 7.4709
+          },
+          "n": 397,
+          "negative_months": 0,
+          "profitable_exit_rate_pct": 40.55,
+          "return_pct": 7.4709,
+          "trades_per_active_day": 12.806,
+          "trades_per_calendar_day": 12.806,
+          "wr": 40.55
+        }
+      },
+      "hold_bars": 48,
+      "hourly_cap": 2,
+      "lookback_bars": 4,
+      "loss_pause": 5,
+      "minimum_move_pct": 0.1,
+      "minimum_universe": 3,
+      "selection": {
+        "active_days": 31,
+        "by_module_count": {
+          "raw_hourly_direction": 439
+        },
+        "by_source_count": {
+          "raw_hourly_direction": 439
+        },
+        "dd_pct": 3.863,
+        "literal_tp_rate_pct": 28.02,
+        "max_entries_same_clock_hour": 2,
+        "max_entries_same_rolling_hour": 2,
+        "max_entries_same_timestamp": 1,
+        "max_loss_streak": 8,
+        "monthly_return_pct": {
+          "2026-05": 7.7378
+        },
+        "n": 439,
+        "negative_months": 0,
+        "profitable_exit_rate_pct": 41.69,
+        "return_pct": 7.7378,
+        "trades_per_active_day": 14.161,
+        "trades_per_calendar_day": 14.161,
+        "wr": 41.69
+      },
+      "stop_pct": 0.75,
+      "style": "reversal",
+      "target_pct": 1.5,
+      "z_threshold": 1.0
+    },
+    "refreshed_history_end": 1792444500,
+    "strategy_source": "reports\\audit_2026_09_08\\crypto_xperp_cross_section_stable_universe_oct20.json"
+  },
+  "raw_completed_fresh_signals": 300,
+  "ready_for_live_orders": false,
+  "sources": {
+    "C:\\Users\\Lenovo\\Desktop\\telegram bot\\crypto_xperp_stable_universe_fresh_oct20_audit.py": "31d41dbdeffe305f6326bb5a0f61e9548aad853e7cc4093ccd728671a69cd1c8",
+    "reports\\audit_2026_09_08\\crypto_xperp_cross_section_stable_universe_oct20.json": "acf7a878c799da4cd3225e504559d5c94d24ccddff5938947c55fee59b4abb07",
+    "reports\\audit_2026_09_08\\xperp_15m_oct17_material\\BTCUSDT_15min_current.pkl": "a04b359fc8c54a9f6ebe7a82a26a2f0c1d67066db0af2d75c4093e1034dc8855",
+    "reports\\audit_2026_09_08\\xperp_15m_oct17_material\\ETHUSDT_15min_current.pkl": "e3da6b6deea72d943e0d66f558103f21619f2829f948ae890d477ef14acb4eff",
+    "reports\\audit_2026_09_08\\xperp_15m_oct17_material\\SOLUSDT_15min_current.pkl": "3111f29333976fc475c1fddef9f8c721d558557a2f83a8f3fac17002d1a5996e",
+    "reports\\audit_2026_09_08\\xperp_15m_oct17_material\\SUIUSDT_15min_current.pkl": "24eb5eefb8252c616efdbe4039b773332d028cec9536b44070a47598aeda4653",
+    "reports\\audit_2026_09_08\\xperp_15m_oct17_material\\XRPUSDT_15min_current.pkl": "7b4d0bc24dc2d7b2bec9e7eebd285b14240cd6fed5e8e0dc8dca92d83323e5ba",
+    "reports\\audit_2026_09_08\\xperp_15m_oct20_forward\\BTCUSDT_15min_current.pkl": "c86ad4b6bd70135fdab3979b3a3c9269acb792ec6b8142f2cfdc5abb3e795c86",
+    "reports\\audit_2026_09_08\\xperp_15m_oct20_forward\\ETHUSDT_15min_current.pkl": "cfdf14e24476add039540d62b4b85e6c2fbad501a48b8cd224a29a018fe51a2a",
+    "reports\\audit_2026_09_08\\xperp_15m_oct20_forward\\SOLUSDT_15min_current.pkl": "648bd1692ec722277570de76459d1eadd3a6652cfcac806c8e42e97dcfad94a4",
+    "reports\\audit_2026_09_08\\xperp_15m_oct20_forward\\SUIUSDT_15min_current.pkl": "128dedf4f025d3882f857234289ce69f2ae32ba0677b034c50510b995ef73d6c",
+    "reports\\audit_2026_09_08\\xperp_15m_oct20_forward\\XRPUSDT_15min_current.pkl": "485b0690c1dca6a0b9cc944150369f64283882514fc7c30cc1dc5e91a97c9897"
+  },
+  "status": "FRESH_FORWARD_NONPOSITIVE"
+}
