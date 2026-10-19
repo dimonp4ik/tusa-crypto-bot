@@ -23,6 +23,7 @@ from crypto_runtime_shadow_portfolio_oct3_audit import money
 OUT = parent.ROOT / "crypto_xperp_cross_section_reversal_oct20.json"
 ROWS_OUT = parent.ROOT / "crypto_xperp_cross_section_reversal_oct20.pkl"
 LOOKBACKS = (1, 2, 4, 8)
+STYLES = ("reversal", "momentum")
 Z_THRESHOLDS = (1.0, 1.25, 1.5)
 MOVE_THRESHOLDS = (.001, .002, .004)
 MINIMUM_UNIVERSES = (3, 4, 5)
@@ -35,7 +36,10 @@ def digest(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
-def feature_rows(candles: dict[str, dict], lookback: int) -> pd.DataFrame:
+def feature_rows(candles: dict[str, dict], lookback: int,
+                 style: str = "reversal") -> pd.DataFrame:
+    if style not in STYLES:
+        raise ValueError(f"unknown cross-sectional style: {style}")
     rows = []
     for symbol, values in candles.items():
         times = np.asarray(values["time"], dtype=np.int64)
@@ -56,8 +60,9 @@ def feature_rows(candles: dict[str, dict], lookback: int) -> pd.DataFrame:
     frame["cross_std"] = grouped.transform("std")
     frame["cross_z"] = ((frame.signal_return - frame.cross_mean)
                         / frame.cross_std.replace(0, np.nan))
+    multiplier = -1 if style == "reversal" else 1
     frame["direction_n"] = (
-        -np.sign(frame.cross_z).fillna(0).astype(np.int8))
+        multiplier * np.sign(frame.cross_z).fillna(0).astype(np.int8))
     frame["direction"] = np.where(
         frame.direction_n > 0, "LONG", "SHORT")
     frame["model_quality"] = (
@@ -113,16 +118,16 @@ def main() -> None:
 
     candidates = []
     labeled_cache = {}
-    for lookback in LOOKBACKS:
-        features = feature_rows(candles, lookback)
+    for lookback, style in itertools.product(LOOKBACKS, STYLES):
+        features = feature_rows(candles, lookback, style)
         for geometry in geometry_audit.GEOMETRIES:
-            labeled_cache[(lookback, geometry)] = geometry_audit.relabel(
+            labeled_cache[(lookback, style, geometry)] = geometry_audit.relabel(
                 features, geometry, direct=True)
         for minimum_universe, z_threshold, move_threshold, geometry in itertools.product(
                 MINIMUM_UNIVERSES, Z_THRESHOLDS, MOVE_THRESHOLDS,
                 geometry_audit.GEOMETRIES):
             selected_frame = select_entries(
-                labeled_cache[(lookback, geometry)],
+                labeled_cache[(lookback, style, geometry)],
                 minimum_universe, z_threshold, move_threshold)
             for loss_pause in parent.LOSS_PAUSES:
                 for hourly_cap in parent.HOURLY_CAPS:
@@ -138,6 +143,7 @@ def main() -> None:
                     values = [selection, *confirmation.values()]
                     candidates.append({
                         "lookback_bars": lookback,
+                        "style": style,
                         "minimum_universe": minimum_universe,
                         "z_threshold": z_threshold,
                         "minimum_move_pct": 100 * move_threshold,
@@ -157,7 +163,8 @@ def main() -> None:
                 float(selected["stop_pct"]) / 100,
                 int(selected["hold_bars"]))
     selected_frame = select_entries(
-        labeled_cache[(int(selected["lookback_bars"]), geometry)],
+        labeled_cache[(int(selected["lookback_bars"]),
+                       str(selected["style"]), geometry)],
         int(selected["minimum_universe"]),
         float(selected["z_threshold"]),
         float(selected["minimum_move_pct"]) / 100)
@@ -193,6 +200,7 @@ def main() -> None:
             "symbols": list(parent.CORE_SYMBOLS),
             "minimum_universes": list(MINIMUM_UNIVERSES),
             "lookbacks_bars": list(LOOKBACKS),
+            "styles": list(STYLES),
             "z_thresholds": list(Z_THRESHOLDS),
             "minimum_move_pct": [100 * value
                                  for value in MOVE_THRESHOLDS],
@@ -206,7 +214,7 @@ def main() -> None:
             "entry": "next 15-minute market open",
             "orders": "market only",
             "money": "client 3% or 5% current-equity margin; fixed 10x",
-            "model": "none; deterministic relative-extreme reversal",
+            "model": "none; deterministic relative-extreme direction",
         },
         "candidate_count": len(candidates),
         "admissible_count": sum(item["admissible"] for item in candidates),
