@@ -32,6 +32,13 @@ def previous_month(value: str) -> str:
     return str(pd.Period(value, freq="M") - 1)
 
 
+def causal_training_rows(direct: pd.DataFrame,
+                         calibration_month: str) -> pd.DataFrame:
+    cutoff = pd.Period(calibration_month, freq="M").start_time.tz_localize(
+        "UTC").timestamp()
+    return direct[direct.exit_time < cutoff].copy()
+
+
 def policy_key(item: dict) -> tuple:
     metrics = item["metrics"]
     return (
@@ -85,7 +92,7 @@ def main() -> None:
     accepted_rows = []
     for test_month in TEST_MONTHS:
         calibration_month = previous_month(test_month)
-        older_direct = direct[direct.month < calibration_month].copy()
+        older_direct = causal_training_rows(direct, calibration_month)
         train = pd.concat([historical_train, older_direct], ignore_index=True)
         schema = parent.design(train)
         model = geometry_audit.fit_model(train, schema, target_name)

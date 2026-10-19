@@ -1,3 +1,5 @@
+import pandas as pd
+
 import crypto_xperp_monthly_adaptive_oct20_audit as audit
 
 
@@ -49,3 +51,12 @@ def test_policy_key_prefers_nonnegative_calibration_month():
     }
 
     assert audit.policy_key(profit) > audit.policy_key(loss)
+
+
+def test_causal_training_rows_requires_closed_outcome():
+    cutoff = pd.Timestamp("2026-06-01", tz="UTC").timestamp()
+    frame = pd.DataFrame({
+        "exit_time": [cutoff - 1, cutoff, cutoff + 1],
+    })
+    result = audit.causal_training_rows(frame, "2026-06")
+    assert result.exit_time.tolist() == [cutoff - 1]

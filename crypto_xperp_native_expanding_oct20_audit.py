@@ -27,7 +27,9 @@ def digest(path: Path) -> str:
 
 
 def training_rows(direct: pd.DataFrame, calibration_month: str) -> pd.DataFrame:
-    return direct[direct.month < calibration_month].copy()
+    cutoff = pd.Period(calibration_month, freq="M").start_time.tz_localize(
+        "UTC").timestamp()
+    return direct[direct.exit_time < cutoff].copy()
 
 
 def main() -> None:

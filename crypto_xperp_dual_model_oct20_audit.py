@@ -92,7 +92,7 @@ def main() -> None:
     accepted_rows = []
     for test_month in monthly.TEST_MONTHS:
         calibration_month = monthly.previous_month(test_month)
-        train = direct[direct.month < calibration_month].copy()
+        train = monthly.causal_training_rows(direct, calibration_month)
         if len(train) < 1000:
             raise RuntimeError(
                 f"insufficient direct training rows before {calibration_month}")
