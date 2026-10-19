@@ -1,0 +1,2100 @@
+{
+  "admissible_count": 36,
+  "candidate_count": 144,
+  "holdouts": {
+    "margin_3pct": {
+      "2026-08": {
+        "active_days": 31,
+        "by_module_count": {
+          "raw_hourly_direction": 395
+        },
+        "by_source_count": {
+          "raw_hourly_direction": 395
+        },
+        "dd_pct": 7.1813,
+        "literal_tp_rate_pct": 32.41,
+        "max_entries_same_clock_hour": 2,
+        "max_entries_same_rolling_hour": 2,
+        "max_entries_same_timestamp": 1,
+        "max_loss_streak": 11,
+        "monthly_return_pct": {
+          "2026-08": -6.311
+        },
+        "n": 395,
+        "negative_months": 1,
+        "profitable_exit_rate_pct": 38.73,
+        "return_pct": -6.311,
+        "trades_per_active_day": 12.742,
+        "trades_per_calendar_day": 12.742,
+        "wr": 38.73
+      },
+      "2026-09": {
+        "active_days": 30,
+        "by_module_count": {
+          "raw_hourly_direction": 408
+        },
+        "by_source_count": {
+          "raw_hourly_direction": 408
+        },
+        "dd_pct": 5.7916,
+        "literal_tp_rate_pct": 35.78,
+        "max_entries_same_clock_hour": 2,
+        "max_entries_same_rolling_hour": 2,
+        "max_entries_same_timestamp": 1,
+        "max_loss_streak": 10,
+        "monthly_return_pct": {
+          "2026-09": -4.1119
+        },
+        "n": 408,
+        "negative_months": 1,
+        "profitable_exit_rate_pct": 38.24,
+        "return_pct": -4.1119,
+        "trades_per_active_day": 13.6,
+        "trades_per_calendar_day": 13.6,
+        "wr": 38.24
+      },
+      "2026-10": {
+        "active_days": 16,
+        "by_module_count": {
+          "raw_hourly_direction": 194
+        },
+        "by_source_count": {
+          "raw_hourly_direction": 194
+        },
+        "dd_pct": 5.0023,
+        "literal_tp_rate_pct": 34.54,
+        "max_entries_same_clock_hour": 2,
+        "max_entries_same_rolling_hour": 2,
+        "max_entries_same_timestamp": 1,
+        "max_loss_streak": 10,
+        "monthly_return_pct": {
+          "2026-10": -3.2088
+        },
+        "n": 194,
+        "negative_months": 1,
+        "profitable_exit_rate_pct": 38.14,
+        "return_pct": -3.2088,
+        "trades_per_active_day": 12.125,
+        "trades_per_calendar_day": 12.125,
+        "wr": 38.14
+      }
+    },
+    "margin_5pct": {
+      "2026-08": {
+        "active_days": 31,
+        "by_module_count": {
+          "raw_hourly_direction": 395
+        },
+        "by_source_count": {
+          "raw_hourly_direction": 395
+        },
+        "dd_pct": 11.8141,
+        "literal_tp_rate_pct": 32.41,
+        "max_entries_same_clock_hour": 2,
+        "max_entries_same_rolling_hour": 2,
+        "max_entries_same_timestamp": 1,
+        "max_loss_streak": 11,
+        "monthly_return_pct": {
+          "2026-08": -10.4341
+        },
+        "n": 395,
+        "negative_months": 1,
+        "profitable_exit_rate_pct": 38.73,
+        "return_pct": -10.4341,
+        "trades_per_active_day": 12.742,
+        "trades_per_calendar_day": 12.742,
+        "wr": 38.73
+      },
+      "2026-09": {
+        "active_days": 30,
+        "by_module_count": {
+          "raw_hourly_direction": 408
+        },
+        "by_source_count": {
+          "raw_hourly_direction": 408
+        },
+        "dd_pct": 9.5468,
+        "literal_tp_rate_pct": 35.78,
+        "max_entries_same_clock_hour": 2,
+        "max_entries_same_rolling_hour": 2,
+        "max_entries_same_timestamp": 1,
+        "max_loss_streak": 10,
+        "monthly_return_pct": {
+          "2026-09": -6.9213
+        },
+        "n": 408,
+        "negative_months": 1,
+        "profitable_exit_rate_pct": 38.24,
+        "return_pct": -6.9213,
+        "trades_per_active_day": 13.6,
+        "trades_per_calendar_day": 13.6,
+        "wr": 38.24
+      },
+      "2026-10": {
+        "active_days": 16,
+        "by_module_count": {
+          "raw_hourly_direction": 194
+        },
+        "by_source_count": {
+          "raw_hourly_direction": 194
+        },
+        "dd_pct": 8.2589,
+        "literal_tp_rate_pct": 34.54,
+        "max_entries_same_clock_hour": 2,
+        "max_entries_same_rolling_hour": 2,
+        "max_entries_same_timestamp": 1,
+        "max_loss_streak": 10,
+        "monthly_return_pct": {
+          "2026-10": -5.3604
+        },
+        "n": 194,
+        "negative_months": 1,
+        "profitable_exit_rate_pct": 38.14,
+        "return_pct": -5.3604,
+        "trades_per_active_day": 12.125,
+        "trades_per_calendar_day": 12.125,
+        "wr": 38.14
+      }
+    }
+  },
+  "limitations": [
+    "The router was conceived after earlier August-October results were observed.",
+    "Direct venue history begins in partial April 2026.",
+    "Only five symbols have continuous native history.",
+    "October is incomplete and remains diagnostic.",
+    "Gross returns exclude fees at user request.",
+    "No backtest guarantees a future monthly return."
+  ],
+  "objective_pass": false,
+  "protocol": {
+    "causality": "router state uses synchronized closed candles only",
+    "components": {
+      "momentum": {
+        "geometry": [
+          0.01,
+          0.0075,
+          48
+        ],
+        "lookback": 4,
+        "minimum_universe": 3,
+        "move_threshold": 0.001,
+        "z_threshold": 1.25
+      },
+      "reversal": {
+        "geometry": [
+          0.015,
+          0.0075,
+          48
+        ],
+        "lookback": 2,
+        "minimum_universe": 3,
+        "move_threshold": 0.004,
+        "z_threshold": 1.25
+      }
+    },
+    "confirmation": [
+      "2026-06",
+      "2026-07"
+    ],
+    "diagnostic_holdouts": [
+      "2026-08",
+      "2026-09",
+      "2026-10"
+    ],
+    "entry": "next 15-minute market open",
+    "money": "client 3% or 5% current-equity margin; fixed 10x",
+    "orders": "market only",
+    "quantiles": [
+      0.25,
+      0.5,
+      0.75
+    ],
+    "regime_fields": [
+      "btc_efficiency8",
+      "btc_abs_return8",
+      "market_abs_mean4",
+      "market_dispersion4",
+      "market_breadth_extreme4",
+      "common_to_dispersion4"
+    ],
+    "selection": "2026-05"
+  },
+  "ready_for_live_orders": false,
+  "selected_before_holdouts": {
+    "admissible": true,
+    "confirmation": {
+      "2026-06": {
+        "active_days": 30,
+        "by_module_count": {
+          "raw_hourly_direction": 433
+        },
+        "by_source_count": {
+          "raw_hourly_direction": 433
+        },
+        "dd_pct": 4.7433,
+        "literal_tp_rate_pct": 44.57,
+        "max_entries_same_clock_hour": 2,
+        "max_entries_same_rolling_hour": 2,
+        "max_entries_same_timestamp": 1,
+        "max_loss_streak": 7,
+        "monthly_return_pct": {
+          "2026-06": 9.7228,
+          "2026-07": 0.1495
+        },
+        "n": 433,
+        "negative_months": 0,
+        "profitable_exit_rate_pct": 47.34,
+        "return_pct": 9.8869,
+        "trades_per_active_day": 14.433,
+        "trades_per_calendar_day": 14.433,
+        "wr": 47.34
+      },
+      "2026-07": {
+        "active_days": 31,
+        "by_module_count": {
+          "raw_hourly_direction": 391
+        },
+        "by_source_count": {
+          "raw_hourly_direction": 391
+        },
+        "dd_pct": 4.039,
+        "literal_tp_rate_pct": 39.64,
+        "max_entries_same_clock_hour": 2,
+        "max_entries_same_rolling_hour": 2,
+        "max_entries_same_timestamp": 1,
+        "max_loss_streak": 10,
+        "monthly_return_pct": {
+          "2026-07": 6.1753
+        },
+        "n": 391,
+        "negative_months": 0,
+        "profitable_exit_rate_pct": 45.01,
+        "return_pct": 6.1753,
+        "trades_per_active_day": 12.613,
+        "trades_per_calendar_day": 12.613,
+        "wr": 45.01
+      }
+    },
+    "field": "market_breadth_extreme4",
+    "high_style": "momentum",
+    "hourly_cap": 2,
+    "loss_pause": 5,
+    "low_style": "reversal",
+    "quantile": 0.5,
+    "selection": {
+      "active_days": 12,
+      "by_module_count": {
+        "raw_hourly_direction": 113
+      },
+      "by_source_count": {
+        "raw_hourly_direction": 113
+      },
+      "dd_pct": 1.3416,
+      "literal_tp_rate_pct": 44.25,
+      "max_entries_same_clock_hour": 2,
+      "max_entries_same_rolling_hour": 2,
+      "max_entries_same_timestamp": 1,
+      "max_loss_streak": 6,
+      "monthly_return_pct": {
+        "2026-05": 4.9379,
+        "2026-06": 0.5989
+      },
+      "n": 113,
+      "negative_months": 0,
+      "profitable_exit_rate_pct": 53.1,
+      "return_pct": 5.5664,
+      "trades_per_active_day": 9.417,
+      "trades_per_calendar_day": 9.417,
+      "wr": 53.1
+    },
+    "threshold": 0.5
+  },
+  "sources": {
+    "C:\\Users\\Lenovo\\Desktop\\telegram bot\\crypto_xperp_regime_style_router_oct20_audit.py": "d193d0664c76ea94eace8328a57e3ee0e7811d32a2df7ee68e2df61a9bda75b7",
+    "reports\\audit_2026_09_08\\xperp_15m_oct17_material\\BTCUSDT_15min_current.pkl": "a04b359fc8c54a9f6ebe7a82a26a2f0c1d67066db0af2d75c4093e1034dc8855",
+    "reports\\audit_2026_09_08\\xperp_15m_oct17_material\\ETHUSDT_15min_current.pkl": "e3da6b6deea72d943e0d66f558103f21619f2829f948ae890d477ef14acb4eff",
+    "reports\\audit_2026_09_08\\xperp_15m_oct17_material\\LINKUSDT_15min_current.pkl": "c24a40f6bca282c3f2e5e80eef44e7b8553efdf1425a47ee3d18c27435d24e76",
+    "reports\\audit_2026_09_08\\xperp_15m_oct17_material\\XLMUSDT_15min_current.pkl": "795aa5ad820b811c913811dd552893978bf4d5414e3ca2b4253d34ffd0d70866",
+    "reports\\audit_2026_09_08\\xperp_15m_oct17_material\\XRPUSDT_15min_current.pkl": "7b4d0bc24dc2d7b2bec9e7eebd285b14240cd6fed5e8e0dc8dca92d83323e5ba"
+  },
+  "status": "REJECTED_OBJECTIVE",
+  "top20_before_holdouts": [
+    {
+      "admissible": true,
+      "confirmation": {
+        "2026-06": {
+          "active_days": 30,
+          "by_module_count": {
+            "raw_hourly_direction": 433
+          },
+          "by_source_count": {
+            "raw_hourly_direction": 433
+          },
+          "dd_pct": 4.7433,
+          "literal_tp_rate_pct": 44.57,
+          "max_entries_same_clock_hour": 2,
+          "max_entries_same_rolling_hour": 2,
+          "max_entries_same_timestamp": 1,
+          "max_loss_streak": 7,
+          "monthly_return_pct": {
+            "2026-06": 9.7228,
+            "2026-07": 0.1495
+          },
+          "n": 433,
+          "negative_months": 0,
+          "profitable_exit_rate_pct": 47.34,
+          "return_pct": 9.8869,
+          "trades_per_active_day": 14.433,
+          "trades_per_calendar_day": 14.433,
+          "wr": 47.34
+        },
+        "2026-07": {
+          "active_days": 31,
+          "by_module_count": {
+            "raw_hourly_direction": 391
+          },
+          "by_source_count": {
+            "raw_hourly_direction": 391
+          },
+          "dd_pct": 4.039,
+          "literal_tp_rate_pct": 39.64,
+          "max_entries_same_clock_hour": 2,
+          "max_entries_same_rolling_hour": 2,
+          "max_entries_same_timestamp": 1,
+          "max_loss_streak": 10,
+          "monthly_return_pct": {
+            "2026-07": 6.1753
+          },
+          "n": 391,
+          "negative_months": 0,
+          "profitable_exit_rate_pct": 45.01,
+          "return_pct": 6.1753,
+          "trades_per_active_day": 12.613,
+          "trades_per_calendar_day": 12.613,
+          "wr": 45.01
+        }
+      },
+      "field": "market_breadth_extreme4",
+      "high_style": "momentum",
+      "hourly_cap": 2,
+      "loss_pause": 5,
+      "low_style": "reversal",
+      "quantile": 0.5,
+      "selection": {
+        "active_days": 12,
+        "by_module_count": {
+          "raw_hourly_direction": 113
+        },
+        "by_source_count": {
+          "raw_hourly_direction": 113
+        },
+        "dd_pct": 1.3416,
+        "literal_tp_rate_pct": 44.25,
+        "max_entries_same_clock_hour": 2,
+        "max_entries_same_rolling_hour": 2,
+        "max_entries_same_timestamp": 1,
+        "max_loss_streak": 6,
+        "monthly_return_pct": {
+          "2026-05": 4.9379,
+          "2026-06": 0.5989
+        },
+        "n": 113,
+        "negative_months": 0,
+        "profitable_exit_rate_pct": 53.1,
+        "return_pct": 5.5664,
+        "trades_per_active_day": 9.417,
+        "trades_per_calendar_day": 9.417,
+        "wr": 53.1
+      },
+      "threshold": 0.5
+    },
+    {
+      "admissible": true,
+      "confirmation": {
+        "2026-06": {
+          "active_days": 30,
+          "by_module_count": {
+            "raw_hourly_direction": 433
+          },
+          "by_source_count": {
+            "raw_hourly_direction": 433
+          },
+          "dd_pct": 4.7433,
+          "literal_tp_rate_pct": 44.57,
+          "max_entries_same_clock_hour": 2,
+          "max_entries_same_rolling_hour": 2,
+          "max_entries_same_timestamp": 1,
+          "max_loss_streak": 7,
+          "monthly_return_pct": {
+            "2026-06": 9.7228,
+            "2026-07": 0.1495
+          },
+          "n": 433,
+          "negative_months": 0,
+          "profitable_exit_rate_pct": 47.34,
+          "return_pct": 9.8869,
+          "trades_per_active_day": 14.433,
+          "trades_per_calendar_day": 14.433,
+          "wr": 47.34
+        },
+        "2026-07": {
+          "active_days": 31,
+          "by_module_count": {
+            "raw_hourly_direction": 391
+          },
+          "by_source_count": {
+            "raw_hourly_direction": 391
+          },
+          "dd_pct": 4.039,
+          "literal_tp_rate_pct": 39.64,
+          "max_entries_same_clock_hour": 2,
+          "max_entries_same_rolling_hour": 2,
+          "max_entries_same_timestamp": 1,
+          "max_loss_streak": 10,
+          "monthly_return_pct": {
+            "2026-07": 6.1753
+          },
+          "n": 391,
+          "negative_months": 0,
+          "profitable_exit_rate_pct": 45.01,
+          "return_pct": 6.1753,
+          "trades_per_active_day": 12.613,
+          "trades_per_calendar_day": 12.613,
+          "wr": 45.01
+        }
+      },
+      "field": "market_breadth_extreme4",
+      "high_style": "momentum",
+      "hourly_cap": 2,
+      "loss_pause": 5,
+      "low_style": "reversal",
+      "quantile": 0.75,
+      "selection": {
+        "active_days": 12,
+        "by_module_count": {
+          "raw_hourly_direction": 113
+        },
+        "by_source_count": {
+          "raw_hourly_direction": 113
+        },
+        "dd_pct": 1.3416,
+        "literal_tp_rate_pct": 44.25,
+        "max_entries_same_clock_hour": 2,
+        "max_entries_same_rolling_hour": 2,
+        "max_entries_same_timestamp": 1,
+        "max_loss_streak": 6,
+        "monthly_return_pct": {
+          "2026-05": 4.9379,
+          "2026-06": 0.5989
+        },
+        "n": 113,
+        "negative_months": 0,
+        "profitable_exit_rate_pct": 53.1,
+        "return_pct": 5.5664,
+        "trades_per_active_day": 9.417,
+        "trades_per_calendar_day": 9.417,
+        "wr": 53.1
+      },
+      "threshold": 0.5
+    },
+    {
+      "admissible": true,
+      "confirmation": {
+        "2026-06": {
+          "active_days": 30,
+          "by_module_count": {
+            "raw_hourly_direction": 379
+          },
+          "by_source_count": {
+            "raw_hourly_direction": 379
+          },
+          "dd_pct": 3.9756,
+          "literal_tp_rate_pct": 43.54,
+          "max_entries_same_clock_hour": 2,
+          "max_entries_same_rolling_hour": 2,
+          "max_entries_same_timestamp": 1,
+          "max_loss_streak": 6,
+          "monthly_return_pct": {
+            "2026-06": 8.1533,
+            "2026-07": 0.5255
+          },
+          "n": 379,
+          "negative_months": 0,
+          "profitable_exit_rate_pct": 46.17,
+          "return_pct": 8.7216,
+          "trades_per_active_day": 12.633,
+          "trades_per_calendar_day": 12.633,
+          "wr": 46.17
+        },
+        "2026-07": {
+          "active_days": 31,
+          "by_module_count": {
+            "raw_hourly_direction": 406
+          },
+          "by_source_count": {
+            "raw_hourly_direction": 406
+          },
+          "dd_pct": 3.5859,
+          "literal_tp_rate_pct": 39.16,
+          "max_entries_same_clock_hour": 2,
+          "max_entries_same_rolling_hour": 2,
+          "max_entries_same_timestamp": 1,
+          "max_loss_streak": 10,
+          "monthly_return_pct": {
+            "2026-07": 4.7613,
+            "2026-08": 0.2037
+          },
+          "n": 406,
+          "negative_months": 0,
+          "profitable_exit_rate_pct": 44.33,
+          "return_pct": 4.9747,
+          "trades_per_active_day": 13.097,
+          "trades_per_calendar_day": 13.097,
+          "wr": 44.33
+        }
+      },
+      "field": "btc_efficiency8",
+      "high_style": "momentum",
+      "hourly_cap": 2,
+      "loss_pause": 5,
+      "low_style": "reversal",
+      "quantile": 0.5,
+      "selection": {
+        "active_days": 12,
+        "by_module_count": {
+          "raw_hourly_direction": 117
+        },
+        "by_source_count": {
+          "raw_hourly_direction": 117
+        },
+        "dd_pct": 1.7116,
+        "literal_tp_rate_pct": 42.74,
+        "max_entries_same_clock_hour": 2,
+        "max_entries_same_rolling_hour": 2,
+        "max_entries_same_timestamp": 1,
+        "max_loss_streak": 5,
+        "monthly_return_pct": {
+          "2026-05": 5.2329,
+          "2026-06": 0.1568
+        },
+        "n": 117,
+        "negative_months": 0,
+        "profitable_exit_rate_pct": 52.99,
+        "return_pct": 5.398,
+        "trades_per_active_day": 9.75,
+        "trades_per_calendar_day": 9.75,
+        "wr": 52.99
+      },
+      "threshold": 0.31236539090167953
+    },
+    {
+      "admissible": true,
+      "confirmation": {
+        "2026-06": {
+          "active_days": 30,
+          "by_module_count": {
+            "raw_hourly_direction": 441
+          },
+          "by_source_count": {
+            "raw_hourly_direction": 441
+          },
+          "dd_pct": 5.4908,
+          "literal_tp_rate_pct": 43.31,
+          "max_entries_same_clock_hour": 2,
+          "max_entries_same_rolling_hour": 2,
+          "max_entries_same_timestamp": 1,
+          "max_loss_streak": 7,
+          "monthly_return_pct": {
+            "2026-06": 7.4217,
+            "2026-07": 0.1495
+          },
+          "n": 441,
+          "negative_months": 0,
+          "profitable_exit_rate_pct": 46.03,
+          "return_pct": 7.5823,
+          "trades_per_active_day": 14.7,
+          "trades_per_calendar_day": 14.7,
+          "wr": 46.03
+        },
+        "2026-07": {
+          "active_days": 31,
+          "by_module_count": {
+            "raw_hourly_direction": 385
+          },
+          "by_source_count": {
+            "raw_hourly_direction": 385
+          },
+          "dd_pct": 3.5031,
+          "literal_tp_rate_pct": 40.78,
+          "max_entries_same_clock_hour": 2,
+          "max_entries_same_rolling_hour": 2,
+          "max_entries_same_timestamp": 1,
+          "max_loss_streak": 9,
+          "monthly_return_pct": {
+            "2026-07": 8.6845
+          },
+          "n": 385,
+          "negative_months": 0,
+          "profitable_exit_rate_pct": 45.97,
+          "return_pct": 8.6845,
+          "trades_per_active_day": 12.419,
+          "trades_per_calendar_day": 12.419,
+          "wr": 45.97
+        }
+      },
+      "field": "common_to_dispersion4",
+      "high_style": "momentum",
+      "hourly_cap": 2,
+      "loss_pause": 5,
+      "low_style": "reversal",
+      "quantile": 0.5,
+      "selection": {
+        "active_days": 12,
+        "by_module_count": {
+          "raw_hourly_direction": 103
+        },
+        "by_source_count": {
+          "raw_hourly_direction": 103
+        },
+        "dd_pct": 1.4482,
+        "literal_tp_rate_pct": 41.75,
+        "max_entries_same_clock_hour": 2,
+        "max_entries_same_rolling_hour": 2,
+        "max_entries_same_timestamp": 1,
+        "max_loss_streak": 6,
+        "monthly_return_pct": {
+          "2026-05": 4.2337,
+          "2026-06": 0.5989
+        },
+        "n": 103,
+        "negative_months": 0,
+        "profitable_exit_rate_pct": 52.43,
+        "return_pct": 4.858,
+        "trades_per_active_day": 8.583,
+        "trades_per_calendar_day": 8.583,
+        "wr": 52.43
+      },
+      "threshold": 1.0716187149175949
+    },
+    {
+      "admissible": true,
+      "confirmation": {
+        "2026-06": {
+          "active_days": 30,
+          "by_module_count": {
+            "raw_hourly_direction": 237
+          },
+          "by_source_count": {
+            "raw_hourly_direction": 237
+          },
+          "dd_pct": 3.1832,
+          "literal_tp_rate_pct": 43.04,
+          "max_entries_same_clock_hour": 1,
+          "max_entries_same_rolling_hour": 2,
+          "max_entries_same_timestamp": 1,
+          "max_loss_streak": 8,
+          "monthly_return_pct": {
+            "2026-06": 4.3541,
+            "2026-07": 0.3
+          },
+          "n": 237,
+          "negative_months": 0,
+          "profitable_exit_rate_pct": 43.46,
+          "return_pct": 4.6671,
+          "trades_per_active_day": 7.9,
+          "trades_per_calendar_day": 7.9,
+          "wr": 43.46
+        },
+        "2026-07": {
+          "active_days": 31,
+          "by_module_count": {
+            "raw_hourly_direction": 250
+          },
+          "by_source_count": {
+            "raw_hourly_direction": 250
+          },
+          "dd_pct": 5.8512,
+          "literal_tp_rate_pct": 39.2,
+          "max_entries_same_clock_hour": 1,
+          "max_entries_same_rolling_hour": 2,
+          "max_entries_same_timestamp": 1,
+          "max_loss_streak": 9,
+          "monthly_return_pct": {
+            "2026-07": 5.8807
+          },
+          "n": 250,
+          "negative_months": 0,
+          "profitable_exit_rate_pct": 44.4,
+          "return_pct": 5.8807,
+          "trades_per_active_day": 8.065,
+          "trades_per_calendar_day": 8.065,
+          "wr": 44.4
+        }
+      },
+      "field": "market_abs_mean4",
+      "high_style": "momentum",
+      "hourly_cap": 1,
+      "loss_pause": 3,
+      "low_style": "reversal",
+      "quantile": 0.75,
+      "selection": {
+        "active_days": 12,
+        "by_module_count": {
+          "raw_hourly_direction": 75
+        },
+        "by_source_count": {
+          "raw_hourly_direction": 75
+        },
+        "dd_pct": 0.9661,
+        "literal_tp_rate_pct": 46.67,
+        "max_entries_same_clock_hour": 1,
+        "max_entries_same_rolling_hour": 2,
+        "max_entries_same_timestamp": 1,
+        "max_loss_streak": 4,
+        "monthly_return_pct": {
+          "2026-05": 5.8154
+        },
+        "n": 75,
+        "negative_months": 0,
+        "profitable_exit_rate_pct": 53.33,
+        "return_pct": 5.8154,
+        "trades_per_active_day": 6.25,
+        "trades_per_calendar_day": 6.25,
+        "wr": 53.33
+      },
+      "threshold": 0.003349966217739977
+    },
+    {
+      "admissible": true,
+      "confirmation": {
+        "2026-06": {
+          "active_days": 30,
+          "by_module_count": {
+            "raw_hourly_direction": 383
+          },
+          "by_source_count": {
+            "raw_hourly_direction": 383
+          },
+          "dd_pct": 5.855,
+          "literal_tp_rate_pct": 42.3,
+          "max_entries_same_clock_hour": 2,
+          "max_entries_same_rolling_hour": 2,
+          "max_entries_same_timestamp": 1,
+          "max_loss_streak": 7,
+          "monthly_return_pct": {
+            "2026-06": 4.1924,
+            "2026-07": 0.3
+          },
+          "n": 383,
+          "negative_months": 0,
+          "profitable_exit_rate_pct": 44.65,
+          "return_pct": 4.505,
+          "trades_per_active_day": 12.767,
+          "trades_per_calendar_day": 12.767,
+          "wr": 44.65
+        },
+        "2026-07": {
+          "active_days": 31,
+          "by_module_count": {
+            "raw_hourly_direction": 319
+          },
+          "by_source_count": {
+            "raw_hourly_direction": 319
+          },
+          "dd_pct": 5.5483,
+          "literal_tp_rate_pct": 39.5,
+          "max_entries_same_clock_hour": 2,
+          "max_entries_same_rolling_hour": 2,
+          "max_entries_same_timestamp": 1,
+          "max_loss_streak": 12,
+          "monthly_return_pct": {
+            "2026-07": 5.6651
+          },
+          "n": 319,
+          "negative_months": 0,
+          "profitable_exit_rate_pct": 43.57,
+          "return_pct": 5.6651,
+          "trades_per_active_day": 10.29,
+          "trades_per_calendar_day": 10.29,
+          "wr": 43.57
+        }
+      },
+      "field": "market_abs_mean4",
+      "high_style": "momentum",
+      "hourly_cap": 2,
+      "loss_pause": 5,
+      "low_style": "reversal",
+      "quantile": 0.75,
+      "selection": {
+        "active_days": 12,
+        "by_module_count": {
+          "raw_hourly_direction": 95
+        },
+        "by_source_count": {
+          "raw_hourly_direction": 95
+        },
+        "dd_pct": 1.1975,
+        "literal_tp_rate_pct": 42.11,
+        "max_entries_same_clock_hour": 2,
+        "max_entries_same_rolling_hour": 2,
+        "max_entries_same_timestamp": 1,
+        "max_loss_streak": 4,
+        "monthly_return_pct": {
+          "2026-05": 4.3808
+        },
+        "n": 95,
+        "negative_months": 0,
+        "profitable_exit_rate_pct": 50.53,
+        "return_pct": 4.3808,
+        "trades_per_active_day": 7.917,
+        "trades_per_calendar_day": 7.917,
+        "wr": 50.53
+      },
+      "threshold": 0.003349966217739977
+    },
+    {
+      "admissible": true,
+      "confirmation": {
+        "2026-06": {
+          "active_days": 30,
+          "by_module_count": {
+            "raw_hourly_direction": 434
+          },
+          "by_source_count": {
+            "raw_hourly_direction": 434
+          },
+          "dd_pct": 2.9838,
+          "literal_tp_rate_pct": 45.16,
+          "max_entries_same_clock_hour": 2,
+          "max_entries_same_rolling_hour": 2,
+          "max_entries_same_timestamp": 1,
+          "max_loss_streak": 7,
+          "monthly_return_pct": {
+            "2026-06": 7.5744,
+            "2026-07": 0.1495
+          },
+          "n": 434,
+          "negative_months": 0,
+          "profitable_exit_rate_pct": 47.24,
+          "return_pct": 7.7352,
+          "trades_per_active_day": 14.467,
+          "trades_per_calendar_day": 14.467,
+          "wr": 47.24
+        },
+        "2026-07": {
+          "active_days": 31,
+          "by_module_count": {
+            "raw_hourly_direction": 410
+          },
+          "by_source_count": {
+            "raw_hourly_direction": 410
+          },
+          "dd_pct": 4.4647,
+          "literal_tp_rate_pct": 39.27,
+          "max_entries_same_clock_hour": 2,
+          "max_entries_same_rolling_hour": 2,
+          "max_entries_same_timestamp": 1,
+          "max_loss_streak": 9,
+          "monthly_return_pct": {
+            "2026-07": 4.1406
+          },
+          "n": 410,
+          "negative_months": 0,
+          "profitable_exit_rate_pct": 44.88,
+          "return_pct": 4.1406,
+          "trades_per_active_day": 13.226,
+          "trades_per_calendar_day": 13.226,
+          "wr": 44.88
+        }
+      },
+      "field": "common_to_dispersion4",
+      "high_style": "momentum",
+      "hourly_cap": 2,
+      "loss_pause": 5,
+      "low_style": "reversal",
+      "quantile": 0.25,
+      "selection": {
+        "active_days": 12,
+        "by_module_count": {
+          "raw_hourly_direction": 125
+        },
+        "by_source_count": {
+          "raw_hourly_direction": 125
+        },
+        "dd_pct": 1.5471,
+        "literal_tp_rate_pct": 43.2,
+        "max_entries_same_clock_hour": 2,
+        "max_entries_same_rolling_hour": 2,
+        "max_entries_same_timestamp": 1,
+        "max_loss_streak": 4,
+        "monthly_return_pct": {
+          "2026-05": 3.7152,
+          "2026-06": 0.5989
+        },
+        "n": 125,
+        "negative_months": 0,
+        "profitable_exit_rate_pct": 52.0,
+        "return_pct": 4.3363,
+        "trades_per_active_day": 10.417,
+        "trades_per_calendar_day": 10.417,
+        "wr": 52.0
+      },
+      "threshold": 0.573698495340605
+    },
+    {
+      "admissible": true,
+      "confirmation": {
+        "2026-06": {
+          "active_days": 30,
+          "by_module_count": {
+            "raw_hourly_direction": 312
+          },
+          "by_source_count": {
+            "raw_hourly_direction": 312
+          },
+          "dd_pct": 2.9888,
+          "literal_tp_rate_pct": 46.15,
+          "max_entries_same_clock_hour": 2,
+          "max_entries_same_rolling_hour": 2,
+          "max_entries_same_timestamp": 1,
+          "max_loss_streak": 8,
+          "monthly_return_pct": {
+            "2026-06": 6.556
+          },
+          "n": 312,
+          "negative_months": 0,
+          "profitable_exit_rate_pct": 47.76,
+          "return_pct": 6.556,
+          "trades_per_active_day": 10.4,
+          "trades_per_calendar_day": 10.4,
+          "wr": 47.76
+        },
+        "2026-07": {
+          "active_days": 31,
+          "by_module_count": {
+            "raw_hourly_direction": 263
+          },
+          "by_source_count": {
+            "raw_hourly_direction": 263
+          },
+          "dd_pct": 2.5015,
+          "literal_tp_rate_pct": 40.3,
+          "max_entries_same_clock_hour": 2,
+          "max_entries_same_rolling_hour": 2,
+          "max_entries_same_timestamp": 1,
+          "max_loss_streak": 7,
+          "monthly_return_pct": {
+            "2026-07": 4.031
+          },
+          "n": 263,
+          "negative_months": 0,
+          "profitable_exit_rate_pct": 46.01,
+          "return_pct": 4.031,
+          "trades_per_active_day": 8.484,
+          "trades_per_calendar_day": 8.484,
+          "wr": 46.01
+        }
+      },
+      "field": "common_to_dispersion4",
+      "high_style": "momentum",
+      "hourly_cap": 2,
+      "loss_pause": 3,
+      "low_style": "reversal",
+      "quantile": 0.25,
+      "selection": {
+        "active_days": 12,
+        "by_module_count": {
+          "raw_hourly_direction": 89
+        },
+        "by_source_count": {
+          "raw_hourly_direction": 89
+        },
+        "dd_pct": 1.8116,
+        "literal_tp_rate_pct": 43.82,
+        "max_entries_same_clock_hour": 2,
+        "max_entries_same_rolling_hour": 2,
+        "max_entries_same_timestamp": 1,
+        "max_loss_streak": 7,
+        "monthly_return_pct": {
+          "2026-05": 3.5887,
+          "2026-06": 0.5989
+        },
+        "n": 89,
+        "negative_months": 0,
+        "profitable_exit_rate_pct": 53.93,
+        "return_pct": 4.209,
+        "trades_per_active_day": 7.417,
+        "trades_per_calendar_day": 7.417,
+        "wr": 53.93
+      },
+      "threshold": 0.573698495340605
+    },
+    {
+      "admissible": true,
+      "confirmation": {
+        "2026-06": {
+          "active_days": 30,
+          "by_module_count": {
+            "raw_hourly_direction": 318
+          },
+          "by_source_count": {
+            "raw_hourly_direction": 318
+          },
+          "dd_pct": 4.4236,
+          "literal_tp_rate_pct": 38.99,
+          "max_entries_same_clock_hour": 1,
+          "max_entries_same_rolling_hour": 2,
+          "max_entries_same_timestamp": 1,
+          "max_loss_streak": 8,
+          "monthly_return_pct": {
+            "2026-06": 6.412,
+            "2026-07": 0.1495
+          },
+          "n": 318,
+          "negative_months": 0,
+          "profitable_exit_rate_pct": 43.08,
+          "return_pct": 6.5711,
+          "trades_per_active_day": 10.6,
+          "trades_per_calendar_day": 10.6,
+          "wr": 43.08
+        },
+        "2026-07": {
+          "active_days": 31,
+          "by_module_count": {
+            "raw_hourly_direction": 347
+          },
+          "by_source_count": {
+            "raw_hourly_direction": 347
+          },
+          "dd_pct": 3.4847,
+          "literal_tp_rate_pct": 35.73,
+          "max_entries_same_clock_hour": 1,
+          "max_entries_same_rolling_hour": 2,
+          "max_entries_same_timestamp": 1,
+          "max_loss_streak": 7,
+          "monthly_return_pct": {
+            "2026-07": 3.5869,
+            "2026-08": 0.3616
+          },
+          "n": 347,
+          "negative_months": 0,
+          "profitable_exit_rate_pct": 42.94,
+          "return_pct": 3.9615,
+          "trades_per_active_day": 11.194,
+          "trades_per_calendar_day": 11.194,
+          "wr": 42.94
+        }
+      },
+      "field": "market_dispersion4",
+      "high_style": "reversal",
+      "hourly_cap": 1,
+      "loss_pause": 5,
+      "low_style": "momentum",
+      "quantile": 0.5,
+      "selection": {
+        "active_days": 12,
+        "by_module_count": {
+          "raw_hourly_direction": 113
+        },
+        "by_source_count": {
+          "raw_hourly_direction": 113
+        },
+        "dd_pct": 2.2087,
+        "literal_tp_rate_pct": 39.82,
+        "max_entries_same_clock_hour": 1,
+        "max_entries_same_rolling_hour": 2,
+        "max_entries_same_timestamp": 1,
+        "max_loss_streak": 4,
+        "monthly_return_pct": {
+          "2026-05": 5.2408,
+          "2026-06": 0.4562
+        },
+        "n": 113,
+        "negative_months": 0,
+        "profitable_exit_rate_pct": 52.21,
+        "return_pct": 5.7209,
+        "trades_per_active_day": 9.417,
+        "trades_per_calendar_day": 9.417,
+        "wr": 52.21
+      },
+      "threshold": 0.0015686530275043774
+    },
+    {
+      "admissible": true,
+      "confirmation": {
+        "2026-06": {
+          "active_days": 30,
+          "by_module_count": {
+            "raw_hourly_direction": 313
+          },
+          "by_source_count": {
+            "raw_hourly_direction": 313
+          },
+          "dd_pct": 2.6854,
+          "literal_tp_rate_pct": 41.53,
+          "max_entries_same_clock_hour": 1,
+          "max_entries_same_rolling_hour": 2,
+          "max_entries_same_timestamp": 1,
+          "max_loss_streak": 8,
+          "monthly_return_pct": {
+            "2026-06": 5.9651,
+            "2026-07": 0.2987
+          },
+          "n": 313,
+          "negative_months": 0,
+          "profitable_exit_rate_pct": 43.77,
+          "return_pct": 6.2816,
+          "trades_per_active_day": 10.433,
+          "trades_per_calendar_day": 10.433,
+          "wr": 43.77
+        },
+        "2026-07": {
+          "active_days": 31,
+          "by_module_count": {
+            "raw_hourly_direction": 317
+          },
+          "by_source_count": {
+            "raw_hourly_direction": 317
+          },
+          "dd_pct": 5.6149,
+          "literal_tp_rate_pct": 35.96,
+          "max_entries_same_clock_hour": 1,
+          "max_entries_same_rolling_hour": 2,
+          "max_entries_same_timestamp": 1,
+          "max_loss_streak": 9,
+          "monthly_return_pct": {
+            "2026-07": 3.425,
+            "2026-08": 0.4849
+          },
+          "n": 317,
+          "negative_months": 0,
+          "profitable_exit_rate_pct": 42.27,
+          "return_pct": 3.9265,
+          "trades_per_active_day": 10.226,
+          "trades_per_calendar_day": 10.226,
+          "wr": 42.27
+        }
+      },
+      "field": "common_to_dispersion4",
+      "high_style": "momentum",
+      "hourly_cap": 1,
+      "loss_pause": 5,
+      "low_style": "reversal",
+      "quantile": 0.75,
+      "selection": {
+        "active_days": 12,
+        "by_module_count": {
+          "raw_hourly_direction": 86
+        },
+        "by_source_count": {
+          "raw_hourly_direction": 86
+        },
+        "dd_pct": 1.4829,
+        "literal_tp_rate_pct": 45.35,
+        "max_entries_same_clock_hour": 1,
+        "max_entries_same_rolling_hour": 2,
+        "max_entries_same_timestamp": 1,
+        "max_loss_streak": 7,
+        "monthly_return_pct": {
+          "2026-05": 7.8171,
+          "2026-06": 0.1571
+        },
+        "n": 86,
+        "negative_months": 0,
+        "profitable_exit_rate_pct": 56.98,
+        "return_pct": 7.9864,
+        "trades_per_active_day": 7.167,
+        "trades_per_calendar_day": 7.167,
+        "wr": 56.98
+      },
+      "threshold": 1.9305137073108223
+    },
+    {
+      "admissible": true,
+      "confirmation": {
+        "2026-06": {
+          "active_days": 30,
+          "by_module_count": {
+            "raw_hourly_direction": 257
+          },
+          "by_source_count": {
+            "raw_hourly_direction": 257
+          },
+          "dd_pct": 4.8002,
+          "literal_tp_rate_pct": 43.97,
+          "max_entries_same_clock_hour": 1,
+          "max_entries_same_rolling_hour": 2,
+          "max_entries_same_timestamp": 1,
+          "max_loss_streak": 7,
+          "monthly_return_pct": {
+            "2026-06": 5.4538,
+            "2026-07": 0.3745
+          },
+          "n": 257,
+          "negative_months": 0,
+          "profitable_exit_rate_pct": 47.08,
+          "return_pct": 5.8487,
+          "trades_per_active_day": 8.567,
+          "trades_per_calendar_day": 8.567,
+          "wr": 47.08
+        },
+        "2026-07": {
+          "active_days": 31,
+          "by_module_count": {
+            "raw_hourly_direction": 258
+          },
+          "by_source_count": {
+            "raw_hourly_direction": 258
+          },
+          "dd_pct": 1.7056,
+          "literal_tp_rate_pct": 41.09,
+          "max_entries_same_clock_hour": 1,
+          "max_entries_same_rolling_hour": 2,
+          "max_entries_same_timestamp": 1,
+          "max_loss_streak": 7,
+          "monthly_return_pct": {
+            "2026-07": 6.8673
+          },
+          "n": 258,
+          "negative_months": 0,
+          "profitable_exit_rate_pct": 46.51,
+          "return_pct": 6.8673,
+          "trades_per_active_day": 8.323,
+          "trades_per_calendar_day": 8.323,
+          "wr": 46.51
+        }
+      },
+      "field": "common_to_dispersion4",
+      "high_style": "momentum",
+      "hourly_cap": 1,
+      "loss_pause": 3,
+      "low_style": "reversal",
+      "quantile": 0.5,
+      "selection": {
+        "active_days": 12,
+        "by_module_count": {
+          "raw_hourly_direction": 80
+        },
+        "by_source_count": {
+          "raw_hourly_direction": 80
+        },
+        "dd_pct": 1.2794,
+        "literal_tp_rate_pct": 42.5,
+        "max_entries_same_clock_hour": 1,
+        "max_entries_same_rolling_hour": 2,
+        "max_entries_same_timestamp": 1,
+        "max_loss_streak": 5,
+        "monthly_return_pct": {
+          "2026-05": 3.907
+        },
+        "n": 80,
+        "negative_months": 0,
+        "profitable_exit_rate_pct": 51.25,
+        "return_pct": 3.907,
+        "trades_per_active_day": 6.667,
+        "trades_per_calendar_day": 6.667,
+        "wr": 51.25
+      },
+      "threshold": 1.0716187149175949
+    },
+    {
+      "admissible": true,
+      "confirmation": {
+        "2026-06": {
+          "active_days": 30,
+          "by_module_count": {
+            "raw_hourly_direction": 455
+          },
+          "by_source_count": {
+            "raw_hourly_direction": 455
+          },
+          "dd_pct": 2.9865,
+          "literal_tp_rate_pct": 44.62,
+          "max_entries_same_clock_hour": 2,
+          "max_entries_same_rolling_hour": 2,
+          "max_entries_same_timestamp": 1,
+          "max_loss_streak": 6,
+          "monthly_return_pct": {
+            "2026-06": 6.0128,
+            "2026-07": 0.1495
+          },
+          "n": 455,
+          "negative_months": 0,
+          "profitable_exit_rate_pct": 46.81,
+          "return_pct": 6.1713,
+          "trades_per_active_day": 15.167,
+          "trades_per_calendar_day": 15.167,
+          "wr": 46.81
+        },
+        "2026-07": {
+          "active_days": 31,
+          "by_module_count": {
+            "raw_hourly_direction": 432
+          },
+          "by_source_count": {
+            "raw_hourly_direction": 432
+          },
+          "dd_pct": 4.7955,
+          "literal_tp_rate_pct": 40.28,
+          "max_entries_same_clock_hour": 2,
+          "max_entries_same_rolling_hour": 2,
+          "max_entries_same_timestamp": 1,
+          "max_loss_streak": 9,
+          "monthly_return_pct": {
+            "2026-07": 5.4121
+          },
+          "n": 432,
+          "negative_months": 0,
+          "profitable_exit_rate_pct": 45.6,
+          "return_pct": 5.4121,
+          "trades_per_active_day": 13.935,
+          "trades_per_calendar_day": 13.935,
+          "wr": 45.6
+        }
+      },
+      "field": "market_breadth_extreme4",
+      "high_style": "momentum",
+      "hourly_cap": 2,
+      "loss_pause": 5,
+      "low_style": "reversal",
+      "quantile": 0.25,
+      "selection": {
+        "active_days": 12,
+        "by_module_count": {
+          "raw_hourly_direction": 126
+        },
+        "by_source_count": {
+          "raw_hourly_direction": 126
+        },
+        "dd_pct": 2.0209,
+        "literal_tp_rate_pct": 43.65,
+        "max_entries_same_clock_hour": 2,
+        "max_entries_same_rolling_hour": 2,
+        "max_entries_same_timestamp": 1,
+        "max_loss_streak": 5,
+        "monthly_return_pct": {
+          "2026-05": 2.9141,
+          "2026-06": 0.5989
+        },
+        "n": 126,
+        "negative_months": 0,
+        "profitable_exit_rate_pct": 50.0,
+        "return_pct": 3.5305,
+        "trades_per_active_day": 10.5,
+        "trades_per_calendar_day": 10.5,
+        "wr": 50.0
+      },
+      "threshold": 0.16666666666666669
+    },
+    {
+      "admissible": true,
+      "confirmation": {
+        "2026-06": {
+          "active_days": 30,
+          "by_module_count": {
+            "raw_hourly_direction": 280
+          },
+          "by_source_count": {
+            "raw_hourly_direction": 280
+          },
+          "dd_pct": 4.5956,
+          "literal_tp_rate_pct": 41.79,
+          "max_entries_same_clock_hour": 2,
+          "max_entries_same_rolling_hour": 2,
+          "max_entries_same_timestamp": 1,
+          "max_loss_streak": 9,
+          "monthly_return_pct": {
+            "2026-06": 3.2505,
+            "2026-07": 0.2255
+          },
+          "n": 280,
+          "negative_months": 0,
+          "profitable_exit_rate_pct": 43.21,
+          "return_pct": 3.4833,
+          "trades_per_active_day": 9.333,
+          "trades_per_calendar_day": 9.333,
+          "wr": 43.21
+        },
+        "2026-07": {
+          "active_days": 30,
+          "by_module_count": {
+            "raw_hourly_direction": 260
+          },
+          "by_source_count": {
+            "raw_hourly_direction": 260
+          },
+          "dd_pct": 4.0866,
+          "literal_tp_rate_pct": 37.31,
+          "max_entries_same_clock_hour": 2,
+          "max_entries_same_rolling_hour": 2,
+          "max_entries_same_timestamp": 1,
+          "max_loss_streak": 8,
+          "monthly_return_pct": {
+            "2026-07": 5.9558
+          },
+          "n": 260,
+          "negative_months": 0,
+          "profitable_exit_rate_pct": 44.62,
+          "return_pct": 5.9558,
+          "trades_per_active_day": 8.667,
+          "trades_per_calendar_day": 8.667,
+          "wr": 44.62
+        }
+      },
+      "field": "common_to_dispersion4",
+      "high_style": "momentum",
+      "hourly_cap": 2,
+      "loss_pause": 3,
+      "low_style": "reversal",
+      "quantile": 0.75,
+      "selection": {
+        "active_days": 11,
+        "by_module_count": {
+          "raw_hourly_direction": 68
+        },
+        "by_source_count": {
+          "raw_hourly_direction": 68
+        },
+        "dd_pct": 1.6592,
+        "literal_tp_rate_pct": 39.71,
+        "max_entries_same_clock_hour": 2,
+        "max_entries_same_rolling_hour": 2,
+        "max_entries_same_timestamp": 1,
+        "max_loss_streak": 5,
+        "monthly_return_pct": {
+          "2026-05": 3.9341
+        },
+        "n": 68,
+        "negative_months": 0,
+        "profitable_exit_rate_pct": 50.0,
+        "return_pct": 3.9341,
+        "trades_per_active_day": 6.182,
+        "trades_per_calendar_day": 5.667,
+        "wr": 50.0
+      },
+      "threshold": 1.9305137073108223
+    },
+    {
+      "admissible": true,
+      "confirmation": {
+        "2026-06": {
+          "active_days": 30,
+          "by_module_count": {
+            "raw_hourly_direction": 405
+          },
+          "by_source_count": {
+            "raw_hourly_direction": 405
+          },
+          "dd_pct": 3.8003,
+          "literal_tp_rate_pct": 42.47,
+          "max_entries_same_clock_hour": 2,
+          "max_entries_same_rolling_hour": 2,
+          "max_entries_same_timestamp": 1,
+          "max_loss_streak": 8,
+          "monthly_return_pct": {
+            "2026-06": 8.7395,
+            "2026-07": 0.3005
+          },
+          "n": 405,
+          "negative_months": 0,
+          "profitable_exit_rate_pct": 44.94,
+          "return_pct": 9.0662,
+          "trades_per_active_day": 13.5,
+          "trades_per_calendar_day": 13.5,
+          "wr": 44.94
+        },
+        "2026-07": {
+          "active_days": 31,
+          "by_module_count": {
+            "raw_hourly_direction": 339
+          },
+          "by_source_count": {
+            "raw_hourly_direction": 339
+          },
+          "dd_pct": 5.7799,
+          "literal_tp_rate_pct": 36.28,
+          "max_entries_same_clock_hour": 2,
+          "max_entries_same_rolling_hour": 2,
+          "max_entries_same_timestamp": 1,
+          "max_loss_streak": 10,
+          "monthly_return_pct": {
+            "2026-07": 3.2657
+          },
+          "n": 339,
+          "negative_months": 0,
+          "profitable_exit_rate_pct": 42.18,
+          "return_pct": 3.2657,
+          "trades_per_active_day": 10.935,
+          "trades_per_calendar_day": 10.935,
+          "wr": 42.18
+        }
+      },
+      "field": "common_to_dispersion4",
+      "high_style": "momentum",
+      "hourly_cap": 2,
+      "loss_pause": 5,
+      "low_style": "reversal",
+      "quantile": 0.75,
+      "selection": {
+        "active_days": 12,
+        "by_module_count": {
+          "raw_hourly_direction": 99
+        },
+        "by_source_count": {
+          "raw_hourly_direction": 99
+        },
+        "dd_pct": 2.4969,
+        "literal_tp_rate_pct": 42.42,
+        "max_entries_same_clock_hour": 2,
+        "max_entries_same_rolling_hour": 2,
+        "max_entries_same_timestamp": 1,
+        "max_loss_streak": 4,
+        "monthly_return_pct": {
+          "2026-05": 5.7117,
+          "2026-06": 0.4555
+        },
+        "n": 99,
+        "negative_months": 0,
+        "profitable_exit_rate_pct": 52.53,
+        "return_pct": 6.1932,
+        "trades_per_active_day": 8.25,
+        "trades_per_calendar_day": 8.25,
+        "wr": 52.53
+      },
+      "threshold": 1.9305137073108223
+    },
+    {
+      "admissible": true,
+      "confirmation": {
+        "2026-06": {
+          "active_days": 30,
+          "by_module_count": {
+            "raw_hourly_direction": 315
+          },
+          "by_source_count": {
+            "raw_hourly_direction": 315
+          },
+          "dd_pct": 4.8281,
+          "literal_tp_rate_pct": 44.13,
+          "max_entries_same_clock_hour": 2,
+          "max_entries_same_rolling_hour": 2,
+          "max_entries_same_timestamp": 1,
+          "max_loss_streak": 8,
+          "monthly_return_pct": {
+            "2026-06": 2.623,
+            "2026-07": 0.5255
+          },
+          "n": 315,
+          "negative_months": 0,
+          "profitable_exit_rate_pct": 45.4,
+          "return_pct": 3.1623,
+          "trades_per_active_day": 10.5,
+          "trades_per_calendar_day": 10.5,
+          "wr": 45.4
+        },
+        "2026-07": {
+          "active_days": 31,
+          "by_module_count": {
+            "raw_hourly_direction": 270
+          },
+          "by_source_count": {
+            "raw_hourly_direction": 270
+          },
+          "dd_pct": 2.1977,
+          "literal_tp_rate_pct": 41.85,
+          "max_entries_same_clock_hour": 2,
+          "max_entries_same_rolling_hour": 2,
+          "max_entries_same_timestamp": 1,
+          "max_loss_streak": 6,
+          "monthly_return_pct": {
+            "2026-07": 7.3778
+          },
+          "n": 270,
+          "negative_months": 0,
+          "profitable_exit_rate_pct": 48.15,
+          "return_pct": 7.3778,
+          "trades_per_active_day": 8.71,
+          "trades_per_calendar_day": 8.71,
+          "wr": 48.15
+        }
+      },
+      "field": "btc_abs_return8",
+      "high_style": "momentum",
+      "hourly_cap": 2,
+      "loss_pause": 3,
+      "low_style": "reversal",
+      "quantile": 0.5,
+      "selection": {
+        "active_days": 12,
+        "by_module_count": {
+          "raw_hourly_direction": 85
+        },
+        "by_source_count": {
+          "raw_hourly_direction": 85
+        },
+        "dd_pct": 2.7053,
+        "literal_tp_rate_pct": 41.18,
+        "max_entries_same_clock_hour": 2,
+        "max_entries_same_rolling_hour": 2,
+        "max_entries_same_timestamp": 1,
+        "max_loss_streak": 8,
+        "monthly_return_pct": {
+          "2026-05": 3.0747,
+          "2026-06": 0.1568
+        },
+        "n": 85,
+        "negative_months": 0,
+        "profitable_exit_rate_pct": 51.76,
+        "return_pct": 3.2364,
+        "trades_per_active_day": 7.083,
+        "trades_per_calendar_day": 7.083,
+        "wr": 51.76
+      },
+      "threshold": 0.0022736903002308906
+    },
+    {
+      "admissible": true,
+      "confirmation": {
+        "2026-06": {
+          "active_days": 30,
+          "by_module_count": {
+            "raw_hourly_direction": 313
+          },
+          "by_source_count": {
+            "raw_hourly_direction": 313
+          },
+          "dd_pct": 2.6336,
+          "literal_tp_rate_pct": 46.33,
+          "max_entries_same_clock_hour": 2,
+          "max_entries_same_rolling_hour": 2,
+          "max_entries_same_timestamp": 1,
+          "max_loss_streak": 7,
+          "monthly_return_pct": {
+            "2026-06": 12.347,
+            "2026-07": 0.5255
+          },
+          "n": 313,
+          "negative_months": 0,
+          "profitable_exit_rate_pct": 49.2,
+          "return_pct": 12.9374,
+          "trades_per_active_day": 10.433,
+          "trades_per_calendar_day": 10.433,
+          "wr": 49.2
+        },
+        "2026-07": {
+          "active_days": 31,
+          "by_module_count": {
+            "raw_hourly_direction": 269
+          },
+          "by_source_count": {
+            "raw_hourly_direction": 269
+          },
+          "dd_pct": 3.2102,
+          "literal_tp_rate_pct": 38.66,
+          "max_entries_same_clock_hour": 2,
+          "max_entries_same_rolling_hour": 2,
+          "max_entries_same_timestamp": 1,
+          "max_loss_streak": 6,
+          "monthly_return_pct": {
+            "2026-07": 3.1062
+          },
+          "n": 269,
+          "negative_months": 0,
+          "profitable_exit_rate_pct": 44.98,
+          "return_pct": 3.1062,
+          "trades_per_active_day": 8.677,
+          "trades_per_calendar_day": 8.677,
+          "wr": 44.98
+        }
+      },
+      "field": "btc_efficiency8",
+      "high_style": "momentum",
+      "hourly_cap": 2,
+      "loss_pause": 3,
+      "low_style": "reversal",
+      "quantile": 0.5,
+      "selection": {
+        "active_days": 12,
+        "by_module_count": {
+          "raw_hourly_direction": 87
+        },
+        "by_source_count": {
+          "raw_hourly_direction": 87
+        },
+        "dd_pct": 2.4492,
+        "literal_tp_rate_pct": 42.53,
+        "max_entries_same_clock_hour": 2,
+        "max_entries_same_rolling_hour": 2,
+        "max_entries_same_timestamp": 1,
+        "max_loss_streak": 6,
+        "monthly_return_pct": {
+          "2026-05": 4.8546,
+          "2026-06": 0.1568
+        },
+        "n": 87,
+        "negative_months": 0,
+        "profitable_exit_rate_pct": 55.17,
+        "return_pct": 5.019,
+        "trades_per_active_day": 7.25,
+        "trades_per_calendar_day": 7.25,
+        "wr": 55.17
+      },
+      "threshold": 0.31236539090167953
+    },
+    {
+      "admissible": true,
+      "confirmation": {
+        "2026-06": {
+          "active_days": 30,
+          "by_module_count": {
+            "raw_hourly_direction": 337
+          },
+          "by_source_count": {
+            "raw_hourly_direction": 337
+          },
+          "dd_pct": 2.6347,
+          "literal_tp_rate_pct": 46.29,
+          "max_entries_same_clock_hour": 2,
+          "max_entries_same_rolling_hour": 2,
+          "max_entries_same_timestamp": 1,
+          "max_loss_streak": 6,
+          "monthly_return_pct": {
+            "2026-06": 9.782,
+            "2026-07": 0.1495
+          },
+          "n": 337,
+          "negative_months": 0,
+          "profitable_exit_rate_pct": 48.66,
+          "return_pct": 9.9461,
+          "trades_per_active_day": 11.233,
+          "trades_per_calendar_day": 11.233,
+          "wr": 48.66
+        },
+        "2026-07": {
+          "active_days": 31,
+          "by_module_count": {
+            "raw_hourly_direction": 271
+          },
+          "by_source_count": {
+            "raw_hourly_direction": 271
+          },
+          "dd_pct": 2.1592,
+          "literal_tp_rate_pct": 38.38,
+          "max_entries_same_clock_hour": 2,
+          "max_entries_same_rolling_hour": 2,
+          "max_entries_same_timestamp": 1,
+          "max_loss_streak": 9,
+          "monthly_return_pct": {
+            "2026-07": 2.9677
+          },
+          "n": 271,
+          "negative_months": 0,
+          "profitable_exit_rate_pct": 44.65,
+          "return_pct": 2.9677,
+          "trades_per_active_day": 8.742,
+          "trades_per_calendar_day": 8.742,
+          "wr": 44.65
+        }
+      },
+      "field": "market_breadth_extreme4",
+      "high_style": "momentum",
+      "hourly_cap": 2,
+      "loss_pause": 3,
+      "low_style": "reversal",
+      "quantile": 0.5,
+      "selection": {
+        "active_days": 11,
+        "by_module_count": {
+          "raw_hourly_direction": 81
+        },
+        "by_source_count": {
+          "raw_hourly_direction": 81
+        },
+        "dd_pct": 1.5601,
+        "literal_tp_rate_pct": 44.44,
+        "max_entries_same_clock_hour": 2,
+        "max_entries_same_rolling_hour": 2,
+        "max_entries_same_timestamp": 1,
+        "max_loss_streak": 7,
+        "monthly_return_pct": {
+          "2026-05": 3.3167,
+          "2026-06": 0.5989
+        },
+        "n": 81,
+        "negative_months": 0,
+        "profitable_exit_rate_pct": 53.09,
+        "return_pct": 3.9355,
+        "trades_per_active_day": 7.364,
+        "trades_per_calendar_day": 6.75,
+        "wr": 53.09
+      },
+      "threshold": 0.5
+    },
+    {
+      "admissible": true,
+      "confirmation": {
+        "2026-06": {
+          "active_days": 30,
+          "by_module_count": {
+            "raw_hourly_direction": 337
+          },
+          "by_source_count": {
+            "raw_hourly_direction": 337
+          },
+          "dd_pct": 2.6347,
+          "literal_tp_rate_pct": 46.29,
+          "max_entries_same_clock_hour": 2,
+          "max_entries_same_rolling_hour": 2,
+          "max_entries_same_timestamp": 1,
+          "max_loss_streak": 6,
+          "monthly_return_pct": {
+            "2026-06": 9.782,
+            "2026-07": 0.1495
+          },
+          "n": 337,
+          "negative_months": 0,
+          "profitable_exit_rate_pct": 48.66,
+          "return_pct": 9.9461,
+          "trades_per_active_day": 11.233,
+          "trades_per_calendar_day": 11.233,
+          "wr": 48.66
+        },
+        "2026-07": {
+          "active_days": 31,
+          "by_module_count": {
+            "raw_hourly_direction": 271
+          },
+          "by_source_count": {
+            "raw_hourly_direction": 271
+          },
+          "dd_pct": 2.1592,
+          "literal_tp_rate_pct": 38.38,
+          "max_entries_same_clock_hour": 2,
+          "max_entries_same_rolling_hour": 2,
+          "max_entries_same_timestamp": 1,
+          "max_loss_streak": 9,
+          "monthly_return_pct": {
+            "2026-07": 2.9677
+          },
+          "n": 271,
+          "negative_months": 0,
+          "profitable_exit_rate_pct": 44.65,
+          "return_pct": 2.9677,
+          "trades_per_active_day": 8.742,
+          "trades_per_calendar_day": 8.742,
+          "wr": 44.65
+        }
+      },
+      "field": "market_breadth_extreme4",
+      "high_style": "momentum",
+      "hourly_cap": 2,
+      "loss_pause": 3,
+      "low_style": "reversal",
+      "quantile": 0.75,
+      "selection": {
+        "active_days": 11,
+        "by_module_count": {
+          "raw_hourly_direction": 81
+        },
+        "by_source_count": {
+          "raw_hourly_direction": 81
+        },
+        "dd_pct": 1.5601,
+        "literal_tp_rate_pct": 44.44,
+        "max_entries_same_clock_hour": 2,
+        "max_entries_same_rolling_hour": 2,
+        "max_entries_same_timestamp": 1,
+        "max_loss_streak": 7,
+        "monthly_return_pct": {
+          "2026-05": 3.3167,
+          "2026-06": 0.5989
+        },
+        "n": 81,
+        "negative_months": 0,
+        "profitable_exit_rate_pct": 53.09,
+        "return_pct": 3.9355,
+        "trades_per_active_day": 7.364,
+        "trades_per_calendar_day": 6.75,
+        "wr": 53.09
+      },
+      "threshold": 0.5
+    },
+    {
+      "admissible": true,
+      "confirmation": {
+        "2026-06": {
+          "active_days": 30,
+          "by_module_count": {
+            "raw_hourly_direction": 312
+          },
+          "by_source_count": {
+            "raw_hourly_direction": 312
+          },
+          "dd_pct": 5.2066,
+          "literal_tp_rate_pct": 42.31,
+          "max_entries_same_clock_hour": 1,
+          "max_entries_same_rolling_hour": 2,
+          "max_entries_same_timestamp": 1,
+          "max_loss_streak": 7,
+          "monthly_return_pct": {
+            "2026-06": 4.7931,
+            "2026-07": 0.3
+          },
+          "n": 312,
+          "negative_months": 0,
+          "profitable_exit_rate_pct": 43.59,
+          "return_pct": 5.1075,
+          "trades_per_active_day": 10.4,
+          "trades_per_calendar_day": 10.4,
+          "wr": 43.59
+        },
+        "2026-07": {
+          "active_days": 31,
+          "by_module_count": {
+            "raw_hourly_direction": 307
+          },
+          "by_source_count": {
+            "raw_hourly_direction": 307
+          },
+          "dd_pct": 4.0903,
+          "literal_tp_rate_pct": 39.41,
+          "max_entries_same_clock_hour": 1,
+          "max_entries_same_rolling_hour": 2,
+          "max_entries_same_timestamp": 1,
+          "max_loss_streak": 10,
+          "monthly_return_pct": {
+            "2026-07": 7.1903,
+            "2026-08": 0.0261
+          },
+          "n": 307,
+          "negative_months": 0,
+          "profitable_exit_rate_pct": 44.63,
+          "return_pct": 7.2183,
+          "trades_per_active_day": 9.903,
+          "trades_per_calendar_day": 9.903,
+          "wr": 44.63
+        }
+      },
+      "field": "market_abs_mean4",
+      "high_style": "momentum",
+      "hourly_cap": 1,
+      "loss_pause": 5,
+      "low_style": "reversal",
+      "quantile": 0.75,
+      "selection": {
+        "active_days": 12,
+        "by_module_count": {
+          "raw_hourly_direction": 84
+        },
+        "by_source_count": {
+          "raw_hourly_direction": 84
+        },
+        "dd_pct": 1.3965,
+        "literal_tp_rate_pct": 40.48,
+        "max_entries_same_clock_hour": 1,
+        "max_entries_same_rolling_hour": 2,
+        "max_entries_same_timestamp": 1,
+        "max_loss_streak": 4,
+        "monthly_return_pct": {
+          "2026-05": 2.963
+        },
+        "n": 84,
+        "negative_months": 0,
+        "profitable_exit_rate_pct": 47.62,
+        "return_pct": 2.963,
+        "trades_per_active_day": 7.0,
+        "trades_per_calendar_day": 7.0,
+        "wr": 47.62
+      },
+      "threshold": 0.003349966217739977
+    },
+    {
+      "admissible": true,
+      "confirmation": {
+        "2026-06": {
+          "active_days": 30,
+          "by_module_count": {
+            "raw_hourly_direction": 208
+          },
+          "by_source_count": {
+            "raw_hourly_direction": 208
+          },
+          "dd_pct": 3.1688,
+          "literal_tp_rate_pct": 38.94,
+          "max_entries_same_clock_hour": 1,
+          "max_entries_same_rolling_hour": 2,
+          "max_entries_same_timestamp": 1,
+          "max_loss_streak": 7,
+          "monthly_return_pct": {
+            "2026-06": 5.9256
+          },
+          "n": 208,
+          "negative_months": 0,
+          "profitable_exit_rate_pct": 43.75,
+          "return_pct": 5.9256,
+          "trades_per_active_day": 6.933,
+          "trades_per_calendar_day": 6.933,
+          "wr": 43.75
+        },
+        "2026-07": {
+          "active_days": 31,
+          "by_module_count": {
+            "raw_hourly_direction": 235
+          },
+          "by_source_count": {
+            "raw_hourly_direction": 235
+          },
+          "dd_pct": 2.5659,
+          "literal_tp_rate_pct": 33.19,
+          "max_entries_same_clock_hour": 1,
+          "max_entries_same_rolling_hour": 2,
+          "max_entries_same_timestamp": 1,
+          "max_loss_streak": 9,
+          "monthly_return_pct": {
+            "2026-07": 2.9452
+          },
+          "n": 235,
+          "negative_months": 0,
+          "profitable_exit_rate_pct": 40.43,
+          "return_pct": 2.9452,
+          "trades_per_active_day": 7.581,
+          "trades_per_calendar_day": 7.581,
+          "wr": 40.43
+        }
+      },
+      "field": "market_dispersion4",
+      "high_style": "reversal",
+      "hourly_cap": 1,
+      "loss_pause": 3,
+      "low_style": "momentum",
+      "quantile": 0.25,
+      "selection": {
+        "active_days": 12,
+        "by_module_count": {
+          "raw_hourly_direction": 73
+        },
+        "by_source_count": {
+          "raw_hourly_direction": 73
+        },
+        "dd_pct": 1.301,
+        "literal_tp_rate_pct": 36.99,
+        "max_entries_same_clock_hour": 1,
+        "max_entries_same_rolling_hour": 2,
+        "max_entries_same_timestamp": 1,
+        "max_loss_streak": 5,
+        "monthly_return_pct": {
+          "2026-05": 3.6323,
+          "2026-06": 0.2982
+        },
+        "n": 73,
+        "negative_months": 0,
+        "profitable_exit_rate_pct": 49.32,
+        "return_pct": 3.9413,
+        "trades_per_active_day": 6.083,
+        "trades_per_calendar_day": 6.083,
+        "wr": 49.32
+      },
+      "threshold": 0.00093355871640816
+    }
+  ]
+}
