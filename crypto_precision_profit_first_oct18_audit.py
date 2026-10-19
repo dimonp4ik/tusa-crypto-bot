@@ -25,6 +25,7 @@ ROWS_OUT = ROOT / "crypto_precision_profit_first_xperp_oct17.pkl"
 OLD_REPORT = ROOT / "crypto_2r_precision_barbell_oct5.json"
 FRESH_FAR = ROOT / "crypto_xperp_raw_router_audit_2_0_oct17_material_raw_raw_families.csv"
 FRESH_NEAR = ROOT / "crypto_xperp_raw_router_audit_0_25_oct17_material_raw_raw_families.csv"
+EXACT_REPLAY_REPORT = ROOT / "crypto_exact_be_expected_value_oct19.json"
 QUANTILES = tuple(float(value) for value in np.arange(.50, .976, .025))
 FRACTIONS = (0.0, .10, .20, .30, .40, .50, .60, .70)
 LOSS_PAUSES = (1, 2, 3, 4, 5)
@@ -81,6 +82,28 @@ def development_score(selection: dict, confirmation: dict) -> float:
     return round(
         selection["return_pct"] + 2 * confirmation["return_pct"]
         - .5 * selection["dd_pct"] - confirmation["dd_pct"], 8)
+
+
+def invalidate_with_exact_replay(report: dict, exact_report: dict) -> dict:
+    """Retire the optimistic two-label replay after exact candle replay."""
+    if exact_report.get("status") == "EXACT_BE_EXPECTED_VALUE_SHADOW_CANDIDATE":
+        return report
+    legacy_status = str(report.get("status", "UNKNOWN"))
+    report["legacy_status_before_exact_replay"] = legacy_status
+    report["status"] = "INVALIDATED_EXIT_PATH"
+    report["ready_for_live_orders"] = False
+    checks = report.setdefault("objective_checks", {})
+    checks["exact_runtime_exit_path_validated"] = False
+    report["invalidation"] = {
+        "reason": (
+            "Independent near/far terminal labels overcount 2R wins after the "
+            "live full-position stop has already moved to breakeven."
+        ),
+        "superseding_report": str(EXACT_REPLAY_REPORT),
+        "superseding_status": exact_report.get("status"),
+        "exact_direct_xperp": exact_report.get("direct_xperp"),
+    }
+    return report
 
 
 def direct_frame() -> pd.DataFrame:
@@ -301,13 +324,19 @@ def main() -> None:
             "complete_direct_months_3pct": full_months_3pct,
             "complete_holdout_months_5pct": holdout_complete_months,
         })
+    if EXACT_REPLAY_REPORT.exists():
+        exact_report = json.loads(EXACT_REPLAY_REPORT.read_text())
+        report = invalidate_with_exact_replay(report, exact_report)
     report["sources"] = {
         str(OLD_REPORT): digest(OLD_REPORT),
         str(FRESH_FAR): digest(FRESH_FAR),
         str(FRESH_NEAR): digest(FRESH_NEAR),
         str(Path(__file__)): digest(Path(__file__)),
     }
+    if EXACT_REPLAY_REPORT.exists():
+        report["sources"][str(EXACT_REPLAY_REPORT)] = digest(EXACT_REPLAY_REPORT)
     report["limitations"] = [
+        "This legacy two-label replay is invalidated by the exact candle-path replay and must not be used for strategy selection.",
         "The April and October direct months are partial calendar months.",
         "The same historical model family was previously inspected; 2024 and later are transfer evidence, not pristine data.",
         "At 3% margin May remains below the 30% monthly goal; the complete-month gate passes at 5% only.",

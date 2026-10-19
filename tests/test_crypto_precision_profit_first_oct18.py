@@ -57,3 +57,23 @@ def test_canonical_history_assigns_overlap_to_later_period():
     overlap = result[result.symbol.eq("BTCUSDT")]
     assert overlap.period.tolist() == ["2022h1"]
     assert result.attrs["duplicate_rows_removed"] == 1
+
+
+def test_rejected_exact_replay_invalidates_optimistic_report():
+    report = {
+        "status": "PROFIT_FIRST_5PCT_SHADOW_CANDIDATE",
+        "ready_for_live_orders": False,
+        "objective_checks": {"legacy_gate": True},
+    }
+    exact = {
+        "status": "REJECTED_OBJECTIVE",
+        "direct_xperp": {"margin_3pct": {"return_pct": 0.4838}},
+    }
+
+    result = audit.invalidate_with_exact_replay(report, exact)
+
+    assert result["status"] == "INVALIDATED_EXIT_PATH"
+    assert result["legacy_status_before_exact_replay"] == (
+        "PROFIT_FIRST_5PCT_SHADOW_CANDIDATE")
+    assert not result["objective_checks"]["exact_runtime_exit_path_validated"]
+    assert result["invalidation"]["exact_direct_xperp"] == exact["direct_xperp"]
