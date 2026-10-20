@@ -32,6 +32,7 @@ OLD_FAR = ROOT / "crypto_xperp_raw_router_audit_2_0_oct17_material_raw_raw_famil
 NEW_NEAR = ROOT / "crypto_xperp_raw_router_audit_0_5_oct20_material_raw_raw_families.csv"
 NEW_FAR = ROOT / "crypto_xperp_raw_router_audit_2_0_oct20_material_raw_raw_families.csv"
 MANIFEST = ROOT / "xperp_15m_oct20_material" / "manifest.json"
+EXACT_PATH_REPORT = ROOT / "crypto_material_exact_path_oct20.json"
 OUT = ROOT / "crypto_profit_first_material_xperp_oct20.json"
 ROWS_OUT = ROOT / "crypto_profit_first_material_xperp_oct20.pkl"
 FRESH_ROWS_OUT = ROOT / "crypto_profit_first_material_xperp_oct20_fresh.pkl"
@@ -188,8 +189,11 @@ def main() -> None:
         and fresh3["dd_pct"] <= 10 and all3["negative_months"] == 0
         and all3["economic_30pct_month_gate"])
     manifest = json.loads(MANIFEST.read_text(encoding="utf-8"))
+    exact_path = json.loads(EXACT_PATH_REPORT.read_text(encoding="utf-8"))
+    exit_path_valid = exact_path.get("status") != "MATERIAL_ROUTE_INVALIDATED_EXIT_PATH"
     report = {
-        "status": ("MATERIAL_ROUTE_SHADOW_CANDIDATE" if pass_gate
+        "status": ("MATERIAL_ROUTE_INVALIDATED_EXIT_PATH" if not exit_path_valid
+                   else "MATERIAL_ROUTE_SHADOW_CANDIDATE" if pass_gate
                    else "MATERIAL_ROUTE_REJECTED_OBJECTIVE"),
         "ready_for_live_orders": False,
         "protocol": {
@@ -206,11 +210,14 @@ def main() -> None:
         "overlap_parity": overlap,
         "route_count": len(routes), "results": results,
         "frozen_policy_comparison": policy_comparison,
-        "economic_pass": pass_gate,
+        "economic_pass": pass_gate and exit_path_valid,
+        "exit_path_valid": exit_path_valid,
+        "exact_path_report": str(EXACT_PATH_REPORT),
         "sources": {str(path): digest(path) for path in (
             FROZEN_REPORT, OLD_NEAR, OLD_FAR, NEW_NEAR, NEW_FAR, MANIFEST,
-            Path(__file__))},
+            EXACT_PATH_REPORT, Path(__file__))},
         "limitations": [
+            "Independent near/far labels overstate returns after the live breakeven stop; the exact path report supersedes these metrics.",
             "The untouched refresh is only a few calendar days.",
             "X-Perp history covers roughly six months, not a full market cycle.",
             "Gross returns exclude fees at user request.",

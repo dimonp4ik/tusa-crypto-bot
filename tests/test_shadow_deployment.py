@@ -122,12 +122,11 @@ class ShadowDeploymentTests(unittest.TestCase):
         self.assertTrue(analysis["_shadow_only"])
         self.assertEqual(analysis["source"], "venue_shadow_experiment")
 
-    def test_live_scan_keeps_profit_first_model_behind_shadow_gate(self):
+    def test_shadow_scan_uses_audited_venue_router(self):
         import inspect
         src = inspect.getsource(main._run_venue_strategy_scan)
-        self.assertIn('DEPLOYMENT_MODE == "shadow"', src)
-        self.assertIn("precision_profit_first_shadow_setups", src)
-        self.assertIn("else:\n                rows = venue_setups", src)
+        self.assertIn("rows = venue_setups", src)
+        self.assertNotIn("precision_profit_first_shadow_setups", src)
 
     def test_five_minute_oi_analysis_is_permanently_shadow_only(self):
         setup = {
@@ -371,18 +370,15 @@ class ShadowDeploymentTests(unittest.TestCase):
         self.assertEqual(send.call_args.args[0]["source"], "venue_regime")
         blocked.assert_called_once_with(9, "hour_cap")
 
-    def test_scan_uses_only_precision_profit_first_in_shadow_mode(self):
+    def test_scan_uses_audited_venue_router_in_shadow_mode(self):
         fifteen = {"time": [900.0], "close": [100.0]}
         setup = {
             "direction": "SHORT", "entry": 99.0, "atr": .495,
-            "target_r": .25, "runner_target_r": 2.0,
-            "near_close_fraction": .10, "first_target_move_pct": .2475,
+            "target_r": .25, "first_target_move_pct": .2475,
             "utc_session": "00_05", "btc_regime": "bear",
-            "eff_ratio": .2, "model_quality": .75,
+            "eff_ratio": .2,
             "signal_bar_ts": 900.0,
-            "module": "shadow_precision_profit_first_025_2r",
-            "_shadow_experiment": True,
-            "_precision_profit_first_shadow": True,
+            "module": "rr_short_bear_asia",
         }
 
         with patch.object(main, "ROBUST_SYMBOLS", {"BTCUSDT"}), \
@@ -398,24 +394,23 @@ class ShadowDeploymentTests(unittest.TestCase):
              patch.object(main, "get_xperp_price", return_value=99.0), \
              patch.object(main, "get_open_signals", return_value=[]), \
              patch.object(main, "get_active_symbol_blocks", return_value=[]), \
-             patch.object(main, "precision_profit_first_shadow_setups",
-                          return_value=[setup]) as precision, \
-             patch.object(main, "venue_setups") as old_router, \
+             patch.object(main, "venue_setups",
+                          return_value=[setup]) as router, \
              patch.object(main, "get_xperp_open_interest_history") as oi, \
              patch.object(main, "log_setup_candidate_once", return_value=11), \
              patch.object(main, "_venue_signal_on_cooldown", return_value=False), \
              patch.object(main, "_publish_venue_candidates", return_value=1) as publish:
             main._run_venue_strategy_scan()
 
-        precision.assert_called_once()
-        old_router.assert_not_called()
+        router.assert_called_once()
         oi.assert_not_called()
         analysis = publish.call_args.args[0][0][0]
         self.assertEqual(analysis["signal_bar_ts"], 900.0)
         self.assertEqual(
-            analysis["source"], "venue_shadow_precision_profit_first")
-        self.assertEqual(analysis["strategy_bar_seconds"], 900)
-        self.assertEqual(analysis["strategy_max_bars"], 48)
+            analysis["source"], "venue_regime")
+        self.assertTrue(analysis["_shadow_only"])
+        self.assertIsNone(analysis["strategy_bar_seconds"])
+        self.assertIsNone(analysis["strategy_max_bars"])
 
     def test_scan_does_not_fetch_oi_without_price_candidate(self):
         with patch.object(main, "DEPLOYMENT_MODE", "shadow"), \

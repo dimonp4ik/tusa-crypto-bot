@@ -1,8 +1,7 @@
 """Crypto paper-trading bot driven by frozen direct-venue strategies.
 
-Every shadow scan loads the audited symbols from X-Perp, evaluates the frozen
-15-minute profit-first precision model, and publishes market-entry paper
-signals. This deployment cannot open an order.
+Every shadow scan loads the audited symbols from X-Perp and publishes
+market-entry paper signals. This deployment cannot open an order.
 """
 
 import json
@@ -51,9 +50,6 @@ from src.crypto_5m_oi_shadow_router import (
 from src.crypto_okx_1h_shadow_router import (
     SUPPORTED_SYMBOLS as HOURLY_HGB_SYMBOLS,
     shadow_setups as hourly_hgb_shadow_setups,
-)
-from src.crypto_precision_profit_first_shadow import (
-    shadow_setups as precision_profit_first_shadow_setups,
 )
 from src.telegram_notifier import (
     send_signal, send_status, send_signal_update, send_morning_digest, send_weekly_digest,
@@ -654,7 +650,7 @@ def health():
 
 @app.route("/status")
 def status():
-    return (f"Mode: {DEPLOYMENT_MODE}. Strategy: frozen 15m profit-first HGB. "
+    return (f"Mode: {DEPLOYMENT_MODE}. Strategy: audited direct-venue router. "
             f"Scanning every {SCAN_INTERVAL_MINUTES} min. "
             f"Max signals/scan: {VENUE_MAX_SIGNALS_PER_SCAN}. "
             f"Signal cache: {len(_signal_cache)} entries."), 200
@@ -3646,8 +3642,6 @@ def _venue_analysis(symbol: str, setup: dict, btc_change: float = 0.0) -> dict:
     shadow_experiment = bool(setup.get("_shadow_experiment"))
     five_minute_oi = bool(setup.get("_five_minute_oi_shadow"))
     hourly_hgb = bool(setup.get("_hourly_hgb_shadow"))
-    precision_profit_first = bool(
-        setup.get("_precision_profit_first_shadow"))
     tags = [f"Venue module {setup['module']}",
             f"BTC regime {setup['btc_regime']}",
             f"Fixed target {setup['target_r']:.2f}R"]
@@ -3661,19 +3655,10 @@ def _venue_analysis(symbol: str, setup: dict, btc_change: float = 0.0) -> dict:
         tags.append(
             f"Target cascade {float(setup.get('selected_target_pct') or .5):.1f}% / "
             f"{int(setup.get('hold_bars') or 12)}h")
-    if five_minute_oi or precision_profit_first:
+    if five_minute_oi:
         runner_target_r = float(setup.get("runner_target_r") or 4.0)
         tp1_close_fraction = float(
-            setup.get("near_close_fraction") if precision_profit_first
-            else setup.get("tp1_close_fraction") or .70)
-        if precision_profit_first:
-            tags.append(
-                f"Frozen HGB quality {float(setup['model_quality']):.4f}")
-            tags.append(
-                f"Profit-first barbell {tp1_close_fraction * 100:.0f}% @ "
-                f"{float(setup['target_r']):.2f}R / "
-                f"{(1-tp1_close_fraction) * 100:.0f}% @ "
-                f"{runner_target_r:.2f}R")
+            setup.get("tp1_close_fraction") or .70)
         if five_minute_oi:
             tags.append(
                 f"Lagged OI 168h {setup['oi_change_168h'] * 100:+.2f}%")
@@ -3700,27 +3685,20 @@ def _venue_analysis(symbol: str, setup: dict, btc_change: float = 0.0) -> dict:
         # Persist the shadow module's fixed absolute-move bracket so a restart
         # cannot fall back to the global 15m trail.
         "fixed_runner_target_r": (runner_target_r
-                                  if five_minute_oi or precision_profit_first
-                                  else None),
+                                  if five_minute_oi else None),
         "strategy_tp1_close_frac": (tp1_close_fraction
-                                    if five_minute_oi or precision_profit_first
-                                    else None),
+                                    if five_minute_oi else None),
         "strategy_runner_mode": ("fixed_be"
-                                 if five_minute_oi or precision_profit_first
-                                 else None),
-        "strategy_bar_seconds": (300 if five_minute_oi else 900
-                                 if precision_profit_first
+                                 if five_minute_oi else None),
+        "strategy_bar_seconds": (300 if five_minute_oi
                                  else 3600 if hourly_hgb else None),
         "strategy_entry_bar_ts": (
-            float(setup["signal_bar_ts"]) + (300 if five_minute_oi else 900
-                                             if precision_profit_first else 3600)
-            if five_minute_oi or precision_profit_first or hourly_hgb else None),
+            float(setup["signal_bar_ts"]) + (300 if five_minute_oi else 3600)
+            if five_minute_oi or hourly_hgb else None),
         "strategy_stop_on_close": (
-            False if five_minute_oi or precision_profit_first or hourly_hgb
+            False if five_minute_oi or hourly_hgb
             else None),
         "strategy_max_bars": (72 if five_minute_oi else
-                              int(setup.get("hold_bars") or 48)
-                              if precision_profit_first else
                               int(setup.get("hold_bars") or 12)
                               if hourly_hgb else None),
         "entry_low": setup["entry"], "entry_high": setup["entry"],
@@ -3728,9 +3706,7 @@ def _venue_analysis(symbol: str, setup: dict, btc_change: float = 0.0) -> dict:
         "volume_ratio": 1.0, "session": setup["utc_session"],
         "swing_trend": "bull" if direction == "LONG" else "bear",
         "signals": tags,
-        "source": ("venue_shadow_precision_profit_first"
-                   if precision_profit_first
-                   else "venue_shadow_1h_hgb" if hourly_hgb
+        "source": ("venue_shadow_1h_hgb" if hourly_hgb
                    else "venue_shadow_5m_oi" if five_minute_oi
                    else "venue_shadow_experiment" if shadow_experiment
                    else "venue_regime"),
@@ -3744,7 +3720,6 @@ def _venue_analysis(symbol: str, setup: dict, btc_change: float = 0.0) -> dict:
         "_shadow_only": shadow_experiment or DEPLOYMENT_MODE == "shadow",
         "_five_minute_oi_shadow": five_minute_oi,
         "_hourly_hgb_shadow": hourly_hgb,
-        "_precision_profit_first_shadow": precision_profit_first,
     }
 
 
@@ -3770,7 +3745,7 @@ def _five_minute_oi_setup(symbol: str, candles_5m: dict | None,
 
 
 def _venue_scan_universe(available: set[str]) -> list[str]:
-    """Return the frozen profit-first universe supported by X-Perp."""
+    """Return the frozen direct-venue universe supported by X-Perp."""
     scan_universe = set(ROBUST_SYMBOLS)
     return sorted(
         symbol for symbol in scan_universe if _base_of_symbol(symbol) in available)
@@ -3799,7 +3774,6 @@ def _publish_venue_candidates(candidates: list[tuple[dict, int]],
             log.warning("Venue portfolio hourly count unavailable: %s", exc)
             recent_hour_count = 2
     source_priority = {
-        "venue_shadow_precision_profit_first": 0,
         "venue_regime": 1,
         "venue_shadow_1h_hgb": 2,
         "venue_shadow_experiment": 3,
@@ -3908,19 +3882,11 @@ def _run_venue_strategy_scan() -> None:
             continue
         try:
             market = market_prices.get(symbol) or float(candles["close"][-1])
-            rows = []
-            if DEPLOYMENT_MODE == "shadow":
-                rows = precision_profit_first_shadow_setups(
-                    candles, btc,
-                    entry_time=float(candles["time"][-1]) + KLINES_INTERVAL_SEC,
-                    market_price=float(market), symbol=symbol,
-                )
-            else:
-                rows = venue_setups(
-                    candles, btc,
-                    entry_time=float(candles["time"][-1]) + KLINES_INTERVAL_SEC,
-                    market_price=float(market), symbol=symbol,
-                )
+            rows = venue_setups(
+                candles, btc,
+                entry_time=float(candles["time"][-1]) + KLINES_INTERVAL_SEC,
+                market_price=float(market), symbol=symbol,
+            )
             for row in rows:
                 # The 5m supplement already carries its own bar timestamp.
                 # Production 15m rows do not, so only fill a missing value.

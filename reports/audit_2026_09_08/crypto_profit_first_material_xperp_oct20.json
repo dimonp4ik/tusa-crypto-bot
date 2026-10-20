@@ -1,5 +1,7 @@
 {
   "economic_pass": false,
+  "exact_path_report": "reports\\audit_2026_09_08\\crypto_material_exact_path_oct20.json",
+  "exit_path_valid": false,
   "frozen_policy_comparison": {
     "broad_regime": {
       "all_refreshed_xperp": {
@@ -559,6 +561,7 @@
     }
   },
   "limitations": [
+    "Independent near/far labels overstate returns after the live breakeven stop; the exact path report supersedes these metrics.",
     "The untouched refresh is only a few calendar days.",
     "X-Perp history covers roughly six months, not a full market cycle.",
     "Gross returns exclude fees at user request.",
@@ -724,7 +727,8 @@
   "route_count": 12,
   "snapshot_end": 1792469700,
   "sources": {
-    "C:\\Users\\Lenovo\\Desktop\\telegram bot\\crypto_profit_first_material_xperp_oct20_audit.py": "17f87e7f2a1e75e106b13f1c2dd9e92ff2e6c7f4a6fbd9a34027a0aed2764770",
+    "C:\\Users\\Lenovo\\Desktop\\telegram bot\\crypto_profit_first_material_xperp_oct20_audit.py": "6dc64f8ac50d6f6a8bd66a363b4c4f485d325ea4705eb2e53d9f9d03c7a06b23",
+    "reports\\audit_2026_09_08\\crypto_material_exact_path_oct20.json": "14a2c779dedfe5bb3c0aca182b1d991b4f5585d9fe0d606e732b11697f31282b",
     "reports\\audit_2026_09_08\\crypto_profit_first_material_ensemble_oct18.json": "8dc87694af72fa1cfb5c0222b7fd9a04b209f7fbb93e1a0555c65b060d562aa6",
     "reports\\audit_2026_09_08\\crypto_xperp_raw_router_audit_0_5_oct17_material_raw_raw_families.csv": "8456501337718cb2e9e128fc260259762d4ceb00df11eea486c3269c89d94db8",
     "reports\\audit_2026_09_08\\crypto_xperp_raw_router_audit_0_5_oct20_material_raw_raw_families.csv": "81deb074a2eee8900e1a98ad8f66d194b9f5ad30ca7328f807ee4d73184f2531",
@@ -732,5 +736,5 @@
     "reports\\audit_2026_09_08\\crypto_xperp_raw_router_audit_2_0_oct20_material_raw_raw_families.csv": "b3a45eae27cdecc099f9c1b209b7795e55d2f8992224597bd1890fe0005e65c8",
     "reports\\audit_2026_09_08\\xperp_15m_oct20_material\\manifest.json": "ca730f4538117dfedfd2ec01e0e4bcf49e0507a993876b7e9d0a99fa65d8da93"
   },
-  "status": "MATERIAL_ROUTE_REJECTED_OBJECTIVE"
+  "status": "MATERIAL_ROUTE_INVALIDATED_EXIT_PATH"
 }
