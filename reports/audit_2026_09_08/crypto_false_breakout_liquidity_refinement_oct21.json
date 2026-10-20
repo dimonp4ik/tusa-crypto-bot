@@ -1,0 +1,2781 @@
+{
+  "admissible_count": 66,
+  "atom_count": 101,
+  "enriched_rows": 22402,
+  "holdouts": {
+    "margin_3pct": {
+      "2025": {
+        "active_days": 360,
+        "by_module_count": {
+          "structural_breakout_5m": 1285
+        },
+        "by_source_count": {
+          "structural_breakout_5m": 1285
+        },
+        "dd_pct": 7.1509,
+        "max_entries_same_clock_hour": 2,
+        "max_entries_same_rolling_hour": 2,
+        "max_loss_streak": 15,
+        "mean_signed_move_pct": 0.01346,
+        "monthly_return_pct": {
+          "2025-01": 1.4184,
+          "2025-02": 5.2584,
+          "2025-03": -0.746,
+          "2025-04": -1.498,
+          "2025-05": 3.6208,
+          "2025-06": -1.0581,
+          "2025-07": -0.0862,
+          "2025-08": -2.2641,
+          "2025-09": 0.1592,
+          "2025-10": 1.5265,
+          "2025-11": 1.3889,
+          "2025-12": -2.7846,
+          "2026-01": 0.0969
+        },
+        "n": 1285,
+        "negative_months": 6,
+        "return_pct": 4.8309,
+        "trades_per_active_day": 3.569,
+        "trades_per_calendar_day": 3.521,
+        "wr": 30.12
+      },
+      "2026": {
+        "active_days": 238,
+        "by_module_count": {
+          "structural_breakout_5m": 886
+        },
+        "by_source_count": {
+          "structural_breakout_5m": 886
+        },
+        "dd_pct": 6.3819,
+        "max_entries_same_clock_hour": 2,
+        "max_entries_same_rolling_hour": 2,
+        "max_loss_streak": 18,
+        "mean_signed_move_pct": 0.03608,
+        "monthly_return_pct": {
+          "2026-01": 2.155,
+          "2026-02": -3.5203,
+          "2026-03": 2.4822,
+          "2026-04": 6.3138,
+          "2026-05": 0.491,
+          "2026-06": 3.3615,
+          "2026-07": 2.3956,
+          "2026-08": -3.9427
+        },
+        "n": 886,
+        "negative_months": 2,
+        "return_pct": 9.7061,
+        "trades_per_active_day": 3.723,
+        "trades_per_calendar_day": 3.646,
+        "wr": 34.76
+      }
+    },
+    "margin_5pct": {
+      "2025": {
+        "active_days": 360,
+        "by_module_count": {
+          "structural_breakout_5m": 1285
+        },
+        "by_source_count": {
+          "structural_breakout_5m": 1285
+        },
+        "dd_pct": 11.765,
+        "max_entries_same_clock_hour": 2,
+        "max_entries_same_rolling_hour": 2,
+        "max_loss_streak": 15,
+        "mean_signed_move_pct": 0.01346,
+        "monthly_return_pct": {
+          "2025-01": 2.3282,
+          "2025-02": 8.8589,
+          "2025-03": -1.2947,
+          "2025-04": -2.5358,
+          "2025-05": 6.0563,
+          "2025-06": -1.7944,
+          "2025-07": -0.1881,
+          "2025-08": -3.7738,
+          "2025-09": 0.2289,
+          "2025-10": 2.5242,
+          "2025-11": 2.2802,
+          "2025-12": -4.6364,
+          "2026-01": 0.1616
+        },
+        "n": 1285,
+        "negative_months": 6,
+        "return_pct": 7.6187,
+        "trades_per_active_day": 3.569,
+        "trades_per_calendar_day": 3.521,
+        "wr": 30.12
+      },
+      "2026": {
+        "active_days": 238,
+        "by_module_count": {
+          "structural_breakout_5m": 886
+        },
+        "by_source_count": {
+          "structural_breakout_5m": 886
+        },
+        "dd_pct": 10.4528,
+        "max_entries_same_clock_hour": 2,
+        "max_entries_same_rolling_hour": 2,
+        "max_loss_streak": 18,
+        "mean_signed_move_pct": 0.03608,
+        "monthly_return_pct": {
+          "2026-01": 3.5689,
+          "2026-02": -5.839,
+          "2026-03": 4.1139,
+          "2026-04": 10.685,
+          "2026-05": 0.7794,
+          "2026-06": 5.6051,
+          "2026-07": 3.975,
+          "2026-08": -6.5025
+        },
+        "n": 886,
+        "negative_months": 2,
+        "return_pct": 16.2742,
+        "trades_per_active_day": 3.723,
+        "trades_per_calendar_day": 3.646,
+        "wr": 34.76
+      }
+    }
+  },
+  "limitations": [
+    "The base strategy and bounded refinement grid create selection risk.",
+    "Binance spot history still requires direct X-Perp transfer.",
+    "Gross results exclude fees at user request."
+  ],
+  "objective_pass": false,
+  "policy_count": 667,
+  "protocol": {
+    "base": "frozen false-breakout fade, 1.5% target / 0.5% stop",
+    "entry": "next 5m market open",
+    "holdouts": [
+      2025,
+      2026
+    ],
+    "money": "client 3% or 5% current-equity margin; fixed 10x",
+    "orders": "market only",
+    "policy_selection": [
+      2020,
+      2021,
+      2022,
+      2023,
+      2024
+    ],
+    "threshold_fit": "2020-2022 quantiles only"
+  },
+  "ready_for_live_orders": false,
+  "selected_before_holdouts": {
+    "admissible": true,
+    "atoms": [
+      {
+        "field": "body_fraction",
+        "op": "le",
+        "value": 0.7924445638471547
+      },
+      {
+        "field": "level_touches_96",
+        "op": "le",
+        "value": 8.0
+      }
+    ],
+    "development": {
+      "confirmation_2023_2024": {
+        "active_days": 717,
+        "by_module_count": {
+          "structural_breakout_5m": 2448
+        },
+        "by_source_count": {
+          "structural_breakout_5m": 2448
+        },
+        "dd_pct": 7.0024,
+        "max_entries_same_clock_hour": 2,
+        "max_entries_same_rolling_hour": 2,
+        "max_loss_streak": 20,
+        "mean_signed_move_pct": 0.01785,
+        "monthly_return_pct": {
+          "2023-01": -1.764,
+          "2023-02": 4.1317,
+          "2023-03": -2.8698,
+          "2023-04": -2.828,
+          "2023-05": 2.1116,
+          "2023-06": -0.949,
+          "2023-07": 2.3882,
+          "2023-08": 1.4343,
+          "2023-09": 5.3619,
+          "2023-10": 2.4133,
+          "2023-11": 0.3586,
+          "2023-12": -1.4927,
+          "2024-01": 2.1441,
+          "2024-02": -1.2128,
+          "2024-03": -2.5098,
+          "2024-04": 0.1406,
+          "2024-05": -0.0191,
+          "2024-06": 3.4725,
+          "2024-07": 3.2291,
+          "2024-08": -0.6852,
+          "2024-09": -0.7574,
+          "2024-10": -0.813,
+          "2024-11": 0.5745,
+          "2024-12": 1.0336
+        },
+        "n": 2448,
+        "negative_months": 11,
+        "return_pct": 13.0657,
+        "trades_per_active_day": 3.414,
+        "trades_per_calendar_day": 3.349,
+        "wr": 31.33
+      },
+      "selection_2020_2022": {
+        "active_days": 1065,
+        "by_module_count": {
+          "structural_breakout_5m": 3545
+        },
+        "by_source_count": {
+          "structural_breakout_5m": 3545
+        },
+        "dd_pct": 6.0083,
+        "max_entries_same_clock_hour": 2,
+        "max_entries_same_rolling_hour": 2,
+        "max_loss_streak": 25,
+        "mean_signed_move_pct": 0.07384,
+        "monthly_return_pct": {
+          "2020-01": -0.2844,
+          "2020-02": 4.8079,
+          "2020-03": 0.5105,
+          "2020-04": 6.3837,
+          "2020-05": -1.8745,
+          "2020-06": 0.0834,
+          "2020-07": 1.4913,
+          "2020-08": 1.3105,
+          "2020-09": 2.5517,
+          "2020-10": -1.1439,
+          "2020-11": 10.332,
+          "2020-12": 4.2999,
+          "2021-01": -0.1865,
+          "2021-02": 3.1356,
+          "2021-03": -2.8711,
+          "2021-04": 2.8475,
+          "2021-05": 3.7826,
+          "2021-06": 8.5155,
+          "2021-07": 5.5456,
+          "2021-08": 2.8042,
+          "2021-09": -1.3181,
+          "2021-10": 1.3137,
+          "2021-11": 10.9849,
+          "2021-12": -0.9302,
+          "2022-01": 0.2964,
+          "2022-02": 11.6746,
+          "2022-03": -0.6033,
+          "2022-04": 2.8328,
+          "2022-05": 2.2527,
+          "2022-06": -0.3395,
+          "2022-07": 0.7849,
+          "2022-08": -0.8595,
+          "2022-09": 4.257,
+          "2022-10": -1.2683,
+          "2022-11": -0.4751,
+          "2022-12": -0.4819
+        },
+        "n": 3545,
+        "negative_months": 13,
+        "return_pct": 116.1247,
+        "trades_per_active_day": 3.329,
+        "trades_per_calendar_day": 3.237,
+        "wr": 30.61
+      }
+    },
+    "development_floor_month_pct": -2.8711,
+    "development_max_dd_pct": 7.0024,
+    "development_negative_months": 24,
+    "development_worst_return_pct": 13.0657
+  },
+  "source_rows": 22430,
+  "sources": {
+    "C:\\Users\\Lenovo\\Desktop\\telegram bot\\crypto_false_breakout_liquidity_refinement_oct21_audit.py": "6f35d1529252733968b9f7f227c90359aeb3f9afe91f4e3349f10ae1b0b94bfc",
+    "manifest_sha256": "86b27c83022564f9313d090b3d7e896b91ae9d06b39106881d54bdef1fc1695c",
+    "reports\\audit_2026_09_08\\crypto_5m_structural_breakout_oct20.pkl": "bc2f4947088d8f6c35dbafd870b86d8bc79ee1aa5451fb0b552c5471a0d8289b"
+  },
+  "stable_atom_count": 90,
+  "status": "REJECTED_OBJECTIVE",
+  "top20_before_holdouts": [
+    {
+      "admissible": true,
+      "atoms": [
+        {
+          "field": "body_fraction",
+          "op": "le",
+          "value": 0.7924445638471547
+        },
+        {
+          "field": "level_touches_96",
+          "op": "le",
+          "value": 8.0
+        }
+      ],
+      "development": {
+        "confirmation_2023_2024": {
+          "active_days": 717,
+          "by_module_count": {
+            "structural_breakout_5m": 2448
+          },
+          "by_source_count": {
+            "structural_breakout_5m": 2448
+          },
+          "dd_pct": 7.0024,
+          "max_entries_same_clock_hour": 2,
+          "max_entries_same_rolling_hour": 2,
+          "max_loss_streak": 20,
+          "mean_signed_move_pct": 0.01785,
+          "monthly_return_pct": {
+            "2023-01": -1.764,
+            "2023-02": 4.1317,
+            "2023-03": -2.8698,
+            "2023-04": -2.828,
+            "2023-05": 2.1116,
+            "2023-06": -0.949,
+            "2023-07": 2.3882,
+            "2023-08": 1.4343,
+            "2023-09": 5.3619,
+            "2023-10": 2.4133,
+            "2023-11": 0.3586,
+            "2023-12": -1.4927,
+            "2024-01": 2.1441,
+            "2024-02": -1.2128,
+            "2024-03": -2.5098,
+            "2024-04": 0.1406,
+            "2024-05": -0.0191,
+            "2024-06": 3.4725,
+            "2024-07": 3.2291,
+            "2024-08": -0.6852,
+            "2024-09": -0.7574,
+            "2024-10": -0.813,
+            "2024-11": 0.5745,
+            "2024-12": 1.0336
+          },
+          "n": 2448,
+          "negative_months": 11,
+          "return_pct": 13.0657,
+          "trades_per_active_day": 3.414,
+          "trades_per_calendar_day": 3.349,
+          "wr": 31.33
+        },
+        "selection_2020_2022": {
+          "active_days": 1065,
+          "by_module_count": {
+            "structural_breakout_5m": 3545
+          },
+          "by_source_count": {
+            "structural_breakout_5m": 3545
+          },
+          "dd_pct": 6.0083,
+          "max_entries_same_clock_hour": 2,
+          "max_entries_same_rolling_hour": 2,
+          "max_loss_streak": 25,
+          "mean_signed_move_pct": 0.07384,
+          "monthly_return_pct": {
+            "2020-01": -0.2844,
+            "2020-02": 4.8079,
+            "2020-03": 0.5105,
+            "2020-04": 6.3837,
+            "2020-05": -1.8745,
+            "2020-06": 0.0834,
+            "2020-07": 1.4913,
+            "2020-08": 1.3105,
+            "2020-09": 2.5517,
+            "2020-10": -1.1439,
+            "2020-11": 10.332,
+            "2020-12": 4.2999,
+            "2021-01": -0.1865,
+            "2021-02": 3.1356,
+            "2021-03": -2.8711,
+            "2021-04": 2.8475,
+            "2021-05": 3.7826,
+            "2021-06": 8.5155,
+            "2021-07": 5.5456,
+            "2021-08": 2.8042,
+            "2021-09": -1.3181,
+            "2021-10": 1.3137,
+            "2021-11": 10.9849,
+            "2021-12": -0.9302,
+            "2022-01": 0.2964,
+            "2022-02": 11.6746,
+            "2022-03": -0.6033,
+            "2022-04": 2.8328,
+            "2022-05": 2.2527,
+            "2022-06": -0.3395,
+            "2022-07": 0.7849,
+            "2022-08": -0.8595,
+            "2022-09": 4.257,
+            "2022-10": -1.2683,
+            "2022-11": -0.4751,
+            "2022-12": -0.4819
+          },
+          "n": 3545,
+          "negative_months": 13,
+          "return_pct": 116.1247,
+          "trades_per_active_day": 3.329,
+          "trades_per_calendar_day": 3.237,
+          "wr": 30.61
+        }
+      },
+      "development_floor_month_pct": -2.8711,
+      "development_max_dd_pct": 7.0024,
+      "development_negative_months": 24,
+      "development_worst_return_pct": 13.0657
+    },
+    {
+      "admissible": true,
+      "atoms": [
+        {
+          "field": "level_touches_96",
+          "op": "le",
+          "value": 8.0
+        },
+        {
+          "field": "wick_fraction",
+          "op": "le",
+          "value": 0.22618421495149885
+        }
+      ],
+      "development": {
+        "confirmation_2023_2024": {
+          "active_days": 727,
+          "by_module_count": {
+            "structural_breakout_5m": 3010
+          },
+          "by_source_count": {
+            "structural_breakout_5m": 3010
+          },
+          "dd_pct": 8.2312,
+          "max_entries_same_clock_hour": 2,
+          "max_entries_same_rolling_hour": 2,
+          "max_loss_streak": 18,
+          "mean_signed_move_pct": 0.02927,
+          "monthly_return_pct": {
+            "2023-01": -0.2602,
+            "2023-02": -0.5485,
+            "2023-03": 2.7044,
+            "2023-04": -0.19,
+            "2023-05": 1.5784,
+            "2023-06": -1.0995,
+            "2023-07": 2.5527,
+            "2023-08": 6.9204,
+            "2023-09": 2.4498,
+            "2023-10": 2.7524,
+            "2023-11": -1.6668,
+            "2023-12": -1.4142,
+            "2024-01": -1.0007,
+            "2024-02": -1.5938,
+            "2024-03": 1.5314,
+            "2024-04": 0.6908,
+            "2024-05": -0.1229,
+            "2024-06": 7.5068,
+            "2024-07": 8.5695,
+            "2024-08": -0.0459,
+            "2024-09": 0.1034,
+            "2024-10": -0.2519,
+            "2024-11": -1.2553,
+            "2024-12": -1.4394
+          },
+          "n": 3010,
+          "negative_months": 13,
+          "return_pct": 28.9122,
+          "trades_per_active_day": 4.14,
+          "trades_per_calendar_day": 4.118,
+          "wr": 32.19
+        },
+        "selection_2020_2022": {
+          "active_days": 1083,
+          "by_module_count": {
+            "structural_breakout_5m": 4208
+          },
+          "by_source_count": {
+            "structural_breakout_5m": 4208
+          },
+          "dd_pct": 8.9713,
+          "max_entries_same_clock_hour": 2,
+          "max_entries_same_rolling_hour": 2,
+          "max_loss_streak": 23,
+          "mean_signed_move_pct": 0.04335,
+          "monthly_return_pct": {
+            "2020-01": -1.795,
+            "2020-02": -0.124,
+            "2020-03": 1.1766,
+            "2020-04": 1.2104,
+            "2020-05": -1.113,
+            "2020-06": 1.0881,
+            "2020-07": 0.772,
+            "2020-08": 1.0096,
+            "2020-09": -0.0785,
+            "2020-10": 2.342,
+            "2020-11": 6.0236,
+            "2020-12": 1.6954,
+            "2021-01": 0.7066,
+            "2021-02": 0.7125,
+            "2021-03": 1.6552,
+            "2021-04": -0.4871,
+            "2021-05": 5.1815,
+            "2021-06": 6.7329,
+            "2021-07": 3.4614,
+            "2021-08": 1.3678,
+            "2021-09": 1.3977,
+            "2021-10": -0.2686,
+            "2021-11": 13.4004,
+            "2021-12": -1.7245,
+            "2022-01": -1.195,
+            "2022-02": 1.3381,
+            "2022-03": -2.8891,
+            "2022-04": 3.8966,
+            "2022-05": 1.248,
+            "2022-06": 1.0337,
+            "2022-07": -1.5685,
+            "2022-08": 1.313,
+            "2022-09": 1.5804,
+            "2022-10": 4.8392,
+            "2022-11": 0.6113,
+            "2022-12": 0.3196
+          },
+          "n": 4208,
+          "negative_months": 10,
+          "return_pct": 69.9358,
+          "trades_per_active_day": 3.886,
+          "trades_per_calendar_day": 3.839,
+          "wr": 29.21
+        }
+      },
+      "development_floor_month_pct": -2.8891,
+      "development_max_dd_pct": 8.9713,
+      "development_negative_months": 23,
+      "development_worst_return_pct": 28.9122
+    },
+    {
+      "admissible": true,
+      "atoms": [
+        {
+          "field": "wick_fraction",
+          "op": "ge",
+          "value": 0.026315789473681135
+        },
+        {
+          "field": "level_touches_96",
+          "op": "le",
+          "value": 8.0
+        }
+      ],
+      "development": {
+        "confirmation_2023_2024": {
+          "active_days": 726,
+          "by_module_count": {
+            "structural_breakout_5m": 2875
+          },
+          "by_source_count": {
+            "structural_breakout_5m": 2875
+          },
+          "dd_pct": 6.7538,
+          "max_entries_same_clock_hour": 2,
+          "max_entries_same_rolling_hour": 2,
+          "max_loss_streak": 21,
+          "mean_signed_move_pct": 0.02788,
+          "monthly_return_pct": {
+            "2023-01": 0.9571,
+            "2023-02": 0.6646,
+            "2023-03": 0.0558,
+            "2023-04": -2.015,
+            "2023-05": 2.8239,
+            "2023-06": 1.0813,
+            "2023-07": 0.0718,
+            "2023-08": 1.9481,
+            "2023-09": 6.6019,
+            "2023-10": 2.6873,
+            "2023-11": -2.3743,
+            "2023-12": -1.1316,
+            "2024-01": 2.9843,
+            "2024-02": -2.9504,
+            "2024-03": 0.5887,
+            "2024-04": 0.7472,
+            "2024-05": 0.3022,
+            "2024-06": 4.8335,
+            "2024-07": 5.3598,
+            "2024-08": 0.5289,
+            "2024-09": 1.4047,
+            "2024-10": 0.6365,
+            "2024-11": 0.0521,
+            "2024-12": -2.0535
+          },
+          "n": 2875,
+          "negative_months": 5,
+          "return_pct": 25.9295,
+          "trades_per_active_day": 3.96,
+          "trades_per_calendar_day": 3.933,
+          "wr": 31.62
+        },
+        "selection_2020_2022": {
+          "active_days": 1084,
+          "by_module_count": {
+            "structural_breakout_5m": 4218
+          },
+          "by_source_count": {
+            "structural_breakout_5m": 4218
+          },
+          "dd_pct": 7.3627,
+          "max_entries_same_clock_hour": 2,
+          "max_entries_same_rolling_hour": 2,
+          "max_loss_streak": 27,
+          "mean_signed_move_pct": 0.04863,
+          "monthly_return_pct": {
+            "2020-01": -0.3328,
+            "2020-02": 2.4152,
+            "2020-03": 3.0988,
+            "2020-04": 2.8683,
+            "2020-05": -2.5081,
+            "2020-06": -0.641,
+            "2020-07": 1.9702,
+            "2020-08": 0.8914,
+            "2020-09": -0.1414,
+            "2020-10": -0.1353,
+            "2020-11": 10.4892,
+            "2020-12": 2.5932,
+            "2021-01": 1.4623,
+            "2021-02": 2.2012,
+            "2021-03": -1.8234,
+            "2021-04": 1.1596,
+            "2021-05": 5.0191,
+            "2021-06": 3.8987,
+            "2021-07": 2.8816,
+            "2021-08": 1.1293,
+            "2021-09": 0.2143,
+            "2021-10": -0.5974,
+            "2021-11": 11.4676,
+            "2021-12": -0.997,
+            "2022-01": -0.1519,
+            "2022-02": 10.2037,
+            "2022-03": -1.3833,
+            "2022-04": 3.335,
+            "2022-05": 2.4238,
+            "2022-06": 2.9284,
+            "2022-07": -1.1283,
+            "2022-08": -1.01,
+            "2022-09": 3.1745,
+            "2022-10": -1.8967,
+            "2022-11": -0.4326,
+            "2022-12": -0.5012
+          },
+          "n": 4218,
+          "negative_months": 15,
+          "return_pct": 81.8484,
+          "trades_per_active_day": 3.891,
+          "trades_per_calendar_day": 3.849,
+          "wr": 29.35
+        }
+      },
+      "development_floor_month_pct": -2.9504,
+      "development_max_dd_pct": 7.3627,
+      "development_negative_months": 20,
+      "development_worst_return_pct": 25.9295
+    },
+    {
+      "admissible": true,
+      "atoms": [
+        {
+          "field": "prior_move_atr",
+          "op": "ge",
+          "value": 0.42794222637158275
+        },
+        {
+          "field": "level_touches_96",
+          "op": "le",
+          "value": 8.0
+        }
+      ],
+      "development": {
+        "confirmation_2023_2024": {
+          "active_days": 717,
+          "by_module_count": {
+            "structural_breakout_5m": 2569
+          },
+          "by_source_count": {
+            "structural_breakout_5m": 2569
+          },
+          "dd_pct": 5.4598,
+          "max_entries_same_clock_hour": 2,
+          "max_entries_same_rolling_hour": 2,
+          "max_loss_streak": 22,
+          "mean_signed_move_pct": 0.03852,
+          "monthly_return_pct": {
+            "2023-01": -1.7062,
+            "2023-02": -0.4076,
+            "2023-03": 2.7954,
+            "2023-04": -2.0888,
+            "2023-05": 1.5046,
+            "2023-06": 0.0901,
+            "2023-07": -2.1129,
+            "2023-08": 3.5659,
+            "2023-09": 3.1374,
+            "2023-10": 1.1475,
+            "2023-11": -0.2821,
+            "2023-12": -0.1981,
+            "2024-01": 3.7101,
+            "2024-02": 0.4426,
+            "2024-03": 2.2027,
+            "2024-04": 0.6167,
+            "2024-05": 0.0233,
+            "2024-06": 6.5113,
+            "2024-07": 8.377,
+            "2024-08": 3.2209,
+            "2024-09": -1.9631,
+            "2024-10": 1.3042,
+            "2024-11": -0.0617,
+            "2024-12": -0.0974
+          },
+          "n": 2569,
+          "negative_months": 9,
+          "return_pct": 33.3705,
+          "trades_per_active_day": 3.583,
+          "trades_per_calendar_day": 3.514,
+          "wr": 33.13
+        },
+        "selection_2020_2022": {
+          "active_days": 1060,
+          "by_module_count": {
+            "structural_breakout_5m": 3535
+          },
+          "by_source_count": {
+            "structural_breakout_5m": 3535
+          },
+          "dd_pct": 6.7719,
+          "max_entries_same_clock_hour": 2,
+          "max_entries_same_rolling_hour": 2,
+          "max_loss_streak": 23,
+          "mean_signed_move_pct": 0.06174,
+          "monthly_return_pct": {
+            "2020-01": 0.8993,
+            "2020-02": 3.0463,
+            "2020-03": 1.6536,
+            "2020-04": 2.7559,
+            "2020-05": -0.9782,
+            "2020-06": -2.9768,
+            "2020-07": 3.246,
+            "2020-08": -0.402,
+            "2020-09": -1.2189,
+            "2020-10": -1.4549,
+            "2020-11": 6.5299,
+            "2020-12": 4.2741,
+            "2021-01": 4.5558,
+            "2021-02": 2.5182,
+            "2021-03": 1.0221,
+            "2021-04": -1.0839,
+            "2021-05": 5.0348,
+            "2021-06": 7.7203,
+            "2021-07": 5.7212,
+            "2021-08": 4.12,
+            "2021-09": 0.774,
+            "2021-10": -0.2667,
+            "2021-11": 10.8973,
+            "2021-12": -2.4529,
+            "2022-01": -1.755,
+            "2022-02": 7.1165,
+            "2022-03": -2.2836,
+            "2022-04": 3.1689,
+            "2022-05": 3.3065,
+            "2022-06": 1.7539,
+            "2022-07": -0.9806,
+            "2022-08": 1.7278,
+            "2022-09": 1.3725,
+            "2022-10": 1.6968,
+            "2022-11": -1.4151,
+            "2022-12": -1.2456
+          },
+          "n": 3535,
+          "negative_months": 13,
+          "return_pct": 89.7304,
+          "trades_per_active_day": 3.335,
+          "trades_per_calendar_day": 3.225,
+          "wr": 29.93
+        }
+      },
+      "development_floor_month_pct": -2.9768,
+      "development_max_dd_pct": 6.7719,
+      "development_negative_months": 22,
+      "development_worst_return_pct": 33.3705
+    },
+    {
+      "admissible": true,
+      "atoms": [
+        {
+          "field": "wick_fraction",
+          "op": "ge",
+          "value": 0.026315789473681135
+        },
+        {
+          "field": "body_fraction",
+          "op": "le",
+          "value": 0.7924445638471547
+        }
+      ],
+      "development": {
+        "confirmation_2023_2024": {
+          "active_days": 716,
+          "by_module_count": {
+            "structural_breakout_5m": 2432
+          },
+          "by_source_count": {
+            "structural_breakout_5m": 2432
+          },
+          "dd_pct": 6.7553,
+          "max_entries_same_clock_hour": 2,
+          "max_entries_same_rolling_hour": 2,
+          "max_loss_streak": 22,
+          "mean_signed_move_pct": 0.03374,
+          "monthly_return_pct": {
+            "2023-01": 1.0348,
+            "2023-02": 1.192,
+            "2023-03": -0.8793,
+            "2023-04": -2.9866,
+            "2023-05": 3.4184,
+            "2023-06": 1.0806,
+            "2023-07": 4.0715,
+            "2023-08": 0.206,
+            "2023-09": 2.2843,
+            "2023-10": 1.6209,
+            "2023-11": -0.2381,
+            "2023-12": -0.2816,
+            "2024-01": 3.2012,
+            "2024-02": -0.4966,
+            "2024-03": -2.0411,
+            "2024-04": 3.5689,
+            "2024-05": 0.7358,
+            "2024-06": 3.6798,
+            "2024-07": 3.0506,
+            "2024-08": 2.5102,
+            "2024-09": 0.0336,
+            "2024-10": -2.0907,
+            "2024-11": 1.4568,
+            "2024-12": 0.2029
+          },
+          "n": 2432,
+          "negative_months": 7,
+          "return_pct": 26.8409,
+          "trades_per_active_day": 3.397,
+          "trades_per_calendar_day": 3.327,
+          "wr": 31.95
+        },
+        "selection_2020_2022": {
+          "active_days": 1073,
+          "by_module_count": {
+            "structural_breakout_5m": 3663
+          },
+          "by_source_count": {
+            "structural_breakout_5m": 3663
+          },
+          "dd_pct": 6.41,
+          "max_entries_same_clock_hour": 2,
+          "max_entries_same_rolling_hour": 2,
+          "max_loss_streak": 25,
+          "mean_signed_move_pct": 0.06383,
+          "monthly_return_pct": {
+            "2020-01": -1.4504,
+            "2020-02": 4.1405,
+            "2020-03": 2.6125,
+            "2020-04": 4.1208,
+            "2020-05": -1.4338,
+            "2020-06": 0.7277,
+            "2020-07": 1.1757,
+            "2020-08": 1.2327,
+            "2020-09": 3.7496,
+            "2020-10": -2.0671,
+            "2020-11": 14.0312,
+            "2020-12": 2.6324,
+            "2021-01": 0.5587,
+            "2021-02": 2.0567,
+            "2021-03": -2.583,
+            "2021-04": 4.2406,
+            "2021-05": 3.468,
+            "2021-06": 4.2184,
+            "2021-07": 5.3866,
+            "2021-08": 3.5993,
+            "2021-09": -0.9543,
+            "2021-10": 0.8162,
+            "2021-11": 10.6494,
+            "2021-12": -0.3409,
+            "2022-01": -1.2544,
+            "2022-02": 14.0377,
+            "2022-03": -0.9327,
+            "2022-04": 0.1817,
+            "2022-05": 2.2555,
+            "2022-06": -1.3949,
+            "2022-07": 1.589,
+            "2022-08": -2.2512,
+            "2022-09": 5.0403,
+            "2022-10": -2.8997,
+            "2022-11": -1.2506,
+            "2022-12": -1.5835
+          },
+          "n": 3663,
+          "negative_months": 13,
+          "return_pct": 98.6893,
+          "trades_per_active_day": 3.414,
+          "trades_per_calendar_day": 3.345,
+          "wr": 30.08
+        }
+      },
+      "development_floor_month_pct": -2.9866,
+      "development_max_dd_pct": 6.7553,
+      "development_negative_months": 20,
+      "development_worst_return_pct": 26.8409
+    },
+    {
+      "admissible": true,
+      "atoms": [
+        {
+          "field": "body_fraction",
+          "op": "le",
+          "value": 0.7924445638471547
+        }
+      ],
+      "development": {
+        "confirmation_2023_2024": {
+          "active_days": 720,
+          "by_module_count": {
+            "structural_breakout_5m": 2717
+          },
+          "by_source_count": {
+            "structural_breakout_5m": 2717
+          },
+          "dd_pct": 7.398,
+          "max_entries_same_clock_hour": 2,
+          "max_entries_same_rolling_hour": 2,
+          "max_loss_streak": 19,
+          "mean_signed_move_pct": 0.0185,
+          "monthly_return_pct": {
+            "2023-01": -1.4534,
+            "2023-02": 1.6457,
+            "2023-03": -2.5759,
+            "2023-04": -2.8712,
+            "2023-05": 2.1058,
+            "2023-06": 1.5911,
+            "2023-07": 3.321,
+            "2023-08": 1.5962,
+            "2023-09": 4.0846,
+            "2023-10": 2.5574,
+            "2023-11": -0.8382,
+            "2023-12": -0.7337,
+            "2024-01": 2.737,
+            "2024-02": -0.8227,
+            "2024-03": -2.9067,
+            "2024-04": 0.586,
+            "2024-05": -0.3697,
+            "2024-06": 3.6923,
+            "2024-07": 3.2971,
+            "2024-08": 1.183,
+            "2024-09": -0.5408,
+            "2024-10": -2.7479,
+            "2024-11": 0.9958,
+            "2024-12": 1.2054
+          },
+          "n": 2717,
+          "negative_months": 10,
+          "return_pct": 15.204,
+          "trades_per_active_day": 3.774,
+          "trades_per_calendar_day": 3.717,
+          "wr": 31.32
+        },
+        "selection_2020_2022": {
+          "active_days": 1078,
+          "by_module_count": {
+            "structural_breakout_5m": 3909
+          },
+          "by_source_count": {
+            "structural_breakout_5m": 3909
+          },
+          "dd_pct": 5.4805,
+          "max_entries_same_clock_hour": 2,
+          "max_entries_same_rolling_hour": 2,
+          "max_loss_streak": 23,
+          "mean_signed_move_pct": 0.0623,
+          "monthly_return_pct": {
+            "2020-01": -0.4175,
+            "2020-02": 5.1277,
+            "2020-03": 2.9159,
+            "2020-04": 4.8959,
+            "2020-05": -2.1513,
+            "2020-06": 1.0795,
+            "2020-07": 0.5995,
+            "2020-08": 1.3365,
+            "2020-09": 2.479,
+            "2020-10": -1.6723,
+            "2020-11": 11.6388,
+            "2020-12": 4.0162,
+            "2021-01": -0.0426,
+            "2021-02": 1.1423,
+            "2021-03": -3.0209,
+            "2021-04": 2.9974,
+            "2021-05": 3.314,
+            "2021-06": 5.6326,
+            "2021-07": 5.5413,
+            "2021-08": 3.028,
+            "2021-09": -0.9552,
+            "2021-10": 0.9634,
+            "2021-11": 10.1519,
+            "2021-12": -0.1917,
+            "2022-01": -1.7297,
+            "2022-02": 12.6771,
+            "2022-03": -1.7864,
+            "2022-04": 0.0316,
+            "2022-05": 3.0192,
+            "2022-06": -0.0604,
+            "2022-07": 0.9279,
+            "2022-08": -0.1147,
+            "2022-09": 7.1526,
+            "2022-10": -2.8859,
+            "2022-11": -0.099,
+            "2022-12": -0.916
+          },
+          "n": 3909,
+          "negative_months": 14,
+          "return_pct": 104.3075,
+          "trades_per_active_day": 3.626,
+          "trades_per_calendar_day": 3.57,
+          "wr": 30.16
+        }
+      },
+      "development_floor_month_pct": -3.0209,
+      "development_max_dd_pct": 7.398,
+      "development_negative_months": 24,
+      "development_worst_return_pct": 15.204
+    },
+    {
+      "admissible": true,
+      "atoms": [
+        {
+          "field": "body_fraction",
+          "op": "le",
+          "value": 0.7924445638471547
+        },
+        {
+          "field": "prior_move_atr",
+          "op": "ge",
+          "value": -0.3125176703019645
+        }
+      ],
+      "development": {
+        "confirmation_2023_2024": {
+          "active_days": 712,
+          "by_module_count": {
+            "structural_breakout_5m": 2459
+          },
+          "by_source_count": {
+            "structural_breakout_5m": 2459
+          },
+          "dd_pct": 7.4311,
+          "max_entries_same_clock_hour": 2,
+          "max_entries_same_rolling_hour": 2,
+          "max_loss_streak": 17,
+          "mean_signed_move_pct": 0.02073,
+          "monthly_return_pct": {
+            "2023-01": -1.5459,
+            "2023-02": 0.0901,
+            "2023-03": -0.576,
+            "2023-04": -3.0403,
+            "2023-05": 1.5295,
+            "2023-06": 0.4767,
+            "2023-07": 3.0321,
+            "2023-08": 0.4082,
+            "2023-09": 3.7094,
+            "2023-10": 2.4556,
+            "2023-11": 0.0471,
+            "2023-12": -1.3198,
+            "2024-01": 2.3227,
+            "2024-02": -0.0574,
+            "2024-03": 0.9926,
+            "2024-04": 2.6934,
+            "2024-05": -1.1109,
+            "2024-06": 4.2244,
+            "2024-07": 3.9249,
+            "2024-08": -0.9075,
+            "2024-09": -1.9743,
+            "2024-10": -1.7129,
+            "2024-11": 0.5467,
+            "2024-12": 0.7533
+          },
+          "n": 2459,
+          "negative_months": 9,
+          "return_pct": 15.5555,
+          "trades_per_active_day": 3.454,
+          "trades_per_calendar_day": 3.364,
+          "wr": 31.52
+        },
+        "selection_2020_2022": {
+          "active_days": 1059,
+          "by_module_count": {
+            "structural_breakout_5m": 3544
+          },
+          "by_source_count": {
+            "structural_breakout_5m": 3544
+          },
+          "dd_pct": 5.3752,
+          "max_entries_same_clock_hour": 2,
+          "max_entries_same_rolling_hour": 2,
+          "max_loss_streak": 22,
+          "mean_signed_move_pct": 0.06765,
+          "monthly_return_pct": {
+            "2020-01": 1.692,
+            "2020-02": 4.0979,
+            "2020-03": 0.3423,
+            "2020-04": 3.2484,
+            "2020-05": -2.878,
+            "2020-06": 1.1169,
+            "2020-07": 0.7648,
+            "2020-08": 0.8839,
+            "2020-09": -0.3302,
+            "2020-10": -1.8691,
+            "2020-11": 8.5169,
+            "2020-12": 5.3659,
+            "2021-01": 4.0849,
+            "2021-02": 1.6007,
+            "2021-03": -2.434,
+            "2021-04": 1.4697,
+            "2021-05": 1.9352,
+            "2021-06": 10.3198,
+            "2021-07": 4.6,
+            "2021-08": 3.6818,
+            "2021-09": 0.5435,
+            "2021-10": 2.2235,
+            "2021-11": 7.3049,
+            "2021-12": -0.7821,
+            "2022-01": -1.1923,
+            "2022-02": 10.6743,
+            "2022-03": -0.5963,
+            "2022-04": 0.4932,
+            "2022-05": 1.948,
+            "2022-06": 0.6087,
+            "2022-07": 0.8592,
+            "2022-08": 0.72,
+            "2022-09": 6.9922,
+            "2022-10": -0.8271,
+            "2022-11": -1.5463,
+            "2022-12": -0.5398
+          },
+          "n": 3544,
+          "negative_months": 10,
+          "return_pct": 102.3157,
+          "trades_per_active_day": 3.347,
+          "trades_per_calendar_day": 3.237,
+          "wr": 30.36
+        }
+      },
+      "development_floor_month_pct": -3.0403,
+      "development_max_dd_pct": 7.4311,
+      "development_negative_months": 19,
+      "development_worst_return_pct": 15.5555
+    },
+    {
+      "admissible": true,
+      "atoms": [
+        {
+          "field": "entry_gap_fade_pct",
+          "op": "le",
+          "value": 0.02172944666349129
+        },
+        {
+          "field": "level_age_bars",
+          "op": "le",
+          "value": 3.0
+        }
+      ],
+      "development": {
+        "confirmation_2023_2024": {
+          "active_days": 717,
+          "by_module_count": {
+            "structural_breakout_5m": 2623
+          },
+          "by_source_count": {
+            "structural_breakout_5m": 2623
+          },
+          "dd_pct": 6.2275,
+          "max_entries_same_clock_hour": 2,
+          "max_entries_same_rolling_hour": 2,
+          "max_loss_streak": 19,
+          "mean_signed_move_pct": 0.037,
+          "monthly_return_pct": {
+            "2023-01": -2.3913,
+            "2023-02": -0.3864,
+            "2023-03": 2.6146,
+            "2023-04": -0.4509,
+            "2023-05": 3.5556,
+            "2023-06": 5.0108,
+            "2023-07": 1.2084,
+            "2023-08": 2.7415,
+            "2023-09": 2.5491,
+            "2023-10": -1.4936,
+            "2023-11": 0.8465,
+            "2023-12": -1.4553,
+            "2024-01": 4.6315,
+            "2024-02": -0.377,
+            "2024-03": 1.6894,
+            "2024-04": -0.0544,
+            "2024-05": -1.7576,
+            "2024-06": 4.2816,
+            "2024-07": 5.2441,
+            "2024-08": -0.2246,
+            "2024-09": -1.9345,
+            "2024-10": 2.2911,
+            "2024-11": 0.5413,
+            "2024-12": 2.3477
+          },
+          "n": 2623,
+          "negative_months": 10,
+          "return_pct": 32.6415,
+          "trades_per_active_day": 3.658,
+          "trades_per_calendar_day": 3.588,
+          "wr": 32.86
+        },
+        "selection_2020_2022": {
+          "active_days": 1054,
+          "by_module_count": {
+            "structural_breakout_5m": 3412
+          },
+          "by_source_count": {
+            "structural_breakout_5m": 3412
+          },
+          "dd_pct": 7.4363,
+          "max_entries_same_clock_hour": 2,
+          "max_entries_same_rolling_hour": 2,
+          "max_loss_streak": 20,
+          "mean_signed_move_pct": 0.05529,
+          "monthly_return_pct": {
+            "2020-01": 1.2577,
+            "2020-02": 2.673,
+            "2020-03": 1.0201,
+            "2020-04": 4.1584,
+            "2020-05": -1.5014,
+            "2020-06": -3.0576,
+            "2020-07": 1.0833,
+            "2020-08": 0.5787,
+            "2020-09": -1.0706,
+            "2020-10": -2.8909,
+            "2020-11": 10.4264,
+            "2020-12": 4.7655,
+            "2021-01": 1.7734,
+            "2021-02": 0.21,
+            "2021-03": -1.2865,
+            "2021-04": 0.5635,
+            "2021-05": 3.3177,
+            "2021-06": 5.0106,
+            "2021-07": 5.075,
+            "2021-08": 5.406,
+            "2021-09": 0.6082,
+            "2021-10": 1.3122,
+            "2021-11": 4.2924,
+            "2021-12": -2.2527,
+            "2022-01": -2.159,
+            "2022-02": 9.3893,
+            "2022-03": 0.9098,
+            "2022-04": 2.2574,
+            "2022-05": 1.2745,
+            "2022-06": 4.3584,
+            "2022-07": 1.1048,
+            "2022-08": 1.8229,
+            "2022-09": 2.8429,
+            "2022-10": -2.0318,
+            "2022-11": -2.5941,
+            "2022-12": -1.2609
+          },
+          "n": 3412,
+          "negative_months": 10,
+          "return_pct": 73.7332,
+          "trades_per_active_day": 3.237,
+          "trades_per_calendar_day": 3.113,
+          "wr": 29.98
+        }
+      },
+      "development_floor_month_pct": -3.0576,
+      "development_max_dd_pct": 7.4363,
+      "development_negative_months": 20,
+      "development_worst_return_pct": 32.6415
+    },
+    {
+      "admissible": true,
+      "atoms": [
+        {
+          "field": "level_touches_96",
+          "op": "le",
+          "value": 8.0
+        },
+        {
+          "field": "prior_move_atr",
+          "op": "ge",
+          "value": -0.3125176703019645
+        }
+      ],
+      "development": {
+        "confirmation_2023_2024": {
+          "active_days": 724,
+          "by_module_count": {
+            "structural_breakout_5m": 3038
+          },
+          "by_source_count": {
+            "structural_breakout_5m": 3038
+          },
+          "dd_pct": 7.0966,
+          "max_entries_same_clock_hour": 2,
+          "max_entries_same_rolling_hour": 2,
+          "max_loss_streak": 20,
+          "mean_signed_move_pct": 0.02481,
+          "monthly_return_pct": {
+            "2023-01": -0.6623,
+            "2023-02": -0.3343,
+            "2023-03": 2.6968,
+            "2023-04": -0.5799,
+            "2023-05": 2.8528,
+            "2023-06": 1.1296,
+            "2023-07": -1.0376,
+            "2023-08": 4.8076,
+            "2023-09": 0.9308,
+            "2023-10": 1.3654,
+            "2023-11": -0.7299,
+            "2023-12": -3.1146,
+            "2024-01": 0.9547,
+            "2024-02": -1.0216,
+            "2024-03": 3.1847,
+            "2024-04": -0.1716,
+            "2024-05": -0.968,
+            "2024-06": 7.0787,
+            "2024-07": 7.1989,
+            "2024-08": 1.7662,
+            "2024-09": -2.1423,
+            "2024-10": -0.0112,
+            "2024-11": 0.0803,
+            "2024-12": -0.8517
+          },
+          "n": 3038,
+          "negative_months": 12,
+          "return_pct": 24.0591,
+          "trades_per_active_day": 4.196,
+          "trades_per_calendar_day": 4.156,
+          "wr": 32.16
+        },
+        "selection_2020_2022": {
+          "active_days": 1079,
+          "by_module_count": {
+            "structural_breakout_5m": 4177
+          },
+          "by_source_count": {
+            "structural_breakout_5m": 4177
+          },
+          "dd_pct": 8.8739,
+          "max_entries_same_clock_hour": 2,
+          "max_entries_same_rolling_hour": 2,
+          "max_loss_streak": 22,
+          "mean_signed_move_pct": 0.04916,
+          "monthly_return_pct": {
+            "2020-01": 1.3134,
+            "2020-02": 1.1963,
+            "2020-03": 0.7307,
+            "2020-04": 2.9334,
+            "2020-05": -1.2886,
+            "2020-06": -0.7396,
+            "2020-07": 2.8455,
+            "2020-08": 1.2941,
+            "2020-09": -2.3612,
+            "2020-10": -1.9308,
+            "2020-11": 2.5233,
+            "2020-12": 3.9634,
+            "2021-01": 5.4949,
+            "2021-02": 2.5101,
+            "2021-03": 1.6223,
+            "2021-04": -1.0892,
+            "2021-05": 3.9292,
+            "2021-06": 8.6667,
+            "2021-07": 3.6605,
+            "2021-08": 2.5551,
+            "2021-09": 1.8264,
+            "2021-10": 0.8233,
+            "2021-11": 11.22,
+            "2021-12": -2.166,
+            "2022-01": -2.0388,
+            "2022-02": 3.8013,
+            "2022-03": -2.8727,
+            "2022-04": 2.5712,
+            "2022-05": 3.3717,
+            "2022-06": 2.5145,
+            "2022-07": -0.9778,
+            "2022-08": 2.2248,
+            "2022-09": 3.5454,
+            "2022-10": 0.8439,
+            "2022-11": 0.0336,
+            "2022-12": -0.6652
+          },
+          "n": 4177,
+          "negative_months": 10,
+          "return_pct": 82.0438,
+          "trades_per_active_day": 3.871,
+          "trades_per_calendar_day": 3.811,
+          "wr": 29.3
+        }
+      },
+      "development_floor_month_pct": -3.1146,
+      "development_max_dd_pct": 8.8739,
+      "development_negative_months": 22,
+      "development_worst_return_pct": 24.0591
+    },
+    {
+      "admissible": true,
+      "atoms": [
+        {
+          "field": "body_fraction",
+          "op": "le",
+          "value": 0.7924445638471547
+        },
+        {
+          "field": "major_level_48",
+          "op": "eq",
+          "value": 0.0
+        }
+      ],
+      "development": {
+        "confirmation_2023_2024": {
+          "active_days": 718,
+          "by_module_count": {
+            "structural_breakout_5m": 2648
+          },
+          "by_source_count": {
+            "structural_breakout_5m": 2648
+          },
+          "dd_pct": 7.5091,
+          "max_entries_same_clock_hour": 2,
+          "max_entries_same_rolling_hour": 2,
+          "max_loss_streak": 21,
+          "mean_signed_move_pct": 0.0205,
+          "monthly_return_pct": {
+            "2023-01": -1.7225,
+            "2023-02": 1.5866,
+            "2023-03": -2.7441,
+            "2023-04": -2.4328,
+            "2023-05": 1.2009,
+            "2023-06": 1.9708,
+            "2023-07": 3.7851,
+            "2023-08": 1.4913,
+            "2023-09": 4.0441,
+            "2023-10": 1.9484,
+            "2023-11": -1.5178,
+            "2023-12": -1.6121,
+            "2024-01": 2.4304,
+            "2024-02": -0.5243,
+            "2024-03": -1.4407,
+            "2024-04": 1.04,
+            "2024-05": -1.0775,
+            "2024-06": 4.2264,
+            "2024-07": 3.6079,
+            "2024-08": 1.9446,
+            "2024-09": -0.5408,
+            "2024-10": -3.2062,
+            "2024-11": 2.2146,
+            "2024-12": 1.3579
+          },
+          "n": 2648,
+          "negative_months": 10,
+          "return_pct": 16.6438,
+          "trades_per_active_day": 3.688,
+          "trades_per_calendar_day": 3.622,
+          "wr": 31.27
+        },
+        "selection_2020_2022": {
+          "active_days": 1076,
+          "by_module_count": {
+            "structural_breakout_5m": 3831
+          },
+          "by_source_count": {
+            "structural_breakout_5m": 3831
+          },
+          "dd_pct": 7.0315,
+          "max_entries_same_clock_hour": 2,
+          "max_entries_same_rolling_hour": 2,
+          "max_loss_streak": 24,
+          "mean_signed_move_pct": 0.06098,
+          "monthly_return_pct": {
+            "2020-01": 0.7101,
+            "2020-02": 5.4442,
+            "2020-03": 2.9159,
+            "2020-04": 5.6848,
+            "2020-05": -2.0043,
+            "2020-06": 1.2281,
+            "2020-07": 0.2992,
+            "2020-08": 1.3823,
+            "2020-09": 2.633,
+            "2020-10": -1.5246,
+            "2020-11": 11.6388,
+            "2020-12": 4.2161,
+            "2021-01": 1.0103,
+            "2021-02": 0.8421,
+            "2021-03": -2.7293,
+            "2021-04": 2.6942,
+            "2021-05": 2.6971,
+            "2021-06": 5.0007,
+            "2021-07": 5.5413,
+            "2021-08": 3.3465,
+            "2021-09": -0.6574,
+            "2021-10": -0.2271,
+            "2021-11": 10.3174,
+            "2021-12": -0.9333,
+            "2022-01": -1.6331,
+            "2022-02": 10.8425,
+            "2022-03": -2.3702,
+            "2022-04": 0.6247,
+            "2022-05": 2.5767,
+            "2022-06": -1.8375,
+            "2022-07": -0.7175,
+            "2022-08": 0.1861,
+            "2022-09": 7.3145,
+            "2022-10": -2.8859,
+            "2022-11": -0.099,
+            "2022-12": 0.0214
+          },
+          "n": 3831,
+          "negative_months": 12,
+          "return_pct": 98.4119,
+          "trades_per_active_day": 3.56,
+          "trades_per_calendar_day": 3.499,
+          "wr": 30.07
+        }
+      },
+      "development_floor_month_pct": -3.2062,
+      "development_max_dd_pct": 7.5091,
+      "development_negative_months": 22,
+      "development_worst_return_pct": 16.6438
+    },
+    {
+      "admissible": true,
+      "atoms": [
+        {
+          "field": "level_age_bars",
+          "op": "le",
+          "value": 3.0
+        },
+        {
+          "field": "major_level_48",
+          "op": "eq",
+          "value": 0.0
+        }
+      ],
+      "development": {
+        "confirmation_2023_2024": {
+          "active_days": 720,
+          "by_module_count": {
+            "structural_breakout_5m": 2798
+          },
+          "by_source_count": {
+            "structural_breakout_5m": 2798
+          },
+          "dd_pct": 7.8183,
+          "max_entries_same_clock_hour": 2,
+          "max_entries_same_rolling_hour": 2,
+          "max_loss_streak": 18,
+          "mean_signed_move_pct": 0.02941,
+          "monthly_return_pct": {
+            "2023-01": -1.55,
+            "2023-02": -0.9492,
+            "2023-03": 3.5481,
+            "2023-04": -1.44,
+            "2023-05": 4.3141,
+            "2023-06": 4.5204,
+            "2023-07": 0.2043,
+            "2023-08": 3.9718,
+            "2023-09": 3.4355,
+            "2023-10": -1.6886,
+            "2023-11": -2.3576,
+            "2023-12": -1.0487,
+            "2024-01": 2.056,
+            "2024-02": -0.5019,
+            "2024-03": 0.4136,
+            "2024-04": 1.5145,
+            "2024-05": -2.0642,
+            "2024-06": 5.1895,
+            "2024-07": 5.506,
+            "2024-08": 0.434,
+            "2024-09": -0.6096,
+            "2024-10": -1.6398,
+            "2024-11": 0.6903,
+            "2024-12": 2.6559
+          },
+          "n": 2798,
+          "negative_months": 10,
+          "return_pct": 26.8169,
+          "trades_per_active_day": 3.886,
+          "trades_per_calendar_day": 3.828,
+          "wr": 32.27
+        },
+        "selection_2020_2022": {
+          "active_days": 1070,
+          "by_module_count": {
+            "structural_breakout_5m": 3812
+          },
+          "by_source_count": {
+            "structural_breakout_5m": 3812
+          },
+          "dd_pct": 8.5887,
+          "max_entries_same_clock_hour": 2,
+          "max_entries_same_rolling_hour": 2,
+          "max_loss_streak": 19,
+          "mean_signed_move_pct": 0.05036,
+          "monthly_return_pct": {
+            "2020-01": 0.8507,
+            "2020-02": 2.4072,
+            "2020-03": 3.6134,
+            "2020-04": 4.5166,
+            "2020-05": -2.195,
+            "2020-06": -3.2541,
+            "2020-07": -0.6584,
+            "2020-08": 1.1779,
+            "2020-09": -0.3322,
+            "2020-10": 0.466,
+            "2020-11": 8.4332,
+            "2020-12": 2.4393,
+            "2021-01": 4.0795,
+            "2021-02": 1.7508,
+            "2021-03": 1.1004,
+            "2021-04": -0.1878,
+            "2021-05": 2.8477,
+            "2021-06": 7.5433,
+            "2021-07": 5.3184,
+            "2021-08": 4.6047,
+            "2021-09": 2.0553,
+            "2021-10": -0.1852,
+            "2021-11": 6.3456,
+            "2021-12": -2.2562,
+            "2022-01": -2.941,
+            "2022-02": 6.1644,
+            "2022-03": 0.4563,
+            "2022-04": -1.1962,
+            "2022-05": 1.1916,
+            "2022-06": 1.827,
+            "2022-07": 0.5076,
+            "2022-08": 2.1242,
+            "2022-09": 4.2227,
+            "2022-10": 0.2742,
+            "2022-11": -2.3449,
+            "2022-12": -2.7256
+          },
+          "n": 3812,
+          "negative_months": 11,
+          "return_pct": 75.1792,
+          "trades_per_active_day": 3.563,
+          "trades_per_calendar_day": 3.478,
+          "wr": 29.56
+        }
+      },
+      "development_floor_month_pct": -3.2541,
+      "development_max_dd_pct": 8.5887,
+      "development_negative_months": 21,
+      "development_worst_return_pct": 26.8169
+    },
+    {
+      "admissible": true,
+      "atoms": [
+        {
+          "field": "level_touches_96",
+          "op": "le",
+          "value": 8.0
+        },
+        {
+          "field": "extreme_depth_atr",
+          "op": "ge",
+          "value": 0.7261340470124478
+        }
+      ],
+      "development": {
+        "confirmation_2023_2024": {
+          "active_days": 713,
+          "by_module_count": {
+            "structural_breakout_5m": 2422
+          },
+          "by_source_count": {
+            "structural_breakout_5m": 2422
+          },
+          "dd_pct": 7.0654,
+          "max_entries_same_clock_hour": 2,
+          "max_entries_same_rolling_hour": 2,
+          "max_loss_streak": 21,
+          "mean_signed_move_pct": 0.01984,
+          "monthly_return_pct": {
+            "2023-01": 1.8283,
+            "2023-02": -0.6244,
+            "2023-03": 2.0337,
+            "2023-04": -3.2651,
+            "2023-05": 0.3414,
+            "2023-06": 0.2123,
+            "2023-07": -0.3419,
+            "2023-08": 0.7601,
+            "2023-09": 4.621,
+            "2023-10": 1.854,
+            "2023-11": -0.6591,
+            "2023-12": -1.2592,
+            "2024-01": 2.1439,
+            "2024-02": -2.3864,
+            "2024-03": -1.8625,
+            "2024-04": 2.7382,
+            "2024-05": 0.8824,
+            "2024-06": 1.9018,
+            "2024-07": 4.6825,
+            "2024-08": -2.6945,
+            "2024-09": 1.4796,
+            "2024-10": -1.6809,
+            "2024-11": 2.8284,
+            "2024-12": 0.6564
+          },
+          "n": 2422,
+          "negative_months": 9,
+          "return_pct": 14.596,
+          "trades_per_active_day": 3.397,
+          "trades_per_calendar_day": 3.313,
+          "wr": 32.0
+        },
+        "selection_2020_2022": {
+          "active_days": 1063,
+          "by_module_count": {
+            "structural_breakout_5m": 3603
+          },
+          "by_source_count": {
+            "structural_breakout_5m": 3603
+          },
+          "dd_pct": 6.1228,
+          "max_entries_same_clock_hour": 2,
+          "max_entries_same_rolling_hour": 2,
+          "max_loss_streak": 20,
+          "mean_signed_move_pct": 0.06214,
+          "monthly_return_pct": {
+            "2020-01": -1.2171,
+            "2020-02": 1.5463,
+            "2020-03": 1.9832,
+            "2020-04": 2.7412,
+            "2020-05": -1.3149,
+            "2020-06": 1.3556,
+            "2020-07": 0.0992,
+            "2020-08": 0.4967,
+            "2020-09": -2.2667,
+            "2020-10": 4.0353,
+            "2020-11": 11.8318,
+            "2020-12": 4.5932,
+            "2021-01": -1.0802,
+            "2021-02": 1.4436,
+            "2021-03": 1.4126,
+            "2021-04": 1.6273,
+            "2021-05": 2.8491,
+            "2021-06": 9.171,
+            "2021-07": 2.0827,
+            "2021-08": 5.9912,
+            "2021-09": -0.3033,
+            "2021-10": -1.7437,
+            "2021-11": 7.6849,
+            "2021-12": -1.8219,
+            "2022-01": 2.5351,
+            "2022-02": 6.7949,
+            "2022-03": 0.7491,
+            "2022-04": 1.7048,
+            "2022-05": 2.0285,
+            "2022-06": 0.9512,
+            "2022-07": -0.3909,
+            "2022-08": -0.4016,
+            "2022-09": 5.4591,
+            "2022-10": 1.4117,
+            "2022-11": -2.0063,
+            "2022-12": -1.9079
+          },
+          "n": 3603,
+          "negative_months": 11,
+          "return_pct": 92.9018,
+          "trades_per_active_day": 3.389,
+          "trades_per_calendar_day": 3.287,
+          "wr": 30.14
+        }
+      },
+      "development_floor_month_pct": -3.2651,
+      "development_max_dd_pct": 7.0654,
+      "development_negative_months": 20,
+      "development_worst_return_pct": 14.596
+    },
+    {
+      "admissible": true,
+      "atoms": [
+        {
+          "field": "entry_gap_fade_pct",
+          "op": "le",
+          "value": 0.0
+        },
+        {
+          "field": "level_touches_96",
+          "op": "le",
+          "value": 8.0
+        }
+      ],
+      "development": {
+        "confirmation_2023_2024": {
+          "active_days": 726,
+          "by_module_count": {
+            "structural_breakout_5m": 2764
+          },
+          "by_source_count": {
+            "structural_breakout_5m": 2764
+          },
+          "dd_pct": 7.637,
+          "max_entries_same_clock_hour": 2,
+          "max_entries_same_rolling_hour": 2,
+          "max_loss_streak": 16,
+          "mean_signed_move_pct": 0.03391,
+          "monthly_return_pct": {
+            "2023-01": 0.475,
+            "2023-02": -1.4585,
+            "2023-03": 1.9551,
+            "2023-04": -0.6642,
+            "2023-05": 2.5959,
+            "2023-06": 1.2735,
+            "2023-07": 6.9958,
+            "2023-08": 1.2818,
+            "2023-09": 5.8901,
+            "2023-10": -1.043,
+            "2023-11": -1.0659,
+            "2023-12": -2.7198,
+            "2024-01": 2.9713,
+            "2024-02": -1.1015,
+            "2024-03": 1.0021,
+            "2024-04": -0.2726,
+            "2024-05": 1.2017,
+            "2024-06": 3.1536,
+            "2024-07": 4.5532,
+            "2024-08": 2.4664,
+            "2024-09": -1.2924,
+            "2024-10": -0.5985,
+            "2024-11": -0.8371,
+            "2024-12": 3.2469
+          },
+          "n": 2764,
+          "negative_months": 10,
+          "return_pct": 31.22,
+          "trades_per_active_day": 3.807,
+          "trades_per_calendar_day": 3.781,
+          "wr": 32.49
+        },
+        "selection_2020_2022": {
+          "active_days": 1070,
+          "by_module_count": {
+            "structural_breakout_5m": 3711
+          },
+          "by_source_count": {
+            "structural_breakout_5m": 3711
+          },
+          "dd_pct": 5.9795,
+          "max_entries_same_clock_hour": 2,
+          "max_entries_same_rolling_hour": 2,
+          "max_loss_streak": 25,
+          "mean_signed_move_pct": 0.04769,
+          "monthly_return_pct": {
+            "2020-01": 0.9875,
+            "2020-02": 0.7217,
+            "2020-03": -0.1235,
+            "2020-04": -0.4509,
+            "2020-05": -0.3749,
+            "2020-06": -1.2051,
+            "2020-07": 2.293,
+            "2020-08": -0.5819,
+            "2020-09": -0.7726,
+            "2020-10": -1.9032,
+            "2020-11": 10.496,
+            "2020-12": 1.5105,
+            "2021-01": 1.6173,
+            "2021-02": 1.1761,
+            "2021-03": -2.6833,
+            "2021-04": 1.6307,
+            "2021-05": 3.4708,
+            "2021-06": 5.4883,
+            "2021-07": 5.5376,
+            "2021-08": 3.2484,
+            "2021-09": 3.1752,
+            "2021-10": -1.3754,
+            "2021-11": 6.3851,
+            "2021-12": -2.8461,
+            "2022-01": 0.7015,
+            "2022-02": 7.4337,
+            "2022-03": -2.4053,
+            "2022-04": 3.4578,
+            "2022-05": 3.7895,
+            "2022-06": 4.174,
+            "2022-07": -3.336,
+            "2022-08": 2.2538,
+            "2022-09": 2.4227,
+            "2022-10": 0.7177,
+            "2022-11": -0.0221,
+            "2022-12": -1.0026
+          },
+          "n": 3711,
+          "negative_months": 14,
+          "return_pct": 67.5622,
+          "trades_per_active_day": 3.468,
+          "trades_per_calendar_day": 3.386,
+          "wr": 29.72
+        }
+      },
+      "development_floor_month_pct": -3.336,
+      "development_max_dd_pct": 7.637,
+      "development_negative_months": 24,
+      "development_worst_return_pct": 31.22
+    },
+    {
+      "admissible": true,
+      "atoms": [
+        {
+          "field": "wick_fraction",
+          "op": "ge",
+          "value": 0.026315789473681135
+        },
+        {
+          "field": "prior_move_atr",
+          "op": "ge",
+          "value": -0.3125176703019645
+        }
+      ],
+      "development": {
+        "confirmation_2023_2024": {
+          "active_days": 721,
+          "by_module_count": {
+            "structural_breakout_5m": 2773
+          },
+          "by_source_count": {
+            "structural_breakout_5m": 2773
+          },
+          "dd_pct": 6.7196,
+          "max_entries_same_clock_hour": 2,
+          "max_entries_same_rolling_hour": 2,
+          "max_loss_streak": 19,
+          "mean_signed_move_pct": 0.03699,
+          "monthly_return_pct": {
+            "2023-01": -1.5655,
+            "2023-02": 1.1865,
+            "2023-03": 1.0476,
+            "2023-04": -1.6079,
+            "2023-05": 2.1567,
+            "2023-06": 3.2623,
+            "2023-07": 0.5582,
+            "2023-08": 2.4797,
+            "2023-09": 4.2402,
+            "2023-10": 3.3592,
+            "2023-11": -2.3466,
+            "2023-12": -1.9215,
+            "2024-01": 3.1515,
+            "2024-02": -2.5277,
+            "2024-03": 1.9699,
+            "2024-04": 4.2981,
+            "2024-05": 0.182,
+            "2024-06": 6.9882,
+            "2024-07": 4.606,
+            "2024-08": 0.3077,
+            "2024-09": -1.505,
+            "2024-10": 1.5315,
+            "2024-11": 1.8719,
+            "2024-12": -0.9981
+          },
+          "n": 2773,
+          "negative_months": 7,
+          "return_pct": 34.7412,
+          "trades_per_active_day": 3.846,
+          "trades_per_calendar_day": 3.793,
+          "wr": 32.46
+        },
+        "selection_2020_2022": {
+          "active_days": 1081,
+          "by_module_count": {
+            "structural_breakout_5m": 4058
+          },
+          "by_source_count": {
+            "structural_breakout_5m": 4058
+          },
+          "dd_pct": 7.5382,
+          "max_entries_same_clock_hour": 2,
+          "max_entries_same_rolling_hour": 2,
+          "max_loss_streak": 27,
+          "mean_signed_move_pct": 0.0476,
+          "monthly_return_pct": {
+            "2020-01": 2.3191,
+            "2020-02": 2.5388,
+            "2020-03": 4.1709,
+            "2020-04": 0.1401,
+            "2020-05": -3.3741,
+            "2020-06": -0.2132,
+            "2020-07": 2.246,
+            "2020-08": 0.6677,
+            "2020-09": -2.8261,
+            "2020-10": -0.9113,
+            "2020-11": 8.1956,
+            "2020-12": 4.1062,
+            "2021-01": 2.227,
+            "2021-02": 4.8355,
+            "2021-03": -1.8221,
+            "2021-04": 0.2559,
+            "2021-05": 1.9221,
+            "2021-06": 4.9876,
+            "2021-07": 4.1225,
+            "2021-08": 4.7316,
+            "2021-09": 0.2321,
+            "2021-10": -0.9496,
+            "2021-11": 11.382,
+            "2021-12": -1.7275,
+            "2022-01": -2.3675,
+            "2022-02": 9.0284,
+            "2022-03": -2.3395,
+            "2022-04": 0.9534,
+            "2022-05": 1.782,
+            "2022-06": 4.292,
+            "2022-07": -1.7853,
+            "2022-08": 0.4122,
+            "2022-09": 4.7429,
+            "2022-10": -1.908,
+            "2022-11": -1.1592,
+            "2022-12": -0.14
+          },
+          "n": 4058,
+          "negative_months": 13,
+          "return_pct": 75.5673,
+          "trades_per_active_day": 3.754,
+          "trades_per_calendar_day": 3.703,
+          "wr": 29.25
+        }
+      },
+      "development_floor_month_pct": -3.3741,
+      "development_max_dd_pct": 7.5382,
+      "development_negative_months": 20,
+      "development_worst_return_pct": 34.7412
+    },
+    {
+      "admissible": true,
+      "atoms": [
+        {
+          "field": "level_age_bars",
+          "op": "le",
+          "value": 3.0
+        },
+        {
+          "field": "level_touches_96",
+          "op": "le",
+          "value": 8.0
+        }
+      ],
+      "development": {
+        "confirmation_2023_2024": {
+          "active_days": 718,
+          "by_module_count": {
+            "structural_breakout_5m": 2568
+          },
+          "by_source_count": {
+            "structural_breakout_5m": 2568
+          },
+          "dd_pct": 5.7975,
+          "max_entries_same_clock_hour": 2,
+          "max_entries_same_rolling_hour": 2,
+          "max_loss_streak": 17,
+          "mean_signed_move_pct": 0.03066,
+          "monthly_return_pct": {
+            "2023-01": -0.591,
+            "2023-02": -1.3655,
+            "2023-03": 1.9107,
+            "2023-04": -1.0815,
+            "2023-05": 3.1554,
+            "2023-06": 3.4835,
+            "2023-07": -0.0312,
+            "2023-08": 4.6994,
+            "2023-09": 2.7686,
+            "2023-10": -0.1392,
+            "2023-11": 0.753,
+            "2023-12": -2.7963,
+            "2024-01": 2.1917,
+            "2024-02": -1.1742,
+            "2024-03": 0.4095,
+            "2024-04": 0.1584,
+            "2024-05": 0.2131,
+            "2024-06": 4.2852,
+            "2024-07": 8.6171,
+            "2024-08": -1.8759,
+            "2024-09": -0.0511,
+            "2024-10": -1.466,
+            "2024-11": 0.0925,
+            "2024-12": 1.409
+          },
+          "n": 2568,
+          "negative_months": 10,
+          "return_pct": 25.5251,
+          "trades_per_active_day": 3.577,
+          "trades_per_calendar_day": 3.513,
+          "wr": 32.09
+        },
+        "selection_2020_2022": {
+          "active_days": 1064,
+          "by_module_count": {
+            "structural_breakout_5m": 3499
+          },
+          "by_source_count": {
+            "structural_breakout_5m": 3499
+          },
+          "dd_pct": 7.5433,
+          "max_entries_same_clock_hour": 2,
+          "max_entries_same_rolling_hour": 2,
+          "max_loss_streak": 16,
+          "mean_signed_move_pct": 0.05957,
+          "monthly_return_pct": {
+            "2020-01": 0.9321,
+            "2020-02": 2.285,
+            "2020-03": -0.0262,
+            "2020-04": 5.6805,
+            "2020-05": -1.8998,
+            "2020-06": -3.4492,
+            "2020-07": 1.2033,
+            "2020-08": 0.6524,
+            "2020-09": 0.6408,
+            "2020-10": 0.39,
+            "2020-11": 7.0054,
+            "2020-12": 1.9527,
+            "2021-01": 4.8644,
+            "2021-02": 1.147,
+            "2021-03": 0.8019,
+            "2021-04": 0.708,
+            "2021-05": 3.6291,
+            "2021-06": 8.0345,
+            "2021-07": 5.7252,
+            "2021-08": 5.7192,
+            "2021-09": 2.2947,
+            "2021-10": 1.2861,
+            "2021-11": 6.187,
+            "2021-12": -2.6925,
+            "2022-01": -1.2631,
+            "2022-02": 8.248,
+            "2022-03": -0.1416,
+            "2022-04": 0.1241,
+            "2022-05": 0.3668,
+            "2022-06": 1.6668,
+            "2022-07": 1.4165,
+            "2022-08": 1.0819,
+            "2022-09": 1.7593,
+            "2022-10": 1.6741,
+            "2022-11": -2.3091,
+            "2022-12": -2.506
+          },
+          "n": 3499,
+          "negative_months": 8,
+          "return_pct": 84.3041,
+          "trades_per_active_day": 3.289,
+          "trades_per_calendar_day": 3.193,
+          "wr": 29.81
+        }
+      },
+      "development_floor_month_pct": -3.4492,
+      "development_max_dd_pct": 7.5433,
+      "development_negative_months": 18,
+      "development_worst_return_pct": 25.5251
+    },
+    {
+      "admissible": true,
+      "atoms": [],
+      "development": {
+        "confirmation_2023_2024": {
+          "active_days": 728,
+          "by_module_count": {
+            "structural_breakout_5m": 3698
+          },
+          "by_source_count": {
+            "structural_breakout_5m": 3698
+          },
+          "dd_pct": 9.3505,
+          "max_entries_same_clock_hour": 2,
+          "max_entries_same_rolling_hour": 2,
+          "max_loss_streak": 27,
+          "mean_signed_move_pct": 0.01746,
+          "monthly_return_pct": {
+            "2023-01": -1.9869,
+            "2023-02": 1.2497,
+            "2023-03": -0.0763,
+            "2023-04": -1.2195,
+            "2023-05": 2.7187,
+            "2023-06": 3.5306,
+            "2023-07": 1.9767,
+            "2023-08": 3.5137,
+            "2023-09": 2.7434,
+            "2023-10": 1.8648,
+            "2023-11": -3.4616,
+            "2023-12": -1.1574,
+            "2024-01": 3.176,
+            "2024-02": -2.7099,
+            "2024-03": 0.7193,
+            "2024-04": -1.6882,
+            "2024-05": -0.3196,
+            "2024-06": 5.4085,
+            "2024-07": 4.8712,
+            "2024-08": 2.2159,
+            "2024-09": -2.4159,
+            "2024-10": -0.2132,
+            "2024-11": -0.1369,
+            "2024-12": 0.2134
+          },
+          "n": 3698,
+          "negative_months": 11,
+          "return_pct": 19.8024,
+          "trades_per_active_day": 5.08,
+          "trades_per_calendar_day": 5.059,
+          "wr": 31.61
+        },
+        "selection_2020_2022": {
+          "active_days": 1094,
+          "by_module_count": {
+            "structural_breakout_5m": 5022
+          },
+          "by_source_count": {
+            "structural_breakout_5m": 5022
+          },
+          "dd_pct": 7.9229,
+          "max_entries_same_clock_hour": 2,
+          "max_entries_same_rolling_hour": 2,
+          "max_loss_streak": 29,
+          "mean_signed_move_pct": 0.03811,
+          "monthly_return_pct": {
+            "2020-01": -0.5898,
+            "2020-02": 4.4777,
+            "2020-03": 4.6698,
+            "2020-04": 1.5416,
+            "2020-05": -0.0464,
+            "2020-06": 1.3826,
+            "2020-07": 2.8842,
+            "2020-08": 2.3419,
+            "2020-09": -2.7807,
+            "2020-10": 0.4748,
+            "2020-11": 9.3111,
+            "2020-12": 3.4746,
+            "2021-01": -0.3448,
+            "2021-02": 1.5804,
+            "2021-03": -0.7999,
+            "2021-04": 0.8518,
+            "2021-05": 2.8387,
+            "2021-06": 3.7338,
+            "2021-07": 4.5894,
+            "2021-08": 0.7913,
+            "2021-09": 1.5757,
+            "2021-10": -2.4631,
+            "2021-11": 12.2888,
+            "2021-12": -0.7033,
+            "2022-01": -0.5018,
+            "2022-02": 5.489,
+            "2022-03": -3.3413,
+            "2022-04": -1.1213,
+            "2022-05": 4.3424,
+            "2022-06": -0.4417,
+            "2022-07": -2.453,
+            "2022-08": 2.9546,
+            "2022-09": 4.9309,
+            "2022-10": -2.2572,
+            "2022-11": 2.3384,
+            "2022-12": -3.2845
+          },
+          "n": 5022,
+          "negative_months": 14,
+          "return_pct": 73.941,
+          "trades_per_active_day": 4.59,
+          "trades_per_calendar_day": 4.582,
+          "wr": 29.07
+        }
+      },
+      "development_floor_month_pct": -3.4616,
+      "development_max_dd_pct": 9.3505,
+      "development_negative_months": 25,
+      "development_worst_return_pct": 19.8024
+    },
+    {
+      "admissible": true,
+      "atoms": [
+        {
+          "field": "wick_fraction",
+          "op": "ge",
+          "value": 0.026315789473681135
+        },
+        {
+          "field": "level_age_bars",
+          "op": "le",
+          "value": 3.0
+        }
+      ],
+      "development": {
+        "confirmation_2023_2024": {
+          "active_days": 703,
+          "by_module_count": {
+            "structural_breakout_5m": 2309
+          },
+          "by_source_count": {
+            "structural_breakout_5m": 2309
+          },
+          "dd_pct": 8.4824,
+          "max_entries_same_clock_hour": 2,
+          "max_entries_same_rolling_hour": 2,
+          "max_loss_streak": 17,
+          "mean_signed_move_pct": 0.03412,
+          "monthly_return_pct": {
+            "2023-01": -2.5762,
+            "2023-02": -0.083,
+            "2023-03": 3.0732,
+            "2023-04": -1.3498,
+            "2023-05": 3.0443,
+            "2023-06": 1.9803,
+            "2023-07": -0.1006,
+            "2023-08": 2.1605,
+            "2023-09": 3.1494,
+            "2023-10": -0.7296,
+            "2023-11": -1.0328,
+            "2023-12": -1.155,
+            "2024-01": 4.8377,
+            "2024-02": -0.6297,
+            "2024-03": 2.7466,
+            "2024-04": 2.3245,
+            "2024-05": -0.9324,
+            "2024-06": 3.945,
+            "2024-07": 4.3072,
+            "2024-08": -0.6436,
+            "2024-09": 0.1529,
+            "2024-10": 0.5552,
+            "2024-11": 0.9664,
+            "2024-12": -0.542
+          },
+          "n": 2309,
+          "negative_months": 11,
+          "return_pct": 25.6949,
+          "trades_per_active_day": 3.284,
+          "trades_per_calendar_day": 3.159,
+          "wr": 31.92
+        },
+        "selection_2020_2022": {
+          "active_days": 1063,
+          "by_module_count": {
+            "structural_breakout_5m": 3391
+          },
+          "by_source_count": {
+            "structural_breakout_5m": 3391
+          },
+          "dd_pct": 7.861,
+          "max_entries_same_clock_hour": 2,
+          "max_entries_same_rolling_hour": 2,
+          "max_loss_streak": 20,
+          "mean_signed_move_pct": 0.05332,
+          "monthly_return_pct": {
+            "2020-01": 1.0925,
+            "2020-02": 2.1017,
+            "2020-03": 3.2621,
+            "2020-04": 2.9249,
+            "2020-05": -3.4625,
+            "2020-06": -2.1593,
+            "2020-07": 0.6137,
+            "2020-08": 0.1757,
+            "2020-09": -1.188,
+            "2020-10": 1.318,
+            "2020-11": 8.9507,
+            "2020-12": 2.7235,
+            "2021-01": 1.9271,
+            "2021-02": 2.5174,
+            "2021-03": -0.8474,
+            "2021-04": 0.8604,
+            "2021-05": 1.0176,
+            "2021-06": 2.6753,
+            "2021-07": 6.1111,
+            "2021-08": 6.3549,
+            "2021-09": 0.2387,
+            "2021-10": 2.2244,
+            "2021-11": 6.024,
+            "2021-12": 0.411,
+            "2022-01": -3.3231,
+            "2022-02": 9.0631,
+            "2022-03": 0.1744,
+            "2022-04": -0.7855,
+            "2022-05": 0.8305,
+            "2022-06": 4.2025,
+            "2022-07": 1.1346,
+            "2022-08": 0.0653,
+            "2022-09": 4.0734,
+            "2022-10": -2.4632,
+            "2022-11": -2.6729,
+            "2022-12": -1.2666
+          },
+          "n": 3391,
+          "negative_months": 9,
+          "return_pct": 69.7092,
+          "trades_per_active_day": 3.19,
+          "trades_per_calendar_day": 3.094,
+          "wr": 29.49
+        }
+      },
+      "development_floor_month_pct": -3.4625,
+      "development_max_dd_pct": 8.4824,
+      "development_negative_months": 20,
+      "development_worst_return_pct": 25.6949
+    },
+    {
+      "admissible": true,
+      "atoms": [
+        {
+          "field": "entry_gap_fade_pct",
+          "op": "le",
+          "value": 0.02172944666349129
+        },
+        {
+          "field": "extreme_depth_atr",
+          "op": "ge",
+          "value": 0.7261340470124478
+        }
+      ],
+      "development": {
+        "confirmation_2023_2024": {
+          "active_days": 713,
+          "by_module_count": {
+            "structural_breakout_5m": 2456
+          },
+          "by_source_count": {
+            "structural_breakout_5m": 2456
+          },
+          "dd_pct": 5.7862,
+          "max_entries_same_clock_hour": 2,
+          "max_entries_same_rolling_hour": 2,
+          "max_loss_streak": 21,
+          "mean_signed_move_pct": 0.03363,
+          "monthly_return_pct": {
+            "2023-01": 0.6322,
+            "2023-02": -0.3904,
+            "2023-03": 2.1237,
+            "2023-04": -1.6811,
+            "2023-05": 0.8171,
+            "2023-06": 3.1166,
+            "2023-07": 0.2732,
+            "2023-08": 2.5907,
+            "2023-09": 2.3888,
+            "2023-10": 2.7126,
+            "2023-11": -0.2325,
+            "2023-12": -2.2906,
+            "2024-01": 4.5081,
+            "2024-02": -2.5134,
+            "2024-03": -0.9772,
+            "2024-04": 4.3763,
+            "2024-05": 0.9185,
+            "2024-06": 2.053,
+            "2024-07": 5.0725,
+            "2024-08": -0.8889,
+            "2024-09": -1.8434,
+            "2024-10": 0.9852,
+            "2024-11": 1.7888,
+            "2024-12": 1.069
+          },
+          "n": 2456,
+          "negative_months": 8,
+          "return_pct": 27.0849,
+          "trades_per_active_day": 3.445,
+          "trades_per_calendar_day": 3.36,
+          "wr": 33.18
+        },
+        "selection_2020_2022": {
+          "active_days": 1055,
+          "by_module_count": {
+            "structural_breakout_5m": 3472
+          },
+          "by_source_count": {
+            "structural_breakout_5m": 3472
+          },
+          "dd_pct": 8.7644,
+          "max_entries_same_clock_hour": 2,
+          "max_entries_same_rolling_hour": 2,
+          "max_loss_streak": 24,
+          "mean_signed_move_pct": 0.0481,
+          "monthly_return_pct": {
+            "2020-01": -1.1285,
+            "2020-02": 1.1589,
+            "2020-03": 1.5401,
+            "2020-04": 3.0439,
+            "2020-05": -1.2891,
+            "2020-06": -0.5655,
+            "2020-07": 0.4136,
+            "2020-08": 1.7858,
+            "2020-09": -0.5438,
+            "2020-10": -0.1167,
+            "2020-11": 13.527,
+            "2020-12": 3.1282,
+            "2021-01": -1.3776,
+            "2021-02": 0.5097,
+            "2021-03": -0.9898,
+            "2021-04": 1.9363,
+            "2021-05": -1.0715,
+            "2021-06": 4.3834,
+            "2021-07": 3.969,
+            "2021-08": 8.8187,
+            "2021-09": -0.8325,
+            "2021-10": -3.1173,
+            "2021-11": 5.5994,
+            "2021-12": 0.8605,
+            "2022-01": 1.8274,
+            "2022-02": 7.0931,
+            "2022-03": 0.6952,
+            "2022-04": 0.4108,
+            "2022-05": 3.0161,
+            "2022-06": 3.0792,
+            "2022-07": -1.9063,
+            "2022-08": 2.3058,
+            "2022-09": 2.5125,
+            "2022-10": -2.7982,
+            "2022-11": -3.5008,
+            "2022-12": -1.3564
+          },
+          "n": 3472,
+          "negative_months": 14,
+          "return_pct": 62.7592,
+          "trades_per_active_day": 3.291,
+          "trades_per_calendar_day": 3.168,
+          "wr": 29.72
+        }
+      },
+      "development_floor_month_pct": -3.5008,
+      "development_max_dd_pct": 8.7644,
+      "development_negative_months": 22,
+      "development_worst_return_pct": 27.0849
+    },
+    {
+      "admissible": true,
+      "atoms": [
+        {
+          "field": "prior_move_atr",
+          "op": "ge",
+          "value": 0.42794222637158275
+        },
+        {
+          "field": "wick_fraction",
+          "op": "ge",
+          "value": 0.026315789473681135
+        }
+      ],
+      "development": {
+        "confirmation_2023_2024": {
+          "active_days": 706,
+          "by_module_count": {
+            "structural_breakout_5m": 2265
+          },
+          "by_source_count": {
+            "structural_breakout_5m": 2265
+          },
+          "dd_pct": 6.5137,
+          "max_entries_same_clock_hour": 2,
+          "max_entries_same_rolling_hour": 2,
+          "max_loss_streak": 17,
+          "mean_signed_move_pct": 0.03059,
+          "monthly_return_pct": {
+            "2023-01": -1.9195,
+            "2023-02": 0.9166,
+            "2023-03": 2.4716,
+            "2023-04": -2.0156,
+            "2023-05": 2.2551,
+            "2023-06": 0.8819,
+            "2023-07": -2.4061,
+            "2023-08": 0.3127,
+            "2023-09": 4.6601,
+            "2023-10": 3.2084,
+            "2023-11": -3.5042,
+            "2023-12": -0.4695,
+            "2024-01": 4.4919,
+            "2024-02": 0.0871,
+            "2024-03": 0.2004,
+            "2024-04": 0.8924,
+            "2024-05": -1.0024,
+            "2024-06": 6.2253,
+            "2024-07": 4.9622,
+            "2024-08": 1.1828,
+            "2024-09": -3.0558,
+            "2024-10": 1.1764,
+            "2024-11": 2.6398,
+            "2024-12": -1.2824
+          },
+          "n": 2265,
+          "negative_months": 8,
+          "return_pct": 22.1903,
+          "trades_per_active_day": 3.208,
+          "trades_per_calendar_day": 3.098,
+          "wr": 32.14
+        },
+        "selection_2020_2022": {
+          "active_days": 1058,
+          "by_module_count": {
+            "structural_breakout_5m": 3365
+          },
+          "by_source_count": {
+            "structural_breakout_5m": 3365
+          },
+          "dd_pct": 7.0486,
+          "max_entries_same_clock_hour": 2,
+          "max_entries_same_rolling_hour": 2,
+          "max_loss_streak": 20,
+          "mean_signed_move_pct": 0.05879,
+          "monthly_return_pct": {
+            "2020-01": 0.0868,
+            "2020-02": 3.5101,
+            "2020-03": 2.5153,
+            "2020-04": 1.2387,
+            "2020-05": -2.1027,
+            "2020-06": -2.5779,
+            "2020-07": 1.8818,
+            "2020-08": -0.2449,
+            "2020-09": -0.7697,
+            "2020-10": -0.7191,
+            "2020-11": 9.2748,
+            "2020-12": 2.8688,
+            "2021-01": 0.5643,
+            "2021-02": 4.0632,
+            "2021-03": -1.0762,
+            "2021-04": 1.3159,
+            "2021-05": 2.2382,
+            "2021-06": 5.1667,
+            "2021-07": 4.9326,
+            "2021-08": 3.9681,
+            "2021-09": 0.392,
+            "2021-10": 0.9924,
+            "2021-11": 11.0641,
+            "2021-12": -1.5723,
+            "2022-01": -1.4948,
+            "2022-02": 10.7025,
+            "2022-03": -1.5965,
+            "2022-04": 2.9462,
+            "2022-05": 3.945,
+            "2022-06": 1.6061,
+            "2022-07": -0.4888,
+            "2022-08": -2.4367,
+            "2022-09": 3.158,
+            "2022-10": -0.3513,
+            "2022-11": -1.2435,
+            "2022-12": -1.3087
+          },
+          "n": 3365,
+          "negative_months": 14,
+          "return_pct": 78.6104,
+          "trades_per_active_day": 3.181,
+          "trades_per_calendar_day": 3.07,
+          "wr": 29.84
+        }
+      },
+      "development_floor_month_pct": -3.5042,
+      "development_max_dd_pct": 7.0486,
+      "development_negative_months": 22,
+      "development_worst_return_pct": 22.1903
+    },
+    {
+      "admissible": true,
+      "atoms": [
+        {
+          "field": "extreme_depth_atr",
+          "op": "ge",
+          "value": 0.7261340470124478
+        }
+      ],
+      "development": {
+        "confirmation_2023_2024": {
+          "active_days": 718,
+          "by_module_count": {
+            "structural_breakout_5m": 2680
+          },
+          "by_source_count": {
+            "structural_breakout_5m": 2680
+          },
+          "dd_pct": 7.0364,
+          "max_entries_same_clock_hour": 2,
+          "max_entries_same_rolling_hour": 2,
+          "max_loss_streak": 24,
+          "mean_signed_move_pct": 0.02147,
+          "monthly_return_pct": {
+            "2023-01": 1.0224,
+            "2023-02": -0.4526,
+            "2023-03": 1.5156,
+            "2023-04": -3.5055,
+            "2023-05": 1.2167,
+            "2023-06": 1.9243,
+            "2023-07": -0.7231,
+            "2023-08": 2.7151,
+            "2023-09": 3.0066,
+            "2023-10": 1.0764,
+            "2023-11": -1.1327,
+            "2023-12": -1.5586,
+            "2024-01": 2.2957,
+            "2024-02": -2.1582,
+            "2024-03": -1.7184,
+            "2024-04": 3.507,
+            "2024-05": 0.8265,
+            "2024-06": 1.3063,
+            "2024-07": 4.181,
+            "2024-08": -0.5626,
+            "2024-09": 0.0572,
+            "2024-10": -0.6694,
+            "2024-11": 3.4712,
+            "2024-12": 1.2178
+          },
+          "n": 2680,
+          "negative_months": 9,
+          "return_pct": 17.7665,
+          "trades_per_active_day": 3.733,
+          "trades_per_calendar_day": 3.666,
+          "wr": 32.01
+        },
+        "selection_2020_2022": {
+          "active_days": 1071,
+          "by_module_count": {
+            "structural_breakout_5m": 3900
+          },
+          "by_source_count": {
+            "structural_breakout_5m": 3900
+          },
+          "dd_pct": 6.3171,
+          "max_entries_same_clock_hour": 2,
+          "max_entries_same_rolling_hour": 2,
+          "max_loss_streak": 26,
+          "mean_signed_move_pct": 0.04973,
+          "monthly_return_pct": {
+            "2020-01": -1.9347,
+            "2020-02": 2.0823,
+            "2020-03": 3.2154,
+            "2020-04": 2.8608,
+            "2020-05": -1.2484,
+            "2020-06": 1.4092,
+            "2020-07": -0.2467,
+            "2020-08": 0.5696,
+            "2020-09": -3.0486,
+            "2020-10": 4.035,
+            "2020-11": 10.3279,
+            "2020-12": 2.4062,
+            "2021-01": -0.6384,
+            "2021-02": 2.0504,
+            "2021-03": -0.3983,
+            "2021-04": 0.7172,
+            "2021-05": -0.6308,
+            "2021-06": 8.0275,
+            "2021-07": 1.9261,
+            "2021-08": 9.2074,
+            "2021-09": -0.901,
+            "2021-10": -2.5387,
+            "2021-11": 8.9717,
+            "2021-12": -0.347,
+            "2022-01": 1.8242,
+            "2022-02": 6.7706,
+            "2022-03": 0.2733,
+            "2022-04": 0.9774,
+            "2022-05": 2.9472,
+            "2022-06": 0.783,
+            "2022-07": -1.7617,
+            "2022-08": 0.9431,
+            "2022-09": 4.6172,
+            "2022-10": -0.5752,
+            "2022-11": -1.3981,
+            "2022-12": -2.2434
+          },
+          "n": 3900,
+          "negative_months": 14,
+          "return_pct": 76.1388,
+          "trades_per_active_day": 3.641,
+          "trades_per_calendar_day": 3.558,
+          "wr": 29.62
+        }
+      },
+      "development_floor_month_pct": -3.5055,
+      "development_max_dd_pct": 7.0364,
+      "development_negative_months": 23,
+      "development_worst_return_pct": 17.7665
+    }
+  ]
+}
