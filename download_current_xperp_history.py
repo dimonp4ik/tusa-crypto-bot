@@ -11,6 +11,8 @@ from pathlib import Path
 
 import requests
 
+from download_current_xperp_5m_history import snapshot_anchor_ms
+
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
@@ -33,7 +35,7 @@ def main() -> None:
     # Freeze one pagination anchor for the whole cross-sectional snapshot.  If
     # a 15-minute candle closes while sequential symbol downloads are running,
     # recomputing this per symbol produces mismatched timelines.
-    request_anchor_ms = int(time.time() * 1000) + 60_000
+    request_anchor_ms = snapshot_anchor_ms("15m")
     report = {"status": "PUBLIC_CURRENT_VENUE_DATA", "bars_requested": args.bars,
               "created_at": datetime.now(timezone.utc).isoformat(),
               "request_anchor_ms": request_anchor_ms, "symbols": {}}
