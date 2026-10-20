@@ -1,0 +1,119 @@
+{
+  "finding": "At 3% sizing the observed edge is roughly 10-25 times smaller than the edge required for +30% per month at the observed frequency.",
+  "limitations": [
+    "The projection is a linear expectancy diagnostic, not a return forecast.",
+    "It ignores compounding and overlap, which do not close an order-of-magnitude gap.",
+    "Gross results exclude fees at user request."
+  ],
+  "periods": {
+    "2022": {
+      "calendar_days": 365,
+      "n": 1419,
+      "observed_mean_signed_move_pct": 0.08055,
+      "sizing": {
+        "margin_3pct": {
+          "linear_projected_month_pct": 2.8184,
+          "required_mean_signed_move_pct": 0.8574,
+          "required_multiple_of_observed": 10.64
+        },
+        "margin_5pct": {
+          "linear_projected_month_pct": 4.6973,
+          "required_mean_signed_move_pct": 0.5144,
+          "required_multiple_of_observed": 6.39
+        }
+      },
+      "trades_per_calendar_day": 3.8877
+    },
+    "2023": {
+      "calendar_days": 365,
+      "n": 1404,
+      "observed_mean_signed_move_pct": 0.03504,
+      "sizing": {
+        "margin_3pct": {
+          "linear_projected_month_pct": 1.213,
+          "required_mean_signed_move_pct": 0.8666,
+          "required_multiple_of_observed": 24.73
+        },
+        "margin_5pct": {
+          "linear_projected_month_pct": 2.0217,
+          "required_mean_signed_move_pct": 0.5199,
+          "required_multiple_of_observed": 14.84
+        }
+      },
+      "trades_per_calendar_day": 3.8466
+    },
+    "2024": {
+      "calendar_days": 366,
+      "n": 1612,
+      "observed_mean_signed_move_pct": 0.07462,
+      "sizing": {
+        "margin_3pct": {
+          "linear_projected_month_pct": 2.9581,
+          "required_mean_signed_move_pct": 0.7568,
+          "required_multiple_of_observed": 10.14
+        },
+        "margin_5pct": {
+          "linear_projected_month_pct": 4.9301,
+          "required_mean_signed_move_pct": 0.4541,
+          "required_multiple_of_observed": 6.09
+        }
+      },
+      "trades_per_calendar_day": 4.4044
+    },
+    "2025": {
+      "calendar_days": 365,
+      "n": 2171,
+      "observed_mean_signed_move_pct": 0.02221,
+      "sizing": {
+        "margin_3pct": {
+          "linear_projected_month_pct": 1.189,
+          "required_mean_signed_move_pct": 0.5604,
+          "required_multiple_of_observed": 25.23
+        },
+        "margin_5pct": {
+          "linear_projected_month_pct": 1.9816,
+          "required_mean_signed_move_pct": 0.3363,
+          "required_multiple_of_observed": 15.14
+        }
+      },
+      "trades_per_calendar_day": 5.9479
+    },
+    "2026": {
+      "calendar_days": 243,
+      "n": 1188,
+      "observed_mean_signed_move_pct": 0.05712,
+      "sizing": {
+        "margin_3pct": {
+          "linear_projected_month_pct": 2.5131,
+          "required_mean_signed_move_pct": 0.6818,
+          "required_multiple_of_observed": 11.94
+        },
+        "margin_5pct": {
+          "linear_projected_month_pct": 4.1885,
+          "required_mean_signed_move_pct": 0.4091,
+          "required_multiple_of_observed": 7.16
+        }
+      },
+      "trades_per_calendar_day": 4.8889
+    }
+  },
+  "protocol": {
+    "formula": "30 * trades/day * margin * leverage * mean signed price move",
+    "leverage": 10.0,
+    "rows": "exact 0.5%-2% portfolio after current runtime rails",
+    "sizing": "client-selected 3% or 5% of current equity",
+    "target_monthly_return_pct": 30,
+    "years": [
+      2022,
+      2023,
+      2024,
+      2025,
+      2026
+    ]
+  },
+  "ready_for_live_orders": false,
+  "sources": {
+    "C:\\Users\\Lenovo\\Desktop\\telegram bot\\crypto_return_feasibility_oct20_audit.py": "e2782d40d3327d68de3e1d3b40906d998dfef29be3dbe0d615fe37b66b721734"
+  },
+  "status": "EMPIRICAL_EDGE_TOO_SMALL_FOR_30PCT_MONTHLY"
+}
