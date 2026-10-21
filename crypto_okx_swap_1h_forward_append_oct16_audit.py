@@ -204,6 +204,7 @@ def stop_cause_diagnostics(prior_rows: list[dict], fresh_rows: list[dict]) -> di
     fresh_mismatch = subset(fresh_pullback, regime_mismatch=True)
     winners = [row for row in fresh_rows if row["outcome"] == "TP"]
     losers = [row for row in fresh_rows if row["outcome"] == "SL"]
+    mismatch_stops = sum(row["outcome"] == "SL" for row in fresh_mismatch)
 
     def mean(rows: list[dict], field: str) -> float | None:
         return round(float(np.mean([float(row[field]) for row in rows])), 6) \
@@ -230,12 +231,12 @@ def stop_cause_diagnostics(prior_rows: list[dict], fresh_rows: list[dict]) -> di
             if losers else None,
         },
         "interpretation": (
-            f"{len(fresh_mismatch)} of the {len(losers)} fresh stops came from "
+            f"{mismatch_stops} of the {len(losers)} fresh stops came from "
             "pullbacks whose frozen 168h direction opposed the most recent 24h "
             "return. The same mismatch was profitable before the append, so this "
             "is evidence of regime drift, not a validated support/resistance or "
-            "liquidity filter. Fresh winners had higher volume on average, but the "
-            "sample is too small to freeze a gate."),
+            "liquidity filter. Fresh losses had higher volume on average than "
+            "winners, but the sample is too small to freeze a gate."),
     }
 
 
