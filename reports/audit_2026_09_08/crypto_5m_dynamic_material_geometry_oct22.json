@@ -1,0 +1,2223 @@
+{
+  "all_stages_meet_monthly_objective": false,
+  "chosen_geometry_counts": {
+    "2022": {
+      "tp1.5_sl1_h288": 3318,
+      "tp1_sl0.75_h144": 421,
+      "tp2_sl1_h288": 7192
+    },
+    "2023": {
+      "tp1.5_sl1_h288": 2329,
+      "tp1_sl0.75_h144": 96,
+      "tp2_sl1_h288": 5774
+    },
+    "2024": {
+      "tp1.5_sl1_h288": 2872,
+      "tp1_sl0.75_h144": 173,
+      "tp2_sl1_h288": 7849
+    }
+  },
+  "grid": {
+    "candidates": 14,
+    "confirmed": 5,
+    "feature_rows": 868712,
+    "proposal_rows": 674244,
+    "routers": 2
+  },
+  "hidden_2025_2026": null,
+  "limitations": [
+    "The router chooses only from literal 1-2% market-entry geometries.",
+    "2025-2026 remain sealed unless 2024 passes.",
+    "Binance spot history is a proxy for X-Perp execution.",
+    "Gross results exclude fees at user request."
+  ],
+  "orders_possible": false,
+  "protocol": {
+    "confirmation": [
+      2023
+    ],
+    "entry": "next five-minute market open",
+    "fit": [
+      2020,
+      2021
+    ],
+    "geometry_choices": [
+      [
+        1.0,
+        0.75,
+        144
+      ],
+      [
+        1.5,
+        1.0,
+        288
+      ],
+      [
+        2.0,
+        1.0,
+        288
+      ]
+    ],
+    "hidden_reveal": [
+      2025,
+      2026
+    ],
+    "money": "client-selected 3% current-equity margin; fixed 10x",
+    "orders": "market only",
+    "selection": [
+      2022
+    ],
+    "untouched_test": [
+      2024
+    ]
+  },
+  "ready_for_live_orders": false,
+  "selected_before_test": {
+    "confirmation_2023": {
+      "annual_3pct": {
+        "2023": {
+          "active_days": 342,
+          "by_module_count": {
+            "multiday:dynamic_material_literal_ev": 1647
+          },
+          "by_source_count": {
+            "multiday_material_trend": 1647
+          },
+          "dd_pct": 7.1231,
+          "economic_gap_multiple": 5.4786,
+          "literal_target_rate_pct": 38.3121,
+          "mandatory_three_daily_mean_signed_move_pct": 0.973137,
+          "max_concurrent_positions": 5,
+          "max_entries_same_clock_hour": 2,
+          "max_entries_same_rolling_hour": 2,
+          "max_gross_notional_equity_pct": 148.5781,
+          "max_loss_streak": 17,
+          "mean_signed_price_return_pct": 0.118044,
+          "monthly_return_pct": {
+            "2023-01": 6.4319,
+            "2023-02": 1.2369,
+            "2023-03": 8.6846,
+            "2023-04": 2.4574,
+            "2023-05": -3.2991,
+            "2023-06": 16.3419,
+            "2023-07": -1.5925,
+            "2023-08": 6.9814,
+            "2023-09": 11.1885,
+            "2023-10": 5.2136,
+            "2023-11": -5.0434,
+            "2023-12": 11.2246
+          },
+          "mtm_dd_pct": 7.733,
+          "n": 1647,
+          "negative_months": 3,
+          "profitable_exit_rate_pct": 39.9514,
+          "projected_30_day_pct": 4.909393,
+          "required_mean_signed_move_at_actual_frequency_pct": 0.646717,
+          "return_pct": 75.5836,
+          "trades_per_active_day": 4.816,
+          "trades_per_calendar_day": 4.512,
+          "wr": 39.95
+        }
+      },
+      "margin_3pct": {
+        "active_days": 342,
+        "by_module_count": {
+          "multiday:dynamic_material_literal_ev": 1647
+        },
+        "by_source_count": {
+          "multiday_material_trend": 1647
+        },
+        "dd_pct": 7.1231,
+        "economic_gap_multiple": 5.4786,
+        "literal_target_rate_pct": 38.3121,
+        "mandatory_three_daily_mean_signed_move_pct": 0.973137,
+        "max_concurrent_positions": 5,
+        "max_entries_same_clock_hour": 2,
+        "max_entries_same_rolling_hour": 2,
+        "max_gross_notional_equity_pct": 148.5781,
+        "max_loss_streak": 17,
+        "mean_signed_price_return_pct": 0.118044,
+        "monthly_return_pct": {
+          "2023-01": 6.4319,
+          "2023-02": 1.2369,
+          "2023-03": 8.6846,
+          "2023-04": 2.4574,
+          "2023-05": -3.2991,
+          "2023-06": 16.3419,
+          "2023-07": -1.5925,
+          "2023-08": 6.9814,
+          "2023-09": 11.1885,
+          "2023-10": 5.2136,
+          "2023-11": -5.0434,
+          "2023-12": 11.2246
+        },
+        "mtm_dd_pct": 7.733,
+        "n": 1647,
+        "negative_months": 3,
+        "profitable_exit_rate_pct": 39.9514,
+        "projected_30_day_pct": 4.909393,
+        "required_mean_signed_move_at_actual_frequency_pct": 0.646717,
+        "return_pct": 75.5836,
+        "trades_per_active_day": 4.816,
+        "trades_per_calendar_day": 4.512,
+        "wr": 39.95
+      }
+    },
+    "router_kind": "literal_ev",
+    "selection_2022": {
+      "annual_3pct": {
+        "2022": {
+          "active_days": 356,
+          "by_module_count": {
+            "multiday:dynamic_material_literal_ev": 1942
+          },
+          "by_source_count": {
+            "multiday_material_trend": 1942
+          },
+          "dd_pct": 8.3895,
+          "economic_gap_multiple": 6.7117,
+          "literal_target_rate_pct": 37.9506,
+          "mandatory_three_daily_mean_signed_move_pct": 0.973137,
+          "max_concurrent_positions": 6,
+          "max_entries_same_clock_hour": 2,
+          "max_entries_same_rolling_hour": 2,
+          "max_gross_notional_equity_pct": 178.8749,
+          "max_loss_streak": 26,
+          "mean_signed_price_return_pct": 0.081695,
+          "monthly_return_pct": {
+            "2022-01": 4.4526,
+            "2022-02": 11.7297,
+            "2022-03": 3.3412,
+            "2022-04": 1.5291,
+            "2022-05": -0.6911,
+            "2022-06": 3.9251,
+            "2022-07": 0.82,
+            "2022-08": 2.0374,
+            "2022-09": 2.0034,
+            "2022-10": 15.7621,
+            "2022-11": -0.693,
+            "2022-12": 3.2636
+          },
+          "mtm_dd_pct": 8.688,
+          "n": 1942,
+          "negative_months": 2,
+          "profitable_exit_rate_pct": 38.414,
+          "projected_30_day_pct": 3.989313,
+          "required_mean_signed_move_at_actual_frequency_pct": 0.54831,
+          "return_pct": 57.4255,
+          "trades_per_active_day": 5.455,
+          "trades_per_calendar_day": 5.321,
+          "wr": 38.41
+        }
+      },
+      "margin_3pct": {
+        "active_days": 356,
+        "by_module_count": {
+          "multiday:dynamic_material_literal_ev": 1942
+        },
+        "by_source_count": {
+          "multiday_material_trend": 1942
+        },
+        "dd_pct": 8.3895,
+        "economic_gap_multiple": 6.7117,
+        "literal_target_rate_pct": 37.9506,
+        "mandatory_three_daily_mean_signed_move_pct": 0.973137,
+        "max_concurrent_positions": 6,
+        "max_entries_same_clock_hour": 2,
+        "max_entries_same_rolling_hour": 2,
+        "max_gross_notional_equity_pct": 178.8749,
+        "max_loss_streak": 26,
+        "mean_signed_price_return_pct": 0.081695,
+        "monthly_return_pct": {
+          "2022-01": 4.4526,
+          "2022-02": 11.7297,
+          "2022-03": 3.3412,
+          "2022-04": 1.5291,
+          "2022-05": -0.6911,
+          "2022-06": 3.9251,
+          "2022-07": 0.82,
+          "2022-08": 2.0374,
+          "2022-09": 2.0034,
+          "2022-10": 15.7621,
+          "2022-11": -0.693,
+          "2022-12": 3.2636
+        },
+        "mtm_dd_pct": 8.688,
+        "n": 1942,
+        "negative_months": 2,
+        "profitable_exit_rate_pct": 38.414,
+        "projected_30_day_pct": 3.989313,
+        "required_mean_signed_move_at_actual_frequency_pct": 0.54831,
+        "return_pct": 57.4255,
+        "trades_per_active_day": 5.455,
+        "trades_per_calendar_day": 5.321,
+        "wr": 38.41
+      }
+    },
+    "selection_quantile": 0.9,
+    "threshold": 0.001857926681945567
+  },
+  "sources": {
+    "C:\\Users\\Lenovo\\Desktop\\telegram bot\\crypto_5m_dynamic_material_geometry_oct22_audit.py": "8218f14c74ab2f685316fa1c5c79fb0bbe17f575c5d48a98f1a6935425f428b0",
+    "C:\\Users\\Lenovo\\Desktop\\telegram bot\\crypto_5m_material_regime_model_oct22_audit.py": "2b3e6dea33c4c87415f93080bb4410f91220b5aef587733d8d53940aaede104d",
+    "reports\\audit_2026_09_08\\crypto_5m_history\\AAVEUSDT_5min_2020_2026.pkl": "293928436d34ca161a164857bb94cb7061468b40731b921c46b846f822f9a849",
+    "reports\\audit_2026_09_08\\crypto_5m_history\\AVAXUSDT_5min_2020_2026.pkl": "c84bdaf2dcb381bbcd6b6bbedf05dca65cae3a527287e79e965d0fa980b049b4",
+    "reports\\audit_2026_09_08\\crypto_5m_history\\BTCUSDT_5min_2020_2026.pkl": "30a8c392eb86ef4d68889fe95316ffbb72c601b40cb56d85088941b400387e33",
+    "reports\\audit_2026_09_08\\crypto_5m_history\\ETHUSDT_5min_2020_2026.pkl": "a4ec9e9fb40c2f465afb79a2208b44a5a4677004cce3cfa95ce9c6862b327b00",
+    "reports\\audit_2026_09_08\\crypto_5m_history\\LINKUSDT_5min_2020_2026.pkl": "b78585f91debf7f19b9daf47077c780682f0969ff06f1d3dad337df4751c6d71",
+    "reports\\audit_2026_09_08\\crypto_5m_history\\SOLUSDT_5min_2020_2026.pkl": "347b22406fa2c49e3f3ca50721d087bb03518b1bd492811b9c4c3624f90bc10a",
+    "reports\\audit_2026_09_08\\crypto_5m_history\\XLMUSDT_5min_2020_2026.pkl": "60b3db8b70c62fcc58dbf789cee1fa1240602a81284a8919ab391355d5a9496a",
+    "reports\\audit_2026_09_08\\crypto_5m_history\\XRPUSDT_5min_2020_2026.pkl": "c6ffcb348c110b1bf8409e5fec55032775d8ea57cf20e6865c7086b2c0e0e334",
+    "reports\\audit_2026_09_08\\crypto_5m_history\\manifest.json": "86b27c83022564f9313d090b3d7e896b91ae9d06b39106881d54bdef1fc1695c",
+    "reports\\audit_2026_09_08\\crypto_5m_material_regime_model_oct22.json": "21d5765eb956ca612554fbe906ed8496c273032363b4859d811c319f53f03060"
+  },
+  "status": "REJECTED_TEST",
+  "test_2024": {
+    "annual_3pct": {
+      "2024": {
+        "active_days": 351,
+        "by_module_count": {
+          "multiday:dynamic_material_literal_ev": 1998
+        },
+        "by_source_count": {
+          "multiday_material_trend": 1998
+        },
+        "dd_pct": 15.7322,
+        "economic_gap_multiple": 9.9913,
+        "literal_target_rate_pct": 36.2863,
+        "mandatory_three_daily_mean_signed_move_pct": 0.973137,
+        "max_concurrent_positions": 6,
+        "max_entries_same_clock_hour": 2,
+        "max_entries_same_rolling_hour": 2,
+        "max_gross_notional_equity_pct": 178.1207,
+        "max_loss_streak": 16,
+        "mean_signed_price_return_pct": 0.05349,
+        "monthly_return_pct": {
+          "2024-01": -0.1703,
+          "2024-02": 0.0002,
+          "2024-03": -10.0764,
+          "2024-04": 4.0033,
+          "2024-05": 7.165,
+          "2024-06": -2.1452,
+          "2024-07": 10.6982,
+          "2024-08": -5.825,
+          "2024-09": -0.0251,
+          "2024-10": 7.1729,
+          "2024-11": 11.7997,
+          "2024-12": 9.8526,
+          "2025-01": 0.3
+        },
+        "mtm_dd_pct": 16.0223,
+        "n": 1998,
+        "negative_months": 5,
+        "profitable_exit_rate_pct": 37.4875,
+        "projected_30_day_pct": 2.662658,
+        "required_mean_signed_move_at_actual_frequency_pct": 0.534438,
+        "return_pct": 34.7166,
+        "trades_per_active_day": 5.692,
+        "trades_per_calendar_day": 5.459,
+        "wr": 37.49
+      }
+    },
+    "margin_3pct": {
+      "active_days": 351,
+      "by_module_count": {
+        "multiday:dynamic_material_literal_ev": 1998
+      },
+      "by_source_count": {
+        "multiday_material_trend": 1998
+      },
+      "dd_pct": 15.7322,
+      "economic_gap_multiple": 9.9913,
+      "literal_target_rate_pct": 36.2863,
+      "mandatory_three_daily_mean_signed_move_pct": 0.973137,
+      "max_concurrent_positions": 6,
+      "max_entries_same_clock_hour": 2,
+      "max_entries_same_rolling_hour": 2,
+      "max_gross_notional_equity_pct": 178.1207,
+      "max_loss_streak": 16,
+      "mean_signed_price_return_pct": 0.05349,
+      "monthly_return_pct": {
+        "2024-01": -0.1703,
+        "2024-02": 0.0002,
+        "2024-03": -10.0764,
+        "2024-04": 4.0033,
+        "2024-05": 7.165,
+        "2024-06": -2.1452,
+        "2024-07": 10.6982,
+        "2024-08": -5.825,
+        "2024-09": -0.0251,
+        "2024-10": 7.1729,
+        "2024-11": 11.7997,
+        "2024-12": 9.8526,
+        "2025-01": 0.3
+      },
+      "mtm_dd_pct": 16.0223,
+      "n": 1998,
+      "negative_months": 5,
+      "profitable_exit_rate_pct": 37.4875,
+      "projected_30_day_pct": 2.662658,
+      "required_mean_signed_move_at_actual_frequency_pct": 0.534438,
+      "return_pct": 34.7166,
+      "trades_per_active_day": 5.692,
+      "trades_per_calendar_day": 5.459,
+      "wr": 37.49
+    }
+  },
+  "top_confirmation": [
+    {
+      "confirmation_2023": {
+        "annual_3pct": {
+          "2023": {
+            "active_days": 332,
+            "by_module_count": {
+              "multiday:dynamic_material_signed_return": 1489
+            },
+            "by_source_count": {
+              "multiday_material_trend": 1489
+            },
+            "dd_pct": 5.5454,
+            "economic_gap_multiple": 4.4732,
+            "literal_target_rate_pct": 37.542,
+            "mandatory_three_daily_mean_signed_move_pct": 0.973137,
+            "max_concurrent_positions": 6,
+            "max_entries_same_clock_hour": 2,
+            "max_entries_same_rolling_hour": 2,
+            "max_gross_notional_equity_pct": 176.2215,
+            "max_loss_streak": 14,
+            "mean_signed_price_return_pct": 0.159471,
+            "monthly_return_pct": {
+              "2023-01": 10.6821,
+              "2023-02": -0.8369,
+              "2023-03": 4.0788,
+              "2023-04": 4.5786,
+              "2023-05": 0.7493,
+              "2023-06": 16.9984,
+              "2023-07": 1.3385,
+              "2023-08": 5.6358,
+              "2023-09": 6.9231,
+              "2023-10": 12.1589,
+              "2023-11": -1.7255,
+              "2023-12": 12.4396
+            },
+            "mtm_dd_pct": 5.8642,
+            "n": 1489,
+            "negative_months": 2,
+            "profitable_exit_rate_pct": 40.8999,
+            "projected_30_day_pct": 6.045891,
+            "required_mean_signed_move_at_actual_frequency_pct": 0.713341,
+            "return_pct": 99.7583,
+            "trades_per_active_day": 4.485,
+            "trades_per_calendar_day": 4.091,
+            "wr": 40.9
+          }
+        },
+        "margin_3pct": {
+          "active_days": 332,
+          "by_module_count": {
+            "multiday:dynamic_material_signed_return": 1489
+          },
+          "by_source_count": {
+            "multiday_material_trend": 1489
+          },
+          "dd_pct": 5.5454,
+          "economic_gap_multiple": 4.4732,
+          "literal_target_rate_pct": 37.542,
+          "mandatory_three_daily_mean_signed_move_pct": 0.973137,
+          "max_concurrent_positions": 6,
+          "max_entries_same_clock_hour": 2,
+          "max_entries_same_rolling_hour": 2,
+          "max_gross_notional_equity_pct": 176.2215,
+          "max_loss_streak": 14,
+          "mean_signed_price_return_pct": 0.159471,
+          "monthly_return_pct": {
+            "2023-01": 10.6821,
+            "2023-02": -0.8369,
+            "2023-03": 4.0788,
+            "2023-04": 4.5786,
+            "2023-05": 0.7493,
+            "2023-06": 16.9984,
+            "2023-07": 1.3385,
+            "2023-08": 5.6358,
+            "2023-09": 6.9231,
+            "2023-10": 12.1589,
+            "2023-11": -1.7255,
+            "2023-12": 12.4396
+          },
+          "mtm_dd_pct": 5.8642,
+          "n": 1489,
+          "negative_months": 2,
+          "profitable_exit_rate_pct": 40.8999,
+          "projected_30_day_pct": 6.045891,
+          "required_mean_signed_move_at_actual_frequency_pct": 0.713341,
+          "return_pct": 99.7583,
+          "trades_per_active_day": 4.485,
+          "trades_per_calendar_day": 4.091,
+          "wr": 40.9
+        }
+      },
+      "router_kind": "signed_return",
+      "selection_2022": {
+        "annual_3pct": {
+          "2022": {
+            "active_days": 344,
+            "by_module_count": {
+              "multiday:dynamic_material_signed_return": 1631
+            },
+            "by_source_count": {
+              "multiday_material_trend": 1631
+            },
+            "dd_pct": 17.3633,
+            "economic_gap_multiple": 9.9911,
+            "literal_target_rate_pct": 36.542,
+            "mandatory_three_daily_mean_signed_move_pct": 0.973137,
+            "max_concurrent_positions": 5,
+            "max_entries_same_clock_hour": 2,
+            "max_entries_same_rolling_hour": 2,
+            "max_gross_notional_equity_pct": 148.6106,
+            "max_loss_streak": 15,
+            "mean_signed_price_return_pct": 0.065178,
+            "monthly_return_pct": {
+              "2022-01": 8.613,
+              "2022-02": 5.0905,
+              "2022-03": 0.5723,
+              "2022-04": 2.9457,
+              "2022-05": -10.1653,
+              "2022-06": -4.626,
+              "2022-07": 5.9858,
+              "2022-08": 4.8296,
+              "2022-09": 2.1004,
+              "2022-10": 11.5383,
+              "2022-11": 0.3238,
+              "2022-12": 4.8435
+            },
+            "mtm_dd_pct": 17.6535,
+            "n": 1631,
+            "negative_months": 2,
+            "profitable_exit_rate_pct": 37.1551,
+            "projected_30_day_pct": 2.663137,
+            "required_mean_signed_move_at_actual_frequency_pct": 0.651195,
+            "return_pct": 34.7519,
+            "trades_per_active_day": 4.741,
+            "trades_per_calendar_day": 4.481,
+            "wr": 37.16
+          }
+        },
+        "margin_3pct": {
+          "active_days": 344,
+          "by_module_count": {
+            "multiday:dynamic_material_signed_return": 1631
+          },
+          "by_source_count": {
+            "multiday_material_trend": 1631
+          },
+          "dd_pct": 17.3633,
+          "economic_gap_multiple": 9.9911,
+          "literal_target_rate_pct": 36.542,
+          "mandatory_three_daily_mean_signed_move_pct": 0.973137,
+          "max_concurrent_positions": 5,
+          "max_entries_same_clock_hour": 2,
+          "max_entries_same_rolling_hour": 2,
+          "max_gross_notional_equity_pct": 148.6106,
+          "max_loss_streak": 15,
+          "mean_signed_price_return_pct": 0.065178,
+          "monthly_return_pct": {
+            "2022-01": 8.613,
+            "2022-02": 5.0905,
+            "2022-03": 0.5723,
+            "2022-04": 2.9457,
+            "2022-05": -10.1653,
+            "2022-06": -4.626,
+            "2022-07": 5.9858,
+            "2022-08": 4.8296,
+            "2022-09": 2.1004,
+            "2022-10": 11.5383,
+            "2022-11": 0.3238,
+            "2022-12": 4.8435
+          },
+          "mtm_dd_pct": 17.6535,
+          "n": 1631,
+          "negative_months": 2,
+          "profitable_exit_rate_pct": 37.1551,
+          "projected_30_day_pct": 2.663137,
+          "required_mean_signed_move_at_actual_frequency_pct": 0.651195,
+          "return_pct": 34.7519,
+          "trades_per_active_day": 4.741,
+          "trades_per_calendar_day": 4.481,
+          "wr": 37.16
+        }
+      },
+      "selection_quantile": 0.925,
+      "threshold": 0.0022823078875642295
+    },
+    {
+      "confirmation_2023": {
+        "annual_3pct": {
+          "2023": {
+            "active_days": 360,
+            "by_module_count": {
+              "multiday:dynamic_material_literal_ev": 2737
+            },
+            "by_source_count": {
+              "multiday_material_trend": 2737
+            },
+            "dd_pct": 10.5901,
+            "economic_gap_multiple": 4.6168,
+            "literal_target_rate_pct": 38.1074,
+            "mandatory_three_daily_mean_signed_move_pct": 0.973137,
+            "max_concurrent_positions": 6,
+            "max_entries_same_clock_hour": 2,
+            "max_entries_same_rolling_hour": 2,
+            "max_gross_notional_equity_pct": 178.7347,
+            "max_loss_streak": 20,
+            "mean_signed_price_return_pct": 0.08425,
+            "monthly_return_pct": {
+              "2023-01": 19.187,
+              "2023-02": 2.5276,
+              "2023-03": 13.7812,
+              "2023-04": 8.3711,
+              "2023-05": -0.8689,
+              "2023-06": 9.7541,
+              "2023-07": 6.0201,
+              "2023-08": 6.0157,
+              "2023-09": 6.908,
+              "2023-10": 6.9063,
+              "2023-11": -6.0811,
+              "2023-12": -1.7629
+            },
+            "mtm_dd_pct": 10.5516,
+            "n": 2737,
+            "negative_months": 3,
+            "profitable_exit_rate_pct": 39.6419,
+            "projected_30_day_pct": 5.850158,
+            "required_mean_signed_move_at_actual_frequency_pct": 0.388966,
+            "return_pct": 94.3055,
+            "trades_per_active_day": 7.603,
+            "trades_per_calendar_day": 7.499,
+            "wr": 39.64
+          }
+        },
+        "margin_3pct": {
+          "active_days": 360,
+          "by_module_count": {
+            "multiday:dynamic_material_literal_ev": 2737
+          },
+          "by_source_count": {
+            "multiday_material_trend": 2737
+          },
+          "dd_pct": 10.5901,
+          "economic_gap_multiple": 4.6168,
+          "literal_target_rate_pct": 38.1074,
+          "mandatory_three_daily_mean_signed_move_pct": 0.973137,
+          "max_concurrent_positions": 6,
+          "max_entries_same_clock_hour": 2,
+          "max_entries_same_rolling_hour": 2,
+          "max_gross_notional_equity_pct": 178.7347,
+          "max_loss_streak": 20,
+          "mean_signed_price_return_pct": 0.08425,
+          "monthly_return_pct": {
+            "2023-01": 19.187,
+            "2023-02": 2.5276,
+            "2023-03": 13.7812,
+            "2023-04": 8.3711,
+            "2023-05": -0.8689,
+            "2023-06": 9.7541,
+            "2023-07": 6.0201,
+            "2023-08": 6.0157,
+            "2023-09": 6.908,
+            "2023-10": 6.9063,
+            "2023-11": -6.0811,
+            "2023-12": -1.7629
+          },
+          "mtm_dd_pct": 10.5516,
+          "n": 2737,
+          "negative_months": 3,
+          "profitable_exit_rate_pct": 39.6419,
+          "projected_30_day_pct": 5.850158,
+          "required_mean_signed_move_at_actual_frequency_pct": 0.388966,
+          "return_pct": 94.3055,
+          "trades_per_active_day": 7.603,
+          "trades_per_calendar_day": 7.499,
+          "wr": 39.64
+        }
+      },
+      "router_kind": "literal_ev",
+      "selection_2022": {
+        "annual_3pct": {
+          "2022": {
+            "active_days": 365,
+            "by_module_count": {
+              "multiday:dynamic_material_literal_ev": 2960
+            },
+            "by_source_count": {
+              "multiday_material_trend": 2960
+            },
+            "dd_pct": 18.0598,
+            "economic_gap_multiple": 8.0942,
+            "literal_target_rate_pct": 37.4662,
+            "mandatory_three_daily_mean_signed_move_pct": 0.973137,
+            "max_concurrent_positions": 6,
+            "max_entries_same_clock_hour": 2,
+            "max_entries_same_rolling_hour": 2,
+            "max_gross_notional_equity_pct": 177.1794,
+            "max_loss_streak": 13,
+            "mean_signed_price_return_pct": 0.044433,
+            "monthly_return_pct": {
+              "2022-01": 12.5592,
+              "2022-02": 16.6734,
+              "2022-03": 3.1029,
+              "2022-04": 3.0112,
+              "2022-05": -7.1975,
+              "2022-06": 11.1762,
+              "2022-07": 4.8935,
+              "2022-08": 0.8911,
+              "2022-09": -10.6599,
+              "2022-10": 5.3088,
+              "2022-11": -1.0797,
+              "2022-12": 1.7761,
+              "2023-01": -0.3
+            },
+            "mtm_dd_pct": 17.9956,
+            "n": 2960,
+            "negative_months": 4,
+            "profitable_exit_rate_pct": 37.9054,
+            "projected_30_day_pct": 3.296087,
+            "required_mean_signed_move_at_actual_frequency_pct": 0.359646,
+            "return_pct": 43.8198,
+            "trades_per_active_day": 8.11,
+            "trades_per_calendar_day": 8.11,
+            "wr": 37.91
+          }
+        },
+        "margin_3pct": {
+          "active_days": 365,
+          "by_module_count": {
+            "multiday:dynamic_material_literal_ev": 2960
+          },
+          "by_source_count": {
+            "multiday_material_trend": 2960
+          },
+          "dd_pct": 18.0598,
+          "economic_gap_multiple": 8.0942,
+          "literal_target_rate_pct": 37.4662,
+          "mandatory_three_daily_mean_signed_move_pct": 0.973137,
+          "max_concurrent_positions": 6,
+          "max_entries_same_clock_hour": 2,
+          "max_entries_same_rolling_hour": 2,
+          "max_gross_notional_equity_pct": 177.1794,
+          "max_loss_streak": 13,
+          "mean_signed_price_return_pct": 0.044433,
+          "monthly_return_pct": {
+            "2022-01": 12.5592,
+            "2022-02": 16.6734,
+            "2022-03": 3.1029,
+            "2022-04": 3.0112,
+            "2022-05": -7.1975,
+            "2022-06": 11.1762,
+            "2022-07": 4.8935,
+            "2022-08": 0.8911,
+            "2022-09": -10.6599,
+            "2022-10": 5.3088,
+            "2022-11": -1.0797,
+            "2022-12": 1.7761,
+            "2023-01": -0.3
+          },
+          "mtm_dd_pct": 17.9956,
+          "n": 2960,
+          "negative_months": 4,
+          "profitable_exit_rate_pct": 37.9054,
+          "projected_30_day_pct": 3.296087,
+          "required_mean_signed_move_at_actual_frequency_pct": 0.359646,
+          "return_pct": 43.8198,
+          "trades_per_active_day": 8.11,
+          "trades_per_calendar_day": 8.11,
+          "wr": 37.91
+        }
+      },
+      "selection_quantile": 0.7,
+      "threshold": 0.000836341576152875
+    },
+    {
+      "confirmation_2023": {
+        "annual_3pct": {
+          "2023": {
+            "active_days": 359,
+            "by_module_count": {
+              "multiday:dynamic_material_literal_ev": 2273
+            },
+            "by_source_count": {
+              "multiday_material_trend": 2273
+            },
+            "dd_pct": 10.8662,
+            "economic_gap_multiple": 5.3045,
+            "literal_target_rate_pct": 38.0114,
+            "mandatory_three_daily_mean_signed_move_pct": 0.973137,
+            "max_concurrent_positions": 6,
+            "max_entries_same_clock_hour": 2,
+            "max_entries_same_rolling_hour": 2,
+            "max_gross_notional_equity_pct": 177.7204,
+            "max_loss_streak": 15,
+            "mean_signed_price_return_pct": 0.088316,
+            "monthly_return_pct": {
+              "2023-01": 13.4125,
+              "2023-02": 0.379,
+              "2023-03": 19.9473,
+              "2023-04": 5.8239,
+              "2023-05": -4.0357,
+              "2023-06": 11.9737,
+              "2023-07": -2.5232,
+              "2023-08": 1.6975,
+              "2023-09": 14.7085,
+              "2023-10": 1.5778,
+              "2023-11": -3.8305,
+              "2023-12": 3.0943
+            },
+            "mtm_dd_pct": 11.4999,
+            "n": 2273,
+            "negative_months": 3,
+            "profitable_exit_rate_pct": 39.3753,
+            "projected_30_day_pct": 5.073355,
+            "required_mean_signed_move_at_actual_frequency_pct": 0.468477,
+            "return_pct": 77.8203,
+            "trades_per_active_day": 6.331,
+            "trades_per_calendar_day": 6.227,
+            "wr": 39.38
+          }
+        },
+        "margin_3pct": {
+          "active_days": 359,
+          "by_module_count": {
+            "multiday:dynamic_material_literal_ev": 2273
+          },
+          "by_source_count": {
+            "multiday_material_trend": 2273
+          },
+          "dd_pct": 10.8662,
+          "economic_gap_multiple": 5.3045,
+          "literal_target_rate_pct": 38.0114,
+          "mandatory_three_daily_mean_signed_move_pct": 0.973137,
+          "max_concurrent_positions": 6,
+          "max_entries_same_clock_hour": 2,
+          "max_entries_same_rolling_hour": 2,
+          "max_gross_notional_equity_pct": 177.7204,
+          "max_loss_streak": 15,
+          "mean_signed_price_return_pct": 0.088316,
+          "monthly_return_pct": {
+            "2023-01": 13.4125,
+            "2023-02": 0.379,
+            "2023-03": 19.9473,
+            "2023-04": 5.8239,
+            "2023-05": -4.0357,
+            "2023-06": 11.9737,
+            "2023-07": -2.5232,
+            "2023-08": 1.6975,
+            "2023-09": 14.7085,
+            "2023-10": 1.5778,
+            "2023-11": -3.8305,
+            "2023-12": 3.0943
+          },
+          "mtm_dd_pct": 11.4999,
+          "n": 2273,
+          "negative_months": 3,
+          "profitable_exit_rate_pct": 39.3753,
+          "projected_30_day_pct": 5.073355,
+          "required_mean_signed_move_at_actual_frequency_pct": 0.468477,
+          "return_pct": 77.8203,
+          "trades_per_active_day": 6.331,
+          "trades_per_calendar_day": 6.227,
+          "wr": 39.38
+        }
+      },
+      "router_kind": "literal_ev",
+      "selection_2022": {
+        "annual_3pct": {
+          "2022": {
+            "active_days": 364,
+            "by_module_count": {
+              "multiday:dynamic_material_literal_ev": 2615
+            },
+            "by_source_count": {
+              "multiday_material_trend": 2615
+            },
+            "dd_pct": 17.3888,
+            "economic_gap_multiple": 5.8361,
+            "literal_target_rate_pct": 38.0115,
+            "mandatory_three_daily_mean_signed_move_pct": 0.973137,
+            "max_concurrent_positions": 6,
+            "max_entries_same_clock_hour": 2,
+            "max_entries_same_rolling_hour": 2,
+            "max_gross_notional_equity_pct": 178.245,
+            "max_loss_streak": 21,
+            "mean_signed_price_return_pct": 0.069767,
+            "monthly_return_pct": {
+              "2022-01": 8.346,
+              "2022-02": 25.7735,
+              "2022-03": 5.4911,
+              "2022-04": 5.4971,
+              "2022-05": -5.7947,
+              "2022-06": 13.8561,
+              "2022-07": 4.8617,
+              "2022-08": -1.8673,
+              "2022-09": -11.0829,
+              "2022-10": 5.8888,
+              "2022-11": 3.1344,
+              "2022-12": 3.3198
+            },
+            "mtm_dd_pct": 18.0307,
+            "n": 2615,
+            "negative_months": 3,
+            "profitable_exit_rate_pct": 38.5086,
+            "projected_30_day_pct": 4.600531,
+            "required_mean_signed_move_at_actual_frequency_pct": 0.407166,
+            "return_pct": 67.9357,
+            "trades_per_active_day": 7.184,
+            "trades_per_calendar_day": 7.164,
+            "wr": 38.51
+          }
+        },
+        "margin_3pct": {
+          "active_days": 364,
+          "by_module_count": {
+            "multiday:dynamic_material_literal_ev": 2615
+          },
+          "by_source_count": {
+            "multiday_material_trend": 2615
+          },
+          "dd_pct": 17.3888,
+          "economic_gap_multiple": 5.8361,
+          "literal_target_rate_pct": 38.0115,
+          "mandatory_three_daily_mean_signed_move_pct": 0.973137,
+          "max_concurrent_positions": 6,
+          "max_entries_same_clock_hour": 2,
+          "max_entries_same_rolling_hour": 2,
+          "max_gross_notional_equity_pct": 178.245,
+          "max_loss_streak": 21,
+          "mean_signed_price_return_pct": 0.069767,
+          "monthly_return_pct": {
+            "2022-01": 8.346,
+            "2022-02": 25.7735,
+            "2022-03": 5.4911,
+            "2022-04": 5.4971,
+            "2022-05": -5.7947,
+            "2022-06": 13.8561,
+            "2022-07": 4.8617,
+            "2022-08": -1.8673,
+            "2022-09": -11.0829,
+            "2022-10": 5.8888,
+            "2022-11": 3.1344,
+            "2022-12": 3.3198
+          },
+          "mtm_dd_pct": 18.0307,
+          "n": 2615,
+          "negative_months": 3,
+          "profitable_exit_rate_pct": 38.5086,
+          "projected_30_day_pct": 4.600531,
+          "required_mean_signed_move_at_actual_frequency_pct": 0.407166,
+          "return_pct": 67.9357,
+          "trades_per_active_day": 7.184,
+          "trades_per_calendar_day": 7.164,
+          "wr": 38.51
+        }
+      },
+      "selection_quantile": 0.8,
+      "threshold": 0.0012368518244751728
+    },
+    {
+      "confirmation_2023": {
+        "annual_3pct": {
+          "2023": {
+            "active_days": 342,
+            "by_module_count": {
+              "multiday:dynamic_material_literal_ev": 1647
+            },
+            "by_source_count": {
+              "multiday_material_trend": 1647
+            },
+            "dd_pct": 7.1231,
+            "economic_gap_multiple": 5.4786,
+            "literal_target_rate_pct": 38.3121,
+            "mandatory_three_daily_mean_signed_move_pct": 0.973137,
+            "max_concurrent_positions": 5,
+            "max_entries_same_clock_hour": 2,
+            "max_entries_same_rolling_hour": 2,
+            "max_gross_notional_equity_pct": 148.5781,
+            "max_loss_streak": 17,
+            "mean_signed_price_return_pct": 0.118044,
+            "monthly_return_pct": {
+              "2023-01": 6.4319,
+              "2023-02": 1.2369,
+              "2023-03": 8.6846,
+              "2023-04": 2.4574,
+              "2023-05": -3.2991,
+              "2023-06": 16.3419,
+              "2023-07": -1.5925,
+              "2023-08": 6.9814,
+              "2023-09": 11.1885,
+              "2023-10": 5.2136,
+              "2023-11": -5.0434,
+              "2023-12": 11.2246
+            },
+            "mtm_dd_pct": 7.733,
+            "n": 1647,
+            "negative_months": 3,
+            "profitable_exit_rate_pct": 39.9514,
+            "projected_30_day_pct": 4.909393,
+            "required_mean_signed_move_at_actual_frequency_pct": 0.646717,
+            "return_pct": 75.5836,
+            "trades_per_active_day": 4.816,
+            "trades_per_calendar_day": 4.512,
+            "wr": 39.95
+          }
+        },
+        "margin_3pct": {
+          "active_days": 342,
+          "by_module_count": {
+            "multiday:dynamic_material_literal_ev": 1647
+          },
+          "by_source_count": {
+            "multiday_material_trend": 1647
+          },
+          "dd_pct": 7.1231,
+          "economic_gap_multiple": 5.4786,
+          "literal_target_rate_pct": 38.3121,
+          "mandatory_three_daily_mean_signed_move_pct": 0.973137,
+          "max_concurrent_positions": 5,
+          "max_entries_same_clock_hour": 2,
+          "max_entries_same_rolling_hour": 2,
+          "max_gross_notional_equity_pct": 148.5781,
+          "max_loss_streak": 17,
+          "mean_signed_price_return_pct": 0.118044,
+          "monthly_return_pct": {
+            "2023-01": 6.4319,
+            "2023-02": 1.2369,
+            "2023-03": 8.6846,
+            "2023-04": 2.4574,
+            "2023-05": -3.2991,
+            "2023-06": 16.3419,
+            "2023-07": -1.5925,
+            "2023-08": 6.9814,
+            "2023-09": 11.1885,
+            "2023-10": 5.2136,
+            "2023-11": -5.0434,
+            "2023-12": 11.2246
+          },
+          "mtm_dd_pct": 7.733,
+          "n": 1647,
+          "negative_months": 3,
+          "profitable_exit_rate_pct": 39.9514,
+          "projected_30_day_pct": 4.909393,
+          "required_mean_signed_move_at_actual_frequency_pct": 0.646717,
+          "return_pct": 75.5836,
+          "trades_per_active_day": 4.816,
+          "trades_per_calendar_day": 4.512,
+          "wr": 39.95
+        }
+      },
+      "router_kind": "literal_ev",
+      "selection_2022": {
+        "annual_3pct": {
+          "2022": {
+            "active_days": 356,
+            "by_module_count": {
+              "multiday:dynamic_material_literal_ev": 1942
+            },
+            "by_source_count": {
+              "multiday_material_trend": 1942
+            },
+            "dd_pct": 8.3895,
+            "economic_gap_multiple": 6.7117,
+            "literal_target_rate_pct": 37.9506,
+            "mandatory_three_daily_mean_signed_move_pct": 0.973137,
+            "max_concurrent_positions": 6,
+            "max_entries_same_clock_hour": 2,
+            "max_entries_same_rolling_hour": 2,
+            "max_gross_notional_equity_pct": 178.8749,
+            "max_loss_streak": 26,
+            "mean_signed_price_return_pct": 0.081695,
+            "monthly_return_pct": {
+              "2022-01": 4.4526,
+              "2022-02": 11.7297,
+              "2022-03": 3.3412,
+              "2022-04": 1.5291,
+              "2022-05": -0.6911,
+              "2022-06": 3.9251,
+              "2022-07": 0.82,
+              "2022-08": 2.0374,
+              "2022-09": 2.0034,
+              "2022-10": 15.7621,
+              "2022-11": -0.693,
+              "2022-12": 3.2636
+            },
+            "mtm_dd_pct": 8.688,
+            "n": 1942,
+            "negative_months": 2,
+            "profitable_exit_rate_pct": 38.414,
+            "projected_30_day_pct": 3.989313,
+            "required_mean_signed_move_at_actual_frequency_pct": 0.54831,
+            "return_pct": 57.4255,
+            "trades_per_active_day": 5.455,
+            "trades_per_calendar_day": 5.321,
+            "wr": 38.41
+          }
+        },
+        "margin_3pct": {
+          "active_days": 356,
+          "by_module_count": {
+            "multiday:dynamic_material_literal_ev": 1942
+          },
+          "by_source_count": {
+            "multiday_material_trend": 1942
+          },
+          "dd_pct": 8.3895,
+          "economic_gap_multiple": 6.7117,
+          "literal_target_rate_pct": 37.9506,
+          "mandatory_three_daily_mean_signed_move_pct": 0.973137,
+          "max_concurrent_positions": 6,
+          "max_entries_same_clock_hour": 2,
+          "max_entries_same_rolling_hour": 2,
+          "max_gross_notional_equity_pct": 178.8749,
+          "max_loss_streak": 26,
+          "mean_signed_price_return_pct": 0.081695,
+          "monthly_return_pct": {
+            "2022-01": 4.4526,
+            "2022-02": 11.7297,
+            "2022-03": 3.3412,
+            "2022-04": 1.5291,
+            "2022-05": -0.6911,
+            "2022-06": 3.9251,
+            "2022-07": 0.82,
+            "2022-08": 2.0374,
+            "2022-09": 2.0034,
+            "2022-10": 15.7621,
+            "2022-11": -0.693,
+            "2022-12": 3.2636
+          },
+          "mtm_dd_pct": 8.688,
+          "n": 1942,
+          "negative_months": 2,
+          "profitable_exit_rate_pct": 38.414,
+          "projected_30_day_pct": 3.989313,
+          "required_mean_signed_move_at_actual_frequency_pct": 0.54831,
+          "return_pct": 57.4255,
+          "trades_per_active_day": 5.455,
+          "trades_per_calendar_day": 5.321,
+          "wr": 38.41
+        }
+      },
+      "selection_quantile": 0.9,
+      "threshold": 0.001857926681945567
+    },
+    {
+      "confirmation_2023": {
+        "annual_3pct": {
+          "2023": {
+            "active_days": 327,
+            "by_module_count": {
+              "multiday:dynamic_material_literal_ev": 1385
+            },
+            "by_source_count": {
+              "multiday_material_trend": 1385
+            },
+            "dd_pct": 8.3553,
+            "economic_gap_multiple": 5.538,
+            "literal_target_rate_pct": 38.917,
+            "mandatory_three_daily_mean_signed_move_pct": 0.973137,
+            "max_concurrent_positions": 5,
+            "max_entries_same_clock_hour": 2,
+            "max_entries_same_rolling_hour": 2,
+            "max_gross_notional_equity_pct": 147.7884,
+            "max_loss_streak": 13,
+            "mean_signed_price_return_pct": 0.138866,
+            "monthly_return_pct": {
+              "2023-01": 3.5515,
+              "2023-02": 0.026,
+              "2023-03": 9.5957,
+              "2023-04": 4.7284,
+              "2023-05": -2.0691,
+              "2023-06": 19.5868,
+              "2023-07": 0.9814,
+              "2023-08": 3.2844,
+              "2023-09": 4.8073,
+              "2023-10": 5.6831,
+              "2023-11": -4.7626,
+              "2023-12": 14.2399
+            },
+            "mtm_dd_pct": 8.8346,
+            "n": 1385,
+            "negative_months": 2,
+            "profitable_exit_rate_pct": 40.5054,
+            "projected_30_day_pct": 4.856226,
+            "required_mean_signed_move_at_actual_frequency_pct": 0.769043,
+            "return_pct": 74.9959,
+            "trades_per_active_day": 4.235,
+            "trades_per_calendar_day": 3.795,
+            "wr": 40.51
+          }
+        },
+        "margin_3pct": {
+          "active_days": 327,
+          "by_module_count": {
+            "multiday:dynamic_material_literal_ev": 1385
+          },
+          "by_source_count": {
+            "multiday_material_trend": 1385
+          },
+          "dd_pct": 8.3553,
+          "economic_gap_multiple": 5.538,
+          "literal_target_rate_pct": 38.917,
+          "mandatory_three_daily_mean_signed_move_pct": 0.973137,
+          "max_concurrent_positions": 5,
+          "max_entries_same_clock_hour": 2,
+          "max_entries_same_rolling_hour": 2,
+          "max_gross_notional_equity_pct": 147.7884,
+          "max_loss_streak": 13,
+          "mean_signed_price_return_pct": 0.138866,
+          "monthly_return_pct": {
+            "2023-01": 3.5515,
+            "2023-02": 0.026,
+            "2023-03": 9.5957,
+            "2023-04": 4.7284,
+            "2023-05": -2.0691,
+            "2023-06": 19.5868,
+            "2023-07": 0.9814,
+            "2023-08": 3.2844,
+            "2023-09": 4.8073,
+            "2023-10": 5.6831,
+            "2023-11": -4.7626,
+            "2023-12": 14.2399
+          },
+          "mtm_dd_pct": 8.8346,
+          "n": 1385,
+          "negative_months": 2,
+          "profitable_exit_rate_pct": 40.5054,
+          "projected_30_day_pct": 4.856226,
+          "required_mean_signed_move_at_actual_frequency_pct": 0.769043,
+          "return_pct": 74.9959,
+          "trades_per_active_day": 4.235,
+          "trades_per_calendar_day": 3.795,
+          "wr": 40.51
+        }
+      },
+      "router_kind": "literal_ev",
+      "selection_2022": {
+        "annual_3pct": {
+          "2022": {
+            "active_days": 345,
+            "by_module_count": {
+              "multiday:dynamic_material_literal_ev": 1662
+            },
+            "by_source_count": {
+              "multiday_material_trend": 1662
+            },
+            "dd_pct": 8.1207,
+            "economic_gap_multiple": 8.6129,
+            "literal_target_rate_pct": 37.6655,
+            "mandatory_three_daily_mean_signed_move_pct": 0.973137,
+            "max_concurrent_positions": 6,
+            "max_entries_same_clock_hour": 2,
+            "max_entries_same_rolling_hour": 2,
+            "max_gross_notional_equity_pct": 177.2109,
+            "max_loss_streak": 23,
+            "mean_signed_price_return_pct": 0.07441,
+            "monthly_return_pct": {
+              "2022-01": 4.391,
+              "2022-02": 14.1751,
+              "2022-03": 1.2736,
+              "2022-04": 0.1294,
+              "2022-05": -1.4344,
+              "2022-06": -1.7213,
+              "2022-07": 2.7746,
+              "2022-08": 7.4981,
+              "2022-09": 0.6614,
+              "2022-10": 10.7851,
+              "2022-11": -2.1889,
+              "2022-12": 0.7429
+            },
+            "mtm_dd_pct": 8.4672,
+            "n": 1662,
+            "negative_months": 3,
+            "profitable_exit_rate_pct": 38.0265,
+            "projected_30_day_pct": 3.095718,
+            "required_mean_signed_move_at_actual_frequency_pct": 0.640887,
+            "return_pct": 42.1381,
+            "trades_per_active_day": 4.817,
+            "trades_per_calendar_day": 4.553,
+            "wr": 38.03
+          }
+        },
+        "margin_3pct": {
+          "active_days": 345,
+          "by_module_count": {
+            "multiday:dynamic_material_literal_ev": 1662
+          },
+          "by_source_count": {
+            "multiday_material_trend": 1662
+          },
+          "dd_pct": 8.1207,
+          "economic_gap_multiple": 8.6129,
+          "literal_target_rate_pct": 37.6655,
+          "mandatory_three_daily_mean_signed_move_pct": 0.973137,
+          "max_concurrent_positions": 6,
+          "max_entries_same_clock_hour": 2,
+          "max_entries_same_rolling_hour": 2,
+          "max_gross_notional_equity_pct": 177.2109,
+          "max_loss_streak": 23,
+          "mean_signed_price_return_pct": 0.07441,
+          "monthly_return_pct": {
+            "2022-01": 4.391,
+            "2022-02": 14.1751,
+            "2022-03": 1.2736,
+            "2022-04": 0.1294,
+            "2022-05": -1.4344,
+            "2022-06": -1.7213,
+            "2022-07": 2.7746,
+            "2022-08": 7.4981,
+            "2022-09": 0.6614,
+            "2022-10": 10.7851,
+            "2022-11": -2.1889,
+            "2022-12": 0.7429
+          },
+          "mtm_dd_pct": 8.4672,
+          "n": 1662,
+          "negative_months": 3,
+          "profitable_exit_rate_pct": 38.0265,
+          "projected_30_day_pct": 3.095718,
+          "required_mean_signed_move_at_actual_frequency_pct": 0.640887,
+          "return_pct": 42.1381,
+          "trades_per_active_day": 4.817,
+          "trades_per_calendar_day": 4.553,
+          "wr": 38.03
+        }
+      },
+      "selection_quantile": 0.925,
+      "threshold": 0.0021176994977651995
+    },
+    {
+      "confirmation_2023": {
+        "annual_3pct": {
+          "2023": {
+            "active_days": 306,
+            "by_module_count": {
+              "multiday:dynamic_material_signed_return": 1125
+            },
+            "by_source_count": {
+              "multiday_material_trend": 1125
+            },
+            "dd_pct": 5.4565,
+            "economic_gap_multiple": 5.7315,
+            "literal_target_rate_pct": 37.4222,
+            "mandatory_three_daily_mean_signed_move_pct": 0.973137,
+            "max_concurrent_positions": 6,
+            "max_entries_same_clock_hour": 2,
+            "max_entries_same_rolling_hour": 2,
+            "max_gross_notional_equity_pct": 179.0678,
+            "max_loss_streak": 21,
+            "mean_signed_price_return_pct": 0.164783,
+            "monthly_return_pct": {
+              "2023-01": 5.298,
+              "2023-02": -1.1696,
+              "2023-03": 6.7772,
+              "2023-04": 1.3261,
+              "2023-05": 2.0408,
+              "2023-06": 16.2039,
+              "2023-07": 0.2558,
+              "2023-08": 1.1624,
+              "2023-09": 7.638,
+              "2023-10": 5.7414,
+              "2023-11": -0.7014,
+              "2023-12": 12.2051
+            },
+            "mtm_dd_pct": 6.2875,
+            "n": 1125,
+            "negative_months": 2,
+            "profitable_exit_rate_pct": 40.8,
+            "projected_30_day_pct": 4.689603,
+            "required_mean_signed_move_at_actual_frequency_pct": 0.944447,
+            "return_pct": 71.7118,
+            "trades_per_active_day": 3.676,
+            "trades_per_calendar_day": 3.091,
+            "wr": 40.8
+          }
+        },
+        "margin_3pct": {
+          "active_days": 306,
+          "by_module_count": {
+            "multiday:dynamic_material_signed_return": 1125
+          },
+          "by_source_count": {
+            "multiday_material_trend": 1125
+          },
+          "dd_pct": 5.4565,
+          "economic_gap_multiple": 5.7315,
+          "literal_target_rate_pct": 37.4222,
+          "mandatory_three_daily_mean_signed_move_pct": 0.973137,
+          "max_concurrent_positions": 6,
+          "max_entries_same_clock_hour": 2,
+          "max_entries_same_rolling_hour": 2,
+          "max_gross_notional_equity_pct": 179.0678,
+          "max_loss_streak": 21,
+          "mean_signed_price_return_pct": 0.164783,
+          "monthly_return_pct": {
+            "2023-01": 5.298,
+            "2023-02": -1.1696,
+            "2023-03": 6.7772,
+            "2023-04": 1.3261,
+            "2023-05": 2.0408,
+            "2023-06": 16.2039,
+            "2023-07": 0.2558,
+            "2023-08": 1.1624,
+            "2023-09": 7.638,
+            "2023-10": 5.7414,
+            "2023-11": -0.7014,
+            "2023-12": 12.2051
+          },
+          "mtm_dd_pct": 6.2875,
+          "n": 1125,
+          "negative_months": 2,
+          "profitable_exit_rate_pct": 40.8,
+          "projected_30_day_pct": 4.689603,
+          "required_mean_signed_move_at_actual_frequency_pct": 0.944447,
+          "return_pct": 71.7118,
+          "trades_per_active_day": 3.676,
+          "trades_per_calendar_day": 3.091,
+          "wr": 40.8
+        }
+      },
+      "router_kind": "signed_return",
+      "selection_2022": {
+        "annual_3pct": {
+          "2022": {
+            "active_days": 309,
+            "by_module_count": {
+              "multiday:dynamic_material_signed_return": 1224
+            },
+            "by_source_count": {
+              "multiday_material_trend": 1224
+            },
+            "dd_pct": 9.4584,
+            "economic_gap_multiple": 8.4998,
+            "literal_target_rate_pct": 37.5817,
+            "mandatory_three_daily_mean_signed_move_pct": 0.973137,
+            "max_concurrent_positions": 5,
+            "max_entries_same_clock_hour": 2,
+            "max_entries_same_rolling_hour": 2,
+            "max_gross_notional_equity_pct": 148.0465,
+            "max_loss_streak": 12,
+            "mean_signed_price_return_pct": 0.102116,
+            "monthly_return_pct": {
+              "2022-01": 10.1351,
+              "2022-02": 2.7605,
+              "2022-03": 1.5387,
+              "2022-04": 0.4503,
+              "2022-05": 1.6621,
+              "2022-06": -5.2293,
+              "2022-07": 8.3699,
+              "2022-08": -0.8128,
+              "2022-09": 2.8996,
+              "2022-10": 4.9614,
+              "2022-11": 4.2056,
+              "2022-12": 6.5347
+            },
+            "mtm_dd_pct": 9.8149,
+            "n": 1224,
+            "negative_months": 2,
+            "profitable_exit_rate_pct": 38.4804,
+            "projected_30_day_pct": 3.138506,
+            "required_mean_signed_move_at_actual_frequency_pct": 0.867961,
+            "return_pct": 43.3367,
+            "trades_per_active_day": 3.961,
+            "trades_per_calendar_day": 3.363,
+            "wr": 38.48
+          }
+        },
+        "margin_3pct": {
+          "active_days": 309,
+          "by_module_count": {
+            "multiday:dynamic_material_signed_return": 1224
+          },
+          "by_source_count": {
+            "multiday_material_trend": 1224
+          },
+          "dd_pct": 9.4584,
+          "economic_gap_multiple": 8.4998,
+          "literal_target_rate_pct": 37.5817,
+          "mandatory_three_daily_mean_signed_move_pct": 0.973137,
+          "max_concurrent_positions": 5,
+          "max_entries_same_clock_hour": 2,
+          "max_entries_same_rolling_hour": 2,
+          "max_gross_notional_equity_pct": 148.0465,
+          "max_loss_streak": 12,
+          "mean_signed_price_return_pct": 0.102116,
+          "monthly_return_pct": {
+            "2022-01": 10.1351,
+            "2022-02": 2.7605,
+            "2022-03": 1.5387,
+            "2022-04": 0.4503,
+            "2022-05": 1.6621,
+            "2022-06": -5.2293,
+            "2022-07": 8.3699,
+            "2022-08": -0.8128,
+            "2022-09": 2.8996,
+            "2022-10": 4.9614,
+            "2022-11": 4.2056,
+            "2022-12": 6.5347
+          },
+          "mtm_dd_pct": 9.8149,
+          "n": 1224,
+          "negative_months": 2,
+          "profitable_exit_rate_pct": 38.4804,
+          "projected_30_day_pct": 3.138506,
+          "required_mean_signed_move_at_actual_frequency_pct": 0.867961,
+          "return_pct": 43.3367,
+          "trades_per_active_day": 3.961,
+          "trades_per_calendar_day": 3.363,
+          "wr": 38.48
+        }
+      },
+      "selection_quantile": 0.95,
+      "threshold": 0.0026210992385213316
+    },
+    {
+      "confirmation_2023": {
+        "annual_3pct": {
+          "2023": {
+            "active_days": 347,
+            "by_module_count": {
+              "multiday:dynamic_material_signed_return": 1790
+            },
+            "by_source_count": {
+              "multiday_material_trend": 1790
+            },
+            "dd_pct": 9.5973,
+            "economic_gap_multiple": 5.9358,
+            "literal_target_rate_pct": 35.8101,
+            "mandatory_three_daily_mean_signed_move_pct": 0.973137,
+            "max_concurrent_positions": 6,
+            "max_entries_same_clock_hour": 2,
+            "max_entries_same_rolling_hour": 2,
+            "max_gross_notional_equity_pct": 179.4103,
+            "max_loss_streak": 15,
+            "mean_signed_price_return_pct": 0.100236,
+            "monthly_return_pct": {
+              "2023-01": 11.9623,
+              "2023-02": 2.0161,
+              "2023-03": 7.914,
+              "2023-04": 6.4413,
+              "2023-05": -3.904,
+              "2023-06": 11.2176,
+              "2023-07": -3.7804,
+              "2023-08": 3.4904,
+              "2023-09": 4.8572,
+              "2023-10": 7.3985,
+              "2023-11": -2.5006,
+              "2023-12": 9.201
+            },
+            "mtm_dd_pct": 10.1593,
+            "n": 1790,
+            "negative_months": 3,
+            "profitable_exit_rate_pct": 39.1061,
+            "projected_30_day_pct": 4.522618,
+            "required_mean_signed_move_at_actual_frequency_pct": 0.594975,
+            "return_pct": 67.4158,
+            "trades_per_active_day": 5.159,
+            "trades_per_calendar_day": 4.904,
+            "wr": 39.11
+          }
+        },
+        "margin_3pct": {
+          "active_days": 347,
+          "by_module_count": {
+            "multiday:dynamic_material_signed_return": 1790
+          },
+          "by_source_count": {
+            "multiday_material_trend": 1790
+          },
+          "dd_pct": 9.5973,
+          "economic_gap_multiple": 5.9358,
+          "literal_target_rate_pct": 35.8101,
+          "mandatory_three_daily_mean_signed_move_pct": 0.973137,
+          "max_concurrent_positions": 6,
+          "max_entries_same_clock_hour": 2,
+          "max_entries_same_rolling_hour": 2,
+          "max_gross_notional_equity_pct": 179.4103,
+          "max_loss_streak": 15,
+          "mean_signed_price_return_pct": 0.100236,
+          "monthly_return_pct": {
+            "2023-01": 11.9623,
+            "2023-02": 2.0161,
+            "2023-03": 7.914,
+            "2023-04": 6.4413,
+            "2023-05": -3.904,
+            "2023-06": 11.2176,
+            "2023-07": -3.7804,
+            "2023-08": 3.4904,
+            "2023-09": 4.8572,
+            "2023-10": 7.3985,
+            "2023-11": -2.5006,
+            "2023-12": 9.201
+          },
+          "mtm_dd_pct": 10.1593,
+          "n": 1790,
+          "negative_months": 3,
+          "profitable_exit_rate_pct": 39.1061,
+          "projected_30_day_pct": 4.522618,
+          "required_mean_signed_move_at_actual_frequency_pct": 0.594975,
+          "return_pct": 67.4158,
+          "trades_per_active_day": 5.159,
+          "trades_per_calendar_day": 4.904,
+          "wr": 39.11
+        }
+      },
+      "router_kind": "signed_return",
+      "selection_2022": {
+        "annual_3pct": {
+          "2022": {
+            "active_days": 353,
+            "by_module_count": {
+              "multiday:dynamic_material_signed_return": 1938
+            },
+            "by_source_count": {
+              "multiday_material_trend": 1938
+            },
+            "dd_pct": 10.9236,
+            "economic_gap_multiple": 7.8125,
+            "literal_target_rate_pct": 36.7389,
+            "mandatory_three_daily_mean_signed_move_pct": 0.973137,
+            "max_concurrent_positions": 6,
+            "max_entries_same_clock_hour": 2,
+            "max_entries_same_rolling_hour": 2,
+            "max_gross_notional_equity_pct": 178.4034,
+            "max_loss_streak": 14,
+            "mean_signed_price_return_pct": 0.070144,
+            "monthly_return_pct": {
+              "2022-01": 2.2572,
+              "2022-02": 5.8836,
+              "2022-03": 6.0943,
+              "2022-04": 2.3709,
+              "2022-05": -6.8875,
+              "2022-06": 1.5009,
+              "2022-07": 2.6749,
+              "2022-08": 1.8245,
+              "2022-09": 1.1459,
+              "2022-10": 17.2979,
+              "2022-11": 4.1017,
+              "2022-12": 2.2766
+            },
+            "mtm_dd_pct": 11.1375,
+            "n": 1938,
+            "negative_months": 1,
+            "profitable_exit_rate_pct": 37.4613,
+            "projected_30_day_pct": 3.417763,
+            "required_mean_signed_move_at_actual_frequency_pct": 0.548,
+            "return_pct": 46.7771,
+            "trades_per_active_day": 5.49,
+            "trades_per_calendar_day": 5.324,
+            "wr": 37.46
+          }
+        },
+        "margin_3pct": {
+          "active_days": 353,
+          "by_module_count": {
+            "multiday:dynamic_material_signed_return": 1938
+          },
+          "by_source_count": {
+            "multiday_material_trend": 1938
+          },
+          "dd_pct": 10.9236,
+          "economic_gap_multiple": 7.8125,
+          "literal_target_rate_pct": 36.7389,
+          "mandatory_three_daily_mean_signed_move_pct": 0.973137,
+          "max_concurrent_positions": 6,
+          "max_entries_same_clock_hour": 2,
+          "max_entries_same_rolling_hour": 2,
+          "max_gross_notional_equity_pct": 178.4034,
+          "max_loss_streak": 14,
+          "mean_signed_price_return_pct": 0.070144,
+          "monthly_return_pct": {
+            "2022-01": 2.2572,
+            "2022-02": 5.8836,
+            "2022-03": 6.0943,
+            "2022-04": 2.3709,
+            "2022-05": -6.8875,
+            "2022-06": 1.5009,
+            "2022-07": 2.6749,
+            "2022-08": 1.8245,
+            "2022-09": 1.1459,
+            "2022-10": 17.2979,
+            "2022-11": 4.1017,
+            "2022-12": 2.2766
+          },
+          "mtm_dd_pct": 11.1375,
+          "n": 1938,
+          "negative_months": 1,
+          "profitable_exit_rate_pct": 37.4613,
+          "projected_30_day_pct": 3.417763,
+          "required_mean_signed_move_at_actual_frequency_pct": 0.548,
+          "return_pct": 46.7771,
+          "trades_per_active_day": 5.49,
+          "trades_per_calendar_day": 5.324,
+          "wr": 37.46
+        }
+      },
+      "selection_quantile": 0.9,
+      "threshold": 0.0020332564096521583
+    },
+    {
+      "confirmation_2023": {
+        "annual_3pct": {
+          "2023": {
+            "active_days": 365,
+            "by_module_count": {
+              "multiday:dynamic_material_signed_return": 3089
+            },
+            "by_source_count": {
+              "multiday_material_trend": 3089
+            },
+            "dd_pct": 12.6715,
+            "economic_gap_multiple": 6.9377,
+            "literal_target_rate_pct": 35.416,
+            "mandatory_three_daily_mean_signed_move_pct": 0.973137,
+            "max_concurrent_positions": 6,
+            "max_entries_same_clock_hour": 2,
+            "max_entries_same_rolling_hour": 2,
+            "max_gross_notional_equity_pct": 179.5887,
+            "max_loss_streak": 15,
+            "mean_signed_price_return_pct": 0.049676,
+            "monthly_return_pct": {
+              "2023-01": 4.2598,
+              "2023-02": -3.7104,
+              "2023-03": 18.5865,
+              "2023-04": 3.8164,
+              "2023-05": 2.623,
+              "2023-06": 6.6199,
+              "2023-07": 3.6767,
+              "2023-08": 7.6289,
+              "2023-09": 7.4041,
+              "2023-10": 1.5982,
+              "2023-11": -6.6055,
+              "2023-12": 0.4347
+            },
+            "mtm_dd_pct": 13.206,
+            "n": 3089,
+            "negative_months": 2,
+            "profitable_exit_rate_pct": 38.6209,
+            "projected_30_day_pct": 3.855891,
+            "required_mean_signed_move_at_actual_frequency_pct": 0.344637,
+            "return_pct": 54.4552,
+            "trades_per_active_day": 8.463,
+            "trades_per_calendar_day": 8.463,
+            "wr": 38.62
+          }
+        },
+        "margin_3pct": {
+          "active_days": 365,
+          "by_module_count": {
+            "multiday:dynamic_material_signed_return": 3089
+          },
+          "by_source_count": {
+            "multiday_material_trend": 3089
+          },
+          "dd_pct": 12.6715,
+          "economic_gap_multiple": 6.9377,
+          "literal_target_rate_pct": 35.416,
+          "mandatory_three_daily_mean_signed_move_pct": 0.973137,
+          "max_concurrent_positions": 6,
+          "max_entries_same_clock_hour": 2,
+          "max_entries_same_rolling_hour": 2,
+          "max_gross_notional_equity_pct": 179.5887,
+          "max_loss_streak": 15,
+          "mean_signed_price_return_pct": 0.049676,
+          "monthly_return_pct": {
+            "2023-01": 4.2598,
+            "2023-02": -3.7104,
+            "2023-03": 18.5865,
+            "2023-04": 3.8164,
+            "2023-05": 2.623,
+            "2023-06": 6.6199,
+            "2023-07": 3.6767,
+            "2023-08": 7.6289,
+            "2023-09": 7.4041,
+            "2023-10": 1.5982,
+            "2023-11": -6.6055,
+            "2023-12": 0.4347
+          },
+          "mtm_dd_pct": 13.206,
+          "n": 3089,
+          "negative_months": 2,
+          "profitable_exit_rate_pct": 38.6209,
+          "projected_30_day_pct": 3.855891,
+          "required_mean_signed_move_at_actual_frequency_pct": 0.344637,
+          "return_pct": 54.4552,
+          "trades_per_active_day": 8.463,
+          "trades_per_calendar_day": 8.463,
+          "wr": 38.62
+        }
+      },
+      "router_kind": "signed_return",
+      "selection_2022": {
+        "annual_3pct": {
+          "2022": {
+            "active_days": 365,
+            "by_module_count": {
+              "multiday:dynamic_material_signed_return": 3318
+            },
+            "by_source_count": {
+              "multiday_material_trend": 3318
+            },
+            "dd_pct": 11.8545,
+            "economic_gap_multiple": 4.3545,
+            "literal_target_rate_pct": 38.1555,
+            "mandatory_three_daily_mean_signed_move_pct": 0.973137,
+            "max_concurrent_positions": 6,
+            "max_entries_same_clock_hour": 2,
+            "max_entries_same_rolling_hour": 2,
+            "max_gross_notional_equity_pct": 179.3154,
+            "max_loss_streak": 14,
+            "mean_signed_price_return_pct": 0.073682,
+            "monthly_return_pct": {
+              "2022-01": 16.6881,
+              "2022-02": 18.9683,
+              "2022-03": 9.551,
+              "2022-04": 7.8022,
+              "2022-05": -4.0349,
+              "2022-06": 0.1415,
+              "2022-07": 13.1216,
+              "2022-08": 1.0533,
+              "2022-09": 2.8332,
+              "2022-10": 2.187,
+              "2022-11": 0.1035,
+              "2022-12": 6.6687
+            },
+            "mtm_dd_pct": 12.3421,
+            "n": 3318,
+            "negative_months": 1,
+            "profitable_exit_rate_pct": 39.1501,
+            "projected_30_day_pct": 6.212646,
+            "required_mean_signed_move_at_actual_frequency_pct": 0.320854,
+            "return_pct": 102.088,
+            "trades_per_active_day": 9.09,
+            "trades_per_calendar_day": 9.09,
+            "wr": 39.15
+          }
+        },
+        "margin_3pct": {
+          "active_days": 365,
+          "by_module_count": {
+            "multiday:dynamic_material_signed_return": 3318
+          },
+          "by_source_count": {
+            "multiday_material_trend": 3318
+          },
+          "dd_pct": 11.8545,
+          "economic_gap_multiple": 4.3545,
+          "literal_target_rate_pct": 38.1555,
+          "mandatory_three_daily_mean_signed_move_pct": 0.973137,
+          "max_concurrent_positions": 6,
+          "max_entries_same_clock_hour": 2,
+          "max_entries_same_rolling_hour": 2,
+          "max_gross_notional_equity_pct": 179.3154,
+          "max_loss_streak": 14,
+          "mean_signed_price_return_pct": 0.073682,
+          "monthly_return_pct": {
+            "2022-01": 16.6881,
+            "2022-02": 18.9683,
+            "2022-03": 9.551,
+            "2022-04": 7.8022,
+            "2022-05": -4.0349,
+            "2022-06": 0.1415,
+            "2022-07": 13.1216,
+            "2022-08": 1.0533,
+            "2022-09": 2.8332,
+            "2022-10": 2.187,
+            "2022-11": 0.1035,
+            "2022-12": 6.6687
+          },
+          "mtm_dd_pct": 12.3421,
+          "n": 3318,
+          "negative_months": 1,
+          "profitable_exit_rate_pct": 39.1501,
+          "projected_30_day_pct": 6.212646,
+          "required_mean_signed_move_at_actual_frequency_pct": 0.320854,
+          "return_pct": 102.088,
+          "trades_per_active_day": 9.09,
+          "trades_per_calendar_day": 9.09,
+          "wr": 39.15
+        }
+      },
+      "selection_quantile": 0.5,
+      "threshold": 0.00039249962467909516
+    },
+    {
+      "confirmation_2023": {
+        "annual_3pct": {
+          "2023": {
+            "active_days": 292,
+            "by_module_count": {
+              "multiday:dynamic_material_literal_ev": 1023
+            },
+            "by_source_count": {
+              "multiday_material_trend": 1023
+            },
+            "dd_pct": 5.5443,
+            "economic_gap_multiple": 6.9906,
+            "literal_target_rate_pct": 39.0029,
+            "mandatory_three_daily_mean_signed_move_pct": 0.973137,
+            "max_concurrent_positions": 5,
+            "max_entries_same_clock_hour": 2,
+            "max_entries_same_rolling_hour": 2,
+            "max_gross_notional_equity_pct": 148.295,
+            "max_loss_streak": 13,
+            "mean_signed_price_return_pct": 0.149005,
+            "monthly_return_pct": {
+              "2023-01": 1.1359,
+              "2023-02": -1.196,
+              "2023-03": 2.3315,
+              "2023-04": 2.898,
+              "2023-05": 2.6099,
+              "2023-06": 13.3325,
+              "2023-07": 1.5197,
+              "2023-08": 5.5434,
+              "2023-09": 3.1274,
+              "2023-10": 4.643,
+              "2023-11": 1.3251,
+              "2023-12": 8.8226
+            },
+            "mtm_dd_pct": 5.6906,
+            "n": 1023,
+            "negative_months": 1,
+            "profitable_exit_rate_pct": 40.567,
+            "projected_30_day_pct": 3.829625,
+            "required_mean_signed_move_at_actual_frequency_pct": 1.041638,
+            "return_pct": 56.0064,
+            "trades_per_active_day": 3.503,
+            "trades_per_calendar_day": 2.803,
+            "wr": 40.57
+          }
+        },
+        "margin_3pct": {
+          "active_days": 292,
+          "by_module_count": {
+            "multiday:dynamic_material_literal_ev": 1023
+          },
+          "by_source_count": {
+            "multiday_material_trend": 1023
+          },
+          "dd_pct": 5.5443,
+          "economic_gap_multiple": 6.9906,
+          "literal_target_rate_pct": 39.0029,
+          "mandatory_three_daily_mean_signed_move_pct": 0.973137,
+          "max_concurrent_positions": 5,
+          "max_entries_same_clock_hour": 2,
+          "max_entries_same_rolling_hour": 2,
+          "max_gross_notional_equity_pct": 148.295,
+          "max_loss_streak": 13,
+          "mean_signed_price_return_pct": 0.149005,
+          "monthly_return_pct": {
+            "2023-01": 1.1359,
+            "2023-02": -1.196,
+            "2023-03": 2.3315,
+            "2023-04": 2.898,
+            "2023-05": 2.6099,
+            "2023-06": 13.3325,
+            "2023-07": 1.5197,
+            "2023-08": 5.5434,
+            "2023-09": 3.1274,
+            "2023-10": 4.643,
+            "2023-11": 1.3251,
+            "2023-12": 8.8226
+          },
+          "mtm_dd_pct": 5.6906,
+          "n": 1023,
+          "negative_months": 1,
+          "profitable_exit_rate_pct": 40.567,
+          "projected_30_day_pct": 3.829625,
+          "required_mean_signed_move_at_actual_frequency_pct": 1.041638,
+          "return_pct": 56.0064,
+          "trades_per_active_day": 3.503,
+          "trades_per_calendar_day": 2.803,
+          "wr": 40.57
+        }
+      },
+      "router_kind": "literal_ev",
+      "selection_2022": {
+        "annual_3pct": {
+          "2022": {
+            "active_days": 307,
+            "by_module_count": {
+              "multiday:dynamic_material_literal_ev": 1266
+            },
+            "by_source_count": {
+              "multiday_material_trend": 1266
+            },
+            "dd_pct": 7.5978,
+            "economic_gap_multiple": 7.2071,
+            "literal_target_rate_pct": 38.9415,
+            "mandatory_three_daily_mean_signed_move_pct": 0.973137,
+            "max_concurrent_positions": 5,
+            "max_entries_same_clock_hour": 2,
+            "max_entries_same_rolling_hour": 2,
+            "max_gross_notional_equity_pct": 147.5818,
+            "max_loss_streak": 18,
+            "mean_signed_price_return_pct": 0.11611,
+            "monthly_return_pct": {
+              "2022-01": 4.6547,
+              "2022-02": 13.3376,
+              "2022-03": 3.6616,
+              "2022-04": -0.6282,
+              "2022-05": 8.4543,
+              "2022-06": -3.5076,
+              "2022-07": 2.6783,
+              "2022-08": 1.3844,
+              "2022-09": 1.0809,
+              "2022-10": 7.485,
+              "2022-11": 0.2126,
+              "2022-12": 5.6377
+            },
+            "mtm_dd_pct": 7.6855,
+            "n": 1266,
+            "negative_months": 2,
+            "profitable_exit_rate_pct": 39.4155,
+            "projected_30_day_pct": 3.711506,
+            "required_mean_signed_move_at_actual_frequency_pct": 0.836817,
+            "return_pct": 53.0953,
+            "trades_per_active_day": 4.124,
+            "trades_per_calendar_day": 3.488,
+            "wr": 39.42
+          }
+        },
+        "margin_3pct": {
+          "active_days": 307,
+          "by_module_count": {
+            "multiday:dynamic_material_literal_ev": 1266
+          },
+          "by_source_count": {
+            "multiday_material_trend": 1266
+          },
+          "dd_pct": 7.5978,
+          "economic_gap_multiple": 7.2071,
+          "literal_target_rate_pct": 38.9415,
+          "mandatory_three_daily_mean_signed_move_pct": 0.973137,
+          "max_concurrent_positions": 5,
+          "max_entries_same_clock_hour": 2,
+          "max_entries_same_rolling_hour": 2,
+          "max_gross_notional_equity_pct": 147.5818,
+          "max_loss_streak": 18,
+          "mean_signed_price_return_pct": 0.11611,
+          "monthly_return_pct": {
+            "2022-01": 4.6547,
+            "2022-02": 13.3376,
+            "2022-03": 3.6616,
+            "2022-04": -0.6282,
+            "2022-05": 8.4543,
+            "2022-06": -3.5076,
+            "2022-07": 2.6783,
+            "2022-08": 1.3844,
+            "2022-09": 1.0809,
+            "2022-10": 7.485,
+            "2022-11": 0.2126,
+            "2022-12": 5.6377
+          },
+          "mtm_dd_pct": 7.6855,
+          "n": 1266,
+          "negative_months": 2,
+          "profitable_exit_rate_pct": 39.4155,
+          "projected_30_day_pct": 3.711506,
+          "required_mean_signed_move_at_actual_frequency_pct": 0.836817,
+          "return_pct": 53.0953,
+          "trades_per_active_day": 4.124,
+          "trades_per_calendar_day": 3.488,
+          "wr": 39.42
+        }
+      },
+      "selection_quantile": 0.95,
+      "threshold": 0.002466430331583489
+    },
+    {
+      "confirmation_2023": {
+        "annual_3pct": {
+          "2023": {
+            "active_days": 361,
+            "by_module_count": {
+              "multiday:dynamic_material_signed_return": 2372
+            },
+            "by_source_count": {
+              "multiday_material_trend": 2372
+            },
+            "dd_pct": 11.1197,
+            "economic_gap_multiple": 7.0134,
+            "literal_target_rate_pct": 34.8651,
+            "mandatory_three_daily_mean_signed_move_pct": 0.973137,
+            "max_concurrent_positions": 6,
+            "max_entries_same_clock_hour": 2,
+            "max_entries_same_rolling_hour": 2,
+            "max_gross_notional_equity_pct": 178.6163,
+            "max_loss_streak": 14,
+            "mean_signed_price_return_pct": 0.064,
+            "monthly_return_pct": {
+              "2023-01": 9.3497,
+              "2023-02": 0.5535,
+              "2023-03": 15.3291,
+              "2023-04": 12.8529,
+              "2023-05": -4.1351,
+              "2023-06": 9.0568,
+              "2023-07": -2.4687,
+              "2023-08": -0.6262,
+              "2023-09": 12.2099,
+              "2023-10": 5.447,
+              "2023-11": -4.6765,
+              "2023-12": -5.9087
+            },
+            "mtm_dd_pct": 11.3174,
+            "n": 2372,
+            "negative_months": 5,
+            "profitable_exit_rate_pct": 37.8162,
+            "projected_30_day_pct": 3.814007,
+            "required_mean_signed_move_at_actual_frequency_pct": 0.448857,
+            "return_pct": 53.8897,
+            "trades_per_active_day": 6.571,
+            "trades_per_calendar_day": 6.499,
+            "wr": 37.82
+          }
+        },
+        "margin_3pct": {
+          "active_days": 361,
+          "by_module_count": {
+            "multiday:dynamic_material_signed_return": 2372
+          },
+          "by_source_count": {
+            "multiday_material_trend": 2372
+          },
+          "dd_pct": 11.1197,
+          "economic_gap_multiple": 7.0134,
+          "literal_target_rate_pct": 34.8651,
+          "mandatory_three_daily_mean_signed_move_pct": 0.973137,
+          "max_concurrent_positions": 6,
+          "max_entries_same_clock_hour": 2,
+          "max_entries_same_rolling_hour": 2,
+          "max_gross_notional_equity_pct": 178.6163,
+          "max_loss_streak": 14,
+          "mean_signed_price_return_pct": 0.064,
+          "monthly_return_pct": {
+            "2023-01": 9.3497,
+            "2023-02": 0.5535,
+            "2023-03": 15.3291,
+            "2023-04": 12.8529,
+            "2023-05": -4.1351,
+            "2023-06": 9.0568,
+            "2023-07": -2.4687,
+            "2023-08": -0.6262,
+            "2023-09": 12.2099,
+            "2023-10": 5.447,
+            "2023-11": -4.6765,
+            "2023-12": -5.9087
+          },
+          "mtm_dd_pct": 11.3174,
+          "n": 2372,
+          "negative_months": 5,
+          "profitable_exit_rate_pct": 37.8162,
+          "projected_30_day_pct": 3.814007,
+          "required_mean_signed_move_at_actual_frequency_pct": 0.448857,
+          "return_pct": 53.8897,
+          "trades_per_active_day": 6.571,
+          "trades_per_calendar_day": 6.499,
+          "wr": 37.82
+        }
+      },
+      "router_kind": "signed_return",
+      "selection_2022": {
+        "annual_3pct": {
+          "2022": {
+            "active_days": 363,
+            "by_module_count": {
+              "multiday:dynamic_material_signed_return": 2647
+            },
+            "by_source_count": {
+              "multiday_material_trend": 2647
+            },
+            "dd_pct": 14.9789,
+            "economic_gap_multiple": 5.9937,
+            "literal_target_rate_pct": 36.9097,
+            "mandatory_three_daily_mean_signed_move_pct": 0.973137,
+            "max_concurrent_positions": 6,
+            "max_entries_same_clock_hour": 2,
+            "max_entries_same_rolling_hour": 2,
+            "max_gross_notional_equity_pct": 178.3025,
+            "max_loss_streak": 16,
+            "mean_signed_price_return_pct": 0.067107,
+            "monthly_return_pct": {
+              "2022-01": 3.801,
+              "2022-02": 15.9083,
+              "2022-03": 5.3132,
+              "2022-04": 0.2965,
+              "2022-05": 3.3642,
+              "2022-06": 8.4682,
+              "2022-07": 3.5723,
+              "2022-08": 1.6846,
+              "2022-09": -6.2728,
+              "2022-10": 7.4816,
+              "2022-11": 3.4288,
+              "2022-12": 6.3259,
+              "2023-01": -0.6
+            },
+            "mtm_dd_pct": 15.3591,
+            "n": 2647,
+            "negative_months": 2,
+            "profitable_exit_rate_pct": 37.9297,
+            "projected_30_day_pct": 4.476845,
+            "required_mean_signed_move_at_actual_frequency_pct": 0.402222,
+            "return_pct": 65.2429,
+            "trades_per_active_day": 7.292,
+            "trades_per_calendar_day": 7.252,
+            "wr": 37.93
+          }
+        },
+        "margin_3pct": {
+          "active_days": 363,
+          "by_module_count": {
+            "multiday:dynamic_material_signed_return": 2647
+          },
+          "by_source_count": {
+            "multiday_material_trend": 2647
+          },
+          "dd_pct": 14.9789,
+          "economic_gap_multiple": 5.9937,
+          "literal_target_rate_pct": 36.9097,
+          "mandatory_three_daily_mean_signed_move_pct": 0.973137,
+          "max_concurrent_positions": 6,
+          "max_entries_same_clock_hour": 2,
+          "max_entries_same_rolling_hour": 2,
+          "max_gross_notional_equity_pct": 178.3025,
+          "max_loss_streak": 16,
+          "mean_signed_price_return_pct": 0.067107,
+          "monthly_return_pct": {
+            "2022-01": 3.801,
+            "2022-02": 15.9083,
+            "2022-03": 5.3132,
+            "2022-04": 0.2965,
+            "2022-05": 3.3642,
+            "2022-06": 8.4682,
+            "2022-07": 3.5723,
+            "2022-08": 1.6846,
+            "2022-09": -6.2728,
+            "2022-10": 7.4816,
+            "2022-11": 3.4288,
+            "2022-12": 6.3259,
+            "2023-01": -0.6
+          },
+          "mtm_dd_pct": 15.3591,
+          "n": 2647,
+          "negative_months": 2,
+          "profitable_exit_rate_pct": 37.9297,
+          "projected_30_day_pct": 4.476845,
+          "required_mean_signed_move_at_actual_frequency_pct": 0.402222,
+          "return_pct": 65.2429,
+          "trades_per_active_day": 7.292,
+          "trades_per_calendar_day": 7.252,
+          "wr": 37.93
+        }
+      },
+      "selection_quantile": 0.8,
+      "threshold": 0.0013997214709437662
+    }
+  ]
+}
