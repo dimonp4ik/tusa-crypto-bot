@@ -43,6 +43,33 @@ def test_geometry_grid_is_material_and_market_compatible():
     assert all(hold >= 288 for _, _, hold in audit.GEOMETRIES)
 
 
+def test_labels_preserve_feature_row_identity_across_symbols():
+    frame = pd.DataFrame([
+        {"symbol": "AAA", "entry_index": 0, "entry_time": 0,
+         "year": 2020, "month": "2020-01", "direction": 1},
+        {"symbol": "BBB", "entry_index": 0, "entry_time": 0,
+         "year": 2020, "month": "2020-01", "direction": 1},
+        {"symbol": "AAA", "entry_index": 0, "entry_time": 0,
+         "year": 2020, "month": "2020-01", "direction": -1},
+        {"symbol": "BBB", "entry_index": 0, "entry_time": 0,
+         "year": 2020, "month": "2020-01", "direction": -1},
+    ])
+    candles = {
+        symbol: {
+            "time": np.array([0], dtype=np.int64),
+            "open": np.array([100.0]), "high": np.array([100.0]),
+            "low": np.array([100.0]), "close": np.array([100.0]),
+        }
+        for symbol in ("AAA", "BBB")
+    }
+
+    result = audit.label_identity(frame, candles, (2.0, 1.0, 1))
+
+    expected = frame[["symbol", "entry_index", "direction"]]
+    pd.testing.assert_frame_equal(
+        result[["symbol", "entry_index", "direction"]], expected)
+
+
 def test_mark_to_market_drawdown_includes_open_trade_path():
     source = {
         "BTCUSDT": {

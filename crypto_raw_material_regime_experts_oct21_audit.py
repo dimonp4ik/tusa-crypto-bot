@@ -47,14 +47,14 @@ def frozen() -> dict:
     report = json.loads(model_base.OUT.read_text(encoding="utf-8"))
     selected = report["selected_before_test"]
     expected = {
-        "model_id": "tp2_sl1_h288_literal_target_l31_n800",
-        "geometry": {"target_pct": 2.0, "stop_pct": 1.0,
+        "model_id": "tp2_sl0.75_h288_literal_target_l15_n400",
+        "geometry": {"target_pct": 2.0, "stop_pct": 0.75,
                      "hold_bars_5m": 288},
         "model_target": "literal_target",
-        "config": {"max_leaf_nodes": 31, "min_samples_leaf": 800,
-                   "l2_regularization": 10.0},
-        "selection_quantile": .925,
-        "threshold": 0.3705791593304682,
+        "config": {"max_leaf_nodes": 15, "min_samples_leaf": 400,
+                   "l2_regularization": 5.0},
+        "selection_quantile": .5,
+        "threshold": 0.2669054605629986,
     }
     found = {key: selected[key] for key in expected}
     if found != expected:

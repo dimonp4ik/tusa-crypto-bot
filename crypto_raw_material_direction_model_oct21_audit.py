@@ -133,14 +133,19 @@ def label_identity(frame: pd.DataFrame, candles: dict,
                "direction"]
     target, stop, hold = geometry
     identity = frame[columns].copy()
+    # add_outcomes evaluates one symbol at a time and concatenates those
+    # groups.  Preserve the original row identity so labels stay aligned with
+    # the feature matrix used by the model.
+    identity["_row_id"] = np.arange(len(identity), dtype=np.int64)
     prices = np.empty(len(identity), dtype=float)
     for symbol, part in identity.groupby("symbol", sort=False):
         source = np.asarray(candles[symbol]["open"], dtype=float)
         prices[part.index.to_numpy(np.int64)] = source[
             part.entry_index.to_numpy(np.int64)]
     identity["entry_price"] = prices
-    return replay.add_outcomes(
-        identity, candles, target, stop, hold).reset_index(drop=True)
+    resolved = replay.add_outcomes(identity, candles, target, stop, hold)
+    return resolved.sort_values("_row_id", kind="mergesort").drop(
+        columns="_row_id").reset_index(drop=True)
 
 
 def mtm_drawdown(rows: list[dict], candles: dict,
