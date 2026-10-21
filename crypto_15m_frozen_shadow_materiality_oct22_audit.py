@@ -187,6 +187,17 @@ def main() -> None:
             "money": "3% current-equity margin, fixed 10x",
         },
         "integrity": payload["integrity"], "candidates": reports,
+        "future_shadow_candidate": {
+            "status": "AWAITING_GENUINELY_NEW_FORWARD_AFTER_2026_10_22",
+            "order_eligible": False,
+            "module": "shadow_pullback_short_bull_pullback_asia_trend",
+            "target_pct": 0.5, "stop_pct": 1.0,
+            "hold_15m_bars": HOLD_BARS,
+            "observed_evidence": reports["asia_pullback"]["literal_geometry"]["0.5%"],
+            "activation_note": (
+                "The exit was selected after this window was inspected. Only later "
+                "unseen outcomes may support another review."),
+        },
         "posthoc_one_pct_portfolio_diagnostic": {
             "not_activation_evidence": True,
             "hourly_baseline": money(baseline, 0.03),
@@ -198,10 +209,11 @@ def main() -> None:
                     "2026-10-01", tz="UTC").timestamp()], 0.03),
         },
         "decision": (
-            "Do not integrate these filters. Their original high-win-rate exits never "
-            "reach the runtime's 0.5% material-move floor. Literal retargeting is too "
-            "sparse, misses the monthly objective, and the inspected 1% combination "
-            "makes October worse. Keep the frozen 1H route in shadow collection."),
+            "Do not make these filters order-eligible. Their original high-win-rate "
+            "exits never reach the runtime's 0.5% material-move floor. Freeze only "
+            "the Asia 0.5% literal variant as a new shadow experiment for genuinely "
+            "later evidence. The inspected 1% portfolio remains rejected because it "
+            "misses the monthly objective and makes October worse."),
         "sources": {
             **payload["sources"], str(ROWS): digest(ROWS),
             str(ONE_HOUR_ROWS): digest(ONE_HOUR_ROWS),

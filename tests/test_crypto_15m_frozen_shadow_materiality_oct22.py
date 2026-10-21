@@ -37,3 +37,7 @@ def test_oct22_report_rejects_nonmaterial_shadow_rules():
     diagnostic = report["posthoc_one_pct_portfolio_diagnostic"]
     assert diagnostic["not_activation_evidence"] is True
     assert diagnostic["october_with_satellites"]["return_pct"] < 0
+    future = report["future_shadow_candidate"]
+    assert future["order_eligible"] is False
+    assert (future["target_pct"], future["stop_pct"], future["hold_15m_bars"]) == (
+        0.5, 1.0, 64)

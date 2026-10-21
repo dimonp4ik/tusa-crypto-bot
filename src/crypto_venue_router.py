@@ -64,7 +64,7 @@ SHADOW_EXPERIMENTAL_MODULES = (
     ),
     Module(
         "shadow_pullback_short_bull_pullback_asia_trend",
-        "trend_pullback", "SHORT", "bull_pullback", "00_05", .25,
+        "trend_pullback", "SHORT", "bull_pullback", "00_05", .5,
         (("btc_return96_atr", "ge", 0.0),
          ("btc_slow_long_atr", "ge", 2.0)),
     ),
@@ -93,6 +93,10 @@ CONDITIONAL_TARGET_MODULE = "rr_short_bull_pullback_asia"
 CONDITIONAL_TARGET_BTC_EFF20_MIN = .1
 CONDITIONAL_TARGET_R = .5
 MIN_FIRST_TARGET_MOVE_PCT = .50
+MATERIAL_ASIA_SHADOW_MODULE = "shadow_pullback_short_bull_pullback_asia_trend"
+MATERIAL_ASIA_TARGET_MOVE = .005
+MATERIAL_ASIA_STOP_MOVE = .01
+MATERIAL_ASIA_HOLD_BARS = 64
 
 
 def _session(timestamp: float) -> str:
@@ -233,10 +237,16 @@ def _setups_for_modules(candles: dict, btc_candles: dict,
         for signal in signals:
             if not _matches(module, signal, context, session):
                 continue
-            risk = 2 * signal["atr"]
+            material_asia = (
+                shadow_experiment
+                and module.name == MATERIAL_ASIA_SHADOW_MODULE)
+            risk = (entry * MATERIAL_ASIA_STOP_MOVE if material_asia
+                    else 2 * signal["atr"])
+            setup_atr = risk / 2 if material_asia else signal["atr"]
             sign = 1 if signal["direction"] == "LONG" else -1
             stop = entry - sign * risk
-            target_r = target_r_for(module, context)
+            target_r = (MATERIAL_ASIA_TARGET_MOVE / MATERIAL_ASIA_STOP_MOVE
+                        if material_asia else target_r_for(module, context))
             target = entry + sign * risk * target_r
             first_target_move_pct = 100.0 * risk * target_r / entry
             if (risk >= entry or min(stop, target) <= 0
@@ -244,8 +254,10 @@ def _setups_for_modules(candles: dict, btc_candles: dict,
                 continue
             return [{
                 **signal, **context,
+                "atr": setup_atr,
                 "module": module.name,
                 "_shadow_experiment": shadow_experiment,
+                "_literal_material_shadow": material_asia,
                 "direction": signal["direction"],
                 "entry_source": "MARKET",
                 "entry": entry,
@@ -253,6 +265,7 @@ def _setups_for_modules(candles: dict, btc_candles: dict,
                 "tp": target,
                 "target_r": target_r,
                 "first_target_move_pct": first_target_move_pct,
+                "hold_bars": MATERIAL_ASIA_HOLD_BARS if material_asia else None,
                 "utc_session": session,
             }]
     return []

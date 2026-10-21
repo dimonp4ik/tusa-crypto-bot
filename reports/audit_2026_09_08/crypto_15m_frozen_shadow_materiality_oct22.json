@@ -1380,6 +1380,113 @@
       }
     }
   },
+  "future_shadow_candidate": {
+    "status": "AWAITING_GENUINELY_NEW_FORWARD_AFTER_2026_10_22",
+    "order_eligible": false,
+    "module": "shadow_pullback_short_bull_pullback_asia_trend",
+    "target_pct": 0.5,
+    "stop_pct": 1.0,
+    "hold_15m_bars": 64,
+    "observed_evidence": {
+      "development_apr_jun": {
+        "n": 13,
+        "wr": 76.92,
+        "return_pct": 0.5984,
+        "dd_pct": 0.5998,
+        "max_loss_streak": 2,
+        "negative_months": 1,
+        "monthly_return_pct": {
+          "2026-04": 0.6007,
+          "2026-06": -0.0023
+        },
+        "active_days": 6,
+        "trades_per_calendar_day": 0.186,
+        "trades_per_active_day": 2.167,
+        "max_entries_same_rolling_hour": 2,
+        "max_entries_same_clock_hour": 3,
+        "by_source_count": {
+          "asia_pullback": 13
+        },
+        "by_module_count": {
+          "asia_pullback": 13
+        }
+      },
+      "validation_jul_aug": {
+        "n": 6,
+        "wr": 83.33,
+        "return_pct": 0.4498,
+        "dd_pct": 0.2996,
+        "max_loss_streak": 1,
+        "negative_months": 1,
+        "monthly_return_pct": {
+          "2026-07": 0.6007,
+          "2026-08": -0.15
+        },
+        "active_days": 3,
+        "trades_per_calendar_day": 0.15,
+        "trades_per_active_day": 2.0,
+        "max_entries_same_rolling_hour": 2,
+        "max_entries_same_clock_hour": 2,
+        "by_source_count": {
+          "asia_pullback": 6
+        },
+        "by_module_count": {
+          "asia_pullback": 6
+        }
+      },
+      "hidden_sep_oct": {
+        "n": 5,
+        "wr": 80.0,
+        "return_pct": 0.4263,
+        "dd_pct": 0.1735,
+        "max_loss_streak": 1,
+        "negative_months": 0,
+        "monthly_return_pct": {
+          "2026-09": 0.3,
+          "2026-10": 0.1259
+        },
+        "active_days": 2,
+        "trades_per_calendar_day": 0.357,
+        "trades_per_active_day": 2.5,
+        "max_entries_same_rolling_hour": 2,
+        "max_entries_same_clock_hour": 3,
+        "by_source_count": {
+          "asia_pullback": 5
+        },
+        "by_module_count": {
+          "asia_pullback": 5
+        }
+      },
+      "all": {
+        "n": 24,
+        "wr": 79.17,
+        "return_pct": 1.4817,
+        "dd_pct": 0.5998,
+        "max_loss_streak": 2,
+        "negative_months": 2,
+        "monthly_return_pct": {
+          "2026-04": 0.6007,
+          "2026-06": -0.0023,
+          "2026-07": 0.6007,
+          "2026-08": -0.15,
+          "2026-09": 0.3,
+          "2026-10": 0.1259
+        },
+        "active_days": 11,
+        "trades_per_calendar_day": 0.14,
+        "trades_per_active_day": 2.182,
+        "max_entries_same_rolling_hour": 2,
+        "max_entries_same_clock_hour": 3,
+        "by_source_count": {
+          "asia_pullback": 24
+        },
+        "by_module_count": {
+          "asia_pullback": 24
+        }
+      }
+    },
+    "activation_note": "The exit was selected after this window was inspected. Only later unseen outcomes may support another review."
+  },
   "posthoc_one_pct_portfolio_diagnostic": {
     "not_activation_evidence": true,
     "hourly_baseline": {
@@ -1489,7 +1596,7 @@
       }
     }
   },
-  "decision": "Do not integrate these filters. Their original high-win-rate exits never reach the runtime's 0.5% material-move floor. Literal retargeting is too sparse, misses the monthly objective, and the inspected 1% combination makes October worse. Keep the frozen 1H route in shadow collection.",
+  "decision": "Do not make these filters order-eligible. Their original high-win-rate exits never reach the runtime's 0.5% material-move floor. Freeze only the Asia 0.5% literal variant as a new shadow experiment for genuinely later evidence. The inspected 1% portfolio remains rejected because it misses the monthly objective and makes October worse.",
   "sources": {
     "reports\\audit_2026_09_08\\crypto_xperp_raw_router_audit_0_25_oct22_all_raw_families.csv": "fdeb484df4b47262556119d52e3cd9797dc0a81a445e4470cee828c751ae7978",
     "reports\\audit_2026_09_08\\crypto_xperp_raw_router_audit_0_5_oct22_all_raw_families.csv": "2075e20bb057c73d69002fa89d3407f90fa990c6e17f10098fd35d500222f828",
@@ -1509,7 +1616,7 @@
     "reports\\audit_2026_09_08\\xperp_15m_oct22_shadow_refresh\\ZECUSDT_15min_current.pkl": "4e393ce895bc6022df1a451084fe0ed1a265278906e9e8afca439811936fb969",
     "reports\\audit_2026_09_08\\crypto_15m_frozen_shadow_materiality_oct22_rows.pkl": "072be109b61596af28dc6fca3c008d2598b78473ce14465ff698d79cf045e6d3",
     "reports\\audit_2026_09_08\\crypto_okx_swap_1h_forward_append_oct22.pkl": "d1cde38b1f30fd88bb3984d2a8131d251d8a270c9abb01be04460cb507659ff7",
-    "C:\\Users\\Lenovo\\Desktop\\telegram bot\\crypto_15m_frozen_shadow_materiality_oct22_audit.py": "8c5ad40fa6db76c1c73eb3d0c547af9db0555c05b03ce88c89c87caf2b3a70a5"
+    "C:\\Users\\Lenovo\\Desktop\\telegram bot\\crypto_15m_frozen_shadow_materiality_oct22_audit.py": "abdb898d40b6296f4727ac4c29ef728e8f1e412d2763806ac76b30c4020c475b"
   },
   "limitations": [
     "Literal target variants are post-hoc diagnostics and cannot activate a rule.",

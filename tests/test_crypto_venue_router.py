@@ -217,8 +217,13 @@ class CryptoVenueRouterTests(unittest.TestCase):
             "shadow_pullback_short_bull_pullback_asia_trend",
         )
         self.assertTrue(shadow[0]["_shadow_experiment"])
+        self.assertTrue(shadow[0]["_literal_material_shadow"])
         self.assertEqual((shadow[0]["target_r"], shadow[0]["entry_source"]),
-                         (.25, "MARKET"))
+                         (.5, "MARKET"))
+        self.assertEqual(shadow[0]["first_target_move_pct"], .5)
+        self.assertEqual(shadow[0]["hold_bars"], 64)
+        self.assertEqual((shadow[0]["entry"], shadow[0]["sl"], shadow[0]["tp"]),
+                         (100.0, 101.0, 99.5))
 
     def test_evening_slow_btc_pullback_candidate_is_shadow_only(self):
         context = {

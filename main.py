@@ -3642,6 +3642,7 @@ def _venue_analysis(symbol: str, setup: dict, btc_change: float = 0.0) -> dict:
     shadow_experiment = bool(setup.get("_shadow_experiment"))
     five_minute_oi = bool(setup.get("_five_minute_oi_shadow"))
     hourly_hgb = bool(setup.get("_hourly_hgb_shadow"))
+    literal_material = bool(setup.get("_literal_material_shadow"))
     tags = [f"Venue module {setup['module']}",
             f"BTC regime {setup['btc_regime']}",
             f"Fixed target {setup['target_r']:.2f}R"]
@@ -3655,6 +3656,10 @@ def _venue_analysis(symbol: str, setup: dict, btc_change: float = 0.0) -> dict:
         tags.append(
             f"Target cascade {float(setup.get('selected_target_pct') or .5):.1f}% / "
             f"{int(setup.get('hold_bars') or 12)}h")
+    if literal_material:
+        tags.append(
+            f"Literal bracket {first_target_move_pct:.2f}% target / "
+            f"{200.0 * float(setup['atr']) / float(setup['entry']):.2f}% stop")
     if five_minute_oi:
         runner_target_r = float(setup.get("runner_target_r") or 4.0)
         tp1_close_fraction = float(
@@ -3690,15 +3695,18 @@ def _venue_analysis(symbol: str, setup: dict, btc_change: float = 0.0) -> dict:
                                     if five_minute_oi else None),
         "strategy_runner_mode": ("fixed_be"
                                  if five_minute_oi else None),
-        "strategy_bar_seconds": (300 if five_minute_oi
+        "strategy_bar_seconds": (300 if five_minute_oi else 900 if literal_material
                                  else 3600 if hourly_hgb else None),
         "strategy_entry_bar_ts": (
-            float(setup["signal_bar_ts"]) + (300 if five_minute_oi else 3600)
-            if five_minute_oi or hourly_hgb else None),
+            float(setup["signal_bar_ts"]) + (
+                300 if five_minute_oi else 900 if literal_material else 3600)
+            if five_minute_oi or literal_material or hourly_hgb else None),
         "strategy_stop_on_close": (
-            False if five_minute_oi or hourly_hgb
+            False if five_minute_oi or literal_material or hourly_hgb
             else None),
         "strategy_max_bars": (72 if five_minute_oi else
+                              int(setup.get("hold_bars") or 64)
+                              if literal_material else
                               int(setup.get("hold_bars") or 12)
                               if hourly_hgb else None),
         "entry_low": setup["entry"], "entry_high": setup["entry"],
@@ -3720,6 +3728,7 @@ def _venue_analysis(symbol: str, setup: dict, btc_change: float = 0.0) -> dict:
         "_shadow_only": shadow_experiment or DEPLOYMENT_MODE == "shadow",
         "_five_minute_oi_shadow": five_minute_oi,
         "_hourly_hgb_shadow": hourly_hgb,
+        "_literal_material_shadow": literal_material,
     }
 
 

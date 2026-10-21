@@ -193,6 +193,28 @@ class ShadowDeploymentTests(unittest.TestCase):
         self.assertTrue(any("Target cascade 2.0% / 48h" in tag
                             for tag in analysis["signals"]))
 
+    def test_literal_material_shadow_persists_15m_geometry(self):
+        setup = {
+            "direction": "SHORT", "entry": 100.0, "atr": .5,
+            "target_r": .5, "first_target_move_pct": .5, "hold_bars": 64,
+            "utc_session": "00_05", "btc_regime": "bull_pullback",
+            "eff_ratio": .2, "signal_bar_ts": 900.0,
+            "module": "shadow_pullback_short_bull_pullback_asia_trend",
+            "_shadow_experiment": True, "_literal_material_shadow": True,
+        }
+        with patch.object(main, "DEPLOYMENT_MODE", "live"):
+            analysis = main._venue_analysis("BTCUSDT", setup)
+
+        self.assertTrue(analysis["_shadow_only"])
+        self.assertTrue(analysis["_literal_material_shadow"])
+        self.assertEqual(analysis["source"], "venue_shadow_experiment")
+        self.assertEqual(analysis["strategy_bar_seconds"], 900)
+        self.assertEqual(analysis["strategy_entry_bar_ts"], 1800.0)
+        self.assertFalse(analysis["strategy_stop_on_close"])
+        self.assertEqual(analysis["strategy_max_bars"], 64)
+        self.assertTrue(any("0.50% target / 1.00% stop" in tag
+                            for tag in analysis["signals"]))
+
     def test_five_minute_fixed_runner_uses_5m_bars_and_next_bar_breakeven(self):
         start = 2_000_000_100.0
         frame = {
