@@ -29,7 +29,7 @@ FAMILIES = (
 MODEL_PATH = Path(__file__).with_name("frozen_crypto_okx_1h_hgb.json")
 _MODEL = json.loads(MODEL_PATH.read_text(encoding="utf-8"))
 # Kept for reproducibility of earlier append audits.  The active Oct 22 route
-# below uses only its fixed 0.5% bracket and never evaluates this cascade.
+# below uses one fixed material bracket and never evaluates this cascade.
 CASCADE_PATH = Path(__file__).with_name("frozen_crypto_okx_1h_target_cascade.json")
 _CASCADE = json.loads(CASCADE_PATH.read_text(encoding="utf-8"))
 POLICY_PATH = Path(__file__).with_name(
@@ -286,7 +286,7 @@ def shadow_setups(candles_by_symbol: dict[str, dict],
             continue
         quality, direction, families, feature_row = max(
             options, key=lambda item: item[0])
-        # The Oct 22 direct transfer passed only for this literal fixed bracket.
+        # The Oct 22 material-exit transfer passed only for this literal bracket.
         # A target cascade would be a different, unvalidated exit contract.
         selected_target = TARGET_PCT
         hold_bars = HOLD_BARS

@@ -156,7 +156,8 @@ class ShadowDeploymentTests(unittest.TestCase):
     def test_hourly_hgb_analysis_is_permanently_shadow_only(self):
         setup = {
             "direction": "LONG", "entry": 100.0, "atr": .5,
-            "target_r": .5, "first_target_move_pct": .5,
+            "target_r": 2.0, "first_target_move_pct": 2.0,
+            "selected_target_pct": 2.0, "hold_bars": 12,
             "utc_session": "hour_12", "btc_regime": "hourly_hgb",
             "eff_ratio": .2, "signal_bar_ts": 3_600.0,
             "module": "shadow_okx_1h_hgb", "model_quality": .81,
@@ -170,14 +171,14 @@ class ShadowDeploymentTests(unittest.TestCase):
         self.assertTrue(analysis["_hourly_hgb_shadow"])
         self.assertEqual(analysis["source"], "venue_shadow_1h_hgb")
         self.assertEqual(analysis["entry_source"], "MARKET")
-        self.assertEqual(analysis["fixed_target_r"], .5)
+        self.assertEqual(analysis["fixed_target_r"], 2.0)
         self.assertEqual(analysis["strategy_bar_seconds"], 3600)
         self.assertEqual(analysis["strategy_entry_bar_ts"], 7_200.0)
         self.assertFalse(analysis["strategy_stop_on_close"])
         self.assertEqual(analysis["strategy_max_bars"], 12)
         self.assertEqual(
             analysis["route_policy"], "short_plus_long_pullback_or_avax")
-        self.assertTrue(any("Fixed hourly bracket 0.5% / 12h" in tag
+        self.assertTrue(any("Fixed hourly bracket 2.0% / 12h" in tag
                             for tag in analysis["signals"]))
 
     def test_hourly_hgb_cascade_persists_two_percent_horizon(self):
