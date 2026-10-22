@@ -161,6 +161,7 @@ class ShadowDeploymentTests(unittest.TestCase):
             "eff_ratio": .2, "signal_bar_ts": 3_600.0,
             "module": "shadow_okx_1h_hgb", "model_quality": .81,
             "families": ["trend", "breadth"],
+            "route_policy": "short_plus_long_pullback_or_avax",
             "_shadow_experiment": True, "_hourly_hgb_shadow": True,
         }
         with patch.object(main, "DEPLOYMENT_MODE", "live"):
@@ -174,6 +175,10 @@ class ShadowDeploymentTests(unittest.TestCase):
         self.assertEqual(analysis["strategy_entry_bar_ts"], 7_200.0)
         self.assertFalse(analysis["strategy_stop_on_close"])
         self.assertEqual(analysis["strategy_max_bars"], 12)
+        self.assertEqual(
+            analysis["route_policy"], "short_plus_long_pullback_or_avax")
+        self.assertTrue(any("Fixed hourly bracket 0.5% / 12h" in tag
+                            for tag in analysis["signals"]))
 
     def test_hourly_hgb_cascade_persists_two_percent_horizon(self):
         setup = {

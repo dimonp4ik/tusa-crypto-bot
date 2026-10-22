@@ -8,9 +8,11 @@ longer mean what they meant during the historical audit.
 """
 from __future__ import annotations
 
+import hashlib
 import json
 import math
 import statistics
+import struct
 from pathlib import Path
 
 from src.portable_hgb import score_named
@@ -26,16 +28,24 @@ FAMILIES = (
 )
 MODEL_PATH = Path(__file__).with_name("frozen_crypto_okx_1h_hgb.json")
 _MODEL = json.loads(MODEL_PATH.read_text(encoding="utf-8"))
-CASCADE_PATH = Path(__file__).with_name("frozen_crypto_okx_1h_target_cascade.json")
-_CASCADE = json.loads(CASCADE_PATH.read_text(encoding="utf-8"))
-QUALITY_THRESHOLD = float(_MODEL["quality_threshold"])
-TARGET_PCT = float(_MODEL["target_pct"])
-STOP_PCT = float(_MODEL["stop_pct"])
-HOLD_BARS = int(_MODEL["hold_bars"])
+POLICY_PATH = Path(__file__).with_name(
+    "frozen_crypto_okx_1h_stable_direction.json")
+_POLICY = json.loads(POLICY_PATH.read_text(encoding="utf-8"))
+if hashlib.sha256(MODEL_PATH.read_bytes()).hexdigest() != _POLICY["base_model_sha256"]:
+    raise RuntimeError("frozen OKX 1h model does not match stable route policy")
+QUALITY_THRESHOLD = float(_POLICY["quality_threshold"])
+TARGET_PCT = float(_POLICY["target_pct"])
+STOP_PCT = float(_POLICY["stop_pct"])
+HOLD_BARS = int(_POLICY["hold_bars"])
 
 
 def _finite(value: float) -> bool:
     return math.isfinite(float(value))
+
+
+def _float32(value: float) -> float:
+    """Match the numpy.float32 design matrix used by the frozen audit."""
+    return struct.unpack("!f", struct.pack("!f", float(value)))[0]
 
 
 def _ret(close: list[float], index: int, window: int) -> float:
@@ -216,7 +226,12 @@ def _model_row(symbol: str, raw: dict[str, float], direction: int,
             output[name] = raw["breakout_down"] if direction > 0 else raw["breakout_up"]
         else:
             output[name] = raw[name] * direction
-    return output
+    return {name: _float32(value) for name, value in output.items()}
+
+
+def _route_allowed(symbol: str, direction: int, families: set[str]) -> bool:
+    """Frozen stable route: every short; pullback or AVAX longs only."""
+    return bool(direction < 0 or "pullback" in families or symbol == "AVAXUSDT")
 
 
 def shadow_setups(candles_by_symbol: dict[str, dict],
@@ -257,7 +272,7 @@ def shadow_setups(candles_by_symbol: dict[str, dict],
             continue
         options = []
         for direction, families in _family_directions(rows[symbol]).items():
-            if not families:
+            if not families or not _route_allowed(symbol, direction, families):
                 continue
             feature_row = _model_row(symbol, rows[symbol], direction, families)
             quality = score_named(_MODEL, feature_row)
@@ -267,16 +282,10 @@ def shadow_setups(candles_by_symbol: dict[str, dict],
             continue
         quality, direction, families, feature_row = max(
             options, key=lambda item: item[0])
+        # The Oct 22 direct transfer passed only for this literal fixed bracket.
+        # A target cascade would be a different, unvalidated exit contract.
         selected_target = TARGET_PCT
         hold_bars = HOLD_BARS
-        target_scores = {}
-        for target_text, target_model in sorted(
-                _CASCADE["models"].items(), key=lambda item: float(item[0])):
-            target_quality = score_named(target_model, feature_row)
-            target_scores[target_text] = target_quality
-            if target_quality >= float(target_model["quality_threshold"]):
-                selected_target = float(target_model["target_pct"])
-                hold_bars = int(target_model["hold_bars"])
         label = "LONG" if direction > 0 else "SHORT"
         output[symbol] = {
             "direction": label, "module": "shadow_okx_1h_hgb",
@@ -288,9 +297,10 @@ def shadow_setups(candles_by_symbol: dict[str, dict],
             "utc_session": f"hour_{(signal_time // 3600) % 24:02d}",
             "eff_ratio": rows[symbol]["eff72"],
             "signal_bar_ts": signal_time, "model_quality": quality,
-            "target_model_scores": target_scores,
+            "target_model_scores": {},
             "selected_target_pct": selected_target, "hold_bars": hold_bars,
             "families": sorted(families), "entry_source": "MARKET",
+            "route_policy": _POLICY["route_policy"],
             "_shadow_experiment": True, "_hourly_hgb_shadow": True,
         }
     return output

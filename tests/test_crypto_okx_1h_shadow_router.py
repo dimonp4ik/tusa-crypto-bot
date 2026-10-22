@@ -3,24 +3,32 @@ import math
 import unittest
 
 from src.crypto_okx_1h_shadow_router import (
-    CASCADE_PATH, MODEL_PATH, QUALITY_THRESHOLD, SUPPORTED_SYMBOLS,
-    _symbol_features, shadow_setups,
+    MODEL_PATH, POLICY_PATH, QUALITY_THRESHOLD, SUPPORTED_SYMBOLS,
+    _float32, _route_allowed, _symbol_features, shadow_setups,
 )
 
 
 class CryptoOkxOneHourShadowRouterTests(unittest.TestCase):
     def test_frozen_artifact_has_material_move_contract(self):
         model = json.loads(MODEL_PATH.read_text(encoding="utf-8"))
+        policy = json.loads(POLICY_PATH.read_text(encoding="utf-8"))
         self.assertEqual(model["bar"], "1H")
-        self.assertEqual(model["target_pct"], .5)
-        self.assertEqual(model["stop_pct"], 1.0)
-        self.assertEqual(model["hold_bars"], 12)
-        self.assertEqual(model["quality_threshold"], QUALITY_THRESHOLD)
+        self.assertEqual(policy["target_pct"], .5)
+        self.assertEqual(policy["stop_pct"], 1.0)
+        self.assertEqual(policy["hold_bars"], 12)
+        self.assertEqual(policy["quality_threshold"], QUALITY_THRESHOLD)
+        self.assertTrue(policy["shadow_only"])
         self.assertEqual(len(model["features"]), 52)
-        cascade = json.loads(CASCADE_PATH.read_text(encoding="utf-8"))
-        self.assertEqual(sorted(map(float, cascade["models"])), [1.0, 1.5, 2.0])
-        self.assertEqual([cascade["models"][key]["hold_bars"]
-                          for key in ("1.0", "1.5", "2.0")], [24, 36, 48])
+
+    def test_frozen_direction_route(self):
+        self.assertTrue(_route_allowed("BTCUSDT", -1, {"trend"}))
+        self.assertTrue(_route_allowed("ETHUSDT", 1, {"pullback"}))
+        self.assertTrue(_route_allowed("AVAXUSDT", 1, {"trend"}))
+        self.assertFalse(_route_allowed("BTCUSDT", 1, {"trend"}))
+
+    def test_model_inputs_use_training_float32_precision(self):
+        self.assertNotEqual(_float32(0.7227249797903944), 0.7227249797903944)
+        self.assertEqual(_float32(1.0), 1.0)
 
     def test_incomplete_cross_market_input_fails_closed(self):
         self.assertEqual(shadow_setups({}, {}), {})

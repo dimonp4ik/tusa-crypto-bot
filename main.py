@@ -3653,9 +3653,17 @@ def _venue_analysis(symbol: str, setup: dict, btc_change: float = 0.0) -> dict:
     if hourly_hgb:
         tags.append(f"Frozen HGB quality {float(setup['model_quality']):.4f}")
         tags.append("Families " + ", ".join(setup.get("families") or []))
-        tags.append(
-            f"Target cascade {float(setup.get('selected_target_pct') or .5):.1f}% / "
-            f"{int(setup.get('hold_bars') or 12)}h")
+        if setup.get("route_policy"):
+            tags.append(f"Stable route {setup['route_policy']}")
+            tags.append(
+                f"Fixed hourly bracket "
+                f"{float(setup.get('selected_target_pct') or .5):.1f}% / "
+                f"{int(setup.get('hold_bars') or 12)}h")
+        else:
+            tags.append(
+                f"Target cascade "
+                f"{float(setup.get('selected_target_pct') or .5):.1f}% / "
+                f"{int(setup.get('hold_bars') or 12)}h")
     if literal_material:
         tags.append(
             f"Literal bracket {first_target_move_pct:.2f}% target / "
@@ -3719,6 +3727,7 @@ def _venue_analysis(symbol: str, setup: dict, btc_change: float = 0.0) -> dict:
                    else "venue_shadow_experiment" if shadow_experiment
                    else "venue_regime"),
         "signal_bar_ts": float(setup["signal_bar_ts"]),
+        "route_policy": setup.get("route_policy"),
         "eff_ratio": setup["eff_ratio"], "btc_change": btc_change,
         # Every signal in the current deployment is visible in Telegram and
         # tracked in the DB, but is permanently ineligible for real orders.
