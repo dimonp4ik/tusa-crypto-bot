@@ -1,0 +1,2101 @@
+{
+  "limitations": [
+    "The venue-native fit spans only the available 2026 X-Perp history.",
+    "September is one selection month and October one partial holdout month.",
+    "Public candles cannot reproduce order-book slippage or latency.",
+    "Gross results exclude fees at user request."
+  ],
+  "objective_pass": false,
+  "october_holdout": {
+    "margin_3pct": {
+      "active_days": 24,
+      "by_module_count": {
+        "walkforward_exact_target_router": 259
+      },
+      "by_source_count": {
+        "walkforward_exact_target_router": 259
+      },
+      "dd_pct": 6.5631,
+      "economic_gate": {
+        "calendar_days_per_month": 30,
+        "frequency_pass": true,
+        "interpretation": "diagnostic projection from observed geometric trade return; not a forecast",
+        "leverage": 10.0,
+        "margin_fraction": 0.03,
+        "mean_signed_price_return_pct": 0.023695,
+        "monthly_target_pct": 30.0,
+        "n": 259,
+        "observed_trades_per_day": 10.792,
+        "passes": false,
+        "projected_monthly_return_pct": 2.1767,
+        "required_constant_signed_price_return_pct": 0.973137,
+        "required_trades_per_day": 3.0,
+        "return_pass": false
+      },
+      "max_entries_same_clock_hour": 2,
+      "max_entries_same_rolling_hour": 2,
+      "max_loss_streak": 9,
+      "monthly_return_pct": {
+        "2026-10": 1.7339
+      },
+      "n": 259,
+      "negative_months": 0,
+      "non_loss_rate": 39.77,
+      "return_pct": 1.7339,
+      "target_counts": {
+        "0.5": 16,
+        "1.0": 57,
+        "2.0": 81,
+        "3.0": 52,
+        "4.0": 53
+      },
+      "target_hit_rate": 32.82,
+      "trades_per_active_day": 10.792,
+      "trades_per_calendar_day": 10.792,
+      "wr": 39.77
+    },
+    "margin_5pct": {
+      "active_days": 24,
+      "by_module_count": {
+        "walkforward_exact_target_router": 259
+      },
+      "by_source_count": {
+        "walkforward_exact_target_router": 259
+      },
+      "dd_pct": 10.7397,
+      "economic_gate": {
+        "calendar_days_per_month": 30,
+        "frequency_pass": true,
+        "interpretation": "diagnostic projection from observed geometric trade return; not a forecast",
+        "leverage": 10.0,
+        "margin_fraction": 0.05,
+        "mean_signed_price_return_pct": 0.023695,
+        "monthly_target_pct": 30.0,
+        "n": 259,
+        "observed_trades_per_day": 10.792,
+        "passes": false,
+        "projected_monthly_return_pct": 3.484,
+        "required_constant_signed_price_return_pct": 0.583882,
+        "required_trades_per_day": 3.0,
+        "return_pass": false
+      },
+      "max_entries_same_clock_hour": 2,
+      "max_entries_same_rolling_hour": 2,
+      "max_loss_streak": 9,
+      "monthly_return_pct": {
+        "2026-10": 2.7678
+      },
+      "n": 259,
+      "negative_months": 0,
+      "non_loss_rate": 39.77,
+      "return_pct": 2.7678,
+      "target_counts": {
+        "0.5": 16,
+        "1.0": 57,
+        "2.0": 81,
+        "3.0": 52,
+        "4.0": 53
+      },
+      "target_hit_rate": 32.82,
+      "trades_per_active_day": 10.792,
+      "trades_per_calendar_day": 10.792,
+      "wr": 39.77
+    }
+  },
+  "order_eligible": false,
+  "protocol": {
+    "entry": "next 15-minute market open",
+    "exit": "single stop-first OHLC path, fixed selected target",
+    "fit": "X-Perp rows strictly before September 2026",
+    "orders": "market entry and market close",
+    "retune_on_october": false,
+    "selection": "September 2026 only",
+    "selection_objective": "maximum projected geometric return",
+    "selection_rails": {
+      "maximum_drawdown_pct": 10,
+      "minimum_rows": 90,
+      "minimum_trades_per_day": 3,
+      "negative_months": 0
+    },
+    "target_price_move_range_pct": [
+      0.5,
+      2.0
+    ],
+    "target_universes": {
+      "five_targets": [
+        0.5,
+        1.0,
+        2.0,
+        3.0,
+        4.0
+      ],
+      "three_targets": [
+        0.5,
+        1.0,
+        2.0
+      ]
+    },
+    "test": "October 2026 through Oct 24"
+  },
+  "ready_for_live_orders": false,
+  "selected_before_october": {
+    "hourly_cap": 2,
+    "loss_pause": 8,
+    "qualified": true,
+    "quantile": 0.8,
+    "rank": [
+      11.761,
+      11.7405,
+      -2.3587,
+      349
+    ],
+    "targets": [
+      0.5,
+      1.0,
+      2.0,
+      3.0,
+      4.0
+    ],
+    "threshold": 0.21206156078986596,
+    "training_coverage": {
+      "training_first_entry_utc": "2026-04-24T06:45:00+00:00",
+      "training_last_entry_utc": "2026-08-31T23:45:00+00:00",
+      "training_months": [
+        "2026-04",
+        "2026-05",
+        "2026-06",
+        "2026-07",
+        "2026-08"
+      ],
+      "training_rows": 23241
+    },
+    "universe": "five_targets"
+  },
+  "selection_frontiers": {
+    "five_targets": [
+      {
+        "hourly_cap": 2,
+        "loss_pause": 6,
+        "metrics": {
+          "dd_pct": 2.8659,
+          "economic_gate": {
+            "calendar_days_per_month": 30,
+            "frequency_pass": true,
+            "interpretation": "diagnostic projection from observed geometric trade return; not a forecast",
+            "leverage": 10.0,
+            "margin_fraction": 0.03,
+            "mean_signed_price_return_pct": 0.093645,
+            "monthly_target_pct": 30.0,
+            "n": 406,
+            "observed_trades_per_day": 13.533,
+            "passes": false,
+            "projected_monthly_return_pct": 11.8364,
+            "required_constant_signed_price_return_pct": 0.973137,
+            "required_trades_per_day": 3.0,
+            "return_pass": false
+          },
+          "max_loss_streak": 10,
+          "n": 406,
+          "negative_months": 1,
+          "non_loss_rate": 46.31,
+          "return_pct": 11.7879,
+          "target_counts": {
+            "0.5": 61,
+            "1.0": 110,
+            "2.0": 97,
+            "3.0": 71,
+            "4.0": 67
+          },
+          "target_hit_rate": 41.87,
+          "trades_per_calendar_day": 13.533,
+          "wr": 46.31
+        },
+        "qualified": false,
+        "quantile": 0.75,
+        "rank": [
+          11.8364,
+          11.7879,
+          -2.8659,
+          406
+        ],
+        "threshold": 0.17284670265775018
+      },
+      {
+        "hourly_cap": 2,
+        "loss_pause": 8,
+        "metrics": {
+          "dd_pct": 2.3587,
+          "economic_gate": {
+            "calendar_days_per_month": 30,
+            "frequency_pass": true,
+            "interpretation": "diagnostic projection from observed geometric trade return; not a forecast",
+            "leverage": 10.0,
+            "margin_fraction": 0.03,
+            "mean_signed_price_return_pct": 0.107898,
+            "monthly_target_pct": 30.0,
+            "n": 349,
+            "observed_trades_per_day": 11.633,
+            "passes": false,
+            "projected_monthly_return_pct": 11.761,
+            "required_constant_signed_price_return_pct": 0.973137,
+            "required_trades_per_day": 3.0,
+            "return_pass": false
+          },
+          "max_loss_streak": 13,
+          "n": 349,
+          "negative_months": 0,
+          "non_loss_rate": 44.13,
+          "return_pct": 11.7405,
+          "target_counts": {
+            "0.5": 33,
+            "1.0": 87,
+            "2.0": 90,
+            "3.0": 76,
+            "4.0": 63
+          },
+          "target_hit_rate": 38.97,
+          "trades_per_calendar_day": 11.633,
+          "wr": 44.13
+        },
+        "qualified": true,
+        "quantile": 0.8,
+        "rank": [
+          11.761,
+          11.7405,
+          -2.3587,
+          349
+        ],
+        "threshold": 0.21206156078986596
+      },
+      {
+        "hourly_cap": 2,
+        "loss_pause": 7,
+        "metrics": {
+          "dd_pct": 2.8659,
+          "economic_gate": {
+            "calendar_days_per_month": 30,
+            "frequency_pass": true,
+            "interpretation": "diagnostic projection from observed geometric trade return; not a forecast",
+            "leverage": 10.0,
+            "margin_fraction": 0.03,
+            "mean_signed_price_return_pct": 0.090654,
+            "monthly_target_pct": 30.0,
+            "n": 416,
+            "observed_trades_per_day": 13.867,
+            "passes": false,
+            "projected_monthly_return_pct": 11.7302,
+            "required_constant_signed_price_return_pct": 0.973137,
+            "required_trades_per_day": 3.0,
+            "return_pass": false
+          },
+          "max_loss_streak": 9,
+          "n": 416,
+          "negative_months": 1,
+          "non_loss_rate": 46.15,
+          "return_pct": 11.6811,
+          "target_counts": {
+            "0.5": 63,
+            "1.0": 111,
+            "2.0": 98,
+            "3.0": 75,
+            "4.0": 69
+          },
+          "target_hit_rate": 41.59,
+          "trades_per_calendar_day": 13.867,
+          "wr": 46.15
+        },
+        "qualified": false,
+        "quantile": 0.75,
+        "rank": [
+          11.7302,
+          11.6811,
+          -2.8659,
+          416
+        ],
+        "threshold": 0.17284670265775018
+      },
+      {
+        "hourly_cap": 2,
+        "loss_pause": 5,
+        "metrics": {
+          "dd_pct": 2.7251,
+          "economic_gate": {
+            "calendar_days_per_month": 30,
+            "frequency_pass": true,
+            "interpretation": "diagnostic projection from observed geometric trade return; not a forecast",
+            "leverage": 10.0,
+            "margin_fraction": 0.03,
+            "mean_signed_price_return_pct": 0.095597,
+            "monthly_target_pct": 30.0,
+            "n": 391,
+            "observed_trades_per_day": 13.033,
+            "passes": false,
+            "projected_monthly_return_pct": 11.6278,
+            "required_constant_signed_price_return_pct": 0.973137,
+            "required_trades_per_day": 3.0,
+            "return_pass": false
+          },
+          "max_loss_streak": 10,
+          "n": 391,
+          "negative_months": 1,
+          "non_loss_rate": 46.8,
+          "return_pct": 11.5798,
+          "target_counts": {
+            "0.5": 59,
+            "1.0": 107,
+            "2.0": 94,
+            "3.0": 71,
+            "4.0": 60
+          },
+          "target_hit_rate": 42.46,
+          "trades_per_calendar_day": 13.033,
+          "wr": 46.8
+        },
+        "qualified": false,
+        "quantile": 0.75,
+        "rank": [
+          11.6278,
+          11.5798,
+          -2.7251,
+          391
+        ],
+        "threshold": 0.17284670265775018
+      },
+      {
+        "hourly_cap": 1,
+        "loss_pause": 5,
+        "metrics": {
+          "dd_pct": 1.8115,
+          "economic_gate": {
+            "calendar_days_per_month": 30,
+            "frequency_pass": true,
+            "interpretation": "diagnostic projection from observed geometric trade return; not a forecast",
+            "leverage": 10.0,
+            "margin_fraction": 0.03,
+            "mean_signed_price_return_pct": 0.162238,
+            "monthly_target_pct": 30.0,
+            "n": 223,
+            "observed_trades_per_day": 7.433,
+            "passes": false,
+            "projected_monthly_return_pct": 11.3335,
+            "required_constant_signed_price_return_pct": 0.973137,
+            "required_trades_per_day": 3.0,
+            "return_pass": false
+          },
+          "max_loss_streak": 7,
+          "n": 223,
+          "negative_months": 0,
+          "non_loss_rate": 43.5,
+          "return_pct": 11.3233,
+          "target_counts": {
+            "0.5": 16,
+            "1.0": 40,
+            "2.0": 61,
+            "3.0": 53,
+            "4.0": 53
+          },
+          "target_hit_rate": 39.01,
+          "trades_per_calendar_day": 7.433,
+          "wr": 43.5
+        },
+        "qualified": true,
+        "quantile": 0.85,
+        "rank": [
+          11.3335,
+          11.3233,
+          -1.8115,
+          223
+        ],
+        "threshold": 0.25990432466488056
+      },
+      {
+        "hourly_cap": 2,
+        "loss_pause": 6,
+        "metrics": {
+          "dd_pct": 2.3772,
+          "economic_gate": {
+            "calendar_days_per_month": 30,
+            "frequency_pass": true,
+            "interpretation": "diagnostic projection from observed geometric trade return; not a forecast",
+            "leverage": 10.0,
+            "margin_fraction": 0.03,
+            "mean_signed_price_return_pct": 0.106667,
+            "monthly_target_pct": 30.0,
+            "n": 338,
+            "observed_trades_per_day": 11.267,
+            "passes": false,
+            "projected_monthly_return_pct": 11.233,
+            "required_constant_signed_price_return_pct": 0.973137,
+            "required_trades_per_day": 3.0,
+            "return_pass": false
+          },
+          "max_loss_streak": 11,
+          "n": 338,
+          "negative_months": 0,
+          "non_loss_rate": 44.08,
+          "return_pct": 11.2203,
+          "target_counts": {
+            "0.5": 31,
+            "1.0": 85,
+            "2.0": 87,
+            "3.0": 74,
+            "4.0": 61
+          },
+          "target_hit_rate": 38.76,
+          "trades_per_calendar_day": 11.267,
+          "wr": 44.08
+        },
+        "qualified": true,
+        "quantile": 0.8,
+        "rank": [
+          11.233,
+          11.2203,
+          -2.3772,
+          338
+        ],
+        "threshold": 0.21206156078986596
+      },
+      {
+        "hourly_cap": 2,
+        "loss_pause": 8,
+        "metrics": {
+          "dd_pct": 2.8659,
+          "economic_gate": {
+            "calendar_days_per_month": 30,
+            "frequency_pass": true,
+            "interpretation": "diagnostic projection from observed geometric trade return; not a forecast",
+            "leverage": 10.0,
+            "margin_fraction": 0.03,
+            "mean_signed_price_return_pct": 0.086822,
+            "monthly_target_pct": 30.0,
+            "n": 417,
+            "observed_trades_per_day": 13.9,
+            "passes": false,
+            "projected_monthly_return_pct": 11.2247,
+            "required_constant_signed_price_return_pct": 0.973137,
+            "required_trades_per_day": 3.0,
+            "return_pass": false
+          },
+          "max_loss_streak": 9,
+          "n": 417,
+          "negative_months": 1,
+          "non_loss_rate": 46.04,
+          "return_pct": 11.1766,
+          "target_counts": {
+            "0.5": 63,
+            "1.0": 112,
+            "2.0": 98,
+            "3.0": 75,
+            "4.0": 69
+          },
+          "target_hit_rate": 41.49,
+          "trades_per_calendar_day": 13.9,
+          "wr": 46.04
+        },
+        "qualified": false,
+        "quantile": 0.75,
+        "rank": [
+          11.2247,
+          11.1766,
+          -2.8659,
+          417
+        ],
+        "threshold": 0.17284670265775018
+      },
+      {
+        "hourly_cap": 2,
+        "loss_pause": 5,
+        "metrics": {
+          "dd_pct": 2.3603,
+          "economic_gate": {
+            "calendar_days_per_month": 30,
+            "frequency_pass": true,
+            "interpretation": "diagnostic projection from observed geometric trade return; not a forecast",
+            "leverage": 10.0,
+            "margin_fraction": 0.03,
+            "mean_signed_price_return_pct": 0.106373,
+            "monthly_target_pct": 30.0,
+            "n": 336,
+            "observed_trades_per_day": 11.2,
+            "passes": false,
+            "projected_monthly_return_pct": 11.1291,
+            "required_constant_signed_price_return_pct": 0.973137,
+            "required_trades_per_day": 3.0,
+            "return_pass": false
+          },
+          "max_loss_streak": 11,
+          "n": 336,
+          "negative_months": 0,
+          "non_loss_rate": 44.05,
+          "return_pct": 11.1155,
+          "target_counts": {
+            "0.5": 30,
+            "1.0": 85,
+            "2.0": 87,
+            "3.0": 74,
+            "4.0": 60
+          },
+          "target_hit_rate": 38.69,
+          "trades_per_calendar_day": 11.2,
+          "wr": 44.05
+        },
+        "qualified": true,
+        "quantile": 0.8,
+        "rank": [
+          11.1291,
+          11.1155,
+          -2.3603,
+          336
+        ],
+        "threshold": 0.21206156078986596
+      },
+      {
+        "hourly_cap": 1,
+        "loss_pause": 6,
+        "metrics": {
+          "dd_pct": 1.8115,
+          "economic_gate": {
+            "calendar_days_per_month": 30,
+            "frequency_pass": true,
+            "interpretation": "diagnostic projection from observed geometric trade return; not a forecast",
+            "leverage": 10.0,
+            "margin_fraction": 0.03,
+            "mean_signed_price_return_pct": 0.157676,
+            "monthly_target_pct": 30.0,
+            "n": 224,
+            "observed_trades_per_day": 7.467,
+            "passes": false,
+            "projected_monthly_return_pct": 11.0474,
+            "required_constant_signed_price_return_pct": 0.973137,
+            "required_trades_per_day": 3.0,
+            "return_pass": false
+          },
+          "max_loss_streak": 7,
+          "n": 224,
+          "negative_months": 0,
+          "non_loss_rate": 43.3,
+          "return_pct": 11.0374,
+          "target_counts": {
+            "0.5": 16,
+            "1.0": 41,
+            "2.0": 61,
+            "3.0": 53,
+            "4.0": 53
+          },
+          "target_hit_rate": 38.84,
+          "trades_per_calendar_day": 7.467,
+          "wr": 43.3
+        },
+        "qualified": true,
+        "quantile": 0.85,
+        "rank": [
+          11.0474,
+          11.0374,
+          -1.8115,
+          224
+        ],
+        "threshold": 0.25990432466488056
+      },
+      {
+        "hourly_cap": 1,
+        "loss_pause": 7,
+        "metrics": {
+          "dd_pct": 1.8115,
+          "economic_gate": {
+            "calendar_days_per_month": 30,
+            "frequency_pass": true,
+            "interpretation": "diagnostic projection from observed geometric trade return; not a forecast",
+            "leverage": 10.0,
+            "margin_fraction": 0.03,
+            "mean_signed_price_return_pct": 0.157676,
+            "monthly_target_pct": 30.0,
+            "n": 224,
+            "observed_trades_per_day": 7.467,
+            "passes": false,
+            "projected_monthly_return_pct": 11.0474,
+            "required_constant_signed_price_return_pct": 0.973137,
+            "required_trades_per_day": 3.0,
+            "return_pass": false
+          },
+          "max_loss_streak": 7,
+          "n": 224,
+          "negative_months": 0,
+          "non_loss_rate": 43.3,
+          "return_pct": 11.0374,
+          "target_counts": {
+            "0.5": 16,
+            "1.0": 41,
+            "2.0": 61,
+            "3.0": 53,
+            "4.0": 53
+          },
+          "target_hit_rate": 38.84,
+          "trades_per_calendar_day": 7.467,
+          "wr": 43.3
+        },
+        "qualified": true,
+        "quantile": 0.85,
+        "rank": [
+          11.0474,
+          11.0374,
+          -1.8115,
+          224
+        ],
+        "threshold": 0.25990432466488056
+      },
+      {
+        "hourly_cap": 1,
+        "loss_pause": 8,
+        "metrics": {
+          "dd_pct": 1.8115,
+          "economic_gate": {
+            "calendar_days_per_month": 30,
+            "frequency_pass": true,
+            "interpretation": "diagnostic projection from observed geometric trade return; not a forecast",
+            "leverage": 10.0,
+            "margin_fraction": 0.03,
+            "mean_signed_price_return_pct": 0.157676,
+            "monthly_target_pct": 30.0,
+            "n": 224,
+            "observed_trades_per_day": 7.467,
+            "passes": false,
+            "projected_monthly_return_pct": 11.0474,
+            "required_constant_signed_price_return_pct": 0.973137,
+            "required_trades_per_day": 3.0,
+            "return_pass": false
+          },
+          "max_loss_streak": 7,
+          "n": 224,
+          "negative_months": 0,
+          "non_loss_rate": 43.3,
+          "return_pct": 11.0374,
+          "target_counts": {
+            "0.5": 16,
+            "1.0": 41,
+            "2.0": 61,
+            "3.0": 53,
+            "4.0": 53
+          },
+          "target_hit_rate": 38.84,
+          "trades_per_calendar_day": 7.467,
+          "wr": 43.3
+        },
+        "qualified": true,
+        "quantile": 0.85,
+        "rank": [
+          11.0474,
+          11.0374,
+          -1.8115,
+          224
+        ],
+        "threshold": 0.25990432466488056
+      },
+      {
+        "hourly_cap": 2,
+        "loss_pause": 8,
+        "metrics": {
+          "dd_pct": 2.3694,
+          "economic_gate": {
+            "calendar_days_per_month": 30,
+            "frequency_pass": true,
+            "interpretation": "diagnostic projection from observed geometric trade return; not a forecast",
+            "leverage": 10.0,
+            "margin_fraction": 0.03,
+            "mean_signed_price_return_pct": 0.128221,
+            "monthly_target_pct": 30.0,
+            "n": 274,
+            "observed_trades_per_day": 9.133,
+            "passes": false,
+            "projected_monthly_return_pct": 10.9678,
+            "required_constant_signed_price_return_pct": 0.973137,
+            "required_trades_per_day": 3.0,
+            "return_pass": false
+          },
+          "max_loss_streak": 9,
+          "n": 274,
+          "negative_months": 1,
+          "non_loss_rate": 42.34,
+          "return_pct": 10.9317,
+          "target_counts": {
+            "0.5": 18,
+            "1.0": 57,
+            "2.0": 68,
+            "3.0": 66,
+            "4.0": 65
+          },
+          "target_hit_rate": 37.23,
+          "trades_per_calendar_day": 9.133,
+          "wr": 42.34
+        },
+        "qualified": false,
+        "quantile": 0.85,
+        "rank": [
+          10.9678,
+          10.9317,
+          -2.3694,
+          274
+        ],
+        "threshold": 0.25990432466488056
+      },
+      {
+        "hourly_cap": 2,
+        "loss_pause": 7,
+        "metrics": {
+          "dd_pct": 2.4078,
+          "economic_gate": {
+            "calendar_days_per_month": 30,
+            "frequency_pass": true,
+            "interpretation": "diagnostic projection from observed geometric trade return; not a forecast",
+            "leverage": 10.0,
+            "margin_fraction": 0.03,
+            "mean_signed_price_return_pct": 0.100767,
+            "monthly_target_pct": 30.0,
+            "n": 342,
+            "observed_trades_per_day": 11.4,
+            "passes": false,
+            "projected_monthly_return_pct": 10.6992,
+            "required_constant_signed_price_return_pct": 0.973137,
+            "required_trades_per_day": 3.0,
+            "return_pass": false
+          },
+          "max_loss_streak": 13,
+          "n": 342,
+          "negative_months": 0,
+          "non_loss_rate": 43.86,
+          "return_pct": 10.6831,
+          "target_counts": {
+            "0.5": 32,
+            "1.0": 86,
+            "2.0": 88,
+            "3.0": 74,
+            "4.0": 62
+          },
+          "target_hit_rate": 38.6,
+          "trades_per_calendar_day": 11.4,
+          "wr": 43.86
+        },
+        "qualified": true,
+        "quantile": 0.8,
+        "rank": [
+          10.6992,
+          10.6831,
+          -2.4078,
+          342
+        ],
+        "threshold": 0.21206156078986596
+      },
+      {
+        "hourly_cap": 1,
+        "loss_pause": 8,
+        "metrics": {
+          "dd_pct": 1.9973,
+          "economic_gate": {
+            "calendar_days_per_month": 30,
+            "frequency_pass": true,
+            "interpretation": "diagnostic projection from observed geometric trade return; not a forecast",
+            "leverage": 10.0,
+            "margin_fraction": 0.03,
+            "mean_signed_price_return_pct": 0.117902,
+            "monthly_target_pct": 30.0,
+            "n": 282,
+            "observed_trades_per_day": 9.4,
+            "passes": false,
+            "projected_monthly_return_pct": 10.3311,
+            "required_constant_signed_price_return_pct": 0.973137,
+            "required_trades_per_day": 3.0,
+            "return_pass": false
+          },
+          "max_loss_streak": 7,
+          "n": 282,
+          "negative_months": 0,
+          "non_loss_rate": 43.97,
+          "return_pct": 10.3306,
+          "target_counts": {
+            "0.5": 32,
+            "1.0": 59,
+            "2.0": 77,
+            "3.0": 62,
+            "4.0": 52
+          },
+          "target_hit_rate": 38.65,
+          "trades_per_calendar_day": 9.4,
+          "wr": 43.97
+        },
+        "qualified": true,
+        "quantile": 0.8,
+        "rank": [
+          10.3311,
+          10.3306,
+          -1.9973,
+          282
+        ],
+        "threshold": 0.21206156078986596
+      },
+      {
+        "hourly_cap": 3,
+        "loss_pause": 6,
+        "metrics": {
+          "dd_pct": 3.2136,
+          "economic_gate": {
+            "calendar_days_per_month": 30,
+            "frequency_pass": true,
+            "interpretation": "diagnostic projection from observed geometric trade return; not a forecast",
+            "leverage": 10.0,
+            "margin_fraction": 0.03,
+            "mean_signed_price_return_pct": 0.093219,
+            "monthly_target_pct": 30.0,
+            "n": 354,
+            "observed_trades_per_day": 11.8,
+            "passes": false,
+            "projected_monthly_return_pct": 10.2118,
+            "required_constant_signed_price_return_pct": 0.973137,
+            "required_trades_per_day": 3.0,
+            "return_pass": false
+          },
+          "max_loss_streak": 11,
+          "n": 354,
+          "negative_months": 0,
+          "non_loss_rate": 43.22,
+          "return_pct": 10.1846,
+          "target_counts": {
+            "0.5": 33,
+            "1.0": 92,
+            "2.0": 90,
+            "3.0": 76,
+            "4.0": 63
+          },
+          "target_hit_rate": 38.14,
+          "trades_per_calendar_day": 11.8,
+          "wr": 43.22
+        },
+        "qualified": true,
+        "quantile": 0.8,
+        "rank": [
+          10.2118,
+          10.1846,
+          -3.2136,
+          354
+        ],
+        "threshold": 0.21206156078986596
+      },
+      {
+        "hourly_cap": 2,
+        "loss_pause": 5,
+        "metrics": {
+          "dd_pct": 4.3162,
+          "economic_gate": {
+            "calendar_days_per_month": 30,
+            "frequency_pass": true,
+            "interpretation": "diagnostic projection from observed geometric trade return; not a forecast",
+            "leverage": 10.0,
+            "margin_fraction": 0.03,
+            "mean_signed_price_return_pct": 0.073602,
+            "monthly_target_pct": 30.0,
+            "n": 448,
+            "observed_trades_per_day": 14.933,
+            "passes": false,
+            "projected_monthly_return_pct": 10.1212,
+            "required_constant_signed_price_return_pct": 0.973137,
+            "required_trades_per_day": 3.0,
+            "return_pass": false
+          },
+          "max_loss_streak": 8,
+          "n": 448,
+          "negative_months": 1,
+          "non_loss_rate": 46.88,
+          "return_pct": 10.0539,
+          "target_counts": {
+            "0.5": 77,
+            "1.0": 130,
+            "2.0": 105,
+            "3.0": 75,
+            "4.0": 61
+          },
+          "target_hit_rate": 42.41,
+          "trades_per_calendar_day": 14.933,
+          "wr": 46.88
+        },
+        "qualified": false,
+        "quantile": 0.7,
+        "rank": [
+          10.1212,
+          10.0539,
+          -4.3162,
+          448
+        ],
+        "threshold": 0.1419410578828775
+      },
+      {
+        "hourly_cap": 3,
+        "loss_pause": 5,
+        "metrics": {
+          "dd_pct": 3.2136,
+          "economic_gate": {
+            "calendar_days_per_month": 30,
+            "frequency_pass": true,
+            "interpretation": "diagnostic projection from observed geometric trade return; not a forecast",
+            "leverage": 10.0,
+            "margin_fraction": 0.03,
+            "mean_signed_price_return_pct": 0.094105,
+            "monthly_target_pct": 30.0,
+            "n": 344,
+            "observed_trades_per_day": 11.467,
+            "passes": false,
+            "projected_monthly_return_pct": 10.0109,
+            "required_constant_signed_price_return_pct": 0.973137,
+            "required_trades_per_day": 3.0,
+            "return_pass": false
+          },
+          "max_loss_streak": 11,
+          "n": 344,
+          "negative_months": 0,
+          "non_loss_rate": 43.02,
+          "return_pct": 9.9974,
+          "target_counts": {
+            "0.5": 30,
+            "1.0": 88,
+            "2.0": 89,
+            "3.0": 74,
+            "4.0": 63
+          },
+          "target_hit_rate": 37.79,
+          "trades_per_calendar_day": 11.467,
+          "wr": 43.02
+        },
+        "qualified": true,
+        "quantile": 0.8,
+        "rank": [
+          10.0109,
+          9.9974,
+          -3.2136,
+          344
+        ],
+        "threshold": 0.21206156078986596
+      },
+      {
+        "hourly_cap": 3,
+        "loss_pause": 6,
+        "metrics": {
+          "dd_pct": 2.8774,
+          "economic_gate": {
+            "calendar_days_per_month": 30,
+            "frequency_pass": true,
+            "interpretation": "diagnostic projection from observed geometric trade return; not a forecast",
+            "leverage": 10.0,
+            "margin_fraction": 0.03,
+            "mean_signed_price_return_pct": 0.077286,
+            "monthly_target_pct": 30.0,
+            "n": 421,
+            "observed_trades_per_day": 14.033,
+            "passes": false,
+            "projected_monthly_return_pct": 10.0063,
+            "required_constant_signed_price_return_pct": 0.973137,
+            "required_trades_per_day": 3.0,
+            "return_pass": false
+          },
+          "max_loss_streak": 11,
+          "n": 421,
+          "negative_months": 1,
+          "non_loss_rate": 45.37,
+          "return_pct": 9.9829,
+          "target_counts": {
+            "0.5": 62,
+            "1.0": 116,
+            "2.0": 102,
+            "3.0": 72,
+            "4.0": 69
+          },
+          "target_hit_rate": 41.09,
+          "trades_per_calendar_day": 14.033,
+          "wr": 45.37
+        },
+        "qualified": false,
+        "quantile": 0.75,
+        "rank": [
+          10.0063,
+          9.9829,
+          -2.8774,
+          421
+        ],
+        "threshold": 0.17284670265775018
+      },
+      {
+        "hourly_cap": 2,
+        "loss_pause": 7,
+        "metrics": {
+          "dd_pct": 2.3694,
+          "economic_gate": {
+            "calendar_days_per_month": 30,
+            "frequency_pass": true,
+            "interpretation": "diagnostic projection from observed geometric trade return; not a forecast",
+            "leverage": 10.0,
+            "margin_fraction": 0.03,
+            "mean_signed_price_return_pct": 0.115967,
+            "monthly_target_pct": 30.0,
+            "n": 268,
+            "observed_trades_per_day": 8.933,
+            "passes": false,
+            "projected_monthly_return_pct": 9.6298,
+            "required_constant_signed_price_return_pct": 0.973137,
+            "required_trades_per_day": 3.0,
+            "return_pass": false
+          },
+          "max_loss_streak": 9,
+          "n": 268,
+          "negative_months": 1,
+          "non_loss_rate": 41.79,
+          "return_pct": 9.6,
+          "target_counts": {
+            "0.5": 17,
+            "1.0": 57,
+            "2.0": 66,
+            "3.0": 64,
+            "4.0": 64
+          },
+          "target_hit_rate": 36.57,
+          "trades_per_calendar_day": 8.933,
+          "wr": 41.79
+        },
+        "qualified": false,
+        "quantile": 0.85,
+        "rank": [
+          9.6298,
+          9.6,
+          -2.3694,
+          268
+        ],
+        "threshold": 0.25990432466488056
+      },
+      {
+        "hourly_cap": 2,
+        "loss_pause": 6,
+        "metrics": {
+          "dd_pct": 4.3162,
+          "economic_gate": {
+            "calendar_days_per_month": 30,
+            "frequency_pass": true,
+            "interpretation": "diagnostic projection from observed geometric trade return; not a forecast",
+            "leverage": 10.0,
+            "margin_fraction": 0.03,
+            "mean_signed_price_return_pct": 0.068744,
+            "monthly_target_pct": 30.0,
+            "n": 457,
+            "observed_trades_per_day": 15.233,
+            "passes": false,
+            "projected_monthly_return_pct": 9.6049,
+            "required_constant_signed_price_return_pct": 0.973137,
+            "required_trades_per_day": 3.0,
+            "return_pass": false
+          },
+          "max_loss_streak": 8,
+          "n": 457,
+          "negative_months": 1,
+          "non_loss_rate": 46.39,
+          "return_pct": 9.5386,
+          "target_counts": {
+            "0.5": 79,
+            "1.0": 130,
+            "2.0": 108,
+            "3.0": 74,
+            "4.0": 66
+          },
+          "target_hit_rate": 42.01,
+          "trades_per_calendar_day": 15.233,
+          "wr": 46.39
+        },
+        "qualified": false,
+        "quantile": 0.7,
+        "rank": [
+          9.6049,
+          9.5386,
+          -4.3162,
+          457
+        ],
+        "threshold": 0.1419410578828775
+      }
+    ],
+    "three_targets": [
+      {
+        "hourly_cap": 3,
+        "loss_pause": 7,
+        "metrics": {
+          "dd_pct": 2.679,
+          "economic_gate": {
+            "calendar_days_per_month": 30,
+            "frequency_pass": true,
+            "interpretation": "diagnostic projection from observed geometric trade return; not a forecast",
+            "leverage": 10.0,
+            "margin_fraction": 0.03,
+            "mean_signed_price_return_pct": 0.182216,
+            "monthly_target_pct": 30.0,
+            "n": 189,
+            "observed_trades_per_day": 6.3,
+            "passes": false,
+            "projected_monthly_return_pct": 10.7665,
+            "required_constant_signed_price_return_pct": 0.973137,
+            "required_trades_per_day": 3.0,
+            "return_pass": false
+          },
+          "max_loss_streak": 7,
+          "n": 189,
+          "negative_months": 0,
+          "non_loss_rate": 52.91,
+          "return_pct": 10.7309,
+          "target_counts": {
+            "0.5": 19,
+            "1.0": 62,
+            "2.0": 108,
+            "3.0": 0,
+            "4.0": 0
+          },
+          "target_hit_rate": 48.68,
+          "trades_per_calendar_day": 6.3,
+          "wr": 52.91
+        },
+        "qualified": true,
+        "quantile": 0.9,
+        "rank": [
+          10.7665,
+          10.7309,
+          -2.679,
+          189
+        ],
+        "threshold": 0.2749384059060203
+      },
+      {
+        "hourly_cap": 4,
+        "loss_pause": 7,
+        "metrics": {
+          "dd_pct": 2.679,
+          "economic_gate": {
+            "calendar_days_per_month": 30,
+            "frequency_pass": true,
+            "interpretation": "diagnostic projection from observed geometric trade return; not a forecast",
+            "leverage": 10.0,
+            "margin_fraction": 0.03,
+            "mean_signed_price_return_pct": 0.182216,
+            "monthly_target_pct": 30.0,
+            "n": 189,
+            "observed_trades_per_day": 6.3,
+            "passes": false,
+            "projected_monthly_return_pct": 10.7665,
+            "required_constant_signed_price_return_pct": 0.973137,
+            "required_trades_per_day": 3.0,
+            "return_pass": false
+          },
+          "max_loss_streak": 7,
+          "n": 189,
+          "negative_months": 0,
+          "non_loss_rate": 52.91,
+          "return_pct": 10.7309,
+          "target_counts": {
+            "0.5": 19,
+            "1.0": 62,
+            "2.0": 108,
+            "3.0": 0,
+            "4.0": 0
+          },
+          "target_hit_rate": 48.68,
+          "trades_per_calendar_day": 6.3,
+          "wr": 52.91
+        },
+        "qualified": true,
+        "quantile": 0.9,
+        "rank": [
+          10.7665,
+          10.7309,
+          -2.679,
+          189
+        ],
+        "threshold": 0.2749384059060203
+      },
+      {
+        "hourly_cap": 3,
+        "loss_pause": 8,
+        "metrics": {
+          "dd_pct": 2.679,
+          "economic_gate": {
+            "calendar_days_per_month": 30,
+            "frequency_pass": true,
+            "interpretation": "diagnostic projection from observed geometric trade return; not a forecast",
+            "leverage": 10.0,
+            "margin_fraction": 0.03,
+            "mean_signed_price_return_pct": 0.182216,
+            "monthly_target_pct": 30.0,
+            "n": 189,
+            "observed_trades_per_day": 6.3,
+            "passes": false,
+            "projected_monthly_return_pct": 10.7665,
+            "required_constant_signed_price_return_pct": 0.973137,
+            "required_trades_per_day": 3.0,
+            "return_pass": false
+          },
+          "max_loss_streak": 7,
+          "n": 189,
+          "negative_months": 0,
+          "non_loss_rate": 52.91,
+          "return_pct": 10.7309,
+          "target_counts": {
+            "0.5": 19,
+            "1.0": 62,
+            "2.0": 108,
+            "3.0": 0,
+            "4.0": 0
+          },
+          "target_hit_rate": 48.68,
+          "trades_per_calendar_day": 6.3,
+          "wr": 52.91
+        },
+        "qualified": true,
+        "quantile": 0.9,
+        "rank": [
+          10.7665,
+          10.7309,
+          -2.679,
+          189
+        ],
+        "threshold": 0.2749384059060203
+      },
+      {
+        "hourly_cap": 4,
+        "loss_pause": 8,
+        "metrics": {
+          "dd_pct": 2.679,
+          "economic_gate": {
+            "calendar_days_per_month": 30,
+            "frequency_pass": true,
+            "interpretation": "diagnostic projection from observed geometric trade return; not a forecast",
+            "leverage": 10.0,
+            "margin_fraction": 0.03,
+            "mean_signed_price_return_pct": 0.182216,
+            "monthly_target_pct": 30.0,
+            "n": 189,
+            "observed_trades_per_day": 6.3,
+            "passes": false,
+            "projected_monthly_return_pct": 10.7665,
+            "required_constant_signed_price_return_pct": 0.973137,
+            "required_trades_per_day": 3.0,
+            "return_pass": false
+          },
+          "max_loss_streak": 7,
+          "n": 189,
+          "negative_months": 0,
+          "non_loss_rate": 52.91,
+          "return_pct": 10.7309,
+          "target_counts": {
+            "0.5": 19,
+            "1.0": 62,
+            "2.0": 108,
+            "3.0": 0,
+            "4.0": 0
+          },
+          "target_hit_rate": 48.68,
+          "trades_per_calendar_day": 6.3,
+          "wr": 52.91
+        },
+        "qualified": true,
+        "quantile": 0.9,
+        "rank": [
+          10.7665,
+          10.7309,
+          -2.679,
+          189
+        ],
+        "threshold": 0.2749384059060203
+      },
+      {
+        "hourly_cap": 3,
+        "loss_pause": 7,
+        "metrics": {
+          "dd_pct": 2.3494,
+          "economic_gate": {
+            "calendar_days_per_month": 30,
+            "frequency_pass": true,
+            "interpretation": "diagnostic projection from observed geometric trade return; not a forecast",
+            "leverage": 10.0,
+            "margin_fraction": 0.03,
+            "mean_signed_price_return_pct": 0.107028,
+            "monthly_target_pct": 30.0,
+            "n": 295,
+            "observed_trades_per_day": 9.833,
+            "passes": false,
+            "projected_monthly_return_pct": 9.7647,
+            "required_constant_signed_price_return_pct": 0.973137,
+            "required_trades_per_day": 3.0,
+            "return_pass": false
+          },
+          "max_loss_streak": 6,
+          "n": 295,
+          "negative_months": 0,
+          "non_loss_rate": 49.83,
+          "return_pct": 9.7314,
+          "target_counts": {
+            "0.5": 39,
+            "1.0": 106,
+            "2.0": 150,
+            "3.0": 0,
+            "4.0": 0
+          },
+          "target_hit_rate": 46.1,
+          "trades_per_calendar_day": 9.833,
+          "wr": 49.83
+        },
+        "qualified": true,
+        "quantile": 0.85,
+        "rank": [
+          9.7647,
+          9.7314,
+          -2.3494,
+          295
+        ],
+        "threshold": 0.2150441447538822
+      },
+      {
+        "hourly_cap": 3,
+        "loss_pause": 8,
+        "metrics": {
+          "dd_pct": 2.3494,
+          "economic_gate": {
+            "calendar_days_per_month": 30,
+            "frequency_pass": true,
+            "interpretation": "diagnostic projection from observed geometric trade return; not a forecast",
+            "leverage": 10.0,
+            "margin_fraction": 0.03,
+            "mean_signed_price_return_pct": 0.107028,
+            "monthly_target_pct": 30.0,
+            "n": 295,
+            "observed_trades_per_day": 9.833,
+            "passes": false,
+            "projected_monthly_return_pct": 9.7647,
+            "required_constant_signed_price_return_pct": 0.973137,
+            "required_trades_per_day": 3.0,
+            "return_pass": false
+          },
+          "max_loss_streak": 6,
+          "n": 295,
+          "negative_months": 0,
+          "non_loss_rate": 49.83,
+          "return_pct": 9.7314,
+          "target_counts": {
+            "0.5": 39,
+            "1.0": 106,
+            "2.0": 150,
+            "3.0": 0,
+            "4.0": 0
+          },
+          "target_hit_rate": 46.1,
+          "trades_per_calendar_day": 9.833,
+          "wr": 49.83
+        },
+        "qualified": true,
+        "quantile": 0.85,
+        "rank": [
+          9.7647,
+          9.7314,
+          -2.3494,
+          295
+        ],
+        "threshold": 0.2150441447538822
+      },
+      {
+        "hourly_cap": 2,
+        "loss_pause": 4,
+        "metrics": {
+          "dd_pct": 2.9866,
+          "economic_gate": {
+            "calendar_days_per_month": 30,
+            "frequency_pass": true,
+            "interpretation": "diagnostic projection from observed geometric trade return; not a forecast",
+            "leverage": 10.0,
+            "margin_fraction": 0.03,
+            "mean_signed_price_return_pct": 0.127329,
+            "monthly_target_pct": 30.0,
+            "n": 245,
+            "observed_trades_per_day": 8.167,
+            "passes": false,
+            "projected_monthly_return_pct": 9.6713,
+            "required_constant_signed_price_return_pct": 0.973137,
+            "required_trades_per_day": 3.0,
+            "return_pass": false
+          },
+          "max_loss_streak": 8,
+          "n": 245,
+          "negative_months": 0,
+          "non_loss_rate": 49.8,
+          "return_pct": 9.6484,
+          "target_counts": {
+            "0.5": 30,
+            "1.0": 80,
+            "2.0": 135,
+            "3.0": 0,
+            "4.0": 0
+          },
+          "target_hit_rate": 46.12,
+          "trades_per_calendar_day": 8.167,
+          "wr": 49.8
+        },
+        "qualified": true,
+        "quantile": 0.85,
+        "rank": [
+          9.6713,
+          9.6484,
+          -2.9866,
+          245
+        ],
+        "threshold": 0.2150441447538822
+      },
+      {
+        "hourly_cap": 2,
+        "loss_pause": 7,
+        "metrics": {
+          "dd_pct": 3.6501,
+          "economic_gate": {
+            "calendar_days_per_month": 30,
+            "frequency_pass": true,
+            "interpretation": "diagnostic projection from observed geometric trade return; not a forecast",
+            "leverage": 10.0,
+            "margin_fraction": 0.03,
+            "mean_signed_price_return_pct": 0.107,
+            "monthly_target_pct": 30.0,
+            "n": 285,
+            "observed_trades_per_day": 9.5,
+            "passes": false,
+            "projected_monthly_return_pct": 9.4137,
+            "required_constant_signed_price_return_pct": 0.973137,
+            "required_trades_per_day": 3.0,
+            "return_pass": false
+          },
+          "max_loss_streak": 8,
+          "n": 285,
+          "negative_months": 0,
+          "non_loss_rate": 49.47,
+          "return_pct": 9.3734,
+          "target_counts": {
+            "0.5": 35,
+            "1.0": 101,
+            "2.0": 149,
+            "3.0": 0,
+            "4.0": 0
+          },
+          "target_hit_rate": 45.61,
+          "trades_per_calendar_day": 9.5,
+          "wr": 49.47
+        },
+        "qualified": true,
+        "quantile": 0.85,
+        "rank": [
+          9.4137,
+          9.3734,
+          -3.6501,
+          285
+        ],
+        "threshold": 0.2150441447538822
+      },
+      {
+        "hourly_cap": 2,
+        "loss_pause": 8,
+        "metrics": {
+          "dd_pct": 3.6501,
+          "economic_gate": {
+            "calendar_days_per_month": 30,
+            "frequency_pass": true,
+            "interpretation": "diagnostic projection from observed geometric trade return; not a forecast",
+            "leverage": 10.0,
+            "margin_fraction": 0.03,
+            "mean_signed_price_return_pct": 0.107,
+            "monthly_target_pct": 30.0,
+            "n": 285,
+            "observed_trades_per_day": 9.5,
+            "passes": false,
+            "projected_monthly_return_pct": 9.4137,
+            "required_constant_signed_price_return_pct": 0.973137,
+            "required_trades_per_day": 3.0,
+            "return_pass": false
+          },
+          "max_loss_streak": 8,
+          "n": 285,
+          "negative_months": 0,
+          "non_loss_rate": 49.47,
+          "return_pct": 9.3734,
+          "target_counts": {
+            "0.5": 35,
+            "1.0": 101,
+            "2.0": 149,
+            "3.0": 0,
+            "4.0": 0
+          },
+          "target_hit_rate": 45.61,
+          "trades_per_calendar_day": 9.5,
+          "wr": 49.47
+        },
+        "qualified": true,
+        "quantile": 0.85,
+        "rank": [
+          9.4137,
+          9.3734,
+          -3.6501,
+          285
+        ],
+        "threshold": 0.2150441447538822
+      },
+      {
+        "hourly_cap": 3,
+        "loss_pause": 6,
+        "metrics": {
+          "dd_pct": 2.679,
+          "economic_gate": {
+            "calendar_days_per_month": 30,
+            "frequency_pass": true,
+            "interpretation": "diagnostic projection from observed geometric trade return; not a forecast",
+            "leverage": 10.0,
+            "margin_fraction": 0.03,
+            "mean_signed_price_return_pct": 0.162009,
+            "monthly_target_pct": 30.0,
+            "n": 182,
+            "observed_trades_per_day": 6.067,
+            "passes": false,
+            "projected_monthly_return_pct": 9.1377,
+            "required_constant_signed_price_return_pct": 0.973137,
+            "required_trades_per_day": 3.0,
+            "return_pass": false
+          },
+          "max_loss_streak": 7,
+          "n": 182,
+          "negative_months": 0,
+          "non_loss_rate": 51.65,
+          "return_pct": 9.1045,
+          "target_counts": {
+            "0.5": 17,
+            "1.0": 62,
+            "2.0": 103,
+            "3.0": 0,
+            "4.0": 0
+          },
+          "target_hit_rate": 48.35,
+          "trades_per_calendar_day": 6.067,
+          "wr": 51.65
+        },
+        "qualified": true,
+        "quantile": 0.9,
+        "rank": [
+          9.1377,
+          9.1045,
+          -2.679,
+          182
+        ],
+        "threshold": 0.2749384059060203
+      },
+      {
+        "hourly_cap": 4,
+        "loss_pause": 6,
+        "metrics": {
+          "dd_pct": 2.679,
+          "economic_gate": {
+            "calendar_days_per_month": 30,
+            "frequency_pass": true,
+            "interpretation": "diagnostic projection from observed geometric trade return; not a forecast",
+            "leverage": 10.0,
+            "margin_fraction": 0.03,
+            "mean_signed_price_return_pct": 0.162009,
+            "monthly_target_pct": 30.0,
+            "n": 182,
+            "observed_trades_per_day": 6.067,
+            "passes": false,
+            "projected_monthly_return_pct": 9.1377,
+            "required_constant_signed_price_return_pct": 0.973137,
+            "required_trades_per_day": 3.0,
+            "return_pass": false
+          },
+          "max_loss_streak": 7,
+          "n": 182,
+          "negative_months": 0,
+          "non_loss_rate": 51.65,
+          "return_pct": 9.1045,
+          "target_counts": {
+            "0.5": 17,
+            "1.0": 62,
+            "2.0": 103,
+            "3.0": 0,
+            "4.0": 0
+          },
+          "target_hit_rate": 48.35,
+          "trades_per_calendar_day": 6.067,
+          "wr": 51.65
+        },
+        "qualified": true,
+        "quantile": 0.9,
+        "rank": [
+          9.1377,
+          9.1045,
+          -2.679,
+          182
+        ],
+        "threshold": 0.2749384059060203
+      },
+      {
+        "hourly_cap": 4,
+        "loss_pause": 7,
+        "metrics": {
+          "dd_pct": 2.8664,
+          "economic_gate": {
+            "calendar_days_per_month": 30,
+            "frequency_pass": true,
+            "interpretation": "diagnostic projection from observed geometric trade return; not a forecast",
+            "leverage": 10.0,
+            "margin_fraction": 0.03,
+            "mean_signed_price_return_pct": 0.101181,
+            "monthly_target_pct": 30.0,
+            "n": 293,
+            "observed_trades_per_day": 9.767,
+            "passes": false,
+            "projected_monthly_return_pct": 9.1329,
+            "required_constant_signed_price_return_pct": 0.973137,
+            "required_trades_per_day": 3.0,
+            "return_pass": false
+          },
+          "max_loss_streak": 6,
+          "n": 293,
+          "negative_months": 0,
+          "non_loss_rate": 49.83,
+          "return_pct": 9.1013,
+          "target_counts": {
+            "0.5": 39,
+            "1.0": 105,
+            "2.0": 149,
+            "3.0": 0,
+            "4.0": 0
+          },
+          "target_hit_rate": 46.08,
+          "trades_per_calendar_day": 9.767,
+          "wr": 49.83
+        },
+        "qualified": true,
+        "quantile": 0.85,
+        "rank": [
+          9.1329,
+          9.1013,
+          -2.8664,
+          293
+        ],
+        "threshold": 0.2150441447538822
+      },
+      {
+        "hourly_cap": 4,
+        "loss_pause": 8,
+        "metrics": {
+          "dd_pct": 2.8664,
+          "economic_gate": {
+            "calendar_days_per_month": 30,
+            "frequency_pass": true,
+            "interpretation": "diagnostic projection from observed geometric trade return; not a forecast",
+            "leverage": 10.0,
+            "margin_fraction": 0.03,
+            "mean_signed_price_return_pct": 0.101181,
+            "monthly_target_pct": 30.0,
+            "n": 293,
+            "observed_trades_per_day": 9.767,
+            "passes": false,
+            "projected_monthly_return_pct": 9.1329,
+            "required_constant_signed_price_return_pct": 0.973137,
+            "required_trades_per_day": 3.0,
+            "return_pass": false
+          },
+          "max_loss_streak": 6,
+          "n": 293,
+          "negative_months": 0,
+          "non_loss_rate": 49.83,
+          "return_pct": 9.1013,
+          "target_counts": {
+            "0.5": 39,
+            "1.0": 105,
+            "2.0": 149,
+            "3.0": 0,
+            "4.0": 0
+          },
+          "target_hit_rate": 46.08,
+          "trades_per_calendar_day": 9.767,
+          "wr": 49.83
+        },
+        "qualified": true,
+        "quantile": 0.85,
+        "rank": [
+          9.1329,
+          9.1013,
+          -2.8664,
+          293
+        ],
+        "threshold": 0.2150441447538822
+      },
+      {
+        "hourly_cap": 2,
+        "loss_pause": 7,
+        "metrics": {
+          "dd_pct": 3.7202,
+          "economic_gate": {
+            "calendar_days_per_month": 30,
+            "frequency_pass": true,
+            "interpretation": "diagnostic projection from observed geometric trade return; not a forecast",
+            "leverage": 10.0,
+            "margin_fraction": 0.03,
+            "mean_signed_price_return_pct": 0.148035,
+            "monthly_target_pct": 30.0,
+            "n": 185,
+            "observed_trades_per_day": 6.167,
+            "passes": false,
+            "projected_monthly_return_pct": 8.4503,
+            "required_constant_signed_price_return_pct": 0.973137,
+            "required_trades_per_day": 3.0,
+            "return_pass": false
+          },
+          "max_loss_streak": 7,
+          "n": 185,
+          "negative_months": 0,
+          "non_loss_rate": 50.81,
+          "return_pct": 8.4074,
+          "target_counts": {
+            "0.5": 17,
+            "1.0": 60,
+            "2.0": 108,
+            "3.0": 0,
+            "4.0": 0
+          },
+          "target_hit_rate": 46.49,
+          "trades_per_calendar_day": 6.167,
+          "wr": 50.81
+        },
+        "qualified": true,
+        "quantile": 0.9,
+        "rank": [
+          8.4503,
+          8.4074,
+          -3.7202,
+          185
+        ],
+        "threshold": 0.2749384059060203
+      },
+      {
+        "hourly_cap": 2,
+        "loss_pause": 8,
+        "metrics": {
+          "dd_pct": 3.7202,
+          "economic_gate": {
+            "calendar_days_per_month": 30,
+            "frequency_pass": true,
+            "interpretation": "diagnostic projection from observed geometric trade return; not a forecast",
+            "leverage": 10.0,
+            "margin_fraction": 0.03,
+            "mean_signed_price_return_pct": 0.148035,
+            "monthly_target_pct": 30.0,
+            "n": 185,
+            "observed_trades_per_day": 6.167,
+            "passes": false,
+            "projected_monthly_return_pct": 8.4503,
+            "required_constant_signed_price_return_pct": 0.973137,
+            "required_trades_per_day": 3.0,
+            "return_pass": false
+          },
+          "max_loss_streak": 7,
+          "n": 185,
+          "negative_months": 0,
+          "non_loss_rate": 50.81,
+          "return_pct": 8.4074,
+          "target_counts": {
+            "0.5": 17,
+            "1.0": 60,
+            "2.0": 108,
+            "3.0": 0,
+            "4.0": 0
+          },
+          "target_hit_rate": 46.49,
+          "trades_per_calendar_day": 6.167,
+          "wr": 50.81
+        },
+        "qualified": true,
+        "quantile": 0.9,
+        "rank": [
+          8.4503,
+          8.4074,
+          -3.7202,
+          185
+        ],
+        "threshold": 0.2749384059060203
+      },
+      {
+        "hourly_cap": 3,
+        "loss_pause": 3,
+        "metrics": {
+          "dd_pct": 2.1046,
+          "economic_gate": {
+            "calendar_days_per_month": 30,
+            "frequency_pass": true,
+            "interpretation": "diagnostic projection from observed geometric trade return; not a forecast",
+            "leverage": 10.0,
+            "margin_fraction": 0.03,
+            "mean_signed_price_return_pct": 0.159177,
+            "monthly_target_pct": 30.0,
+            "n": 167,
+            "observed_trades_per_day": 5.567,
+            "passes": false,
+            "projected_monthly_return_pct": 8.2001,
+            "required_constant_signed_price_return_pct": 0.973137,
+            "required_trades_per_day": 3.0,
+            "return_pass": false
+          },
+          "max_loss_streak": 6,
+          "n": 167,
+          "negative_months": 0,
+          "non_loss_rate": 51.5,
+          "return_pct": 8.1659,
+          "target_counts": {
+            "0.5": 17,
+            "1.0": 54,
+            "2.0": 96,
+            "3.0": 0,
+            "4.0": 0
+          },
+          "target_hit_rate": 47.9,
+          "trades_per_calendar_day": 5.567,
+          "wr": 51.5
+        },
+        "qualified": true,
+        "quantile": 0.9,
+        "rank": [
+          8.2001,
+          8.1659,
+          -2.1046,
+          167
+        ],
+        "threshold": 0.2749384059060203
+      },
+      {
+        "hourly_cap": 4,
+        "loss_pause": 3,
+        "metrics": {
+          "dd_pct": 2.1046,
+          "economic_gate": {
+            "calendar_days_per_month": 30,
+            "frequency_pass": true,
+            "interpretation": "diagnostic projection from observed geometric trade return; not a forecast",
+            "leverage": 10.0,
+            "margin_fraction": 0.03,
+            "mean_signed_price_return_pct": 0.159177,
+            "monthly_target_pct": 30.0,
+            "n": 167,
+            "observed_trades_per_day": 5.567,
+            "passes": false,
+            "projected_monthly_return_pct": 8.2001,
+            "required_constant_signed_price_return_pct": 0.973137,
+            "required_trades_per_day": 3.0,
+            "return_pass": false
+          },
+          "max_loss_streak": 6,
+          "n": 167,
+          "negative_months": 0,
+          "non_loss_rate": 51.5,
+          "return_pct": 8.1659,
+          "target_counts": {
+            "0.5": 17,
+            "1.0": 54,
+            "2.0": 96,
+            "3.0": 0,
+            "4.0": 0
+          },
+          "target_hit_rate": 47.9,
+          "trades_per_calendar_day": 5.567,
+          "wr": 51.5
+        },
+        "qualified": true,
+        "quantile": 0.9,
+        "rank": [
+          8.2001,
+          8.1659,
+          -2.1046,
+          167
+        ],
+        "threshold": 0.2749384059060203
+      },
+      {
+        "hourly_cap": 3,
+        "loss_pause": 5,
+        "metrics": {
+          "dd_pct": 2.9208,
+          "economic_gate": {
+            "calendar_days_per_month": 30,
+            "frequency_pass": true,
+            "interpretation": "diagnostic projection from observed geometric trade return; not a forecast",
+            "leverage": 10.0,
+            "margin_fraction": 0.03,
+            "mean_signed_price_return_pct": 0.150255,
+            "monthly_target_pct": 30.0,
+            "n": 177,
+            "observed_trades_per_day": 5.9,
+            "passes": false,
+            "projected_monthly_return_pct": 8.1981,
+            "required_constant_signed_price_return_pct": 0.973137,
+            "required_trades_per_day": 3.0,
+            "return_pass": false
+          },
+          "max_loss_streak": 7,
+          "n": 177,
+          "negative_months": 0,
+          "non_loss_rate": 51.41,
+          "return_pct": 8.1633,
+          "target_counts": {
+            "0.5": 17,
+            "1.0": 58,
+            "2.0": 102,
+            "3.0": 0,
+            "4.0": 0
+          },
+          "target_hit_rate": 48.02,
+          "trades_per_calendar_day": 5.9,
+          "wr": 51.41
+        },
+        "qualified": true,
+        "quantile": 0.9,
+        "rank": [
+          8.1981,
+          8.1633,
+          -2.9208,
+          177
+        ],
+        "threshold": 0.2749384059060203
+      },
+      {
+        "hourly_cap": 4,
+        "loss_pause": 5,
+        "metrics": {
+          "dd_pct": 2.9208,
+          "economic_gate": {
+            "calendar_days_per_month": 30,
+            "frequency_pass": true,
+            "interpretation": "diagnostic projection from observed geometric trade return; not a forecast",
+            "leverage": 10.0,
+            "margin_fraction": 0.03,
+            "mean_signed_price_return_pct": 0.150255,
+            "monthly_target_pct": 30.0,
+            "n": 177,
+            "observed_trades_per_day": 5.9,
+            "passes": false,
+            "projected_monthly_return_pct": 8.1981,
+            "required_constant_signed_price_return_pct": 0.973137,
+            "required_trades_per_day": 3.0,
+            "return_pass": false
+          },
+          "max_loss_streak": 7,
+          "n": 177,
+          "negative_months": 0,
+          "non_loss_rate": 51.41,
+          "return_pct": 8.1633,
+          "target_counts": {
+            "0.5": 17,
+            "1.0": 58,
+            "2.0": 102,
+            "3.0": 0,
+            "4.0": 0
+          },
+          "target_hit_rate": 48.02,
+          "trades_per_calendar_day": 5.9,
+          "wr": 51.41
+        },
+        "qualified": true,
+        "quantile": 0.9,
+        "rank": [
+          8.1981,
+          8.1633,
+          -2.9208,
+          177
+        ],
+        "threshold": 0.2749384059060203
+      },
+      {
+        "hourly_cap": 3,
+        "loss_pause": 4,
+        "metrics": {
+          "dd_pct": 2.9217,
+          "economic_gate": {
+            "calendar_days_per_month": 30,
+            "frequency_pass": true,
+            "interpretation": "diagnostic projection from observed geometric trade return; not a forecast",
+            "leverage": 10.0,
+            "margin_fraction": 0.03,
+            "mean_signed_price_return_pct": 0.100882,
+            "monthly_target_pct": 30.0,
+            "n": 259,
+            "observed_trades_per_day": 8.633,
+            "passes": false,
+            "projected_monthly_return_pct": 8.0105,
+            "required_constant_signed_price_return_pct": 0.973137,
+            "required_trades_per_day": 3.0,
+            "return_pass": false
+          },
+          "max_loss_streak": 8,
+          "n": 259,
+          "negative_months": 0,
+          "non_loss_rate": 49.42,
+          "return_pct": 7.9956,
+          "target_counts": {
+            "0.5": 36,
+            "1.0": 85,
+            "2.0": 138,
+            "3.0": 0,
+            "4.0": 0
+          },
+          "target_hit_rate": 45.56,
+          "trades_per_calendar_day": 8.633,
+          "wr": 49.42
+        },
+        "qualified": true,
+        "quantile": 0.85,
+        "rank": [
+          8.0105,
+          7.9956,
+          -2.9217,
+          259
+        ],
+        "threshold": 0.2150441447538822
+      }
+    ]
+  },
+  "selection_metrics": {
+    "dd_pct": 2.3587,
+    "economic_gate": {
+      "calendar_days_per_month": 30,
+      "frequency_pass": true,
+      "interpretation": "diagnostic projection from observed geometric trade return; not a forecast",
+      "leverage": 10.0,
+      "margin_fraction": 0.03,
+      "mean_signed_price_return_pct": 0.107898,
+      "monthly_target_pct": 30.0,
+      "n": 349,
+      "observed_trades_per_day": 11.633,
+      "passes": false,
+      "projected_monthly_return_pct": 11.761,
+      "required_constant_signed_price_return_pct": 0.973137,
+      "required_trades_per_day": 3.0,
+      "return_pass": false
+    },
+    "max_loss_streak": 13,
+    "n": 349,
+    "negative_months": 0,
+    "non_loss_rate": 44.13,
+    "return_pct": 11.7405,
+    "target_counts": {
+      "0.5": 33,
+      "1.0": 87,
+      "2.0": 90,
+      "3.0": 76,
+      "4.0": 63
+    },
+    "target_hit_rate": 38.97,
+    "trades_per_calendar_day": 11.633,
+    "wr": 44.13
+  },
+  "sources": {
+    "C:\\Users\\Lenovo\\Desktop\\telegram bot\\crypto_xperp_native_target_router_oct24_audit.py": "be26336d1fdf2d4629afe7687704276a144a4f8710884fc89f00fdccacb5245d",
+    "reports\\audit_2026_09_08\\crypto_xperp_raw_router_audit_0_25_oct24_material_raw_raw_families.csv": "6f6e2bbd66d7e622933460e04b55c92319cedd387824936bc06a2b52a7b5fc76",
+    "reports\\audit_2026_09_08\\crypto_xperp_raw_router_audit_2_0_oct24_material_raw_raw_families.csv": "60f0c22242118d24fbe4405c47abbdd9a025cc9309793b78874ba9fe512b4db9",
+    "reports\\audit_2026_09_08\\xperp_15m_oct24_material\\manifest.json": "afc85a0097674504b8dada339c448db4a5f5122f957ec0fd453b65c3c6d70799"
+  },
+  "status": "XPERP_NATIVE_ROUTER_REJECTED"
+}
