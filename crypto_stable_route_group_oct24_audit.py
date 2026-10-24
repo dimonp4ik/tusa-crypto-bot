@@ -22,6 +22,7 @@ ROOT = Path("reports/audit_2026_09_08")
 SOURCE = ROOT / "crypto_walkforward_target_router_oct24_forward.json"
 OUT = ROOT / "crypto_stable_route_group_oct24_audit.json"
 ROWS_OUT = ROOT / "crypto_stable_route_group_oct24_audit.pkl"
+SELECTION_ROWS_OUT = ROOT / "crypto_stable_route_group_oct24_selection.pkl"
 
 GROUP_SPECS = (
     ("family", "direction"),
@@ -212,9 +213,12 @@ def main() -> None:
     groups = learned[lookup]
     selected_oct_rows = gated(apply_filter(
         october, spec, groups, selected["mode"]), policy)
+    selected_sep_rows = gated(apply_filter(
+        september, spec, groups, selected["mode"]), policy)
     oct3 = metrics(selected_oct_rows, .03)
     oct5 = metrics(selected_oct_rows, .05)
     pd.DataFrame(selected_oct_rows).to_pickle(ROWS_OUT)
+    pd.DataFrame(selected_sep_rows).to_pickle(SELECTION_ROWS_OUT)
 
     improved = bool(
         oct3["return_pct"] > baseline_oct["return_pct"]
