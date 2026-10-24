@@ -1,0 +1,503 @@
+{
+  "baseline_october": {
+    "active_days": 24,
+    "by_module_count": {
+      "walkforward_exact_target_router": 185
+    },
+    "by_source_count": {
+      "walkforward_exact_target_router": 185
+    },
+    "dd_pct": 3.0177,
+    "economic_gate": {
+      "calendar_days_per_month": 30,
+      "frequency_pass": true,
+      "interpretation": "diagnostic projection from observed geometric trade return; not a forecast",
+      "leverage": 10.0,
+      "margin_fraction": 0.03,
+      "mean_signed_price_return_pct": 0.163313,
+      "monthly_target_pct": 30.0,
+      "n": 185,
+      "observed_trades_per_day": 7.708,
+      "passes": false,
+      "projected_monthly_return_pct": 11.8762,
+      "required_constant_signed_price_return_pct": 0.973137,
+      "required_trades_per_day": 3.0,
+      "return_pass": false
+    },
+    "max_entries_same_clock_hour": 2,
+    "max_entries_same_rolling_hour": 2,
+    "max_loss_streak": 9,
+    "monthly_return_pct": {
+      "2026-10": 9.3217
+    },
+    "n": 185,
+    "negative_months": 0,
+    "return_pct": 9.3217,
+    "trades_per_active_day": 7.708,
+    "trades_per_calendar_day": 7.708,
+    "wr": 47.57
+  },
+  "improves_baseline_with_frequency_rail": false,
+  "limitations": [
+    "Only one partial October month is available for final validation.",
+    "September chooses among three fixed residual objectives.",
+    "Gross results exclude fees at user request."
+  ],
+  "objective_pass": false,
+  "october_test": {
+    "margin_3pct": {
+      "active_days": 22,
+      "by_module_count": {
+        "walkforward_exact_target_router": 150
+      },
+      "by_source_count": {
+        "walkforward_exact_target_router": 150
+      },
+      "dd_pct": 3.6267,
+      "economic_gate": {
+        "calendar_days_per_month": 30,
+        "frequency_pass": true,
+        "interpretation": "diagnostic projection from observed geometric trade return; not a forecast",
+        "leverage": 10.0,
+        "margin_fraction": 0.03,
+        "mean_signed_price_return_pct": 0.103249,
+        "monthly_target_pct": 30.0,
+        "n": 150,
+        "observed_trades_per_day": 6.818,
+        "passes": false,
+        "projected_monthly_return_pct": 6.4379,
+        "required_constant_signed_price_return_pct": 0.973137,
+        "required_trades_per_day": 3.0,
+        "return_pass": false
+      },
+      "max_entries_same_clock_hour": 3,
+      "max_entries_same_rolling_hour": 2,
+      "max_loss_streak": 13,
+      "monthly_return_pct": {
+        "2026-10": 4.6316
+      },
+      "n": 150,
+      "negative_months": 0,
+      "return_pct": 4.6316,
+      "trades_per_active_day": 6.818,
+      "trades_per_calendar_day": 6.818,
+      "wr": 40.0
+    },
+    "margin_5pct": {
+      "active_days": 22,
+      "by_module_count": {
+        "walkforward_exact_target_router": 150
+      },
+      "by_source_count": {
+        "walkforward_exact_target_router": 150
+      },
+      "dd_pct": 5.9851,
+      "economic_gate": {
+        "calendar_days_per_month": 30,
+        "frequency_pass": true,
+        "interpretation": "diagnostic projection from observed geometric trade return; not a forecast",
+        "leverage": 10.0,
+        "margin_fraction": 0.05,
+        "mean_signed_price_return_pct": 0.103249,
+        "monthly_target_pct": 30.0,
+        "n": 150,
+        "observed_trades_per_day": 6.818,
+        "passes": false,
+        "projected_monthly_return_pct": 10.8399,
+        "required_constant_signed_price_return_pct": 0.583882,
+        "required_trades_per_day": 3.0,
+        "return_pass": false
+      },
+      "max_entries_same_clock_hour": 3,
+      "max_entries_same_rolling_hour": 2,
+      "max_loss_streak": 13,
+      "monthly_return_pct": {
+        "2026-10": 7.6969
+      },
+      "n": 150,
+      "negative_months": 0,
+      "return_pct": 7.6969,
+      "trades_per_active_day": 6.818,
+      "trades_per_calendar_day": 6.818,
+      "wr": 40.0
+    }
+  },
+  "order_eligible": false,
+  "protocol": {
+    "base_router": "frozen before October",
+    "candidate_policies": 720,
+    "october_used_for_selection": false,
+    "residual_fit": "X-Perp before September",
+    "selection": "September 2026 only",
+    "untouched_test": "October 2026 through Oct 24",
+    "variants": 3
+  },
+  "ready_for_live_orders": false,
+  "selected_policy": {
+    "cutoff": 0.48264635064829997,
+    "hourly_cap": 3,
+    "loss_pause": 8,
+    "quantile": 0.6,
+    "selection_metrics": {
+      "dd_pct": 4.4318,
+      "max_loss_streak": 13,
+      "n": 142,
+      "negative_months": 0,
+      "return_pct": 7.2656,
+      "trades_per_calendar_day": 4.733,
+      "wr": 44.37
+    },
+    "selection_score": 6.15765,
+    "variant": "net_r_regression"
+  },
+  "selection_frontier": [
+    {
+      "cutoff": 0.48264635064829997,
+      "hourly_cap": 3,
+      "loss_pause": 8,
+      "quantile": 0.6,
+      "selection_metrics": {
+        "dd_pct": 4.4318,
+        "max_loss_streak": 13,
+        "n": 142,
+        "negative_months": 0,
+        "return_pct": 7.2656,
+        "trades_per_calendar_day": 4.733,
+        "wr": 44.37
+      },
+      "selection_score": 6.15765,
+      "variant": "net_r_regression"
+    },
+    {
+      "cutoff": 0.48264635064829997,
+      "hourly_cap": 4,
+      "loss_pause": 8,
+      "quantile": 0.6,
+      "selection_metrics": {
+        "dd_pct": 4.4318,
+        "max_loss_streak": 13,
+        "n": 142,
+        "negative_months": 0,
+        "return_pct": 7.2378,
+        "trades_per_calendar_day": 4.733,
+        "wr": 43.66
+      },
+      "selection_score": 6.12985,
+      "variant": "net_r_regression"
+    },
+    {
+      "cutoff": 0.48264635064829997,
+      "hourly_cap": 3,
+      "loss_pause": 7,
+      "quantile": 0.6,
+      "selection_metrics": {
+        "dd_pct": 4.4318,
+        "max_loss_streak": 13,
+        "n": 142,
+        "negative_months": 0,
+        "return_pct": 6.9426,
+        "trades_per_calendar_day": 4.733,
+        "wr": 43.66
+      },
+      "selection_score": 5.83465,
+      "variant": "net_r_regression"
+    },
+    {
+      "cutoff": 0.48264635064829997,
+      "hourly_cap": 4,
+      "loss_pause": 7,
+      "quantile": 0.6,
+      "selection_metrics": {
+        "dd_pct": 4.4318,
+        "max_loss_streak": 13,
+        "n": 142,
+        "negative_months": 0,
+        "return_pct": 6.9426,
+        "trades_per_calendar_day": 4.733,
+        "wr": 43.66
+      },
+      "selection_score": 5.83465,
+      "variant": "net_r_regression"
+    },
+    {
+      "cutoff": 0.48264635064829997,
+      "hourly_cap": 2,
+      "loss_pause": 8,
+      "quantile": 0.6,
+      "selection_metrics": {
+        "dd_pct": 4.6509,
+        "max_loss_streak": 13,
+        "n": 140,
+        "negative_months": 0,
+        "return_pct": 6.8833,
+        "trades_per_calendar_day": 4.667,
+        "wr": 44.29
+      },
+      "selection_score": 5.720575,
+      "variant": "net_r_regression"
+    },
+    {
+      "cutoff": 0.48264635064829997,
+      "hourly_cap": 2,
+      "loss_pause": 7,
+      "quantile": 0.6,
+      "selection_metrics": {
+        "dd_pct": 4.6509,
+        "max_loss_streak": 13,
+        "n": 140,
+        "negative_months": 0,
+        "return_pct": 6.6273,
+        "trades_per_calendar_day": 4.667,
+        "wr": 43.57
+      },
+      "selection_score": 5.464575,
+      "variant": "net_r_regression"
+    },
+    {
+      "cutoff": 0.39086712420563374,
+      "hourly_cap": 3,
+      "loss_pause": 7,
+      "quantile": 0.5,
+      "selection_metrics": {
+        "dd_pct": 5.8026,
+        "max_loss_streak": 12,
+        "n": 171,
+        "negative_months": 0,
+        "return_pct": 6.5389,
+        "trades_per_calendar_day": 5.7,
+        "wr": 44.44
+      },
+      "selection_score": 5.08825,
+      "variant": "net_r_regression"
+    },
+    {
+      "cutoff": 0.39086712420563374,
+      "hourly_cap": 4,
+      "loss_pause": 7,
+      "quantile": 0.5,
+      "selection_metrics": {
+        "dd_pct": 5.8026,
+        "max_loss_streak": 12,
+        "n": 171,
+        "negative_months": 0,
+        "return_pct": 6.5389,
+        "trades_per_calendar_day": 5.7,
+        "wr": 44.44
+      },
+      "selection_score": 5.08825,
+      "variant": "net_r_regression"
+    },
+    {
+      "cutoff": 0.48264635064829997,
+      "hourly_cap": 3,
+      "loss_pause": 5,
+      "quantile": 0.6,
+      "selection_metrics": {
+        "dd_pct": 4.8894,
+        "max_loss_streak": 18,
+        "n": 140,
+        "negative_months": 0,
+        "return_pct": 6.0497,
+        "trades_per_calendar_day": 4.667,
+        "wr": 42.86
+      },
+      "selection_score": 4.82735,
+      "variant": "net_r_regression"
+    },
+    {
+      "cutoff": 0.48264635064829997,
+      "hourly_cap": 4,
+      "loss_pause": 5,
+      "quantile": 0.6,
+      "selection_metrics": {
+        "dd_pct": 4.8894,
+        "max_loss_streak": 18,
+        "n": 140,
+        "negative_months": 0,
+        "return_pct": 6.0497,
+        "trades_per_calendar_day": 4.667,
+        "wr": 42.86
+      },
+      "selection_score": 4.82735,
+      "variant": "net_r_regression"
+    },
+    {
+      "cutoff": 0.6125836118612846,
+      "hourly_cap": 3,
+      "loss_pause": 4,
+      "quantile": 0.5,
+      "selection_metrics": {
+        "dd_pct": 3.28,
+        "max_loss_streak": 5,
+        "n": 154,
+        "negative_months": 0,
+        "return_pct": 5.6407,
+        "trades_per_calendar_day": 5.133,
+        "wr": 55.19
+      },
+      "selection_score": 4.8207,
+      "variant": "win_classifier"
+    },
+    {
+      "cutoff": 0.6125836118612846,
+      "hourly_cap": 4,
+      "loss_pause": 4,
+      "quantile": 0.5,
+      "selection_metrics": {
+        "dd_pct": 3.28,
+        "max_loss_streak": 5,
+        "n": 154,
+        "negative_months": 0,
+        "return_pct": 5.6407,
+        "trades_per_calendar_day": 5.133,
+        "wr": 55.19
+      },
+      "selection_score": 4.8207,
+      "variant": "win_classifier"
+    },
+    {
+      "cutoff": 0.39086712420563374,
+      "hourly_cap": 2,
+      "loss_pause": 8,
+      "quantile": 0.5,
+      "selection_metrics": {
+        "dd_pct": 6.1264,
+        "max_loss_streak": 12,
+        "n": 166,
+        "negative_months": 0,
+        "return_pct": 6.2167,
+        "trades_per_calendar_day": 5.533,
+        "wr": 45.18
+      },
+      "selection_score": 4.6851,
+      "variant": "net_r_regression"
+    },
+    {
+      "cutoff": 0.48264635064829997,
+      "hourly_cap": 3,
+      "loss_pause": 6,
+      "quantile": 0.6,
+      "selection_metrics": {
+        "dd_pct": 4.8894,
+        "max_loss_streak": 19,
+        "n": 141,
+        "negative_months": 0,
+        "return_pct": 5.7764,
+        "trades_per_calendar_day": 4.7,
+        "wr": 42.55
+      },
+      "selection_score": 4.55405,
+      "variant": "net_r_regression"
+    },
+    {
+      "cutoff": 0.48264635064829997,
+      "hourly_cap": 4,
+      "loss_pause": 6,
+      "quantile": 0.6,
+      "selection_metrics": {
+        "dd_pct": 4.8894,
+        "max_loss_streak": 19,
+        "n": 141,
+        "negative_months": 0,
+        "return_pct": 5.7764,
+        "trades_per_calendar_day": 4.7,
+        "wr": 42.55
+      },
+      "selection_score": 4.55405,
+      "variant": "net_r_regression"
+    },
+    {
+      "cutoff": 0.39086712420563374,
+      "hourly_cap": 3,
+      "loss_pause": 5,
+      "quantile": 0.5,
+      "selection_metrics": {
+        "dd_pct": 6.019,
+        "max_loss_streak": 12,
+        "n": 162,
+        "negative_months": 0,
+        "return_pct": 6.0219,
+        "trades_per_calendar_day": 5.4,
+        "wr": 43.83
+      },
+      "selection_score": 4.51715,
+      "variant": "net_r_regression"
+    },
+    {
+      "cutoff": 0.39086712420563374,
+      "hourly_cap": 4,
+      "loss_pause": 5,
+      "quantile": 0.5,
+      "selection_metrics": {
+        "dd_pct": 6.019,
+        "max_loss_streak": 12,
+        "n": 162,
+        "negative_months": 0,
+        "return_pct": 6.0219,
+        "trades_per_calendar_day": 5.4,
+        "wr": 43.83
+      },
+      "selection_score": 4.51715,
+      "variant": "net_r_regression"
+    },
+    {
+      "cutoff": 0.39086712420563374,
+      "hourly_cap": 3,
+      "loss_pause": 8,
+      "quantile": 0.5,
+      "selection_metrics": {
+        "dd_pct": 5.8026,
+        "max_loss_streak": 12,
+        "n": 170,
+        "negative_months": 0,
+        "return_pct": 5.9332,
+        "trades_per_calendar_day": 5.667,
+        "wr": 44.12
+      },
+      "selection_score": 4.48255,
+      "variant": "net_r_regression"
+    },
+    {
+      "cutoff": 0.39086712420563374,
+      "hourly_cap": 4,
+      "loss_pause": 8,
+      "quantile": 0.5,
+      "selection_metrics": {
+        "dd_pct": 5.8026,
+        "max_loss_streak": 12,
+        "n": 170,
+        "negative_months": 0,
+        "return_pct": 5.9058,
+        "trades_per_calendar_day": 5.667,
+        "wr": 43.53
+      },
+      "selection_score": 4.45515,
+      "variant": "net_r_regression"
+    },
+    {
+      "cutoff": 0.48264635064829997,
+      "hourly_cap": 2,
+      "loss_pause": 5,
+      "quantile": 0.6,
+      "selection_metrics": {
+        "dd_pct": 5.3105,
+        "max_loss_streak": 18,
+        "n": 138,
+        "negative_months": 0,
+        "return_pct": 5.7347,
+        "trades_per_calendar_day": 4.6,
+        "wr": 42.75
+      },
+      "selection_score": 4.407075,
+      "variant": "net_r_regression"
+    }
+  ],
+  "sources": {
+    "C:\\Users\\Lenovo\\Desktop\\telegram bot\\crypto_residual_meta_router_oct24_audit.py": "cb6508a5db758dcfd47f1e3fdb11e0bad778434b34255973a161c4d13c15e9ec",
+    "reports\\audit_2026_09_08\\crypto_walkforward_target_router_oct24_forward.json": "df30598f8b31dad11f281de10db318dca49fa1dd14b4bfcf23b84a348b883fce",
+    "reports\\audit_2026_09_08\\crypto_xperp_raw_router_audit_0_25_oct24_material_raw_raw_families.csv": "6f6e2bbd66d7e622933460e04b55c92319cedd387824936bc06a2b52a7b5fc76",
+    "reports\\audit_2026_09_08\\crypto_xperp_raw_router_audit_2_0_oct24_material_raw_raw_families.csv": "60f0c22242118d24fbe4405c47abbdd9a025cc9309793b78874ba9fe512b4db9",
+    "reports\\audit_2026_09_08\\xperp_15m_oct24_material\\manifest.json": "afc85a0097674504b8dada339c448db4a5f5122f957ec0fd453b65c3c6d70799"
+  },
+  "status": "REJECTED_RESIDUAL_META_ROUTER"
+}
