@@ -1,0 +1,2694 @@
+{
+  "confirmation_2025_2026": null,
+  "coverage": {
+    "global": {
+      "AAVEUSDT": {
+        "bars": 51469,
+        "end": 1792857600,
+        "overlap_bars_verified": 51049,
+        "start": 1607572800
+      },
+      "AVAXUSDT": {
+        "bars": 53341,
+        "end": 1792857600,
+        "overlap_bars_verified": 52921,
+        "start": 1600833600
+      },
+      "BTCUSDT": {
+        "bars": 59729,
+        "end": 1792857600,
+        "overlap_bars_verified": 59309,
+        "start": 1577836800
+      },
+      "ETHUSDT": {
+        "bars": 59729,
+        "end": 1792857600,
+        "overlap_bars_verified": 59309,
+        "start": 1577836800
+      },
+      "LINKUSDT": {
+        "bars": 58158,
+        "end": 1792857600,
+        "overlap_bars_verified": 57738,
+        "start": 1583492400
+      },
+      "SOLUSDT": {
+        "bars": 50435,
+        "end": 1792857600,
+        "overlap_bars_verified": 50015,
+        "start": 1611295200
+      },
+      "XLMUSDT": {
+        "bars": 56582,
+        "end": 1792857600,
+        "overlap_bars_verified": 56162,
+        "start": 1589166000
+      },
+      "XRPUSDT": {
+        "bars": 59729,
+        "end": 1792857600,
+        "overlap_bars_verified": 59309,
+        "start": 1577836800
+      }
+    }
+  },
+  "direct_xperp_diagnostic": null,
+  "frozen_before_validation": {
+    "eligible_guards": 4,
+    "guard": "trend_ext0.0200_counter1h0.0025",
+    "selection_2022": {
+      "active_days": 253,
+      "by_module_count": {
+        "literal_regime_router": 680
+      },
+      "by_source_count": {
+        "literal_regime_router": 680
+      },
+      "dd_pct": 4.8578,
+      "literal_target_hit_rate": 33.3824,
+      "literal_target_hits": 227,
+      "max_entries_same_clock_hour": 2,
+      "max_entries_same_rolling_hour": 2,
+      "max_loss_streak": 16,
+      "median_month_pct": 3.7791,
+      "minimum_month_pct": -0.9394,
+      "monthly_return_pct": {
+        "2022-01": 1.4937,
+        "2022-02": 5.155,
+        "2022-03": 3.7791,
+        "2022-04": 5.1982,
+        "2022-05": 5.0184,
+        "2022-06": 5.9834,
+        "2022-07": -0.9394,
+        "2022-08": 6.0048,
+        "2022-09": 2.1689,
+        "2022-10": 0.0985,
+        "2022-11": 1.6764,
+        "2022-12": 5.6339,
+        "2023-01": 1.4387
+      },
+      "months": 13,
+      "months_ge_30pct": 0,
+      "n": 680,
+      "negative_months": 1,
+      "return_pct": 51.7365,
+      "stops": 350,
+      "timeouts": 103,
+      "trades_per_active_day": 2.688,
+      "trades_per_calendar_day": 1.863,
+      "wr": 44.56
+    },
+    "selection_baseline_2022": {
+      "active_days": 262,
+      "by_module_count": {
+        "literal_regime_router": 763
+      },
+      "by_source_count": {
+        "literal_regime_router": 763
+      },
+      "dd_pct": 6.0735,
+      "literal_target_hit_rate": 32.8965,
+      "literal_target_hits": 251,
+      "max_entries_same_clock_hour": 2,
+      "max_entries_same_rolling_hour": 2,
+      "max_loss_streak": 16,
+      "median_month_pct": 3.5898,
+      "minimum_month_pct": -2.4336,
+      "monthly_return_pct": {
+        "2022-01": -0.3302,
+        "2022-02": 3.5898,
+        "2022-03": 4.557,
+        "2022-04": 7.1368,
+        "2022-05": 3.7017,
+        "2022-06": 7.0824,
+        "2022-07": -2.4336,
+        "2022-08": 10.5107,
+        "2022-09": 2.7691,
+        "2022-10": -0.8906,
+        "2022-11": 1.3741,
+        "2022-12": 3.7869,
+        "2023-01": 1.4387
+      },
+      "months": 13,
+      "months_ge_30pct": 0,
+      "n": 763,
+      "negative_months": 3,
+      "return_pct": 50.533,
+      "stops": 402,
+      "timeouts": 110,
+      "trades_per_active_day": 2.912,
+      "trades_per_calendar_day": 2.09,
+      "wr": 43.64
+    }
+  },
+  "limitations": [
+    "The candidate family was motivated by five already observed direct losses.",
+    "Closed hourly features cannot reproduce order-book liquidity or tick order.",
+    "A historical pass still requires a genuinely new forward interval before activation.",
+    "Gross results exclude fees at user request."
+  ],
+  "order_eligible": false,
+  "protocol": {
+    "conditional_test": 2024,
+    "confirmation_only": [
+      2025,
+      2026
+    ],
+    "direct_cluster": "diagnostic only; it motivated the family and is not validation",
+    "entry_route": "frozen stable direction hourly route",
+    "exit": "fixed 2% target, 1% stop, 12-hour maximum, stop-first",
+    "market_entries_only": true,
+    "money": "client-selected current-equity margin; diagnostics use 3% and fixed 10x",
+    "pullback_guard": "block when the symbol 24h move still opposes pullback direction",
+    "selection": 2022,
+    "trend_guard": "block extended direction-aligned 24h move when last closed hour reverses",
+    "validation": 2023
+  },
+  "ready_for_live_orders": false,
+  "selection_baseline_2022": {
+    "active_days": 262,
+    "by_module_count": {
+      "literal_regime_router": 763
+    },
+    "by_source_count": {
+      "literal_regime_router": 763
+    },
+    "dd_pct": 6.0735,
+    "literal_target_hit_rate": 32.8965,
+    "literal_target_hits": 251,
+    "max_entries_same_clock_hour": 2,
+    "max_entries_same_rolling_hour": 2,
+    "max_loss_streak": 16,
+    "median_month_pct": 3.5898,
+    "minimum_month_pct": -2.4336,
+    "monthly_return_pct": {
+      "2022-01": -0.3302,
+      "2022-02": 3.5898,
+      "2022-03": 4.557,
+      "2022-04": 7.1368,
+      "2022-05": 3.7017,
+      "2022-06": 7.0824,
+      "2022-07": -2.4336,
+      "2022-08": 10.5107,
+      "2022-09": 2.7691,
+      "2022-10": -0.8906,
+      "2022-11": 1.3741,
+      "2022-12": 3.7869,
+      "2023-01": 1.4387
+    },
+    "months": 13,
+    "months_ge_30pct": 0,
+    "n": 763,
+    "negative_months": 3,
+    "return_pct": 50.533,
+    "stops": 402,
+    "timeouts": 110,
+    "trades_per_active_day": 2.912,
+    "trades_per_calendar_day": 2.09,
+    "wr": 43.64
+  },
+  "selection_frontier": [
+    {
+      "blocked_raw_rows": 1478,
+      "guard": "trend_ext0.0200_counter1h0.0025",
+      "selection_2022": {
+        "active_days": 253,
+        "by_module_count": {
+          "literal_regime_router": 680
+        },
+        "by_source_count": {
+          "literal_regime_router": 680
+        },
+        "dd_pct": 4.8578,
+        "literal_target_hit_rate": 33.3824,
+        "literal_target_hits": 227,
+        "max_entries_same_clock_hour": 2,
+        "max_entries_same_rolling_hour": 2,
+        "max_loss_streak": 16,
+        "median_month_pct": 3.7791,
+        "minimum_month_pct": -0.9394,
+        "monthly_return_pct": {
+          "2022-01": 1.4937,
+          "2022-02": 5.155,
+          "2022-03": 3.7791,
+          "2022-04": 5.1982,
+          "2022-05": 5.0184,
+          "2022-06": 5.9834,
+          "2022-07": -0.9394,
+          "2022-08": 6.0048,
+          "2022-09": 2.1689,
+          "2022-10": 0.0985,
+          "2022-11": 1.6764,
+          "2022-12": 5.6339,
+          "2023-01": 1.4387
+        },
+        "months": 13,
+        "months_ge_30pct": 0,
+        "n": 680,
+        "negative_months": 1,
+        "return_pct": 51.7365,
+        "stops": 350,
+        "timeouts": 103,
+        "trades_per_active_day": 2.688,
+        "trades_per_calendar_day": 1.863,
+        "wr": 44.56
+      },
+      "selection_pass": true
+    },
+    {
+      "blocked_raw_rows": 914,
+      "guard": "trend_ext0.0400_counter1h0.0025",
+      "selection_2022": {
+        "active_days": 256,
+        "by_module_count": {
+          "literal_regime_router": 713
+        },
+        "by_source_count": {
+          "literal_regime_router": 713
+        },
+        "dd_pct": 6.0687,
+        "literal_target_hit_rate": 33.0996,
+        "literal_target_hits": 236,
+        "max_entries_same_clock_hour": 2,
+        "max_entries_same_rolling_hour": 2,
+        "max_loss_streak": 16,
+        "median_month_pct": 3.6674,
+        "minimum_month_pct": -1.1754,
+        "monthly_return_pct": {
+          "2022-01": 0.8785,
+          "2022-02": 5.4723,
+          "2022-03": 4.7028,
+          "2022-04": 4.9123,
+          "2022-05": 3.6674,
+          "2022-06": 7.2503,
+          "2022-07": 0.5378,
+          "2022-08": 7.2587,
+          "2022-09": 2.4608,
+          "2022-10": -1.1754,
+          "2022-11": 1.3741,
+          "2022-12": 3.7567,
+          "2023-01": 1.4387
+        },
+        "months": 13,
+        "months_ge_30pct": 0,
+        "n": 713,
+        "negative_months": 1,
+        "return_pct": 51.389,
+        "stops": 370,
+        "timeouts": 107,
+        "trades_per_active_day": 2.785,
+        "trades_per_calendar_day": 1.953,
+        "wr": 44.18
+      },
+      "selection_pass": true
+    },
+    {
+      "blocked_raw_rows": 616,
+      "guard": "trend_ext0.0500_counter1h0.0025",
+      "selection_2022": {
+        "active_days": 258,
+        "by_module_count": {
+          "literal_regime_router": 726
+        },
+        "by_source_count": {
+          "literal_regime_router": 726
+        },
+        "dd_pct": 6.0721,
+        "literal_target_hit_rate": 33.0579,
+        "literal_target_hits": 240,
+        "max_entries_same_clock_hour": 2,
+        "max_entries_same_rolling_hour": 2,
+        "max_loss_streak": 16,
+        "median_month_pct": 3.6653,
+        "minimum_month_pct": -1.5528,
+        "monthly_return_pct": {
+          "2022-01": 1.4838,
+          "2022-02": 5.1559,
+          "2022-03": 5.499,
+          "2022-04": 5.1986,
+          "2022-05": 3.6653,
+          "2022-06": 7.2503,
+          "2022-07": -1.5528,
+          "2022-08": 7.2587,
+          "2022-09": 2.7645,
+          "2022-10": -1.179,
+          "2022-11": 1.3741,
+          "2022-12": 3.7567,
+          "2023-01": 1.4387
+        },
+        "months": 13,
+        "months_ge_30pct": 0,
+        "n": 726,
+        "negative_months": 2,
+        "return_pct": 50.6591,
+        "stops": 379,
+        "timeouts": 107,
+        "trades_per_active_day": 2.814,
+        "trades_per_calendar_day": 1.989,
+        "wr": 43.8
+      },
+      "selection_pass": true
+    },
+    {
+      "blocked_raw_rows": 1436,
+      "guard": "pullback_24h_conflict0.0200",
+      "selection_2022": {
+        "active_days": 243,
+        "by_module_count": {
+          "literal_regime_router": 659
+        },
+        "by_source_count": {
+          "literal_regime_router": 659
+        },
+        "dd_pct": 5.0133,
+        "literal_target_hit_rate": 33.2322,
+        "literal_target_hits": 219,
+        "max_entries_same_clock_hour": 2,
+        "max_entries_same_rolling_hour": 2,
+        "max_loss_streak": 13,
+        "median_month_pct": 2.9812,
+        "minimum_month_pct": -1.8118,
+        "monthly_return_pct": {
+          "2022-01": -0.0976,
+          "2022-02": 2.9812,
+          "2022-03": 4.075,
+          "2022-04": 9.1395,
+          "2022-05": 4.6401,
+          "2022-06": 6.6599,
+          "2022-07": -1.2367,
+          "2022-08": 7.9216,
+          "2022-09": 2.6373,
+          "2022-10": -1.8118,
+          "2022-11": 2.6034,
+          "2022-12": 3.6577,
+          "2023-01": 1.4387
+        },
+        "months": 13,
+        "months_ge_30pct": 0,
+        "n": 659,
+        "negative_months": 3,
+        "return_pct": 51.1459,
+        "stops": 334,
+        "timeouts": 106,
+        "trades_per_active_day": 2.712,
+        "trades_per_calendar_day": 1.805,
+        "wr": 44.92
+      },
+      "selection_pass": true
+    },
+    {
+      "blocked_raw_rows": 3588,
+      "guard": "trend_ext0.0300_counter1h0.0025__plus__pullback_24h_conflict0.0100",
+      "selection_2022": {
+        "active_days": 212,
+        "by_module_count": {
+          "literal_regime_router": 510
+        },
+        "by_source_count": {
+          "literal_regime_router": 510
+        },
+        "dd_pct": 4.4494,
+        "literal_target_hit_rate": 33.9216,
+        "literal_target_hits": 173,
+        "max_entries_same_clock_hour": 2,
+        "max_entries_same_rolling_hour": 2,
+        "max_loss_streak": 13,
+        "median_month_pct": 2.4037,
+        "minimum_month_pct": 0.5616,
+        "monthly_return_pct": {
+          "2022-01": 2.553,
+          "2022-02": 3.6019,
+          "2022-03": 0.5616,
+          "2022-04": 1.4256,
+          "2022-05": 5.8845,
+          "2022-06": 6.8357,
+          "2022-07": 0.8661,
+          "2022-08": 2.2544,
+          "2022-09": 0.6427,
+          "2022-10": 0.9762,
+          "2022-11": 2.6062,
+          "2022-12": 5.4529
+        },
+        "months": 12,
+        "months_ge_30pct": 0,
+        "n": 510,
+        "negative_months": 0,
+        "return_pct": 39.0287,
+        "stops": 259,
+        "timeouts": 78,
+        "trades_per_active_day": 2.406,
+        "trades_per_calendar_day": 1.405,
+        "wr": 44.51
+      },
+      "selection_pass": false
+    },
+    {
+      "blocked_raw_rows": 3812,
+      "guard": "trend_ext0.0200_counter1h0.0025__plus__pullback_24h_conflict0.0100",
+      "selection_2022": {
+        "active_days": 212,
+        "by_module_count": {
+          "literal_regime_router": 496
+        },
+        "by_source_count": {
+          "literal_regime_router": 496
+        },
+        "dd_pct": 4.4494,
+        "literal_target_hit_rate": 34.4758,
+        "literal_target_hits": 171,
+        "max_entries_same_clock_hour": 2,
+        "max_entries_same_rolling_hour": 2,
+        "max_loss_streak": 13,
+        "median_month_pct": 2.9394,
+        "minimum_month_pct": 0.3558,
+        "monthly_return_pct": {
+          "2022-01": 3.4787,
+          "2022-02": 3.9137,
+          "2022-03": 0.866,
+          "2022-04": 2.9695,
+          "2022-05": 5.8845,
+          "2022-06": 5.8828,
+          "2022-07": 0.8796,
+          "2022-08": 1.9547,
+          "2022-09": 0.3558,
+          "2022-10": 0.9762,
+          "2022-11": 2.9094,
+          "2022-12": 6.4046
+        },
+        "months": 12,
+        "months_ge_30pct": 0,
+        "n": 496,
+        "negative_months": 0,
+        "return_pct": 42.8969,
+        "stops": 247,
+        "timeouts": 78,
+        "trades_per_active_day": 2.34,
+        "trades_per_calendar_day": 1.366,
+        "wr": 45.56
+      },
+      "selection_pass": false
+    },
+    {
+      "blocked_raw_rows": 4262,
+      "guard": "trend_ext0.0200_counter1h0.0025__plus__pullback_24h_conflict0.0050",
+      "selection_2022": {
+        "active_days": 199,
+        "by_module_count": {
+          "literal_regime_router": 443
+        },
+        "by_source_count": {
+          "literal_regime_router": 443
+        },
+        "dd_pct": 4.7118,
+        "literal_target_hit_rate": 34.3115,
+        "literal_target_hits": 152,
+        "max_entries_same_clock_hour": 2,
+        "max_entries_same_rolling_hour": 2,
+        "max_loss_streak": 13,
+        "median_month_pct": 2.2608,
+        "minimum_month_pct": 0.2638,
+        "monthly_return_pct": {
+          "2022-01": 2.2256,
+          "2022-02": 3.2939,
+          "2022-03": 0.2638,
+          "2022-04": 2.4185,
+          "2022-05": 5.3162,
+          "2022-06": 5.8828,
+          "2022-07": 0.8851,
+          "2022-08": 2.296,
+          "2022-09": 0.9892,
+          "2022-10": 0.9871,
+          "2022-11": 1.997,
+          "2022-12": 4.6387
+        },
+        "months": 12,
+        "months_ge_30pct": 0,
+        "n": 443,
+        "negative_months": 0,
+        "return_pct": 35.8261,
+        "stops": 223,
+        "timeouts": 68,
+        "trades_per_active_day": 2.226,
+        "trades_per_calendar_day": 1.22,
+        "wr": 45.37
+      },
+      "selection_pass": false
+    },
+    {
+      "blocked_raw_rows": 4038,
+      "guard": "trend_ext0.0300_counter1h0.0025__plus__pullback_24h_conflict0.0050",
+      "selection_2022": {
+        "active_days": 199,
+        "by_module_count": {
+          "literal_regime_router": 457
+        },
+        "by_source_count": {
+          "literal_regime_router": 457
+        },
+        "dd_pct": 4.7118,
+        "literal_target_hit_rate": 33.698,
+        "literal_target_hits": 154,
+        "max_entries_same_clock_hour": 2,
+        "max_entries_same_rolling_hour": 2,
+        "max_loss_streak": 13,
+        "median_month_pct": 1.5037,
+        "minimum_month_pct": -0.0388,
+        "monthly_return_pct": {
+          "2022-01": 1.311,
+          "2022-02": 2.984,
+          "2022-03": -0.0388,
+          "2022-04": 0.8829,
+          "2022-05": 5.3162,
+          "2022-06": 6.8357,
+          "2022-07": 0.8725,
+          "2022-08": 2.5966,
+          "2022-09": 1.2779,
+          "2022-10": 0.9871,
+          "2022-11": 1.6965,
+          "2022-12": 3.7027
+        },
+        "months": 12,
+        "months_ge_30pct": 0,
+        "n": 457,
+        "negative_months": 1,
+        "return_pct": 32.1506,
+        "stops": 235,
+        "timeouts": 68,
+        "trades_per_active_day": 2.296,
+        "trades_per_calendar_day": 1.259,
+        "wr": 44.2
+      },
+      "selection_pass": false
+    },
+    {
+      "blocked_raw_rows": 3698,
+      "guard": "trend_ext0.0400_counter1h0.0025__plus__pullback_24h_conflict0.0050",
+      "selection_2022": {
+        "active_days": 202,
+        "by_module_count": {
+          "literal_regime_router": 475
+        },
+        "by_source_count": {
+          "literal_regime_router": 475
+        },
+        "dd_pct": 4.7118,
+        "literal_target_hit_rate": 33.8947,
+        "literal_target_hits": 161,
+        "max_entries_same_clock_hour": 2,
+        "max_entries_same_rolling_hour": 2,
+        "max_loss_streak": 13,
+        "median_month_pct": 1.9699,
+        "minimum_month_pct": -0.2982,
+        "monthly_return_pct": {
+          "2022-01": 1.606,
+          "2022-02": 3.6038,
+          "2022-03": 1.1562,
+          "2022-04": 2.1639,
+          "2022-05": 4.3618,
+          "2022-06": 7.1485,
+          "2022-07": 1.7758,
+          "2022-08": 3.506,
+          "2022-09": 1.2769,
+          "2022-10": -0.2982,
+          "2022-11": 1.6937,
+          "2022-12": 2.7719
+        },
+        "months": 12,
+        "months_ge_30pct": 0,
+        "n": 475,
+        "negative_months": 1,
+        "return_pct": 35.2399,
+        "stops": 243,
+        "timeouts": 71,
+        "trades_per_active_day": 2.351,
+        "trades_per_calendar_day": 1.309,
+        "wr": 44.63
+      },
+      "selection_pass": false
+    },
+    {
+      "blocked_raw_rows": 3888,
+      "guard": "trend_ext0.0400_counter1h0.0000__plus__pullback_24h_conflict0.0050",
+      "selection_2022": {
+        "active_days": 200,
+        "by_module_count": {
+          "literal_regime_router": 466
+        },
+        "by_source_count": {
+          "literal_regime_router": 466
+        },
+        "dd_pct": 4.7118,
+        "literal_target_hit_rate": 33.4764,
+        "literal_target_hits": 156,
+        "max_entries_same_clock_hour": 2,
+        "max_entries_same_rolling_hour": 2,
+        "max_loss_streak": 13,
+        "median_month_pct": 1.9735,
+        "minimum_month_pct": -0.2982,
+        "monthly_return_pct": {
+          "2022-01": 1.606,
+          "2022-02": 3.602,
+          "2022-03": 1.1562,
+          "2022-04": 2.1712,
+          "2022-05": 4.3618,
+          "2022-06": 6.0247,
+          "2022-07": 1.7758,
+          "2022-08": 3.5079,
+          "2022-09": 1.2788,
+          "2022-10": -0.2982,
+          "2022-11": 1.089,
+          "2022-12": 2.4721
+        },
+        "months": 12,
+        "months_ge_30pct": 0,
+        "n": 466,
+        "negative_months": 1,
+        "return_pct": 32.6495,
+        "stops": 240,
+        "timeouts": 70,
+        "trades_per_active_day": 2.33,
+        "trades_per_calendar_day": 1.284,
+        "wr": 44.42
+      },
+      "selection_pass": false
+    },
+    {
+      "blocked_raw_rows": 3400,
+      "guard": "trend_ext0.0500_counter1h0.0025__plus__pullback_24h_conflict0.0050",
+      "selection_2022": {
+        "active_days": 204,
+        "by_module_count": {
+          "literal_regime_router": 488
+        },
+        "by_source_count": {
+          "literal_regime_router": 488
+        },
+        "dd_pct": 4.4293,
+        "literal_target_hit_rate": 34.0164,
+        "literal_target_hits": 166,
+        "max_entries_same_clock_hour": 2,
+        "max_entries_same_rolling_hour": 2,
+        "max_loss_streak": 13,
+        "median_month_pct": 2.3291,
+        "minimum_month_pct": -0.3017,
+        "monthly_return_pct": {
+          "2022-01": 2.2156,
+          "2022-02": 3.2929,
+          "2022-03": 1.9255,
+          "2022-04": 2.4427,
+          "2022-05": 4.3586,
+          "2022-06": 7.1485,
+          "2022-07": 0.5635,
+          "2022-08": 3.506,
+          "2022-09": 1.5771,
+          "2022-10": -0.3017,
+          "2022-11": 1.6937,
+          "2022-12": 2.7719
+        },
+        "months": 12,
+        "months_ge_30pct": 0,
+        "n": 488,
+        "negative_months": 1,
+        "return_pct": 35.8076,
+        "stops": 251,
+        "timeouts": 71,
+        "trades_per_active_day": 2.392,
+        "trades_per_calendar_day": 1.344,
+        "wr": 44.26
+      },
+      "selection_pass": false
+    },
+    {
+      "blocked_raw_rows": 3528,
+      "guard": "trend_ext0.0500_counter1h0.0000__plus__pullback_24h_conflict0.0050",
+      "selection_2022": {
+        "active_days": 203,
+        "by_module_count": {
+          "literal_regime_router": 485
+        },
+        "by_source_count": {
+          "literal_regime_router": 485
+        },
+        "dd_pct": 4.4293,
+        "literal_target_hit_rate": 33.4021,
+        "literal_target_hits": 162,
+        "max_entries_same_clock_hour": 2,
+        "max_entries_same_rolling_hour": 2,
+        "max_loss_streak": 13,
+        "median_month_pct": 2.0705,
+        "minimum_month_pct": -0.3017,
+        "monthly_return_pct": {
+          "2022-01": 2.2156,
+          "2022-02": 3.2911,
+          "2022-03": 1.9255,
+          "2022-04": 1.5307,
+          "2022-05": 4.3586,
+          "2022-06": 5.7056,
+          "2022-07": 0.5635,
+          "2022-08": 3.506,
+          "2022-09": 1.578,
+          "2022-10": -0.3017,
+          "2022-11": 1.089,
+          "2022-12": 2.7719
+        },
+        "months": 12,
+        "months_ge_30pct": 0,
+        "n": 485,
+        "negative_months": 1,
+        "return_pct": 31.9954,
+        "stops": 253,
+        "timeouts": 70,
+        "trades_per_active_day": 2.389,
+        "trades_per_calendar_day": 1.336,
+        "wr": 43.71
+      },
+      "selection_pass": false
+    },
+    {
+      "blocked_raw_rows": 3248,
+      "guard": "trend_ext0.0400_counter1h0.0025__plus__pullback_24h_conflict0.0100",
+      "selection_2022": {
+        "active_days": 216,
+        "by_module_count": {
+          "literal_regime_router": 528
+        },
+        "by_source_count": {
+          "literal_regime_router": 528
+        },
+        "dd_pct": 4.4494,
+        "literal_target_hit_rate": 34.0909,
+        "literal_target_hits": 180,
+        "max_entries_same_clock_hour": 2,
+        "max_entries_same_rolling_hour": 2,
+        "max_loss_streak": 13,
+        "median_month_pct": 2.8119,
+        "minimum_month_pct": -0.3089,
+        "monthly_return_pct": {
+          "2022-01": 2.8515,
+          "2022-02": 4.2254,
+          "2022-03": 1.7638,
+          "2022-04": 2.7722,
+          "2022-05": 4.9249,
+          "2022-06": 7.1485,
+          "2022-07": 1.7703,
+          "2022-08": 3.1607,
+          "2022-09": 0.6417,
+          "2022-10": -0.3089,
+          "2022-11": 2.6034,
+          "2022-12": 4.5138
+        },
+        "months": 12,
+        "months_ge_30pct": 0,
+        "n": 528,
+        "negative_months": 1,
+        "return_pct": 42.3715,
+        "stops": 267,
+        "timeouts": 81,
+        "trades_per_active_day": 2.444,
+        "trades_per_calendar_day": 1.455,
+        "wr": 44.89
+      },
+      "selection_pass": false
+    },
+    {
+      "blocked_raw_rows": 3438,
+      "guard": "trend_ext0.0400_counter1h0.0000__plus__pullback_24h_conflict0.0100",
+      "selection_2022": {
+        "active_days": 214,
+        "by_module_count": {
+          "literal_regime_router": 519
+        },
+        "by_source_count": {
+          "literal_regime_router": 519
+        },
+        "dd_pct": 4.4494,
+        "literal_target_hit_rate": 33.7187,
+        "literal_target_hits": 175,
+        "max_entries_same_clock_hour": 2,
+        "max_entries_same_rolling_hour": 2,
+        "max_loss_streak": 13,
+        "median_month_pct": 2.8155,
+        "minimum_month_pct": -0.3089,
+        "monthly_return_pct": {
+          "2022-01": 2.8515,
+          "2022-02": 4.2236,
+          "2022-03": 1.7638,
+          "2022-04": 2.7796,
+          "2022-05": 4.9249,
+          "2022-06": 6.0247,
+          "2022-07": 1.7693,
+          "2022-08": 3.1626,
+          "2022-09": 0.6436,
+          "2022-10": -0.3089,
+          "2022-11": 1.9933,
+          "2022-12": 4.2089
+        },
+        "months": 12,
+        "months_ge_30pct": 0,
+        "n": 519,
+        "negative_months": 1,
+        "return_pct": 39.6433,
+        "stops": 264,
+        "timeouts": 80,
+        "trades_per_active_day": 2.425,
+        "trades_per_calendar_day": 1.43,
+        "wr": 44.7
+      },
+      "selection_pass": false
+    },
+    {
+      "blocked_raw_rows": 2950,
+      "guard": "trend_ext0.0500_counter1h0.0025__plus__pullback_24h_conflict0.0100",
+      "selection_2022": {
+        "active_days": 218,
+        "by_module_count": {
+          "literal_regime_router": 541
+        },
+        "by_source_count": {
+          "literal_regime_router": 541
+        },
+        "dd_pct": 4.1662,
+        "literal_target_hit_rate": 34.1959,
+        "literal_target_hits": 185,
+        "max_entries_same_clock_hour": 2,
+        "max_entries_same_rolling_hour": 2,
+        "max_loss_streak": 13,
+        "median_month_pct": 3.1067,
+        "minimum_month_pct": -0.3125,
+        "monthly_return_pct": {
+          "2022-01": 3.4687,
+          "2022-02": 3.9127,
+          "2022-03": 2.5376,
+          "2022-04": 3.0527,
+          "2022-05": 4.9218,
+          "2022-06": 7.1485,
+          "2022-07": 0.5581,
+          "2022-08": 3.1607,
+          "2022-09": 0.94,
+          "2022-10": -0.3125,
+          "2022-11": 2.6034,
+          "2022-12": 4.5138
+        },
+        "months": 12,
+        "months_ge_30pct": 0,
+        "n": 541,
+        "negative_months": 1,
+        "return_pct": 42.9692,
+        "stops": 275,
+        "timeouts": 81,
+        "trades_per_active_day": 2.482,
+        "trades_per_calendar_day": 1.49,
+        "wr": 44.55
+      },
+      "selection_pass": false
+    },
+    {
+      "blocked_raw_rows": 3078,
+      "guard": "trend_ext0.0500_counter1h0.0000__plus__pullback_24h_conflict0.0100",
+      "selection_2022": {
+        "active_days": 217,
+        "by_module_count": {
+          "literal_regime_router": 538
+        },
+        "by_source_count": {
+          "literal_regime_router": 538
+        },
+        "dd_pct": 4.1662,
+        "literal_target_hit_rate": 33.6431,
+        "literal_target_hits": 181,
+        "max_entries_same_clock_hour": 2,
+        "max_entries_same_rolling_hour": 2,
+        "max_loss_streak": 13,
+        "median_month_pct": 2.8491,
+        "minimum_month_pct": -0.3125,
+        "monthly_return_pct": {
+          "2022-01": 3.4687,
+          "2022-02": 3.9108,
+          "2022-03": 2.5376,
+          "2022-04": 2.1353,
+          "2022-05": 4.9218,
+          "2022-06": 5.7056,
+          "2022-07": 0.5572,
+          "2022-08": 3.1607,
+          "2022-09": 0.9409,
+          "2022-10": -0.3125,
+          "2022-11": 1.9933,
+          "2022-12": 4.5138
+        },
+        "months": 12,
+        "months_ge_30pct": 0,
+        "n": 538,
+        "negative_months": 1,
+        "return_pct": 38.9547,
+        "stops": 277,
+        "timeouts": 80,
+        "trades_per_active_day": 2.479,
+        "trades_per_calendar_day": 1.482,
+        "wr": 44.05
+      },
+      "selection_pass": false
+    },
+    {
+      "blocked_raw_rows": 2784,
+      "guard": "pullback_24h_conflict0.0050",
+      "selection_2022": {
+        "active_days": 211,
+        "by_module_count": {
+          "literal_regime_router": 524
+        },
+        "by_source_count": {
+          "literal_regime_router": 524
+        },
+        "dd_pct": 4.9478,
+        "literal_target_hit_rate": 33.7786,
+        "literal_target_hits": 177,
+        "max_entries_same_clock_hour": 2,
+        "max_entries_same_rolling_hour": 2,
+        "max_loss_streak": 13,
+        "median_month_pct": 1.7241,
+        "minimum_month_pct": -0.3361,
+        "monthly_return_pct": {
+          "2022-01": 0.3885,
+          "2022-02": 1.7546,
+          "2022-03": 1.0154,
+          "2022-04": 4.3301,
+          "2022-05": 4.3953,
+          "2022-06": 6.9808,
+          "2022-07": -0.3361,
+          "2022-08": 6.9651,
+          "2022-09": 1.5816,
+          "2022-10": -0.0108,
+          "2022-11": 1.6937,
+          "2022-12": 2.8018
+        },
+        "months": 12,
+        "months_ge_30pct": 0,
+        "n": 524,
+        "negative_months": 2,
+        "return_pct": 36.1022,
+        "stops": 273,
+        "timeouts": 74,
+        "trades_per_active_day": 2.483,
+        "trades_per_calendar_day": 1.444,
+        "wr": 44.08
+      },
+      "selection_pass": false
+    },
+    {
+      "blocked_raw_rows": 2334,
+      "guard": "pullback_24h_conflict0.0100",
+      "selection_2022": {
+        "active_days": 223,
+        "by_module_count": {
+          "literal_regime_router": 577
+        },
+        "by_source_count": {
+          "literal_regime_router": 577
+        },
+        "dd_pct": 4.6905,
+        "literal_target_hit_rate": 33.9688,
+        "literal_target_hits": 196,
+        "max_entries_same_clock_hour": 2,
+        "max_entries_same_rolling_hour": 2,
+        "max_loss_streak": 13,
+        "median_month_pct": 2.4843,
+        "minimum_month_pct": -0.3415,
+        "monthly_return_pct": {
+          "2022-01": 1.6192,
+          "2022-02": 2.3651,
+          "2022-03": 1.6221,
+          "2022-04": 4.9514,
+          "2022-05": 4.9587,
+          "2022-06": 6.9808,
+          "2022-07": -0.3415,
+          "2022-08": 6.6083,
+          "2022-09": 0.9445,
+          "2022-10": -0.0216,
+          "2022-11": 2.6034,
+          "2022-12": 4.5442
+        },
+        "months": 12,
+        "months_ge_30pct": 0,
+        "n": 577,
+        "negative_months": 2,
+        "return_pct": 43.2794,
+        "stops": 297,
+        "timeouts": 84,
+        "trades_per_active_day": 2.587,
+        "trades_per_calendar_day": 1.59,
+        "wr": 44.37
+      },
+      "selection_pass": false
+    },
+    {
+      "blocked_raw_rows": 3409,
+      "guard": "trend_ext0.0400_counter1h0.0050__plus__pullback_24h_conflict0.0050",
+      "selection_2022": {
+        "active_days": 205,
+        "by_module_count": {
+          "literal_regime_router": 490
+        },
+        "by_source_count": {
+          "literal_regime_router": 490
+        },
+        "dd_pct": 4.9993,
+        "literal_target_hit_rate": 33.6735,
+        "literal_target_hits": 165,
+        "max_entries_same_clock_hour": 2,
+        "max_entries_same_rolling_hour": 2,
+        "max_loss_streak": 13,
+        "median_month_pct": 2.3507,
+        "minimum_month_pct": -0.5973,
+        "monthly_return_pct": {
+          "2022-01": 0.4012,
+          "2022-02": 3.6038,
+          "2022-03": -0.0362,
+          "2022-04": 2.9256,
+          "2022-05": 5.1781,
+          "2022-06": 7.1485,
+          "2022-07": 1.7758,
+          "2022-08": 3.9831,
+          "2022-09": 0.9767,
+          "2022-10": -0.5973,
+          "2022-11": 1.6937,
+          "2022-12": 4.4241
+        },
+        "months": 12,
+        "months_ge_30pct": 0,
+        "n": 490,
+        "negative_months": 2,
+        "return_pct": 36.0546,
+        "stops": 250,
+        "timeouts": 75,
+        "trades_per_active_day": 2.39,
+        "trades_per_calendar_day": 1.35,
+        "wr": 44.69
+      },
+      "selection_pass": false
+    },
+    {
+      "blocked_raw_rows": 3598,
+      "guard": "trend_ext0.0300_counter1h0.0050__plus__pullback_24h_conflict0.0050",
+      "selection_2022": {
+        "active_days": 203,
+        "by_module_count": {
+          "literal_regime_router": 480
+        },
+        "by_source_count": {
+          "literal_regime_router": 480
+        },
+        "dd_pct": 4.9993,
+        "literal_target_hit_rate": 33.125,
+        "literal_target_hits": 159,
+        "max_entries_same_clock_hour": 2,
+        "max_entries_same_rolling_hour": 2,
+        "max_loss_streak": 13,
+        "median_month_pct": 2.471,
+        "minimum_month_pct": -0.5973,
+        "monthly_return_pct": {
+          "2022-01": 0.1097,
+          "2022-02": 2.984,
+          "2022-03": -0.336,
+          "2022-04": 2.3304,
+          "2022-05": 5.1865,
+          "2022-06": 6.5133,
+          "2022-07": 1.4777,
+          "2022-08": 3.6861,
+          "2022-09": 0.9767,
+          "2022-10": -0.5973,
+          "2022-11": 2.6117,
+          "2022-12": 4.4241
+        },
+        "months": 12,
+        "months_ge_30pct": 0,
+        "n": 480,
+        "negative_months": 2,
+        "return_pct": 33.3093,
+        "stops": 245,
+        "timeouts": 76,
+        "trades_per_active_day": 2.365,
+        "trades_per_calendar_day": 1.322,
+        "wr": 44.58
+      },
+      "selection_pass": false
+    },
+    {
+      "blocked_raw_rows": 2959,
+      "guard": "trend_ext0.0400_counter1h0.0050__plus__pullback_24h_conflict0.0100",
+      "selection_2022": {
+        "active_days": 218,
+        "by_module_count": {
+          "literal_regime_router": 543
+        },
+        "by_source_count": {
+          "literal_regime_router": 543
+        },
+        "dd_pct": 4.7481,
+        "literal_target_hit_rate": 33.8858,
+        "literal_target_hits": 184,
+        "max_entries_same_clock_hour": 2,
+        "max_entries_same_rolling_hour": 2,
+        "max_loss_streak": 13,
+        "median_month_pct": 3.0709,
+        "minimum_month_pct": -0.608,
+        "monthly_return_pct": {
+          "2022-01": 1.632,
+          "2022-02": 4.2254,
+          "2022-03": 0.5642,
+          "2022-04": 3.5384,
+          "2022-05": 5.7457,
+          "2022-06": 7.1485,
+          "2022-07": 1.7703,
+          "2022-08": 3.6362,
+          "2022-09": 0.3434,
+          "2022-10": -0.608,
+          "2022-11": 2.6034,
+          "2022-12": 6.1939
+        },
+        "months": 12,
+        "months_ge_30pct": 0,
+        "n": 543,
+        "negative_months": 1,
+        "return_pct": 43.2293,
+        "stops": 274,
+        "timeouts": 85,
+        "trades_per_active_day": 2.491,
+        "trades_per_calendar_day": 1.496,
+        "wr": 44.94
+      },
+      "selection_pass": false
+    },
+    {
+      "blocked_raw_rows": 3263,
+      "guard": "trend_ext0.0200_counter1h0.0050__plus__pullback_24h_conflict0.0100",
+      "selection_2022": {
+        "active_days": 215,
+        "by_module_count": {
+          "literal_regime_router": 522
+        },
+        "by_source_count": {
+          "literal_regime_router": 522
+        },
+        "dd_pct": 4.7481,
+        "literal_target_hit_rate": 33.7165,
+        "literal_target_hits": 176,
+        "max_entries_same_clock_hour": 2,
+        "max_entries_same_rolling_hour": 2,
+        "max_loss_streak": 13,
+        "median_month_pct": 3.1991,
+        "minimum_month_pct": -0.608,
+        "monthly_return_pct": {
+          "2022-01": 2.2517,
+          "2022-02": 3.9137,
+          "2022-03": -0.339,
+          "2022-04": 2.8685,
+          "2022-05": 5.7541,
+          "2022-06": 5.5632,
+          "2022-07": 1.1804,
+          "2022-08": 3.6519,
+          "2022-09": 0.3434,
+          "2022-10": -0.608,
+          "2022-11": 3.5297,
+          "2022-12": 7.1524
+        },
+        "months": 12,
+        "months_ge_30pct": 0,
+        "n": 522,
+        "negative_months": 2,
+        "return_pct": 41.1046,
+        "stops": 262,
+        "timeouts": 84,
+        "trades_per_active_day": 2.428,
+        "trades_per_calendar_day": 1.438,
+        "wr": 45.02
+      },
+      "selection_pass": false
+    },
+    {
+      "blocked_raw_rows": 3148,
+      "guard": "trend_ext0.0300_counter1h0.0050__plus__pullback_24h_conflict0.0100",
+      "selection_2022": {
+        "active_days": 215,
+        "by_module_count": {
+          "literal_regime_router": 534
+        },
+        "by_source_count": {
+          "literal_regime_router": 534
+        },
+        "dd_pct": 4.7481,
+        "literal_target_hit_rate": 33.3333,
+        "literal_target_hits": 178,
+        "max_entries_same_clock_hour": 2,
+        "max_entries_same_rolling_hour": 2,
+        "max_loss_streak": 13,
+        "median_month_pct": 3.1688,
+        "minimum_month_pct": -0.608,
+        "monthly_return_pct": {
+          "2022-01": 1.3369,
+          "2022-02": 3.6019,
+          "2022-03": 0.2626,
+          "2022-04": 2.9973,
+          "2022-05": 5.7541,
+          "2022-06": 6.5133,
+          "2022-07": 1.4713,
+          "2022-08": 3.3402,
+          "2022-09": 0.3434,
+          "2022-10": -0.608,
+          "2022-11": 3.5297,
+          "2022-12": 6.1939
+        },
+        "months": 12,
+        "months_ge_30pct": 0,
+        "n": 534,
+        "negative_months": 1,
+        "return_pct": 40.4165,
+        "stops": 269,
+        "timeouts": 87,
+        "trades_per_active_day": 2.484,
+        "trades_per_calendar_day": 1.471,
+        "wr": 44.94
+      },
+      "selection_pass": false
+    },
+    {
+      "blocked_raw_rows": 4632,
+      "guard": "trend_ext0.0200_counter1h0.0000__plus__pullback_24h_conflict0.0050",
+      "selection_2022": {
+        "active_days": 195,
+        "by_module_count": {
+          "literal_regime_router": 426
+        },
+        "by_source_count": {
+          "literal_regime_router": 426
+        },
+        "dd_pct": 4.5505,
+        "literal_target_hit_rate": 33.5681,
+        "literal_target_hits": 143,
+        "max_entries_same_clock_hour": 2,
+        "max_entries_same_rolling_hour": 2,
+        "max_loss_streak": 13,
+        "median_month_pct": 2.1071,
+        "minimum_month_pct": -0.7278,
+        "monthly_return_pct": {
+          "2022-01": 1.3164,
+          "2022-02": 3.2921,
+          "2022-03": 0.2629,
+          "2022-04": 3.2453,
+          "2022-05": 5.2872,
+          "2022-06": 3.8283,
+          "2022-07": 1.494,
+          "2022-08": 2.3078,
+          "2022-09": 1.9063,
+          "2022-10": -0.7278,
+          "2022-11": 1.0899,
+          "2022-12": 4.0259
+        },
+        "months": 12,
+        "months_ge_30pct": 0,
+        "n": 426,
+        "negative_months": 1,
+        "return_pct": 30.8207,
+        "stops": 218,
+        "timeouts": 65,
+        "trades_per_active_day": 2.185,
+        "trades_per_calendar_day": 1.174,
+        "wr": 44.6
+      },
+      "selection_pass": false
+    },
+    {
+      "blocked_raw_rows": 4182,
+      "guard": "trend_ext0.0200_counter1h0.0000__plus__pullback_24h_conflict0.0100",
+      "selection_2022": {
+        "active_days": 208,
+        "by_module_count": {
+          "literal_regime_router": 479
+        },
+        "by_source_count": {
+          "literal_regime_router": 479
+        },
+        "dd_pct": 4.2981,
+        "literal_target_hit_rate": 33.8205,
+        "literal_target_hits": 162,
+        "max_entries_same_clock_hour": 2,
+        "max_entries_same_rolling_hour": 2,
+        "max_loss_streak": 13,
+        "median_month_pct": 2.2763,
+        "minimum_month_pct": -0.7385,
+        "monthly_return_pct": {
+          "2022-01": 2.5585,
+          "2022-02": 3.9118,
+          "2022-03": 0.8651,
+          "2022-04": 3.8008,
+          "2022-05": 5.8554,
+          "2022-06": 3.8283,
+          "2022-07": 1.4885,
+          "2022-08": 1.9665,
+          "2022-09": 1.2672,
+          "2022-10": -0.7385,
+          "2022-11": 1.9942,
+          "2022-12": 5.7815
+        },
+        "months": 12,
+        "months_ge_30pct": 0,
+        "n": 479,
+        "negative_months": 1,
+        "return_pct": 37.631,
+        "stops": 242,
+        "timeouts": 75,
+        "trades_per_active_day": 2.303,
+        "trades_per_calendar_day": 1.32,
+        "wr": 44.89
+      },
+      "selection_pass": false
+    },
+    {
+      "blocked_raw_rows": 2914,
+      "guard": "trend_ext0.0200_counter1h0.0025__plus__pullback_24h_conflict0.0200",
+      "selection_2022": {
+        "active_days": 233,
+        "by_module_count": {
+          "literal_regime_router": 577
+        },
+        "by_source_count": {
+          "literal_regime_router": 577
+        },
+        "dd_pct": 4.0645,
+        "literal_target_hit_rate": 33.6222,
+        "literal_target_hits": 194,
+        "max_entries_same_clock_hour": 2,
+        "max_entries_same_rolling_hour": 2,
+        "max_loss_streak": 13,
+        "median_month_pct": 3.2107,
+        "minimum_month_pct": -0.8319,
+        "monthly_return_pct": {
+          "2022-01": 1.7305,
+          "2022-02": 4.5372,
+          "2022-03": 3.3007,
+          "2022-04": 7.5215,
+          "2022-05": 5.5631,
+          "2022-06": 5.5651,
+          "2022-07": -0.0265,
+          "2022-08": 3.2107,
+          "2022-09": 2.0387,
+          "2022-10": -0.8319,
+          "2022-11": 2.9094,
+          "2022-12": 5.5024,
+          "2023-01": 1.4387
+        },
+        "months": 13,
+        "months_ge_30pct": 0,
+        "n": 577,
+        "negative_months": 2,
+        "return_pct": 51.3633,
+        "stops": 283,
+        "timeouts": 100,
+        "trades_per_active_day": 2.476,
+        "trades_per_calendar_day": 1.581,
+        "wr": 46.1
+      },
+      "selection_pass": false
+    },
+    {
+      "blocked_raw_rows": 2690,
+      "guard": "trend_ext0.0300_counter1h0.0025__plus__pullback_24h_conflict0.0200",
+      "selection_2022": {
+        "active_days": 233,
+        "by_module_count": {
+          "literal_regime_router": 591
+        },
+        "by_source_count": {
+          "literal_regime_router": 591
+        },
+        "dd_pct": 4.0645,
+        "literal_target_hit_rate": 33.1641,
+        "literal_target_hits": 196,
+        "max_entries_same_clock_hour": 2,
+        "max_entries_same_rolling_hour": 2,
+        "max_loss_streak": 13,
+        "median_month_pct": 2.9889,
+        "minimum_month_pct": -0.8319,
+        "monthly_return_pct": {
+          "2022-01": 0.8204,
+          "2022-02": 4.2254,
+          "2022-03": 2.9889,
+          "2022-04": 5.9094,
+          "2022-05": 5.5631,
+          "2022-06": 6.5152,
+          "2022-07": -0.0399,
+          "2022-08": 3.514,
+          "2022-09": 2.3304,
+          "2022-10": -0.8319,
+          "2022-11": 2.6062,
+          "2022-12": 4.5587,
+          "2023-01": 1.4387
+        },
+        "months": 13,
+        "months_ge_30pct": 0,
+        "n": 591,
+        "negative_months": 2,
+        "return_pct": 47.2686,
+        "stops": 295,
+        "timeouts": 100,
+        "trades_per_active_day": 2.536,
+        "trades_per_calendar_day": 1.619,
+        "wr": 45.18
+      },
+      "selection_pass": false
+    },
+    {
+      "blocked_raw_rows": 3713,
+      "guard": "trend_ext0.0200_counter1h0.0050__plus__pullback_24h_conflict0.0050",
+      "selection_2022": {
+        "active_days": 203,
+        "by_module_count": {
+          "literal_regime_router": 468
+        },
+        "by_source_count": {
+          "literal_regime_router": 468
+        },
+        "dd_pct": 4.9993,
+        "literal_target_hit_rate": 33.3333,
+        "literal_target_hits": 156,
+        "max_entries_same_clock_hour": 2,
+        "max_entries_same_rolling_hour": 2,
+        "max_loss_streak": 13,
+        "median_month_pct": 2.1614,
+        "minimum_month_pct": -0.934,
+        "monthly_return_pct": {
+          "2022-01": 1.0134,
+          "2022-02": 3.2939,
+          "2022-03": -0.934,
+          "2022-04": 1.7111,
+          "2022-05": 5.1865,
+          "2022-06": 5.5632,
+          "2022-07": 1.1859,
+          "2022-08": 3.9989,
+          "2022-09": 0.9767,
+          "2022-10": -0.5973,
+          "2022-11": 2.6117,
+          "2022-12": 5.3665
+        },
+        "months": 12,
+        "months_ge_30pct": 0,
+        "n": 468,
+        "negative_months": 2,
+        "return_pct": 33.3175,
+        "stops": 238,
+        "timeouts": 74,
+        "trades_per_active_day": 2.305,
+        "trades_per_calendar_day": 1.289,
+        "wr": 44.66
+      },
+      "selection_pass": false
+    },
+    {
+      "blocked_raw_rows": 1254,
+      "guard": "trend_ext0.0300_counter1h0.0025",
+      "selection_2022": {
+        "active_days": 253,
+        "by_module_count": {
+          "literal_regime_router": 694
+        },
+        "by_source_count": {
+          "literal_regime_router": 694
+        },
+        "dd_pct": 4.8578,
+        "literal_target_hit_rate": 32.9971,
+        "literal_target_hits": 229,
+        "max_entries_same_clock_hour": 2,
+        "max_entries_same_rolling_hour": 2,
+        "max_loss_streak": 16,
+        "median_month_pct": 3.4659,
+        "minimum_month_pct": -0.9527,
+        "monthly_return_pct": {
+          "2022-01": 0.5857,
+          "2022-02": 4.8414,
+          "2022-03": 3.4659,
+          "2022-04": 3.6209,
+          "2022-05": 5.0184,
+          "2022-06": 6.9372,
+          "2022-07": -0.9527,
+          "2022-08": 6.3163,
+          "2022-09": 2.4618,
+          "2022-10": 0.0985,
+          "2022-11": 1.3768,
+          "2022-12": 4.689,
+          "2023-01": 1.4387
+        },
+        "months": 13,
+        "months_ge_30pct": 0,
+        "n": 694,
+        "negative_months": 1,
+        "return_pct": 47.633,
+        "stops": 362,
+        "timeouts": 103,
+        "trades_per_active_day": 2.743,
+        "trades_per_calendar_day": 1.901,
+        "wr": 43.8
+      },
+      "selection_pass": false
+    },
+    {
+      "blocked_raw_rows": 4316,
+      "guard": "trend_ext0.0300_counter1h0.0000__plus__pullback_24h_conflict0.0050",
+      "selection_2022": {
+        "active_days": 197,
+        "by_module_count": {
+          "literal_regime_router": 446
+        },
+        "by_source_count": {
+          "literal_regime_router": 446
+        },
+        "dd_pct": 5.1375,
+        "literal_target_hit_rate": 32.9596,
+        "literal_target_hits": 147,
+        "max_entries_same_clock_hour": 2,
+        "max_entries_same_rolling_hour": 2,
+        "max_loss_streak": 13,
+        "median_month_pct": 1.8445,
+        "minimum_month_pct": -1.0415,
+        "monthly_return_pct": {
+          "2022-01": 1.311,
+          "2022-02": 2.9822,
+          "2022-03": -0.0388,
+          "2022-04": 2.1045,
+          "2022-05": 5.3162,
+          "2022-06": 4.7627,
+          "2022-07": 1.1778,
+          "2022-08": 2.2997,
+          "2022-09": 1.5845,
+          "2022-10": -1.0415,
+          "2022-11": 1.0917,
+          "2022-12": 3.7118
+        },
+        "months": 12,
+        "months_ge_30pct": 0,
+        "n": 446,
+        "negative_months": 2,
+        "return_pct": 28.1685,
+        "stops": 232,
+        "timeouts": 67,
+        "trades_per_active_day": 2.264,
+        "trades_per_calendar_day": 1.229,
+        "wr": 43.72
+      },
+      "selection_pass": false
+    },
+    {
+      "blocked_raw_rows": 3866,
+      "guard": "trend_ext0.0300_counter1h0.0000__plus__pullback_24h_conflict0.0100",
+      "selection_2022": {
+        "active_days": 210,
+        "by_module_count": {
+          "literal_regime_router": 499
+        },
+        "by_source_count": {
+          "literal_regime_router": 499
+        },
+        "dd_pct": 4.8867,
+        "literal_target_hit_rate": 33.2665,
+        "literal_target_hits": 166,
+        "max_entries_same_clock_hour": 2,
+        "max_entries_same_rolling_hour": 2,
+        "max_loss_streak": 13,
+        "median_month_pct": 2.2746,
+        "minimum_month_pct": -1.0522,
+        "monthly_return_pct": {
+          "2022-01": 2.553,
+          "2022-02": 3.6001,
+          "2022-03": 0.5616,
+          "2022-04": 2.6538,
+          "2022-05": 5.8845,
+          "2022-06": 4.7627,
+          "2022-07": 1.1705,
+          "2022-08": 1.9585,
+          "2022-09": 0.9473,
+          "2022-10": -1.0522,
+          "2022-11": 1.9961,
+          "2022-12": 5.4621
+        },
+        "months": 12,
+        "months_ge_30pct": 0,
+        "n": 499,
+        "negative_months": 1,
+        "return_pct": 34.8382,
+        "stops": 256,
+        "timeouts": 77,
+        "trades_per_active_day": 2.376,
+        "trades_per_calendar_day": 1.375,
+        "wr": 44.09
+      },
+      "selection_pass": false
+    },
+    {
+      "blocked_raw_rows": 1104,
+      "guard": "trend_ext0.0400_counter1h0.0000",
+      "selection_2022": {
+        "active_days": 255,
+        "by_module_count": {
+          "literal_regime_router": 704
+        },
+        "by_source_count": {
+          "literal_regime_router": 704
+        },
+        "dd_pct": 6.0687,
+        "literal_target_hit_rate": 32.8125,
+        "literal_target_hits": 231,
+        "max_entries_same_clock_hour": 2,
+        "max_entries_same_rolling_hour": 2,
+        "max_loss_streak": 16,
+        "median_month_pct": 3.454,
+        "minimum_month_pct": -1.1754,
+        "monthly_return_pct": {
+          "2022-01": 0.8785,
+          "2022-02": 5.4705,
+          "2022-03": 4.7028,
+          "2022-04": 4.9198,
+          "2022-05": 3.6674,
+          "2022-06": 6.1254,
+          "2022-07": 0.5369,
+          "2022-08": 7.2606,
+          "2022-09": 2.4627,
+          "2022-10": -1.1754,
+          "2022-11": 0.7713,
+          "2022-12": 3.454,
+          "2023-01": 1.4387
+        },
+        "months": 13,
+        "months_ge_30pct": 0,
+        "n": 704,
+        "negative_months": 1,
+        "return_pct": 48.488,
+        "stops": 367,
+        "timeouts": 106,
+        "trades_per_active_day": 2.761,
+        "trades_per_calendar_day": 1.929,
+        "wr": 44.03
+      },
+      "selection_pass": false
+    },
+    {
+      "blocked_raw_rows": 3226,
+      "guard": "trend_ext0.0500_counter1h0.0050__plus__pullback_24h_conflict0.0050",
+      "selection_2022": {
+        "active_days": 206,
+        "by_module_count": {
+          "literal_regime_router": 502
+        },
+        "by_source_count": {
+          "literal_regime_router": 502
+        },
+        "dd_pct": 5.0027,
+        "literal_target_hit_rate": 33.4661,
+        "literal_target_hits": 168,
+        "max_entries_same_clock_hour": 2,
+        "max_entries_same_rolling_hour": 2,
+        "max_loss_streak": 13,
+        "median_month_pct": 2.07,
+        "minimum_month_pct": -1.1937,
+        "monthly_return_pct": {
+          "2022-01": 1.0036,
+          "2022-02": 3.2929,
+          "2022-03": 0.724,
+          "2022-04": 2.4463,
+          "2022-05": 5.1749,
+          "2022-06": 7.1485,
+          "2022-07": 0.5635,
+          "2022-08": 3.9831,
+          "2022-09": 1.5825,
+          "2022-10": -1.1937,
+          "2022-11": 1.6937,
+          "2022-12": 4.4241
+        },
+        "months": 12,
+        "months_ge_30pct": 0,
+        "n": 502,
+        "negative_months": 1,
+        "return_pct": 35.2188,
+        "stops": 258,
+        "timeouts": 76,
+        "trades_per_active_day": 2.437,
+        "trades_per_calendar_day": 1.383,
+        "wr": 44.22
+      },
+      "selection_pass": false
+    },
+    {
+      "blocked_raw_rows": 2776,
+      "guard": "trend_ext0.0500_counter1h0.0050__plus__pullback_24h_conflict0.0100",
+      "selection_2022": {
+        "active_days": 219,
+        "by_module_count": {
+          "literal_regime_router": 555
+        },
+        "by_source_count": {
+          "literal_regime_router": 555
+        },
+        "dd_pct": 4.7515,
+        "literal_target_hit_rate": 33.6937,
+        "literal_target_hits": 187,
+        "max_entries_same_clock_hour": 2,
+        "max_entries_same_rolling_hour": 2,
+        "max_loss_streak": 13,
+        "median_month_pct": 2.8299,
+        "minimum_month_pct": -1.2044,
+        "monthly_return_pct": {
+          "2022-01": 2.2418,
+          "2022-02": 3.9127,
+          "2022-03": 1.3289,
+          "2022-04": 3.0564,
+          "2022-05": 5.7425,
+          "2022-06": 7.1485,
+          "2022-07": 0.5581,
+          "2022-08": 3.6362,
+          "2022-09": 0.9454,
+          "2022-10": -1.2044,
+          "2022-11": 2.6034,
+          "2022-12": 6.1939
+        },
+        "months": 12,
+        "months_ge_30pct": 0,
+        "n": 555,
+        "negative_months": 1,
+        "return_pct": 42.3493,
+        "stops": 282,
+        "timeouts": 86,
+        "trades_per_active_day": 2.534,
+        "trades_per_calendar_day": 1.529,
+        "wr": 44.5
+      },
+      "selection_pass": false
+    },
+    {
+      "blocked_raw_rows": 625,
+      "guard": "trend_ext0.0400_counter1h0.0050",
+      "selection_2022": {
+        "active_days": 258,
+        "by_module_count": {
+          "literal_regime_router": 728
+        },
+        "by_source_count": {
+          "literal_regime_router": 728
+        },
+        "dd_pct": 6.3505,
+        "literal_target_hit_rate": 32.8297,
+        "literal_target_hits": 239,
+        "max_entries_same_clock_hour": 2,
+        "max_entries_same_rolling_hour": 2,
+        "max_loss_streak": 16,
+        "median_month_pct": 3.4686,
+        "minimum_month_pct": -1.4719,
+        "monthly_return_pct": {
+          "2022-01": -0.3177,
+          "2022-02": 5.4723,
+          "2022-03": 3.4686,
+          "2022-04": 5.6944,
+          "2022-05": 4.4783,
+          "2022-06": 7.2503,
+          "2022-07": -0.3661,
+          "2022-08": 7.7531,
+          "2022-09": 2.1571,
+          "2022-10": -1.4719,
+          "2022-11": 1.3741,
+          "2022-12": 5.4246,
+          "2023-01": 1.4387
+        },
+        "months": 13,
+        "months_ge_30pct": 0,
+        "n": 728,
+        "negative_months": 3,
+        "return_pct": 50.9318,
+        "stops": 378,
+        "timeouts": 111,
+        "trades_per_active_day": 2.822,
+        "trades_per_calendar_day": 1.995,
+        "wr": 44.09
+      },
+      "selection_pass": false
+    },
+    {
+      "blocked_raw_rows": 929,
+      "guard": "trend_ext0.0200_counter1h0.0050",
+      "selection_2022": {
+        "active_days": 256,
+        "by_module_count": {
+          "literal_regime_router": 707
+        },
+        "by_source_count": {
+          "literal_regime_router": 707
+        },
+        "dd_pct": 6.3505,
+        "literal_target_hit_rate": 32.6733,
+        "literal_target_hits": 231,
+        "max_entries_same_clock_hour": 2,
+        "max_entries_same_rolling_hour": 2,
+        "max_loss_streak": 16,
+        "median_month_pct": 2.5393,
+        "minimum_month_pct": -1.4719,
+        "monthly_return_pct": {
+          "2022-01": 0.2902,
+          "2022-02": 5.155,
+          "2022-03": 2.5393,
+          "2022-04": 5.0951,
+          "2022-05": 4.4867,
+          "2022-06": 5.6635,
+          "2022-07": -0.9435,
+          "2022-08": 7.7694,
+          "2022-09": 2.1571,
+          "2022-10": -1.4719,
+          "2022-11": 2.2892,
+          "2022-12": 6.3762,
+          "2023-01": 1.4387
+        },
+        "months": 13,
+        "months_ge_30pct": 0,
+        "n": 707,
+        "negative_months": 2,
+        "return_pct": 48.8098,
+        "stops": 366,
+        "timeouts": 110,
+        "trades_per_active_day": 2.762,
+        "trades_per_calendar_day": 1.937,
+        "wr": 44.13
+      },
+      "selection_pass": false
+    },
+    {
+      "blocked_raw_rows": 814,
+      "guard": "trend_ext0.0300_counter1h0.0050",
+      "selection_2022": {
+        "active_days": 256,
+        "by_module_count": {
+          "literal_regime_router": 719
+        },
+        "by_source_count": {
+          "literal_regime_router": 719
+        },
+        "dd_pct": 6.3505,
+        "literal_target_hit_rate": 32.4061,
+        "literal_target_hits": 233,
+        "max_entries_same_clock_hour": 2,
+        "max_entries_same_rolling_hour": 2,
+        "max_loss_streak": 16,
+        "median_month_pct": 3.1583,
+        "minimum_month_pct": -1.4719,
+        "monthly_return_pct": {
+          "2022-01": -0.607,
+          "2022-02": 4.8414,
+          "2022-03": 3.1583,
+          "2022-04": 5.2266,
+          "2022-05": 4.4867,
+          "2022-06": 6.6145,
+          "2022-07": -0.6588,
+          "2022-08": 7.4453,
+          "2022-09": 2.1571,
+          "2022-10": -1.4719,
+          "2022-11": 2.2892,
+          "2022-12": 5.4246,
+          "2023-01": 1.4387
+        },
+        "months": 13,
+        "months_ge_30pct": 0,
+        "n": 719,
+        "negative_months": 3,
+        "return_pct": 48.0867,
+        "stops": 373,
+        "timeouts": 113,
+        "trades_per_active_day": 2.809,
+        "trades_per_calendar_day": 1.97,
+        "wr": 44.09
+      },
+      "selection_pass": false
+    },
+    {
+      "blocked_raw_rows": 744,
+      "guard": "trend_ext0.0500_counter1h0.0000",
+      "selection_2022": {
+        "active_days": 257,
+        "by_module_count": {
+          "literal_regime_router": 723
+        },
+        "by_source_count": {
+          "literal_regime_router": 723
+        },
+        "dd_pct": 6.0721,
+        "literal_target_hit_rate": 32.6418,
+        "literal_target_hits": 236,
+        "max_entries_same_clock_hour": 2,
+        "max_entries_same_rolling_hour": 2,
+        "max_loss_streak": 16,
+        "median_month_pct": 3.6653,
+        "minimum_month_pct": -1.5537,
+        "monthly_return_pct": {
+          "2022-01": 1.4838,
+          "2022-02": 5.154,
+          "2022-03": 5.499,
+          "2022-04": 4.2621,
+          "2022-05": 3.6653,
+          "2022-06": 5.8061,
+          "2022-07": -1.5537,
+          "2022-08": 7.2587,
+          "2022-09": 2.7655,
+          "2022-10": -1.179,
+          "2022-11": 0.7713,
+          "2022-12": 3.7567,
+          "2023-01": 1.4387
+        },
+        "months": 13,
+        "months_ge_30pct": 0,
+        "n": 723,
+        "negative_months": 2,
+        "return_pct": 46.4287,
+        "stops": 381,
+        "timeouts": 106,
+        "trades_per_active_day": 2.813,
+        "trades_per_calendar_day": 1.981,
+        "wr": 43.43
+      },
+      "selection_pass": false
+    },
+    {
+      "blocked_raw_rows": 1848,
+      "guard": "trend_ext0.0200_counter1h0.0000",
+      "selection_2022": {
+        "active_days": 251,
+        "by_module_count": {
+          "literal_regime_router": 664
+        },
+        "by_source_count": {
+          "literal_regime_router": 664
+        },
+        "dd_pct": 6.4734,
+        "literal_target_hit_rate": 32.8313,
+        "literal_target_hits": 218,
+        "max_entries_same_clock_hour": 2,
+        "max_entries_same_rolling_hour": 2,
+        "max_loss_streak": 16,
+        "median_month_pct": 3.7782,
+        "minimum_month_pct": -1.6013,
+        "monthly_return_pct": {
+          "2022-01": 0.5911,
+          "2022-02": 5.1531,
+          "2022-03": 3.7782,
+          "2022-04": 6.0475,
+          "2022-05": 4.9895,
+          "2022-06": 3.9269,
+          "2022-07": -0.3414,
+          "2022-08": 5.6981,
+          "2022-09": 3.0977,
+          "2022-10": -1.6013,
+          "2022-11": 0.7722,
+          "2022-12": 5.0152,
+          "2023-01": 1.4387
+        },
+        "months": 13,
+        "months_ge_30pct": 0,
+        "n": 664,
+        "negative_months": 2,
+        "return_pct": 45.7064,
+        "stops": 346,
+        "timeouts": 100,
+        "trades_per_active_day": 2.645,
+        "trades_per_calendar_day": 1.819,
+        "wr": 43.98
+      },
+      "selection_pass": false
+    },
+    {
+      "blocked_raw_rows": 1532,
+      "guard": "trend_ext0.0300_counter1h0.0000",
+      "selection_2022": {
+        "active_days": 252,
+        "by_module_count": {
+          "literal_regime_router": 683
+        },
+        "by_source_count": {
+          "literal_regime_router": 683
+        },
+        "dd_pct": 6.769,
+        "literal_target_hit_rate": 32.5037,
+        "literal_target_hits": 222,
+        "max_entries_same_clock_hour": 2,
+        "max_entries_same_rolling_hour": 2,
+        "max_loss_streak": 16,
+        "median_month_pct": 3.4659,
+        "minimum_month_pct": -1.9122,
+        "monthly_return_pct": {
+          "2022-01": 0.5857,
+          "2022-02": 4.8395,
+          "2022-03": 3.4659,
+          "2022-04": 4.8756,
+          "2022-05": 5.0184,
+          "2022-06": 4.8623,
+          "2022-07": -0.6537,
+          "2022-08": 6.0087,
+          "2022-09": 2.772,
+          "2022-10": -1.9122,
+          "2022-11": 0.774,
+          "2022-12": 4.6982,
+          "2023-01": 1.4387
+        },
+        "months": 13,
+        "months_ge_30pct": 0,
+        "n": 683,
+        "negative_months": 2,
+        "return_pct": 43.1831,
+        "stops": 359,
+        "timeouts": 102,
+        "trades_per_active_day": 2.71,
+        "trades_per_calendar_day": 1.871,
+        "wr": 43.48
+      },
+      "selection_pass": false
+    },
+    {
+      "blocked_raw_rows": 442,
+      "guard": "trend_ext0.0500_counter1h0.0050",
+      "selection_2022": {
+        "active_days": 259,
+        "by_module_count": {
+          "literal_regime_router": 740
+        },
+        "by_source_count": {
+          "literal_regime_router": 740
+        },
+        "dd_pct": 6.9124,
+        "literal_target_hit_rate": 32.7027,
+        "literal_target_hits": 242,
+        "max_entries_same_clock_hour": 2,
+        "max_entries_same_rolling_hour": 2,
+        "max_loss_streak": 16,
+        "median_month_pct": 4.2554,
+        "minimum_month_pct": -2.0631,
+        "monthly_return_pct": {
+          "2022-01": 0.2804,
+          "2022-02": 5.1559,
+          "2022-03": 4.2554,
+          "2022-04": 5.2023,
+          "2022-05": 4.4762,
+          "2022-06": 7.2503,
+          "2022-07": -1.5528,
+          "2022-08": 7.7531,
+          "2022-09": 2.77,
+          "2022-10": -2.0631,
+          "2022-11": 1.3741,
+          "2022-12": 5.4246,
+          "2023-01": 1.4387
+        },
+        "months": 13,
+        "months_ge_30pct": 0,
+        "n": 740,
+        "negative_months": 2,
+        "return_pct": 50.0059,
+        "stops": 386,
+        "timeouts": 112,
+        "trades_per_active_day": 2.857,
+        "trades_per_calendar_day": 2.027,
+        "wr": 43.78
+      },
+      "selection_pass": false
+    },
+    {
+      "blocked_raw_rows": 2350,
+      "guard": "trend_ext0.0400_counter1h0.0025__plus__pullback_24h_conflict0.0200",
+      "selection_2022": {
+        "active_days": 237,
+        "by_module_count": {
+          "literal_regime_router": 610
+        },
+        "by_source_count": {
+          "literal_regime_router": 610
+        },
+        "dd_pct": 5.2854,
+        "literal_target_hit_rate": 33.2787,
+        "literal_target_hits": 203,
+        "max_entries_same_clock_hour": 2,
+        "max_entries_same_rolling_hour": 2,
+        "max_loss_streak": 13,
+        "median_month_pct": 3.6275,
+        "minimum_month_pct": -2.094,
+        "monthly_return_pct": {
+          "2022-01": 1.1139,
+          "2022-02": 4.8527,
+          "2022-03": 4.2202,
+          "2022-04": 6.8733,
+          "2022-05": 4.6064,
+          "2022-06": 6.8271,
+          "2022-07": 0.8561,
+          "2022-08": 4.4316,
+          "2022-09": 2.3294,
+          "2022-10": -2.094,
+          "2022-11": 2.6034,
+          "2022-12": 3.6275,
+          "2023-01": 1.4387
+        },
+        "months": 13,
+        "months_ge_30pct": 0,
+        "n": 610,
+        "negative_months": 1,
+        "return_pct": 50.1882,
+        "stops": 304,
+        "timeouts": 103,
+        "trades_per_active_day": 2.574,
+        "trades_per_calendar_day": 1.671,
+        "wr": 45.41
+      },
+      "selection_pass": false
+    },
+    {
+      "blocked_raw_rows": 2540,
+      "guard": "trend_ext0.0400_counter1h0.0000__plus__pullback_24h_conflict0.0200",
+      "selection_2022": {
+        "active_days": 235,
+        "by_module_count": {
+          "literal_regime_router": 601
+        },
+        "by_source_count": {
+          "literal_regime_router": 601
+        },
+        "dd_pct": 5.2854,
+        "literal_target_hit_rate": 32.9451,
+        "literal_target_hits": 198,
+        "max_entries_same_clock_hour": 2,
+        "max_entries_same_rolling_hour": 2,
+        "max_loss_streak": 13,
+        "median_month_pct": 3.3252,
+        "minimum_month_pct": -2.094,
+        "monthly_return_pct": {
+          "2022-01": 1.1139,
+          "2022-02": 4.8508,
+          "2022-03": 4.2202,
+          "2022-04": 6.881,
+          "2022-05": 4.6064,
+          "2022-06": 5.7066,
+          "2022-07": 0.8552,
+          "2022-08": 4.4334,
+          "2022-09": 2.3313,
+          "2022-10": -2.094,
+          "2022-11": 1.9933,
+          "2022-12": 3.3252,
+          "2023-01": 1.4387
+        },
+        "months": 13,
+        "months_ge_30pct": 0,
+        "n": 601,
+        "negative_months": 1,
+        "return_pct": 47.3102,
+        "stops": 301,
+        "timeouts": 102,
+        "trades_per_active_day": 2.557,
+        "trades_per_calendar_day": 1.647,
+        "wr": 45.26
+      },
+      "selection_pass": false
+    },
+    {
+      "blocked_raw_rows": 2052,
+      "guard": "trend_ext0.0500_counter1h0.0025__plus__pullback_24h_conflict0.0200",
+      "selection_2022": {
+        "active_days": 239,
+        "by_module_count": {
+          "literal_regime_router": 623
+        },
+        "by_source_count": {
+          "literal_regime_router": 623
+        },
+        "dd_pct": 5.2889,
+        "literal_target_hit_rate": 33.3868,
+        "literal_target_hits": 208,
+        "max_entries_same_clock_hour": 2,
+        "max_entries_same_rolling_hour": 2,
+        "max_loss_streak": 13,
+        "median_month_pct": 3.6275,
+        "minimum_month_pct": -2.0975,
+        "monthly_return_pct": {
+          "2022-01": 1.7206,
+          "2022-02": 4.538,
+          "2022-03": 5.0127,
+          "2022-04": 7.1631,
+          "2022-05": 4.6033,
+          "2022-06": 6.8271,
+          "2022-07": -0.3451,
+          "2022-08": 4.4316,
+          "2022-09": 2.6327,
+          "2022-10": -2.0975,
+          "2022-11": 2.6034,
+          "2022-12": 3.6275,
+          "2023-01": 1.4387
+        },
+        "months": 13,
+        "months_ge_30pct": 0,
+        "n": 623,
+        "negative_months": 2,
+        "return_pct": 50.8159,
+        "stops": 312,
+        "timeouts": 103,
+        "trades_per_active_day": 2.607,
+        "trades_per_calendar_day": 1.707,
+        "wr": 45.1
+      },
+      "selection_pass": false
+    },
+    {
+      "blocked_raw_rows": 2180,
+      "guard": "trend_ext0.0500_counter1h0.0000__plus__pullback_24h_conflict0.0200",
+      "selection_2022": {
+        "active_days": 238,
+        "by_module_count": {
+          "literal_regime_router": 620
+        },
+        "by_source_count": {
+          "literal_regime_router": 620
+        },
+        "dd_pct": 5.2889,
+        "literal_target_hit_rate": 32.9032,
+        "literal_target_hits": 204,
+        "max_entries_same_clock_hour": 2,
+        "max_entries_same_rolling_hour": 2,
+        "max_loss_streak": 13,
+        "median_month_pct": 3.6275,
+        "minimum_month_pct": -2.0975,
+        "monthly_return_pct": {
+          "2022-01": 1.7206,
+          "2022-02": 4.5362,
+          "2022-03": 5.0127,
+          "2022-04": 6.211,
+          "2022-05": 4.6033,
+          "2022-06": 5.3885,
+          "2022-07": -0.3461,
+          "2022-08": 4.4316,
+          "2022-09": 2.6337,
+          "2022-10": -2.0975,
+          "2022-11": 1.9933,
+          "2022-12": 3.6275,
+          "2023-01": 1.4387
+        },
+        "months": 13,
+        "months_ge_30pct": 0,
+        "n": 620,
+        "negative_months": 2,
+        "return_pct": 46.5837,
+        "stops": 314,
+        "timeouts": 102,
+        "trades_per_active_day": 2.605,
+        "trades_per_calendar_day": 1.699,
+        "wr": 44.68
+      },
+      "selection_pass": false
+    },
+    {
+      "blocked_raw_rows": 2061,
+      "guard": "trend_ext0.0400_counter1h0.0050__plus__pullback_24h_conflict0.0200",
+      "selection_2022": {
+        "active_days": 239,
+        "by_module_count": {
+          "literal_regime_router": 625
+        },
+        "by_source_count": {
+          "literal_regime_router": 625
+        },
+        "dd_pct": 5.5696,
+        "literal_target_hit_rate": 33.12,
+        "literal_target_hits": 207,
+        "max_entries_same_clock_hour": 2,
+        "max_entries_same_rolling_hour": 2,
+        "max_loss_streak": 13,
+        "median_month_pct": 2.9916,
+        "minimum_month_pct": -2.3877,
+        "monthly_return_pct": {
+          "2022-01": -0.0851,
+          "2022-02": 4.8527,
+          "2022-03": 2.9916,
+          "2022-04": 7.6701,
+          "2022-05": 5.4247,
+          "2022-06": 6.8271,
+          "2022-07": 0.8561,
+          "2022-08": 4.9129,
+          "2022-09": 2.0261,
+          "2022-10": -2.3877,
+          "2022-11": 2.6034,
+          "2022-12": 5.2934,
+          "2023-01": 1.4387
+        },
+        "months": 13,
+        "months_ge_30pct": 0,
+        "n": 625,
+        "negative_months": 2,
+        "return_pct": 51.093,
+        "stops": 311,
+        "timeouts": 107,
+        "trades_per_active_day": 2.615,
+        "trades_per_calendar_day": 1.712,
+        "wr": 45.44
+      },
+      "selection_pass": false
+    },
+    {
+      "blocked_raw_rows": 2365,
+      "guard": "trend_ext0.0200_counter1h0.0050__plus__pullback_24h_conflict0.0200",
+      "selection_2022": {
+        "active_days": 236,
+        "by_module_count": {
+          "literal_regime_router": 603
+        },
+        "by_source_count": {
+          "literal_regime_router": 603
+        },
+        "dd_pct": 5.5696,
+        "literal_target_hit_rate": 33.0017,
+        "literal_target_hits": 199,
+        "max_entries_same_clock_hour": 2,
+        "max_entries_same_rolling_hour": 2,
+        "max_loss_streak": 13,
+        "median_month_pct": 3.5297,
+        "minimum_month_pct": -2.3877,
+        "monthly_return_pct": {
+          "2022-01": 0.5242,
+          "2022-02": 4.5372,
+          "2022-03": 2.0666,
+          "2022-04": 7.4161,
+          "2022-05": 5.4331,
+          "2022-06": 5.2465,
+          "2022-07": 0.2716,
+          "2022-08": 4.9288,
+          "2022-09": 2.0261,
+          "2022-10": -2.3877,
+          "2022-11": 3.5297,
+          "2022-12": 6.2437,
+          "2023-01": 1.4387
+        },
+        "months": 13,
+        "months_ge_30pct": 0,
+        "n": 603,
+        "negative_months": 1,
+        "return_pct": 49.4648,
+        "stops": 298,
+        "timeouts": 106,
+        "trades_per_active_day": 2.555,
+        "trades_per_calendar_day": 1.652,
+        "wr": 45.61
+      },
+      "selection_pass": false
+    },
+    {
+      "blocked_raw_rows": 2250,
+      "guard": "trend_ext0.0300_counter1h0.0050__plus__pullback_24h_conflict0.0200",
+      "selection_2022": {
+        "active_days": 236,
+        "by_module_count": {
+          "literal_regime_router": 615
+        },
+        "by_source_count": {
+          "literal_regime_router": 615
+        },
+        "dd_pct": 5.5696,
+        "literal_target_hit_rate": 32.6829,
+        "literal_target_hits": 201,
+        "max_entries_same_clock_hour": 2,
+        "max_entries_same_rolling_hour": 2,
+        "max_loss_streak": 13,
+        "median_month_pct": 3.5297,
+        "minimum_month_pct": -2.3877,
+        "monthly_return_pct": {
+          "2022-01": -0.3751,
+          "2022-02": 4.2254,
+          "2022-03": 2.6827,
+          "2022-04": 7.5506,
+          "2022-05": 5.4331,
+          "2022-06": 6.1937,
+          "2022-07": 0.5599,
+          "2022-08": 4.6133,
+          "2022-09": 2.0261,
+          "2022-10": -2.3877,
+          "2022-11": 3.5297,
+          "2022-12": 5.2934,
+          "2023-01": 1.4387
+        },
+        "months": 13,
+        "months_ge_30pct": 0,
+        "n": 615,
+        "negative_months": 2,
+        "return_pct": 48.7386,
+        "stops": 305,
+        "timeouts": 109,
+        "trades_per_active_day": 2.606,
+        "trades_per_calendar_day": 1.685,
+        "wr": 45.53
+      },
+      "selection_pass": false
+    },
+    {
+      "blocked_raw_rows": 3284,
+      "guard": "trend_ext0.0200_counter1h0.0000__plus__pullback_24h_conflict0.0200",
+      "selection_2022": {
+        "active_days": 229,
+        "by_module_count": {
+          "literal_regime_router": 560
+        },
+        "by_source_count": {
+          "literal_regime_router": 560
+        },
+        "dd_pct": 5.6936,
+        "literal_target_hit_rate": 33.0357,
+        "literal_target_hits": 185,
+        "max_entries_same_clock_hour": 2,
+        "max_entries_same_rolling_hour": 2,
+        "max_loss_streak": 13,
+        "median_month_pct": 3.2227,
+        "minimum_month_pct": -2.5159,
+        "monthly_return_pct": {
+          "2022-01": 0.8258,
+          "2022-02": 4.5353,
+          "2022-03": 3.2998,
+          "2022-04": 8.3895,
+          "2022-05": 5.534,
+          "2022-06": 3.5168,
+          "2022-07": 0.577,
+          "2022-08": 3.2227,
+          "2022-09": 2.9654,
+          "2022-10": -2.5159,
+          "2022-11": 1.9942,
+          "2022-12": 4.8845,
+          "2023-01": 1.4387
+        },
+        "months": 13,
+        "months_ge_30pct": 0,
+        "n": 560,
+        "negative_months": 1,
+        "return_pct": 45.7854,
+        "stops": 278,
+        "timeouts": 97,
+        "trades_per_active_day": 2.445,
+        "trades_per_calendar_day": 1.534,
+        "wr": 45.54
+      },
+      "selection_pass": false
+    },
+    {
+      "blocked_raw_rows": 2968,
+      "guard": "trend_ext0.0300_counter1h0.0000__plus__pullback_24h_conflict0.0200",
+      "selection_2022": {
+        "active_days": 231,
+        "by_module_count": {
+          "literal_regime_router": 580
+        },
+        "by_source_count": {
+          "literal_regime_router": 580
+        },
+        "dd_pct": 5.9916,
+        "literal_target_hit_rate": 32.5862,
+        "literal_target_hits": 189,
+        "max_entries_same_clock_hour": 2,
+        "max_entries_same_rolling_hour": 2,
+        "max_loss_streak": 13,
+        "median_month_pct": 2.9889,
+        "minimum_month_pct": -2.8239,
+        "monthly_return_pct": {
+          "2022-01": 0.8204,
+          "2022-02": 4.2236,
+          "2022-03": 2.9889,
+          "2022-04": 7.1918,
+          "2022-05": 5.5631,
+          "2022-06": 4.4484,
+          "2022-07": 0.2618,
+          "2022-08": 3.2145,
+          "2022-09": 2.6402,
+          "2022-10": -2.8239,
+          "2022-11": 1.9961,
+          "2022-12": 4.5678,
+          "2023-01": 1.4387
+        },
+        "months": 13,
+        "months_ge_30pct": 0,
+        "n": 580,
+        "negative_months": 1,
+        "return_pct": 42.8297,
+        "stops": 292,
+        "timeouts": 99,
+        "trades_per_active_day": 2.511,
+        "trades_per_calendar_day": 1.589,
+        "wr": 44.83
+      },
+      "selection_pass": false
+    },
+    {
+      "blocked_raw_rows": 1878,
+      "guard": "trend_ext0.0500_counter1h0.0050__plus__pullback_24h_conflict0.0200",
+      "selection_2022": {
+        "active_days": 240,
+        "by_module_count": {
+          "literal_regime_router": 637
+        },
+        "by_source_count": {
+          "literal_regime_router": 637
+        },
+        "dd_pct": 6.1362,
+        "literal_target_hit_rate": 32.967,
+        "literal_target_hits": 210,
+        "max_entries_same_clock_hour": 2,
+        "max_entries_same_rolling_hour": 2,
+        "max_loss_streak": 13,
+        "median_month_pct": 3.7748,
+        "minimum_month_pct": -2.9734,
+        "monthly_return_pct": {
+          "2022-01": 0.5144,
+          "2022-02": 4.538,
+          "2022-03": 3.7748,
+          "2022-04": 7.1688,
+          "2022-05": 5.4215,
+          "2022-06": 6.8271,
+          "2022-07": -0.3451,
+          "2022-08": 4.9129,
+          "2022-09": 2.6382,
+          "2022-10": -2.9734,
+          "2022-11": 2.6034,
+          "2022-12": 5.2934,
+          "2023-01": 1.4387
+        },
+        "months": 13,
+        "months_ge_30pct": 0,
+        "n": 637,
+        "negative_months": 2,
+        "return_pct": 50.1647,
+        "stops": 319,
+        "timeouts": 108,
+        "trades_per_active_day": 2.654,
+        "trades_per_calendar_day": 1.745,
+        "wr": 45.05
+      },
+      "selection_pass": false
+    }
+  ],
+  "sources": {
+    "C:\\Users\\Lenovo\\Desktop\\telegram bot\\crypto_family_exhaustion_veto_oct25_audit.py": "d40717fc133c11ebca20f6d2098f4b0a4094ae3fbd4977eda7d952eec8d7065a",
+    "C:\\Users\\Lenovo\\Desktop\\telegram bot\\reports\\audit_2026_09_08\\crypto_okx_swap_1h_expanded_oct24\\AAVEUSDT_1h_2020_2026.pkl": "c128d2cc84484047b84cfaf066a6d439ae2b3609b0e32404a51c131541eb44ba",
+    "C:\\Users\\Lenovo\\Desktop\\telegram bot\\reports\\audit_2026_09_08\\crypto_okx_swap_1h_expanded_oct24\\AVAXUSDT_1h_2020_2026.pkl": "2d19f4b1e3d1862fa4a03bc9f591cfdc60542378550e5320b33cbf250baf6112",
+    "C:\\Users\\Lenovo\\Desktop\\telegram bot\\reports\\audit_2026_09_08\\crypto_okx_swap_1h_expanded_oct24\\BTCUSDT_1h_2020_2026.pkl": "ac299f9ccbd6c6153d83a3f18c8d206b09fc5a3b2d63f0858b43ed1c8d0e9e01",
+    "C:\\Users\\Lenovo\\Desktop\\telegram bot\\reports\\audit_2026_09_08\\crypto_okx_swap_1h_expanded_oct24\\ETHUSDT_1h_2020_2026.pkl": "2eed95c0897f79417f5715dcc747c182d736fa8d446675cf97bb811380ebb873",
+    "C:\\Users\\Lenovo\\Desktop\\telegram bot\\reports\\audit_2026_09_08\\crypto_okx_swap_1h_expanded_oct24\\LINKUSDT_1h_2020_2026.pkl": "4b5318946d1e24b4d3807825a8b433e3bf3a17bb9cdc72942a985d8ea3ec5b4c",
+    "C:\\Users\\Lenovo\\Desktop\\telegram bot\\reports\\audit_2026_09_08\\crypto_okx_swap_1h_expanded_oct24\\SOLUSDT_1h_2020_2026.pkl": "96a77c5a4364d5db95618794d9b945af8387a13bcd7295d844b976e4847fd4b3",
+    "C:\\Users\\Lenovo\\Desktop\\telegram bot\\reports\\audit_2026_09_08\\crypto_okx_swap_1h_expanded_oct24\\XLMUSDT_1h_2020_2026.pkl": "73bdb94f2dcf591522cdcb0d30057236d6930a22a8856efb2de3f1827074a81a",
+    "C:\\Users\\Lenovo\\Desktop\\telegram bot\\reports\\audit_2026_09_08\\crypto_okx_swap_1h_expanded_oct24\\XRPUSDT_1h_2020_2026.pkl": "fa890ffe38c56752958ff80b7c2afa377ebc5aa2c5b25dbd9b81c73706fb4c28",
+    "C:\\Users\\Lenovo\\Desktop\\telegram bot\\reports\\audit_2026_09_08\\crypto_okx_swap_1h_history\\AAVEUSDT_1h_2020_2026.pkl": "f8b5a5cebf1f0d7f95a1da7496cd1d0977c829dceb4a445a5fb61decec1e5d56",
+    "C:\\Users\\Lenovo\\Desktop\\telegram bot\\reports\\audit_2026_09_08\\crypto_okx_swap_1h_history\\AVAXUSDT_1h_2020_2026.pkl": "9ccc2e628083173b414887ee19ab5003ac377cc0ac2edde461c2562201a6223d",
+    "C:\\Users\\Lenovo\\Desktop\\telegram bot\\reports\\audit_2026_09_08\\crypto_okx_swap_1h_history\\BTCUSDT_1h_2020_2026.pkl": "2922616381ea4a986109037451cd617c5600eede06b6c5d006c777fe1a25b1d1",
+    "C:\\Users\\Lenovo\\Desktop\\telegram bot\\reports\\audit_2026_09_08\\crypto_okx_swap_1h_history\\ETHUSDT_1h_2020_2026.pkl": "ea41c84488a2659162a9a5fbc4a8a849d6502c65bca08d367d66b4f53b974af8",
+    "C:\\Users\\Lenovo\\Desktop\\telegram bot\\reports\\audit_2026_09_08\\crypto_okx_swap_1h_history\\LINKUSDT_1h_2020_2026.pkl": "7ad97eed0cce9c3d9b152927d406fc156a3af69f464182bee34dc1a8c95cf8a6",
+    "C:\\Users\\Lenovo\\Desktop\\telegram bot\\reports\\audit_2026_09_08\\crypto_okx_swap_1h_history\\SOLUSDT_1h_2020_2026.pkl": "88ec6fc4fc4f30e8c327e11cf5b1d4af18559f040bac6ba5a6345e8ca401e4a7",
+    "C:\\Users\\Lenovo\\Desktop\\telegram bot\\reports\\audit_2026_09_08\\crypto_okx_swap_1h_history\\XLMUSDT_1h_2020_2026.pkl": "89966133c100f5f96e5c7653485291bf73b6b35711bb324a7f0f82e0adec624f",
+    "C:\\Users\\Lenovo\\Desktop\\telegram bot\\reports\\audit_2026_09_08\\crypto_okx_swap_1h_history\\XRPUSDT_1h_2020_2026.pkl": "4869e0f422042773b7f65f0e81c722a5491fa119802e608ab0ac7a9f16b56d38",
+    "reports\\audit_2026_09_08\\crypto_okx_swap_1h_expanded_oct24\\manifest.json": "4bcaa24f96f647a351f9e28b442ca15916c3a37f0bc9dbde295aac01fcdd9ddb",
+    "reports\\audit_2026_09_08\\crypto_okx_swap_1h_frequency_oct22.pkl": "dba637e15be73741d171954db49ae8e6c9d357e49e71564930bf098fc2bec842",
+    "reports\\audit_2026_09_08\\crypto_okx_swap_1h_history\\manifest.json": "348e7b907566dc1942b21f9c7adad73e83281c4fb5fb40db3e43cbff8fdb5c72",
+    "reports\\audit_2026_09_08\\crypto_okx_swap_1h_stable_direction_oct22.json": "e2b5ff67f7cb4600a3282be1f04643d797c5569d737885d7aa9a67ee996ddee2",
+    "reports\\audit_2026_09_08\\crypto_okx_swap_1h_stable_material_exit_oct24_forward.json": "d94e18927ea5593c485940583252c2ae7fdf57cc8f715bc9eff59096de03eac6"
+  },
+  "status": "REJECTED_VALIDATION",
+  "test_2024": null,
+  "validation_2023": {
+    "baseline": {
+      "active_days": 276,
+      "by_module_count": {
+        "literal_regime_router": 683
+      },
+      "by_source_count": {
+        "literal_regime_router": 683
+      },
+      "dd_pct": 5.8625,
+      "literal_target_hit_rate": 26.3543,
+      "literal_target_hits": 180,
+      "max_entries_same_clock_hour": 2,
+      "max_entries_same_rolling_hour": 2,
+      "max_loss_streak": 10,
+      "median_month_pct": 2.1807,
+      "minimum_month_pct": -2.2123,
+      "monthly_return_pct": {
+        "2023-01": 0.8977,
+        "2023-02": -0.8781,
+        "2023-03": 3.5359,
+        "2023-04": 5.3006,
+        "2023-05": 9.2002,
+        "2023-06": 5.58,
+        "2023-07": -0.2793,
+        "2023-08": 3.9146,
+        "2023-09": -2.2123,
+        "2023-10": 2.0031,
+        "2023-11": 0.4446,
+        "2023-12": 2.3583
+      },
+      "months": 12,
+      "months_ge_30pct": 0,
+      "n": 683,
+      "negative_months": 3,
+      "return_pct": 33.5941,
+      "stops": 316,
+      "timeouts": 187,
+      "trades_per_active_day": 2.475,
+      "trades_per_calendar_day": 1.876,
+      "wr": 44.95
+    },
+    "candidate": {
+      "active_days": 272,
+      "by_module_count": {
+        "literal_regime_router": 650
+      },
+      "by_source_count": {
+        "literal_regime_router": 650
+      },
+      "dd_pct": 6.1322,
+      "literal_target_hit_rate": 26.7692,
+      "literal_target_hits": 174,
+      "max_entries_same_clock_hour": 2,
+      "max_entries_same_rolling_hour": 2,
+      "max_loss_streak": 10,
+      "median_month_pct": 2.8359,
+      "minimum_month_pct": -1.9147,
+      "monthly_return_pct": {
+        "2023-01": 0.7231,
+        "2023-02": -0.6488,
+        "2023-03": 4.3806,
+        "2023-04": 5.3379,
+        "2023-05": 8.6212,
+        "2023-06": 4.178,
+        "2023-07": -0.4113,
+        "2023-08": 3.7018,
+        "2023-09": -1.9147,
+        "2023-10": 2.3892,
+        "2023-11": 1.1434,
+        "2023-12": 3.2825
+      },
+      "months": 12,
+      "months_ge_30pct": 0,
+      "n": 650,
+      "negative_months": 3,
+      "return_pct": 34.9014,
+      "stops": 295,
+      "timeouts": 181,
+      "trades_per_active_day": 2.39,
+      "trades_per_calendar_day": 1.786,
+      "wr": 45.23
+    },
+    "passes": false
+  }
+}
