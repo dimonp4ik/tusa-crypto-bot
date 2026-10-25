@@ -1,0 +1,435 @@
+{
+  "confirmation_2025_2026": null,
+  "frozen_before_validation": null,
+  "limitations": [
+    "Hourly OHLC cannot reveal the tick path inside a candle.",
+    "A close-confirmed stop can realize more than the original 1% price loss.",
+    "The rule requires a virtual stop during an eligible first touch and therefore carries gap and intrabar tail risk.",
+    "No historical result is eligible for runtime use without forward shadow evidence."
+  ],
+  "mask_definitions": {
+    "aligned_atr_safe_or_supportive": "alignment and safe path, plus ATR or supportive order block",
+    "aligned_atr_safe_path": "alignment, ATR and safe path",
+    "aligned_safe_path": "BTC, breadth, 168h trend align and path is safe",
+    "atr_safe_path": "14h ATR is at least 1% and path is safe",
+    "safe_path": "no opposing level, opposing block, or failed breakout"
+  },
+  "protocol": {
+    "conditional_test": 2024,
+    "confirmed_break_execution": "market exit at next hourly open",
+    "default_stop_pct": 1.0,
+    "entry_and_target_router": "unchanged frozen target cascade",
+    "fees": "excluded by user instruction",
+    "grace": "ignore first intrabar stop touch only after recovered hourly close; restore hard stop next candle",
+    "market_entries_only": true,
+    "money": "3% current equity margin, fixed 10x gross",
+    "published_confirmation_only": [
+      2025,
+      2026
+    ],
+    "same_bar_target_and_stop": "conservative stop-first; no grace",
+    "selection": 2022,
+    "validation": 2023
+  },
+  "ready_for_live_orders": false,
+  "selection_baseline_2022": {
+    "active_days": 279,
+    "average_selected_target_pct": 0.6414,
+    "by_module_count": {
+      "literal_regime_router": 955
+    },
+    "by_source_count": {
+      "literal_regime_router": 955
+    },
+    "dd_pct": 4.2856,
+    "grace_eventual_stops": 0,
+    "grace_target_hits": 0,
+    "grace_used": 0,
+    "literal_target_hit_rate": 68.1675,
+    "literal_target_hits": 651,
+    "max_entries_same_clock_hour": 2,
+    "max_entries_same_rolling_hour": 2,
+    "max_loss_streak": 7,
+    "median_month_pct": 2.516,
+    "minimum_month_pct": -0.4807,
+    "monthly_return_pct": {
+      "2022-01": -0.4807,
+      "2022-02": 2.4141,
+      "2022-03": 5.0745,
+      "2022-04": 5.0777,
+      "2022-05": 1.7897,
+      "2022-06": 0.1265,
+      "2022-07": 4.7222,
+      "2022-08": 3.6309,
+      "2022-09": 3.3067,
+      "2022-10": 1.1713,
+      "2022-11": 1.1911,
+      "2022-12": 2.6178
+    },
+    "months": 12,
+    "months_ge_30pct": 0,
+    "n": 955,
+    "negative_months": 1,
+    "realized_min_signed_move_pct": -1.0,
+    "realized_p01_signed_move_pct": -1.0,
+    "return_pct": 35.0848,
+    "stops": 298,
+    "target_distribution": {
+      "0.5": 802,
+      "1.0": 48,
+      "1.5": 93,
+      "2.0": 12
+    },
+    "target_hits": {
+      "0.5": 566,
+      "1.0": 26,
+      "1.5": 54,
+      "2.0": 5
+    },
+    "timeouts": 6,
+    "trades_per_active_day": 3.423,
+    "trades_per_calendar_day": 2.616,
+    "worst_intrabar_excursion_pct": null,
+    "wr": 68.38
+  },
+  "selection_frontier": [
+    {
+      "mask": "safe_path",
+      "selection_2022": {
+        "active_days": 279,
+        "average_selected_target_pct": 0.6433,
+        "by_module_count": {
+          "literal_regime_router": 942
+        },
+        "by_source_count": {
+          "literal_regime_router": 942
+        },
+        "dd_pct": 6.3563,
+        "grace_eventual_stops": 84,
+        "grace_target_hits": 24,
+        "grace_used": 112,
+        "literal_target_hit_rate": 70.8068,
+        "literal_target_hits": 667,
+        "max_entries_same_clock_hour": 2,
+        "max_entries_same_rolling_hour": 2,
+        "max_loss_streak": 6,
+        "median_month_pct": 1.8781,
+        "minimum_month_pct": -1.8477,
+        "monthly_return_pct": {
+          "2022-01": -1.115,
+          "2022-02": 2.0755,
+          "2022-03": 8.2853,
+          "2022-04": 4.5141,
+          "2022-05": 1.6808,
+          "2022-06": -1.8477,
+          "2022-07": 5.0516,
+          "2022-08": 4.5187,
+          "2022-09": 2.4978,
+          "2022-10": 0.9765,
+          "2022-11": 0.1163,
+          "2022-12": 0.3224
+        },
+        "months": 12,
+        "months_ge_30pct": 0,
+        "n": 942,
+        "negative_months": 2,
+        "realized_min_signed_move_pct": -6.51022,
+        "realized_p01_signed_move_pct": -2.333228,
+        "return_pct": 30.1277,
+        "stops": 265,
+        "target_distribution": {
+          "0.5": 790,
+          "1.0": 46,
+          "1.5": 94,
+          "2.0": 12
+        },
+        "target_hits": {
+          "0.5": 578,
+          "1.0": 27,
+          "1.5": 57,
+          "2.0": 5
+        },
+        "timeouts": 10,
+        "trades_per_active_day": 3.376,
+        "trades_per_calendar_day": 2.581,
+        "worst_intrabar_excursion_pct": -7.040121,
+        "wr": 71.02
+      },
+      "selection_pass": false
+    },
+    {
+      "mask": "aligned_safe_path",
+      "selection_2022": {
+        "active_days": 279,
+        "average_selected_target_pct": 0.6429,
+        "by_module_count": {
+          "literal_regime_router": 945
+        },
+        "by_source_count": {
+          "literal_regime_router": 945
+        },
+        "dd_pct": 3.3485,
+        "grace_eventual_stops": 39,
+        "grace_target_hits": 9,
+        "grace_used": 49,
+        "literal_target_hit_rate": 69.3122,
+        "literal_target_hits": 655,
+        "max_entries_same_clock_hour": 2,
+        "max_entries_same_rolling_hour": 2,
+        "max_loss_streak": 6,
+        "median_month_pct": 1.9609,
+        "minimum_month_pct": 0.2248,
+        "monthly_return_pct": {
+          "2022-01": 0.2248,
+          "2022-02": 2.0755,
+          "2022-03": 4.9624,
+          "2022-04": 4.7448,
+          "2022-05": 2.198,
+          "2022-06": 1.4678,
+          "2022-07": 5.5069,
+          "2022-08": 1.4641,
+          "2022-09": 3.1095,
+          "2022-10": 0.7919,
+          "2022-11": 1.168,
+          "2022-12": 1.8464
+        },
+        "months": 12,
+        "months_ge_30pct": 0,
+        "n": 945,
+        "negative_months": 0,
+        "realized_min_signed_move_pct": -3.818882,
+        "realized_p01_signed_move_pct": -1.689405,
+        "return_pct": 33.7025,
+        "stops": 283,
+        "target_distribution": {
+          "0.5": 793,
+          "1.0": 46,
+          "1.5": 94,
+          "2.0": 12
+        },
+        "target_hits": {
+          "0.5": 569,
+          "1.0": 26,
+          "1.5": 55,
+          "2.0": 5
+        },
+        "timeouts": 7,
+        "trades_per_active_day": 3.387,
+        "trades_per_calendar_day": 2.589,
+        "worst_intrabar_excursion_pct": -7.040121,
+        "wr": 69.52
+      },
+      "selection_pass": false
+    },
+    {
+      "mask": "atr_safe_path",
+      "selection_2022": {
+        "active_days": 279,
+        "average_selected_target_pct": 0.6422,
+        "by_module_count": {
+          "literal_regime_router": 946
+        },
+        "by_source_count": {
+          "literal_regime_router": 946
+        },
+        "dd_pct": 6.3199,
+        "grace_eventual_stops": 53,
+        "grace_target_hits": 13,
+        "grace_used": 67,
+        "literal_target_hit_rate": 69.6617,
+        "literal_target_hits": 659,
+        "max_entries_same_clock_hour": 2,
+        "max_entries_same_rolling_hour": 2,
+        "max_loss_streak": 6,
+        "median_month_pct": 2.1159,
+        "minimum_month_pct": -1.9565,
+        "monthly_return_pct": {
+          "2022-01": -1.6917,
+          "2022-02": 2.0755,
+          "2022-03": 7.5569,
+          "2022-04": 4.2014,
+          "2022-05": 2.4548,
+          "2022-06": -1.9565,
+          "2022-07": 5.1965,
+          "2022-08": 4.1695,
+          "2022-09": 2.1562,
+          "2022-10": 1.3272,
+          "2022-11": 0.7094,
+          "2022-12": 0.3594
+        },
+        "months": 12,
+        "months_ge_30pct": 0,
+        "n": 946,
+        "negative_months": 2,
+        "realized_min_signed_move_pct": -6.51022,
+        "realized_p01_signed_move_pct": -1.950038,
+        "return_pct": 29.5195,
+        "stops": 280,
+        "target_distribution": {
+          "0.5": 794,
+          "1.0": 47,
+          "1.5": 93,
+          "2.0": 12
+        },
+        "target_hits": {
+          "0.5": 572,
+          "1.0": 26,
+          "1.5": 56,
+          "2.0": 5
+        },
+        "timeouts": 7,
+        "trades_per_active_day": 3.391,
+        "trades_per_calendar_day": 2.592,
+        "worst_intrabar_excursion_pct": -7.040121,
+        "wr": 69.87
+      },
+      "selection_pass": false
+    },
+    {
+      "mask": "aligned_atr_safe_path",
+      "selection_2022": {
+        "active_days": 279,
+        "average_selected_target_pct": 0.6422,
+        "by_module_count": {
+          "literal_regime_router": 946
+        },
+        "by_source_count": {
+          "literal_regime_router": 946
+        },
+        "dd_pct": 3.3111,
+        "grace_eventual_stops": 23,
+        "grace_target_hits": 6,
+        "grace_used": 30,
+        "literal_target_hit_rate": 68.9218,
+        "literal_target_hits": 652,
+        "max_entries_same_clock_hour": 2,
+        "max_entries_same_rolling_hour": 2,
+        "max_loss_streak": 6,
+        "median_month_pct": 2.1368,
+        "minimum_month_pct": -0.6757,
+        "monthly_return_pct": {
+          "2022-01": -0.6757,
+          "2022-02": 2.0755,
+          "2022-03": 4.6849,
+          "2022-04": 4.4873,
+          "2022-05": 2.198,
+          "2022-06": 1.5071,
+          "2022-07": 5.5002,
+          "2022-08": 2.926,
+          "2022-09": 2.5809,
+          "2022-10": 0.9103,
+          "2022-11": 1.168,
+          "2022-12": 2.0489
+        },
+        "months": 12,
+        "months_ge_30pct": 0,
+        "n": 946,
+        "negative_months": 1,
+        "realized_min_signed_move_pct": -2.759158,
+        "realized_p01_signed_move_pct": -1.675511,
+        "return_pct": 33.5044,
+        "stops": 287,
+        "target_distribution": {
+          "0.5": 794,
+          "1.0": 47,
+          "1.5": 93,
+          "2.0": 12
+        },
+        "target_hits": {
+          "0.5": 567,
+          "1.0": 26,
+          "1.5": 54,
+          "2.0": 5
+        },
+        "timeouts": 7,
+        "trades_per_active_day": 3.391,
+        "trades_per_calendar_day": 2.592,
+        "worst_intrabar_excursion_pct": -7.040121,
+        "wr": 69.13
+      },
+      "selection_pass": false
+    },
+    {
+      "mask": "aligned_atr_safe_or_supportive",
+      "selection_2022": {
+        "active_days": 279,
+        "average_selected_target_pct": 0.6419,
+        "by_module_count": {
+          "literal_regime_router": 944
+        },
+        "by_source_count": {
+          "literal_regime_router": 944
+        },
+        "dd_pct": 3.3111,
+        "grace_eventual_stops": 28,
+        "grace_target_hits": 6,
+        "grace_used": 35,
+        "literal_target_hit_rate": 68.9619,
+        "literal_target_hits": 651,
+        "max_entries_same_clock_hour": 2,
+        "max_entries_same_rolling_hour": 2,
+        "max_loss_streak": 6,
+        "median_month_pct": 2.1368,
+        "minimum_month_pct": -0.6757,
+        "monthly_return_pct": {
+          "2022-01": -0.6757,
+          "2022-02": 2.0755,
+          "2022-03": 4.6849,
+          "2022-04": 4.3317,
+          "2022-05": 2.198,
+          "2022-06": 1.5071,
+          "2022-07": 5.5002,
+          "2022-08": 2.7014,
+          "2022-09": 3.1095,
+          "2022-10": 0.9103,
+          "2022-11": 1.168,
+          "2022-12": 2.0489
+        },
+        "months": 12,
+        "months_ge_30pct": 0,
+        "n": 944,
+        "negative_months": 1,
+        "realized_min_signed_move_pct": -2.759158,
+        "realized_p01_signed_move_pct": -1.675941,
+        "return_pct": 33.7,
+        "stops": 286,
+        "target_distribution": {
+          "0.5": 793,
+          "1.0": 46,
+          "1.5": 93,
+          "2.0": 12
+        },
+        "target_hits": {
+          "0.5": 566,
+          "1.0": 26,
+          "1.5": 54,
+          "2.0": 5
+        },
+        "timeouts": 7,
+        "trades_per_active_day": 3.384,
+        "trades_per_calendar_day": 2.586,
+        "worst_intrabar_excursion_pct": -7.040121,
+        "wr": 69.17
+      },
+      "selection_pass": false
+    }
+  ],
+  "sources": {
+    "C:\\Users\\Lenovo\\Desktop\\telegram bot\\reports\\audit_2026_09_08\\crypto_okx_swap_1h_expanded_oct11\\AAVEUSDT_1h_2020_2026.pkl": "8ce4a640036eee8b071f1760c76dfedaac6e563376d4b56b24653d778fe903d6",
+    "C:\\Users\\Lenovo\\Desktop\\telegram bot\\reports\\audit_2026_09_08\\crypto_okx_swap_1h_expanded_oct11\\AVAXUSDT_1h_2020_2026.pkl": "2e62aa965e4afb6cdb36f3235859ef947a19281cc55dc09652d3db88bd79da8b",
+    "C:\\Users\\Lenovo\\Desktop\\telegram bot\\reports\\audit_2026_09_08\\crypto_okx_swap_1h_expanded_oct11\\BTCUSDT_1h_2020_2026.pkl": "f64016826f5632c546d74cee6a0f2d90f623566f9a7137d5b863e96e83db91ad",
+    "C:\\Users\\Lenovo\\Desktop\\telegram bot\\reports\\audit_2026_09_08\\crypto_okx_swap_1h_expanded_oct11\\ETHUSDT_1h_2020_2026.pkl": "4d48ca685e4bd68dfef63d6221b630b47ba398bf5b6b9bbb605b353030dddedd",
+    "C:\\Users\\Lenovo\\Desktop\\telegram bot\\reports\\audit_2026_09_08\\crypto_okx_swap_1h_expanded_oct11\\LINKUSDT_1h_2020_2026.pkl": "016dc9af8327af77e19d8d8d25a0500d0655f409eff39ca1473c1beeeb6eb14f",
+    "C:\\Users\\Lenovo\\Desktop\\telegram bot\\reports\\audit_2026_09_08\\crypto_okx_swap_1h_expanded_oct11\\SOLUSDT_1h_2020_2026.pkl": "fabe174359e29685177fa9e268fa4bde36df9dfe898cc7677fd960d58c12154b",
+    "C:\\Users\\Lenovo\\Desktop\\telegram bot\\reports\\audit_2026_09_08\\crypto_okx_swap_1h_expanded_oct11\\XLMUSDT_1h_2020_2026.pkl": "0823dbc26a677d0ac43d63ca5439ee5a621f9b195e7b5f6493a5f56542ab7f94",
+    "C:\\Users\\Lenovo\\Desktop\\telegram bot\\reports\\audit_2026_09_08\\crypto_okx_swap_1h_expanded_oct11\\XRPUSDT_1h_2020_2026.pkl": "a0c0aaecf8c1dea597a5fe01a9454aff7187df5702836a39c6b8425aa8aa7142",
+    "crypto_okx_swap_1h_target_cascade_oct7_audit.py": "f0cd5ec4c8c2bcce4d6d5acf31d4e557e78bfcf81feb113f973422de469ddeff",
+    "crypto_one_bar_wick_grace_oct25_audit.py": "124ac28d9fbe86d8751d3e5f3f819a802fff26e2c163ff3d7f1cf382039d6db0",
+    "crypto_stop_cause_oct11_audit.py": "eefa8e65bb92f30d2e42235140e4a1d2facb4fcc171f13a0f29ca8be241939c2",
+    "reports\\audit_2026_09_08\\crypto_okx_swap_1h_expanded_oct11\\manifest.json": "a108c54238a6d9f1cb6c7bc14a873f3f2af034508303b5c0ed51ed9010e6ac9b",
+    "reports\\audit_2026_09_08\\crypto_okx_swap_1h_target_cascade_oct7.pkl": "e9808c43acba2862ea93de10b96e270284a10eb3c1c2c973fb0bfd6625f71d75"
+  },
+  "status": "REJECTED_SELECTION",
+  "test_2024": null,
+  "validation_2023": null
+}
