@@ -2,6 +2,7 @@ import os
 import subprocess
 import sys
 import unittest
+from datetime import datetime, timezone
 from unittest.mock import patch
 
 os.environ["BOT_STARTUP_ENABLED"] = "0"
@@ -122,11 +123,37 @@ class ShadowDeploymentTests(unittest.TestCase):
         self.assertTrue(analysis["_shadow_only"])
         self.assertEqual(analysis["source"], "venue_shadow_experiment")
 
-    def test_shadow_scan_uses_audited_venue_router(self):
+    def test_shadow_scan_uses_frozen_material_profit_first_router(self):
         import inspect
         src = inspect.getsource(main._run_venue_strategy_scan)
-        self.assertIn("rows = venue_setups", src)
-        self.assertNotIn("precision_profit_first_shadow_setups", src)
+        self.assertIn("rows = profit_first_material_shadow_setups", src)
+        self.assertNotIn("rows = venue_setups", src)
+
+    def test_profit_first_material_analysis_persists_frozen_barbell(self):
+        setup = {
+            "direction": "SHORT", "entry": 100.0, "atr": .75,
+            "target_r": .5, "runner_target_r": 2.0,
+            "tp1_close_fraction": .05, "first_target_move_pct": .75,
+            "hold_bars": 48, "model_quality": .42,
+            "utc_session": "18_23", "btc_regime": "bear",
+            "eff_ratio": .2, "signal_bar_ts": 900.0,
+            "module": "profit_first_material_2r",
+            "_shadow_experiment": True,
+            "_profit_first_material_shadow": True,
+        }
+        with patch.object(main, "DEPLOYMENT_MODE", "live"):
+            analysis = main._venue_analysis("AAVEUSDT", setup)
+        self.assertTrue(analysis["_shadow_only"])
+        self.assertTrue(analysis["_profit_first_material_shadow"])
+        self.assertEqual(analysis["source"], "venue_shadow_profit_first_2r")
+        self.assertEqual(analysis["fixed_target_r"], .5)
+        self.assertEqual(analysis["fixed_runner_target_r"], 2.0)
+        self.assertEqual(analysis["strategy_tp1_close_frac"], .05)
+        self.assertEqual(analysis["strategy_runner_mode"], "fixed_be")
+        self.assertEqual(analysis["strategy_bar_seconds"], 900)
+        self.assertEqual(analysis["strategy_entry_bar_ts"], 1800.0)
+        self.assertFalse(analysis["strategy_stop_on_close"])
+        self.assertEqual(analysis["strategy_max_bars"], 48)
 
     def test_five_minute_oi_analysis_is_permanently_shadow_only(self):
         setup = {
@@ -311,10 +338,10 @@ class ShadowDeploymentTests(unittest.TestCase):
         }
         signal = {
             "id": 731, "symbol": "BTCUSDT", "direction": "LONG",
-            "entry_price": 100.0, "sl": 98.0, "tp1": 100.5, "tp2": 104.0,
+            "entry_price": 100.0, "sl": 98.0, "tp1": 101.0, "tp2": 104.0,
             "atr": 1.0, "opened_at": start - 60, "status": "TP1_PARTIAL",
             "tp1_hit_at": start - 30, "runner_activation_bar_ts": start - 30,
-            "strategy_tp1_close_frac": .10, "strategy_runner_mode": "fixed_be",
+            "strategy_tp1_close_frac": .05, "strategy_runner_mode": "fixed_be",
             "strategy_bar_seconds": 900, "strategy_entry_bar_ts": start,
             "strategy_stop_on_close": 0, "strategy_max_bars": 48,
         }
@@ -398,15 +425,20 @@ class ShadowDeploymentTests(unittest.TestCase):
         self.assertEqual(send.call_args.args[0]["source"], "venue_regime")
         blocked.assert_called_once_with(9, "hour_cap")
 
-    def test_scan_uses_audited_venue_router_in_shadow_mode(self):
-        fifteen = {"time": [900.0], "close": [100.0]}
+    def test_scan_uses_frozen_profit_first_router_in_shadow_mode(self):
+        closed_at = datetime.now(timezone.utc).timestamp() - 900
+        fifteen = {"time": [closed_at], "close": [100.0]}
         setup = {
             "direction": "SHORT", "entry": 99.0, "atr": .495,
-            "target_r": .25, "first_target_move_pct": .2475,
+            "target_r": .5, "runner_target_r": 2.0,
+            "tp1_close_fraction": .05, "first_target_move_pct": .5,
+            "hold_bars": 48, "model_quality": .42,
             "utc_session": "00_05", "btc_regime": "bear",
             "eff_ratio": .2,
-            "signal_bar_ts": 900.0,
-            "module": "rr_short_bear_asia",
+            "signal_bar_ts": closed_at,
+            "module": "profit_first_material_2r",
+            "_shadow_experiment": True,
+            "_profit_first_material_shadow": True,
         }
 
         with patch.object(main, "ROBUST_SYMBOLS", {"BTCUSDT"}), \
@@ -422,7 +454,7 @@ class ShadowDeploymentTests(unittest.TestCase):
              patch.object(main, "get_xperp_price", return_value=99.0), \
              patch.object(main, "get_open_signals", return_value=[]), \
              patch.object(main, "get_active_symbol_blocks", return_value=[]), \
-             patch.object(main, "venue_setups",
+             patch.object(main, "profit_first_material_shadow_setups",
                           return_value=[setup]) as router, \
              patch.object(main, "get_xperp_open_interest_history") as oi, \
              patch.object(main, "log_setup_candidate_once", return_value=11), \
@@ -433,12 +465,30 @@ class ShadowDeploymentTests(unittest.TestCase):
         router.assert_called_once()
         oi.assert_not_called()
         analysis = publish.call_args.args[0][0][0]
-        self.assertEqual(analysis["signal_bar_ts"], 900.0)
-        self.assertEqual(
-            analysis["source"], "venue_regime")
+        self.assertEqual(analysis["signal_bar_ts"], closed_at)
+        self.assertEqual(analysis["source"], "venue_shadow_profit_first_2r")
         self.assertTrue(analysis["_shadow_only"])
-        self.assertIsNone(analysis["strategy_bar_seconds"])
-        self.assertIsNone(analysis["strategy_max_bars"])
+        self.assertEqual(analysis["strategy_bar_seconds"], 900)
+        self.assertEqual(analysis["strategy_max_bars"], 48)
+
+    def test_scan_drops_stale_closed_bar_instead_of_entering_late(self):
+        fifteen = {"time": [900.0], "close": [100.0]}
+        with patch.object(main, "ROBUST_SYMBOLS", {"BTCUSDT"}), \
+             patch.object(main, "REGIME_FILTER_MODE", "paper"), \
+             patch.object(main, "TRADE_WEEKENDS", True), \
+             patch.object(main, "TRADING_HOURS_START", 0), \
+             patch.object(main, "TRADING_HOURS_END", 24), \
+             patch.object(main, "_venue_daily_loss_pause", return_value=False), \
+             patch.object(main, "get_xperp_instruments", return_value={"BTC": "X"}), \
+             patch.object(main, "get_klines_xperp", return_value=fifteen), \
+             patch.object(main, "get_xperp_price", return_value=100.0), \
+             patch.object(main, "get_open_signals", return_value=[]), \
+             patch.object(main, "get_active_symbol_blocks", return_value=[]), \
+             patch.object(main, "profit_first_material_shadow_setups") as router, \
+             patch.object(main, "_publish_venue_candidates", return_value=0) as publish:
+            main._run_venue_strategy_scan()
+        router.assert_not_called()
+        publish.assert_called_once_with([], {"LONG": 0, "SHORT": 0})
 
     def test_scan_does_not_fetch_oi_without_price_candidate(self):
         with patch.object(main, "DEPLOYMENT_MODE", "shadow"), \

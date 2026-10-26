@@ -44,11 +44,10 @@ SCAN_INTERVAL_MINUTES = int(os.getenv("SCAN_INTERVAL_MINUTES", "5"))
 VENUE_MAX_SIGNALS_PER_SCAN = max(
     1, min(3, int(os.getenv("VENUE_MAX_SIGNALS_PER_SCAN", "3")))
 )
-# The profit-first 15m shadow replay selected four completed losses on 2022h1,
-# confirmed it on 2022h2-2023, and then preserved the complete-month target on
-# 2024-2026 plus direct X-Perp.  A pause of three stopped profitable recovery
-# sequences too early.  Keep this separate from the legacy SMC kill switch.
-VENUE_LOSS_PAUSE_STREAK = 4
+# The frozen profit-first replay and its direct X-Perp refresh both use a
+# three-loss UTC-day pause. Keep this separate from the legacy SMC kill switch
+# so the runtime portfolio gate stays identical to the audited one.
+VENUE_LOSS_PAUSE_STREAK = 3
 # Deployment is deliberately fail-closed.  A stale Railway AUTOTRADE_ENABLED=1
 # cannot open an order unless DEPLOYMENT_MODE is explicitly changed to live.
 DEPLOYMENT_MODE = os.getenv("DEPLOYMENT_MODE", "shadow").strip().lower()
