@@ -14,19 +14,37 @@ import requests
 from download_current_xperp_5m_history import snapshot_anchor_ms
 
 
+def get_json(session: requests.Session, url: str, params: dict) -> dict:
+    """Fetch public OKX data with bounded retries for transient throttling."""
+    last_error = None
+    for attempt in range(6):
+        try:
+            response = session.get(url, params=params, timeout=25)
+            if response.status_code == 429:
+                retry_after = float(response.headers.get("Retry-After", 0) or 0)
+                time.sleep(max(retry_after, 1.5 * (attempt + 1)))
+                continue
+            response.raise_for_status()
+            body = response.json()
+            if body.get("code") != "0":
+                raise RuntimeError(str(body))
+            return body
+        except (requests.RequestException, RuntimeError, ValueError) as exc:
+            last_error = exc
+            if attempt < 5:
+                time.sleep(1.5 * (attempt + 1))
+    raise RuntimeError(f"request failed after retries: {last_error or 'HTTP 429'}")
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--symbols", required=True)
     parser.add_argument("--bars", type=int, default=18000)
     parser.add_argument("--out", type=Path, required=True)
     args = parser.parse_args()
-    response = requests.get(
-        "https://www.okx.com/api/v5/public/instruments",
-        params={"instType": "FUTURES"}, timeout=25)
-    response.raise_for_status()
-    body = response.json()
-    if body.get("code") != "0":
-        raise RuntimeError(str(body))
+    session = requests.Session()
+    body = get_json(session, "https://www.okx.com/api/v5/public/instruments",
+                    {"instType": "FUTURES"})
     instruments = body.get("data", [])
     mapping = {item["instId"].split("-")[0] + "USDT": item["instId"]
                for item in instruments
@@ -48,15 +66,11 @@ def main() -> None:
         received = {}
         pages = (args.bars + 299) // 300
         for _ in range(pages):
-            response = requests.get(
-                "https://www.okx.com/api/v5/market/history-candles",
-                params={"instId": instrument, "bar": "15m", "after": after, "limit": 300},
-                timeout=25,
+            body = get_json(
+                session, "https://www.okx.com/api/v5/market/history-candles",
+                {"instId": instrument, "bar": "15m", "after": after,
+                 "limit": 300},
             )
-            response.raise_for_status()
-            body = response.json()
-            if body.get("code") != "0":
-                raise RuntimeError(str(body))
             batch = body.get("data", [])
             if not batch:
                 break
@@ -69,7 +83,7 @@ def main() -> None:
             after = oldest
             if len(received) >= args.bars:
                 break
-            time.sleep(.16)
+            time.sleep(.22)
         times = sorted(received)[-args.bars:]
         candles = {"time": times, **{
             key: [float(received[timestamp][index]) for timestamp in times]
