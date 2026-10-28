@@ -1,0 +1,474 @@
+{
+  "baseline": {
+    "confirmation_2022h2_2023": {
+      "dd_pct": 3.9652,
+      "max_loss_streak": 5,
+      "n": 885,
+      "negative_months": 2,
+      "return_pct": 149.8227,
+      "stop_rate_pct": 29.0395,
+      "stops": 257,
+      "trades_per_calendar_day": 2.438,
+      "wr": 70.96
+    },
+    "later_2025_2026": {
+      "dd_pct": 6.2325,
+      "max_loss_streak": 7,
+      "n": 1001,
+      "negative_months": 2,
+      "return_pct": 140.016,
+      "stop_rate_pct": 30.7692,
+      "stops": 308,
+      "trades_per_calendar_day": 1.741,
+      "wr": 69.23
+    },
+    "selection_2022h1": {
+      "dd_pct": 4.2348,
+      "max_loss_streak": 5,
+      "n": 828,
+      "negative_months": 1,
+      "return_pct": 133.1945,
+      "stop_rate_pct": 32.8502,
+      "stops": 272,
+      "trades_per_calendar_day": 4.525,
+      "wr": 67.15
+    },
+    "validation_2024": {
+      "dd_pct": 2.8014,
+      "max_loss_streak": 7,
+      "n": 507,
+      "negative_months": 0,
+      "return_pct": 56.6985,
+      "stop_rate_pct": 32.9389,
+      "stops": 167,
+      "trades_per_calendar_day": 2.755,
+      "wr": 67.06
+    }
+  },
+  "baseline_threshold": 0.3273125824651171,
+  "created_at": "2026-10-28T08:20:03.210686+00:00",
+  "direct_xperp": {
+    "baseline": {
+      "dd_pct": 3.9881,
+      "max_loss_streak": 5,
+      "n": 749,
+      "negative_months": 0,
+      "return_pct": 100.5242,
+      "stop_rate_pct": 33.1108,
+      "stops": 248,
+      "trades_per_calendar_day": 4.38,
+      "wr": 66.89
+    },
+    "candidate": null,
+    "pass": false
+  },
+  "grid": {
+    "candidate_thresholds": 7,
+    "selection_quantiles": [
+      0.8,
+      0.825,
+      0.85,
+      0.875,
+      0.9,
+      0.925,
+      0.95
+    ]
+  },
+  "historical_holdout_pass": false,
+  "limitations": [
+    "Current direct X-Perp history begins in April 2026.",
+    "A threshold grid still creates multiple-testing risk.",
+    "Public OHLC cannot reproduce order-book slippage or latency.",
+    "Gross results exclude fees at user request."
+  ],
+  "orders_possible": false,
+  "protocol": {
+    "change": "raise only the frozen HGB probability threshold",
+    "holdouts": [
+      "2024",
+      "2025-2026",
+      "direct X-Perp through Oct27"
+    ],
+    "money": "3% current-equity margin; fixed 10x; market only",
+    "selection": [
+      "2022h1",
+      "2022h2-2023"
+    ],
+    "unchanged": "entries, 0.5R/2R exit, 5% first bank, portfolio rails"
+  },
+  "ready_for_live_orders": false,
+  "selected_before_holdouts": null,
+  "sources": {
+    "C:\\Users\\Lenovo\\Desktop\\telegram bot\\crypto_profit_first_stop_guard_oct28_audit.py": "d14970b460ee3342508c364cadb907a5b1d14380b339ebfda1b9fbc821c4c6e0",
+    "reports\\audit_2026_09_08\\crypto_profit_first_material_target_oct18.json": "776f68f95d1266016314dddb1785f606ae06238950d7837face121356783d93c",
+    "reports\\audit_2026_09_08\\crypto_xperp_raw_router_audit_0_5_oct28_material_raw_raw_families.csv": "602aca8d8f51d2544cb12f0764753908e79458f370ce9ec1663149257cc88112",
+    "reports\\audit_2026_09_08\\crypto_xperp_raw_router_audit_2_0_oct28_material_raw_raw_families.csv": "d4639bf48808ee20adf06e0a27f38f55a9a4e1ea337448bca8b9f5aafb308c7e"
+  },
+  "status": "REJECTED_DEVELOPMENT",
+  "top_development": [
+    {
+      "development_min_return_gain": -56.922,
+      "development_pass": false,
+      "selection_quantile": 0.8,
+      "stages": {
+        "confirmation_2022h2_2023": {
+          "dd_pct": 3.2851,
+          "max_loss_streak": 4,
+          "n": 725,
+          "negative_months": 1,
+          "return_pct": 92.9007,
+          "stop_rate_pct": 28.6897,
+          "stops": 208,
+          "trades_per_calendar_day": 1.997,
+          "wr": 71.31
+        },
+        "later_2025_2026": {
+          "dd_pct": 5.5001,
+          "max_loss_streak": 5,
+          "n": 837,
+          "negative_months": 1,
+          "return_pct": 120.1108,
+          "stop_rate_pct": 30.3465,
+          "stops": 254,
+          "trades_per_calendar_day": 1.456,
+          "wr": 69.65
+        },
+        "selection_2022h1": {
+          "dd_pct": 4.3065,
+          "max_loss_streak": 5,
+          "n": 696,
+          "negative_months": 1,
+          "return_pct": 117.8846,
+          "stop_rate_pct": 31.1782,
+          "stops": 217,
+          "trades_per_calendar_day": 3.803,
+          "wr": 68.82
+        },
+        "validation_2024": {
+          "dd_pct": 3.698,
+          "max_loss_streak": 6,
+          "n": 434,
+          "negative_months": 1,
+          "return_pct": 53.4427,
+          "stop_rate_pct": 32.9493,
+          "stops": 143,
+          "trades_per_calendar_day": 2.359,
+          "wr": 67.05
+        }
+      },
+      "threshold": 0.3358062224748494
+    },
+    {
+      "development_min_return_gain": -57.0834,
+      "development_pass": false,
+      "selection_quantile": 0.825,
+      "stages": {
+        "confirmation_2022h2_2023": {
+          "dd_pct": 3.2875,
+          "max_loss_streak": 4,
+          "n": 654,
+          "negative_months": 2,
+          "return_pct": 92.7393,
+          "stop_rate_pct": 28.5933,
+          "stops": 187,
+          "trades_per_calendar_day": 1.802,
+          "wr": 71.41
+        },
+        "later_2025_2026": {
+          "dd_pct": 6.2256,
+          "max_loss_streak": 5,
+          "n": 739,
+          "negative_months": 1,
+          "return_pct": 99.1705,
+          "stop_rate_pct": 30.7172,
+          "stops": 227,
+          "trades_per_calendar_day": 1.285,
+          "wr": 69.28
+        },
+        "selection_2022h1": {
+          "dd_pct": 4.0326,
+          "max_loss_streak": 5,
+          "n": 614,
+          "negative_months": 1,
+          "return_pct": 120.5598,
+          "stop_rate_pct": 29.9674,
+          "stops": 184,
+          "trades_per_calendar_day": 3.374,
+          "wr": 70.03
+        },
+        "validation_2024": {
+          "dd_pct": 4.5121,
+          "max_loss_streak": 7,
+          "n": 384,
+          "negative_months": 1,
+          "return_pct": 50.2538,
+          "stop_rate_pct": 32.5521,
+          "stops": 125,
+          "trades_per_calendar_day": 2.087,
+          "wr": 67.45
+        }
+      },
+      "threshold": 0.3400434912662658
+    },
+    {
+      "development_min_return_gain": -76.74,
+      "development_pass": false,
+      "selection_quantile": 0.85,
+      "stages": {
+        "confirmation_2022h2_2023": {
+          "dd_pct": 3.2972,
+          "max_loss_streak": 5,
+          "n": 564,
+          "negative_months": 2,
+          "return_pct": 73.0827,
+          "stop_rate_pct": 29.6099,
+          "stops": 167,
+          "trades_per_calendar_day": 1.554,
+          "wr": 70.39
+        },
+        "later_2025_2026": {
+          "dd_pct": 4.3553,
+          "max_loss_streak": 5,
+          "n": 638,
+          "negative_months": 1,
+          "return_pct": 86.7835,
+          "stop_rate_pct": 31.5047,
+          "stops": 201,
+          "trades_per_calendar_day": 1.11,
+          "wr": 68.5
+        },
+        "selection_2022h1": {
+          "dd_pct": 3.6445,
+          "max_loss_streak": 5,
+          "n": 522,
+          "negative_months": 1,
+          "return_pct": 98.7609,
+          "stop_rate_pct": 30.2682,
+          "stops": 158,
+          "trades_per_calendar_day": 2.868,
+          "wr": 69.73
+        },
+        "validation_2024": {
+          "dd_pct": 3.1776,
+          "max_loss_streak": 5,
+          "n": 328,
+          "negative_months": 0,
+          "return_pct": 57.1485,
+          "stop_rate_pct": 30.4878,
+          "stops": 100,
+          "trades_per_calendar_day": 1.792,
+          "wr": 69.51
+        }
+      },
+      "threshold": 0.3463274162702269
+    },
+    {
+      "development_min_return_gain": -86.52789999999999,
+      "development_pass": false,
+      "selection_quantile": 0.875,
+      "stages": {
+        "confirmation_2022h2_2023": {
+          "dd_pct": 2.9825,
+          "max_loss_streak": 4,
+          "n": 457,
+          "negative_months": 0,
+          "return_pct": 63.2948,
+          "stop_rate_pct": 28.6652,
+          "stops": 131,
+          "trades_per_calendar_day": 1.266,
+          "wr": 71.33
+        },
+        "later_2025_2026": {
+          "dd_pct": 4.4867,
+          "max_loss_streak": 5,
+          "n": 527,
+          "negative_months": 3,
+          "return_pct": 58.389,
+          "stop_rate_pct": 32.2581,
+          "stops": 170,
+          "trades_per_calendar_day": 0.917,
+          "wr": 67.74
+        },
+        "selection_2022h1": {
+          "dd_pct": 3.3179,
+          "max_loss_streak": 5,
+          "n": 426,
+          "negative_months": 1,
+          "return_pct": 87.0136,
+          "stop_rate_pct": 29.8122,
+          "stops": 127,
+          "trades_per_calendar_day": 2.354,
+          "wr": 70.19
+        },
+        "validation_2024": {
+          "dd_pct": 3.1776,
+          "max_loss_streak": 5,
+          "n": 275,
+          "negative_months": 0,
+          "return_pct": 51.696,
+          "stop_rate_pct": 31.2727,
+          "stops": 86,
+          "trades_per_calendar_day": 1.503,
+          "wr": 68.73
+        }
+      },
+      "threshold": 0.35456264921671604
+    },
+    {
+      "development_min_return_gain": -103.9781,
+      "development_pass": false,
+      "selection_quantile": 0.9,
+      "stages": {
+        "confirmation_2022h2_2023": {
+          "dd_pct": 3.2015,
+          "max_loss_streak": 4,
+          "n": 348,
+          "negative_months": 1,
+          "return_pct": 45.8446,
+          "stop_rate_pct": 31.0345,
+          "stops": 108,
+          "trades_per_calendar_day": 0.969,
+          "wr": 68.97
+        },
+        "later_2025_2026": {
+          "dd_pct": 4.6597,
+          "max_loss_streak": 5,
+          "n": 396,
+          "negative_months": 4,
+          "return_pct": 41.2024,
+          "stop_rate_pct": 32.3232,
+          "stops": 128,
+          "trades_per_calendar_day": 0.689,
+          "wr": 67.68
+        },
+        "selection_2022h1": {
+          "dd_pct": 2.7332,
+          "max_loss_streak": 6,
+          "n": 342,
+          "negative_months": 1,
+          "return_pct": 67.3435,
+          "stop_rate_pct": 28.0702,
+          "stops": 96,
+          "trades_per_calendar_day": 1.89,
+          "wr": 71.93
+        },
+        "validation_2024": {
+          "dd_pct": 3.4151,
+          "max_loss_streak": 4,
+          "n": 208,
+          "negative_months": 2,
+          "return_pct": 40.1463,
+          "stop_rate_pct": 32.2115,
+          "stops": 67,
+          "trades_per_calendar_day": 1.137,
+          "wr": 67.79
+        }
+      },
+      "threshold": 0.3655726821176825
+    },
+    {
+      "development_min_return_gain": -110.875,
+      "development_pass": false,
+      "selection_quantile": 0.925,
+      "stages": {
+        "confirmation_2022h2_2023": {
+          "dd_pct": 2.5158,
+          "max_loss_streak": 4,
+          "n": 245,
+          "negative_months": 1,
+          "return_pct": 38.9477,
+          "stop_rate_pct": 28.1633,
+          "stops": 69,
+          "trades_per_calendar_day": 0.684,
+          "wr": 71.84
+        },
+        "later_2025_2026": {
+          "dd_pct": 4.0434,
+          "max_loss_streak": 8,
+          "n": 278,
+          "negative_months": 6,
+          "return_pct": 22.4085,
+          "stop_rate_pct": 32.3741,
+          "stops": 90,
+          "trades_per_calendar_day": 0.483,
+          "wr": 67.63
+        },
+        "selection_2022h1": {
+          "dd_pct": 2.7572,
+          "max_loss_streak": 3,
+          "n": 262,
+          "negative_months": 1,
+          "return_pct": 50.355,
+          "stop_rate_pct": 25.5725,
+          "stops": 67,
+          "trades_per_calendar_day": 1.448,
+          "wr": 74.43
+        },
+        "validation_2024": {
+          "dd_pct": 3.637,
+          "max_loss_streak": 6,
+          "n": 155,
+          "negative_months": 2,
+          "return_pct": 33.7555,
+          "stop_rate_pct": 32.2581,
+          "stops": 50,
+          "trades_per_calendar_day": 0.856,
+          "wr": 67.74
+        }
+      },
+      "threshold": 0.37920216935638723
+    },
+    {
+      "development_min_return_gain": -121.0907,
+      "development_pass": false,
+      "selection_quantile": 0.95,
+      "stages": {
+        "confirmation_2022h2_2023": {
+          "dd_pct": 2.4085,
+          "max_loss_streak": 3,
+          "n": 162,
+          "negative_months": 2,
+          "return_pct": 28.732,
+          "stop_rate_pct": 29.6296,
+          "stops": 48,
+          "trades_per_calendar_day": 0.453,
+          "wr": 70.37
+        },
+        "later_2025_2026": {
+          "dd_pct": 2.1279,
+          "max_loss_streak": 5,
+          "n": 172,
+          "negative_months": 5,
+          "return_pct": 10.1169,
+          "stop_rate_pct": 35.4651,
+          "stops": 61,
+          "trades_per_calendar_day": 0.299,
+          "wr": 64.53
+        },
+        "selection_2022h1": {
+          "dd_pct": 2.1629,
+          "max_loss_streak": 3,
+          "n": 188,
+          "negative_months": 1,
+          "return_pct": 35.19,
+          "stop_rate_pct": 25.0,
+          "stops": 47,
+          "trades_per_calendar_day": 1.056,
+          "wr": 75.0
+        },
+        "validation_2024": {
+          "dd_pct": 2.5429,
+          "max_loss_streak": 5,
+          "n": 105,
+          "negative_months": 2,
+          "return_pct": 18.7792,
+          "stop_rate_pct": 35.2381,
+          "stops": 37,
+          "trades_per_calendar_day": 0.621,
+          "wr": 64.76
+        }
+      },
+      "threshold": 0.3972891340147077
+    }
+  ]
+}
