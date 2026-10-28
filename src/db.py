@@ -10,6 +10,7 @@ Lifecycle:
   SL_HIT       -> initial stop hit before TP1
   EXPIRED      -> no TP1/SL within 24h
   TP1_EXPIRED  -> TP1 hit, then rest expired before TP2/BE
+  TP1_STOP     -> TP1 banked, remainder hit the original stop in that bar
 """
 
 import sqlite3
@@ -51,8 +52,8 @@ _SHADOW_R_TP1  = 0.76   # value of a setup that reached TP1
 _SHADOW_R_STOP = 1.23   # cost of a setup that stopped
 
 ACTIVE_STATUSES = ("OPEN", "TP1_PARTIAL")
-FINAL_STATUSES  = ("TP2_HIT", "BREAKEVEN", "SL_HIT", "EXPIRED", "TP1_EXPIRED", "TP1_HIT", "TP1_TRAIL")
-TP1_STATUSES    = ("TP1_PARTIAL", "TP2_HIT", "BREAKEVEN", "TP1_EXPIRED", "TP1_HIT", "TP1_TRAIL")
+FINAL_STATUSES  = ("TP2_HIT", "BREAKEVEN", "SL_HIT", "EXPIRED", "TP1_EXPIRED", "TP1_HIT", "TP1_TRAIL", "TP1_STOP")
+TP1_STATUSES    = ("TP1_PARTIAL", "TP2_HIT", "BREAKEVEN", "TP1_EXPIRED", "TP1_HIT", "TP1_TRAIL", "TP1_STOP")
 PROFIT_STATUSES = ("TP2_HIT", "BREAKEVEN", "TP1_EXPIRED", "TP1_HIT", "TP1_TRAIL")
 
 
@@ -1674,6 +1675,7 @@ _SIGNAL_STATUS_TO_OUTCOME = {
     "TP1_TRAIL":   ("TP1", 1, 0),   # ran past TP1, trailed exit short of TP2
     "BREAKEVEN":   ("TP1", 1, 0),   # reached TP1, runner gave back to flat
     "TP1_EXPIRED": ("TP1", 1, 0),   # reached TP1, window expired before TP2
+    "TP1_STOP":    ("TP1", 1, 0),   # banked TP1, remainder hit original stop
     "EXPIRED":     ("EXPIRED", 0, 0),
 }
 
