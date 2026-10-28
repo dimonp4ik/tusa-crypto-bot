@@ -2,6 +2,7 @@ import json
 
 import crypto_profit_first_stop_guard_oct28_audit as stop_guard
 import crypto_profit_first_third_target_oct28_audit as third
+import crypto_profit_first_conditional_tp3_oct28_audit as conditional
 
 
 def load(path):
@@ -24,3 +25,12 @@ def test_higher_quality_threshold_kills_profit_and_frequency():
     assert value["direct_xperp"]["baseline"]["n"] == 749
     assert value["status"] == "REJECTED_DEVELOPMENT"
     assert value["orders_possible"] is False
+
+
+def test_conditional_tp3_has_no_pre_holdout_survivor():
+    value = load(conditional.OUT)
+    assert value["fit_2r_winners"] == 3379
+    assert value["grid"]["candidates"] == 15
+    assert value["selected_before_holdouts"] is None
+    assert value["status"] == "REJECTED_DEVELOPMENT"
+    assert value["ready_for_live_orders"] is False

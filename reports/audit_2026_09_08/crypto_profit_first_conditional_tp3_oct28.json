@@ -1,0 +1,656 @@
+{
+  "baseline": {
+    "confirmation_2022h2_2023": {
+      "conditional_share_pct": 0.0,
+      "conditional_tp3": 0,
+      "dd_pct": 3.9652,
+      "max_loss_streak": 5,
+      "n": 885,
+      "negative_months": 2,
+      "return_pct": 149.8227,
+      "trades_per_calendar_day": 2.438,
+      "wr": 70.96
+    },
+    "later_2025_2026": {
+      "conditional_share_pct": 0.0,
+      "conditional_tp3": 0,
+      "dd_pct": 6.2325,
+      "max_loss_streak": 7,
+      "n": 1001,
+      "negative_months": 2,
+      "return_pct": 140.016,
+      "trades_per_calendar_day": 1.741,
+      "wr": 69.23
+    },
+    "selection_2022h1": {
+      "conditional_share_pct": 0.0,
+      "conditional_tp3": 0,
+      "dd_pct": 4.2348,
+      "max_loss_streak": 5,
+      "n": 828,
+      "negative_months": 1,
+      "return_pct": 133.1945,
+      "trades_per_calendar_day": 4.525,
+      "wr": 67.15
+    },
+    "validation_2024": {
+      "conditional_share_pct": 0.0,
+      "conditional_tp3": 0,
+      "dd_pct": 2.8014,
+      "max_loss_streak": 7,
+      "n": 507,
+      "negative_months": 0,
+      "return_pct": 56.6985,
+      "trades_per_calendar_day": 2.755,
+      "wr": 67.06
+    }
+  },
+  "created_at": "2026-10-28T08:27:17.174799+00:00",
+  "direct_xperp": {
+    "baseline": {
+      "conditional_share_pct": 0.0,
+      "conditional_tp3": 0,
+      "dd_pct": 3.9881,
+      "max_loss_streak": 5,
+      "n": 749,
+      "negative_months": 0,
+      "return_pct": 100.5242,
+      "trades_per_calendar_day": 4.38,
+      "wr": 66.89
+    },
+    "candidate": null,
+    "pass": false
+  },
+  "fit_2r_winners": 3379,
+  "fit_3r_rate_pct": 62.1782,
+  "grid": {
+    "candidates": 15,
+    "remainder_fractions": [
+      0.05,
+      0.1,
+      0.2
+    ],
+    "threshold_quantiles": [
+      0.5,
+      0.6,
+      0.7,
+      0.8,
+      0.9
+    ]
+  },
+  "historical_holdout_pass": false,
+  "limitations": [
+    "The continuation decision uses entry-time features only.",
+    "Current direct X-Perp history begins in April 2026.",
+    "Public OHLC cannot reproduce order-book slippage or latency.",
+    "Gross results exclude fees at user request."
+  ],
+  "model": {
+    "learning_rate": 0.05,
+    "max_leaf_nodes": 7,
+    "min_samples_leaf": 200
+  },
+  "orders_possible": false,
+  "protocol": {
+    "candidate": "retain 5/10/20% after 2R only when causal continuation score passes",
+    "continuation_fit": [
+      "2020h1",
+      "2020h2",
+      "2021h1",
+      "2021h2"
+    ],
+    "entry_and_base_exit": "unchanged frozen 0.5R/2R Profit-First route",
+    "holdouts": [
+      "2024",
+      "2025-2026",
+      "direct X-Perp through Oct27"
+    ],
+    "money": "3% current-equity margin; fixed 10x; market only",
+    "selection": [
+      "2022h1",
+      "2022h2-2023"
+    ]
+  },
+  "ready_for_live_orders": false,
+  "selected_before_holdouts": null,
+  "sources": {
+    "C:\\Users\\Lenovo\\Desktop\\telegram bot\\crypto_profit_first_conditional_tp3_oct28_audit.py": "3cadd57ad091205cd713aa75415d4bf342de11997dc6c67d2f7b20f079c7872d",
+    "reports\\audit_2026_09_08\\crypto_profit_first_material_target_oct18.json": "776f68f95d1266016314dddb1785f606ae06238950d7837face121356783d93c",
+    "reports\\audit_2026_09_08\\crypto_xperp_raw_router_audit_0_5_oct28_material_raw_raw_families.csv": "602aca8d8f51d2544cb12f0764753908e79458f370ce9ec1663149257cc88112",
+    "reports\\audit_2026_09_08\\crypto_xperp_raw_router_audit_2_0_oct28_material_raw_raw_families.csv": "d4639bf48808ee20adf06e0a27f38f55a9a4e1ea337448bca8b9f5aafb308c7e",
+    "reports\\audit_2026_09_08\\crypto_xperp_raw_router_audit_3_0_oct28_material_raw_raw_families.csv": "e31796cf4d1bafbac9504aedb7093013536e754b483319dc15e5d88d33ffa220"
+  },
+  "status": "REJECTED_DEVELOPMENT",
+  "top_development": [
+    {
+      "continuation_threshold": 0.6299420684012951,
+      "development_min_return_gain": -8.72229999999999,
+      "development_pass": false,
+      "selection_quantile": 0.5,
+      "stages": {
+        "confirmation_2022h2_2023": {
+          "conditional_share_pct": 17.2055,
+          "conditional_tp3": 149,
+          "dd_pct": 3.9315,
+          "max_loss_streak": 5,
+          "n": 866,
+          "negative_months": 3,
+          "return_pct": 141.1004,
+          "trades_per_calendar_day": 2.386,
+          "wr": 70.9
+        },
+        "later_2025_2026": {
+          "conditional_share_pct": 14.3885,
+          "conditional_tp3": 140,
+          "dd_pct": 5.6201,
+          "max_loss_streak": 7,
+          "n": 973,
+          "negative_months": 2,
+          "return_pct": 124.6166,
+          "trades_per_calendar_day": 1.692,
+          "wr": 69.06
+        },
+        "selection_2022h1": {
+          "conditional_share_pct": 15.443,
+          "conditional_tp3": 122,
+          "dd_pct": 3.8967,
+          "max_loss_streak": 5,
+          "n": 790,
+          "negative_months": 1,
+          "return_pct": 125.0762,
+          "trades_per_calendar_day": 4.317,
+          "wr": 67.47
+        },
+        "validation_2024": {
+          "conditional_share_pct": 17.1371,
+          "conditional_tp3": 85,
+          "dd_pct": 2.9461,
+          "max_loss_streak": 7,
+          "n": 496,
+          "negative_months": 0,
+          "return_pct": 56.717,
+          "trades_per_calendar_day": 2.696,
+          "wr": 67.14
+        }
+      },
+      "tp3_remainder_fraction": 0.05
+    },
+    {
+      "continuation_threshold": 0.734375749457875,
+      "development_min_return_gain": -9.934899999999999,
+      "development_pass": false,
+      "selection_quantile": 0.9,
+      "stages": {
+        "confirmation_2022h2_2023": {
+          "conditional_share_pct": 3.8505,
+          "conditional_tp3": 34,
+          "dd_pct": 3.9656,
+          "max_loss_streak": 5,
+          "n": 883,
+          "negative_months": 3,
+          "return_pct": 144.9981,
+          "trades_per_calendar_day": 2.433,
+          "wr": 70.78
+        },
+        "later_2025_2026": {
+          "conditional_share_pct": 3.4068,
+          "conditional_tp3": 34,
+          "dd_pct": 6.2325,
+          "max_loss_streak": 7,
+          "n": 998,
+          "negative_months": 2,
+          "return_pct": 143.1837,
+          "trades_per_calendar_day": 1.736,
+          "wr": 69.34
+        },
+        "selection_2022h1": {
+          "conditional_share_pct": 3.1785,
+          "conditional_tp3": 26,
+          "dd_pct": 4.2347,
+          "max_loss_streak": 5,
+          "n": 818,
+          "negative_months": 1,
+          "return_pct": 123.2596,
+          "trades_per_calendar_day": 4.47,
+          "wr": 66.75
+        },
+        "validation_2024": {
+          "conditional_share_pct": 4.3738,
+          "conditional_tp3": 22,
+          "dd_pct": 2.8014,
+          "max_loss_streak": 7,
+          "n": 503,
+          "negative_months": 0,
+          "return_pct": 56.7736,
+          "trades_per_calendar_day": 2.734,
+          "wr": 67.4
+        }
+      },
+      "tp3_remainder_fraction": 0.2
+    },
+    {
+      "continuation_threshold": 0.734375749457875,
+      "development_min_return_gain": -10.205200000000005,
+      "development_pass": false,
+      "selection_quantile": 0.9,
+      "stages": {
+        "confirmation_2022h2_2023": {
+          "conditional_share_pct": 3.8505,
+          "conditional_tp3": 34,
+          "dd_pct": 3.9654,
+          "max_loss_streak": 5,
+          "n": 883,
+          "negative_months": 3,
+          "return_pct": 145.7989,
+          "trades_per_calendar_day": 2.433,
+          "wr": 70.78
+        },
+        "later_2025_2026": {
+          "conditional_share_pct": 3.4068,
+          "conditional_tp3": 34,
+          "dd_pct": 6.2325,
+          "max_loss_streak": 7,
+          "n": 998,
+          "negative_months": 2,
+          "return_pct": 142.8021,
+          "trades_per_calendar_day": 1.736,
+          "wr": 69.34
+        },
+        "selection_2022h1": {
+          "conditional_share_pct": 3.1785,
+          "conditional_tp3": 26,
+          "dd_pct": 4.2347,
+          "max_loss_streak": 5,
+          "n": 818,
+          "negative_months": 1,
+          "return_pct": 122.9893,
+          "trades_per_calendar_day": 4.47,
+          "wr": 66.75
+        },
+        "validation_2024": {
+          "conditional_share_pct": 4.3738,
+          "conditional_tp3": 22,
+          "dd_pct": 2.8014,
+          "max_loss_streak": 7,
+          "n": 503,
+          "negative_months": 0,
+          "return_pct": 57.0977,
+          "trades_per_calendar_day": 2.734,
+          "wr": 67.4
+        }
+      },
+      "tp3_remainder_fraction": 0.1
+    },
+    {
+      "continuation_threshold": 0.6299420684012951,
+      "development_min_return_gain": -10.213999999999999,
+      "development_pass": false,
+      "selection_quantile": 0.5,
+      "stages": {
+        "confirmation_2022h2_2023": {
+          "conditional_share_pct": 17.2055,
+          "conditional_tp3": 149,
+          "dd_pct": 3.8977,
+          "max_loss_streak": 5,
+          "n": 866,
+          "negative_months": 3,
+          "return_pct": 139.6087,
+          "trades_per_calendar_day": 2.386,
+          "wr": 70.9
+        },
+        "later_2025_2026": {
+          "conditional_share_pct": 14.3885,
+          "conditional_tp3": 140,
+          "dd_pct": 5.6602,
+          "max_loss_streak": 7,
+          "n": 973,
+          "negative_months": 2,
+          "return_pct": 123.4994,
+          "trades_per_calendar_day": 1.692,
+          "wr": 69.06
+        },
+        "selection_2022h1": {
+          "conditional_share_pct": 15.443,
+          "conditional_tp3": 122,
+          "dd_pct": 3.8967,
+          "max_loss_streak": 5,
+          "n": 790,
+          "negative_months": 1,
+          "return_pct": 123.6714,
+          "trades_per_calendar_day": 4.317,
+          "wr": 67.47
+        },
+        "validation_2024": {
+          "conditional_share_pct": 17.1371,
+          "conditional_tp3": 85,
+          "dd_pct": 2.9616,
+          "max_loss_streak": 7,
+          "n": 496,
+          "negative_months": 0,
+          "return_pct": 55.9594,
+          "trades_per_calendar_day": 2.696,
+          "wr": 67.14
+        }
+      },
+      "tp3_remainder_fraction": 0.1
+    },
+    {
+      "continuation_threshold": 0.734375749457875,
+      "development_min_return_gain": -10.340800000000002,
+      "development_pass": false,
+      "selection_quantile": 0.9,
+      "stages": {
+        "confirmation_2022h2_2023": {
+          "conditional_share_pct": 3.8505,
+          "conditional_tp3": 34,
+          "dd_pct": 3.9653,
+          "max_loss_streak": 5,
+          "n": 883,
+          "negative_months": 2,
+          "return_pct": 146.1993,
+          "trades_per_calendar_day": 2.433,
+          "wr": 70.78
+        },
+        "later_2025_2026": {
+          "conditional_share_pct": 3.4068,
+          "conditional_tp3": 34,
+          "dd_pct": 6.2325,
+          "max_loss_streak": 7,
+          "n": 998,
+          "negative_months": 2,
+          "return_pct": 142.6107,
+          "trades_per_calendar_day": 1.736,
+          "wr": 69.34
+        },
+        "selection_2022h1": {
+          "conditional_share_pct": 3.1785,
+          "conditional_tp3": 26,
+          "dd_pct": 4.2347,
+          "max_loss_streak": 5,
+          "n": 818,
+          "negative_months": 1,
+          "return_pct": 122.8537,
+          "trades_per_calendar_day": 4.47,
+          "wr": 66.75
+        },
+        "validation_2024": {
+          "conditional_share_pct": 4.3738,
+          "conditional_tp3": 22,
+          "dd_pct": 2.8014,
+          "max_loss_streak": 7,
+          "n": 503,
+          "negative_months": 0,
+          "return_pct": 57.2596,
+          "trades_per_calendar_day": 2.734,
+          "wr": 67.4
+        }
+      },
+      "tp3_remainder_fraction": 0.05
+    },
+    {
+      "continuation_threshold": 0.652782765151343,
+      "development_min_return_gain": -11.553200000000004,
+      "development_pass": false,
+      "selection_quantile": 0.6,
+      "stages": {
+        "confirmation_2022h2_2023": {
+          "conditional_share_pct": 14.3513,
+          "conditional_tp3": 125,
+          "dd_pct": 3.9499,
+          "max_loss_streak": 5,
+          "n": 871,
+          "negative_months": 3,
+          "return_pct": 141.6159,
+          "trades_per_calendar_day": 2.399,
+          "wr": 71.07
+        },
+        "later_2025_2026": {
+          "conditional_share_pct": 11.8852,
+          "conditional_tp3": 116,
+          "dd_pct": 5.6201,
+          "max_loss_streak": 7,
+          "n": 976,
+          "negative_months": 2,
+          "return_pct": 131.8102,
+          "trades_per_calendar_day": 1.697,
+          "wr": 69.47
+        },
+        "selection_2022h1": {
+          "conditional_share_pct": 12.625,
+          "conditional_tp3": 101,
+          "dd_pct": 3.8967,
+          "max_loss_streak": 5,
+          "n": 800,
+          "negative_months": 1,
+          "return_pct": 121.6413,
+          "trades_per_calendar_day": 4.372,
+          "wr": 67.25
+        },
+        "validation_2024": {
+          "conditional_share_pct": 13.8277,
+          "conditional_tp3": 69,
+          "dd_pct": 2.9461,
+          "max_loss_streak": 7,
+          "n": 499,
+          "negative_months": 0,
+          "return_pct": 57.5234,
+          "trades_per_calendar_day": 2.712,
+          "wr": 67.33
+        }
+      },
+      "tp3_remainder_fraction": 0.05
+    },
+    {
+      "continuation_threshold": 0.652782765151343,
+      "development_min_return_gain": -12.662199999999999,
+      "development_pass": false,
+      "selection_quantile": 0.6,
+      "stages": {
+        "confirmation_2022h2_2023": {
+          "conditional_share_pct": 14.3513,
+          "conditional_tp3": 125,
+          "dd_pct": 3.9346,
+          "max_loss_streak": 5,
+          "n": 871,
+          "negative_months": 3,
+          "return_pct": 140.2354,
+          "trades_per_calendar_day": 2.399,
+          "wr": 71.07
+        },
+        "later_2025_2026": {
+          "conditional_share_pct": 11.8852,
+          "conditional_tp3": 116,
+          "dd_pct": 5.6602,
+          "max_loss_streak": 7,
+          "n": 976,
+          "negative_months": 2,
+          "return_pct": 130.9676,
+          "trades_per_calendar_day": 1.697,
+          "wr": 69.47
+        },
+        "selection_2022h1": {
+          "conditional_share_pct": 12.625,
+          "conditional_tp3": 101,
+          "dd_pct": 3.8967,
+          "max_loss_streak": 5,
+          "n": 800,
+          "negative_months": 1,
+          "return_pct": 120.5323,
+          "trades_per_calendar_day": 4.372,
+          "wr": 67.25
+        },
+        "validation_2024": {
+          "conditional_share_pct": 13.8277,
+          "conditional_tp3": 69,
+          "dd_pct": 2.9616,
+          "max_loss_streak": 7,
+          "n": 499,
+          "negative_months": 0,
+          "return_pct": 56.9577,
+          "trades_per_calendar_day": 2.712,
+          "wr": 67.33
+        }
+      },
+      "tp3_remainder_fraction": 0.1
+    },
+    {
+      "continuation_threshold": 0.6299420684012951,
+      "development_min_return_gain": -13.1798,
+      "development_pass": false,
+      "selection_quantile": 0.5,
+      "stages": {
+        "confirmation_2022h2_2023": {
+          "conditional_share_pct": 17.2055,
+          "conditional_tp3": 149,
+          "dd_pct": 3.8303,
+          "max_loss_streak": 5,
+          "n": 866,
+          "negative_months": 2,
+          "return_pct": 136.6429,
+          "trades_per_calendar_day": 2.386,
+          "wr": 70.9
+        },
+        "later_2025_2026": {
+          "conditional_share_pct": 14.3885,
+          "conditional_tp3": 140,
+          "dd_pct": 5.7402,
+          "max_loss_streak": 7,
+          "n": 973,
+          "negative_months": 2,
+          "return_pct": 121.274,
+          "trades_per_calendar_day": 1.692,
+          "wr": 69.06
+        },
+        "selection_2022h1": {
+          "conditional_share_pct": 15.443,
+          "conditional_tp3": 122,
+          "dd_pct": 3.8967,
+          "max_loss_streak": 5,
+          "n": 790,
+          "negative_months": 1,
+          "return_pct": 120.8786,
+          "trades_per_calendar_day": 4.317,
+          "wr": 67.47
+        },
+        "validation_2024": {
+          "conditional_share_pct": 17.1371,
+          "conditional_tp3": 85,
+          "dd_pct": 2.9925,
+          "max_loss_streak": 7,
+          "n": 496,
+          "negative_months": 0,
+          "return_pct": 54.4518,
+          "trades_per_calendar_day": 2.696,
+          "wr": 67.14
+        }
+      },
+      "tp3_remainder_fraction": 0.2
+    },
+    {
+      "continuation_threshold": 0.7070197884510997,
+      "development_min_return_gain": -14.421599999999998,
+      "development_pass": false,
+      "selection_quantile": 0.8,
+      "stages": {
+        "confirmation_2022h2_2023": {
+          "conditional_share_pct": 6.3709,
+          "conditional_tp3": 56,
+          "dd_pct": 3.9653,
+          "max_loss_streak": 5,
+          "n": 879,
+          "negative_months": 2,
+          "return_pct": 145.4224,
+          "trades_per_calendar_day": 2.421,
+          "wr": 70.76
+        },
+        "later_2025_2026": {
+          "conditional_share_pct": 5.4381,
+          "conditional_tp3": 54,
+          "dd_pct": 6.2147,
+          "max_loss_streak": 7,
+          "n": 993,
+          "negative_months": 2,
+          "return_pct": 142.9631,
+          "trades_per_calendar_day": 1.727,
+          "wr": 69.39
+        },
+        "selection_2022h1": {
+          "conditional_share_pct": 6.7901,
+          "conditional_tp3": 55,
+          "dd_pct": 4.2347,
+          "max_loss_streak": 5,
+          "n": 810,
+          "negative_months": 1,
+          "return_pct": 118.7729,
+          "trades_per_calendar_day": 4.426,
+          "wr": 66.54
+        },
+        "validation_2024": {
+          "conditional_share_pct": 6.986,
+          "conditional_tp3": 35,
+          "dd_pct": 2.8014,
+          "max_loss_streak": 7,
+          "n": 501,
+          "negative_months": 0,
+          "return_pct": 58.5234,
+          "trades_per_calendar_day": 2.723,
+          "wr": 67.66
+        }
+      },
+      "tp3_remainder_fraction": 0.05
+    },
+    {
+      "continuation_threshold": 0.7070197884510997,
+      "development_min_return_gain": -14.42240000000001,
+      "development_pass": false,
+      "selection_quantile": 0.8,
+      "stages": {
+        "confirmation_2022h2_2023": {
+          "conditional_share_pct": 6.3709,
+          "conditional_tp3": 56,
+          "dd_pct": 3.9654,
+          "max_loss_streak": 5,
+          "n": 879,
+          "negative_months": 3,
+          "return_pct": 145.2244,
+          "trades_per_calendar_day": 2.421,
+          "wr": 70.76
+        },
+        "later_2025_2026": {
+          "conditional_share_pct": 5.4381,
+          "conditional_tp3": 54,
+          "dd_pct": 6.197,
+          "max_loss_streak": 7,
+          "n": 993,
+          "negative_months": 2,
+          "return_pct": 142.5863,
+          "trades_per_calendar_day": 1.727,
+          "wr": 69.39
+        },
+        "selection_2022h1": {
+          "conditional_share_pct": 6.7901,
+          "conditional_tp3": 55,
+          "dd_pct": 4.2347,
+          "max_loss_streak": 5,
+          "n": 810,
+          "negative_months": 1,
+          "return_pct": 118.7721,
+          "trades_per_calendar_day": 4.426,
+          "wr": 66.54
+        },
+        "validation_2024": {
+          "conditional_share_pct": 6.986,
+          "conditional_tp3": 35,
+          "dd_pct": 2.8014,
+          "max_loss_streak": 7,
+          "n": 501,
+          "negative_months": 0,
+          "return_pct": 58.3912,
+          "trades_per_calendar_day": 2.723,
+          "wr": 67.66
+        }
+      },
+      "tp3_remainder_fraction": 0.1
+    }
+  ]
+}
