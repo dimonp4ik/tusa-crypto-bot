@@ -86,7 +86,8 @@ class ShadowDeploymentTests(unittest.TestCase):
     def test_menu_has_no_autotrading_button(self):
         labels = str(main._USER_KB) + str(main._ADMIN_KB) + str(main._KB_PEOPLE)
         self.assertNotIn("Автотрейдинг", labels)
-        self.assertIn("Paper-сделки", labels)
+        self.assertIn("Открытые сделки", labels)
+        self.assertIn("Результаты", labels)
 
     def test_every_button_has_a_handler(self):
         """A button with no branch does nothing when pressed."""

@@ -58,6 +58,7 @@ from src.telegram_notifier import (
 )
 from src.news_agent import get_daily_digest, get_day_events, generate_weekly_commentary
 from src.r_model import blended_r
+from src.result_summary import format_results_message
 from src.db import (
     init_db, get_open_signals, update_signal_status, get_stats, set_sl_xperp_only,
     get_sl_wick_stats, get_variant_rows, mark_setup_blocked, get_cap_impact_stats,
@@ -84,6 +85,7 @@ from config import (
     # AUTOTRADE_ENABLED is read by _check_profit_sweeps and was never imported:
     # the sweep job raised NameError on every run instead of offering anything.
     AUTOTRADE_ENABLED,
+    AUTOTRADE_LEVERAGE,
     PROFIT_SWEEP_MIN_GAP_H, PROFIT_SWEEP_MIN_ORDER_USD,
 )
 from src.keystore import keystore_ready, encrypt_secret
@@ -346,30 +348,13 @@ def _build_and_send_report(chat_id: int, message_id: int,
         else:
             A("  всё, что есть в базе")
         A("")
-        A("Прогноз модели (backtest.py, OKX = та же биржа; вход по зоне, как")
-        A("работает бот с 13.08; TP1=0.6R; 18000 свечей ≈ 187 дней):")
-        A("  708 сделок, WR 73.4%, +0.164R/сделка, maxDD -17.6R")
-        A("ВАЖНО: в модели НЕТ Клода — она мерит только фильтр правил, поэтому")
-        A("живых сделок будет меньше. Сравнивать нужно ВИНРЕЙТ, не количество.")
-        A("")
-        A("Прежний ориентир 82% / +0.49R БОЛЬШЕ НЕ ДЕЙСТВУЕТ: он считался при")
-        A("входе по середине зоны, а такую цену рынок давал лишь в 20% случаев.")
-        A("Одна эта поблажка стоила +0.34R из тех +0.49R.")
-        A("")
-        A(f"ОТСЧЁТ С {_CONFIG_CHANGE_LABEL}.2026 — в этот день изменился ВХОД: бот")
-        A("перестал догонять цену и стал ждать возврата в зону. Вход — единственное,")
-        A("что двигает винрейт и прибыль вместе, поэтому результаты до этой даты")
-        A("относятся к другому боту. Два признака, державшихся пять лет, умерли")
-        A("ровно на этом переходе — это и есть мера того, насколько всё поменялось.")
-        if _CONFIG_CHANGE_TS and 0 < since_ts < _CONFIG_CHANGE_TS:
-            A("")
-            A(f"!! ВНИМАНИЕ: выбранное окно начинается ДО {_CONFIG_CHANGE_LABEL}, значит")
-            A("   все цифры ниже — средневзвешенное по ДВУМ разным ботам. Годится")
-            A("   только чтобы сравнить эпохи между собой, не для оценки текущего.")
-        elif since_ts == 0:
-            A("")
-            A(f"!! ВНИМАНИЕ: окно 'всё время' включает эпоху до {_CONFIG_CHANGE_LABEL} —")
-            A("   это смесь двух разных ботов. Для оценки текущего бери 7/30 дней.")
+        A("## МЕТОДИКА РАСЧЁТА")
+        A("  доля прибыльных = закрытые сделки с realized_r > 0 / все закрытые")
+        A("  открытые сделки не входят ни в результат, ни в долю прибыльных")
+        A("  unit R не использует старые внутренние size_mult: размер задаёт клиент")
+        A("  доходность сделки = маржа% × плечо × unit_R × |вход-стоп| / вход")
+        A("  доходность окна и max DD считаются последовательным реинвестированием")
+        A("  отчёт ниже описывает только фактически записанные forward-сигналы")
         A("")
 
         # 1. Live results — chosen window, plus 7d for recency.
@@ -392,14 +377,21 @@ def _build_and_send_report(chat_id: int, message_id: int,
             # price got there. On the honest fill the same window measures 73.9%
             # (18000 candles to 2026-08-26). Dated, because a bare number here
             # is what made the old one outlive its own correction.
-            A(f"  винрейт: {s['win_rate']}%   (модель на 2026-08-26: 73.9%)")
+            A(f"  исходы закрытых: прибыль {s.get('wins', 0)}  "
+              f"убыток {s.get('losses', 0)}  ноль {s.get('flat', 0)}")
+            A(f"  доля прибыльных: {s['win_rate']}% от {s['closed']} закрытых")
             A(f"  TP1: {s['tp1_hit']} ({s['tp1_rate']}%)  TP2: {s['tp2_hit']}  "
               f"SL: {s['sl_hit']}  истекло: {s['expired']}")
-            A(f"  валовой: {s['total_r']}R  ({s['r_per_trade']}R/сделка)")
-            A(f"  издержки: -{s.get('cost_r', 0)}R  "
-              f"(комиссия+спред, посчитаны по {s.get('cost_n', 0)} сделкам)")
-            A(f"  ЧИСТЫМИ: {s.get('net_r', 0)}R  "
-              f"({s.get('net_per_trade', 0)}R/сделка)  оценка по сигналам, не PnL счёта OKX")
+            A(f"  единый размер клиента: {s.get('unit_total_r', 0):+.3f}R  "
+              f"({s.get('unit_r_per_trade', 0):+.3f}R/закрытую)")
+            A(f"  модель депозита: {s.get('account_return_pct', 0):+.3f}%  "
+              f"max DD {s.get('account_max_drawdown_pct', 0):.3f}%  "
+              f"при {s.get('account_margin_pct', 3):g}% маржи ×{s.get('account_leverage', 10):g}")
+            A(f"  полнота модели: {s.get('account_model_n', 0)}/{s['closed']} сделок; "
+              f"без геометрии {s.get('account_model_missing', 0)}; "
+              f"макс. серия убытков {s.get('max_loss_streak', 0)}")
+            A(f"  контроль legacy-size: {s['total_r']:+.2f}R "
+              f"(не показывается клиенту)")
             _l, _sh = s.get("long") or {}, s.get("short") or {}
             A(f"  LONG  n={_l.get('total', 0)} WR={_l.get('win_rate', 0)}% R={_l.get('total_r', 0)}")
             A(f"  SHORT n={_sh.get('total', 0)} WR={_sh.get('win_rate', 0)}% R={_sh.get('total_r', 0)}")
@@ -661,7 +653,7 @@ def status():
 # Persistent Telegram menu for the forward paper test.
 _USER_KB = {
     "keyboard": [
-        [{"text": "📋 Paper-сделки"}, {"text": "📈 Paper-результаты"}],
+        [{"text": "📋 Открытые сделки"}, {"text": "📈 Результаты"}],
         [{"text": "🛡 Режим"}, {"text": "❓ Помощь"}],
     ],
     "resize_keyboard": True, "is_persistent": True,
@@ -669,7 +661,7 @@ _USER_KB = {
 _ADMIN_KB = {
     "keyboard": [
         [{"text": "🛠 Админ панель"}],
-        [{"text": "📋 Paper-сделки"}, {"text": "📈 Paper-результаты"}],
+        [{"text": "📋 Открытые сделки"}, {"text": "📈 Результаты"}],
         [{"text": "🛡 Режим"}, {"text": "❓ Помощь"}],
     ],
     "resize_keyboard": True, "is_persistent": True,
@@ -678,16 +670,16 @@ _GROUP_KB = _USER_KB
 _GROUP_ADMIN_KB = _ADMIN_KB
 
 _ADMIN_KEYBOARD = {"inline_keyboard": [
-    [{"text": "📊 Paper-торговля", "callback_data": "adm_sec_trading"},
+    [{"text": "📊 Сигналы и сделки", "callback_data": "adm_sec_trading"},
      {"text": "🧩 Стратегия", "callback_data": "adm_sec_settings"}],
     [{"text": "📈 Аналитика", "callback_data": "adm_sec_analytics"},
      {"text": "👥 Люди", "callback_data": "adm_sec_people"}],
 ]}
 _BACK_ROW = [{"text": "« Назад", "callback_data": "adm_back"}]
 _KB_TRADING = {"inline_keyboard": [
-    [{"text": "📊 Paper-статистика", "callback_data": "adm_stats"},
-     {"text": "📋 Paper-сделки", "callback_data": "adm_open"}],
-    [{"text": "🔍 История сигналов", "callback_data": "adm_setups"}],
+    [{"text": "📊 Статистика", "callback_data": "adm_stats"},
+     {"text": "📋 Сделки", "callback_data": "adm_open"}],
+    [{"text": "🔍 Проверка сигналов", "callback_data": "adm_setups"}],
     _BACK_ROW,
 ]}
 
@@ -701,7 +693,7 @@ def _kb_settings():
 _KB_ANALYTICS = {"inline_keyboard": [
     [{"text": "🏆 Топ тикеров", "callback_data": "adm_top"},
      {"text": "💀 Худшие тикеры", "callback_data": "adm_worst"}],
-    [{"text": "📦 Paper-отчёт", "callback_data": "adm_fullreport"}],
+    [{"text": "📦 Полный аудит", "callback_data": "adm_fullreport"}],
     _BACK_ROW,
 ]}
 _KB_PEOPLE = {"inline_keyboard": [
@@ -718,13 +710,14 @@ def _send_persistent_menu(chat_id: int, is_admin: bool = False, is_dm: bool = Tr
         kb = _ADMIN_KB if is_admin else _USER_KB
     else:
         kb = _GROUP_ADMIN_KB if is_admin else _GROUP_KB
-    text = ("✅ Меню активировано.\n🛠 Админ панель доступна."
+    text = ("✅ *Меню готово*\nВыберите нужный раздел. Админ-панель доступна."
             if is_admin else
-            "✅ Меню активировано. Кнопки внизу всегда доступны.")
+            "✅ *Меню готово*\nВыберите нужный раздел кнопками внизу.")
     try:
         _requests.post(
             f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage",
-            json={"chat_id": chat_id, "text": text, "reply_markup": kb},
+            json={"chat_id": chat_id, "text": text, "parse_mode": "Markdown",
+                  "reply_markup": kb},
             timeout=10,
         )
     except Exception as e:
@@ -906,15 +899,19 @@ def _format_open_signal(s: dict) -> str:
         # positive pnl means price moved in our favour
         pnl   = pct if direction == "LONG" else -pct
         pnl_s = f"+{pnl:.2f}%" if pnl >= 0 else f"{pnl:.2f}%"
-        price_line = (f"   {arrow} `{_format_price(cur)}` ({pnl_s}) | "
-                      f"🎯 {nearest_label}: `{_format_price(nearest_tp)}` | "
-                      f"🛑 SL: `{_format_price(sl)}`")
+        price_line = (
+            f"{arrow} Сейчас: `{_format_price(cur)}`  ·  по сигналу {pnl_s}\n"
+            f"🎯 Следующая цель {nearest_label}: `{_format_price(nearest_tp)}`\n"
+            f"🛑 Стоп: `{_format_price(sl)}`")
     else:
-        price_line = (f"   🎯 {nearest_label}: `{_format_price(nearest_tp)}` | "
-                      f"🛑 SL: `{_format_price(sl)}`")
+        price_line = (
+            f"🎯 Следующая цель {nearest_label}: `{_format_price(nearest_tp)}`\n"
+            f"🛑 Стоп: `{_format_price(sl)}`")
 
-    header = (f"{icon} *{_disp_sym(s['symbol'])}* {direction} "
-              f"@ `{_format_price(entry)}`  _{age_h}ч_")
+    direction_ru = "LONG · рост" if direction == "LONG" else "SHORT · снижение"
+    header = (
+        f"{icon} *{_disp_sym(s['symbol'])}*  ·  {direction_ru}\n"
+        f"💰 Вход: `{_format_price(entry)}`  ·  в работе {age_h} ч")
     return f"{header}\n{price_line}"
 
 
@@ -1161,7 +1158,7 @@ def _handle_admin_callback(callback_id: str, chat_id: int,
         _admin_section[chat_id] = data
 
     if data == "adm_sec_trading":
-        _edit_admin_text(chat_id, message_id, "📊 *Paper-торговля*\nВыбери раздел:", _KB_TRADING)
+        _edit_admin_text(chat_id, message_id, "📊 *Сигналы и сделки*\nВыберите раздел:", _KB_TRADING)
 
     elif data == "adm_sec_settings":
         _edit_admin_text(chat_id, message_id, "🔧 *Настройки*\nВыбери раздел:", _kb_settings())
@@ -1174,37 +1171,16 @@ def _handle_admin_callback(callback_id: str, chat_id: int,
 
     elif data == "adm_stats":
         try:
-            _now_riga      = datetime.now(_riga_tz())
-            _riga_midnight = _now_riga.replace(hour=0, minute=0, second=0, microsecond=0).timestamp()
-            sd  = get_stats(since_ts=_riga_midnight)
-            s7  = get_stats(days=7)
-            s30 = get_stats(days=30)
-            txt = (
-                f"📈 *СТАТИСТИКА*\n\n"
-                f"*Сегодня:*\n"
-                f"  Сигналов: {sd['total']}  Закрыто: {sd['closed']}\n"
-                f"  TP1: {sd['tp1_hit']} ({sd['tp1_rate']}%)  TP2: {sd['tp2_hit']}\n"
-                f"  BE: {sd['breakeven']}  SL: {sd['sl_hit']}  Expired: {sd['expired']}\n"
-                f"  Win rate: *{sd['win_rate']}%*\n\n"
-                f"*За 7 дней:*\n"
-                f"  Сигналов: {s7['total']}  Закрыто: {s7['closed']}\n"
-                f"  TP1: {s7['tp1_hit']} ({s7['tp1_rate']}%)  TP2: {s7['tp2_hit']}\n"
-                f"  BE: {s7['breakeven']}  SL: {s7['sl_hit']}  Expired: {s7['expired']}\n"
-                f"  Win rate: *{s7['win_rate']}%*\n\n"
-                f"*За 30 дней:*\n"
-                f"  Сигналов: {s30['total']}  Закрыто: {s30['closed']}\n"
-                f"  TP1: {s30['tp1_hit']} ({s30['tp1_rate']}%)  TP2: {s30['tp2_hit']}\n"
-                f"  BE: {s30['breakeven']}  SL: {s30['sl_hit']}  Expired: {s30['expired']}\n"
-                f"  Win rate: *{s30['win_rate']}%*"
-            )
+            txt = _paper_results_text(user_id)
         except Exception as e:
-            txt = f"Ошибка: {e}"
+            log.exception("Admin paper results failed")
+            txt = f"Не удалось посчитать результаты: {e}"
         _edit_message(chat_id, message_id, txt)
 
     elif data == "adm_fullreport":
         _edit_admin_text(
             chat_id, message_id,
-            "📦 *Полный отчёт*\n\nС какой даты считать?\n"
+            "📦 *Полный аудит*\n\nС какой даты считать?\n"
             "_Настройки фильтров менялись — данные до и после смешивать нельзя, "
             "иначе цифры ни о чём._",
             {"inline_keyboard": [
@@ -2037,6 +2013,36 @@ def _riga_tz():
     except Exception:
         from datetime import timezone as _tz, timedelta as _td
         return _tz(_td(hours=3))
+
+
+def _result_margin_for_user(user_id: int) -> tuple[float, bool]:
+    """Client-selected margin share, or the documented 3% paper example."""
+    try:
+        row = at_get(user_id) or {}
+        if row.get("size_mode") == "percent":
+            value = float(row.get("size_value") or 0)
+            if 1 <= value <= 10:
+                return value, True
+    except (TypeError, ValueError):
+        pass
+    return 3.0, False
+
+
+def _paper_results_text(user_id: int) -> str:
+    margin_pct, configured = _result_margin_for_user(user_id)
+    now = datetime.now(_riga_tz())
+    midnight = now.replace(hour=0, minute=0, second=0, microsecond=0).timestamp()
+    kwargs = {"margin_pct": margin_pct, "leverage": AUTOTRADE_LEVERAGE}
+    today = get_stats(since_ts=midnight, **kwargs)
+    week = get_stats(days=7, **kwargs)
+    month = get_stats(days=30, **kwargs)
+    return format_results_message(
+        today, week, month, _riga_tz(), margin_pct, AUTOTRADE_LEVERAGE,
+        configured=configured)
+
+
+def _send_paper_results(chat_id: int, user_id: int) -> None:
+    _reply(chat_id, _paper_results_text(user_id))
 
 
 def _format_day_news() -> str:
@@ -2955,103 +2961,10 @@ def webhook():
     # 📈 Результаты
     elif text in ("📈 результаты", "📈 paper-результаты"):
         try:
-            # "Today" = since midnight Europe/Riga (calendar day, not rolling 24h)
-            _now_riga    = datetime.now(_riga_tz())
-            _riga_midnight = _now_riga.replace(hour=0, minute=0, second=0, microsecond=0).timestamp()
-            sd  = get_stats(since_ts=_riga_midnight)
-            s7  = get_stats(days=7)
-            s30 = get_stats(days=30)
-
-            def _fmt_stats(s: dict, label: str) -> str:
-                # R sign and emoji
-                r_val  = s["total_r"]
-                r_sign = "📈" if r_val > 0 else ("📉" if r_val < 0 else "➖")
-                r_str  = f"{r_val:+.2f}R"
-                rpt    = s["r_per_trade"]
-                rpt_str = f"{rpt:+.3f}R"
-
-                # Direction lines (only show if data exists)
-                lo = s.get("long",  {})
-                sh = s.get("short", {})
-                dir_lines = ""
-                if lo.get("total", 0) or sh.get("total", 0):
-                    def _dir(d, name):
-                        if not d.get("total"):
-                            return ""
-                        wr  = d["win_rate"]
-                        dr  = d["total_r"]
-                        dr_s = f"{dr:+.2f}R"
-                        icon = "🟢" if dr > 0 else ("🔴" if dr < 0 else "⚪")
-                        return f"  {icon} {name}: {d['total']} сд. → {wr}% win  {dr_s}\n"
-                    dir_lines = "\n" + _dir(lo, "LONG") + _dir(sh, "SHORT")
-
-                in_work = s["open"] + s["tp1_partial_open"]
-                in_work_str = ""
-                if in_work:
-                    tp1p = s["tp1_partial_open"]
-                    in_work_str = f"  В работе сейчас: *{in_work}*"
-                    if tp1p:
-                        in_work_str += f" ({tp1p} уже взяли TP1)"
-                    in_work_str += "\n"
-
-                # Premium 💎 breakdown (only when at least one premium signal exists)
-                prem = s.get("premium", {})
-                prem_str = ""
-                if prem.get("total"):
-                    pr_r = prem["total_r"]
-                    pr_sign = "🟢" if pr_r > 0 else ("🔴" if pr_r < 0 else "⚪")
-                    if prem.get("closed"):
-                        prem_str = (
-                            f"\n💎 Premium: {prem['total']} сд. "
-                            f"({prem['closed']} закр.) → *{prem['win_rate']}%* win  "
-                            f"{pr_sign} {pr_r:+.2f}R\n"
-                        )
-                    else:
-                        prem_str = f"\n💎 Premium: {prem['total']} сд. (ещё в работе)\n"
-
-                # A clamped window holds less than its label promises — say so,
-                # otherwise "30 дней" silently means "с 31.07".
-                if s.get("clamped"):
-                    label = f"{label} _(с {_CONFIG_CHANGE_LABEL} — раньше был другой бот)_"
-                return (
-                    f"*{label}*\n"
-                    f"  Сигналов: {s['total']}  •  Закрыто: {s['closed']}\n"
-                    f"{in_work_str}"
-                    f"  TP1: {s['tp1_hit']}  TP2: {s['tp2_hit']}  "
-                    f"BE: {s['breakeven']}  SL: {s['sl_hit']}\n"
-                    f"  Win rate: *{s['win_rate']}%*  "
-                    f"•  TP1 reach: {s['tp1_rate']}%\n"
-                    f"{dir_lines}"
-                    f"{prem_str}"
-                    f"\n{r_sign} Итого: *{r_str}*  •  {rpt_str} за сделку"
-                )
-
-            def _fmt_streak(s: dict) -> str:
-                if not s.get("streak"):
-                    return ""
-                icons = " ".join(s["streak"])
-                run   = s["current_run"]
-                first = s["streak"][0]
-                if first == "❌" and run >= 2:
-                    run_txt = f"  ⚠️ {run} SL подряд"
-                elif first in ("✅", "🏆") and run >= 2:
-                    run_txt = f"  🔥 {run} в прибыли подряд"
-                else:
-                    run_txt = ""
-                return f"🕐 *Последние:* {icons}{run_txt}\n\n"
-
-            text_out = (
-                "📈 *Результаты бота*\n\n"
-                + _fmt_streak(s30)
-                + _fmt_stats(sd,  "Сегодня")
-                + "\n\n"
-                + _fmt_stats(s7,  "За 7 дней")
-                + "\n\n"
-                + _fmt_stats(s30, "За 30 дней")
-            )
-            _reply(chat_id, text_out)
+            _send_paper_results(chat_id, user_id)
         except Exception as e:
-            _reply(chat_id, f"Ошибка: {e}")
+            log.exception("Paper results failed")
+            _reply(chat_id, f"Не удалось посчитать результаты: {e}")
 
     # 📰 Новости на сегодня
     elif text == "📰 новости на сегодня":
@@ -3062,16 +2975,20 @@ def webhook():
 
     # ❓ Помощь
     elif text == "❓ помощь":
-        _reply(chat_id,
-               "❓ *Как читать paper-сигналы*\n\n"
-               "LONG — фильтр ожидает рост, SHORT — снижение.\n"
-               "Вход фиксируется по рыночной цене X-Perp в момент сигнала.\n"
-               "Стоп равен 1R. На первой цели 0.5R фиксируется 5%, "
-               "остальные 95% идут к 2R со стопом в безубытке после первой цели.\n"
-               "Если за 48 свечей цель не достигнута, сделка закрывается по правилам стратегии.\n\n"
-               "🧪 PAPER означает, что Telegram показывает виртуальную сделку: "
-               "биржевой ордер не создаётся. Кнопки результатов считают только "
-               "новые forward-сигналы.")
+        _reply(
+            chat_id,
+            "❓ *Как пользоваться ботом*\n\n"
+            "📋 *Открытые сделки* — текущая цена, результат от входа, ближайшая цель и стоп.\n"
+            "📈 *Результаты* — только закрытые PAPER-сделки за сегодня, 7 и 30 дней.\n"
+            "🛡 *Режим* — активная стратегия и состояние реальных ордеров.\n\n"
+            "*Как читать сигнал*\n"
+            "LONG — ожидается рост, SHORT — снижение. Вход фиксируется по рыночной цене "
+            "X-Perp в момент сигнала. Стоп равен 1R; первая цель фиксирует малую часть, "
+            "остаток ведётся к дальней цели по правилам модуля.\n\n"
+            "*Как считаются результаты*\n"
+            "Доля прибыльных = прибыльные / закрытые. Открытые сделки в неё не входят. "
+            "Модель депозита использует выбранный клиентом процент маржи и плечо ×10.\n\n"
+            "🧪 PAPER — виртуальная сделка для forward-проверки. Биржевой ордер не создаётся.")
 
     # /admin works in groups too; group privacy mode still delivers commands.
     elif text.startswith("/admin") or text in ("admin", "admin panel", "panel"):
@@ -3091,36 +3008,13 @@ def webhook():
                f"🧩 Решение: 15m Profit-First HGB\n"
                f"🚫 Реальные ордера отключены")
 
-    # /stats — статистика побед/поражений
+    # /stats — тот же проверяемый расчёт, что и у кнопки.
     elif text in ("/stats", "/статистика"):
         try:
-            _now_riga      = datetime.now(_riga_tz())
-            _riga_midnight = _now_riga.replace(hour=0, minute=0, second=0, microsecond=0).timestamp()
-            sd  = get_stats(since_ts=_riga_midnight)
-            s7  = get_stats(days=7)
-            s30 = get_stats(days=30)
-            blocks = get_active_symbol_blocks()
-            blocks_line = ", ".join(b["symbol"] for b in blocks[:6]) if blocks else "нет"
-            _reply(chat_id,
-                   f"📈 *СТАТИСТИКА*\n\n"
-                   f"*Сегодня:*\n"
-                   f"  Сигналов: {sd['total']}  Закрыто: {sd['closed']}\n"
-                   f"  TP1: {sd['tp1_hit']} ({sd['tp1_rate']}%)  TP2: {sd['tp2_hit']}\n"
-                   f"  BE: {sd['breakeven']}  SL: {sd['sl_hit']}  Expired: {sd['expired']}\n"
-                   f"  Win rate: *{sd['win_rate']}%*\n\n"
-                   f"*За 7 дней:*\n"
-                   f"  Сигналов: {s7['total']}  Закрыто: {s7['closed']}\n"
-                   f"  TP1: {s7['tp1_hit']} ({s7['tp1_rate']}%)  TP2: {s7['tp2_hit']}\n"
-                   f"  BE: {s7['breakeven']}  SL: {s7['sl_hit']}  Expired: {s7['expired']}\n"
-                   f"  Win rate: *{s7['win_rate']}%*\n\n"
-                   f"*За 30 дней:*\n"
-                   f"  Сигналов: {s30['total']}  Закрыто: {s30['closed']}\n"
-                   f"  TP1: {s30['tp1_hit']} ({s30['tp1_rate']}%)  TP2: {s30['tp2_hit']}\n"
-                   f"  BE: {s30['breakeven']}  SL: {s30['sl_hit']}  Expired: {s30['expired']}\n"
-                   f"  Win rate: *{s30['win_rate']}%*\n\n"
-                   f"🚫 Авто-блок: {blocks_line}")
+            _send_paper_results(chat_id, user_id)
         except Exception as e:
-            _reply(chat_id, f"Ошибка статистики: {e}")
+            log.exception("Paper stats command failed")
+            _reply(chat_id, f"Не удалось посчитать результаты: {e}")
 
     return "ok", 200
 
