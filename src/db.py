@@ -143,7 +143,14 @@ def init_db():
                 strategy_stop_on_close INTEGER,
                 strategy_max_bars INTEGER,
                 strategy_expire_at REAL,
-                runner_activation_bar_ts REAL
+                runner_activation_bar_ts REAL,
+                strategy_tp1_volume_threshold REAL,
+                strategy_tp1_extra_close_frac REAL,
+                tp1_hit_volume_ratio REAL,
+                tp1_extra_close_frac REAL,
+                tp1_extra_exit_price REAL,
+                tp1_extra_exit_at REAL,
+                tp1_volume_candidate_r REAL
             )
         """)
         # Migrate older DBs
@@ -173,6 +180,15 @@ def init_db():
             "strategy_max_bars": "INTEGER",
             "strategy_expire_at": "REAL",
             "runner_activation_bar_ts": "REAL",
+            # Frozen TP1-volume shadow challenger.  These fields are parallel
+            # paper accounting only; realized_r remains the baseline contract.
+            "strategy_tp1_volume_threshold": "REAL",
+            "strategy_tp1_extra_close_frac": "REAL",
+            "tp1_hit_volume_ratio": "REAL",
+            "tp1_extra_close_frac": "REAL",
+            "tp1_extra_exit_price": "REAL",
+            "tp1_extra_exit_at": "REAL",
+            "tp1_volume_candidate_r": "REAL",
             # Signals forced through only to measure a disabled Claude gate stay
             # visible and resolvable, but must never reach a real-money opener.
             "autotrade_eligible": "INTEGER NOT NULL DEFAULT 1",
@@ -635,7 +651,9 @@ def log_signal(analysis: dict, tp1: float, tp2: float, sl: float) -> int:
                 strategy_tp1_close_frac = ?, strategy_runner_mode = ?,
                 strategy_runner_target_r = ?, strategy_bar_seconds = ?,
                 strategy_entry_bar_ts = ?, strategy_stop_on_close = ?,
-                strategy_max_bars = ?, strategy_expire_at = ?
+                strategy_max_bars = ?, strategy_expire_at = ?,
+                strategy_tp1_volume_threshold = ?,
+                strategy_tp1_extra_close_frac = ?
             WHERE id = ?
         """, (
             analysis.get("strategy_tp1_close_frac"),
@@ -646,6 +664,8 @@ def log_signal(analysis: dict, tp1: float, tp2: float, sl: float) -> int:
             analysis.get("strategy_stop_on_close"),
             analysis.get("strategy_max_bars"),
             analysis.get("strategy_expire_at"),
+            analysis.get("strategy_tp1_volume_threshold"),
+            analysis.get("strategy_tp1_extra_close_frac"),
             cur.lastrowid,
         ))
         if analysis.get("_shadow_only"):
@@ -671,7 +691,8 @@ def get_open_signals() -> list:
 
 
 def update_signal_status(signal_id: int, status: str, exit_price=None, realized_r=None,
-                         runner_trail_atr_mult=None, runner_activation_bar_ts=None):
+                         runner_trail_atr_mult=None, runner_activation_bar_ts=None,
+                         tp1_volume_candidate_r=None):
     """
     Update signal lifecycle.
     TP1_PARTIAL records TP1 but keeps signal active for TP2/BE monitoring.
@@ -692,9 +713,26 @@ def update_signal_status(signal_id: int, status: str, exit_price=None, realized_
                   runner_activation_bar_ts, signal_id))
         else:
             c.execute("""
-                UPDATE signals SET status = ?, closed_at = ?, exit_price = ?, realized_r = ?
+                UPDATE signals SET status = ?, closed_at = ?, exit_price = ?,
+                    realized_r = ?, tp1_volume_candidate_r = ?
                 WHERE id = ?
-            """, (status, now, exit_price, realized_r, signal_id))
+            """, (status, now, exit_price, realized_r,
+                  tp1_volume_candidate_r, signal_id))
+
+
+def record_tp1_volume_observation(signal_id: int, *, volume_ratio: float,
+                                  extra_fraction: float, exit_price: float,
+                                  observed_at: float) -> bool:
+    """Persist the completed TP1 candle once for parallel paper accounting."""
+    with _conn() as c:
+        cursor = c.execute("""
+            UPDATE signals SET tp1_hit_volume_ratio = ?,
+                tp1_extra_close_frac = ?, tp1_extra_exit_price = ?,
+                tp1_extra_exit_at = ?
+            WHERE id = ? AND tp1_hit_volume_ratio IS NULL
+        """, (float(volume_ratio), float(extra_fraction), float(exit_price),
+              float(observed_at), signal_id))
+        return cursor.rowcount == 1
 
 
 def set_sl_xperp_only(signal_id: int, xperp_only: int) -> None:
@@ -1458,6 +1496,57 @@ def get_stats(days: int = 7, since_ts: float = None,
         "premium":          premium,
         "streak":           streak,
         "current_run":      current_run,
+    }
+
+
+def get_tp1_volume_forward_stats(days: int = 30, *, margin_pct: float = 3.0,
+                                 leverage: float = 10.0) -> dict:
+    """Compare baseline and volume-bank R on the same new shadow closures."""
+    cutoff = max(time_mod.time() - days * 86400, LIVE_HIST_EPOCH_TS or 0.0)
+    with _conn() as c:
+        rows = c.execute("""
+            SELECT opened_at, entry_price, sl, realized_r,
+                   tp1_volume_candidate_r, tp1_extra_close_frac
+            FROM signals
+            WHERE opened_at >= ?
+              AND strategy_tp1_volume_threshold IS NOT NULL
+              AND tp1_volume_candidate_r IS NOT NULL
+            ORDER BY opened_at, rowid
+        """, (cutoff,)).fetchall()
+    records = [dict(row) for row in rows]
+
+    def account(field: str) -> tuple[float, float]:
+        equity = peak = 1.0
+        drawdown = 0.0
+        for row in records:
+            entry = float(row["entry_price"])
+            risk_fraction = abs(entry - float(row["sl"])) / entry
+            change = (float(margin_pct) / 100.0) * float(leverage) \
+                * float(row[field]) * risk_fraction
+            equity *= max(0.0, 1.0 + change)
+            peak = max(peak, equity)
+            drawdown = max(drawdown, (peak - equity) / peak if peak else 0.0)
+        return (round((equity - 1.0) * 100.0, 3),
+                round(drawdown * 100.0, 3))
+
+    base_return, base_dd = account("realized_r")
+    candidate_return, candidate_dd = account("tp1_volume_candidate_r")
+    total = len(records)
+    return {
+        "since": cutoff,
+        "n": total,
+        "weak_volume_banks": sum(
+            1 for row in records if float(row["tp1_extra_close_frac"] or 0) > 0),
+        "baseline_win_rate": round(100 * sum(
+            float(row["realized_r"]) > 0 for row in records) / total, 1)
+            if total else 0.0,
+        "candidate_win_rate": round(100 * sum(
+            float(row["tp1_volume_candidate_r"]) > 0 for row in records) / total, 1)
+            if total else 0.0,
+        "baseline_return_pct": base_return,
+        "candidate_return_pct": candidate_return,
+        "baseline_dd_pct": base_dd,
+        "candidate_dd_pct": candidate_dd,
     }
 
 
