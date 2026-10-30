@@ -56,10 +56,12 @@ class ProfitFirstMaterialShadowRouterTests(unittest.TestCase):
             "atr": SAMPLE["entry"] * SAMPLE["risk_pct"] / 2.0,
             "abs_z": abs(SAMPLE["signal"]["z"]),
         }
+        candles = {"close": [SAMPLE["entry"]] * router.REQUIRED_SYMBOL_HISTORY_BARS}
+        btc_candles = {"close": [1.0] * router.REQUIRED_BTC_HISTORY_BARS}
         with patch.object(router, "family_signals", return_value=[signal]), \
              patch.object(router, "btc_context", return_value=SAMPLE["context"]):
             rows = router.shadow_setups(
-                {"close": [SAMPLE["entry"]]}, {"close": []},
+                candles, btc_candles,
                 entry_time=SAMPLE["entry_time"],
                 market_price=SAMPLE["entry"], symbol=SAMPLE["symbol"])
         self.assertEqual(len(rows), 1)
@@ -74,6 +76,32 @@ class ProfitFirstMaterialShadowRouterTests(unittest.TestCase):
         self.assertEqual(setup["hold_bars"], 48)
         self.assertGreater(setup["sl"], setup["entry"])
         self.assertLess(setup["tp"], setup["entry"])
+
+    def test_history_requirements_and_filter_reason_are_explainable(self):
+        audit = {}
+        rows = router.shadow_setups(
+            {"close": [1.0] * (router.REQUIRED_SYMBOL_HISTORY_BARS - 1)},
+            {"close": [1.0] * router.REQUIRED_BTC_HISTORY_BARS},
+            entry_time=SAMPLE["entry_time"], market_price=1.0,
+            symbol="BTCUSDT", diagnostics=audit)
+        self.assertEqual(rows, [])
+        self.assertEqual(audit["result"], "insufficient_symbol_history")
+        self.assertEqual(audit["required_symbol_history_bars"], 100)
+        self.assertEqual(audit["required_btc_history_bars"], 385)
+
+        signal = {
+            **SAMPLE["signal"], "atr": .001, "abs_z": 1.0,
+        }
+        with patch.object(router, "btc_context", return_value=SAMPLE["context"]), \
+             patch.object(router, "family_signals", return_value=[signal]):
+            rows = router.shadow_setups(
+                {"close": [1.0] * router.REQUIRED_SYMBOL_HISTORY_BARS},
+                {"close": [1.0] * router.REQUIRED_BTC_HISTORY_BARS},
+                entry_time=SAMPLE["entry_time"], market_price=1.0,
+                symbol="BTCUSDT", diagnostics=audit)
+        self.assertEqual(rows, [])
+        self.assertEqual(audit["result"], "all_family_signals_filtered")
+        self.assertEqual(audit["rejected"], {"risk_outside_1_to_2pct": 1})
 
 
 if __name__ == "__main__":

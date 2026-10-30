@@ -85,6 +85,8 @@ ROBUST_EXCLUDED_SYMBOLS = frozenset({
     "ADAUSDT", "DOTUSDT", "NEARUSDT", "TAOUSDT",
 })
 ROBUST_SYMBOLS = AUDITED_SYMBOLS - ROBUST_EXCLUDED_SYMBOLS
+BTC_CONTEXT_HISTORY_BARS = 385
+FAMILY_SIGNAL_HISTORY_BARS = 100
 
 # Shadow candidate selected on 2020-23, validated on 2024, then checked on
 # 2025-26 and public X-Perp through 2026-09-30.  The base module stays at
@@ -125,9 +127,10 @@ def btc_context(candles: dict) -> dict | None:
     close = list(map(float, candles.get("close", [])))
     high = candles.get("high", [])
     low = candles.get("low", [])
-    if len(close) < 385 or len(high) != len(close) or len(low) != len(close):
+    if (len(close) < BTC_CONTEXT_HISTORY_BARS
+            or len(high) != len(close) or len(low) != len(close)):
         return None
-    history = close[-385:]
+    history = close[-BTC_CONTEXT_HISTORY_BARS:]
     recent, slow, long = history[-20:], history[-96:], history[-384:]
     atr = _atr({"close": close, "high": high, "low": low}, len(close) - 14, len(close))
     movement20 = sum(abs(recent[i] - recent[i - 1]) for i in range(1, 20))
@@ -164,7 +167,8 @@ def family_signals(candles: dict) -> list[dict]:
     close = list(map(float, candles.get("close", [])))
     high = candles.get("high", [])
     low = candles.get("low", [])
-    if len(close) < 100 or len(high) != len(close) or len(low) != len(close):
+    if (len(close) < FAMILY_SIGNAL_HISTORY_BARS
+            or len(high) != len(close) or len(low) != len(close)):
         return []
     last = close[-1]
     recent = close[-20:]

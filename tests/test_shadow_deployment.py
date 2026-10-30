@@ -130,6 +130,13 @@ class ShadowDeploymentTests(unittest.TestCase):
         self.assertIn("rows = profit_first_material_shadow_setups", src)
         self.assertNotIn("rows = venue_setups", src)
 
+    def test_scan_fetch_limits_follow_router_history_contract(self):
+        import inspect
+        src = inspect.getsource(main._run_venue_strategy_scan)
+        self.assertIn("REQUIRED_BTC_HISTORY_BARS", src)
+        self.assertIn("REQUIRED_SYMBOL_HISTORY_BARS", src)
+        self.assertNotIn('limit=400 if symbol == "BTCUSDT" else 120', src)
+
     def test_profit_first_material_analysis_persists_frozen_barbell(self):
         setup = {
             "direction": "SHORT", "entry": 100.0, "atr": .75,

@@ -39,6 +39,7 @@ from src.binance_client import (
 from src.filter_variants import VARIANTS
 from src.crypto_venue_router import ROBUST_SYMBOLS
 from src.crypto_profit_first_material_shadow_router import (
+    REQUIRED_BTC_HISTORY_BARS, REQUIRED_SYMBOL_HISTORY_BARS,
     shadow_setups as profit_first_material_shadow_setups,
 )
 from src.crypto_5m_oi_shadow_router import (
@@ -397,6 +398,32 @@ def _build_and_send_report(chat_id: int, message_id: int,
             A(f"  SHORT n={_sh.get('total', 0)} WR={_sh.get('win_rate', 0)}% R={_sh.get('total_r', 0)}")
             A("")
 
+        A("## ПОСЛЕДНИЙ СКАН PROFIT-FIRST X-PERP")
+        try:
+            _scan = json.loads(get_bot_state("crypto_scan_audit") or "{}")
+            if _scan:
+                A(f"  время UTC: {datetime.fromtimestamp(float(_scan.get('ts') or 0), timezone.utc):%Y-%m-%d %H:%M:%S}")
+                A(f"  итог: {_scan.get('result', 'unknown')}")
+                A(f"  инструменты: доступно {_scan.get('available_instruments', 0)}, "
+                  f"целей {_scan.get('targets', 0)}, загружено {_scan.get('fetched', 0)}")
+                A(f"  история инструмента: минимум {_scan.get('minimum_symbol_bars', 0)}, "
+                  f"нужно {REQUIRED_SYMBOL_HISTORY_BARS}; "
+                  f"BTC {_scan.get('btc_history_bars', 0)}, нужно {REQUIRED_BTC_HISTORY_BARS}")
+                _sa = _scan.get("strategy") or {}
+                A(f"  проверено моделью: {_sa.get('symbols_evaluated', 0)}; "
+                  f"семейных сетапов {_sa.get('family_signals', 0)}; "
+                  f"сырых кандидатов {_scan.get('raw_setups', 0)}; "
+                  f"к публикации {_scan.get('publish_candidates', 0)}; "
+                  f"отправлено {_scan.get('published', 0)}")
+                A(f"  итог по инструментам: {json.dumps(_sa.get('results') or {}, ensure_ascii=False, sort_keys=True)}")
+                A(f"  причины фильтра модели: {json.dumps(_sa.get('rejected') or {}, ensure_ascii=False, sort_keys=True)}")
+                A(f"  причины портфеля: {json.dumps(_scan.get('portfolio_rejects') or {}, ensure_ascii=False, sort_keys=True)}")
+            else:
+                A("  данных ещё нет после запуска этой версии")
+        except Exception as _scan_exc:
+            A(f"  ошибка чтения аудита: {_scan_exc}")
+        A("")
+
         # 2. Claude approval rate + accuracy
         A(f"## КЛОД: ТОЧНОСТЬ И ДОЛЯ ОДОБРЕНИЙ ({window_label})")
         acc = get_setup_accuracy(since_ts)
@@ -640,12 +667,44 @@ def health():
     return f"Crypto Signal Bot is running ({DEPLOYMENT_MODE}).", 200
 
 
+def _crypto_scan_status_text() -> str:
+    try:
+        row = json.loads(get_bot_state("crypto_scan_audit") or "{}")
+        if not row:
+            return "Последний скан: данных ещё нет"
+        age_minutes = max(0, int((time.time() - float(row.get("ts") or 0)) / 60))
+        result_names = {
+            "published": "сигнал опубликован",
+            "no_candidate_passed": "рынок проверен, сетапов нет",
+            "qualified_but_not_published": "сетап отфильтрован портфелем",
+            "weekend": "пауза на выходных",
+            "outside_trading_hours": "вне торговых часов",
+            "filter_disabled": "фильтр отключён настройкой",
+            "daily_loss_pause": "пауза после серии убытков",
+            "btc_instrument_unavailable": "контракт BTC недоступен",
+            "btc_history_unavailable": "история BTC недоступна",
+        }
+        result = result_names.get(
+            str(row.get("result")), str(row.get("result") or "неизвестно"))
+        return (
+            f"Последний скан: {age_minutes} мин назад · {result}\n"
+            f"Данные: {int(row.get('fetched') or 0)}/{int(row.get('targets') or 0)} "
+            f"инструментов · семейных сетапов "
+            f"{int((row.get('strategy') or {}).get('family_signals') or 0)} · "
+            f"к публикации {int(row.get('publish_candidates') or 0)} · "
+            f"отправлено {int(row.get('published') or 0)}"
+        )
+    except Exception:
+        return "Последний скан: аудит временно недоступен"
+
+
 @app.route("/status")
 def status():
     return (f"Mode: {DEPLOYMENT_MODE}. Strategy: audited direct-venue router. "
             f"Scanning every {SCAN_INTERVAL_MINUTES} min. "
             f"Max signals/scan: {VENUE_MAX_SIGNALS_PER_SCAN}. "
-            f"Signal cache: {len(_signal_cache)} entries."), 200
+            f"Signal cache: {len(_signal_cache)} entries. "
+            f"{_crypto_scan_status_text().replace(chr(10), ' | ')}"), 200
 
 
 # ── Admin panel helpers ───────────────────────────────────────────────────────
@@ -2921,7 +2980,8 @@ def webhook():
                "Работает замороженная 15m Profit-First модель X-Perp.\n"
                "Сигналы входят по рынку и считаются виртуально.\n"
                "Нейросеть не принимает торговых решений.\n"
-               "Реальные ордера отключены на уровне конфигурации и кода.")
+               "Реальные ордера отключены на уровне конфигурации и кода.\n\n"
+               + _crypto_scan_status_text())
 
     elif text == "🤖 автотрейдинг":
         if DEPLOYMENT_MODE == "shadow":
@@ -3006,7 +3066,8 @@ def webhook():
                f"📊 Сигналов в кэше: {len(_signal_cache)}\n"
                f"💾 Данные: OKX\n"
                f"🧩 Решение: 15m Profit-First HGB\n"
-               f"🚫 Реальные ордера отключены")
+               f"🚫 Реальные ордера отключены\n\n"
+               f"{_crypto_scan_status_text()}")
 
     # /stats — тот же проверяемый расчёт, что и у кнопки.
     elif text in ("/stats", "/статистика"):
@@ -3790,6 +3851,14 @@ def _publish_venue_candidates(candidates: list[tuple[dict, int]],
     return published
 
 
+def _persist_crypto_scan_audit(payload: dict) -> None:
+    """Persist why the latest scan did or did not produce a paper signal."""
+    try:
+        set_bot_state("crypto_scan_audit", json.dumps(payload, ensure_ascii=False))
+    except Exception as exc:
+        log.warning("Crypto scan audit persistence failed: %s", exc)
+
+
 def _run_venue_strategy_scan() -> None:
     """Fast deterministic path for the frozen X-Perp precision portfolio.
 
@@ -3799,15 +3868,32 @@ def _run_venue_strategy_scan() -> None:
     """
     now_utc = datetime.now(timezone.utc)
     if not TRADE_WEEKENDS and now_utc.weekday() >= 5:
+        _persist_crypto_scan_audit({
+            "ts": time.time(), "result": "weekend", "targets": 0,
+            "fetched": 0, "published": 0,
+        })
         log.info("Venue scan skipped: weekend")
         return
     if not (TRADING_HOURS_START <= now_utc.hour < TRADING_HOURS_END):
+        _persist_crypto_scan_audit({
+            "ts": time.time(), "result": "outside_trading_hours",
+            "targets": 0, "fetched": 0, "published": 0,
+        })
         log.info("Venue scan skipped: outside configured hours")
         return
     if REGIME_FILTER_MODE == "off":
+        _persist_crypto_scan_audit({
+            "ts": time.time(), "result": "filter_disabled", "targets": 0,
+            "fetched": 0, "published": 0,
+        })
         log.warning("Venue scan disabled by REGIME_FILTER_MODE=off")
         return
     if _venue_daily_loss_pause():
+        _persist_crypto_scan_audit({
+            "ts": time.time(), "result": "daily_loss_pause",
+            "loss_pause_streak": VENUE_LOSS_PAUSE_STREAK,
+            "targets": 0, "fetched": 0, "published": 0,
+        })
         log.warning("Venue scan paused after %s consecutive UTC-day stops",
                     VENUE_LOSS_PAUSE_STREAK)
         return
@@ -3815,13 +3901,23 @@ def _run_venue_strategy_scan() -> None:
     available = set(get_xperp_instruments())
     symbols = _venue_scan_universe(available)
     if "BTCUSDT" not in symbols:
+        _persist_crypto_scan_audit({
+            "ts": time.time(), "result": "btc_instrument_unavailable",
+            "available_instruments": len(available), "targets": len(symbols),
+            "fetched": 0, "published": 0,
+        })
         log.warning("Venue scan refused: BTC X-Perp context is unavailable")
         return
     fetched = {}
     market_prices = {}
     def _fetch(symbol: str):
+        # These constants come from the feature builders themselves.  Keeping
+        # the fetch tied to them prevents a shorter magic limit from silently
+        # making every model call return no setup.
         fifteen = get_klines_xperp(
-            symbol, limit=400 if symbol == "BTCUSDT" else 120)
+            symbol, limit=(REQUIRED_BTC_HISTORY_BARS
+                           if symbol == "BTCUSDT"
+                           else REQUIRED_SYMBOL_HISTORY_BARS))
         try:
             market = get_xperp_price(symbol)
         except Exception as exc:
@@ -3841,6 +3937,11 @@ def _run_venue_strategy_scan() -> None:
 
     btc = fetched.get("BTCUSDT")
     if not btc:
+        _persist_crypto_scan_audit({
+            "ts": time.time(), "result": "btc_history_unavailable",
+            "available_instruments": len(available), "targets": len(symbols),
+            "fetched": len(fetched), "published": 0,
+        })
         log.warning("Venue scan refused: BTC candles are unavailable")
         return
     # Market fallback remains X-Perp and is used only when the public ticker
@@ -3859,9 +3960,26 @@ def _run_venue_strategy_scan() -> None:
     if blocked:
         log.info("Venue scan: %d blocked symbol(s) skipped", len(blocked))
     candidates = []
+    raw_setups = 0
+    strategy_audit = {
+        "symbols_evaluated": 0, "family_signals": 0,
+        "results": {}, "rejected": {},
+    }
+    portfolio_rejects = {
+        "already_open": 0, "symbol_blocked": 0, "missing_history": 0,
+        "stale_bar": 0, "duplicate_bar": 0, "cooldown": 0,
+        "strategy_error": 0,
+    }
     for symbol in symbols:
         candles = fetched.get(symbol)
-        if not candles or symbol in active or symbol in blocked:
+        if not candles:
+            portfolio_rejects["missing_history"] += 1
+            continue
+        if symbol in active:
+            portfolio_rejects["already_open"] += 1
+            continue
+        if symbol in blocked:
+            portfolio_rejects["symbol_blocked"] += 1
             continue
         try:
             entry_time = float(candles["time"][-1]) + KLINES_INTERVAL_SEC
@@ -3870,14 +3988,27 @@ def _run_venue_strategy_scan() -> None:
             # entry. One scheduler interval plus feed-settlement tolerance is
             # the maximum admissible delay.
             if now_utc.timestamp() - entry_time > _MAX_VENUE_ENTRY_DELAY_SEC:
+                portfolio_rejects["stale_bar"] += 1
                 log.info("Venue setup skipped for %s: closed bar is stale", symbol)
                 continue
             market = market_prices.get(symbol) or float(candles["close"][-1])
+            route_audit = {}
             rows = profit_first_material_shadow_setups(
                 candles, btc,
                 entry_time=entry_time,
                 market_price=float(market), symbol=symbol,
+                diagnostics=route_audit,
             )
+            strategy_audit["symbols_evaluated"] += 1
+            strategy_audit["family_signals"] += int(
+                route_audit.get("family_signals") or 0)
+            route_result = str(route_audit.get("result") or "unknown")
+            strategy_audit["results"][route_result] = (
+                int(strategy_audit["results"].get(route_result, 0)) + 1)
+            for reason, count in (route_audit.get("rejected") or {}).items():
+                strategy_audit["rejected"][reason] = (
+                    int(strategy_audit["rejected"].get(reason, 0)) + int(count))
+            raw_setups += len(rows)
             for row in rows:
                 # The 5m supplement already carries its own bar timestamp.
                 # Production 15m rows do not, so only fill a missing value.
@@ -3885,17 +4016,46 @@ def _run_venue_strategy_scan() -> None:
                 analysis = _venue_analysis(symbol, row)
                 setup_id = log_setup_candidate_once(analysis)
                 if not setup_id:
+                    portfolio_rejects["duplicate_bar"] += 1
                     continue
                 analysis["_setup_log_id"] = setup_id
                 if _venue_signal_on_cooldown(symbol, analysis["direction"]):
+                    portfolio_rejects["cooldown"] += 1
                     mark_setup_blocked(setup_id, "cooldown")
                     continue
                 candidates.append((analysis, setup_id))
         except Exception as exc:
+            portfolio_rejects["strategy_error"] += 1
             log.warning("Venue strategy failed for %s: %s", symbol, exc)
     published = _publish_venue_candidates(candidates, open_direction_counts)
-    _last_scan_stats.update(coins=len(symbols), setups=published, fresh=published,
-                            ts=time.time())
+    now = time.time()
+    symbol_lengths = [len(row.get("close") or []) for key, row in fetched.items()
+                      if key != "BTCUSDT"]
+    audit = {
+        "ts": now,
+        "result": ("published" if published else
+                   "qualified_but_not_published" if candidates else
+                   "no_candidate_passed"),
+        "available_instruments": len(available),
+        "targets": len(symbols),
+        "fetched": len(fetched),
+        "minimum_symbol_bars": min(symbol_lengths) if symbol_lengths else 0,
+        "maximum_symbol_bars": max(symbol_lengths) if symbol_lengths else 0,
+        "required_symbol_history_bars": REQUIRED_SYMBOL_HISTORY_BARS,
+        "btc_history_bars": len(btc.get("close") or []),
+        "required_btc_history_bars": REQUIRED_BTC_HISTORY_BARS,
+        "strategy": strategy_audit,
+        "raw_setups": raw_setups,
+        "portfolio_rejects": portfolio_rejects,
+        "publish_candidates": len(candidates),
+        "published": published,
+        "open_long": open_direction_counts.get("LONG", 0),
+        "open_short": open_direction_counts.get("SHORT", 0),
+    }
+    _persist_crypto_scan_audit(audit)
+    _last_scan_stats.update(
+        coins=len(fetched), setups=raw_setups, fresh=len(candidates),
+        enriched=len(candidates), sent=published, ts=now)
     log.info("Venue scan complete: %s symbols, %s candidates, %s paper signals",
              len(symbols), len(candidates), published)
 

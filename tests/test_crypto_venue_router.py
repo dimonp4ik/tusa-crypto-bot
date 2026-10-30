@@ -2,7 +2,8 @@ import unittest
 from unittest.mock import patch
 
 from src.crypto_venue_router import (
-    MODULES, ROBUST_EXCLUDED_SYMBOLS, ROBUST_SYMBOLS,
+    BTC_CONTEXT_HISTORY_BARS, FAMILY_SIGNAL_HISTORY_BARS, MODULES,
+    ROBUST_EXCLUDED_SYMBOLS, ROBUST_SYMBOLS,
     SHADOW_EXPERIMENTAL_MODULES, btc_context, shadow_experimental_setups,
     venue_setups,
 )
@@ -273,6 +274,10 @@ class CryptoVenueRouterTests(unittest.TestCase):
         candles = {"close": values, "high": [x + 1 for x in values],
                    "low": [x - 1 for x in values]}
         self.assertIsNone(btc_context(candles))
+
+    def test_feature_history_requirements_are_public_runtime_contracts(self):
+        self.assertEqual(BTC_CONTEXT_HISTORY_BARS, 385)
+        self.assertEqual(FAMILY_SIGNAL_HISTORY_BARS, 100)
 
     def test_xperp_fetch_paginates_for_btc_context(self):
         def row(timestamp):
