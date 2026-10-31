@@ -374,6 +374,18 @@ def init_db():
             # historical outcome (Claude memory prior, excluded from stats).
             "source":       "TEXT NOT NULL DEFAULT 'live'",
             "signal_bar_ts": "REAL",
+            # Immutable execution contract for blocked venue candidates. The
+            # signal row already carries these fields, but a capped candidate
+            # never becomes a signal. Without a copy here its counterfactual
+            # result cannot be replayed on the correct timeframe/horizon.
+            "strategy_tp1_close_frac": "REAL",
+            "strategy_runner_mode": "TEXT",
+            "strategy_runner_target_r": "REAL",
+            "strategy_bar_seconds": "INTEGER",
+            "strategy_entry_bar_ts": "REAL",
+            "strategy_stop_on_close": "INTEGER",
+            "strategy_max_bars": "INTEGER",
+            "strategy_expire_at": "REAL",
             # Filter-variant A/B experiment (2026-07-24): comma-separated list of
             # variant codes whose filter settings WOULD have admitted this setup
             # (e.g. "A,C,E"). Claude judges each setup ONCE; the verdict is then
@@ -1609,6 +1621,14 @@ def _prepared_setup_candidate(analysis: dict) -> tuple:
             1 if analysis.get("sniper") else 0,
             analysis.get("funding_rate"),
             analysis.get("signal_bar_ts"),
+            analysis.get("strategy_tp1_close_frac"),
+            analysis.get("strategy_runner_mode"),
+            analysis.get("fixed_runner_target_r"),
+            analysis.get("strategy_bar_seconds"),
+            analysis.get("strategy_entry_bar_ts"),
+            analysis.get("strategy_stop_on_close"),
+            analysis.get("strategy_max_bars"),
+            analysis.get("strategy_expire_at"),
         )
 
 
@@ -1621,9 +1641,13 @@ def _insert_setup_candidate(c, values: tuple) -> int:
              oi_delta_pct, oi_regime, oi_confirms, counter, variants, source,
              open_same_dir,
              book_spread_bps, book_depth_usd, book_imbalance,
-             hours_to_event, next_event, sniper, funding_rate, signal_bar_ts)
+             hours_to_event, next_event, sniper, funding_rate, signal_bar_ts,
+             strategy_tp1_close_frac, strategy_runner_mode,
+             strategy_runner_target_r, strategy_bar_seconds,
+             strategy_entry_bar_ts, strategy_stop_on_close,
+             strategy_max_bars, strategy_expire_at)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
-                ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     """, values)
     return cur.lastrowid
 
@@ -1673,7 +1697,7 @@ def mark_setup_blocked(setup_log_id: int, reason: str) -> None:
 
 
 def get_cap_impact_stats(since_ts: float) -> dict:
-    """Outcomes of setups Claude approved but never sent.
+    """Outcomes of valid venue setups blocked before publication.
 
     This is the direct answer to "did withholding this setup save money or
     cost it": the shadow tracker resolves these rows regardless of whether a
@@ -1685,21 +1709,26 @@ def get_cap_impact_stats(since_ts: float) -> dict:
     """
     out = {}
     with _conn() as c:
-        for reason in ("dir_cap", "scan_cap", "cooldown", "send_failed", "stale_entry"):
+        for reason in ("dir_cap", "scan_cap", "hour_cap", "cooldown",
+                       "send_failed", "stale_entry"):
             rows = c.execute(
-                """SELECT outcome, reached_tp1 FROM setup_log
+                """SELECT outcome, reached_tp1, net_r FROM setup_log
                    WHERE resolved=1 AND COALESCE(outcome,'') != 'NO_FILL' AND ts >= ? AND block_reason=?
-                     AND COALESCE(source,'live')='live'""",
+                     AND COALESCE(source,'live')!='backtest'""",
                 (since_ts, reason),
             ).fetchall()
             n = len(rows)
             tp1 = sum(1 for r in rows if r["reached_tp1"])
             sl = sum(1 for r in rows if r["outcome"] == "SL")
-            # Net R the cap saved (+) or cost (-), on the same first-order
-            # basis the mirror experiment uses: a stopped setup avoided is
-            # worth the real average loss, a TP1 setup missed costs the real
-            # average of a trailed winner.
-            saved_r = sl * _SHADOW_R_STOP - tp1 * _SHADOW_R_TP1
+            # A blocked trade saves the opposite of the R it would have made.
+            # Keep the old estimate only for legacy rows without exact net_r.
+            saved_r = sum(
+                -float(r["net_r"])
+                if r["net_r"] is not None else
+                (_SHADOW_R_STOP if r["outcome"] == "SL" else
+                 -_SHADOW_R_TP1 if r["reached_tp1"] else 0.0)
+                for r in rows
+            )
             out[reason] = {
                 "n": n, "reached_tp1": tp1, "sl": sl,
                 "tp1_pct": (tp1 / n * 100) if n else 0.0,
@@ -1781,6 +1810,28 @@ def get_unresolved_setups(max_age_sec: float, limit: int = 80) -> list:
             (now - 900, now - max_age_sec, limit),
         ).fetchall()
         return [dict(r) for r in rows]
+
+
+def get_unresolved_venue_setups(limit: int = 200) -> list:
+    """Blocked venue candidates whose exact paper outcome is still unknown.
+
+    Only rows written after the execution-contract migration qualify. Older
+    capped rows lack enough information for an honest replay and are left
+    unresolved instead of being guessed with today's strategy settings.
+    """
+    with _conn() as c:
+        rows = c.execute(
+            """SELECT * FROM setup_log
+               WHERE resolved=0 AND sl IS NOT NULL AND signal_id IS NULL
+                 AND COALESCE(sent,0)=0
+                 AND block_reason IS NOT NULL
+                 AND strategy_bar_seconds IS NOT NULL
+                 AND strategy_entry_bar_ts IS NOT NULL
+                 AND strategy_max_bars IS NOT NULL
+               ORDER BY ts ASC LIMIT ?""",
+            (int(limit),),
+        ).fetchall()
+        return [dict(row) for row in rows]
 
 
 def mark_setup_resolved(setup_id: int, outcome: str,

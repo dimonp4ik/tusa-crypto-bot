@@ -59,6 +59,7 @@ from src.telegram_notifier import (
 )
 from src.news_agent import get_daily_digest, get_day_events, generate_weekly_commentary
 from src.r_model import blended_r
+from src.backtest_integrity import simulate_exit
 from src.tp1_volume_bank import candidate_r as tp1_volume_candidate_r
 from src.tp1_volume_bank import completed_observation as tp1_volume_observation
 from src.tp1_volume_bank import VOLUME_LOOKBACK as TP1_VOLUME_LOOKBACK
@@ -76,6 +77,7 @@ from src.db import (
     get_bot_state, set_bot_state, log_setup_candidate_once, mark_setup_sent,
     get_setups_by_date, get_setup_accuracy, link_setup_to_signal,
     resolve_sent_setups_from_signals, backfill_setup_signal_links, get_weekly_stats,
+    get_unresolved_venue_setups, mark_setup_resolved,
     at_add_allowed, at_remove, at_get, at_all_allowed, at_set_keys, at_set_mode,
     at_set_active, at_set_balance, at_set_tp1_close_pct, watch_stats,
     get_today_sl_streak, get_recent_signals,
@@ -483,6 +485,7 @@ def _build_and_send_report(chat_id: int, message_id: int,
         _caps = get_cap_impact_stats(since_ts) or {}
         for code, title in (("dir_cap", f"лимит одной стороны ({MAX_SAME_DIRECTION_POSITIONS})"),
                             ("scan_cap", f"лимит {VENUE_MAX_SIGNALS_PER_SCAN} за скан"),
+                            ("hour_cap", "лимит 2 сигнала за скользящий час"),
                             ("cooldown", f"повтор того же направления (<{SIGNAL_COOLDOWN_HOURS:g}ч)"),
                             ("send_failed", "⚠️ СБОЙ ОТПРАВКИ (баг, не лимит — должно быть 0)"),
                             ("stale_entry", "🏃 цена ушла из зоны до публикации"),
@@ -1305,6 +1308,7 @@ def _handle_admin_callback(callback_id: str, chat_id: int,
 
             _titles = {"dir_cap": f"Лимит одной стороны ({MAX_SAME_DIRECTION_POSITIONS})",
                        "scan_cap": f"Лимит {VENUE_MAX_SIGNALS_PER_SCAN} за скан",
+                       "hour_cap": "Лимит 2 сигнала за скользящий час",
                        "cooldown": f"Повтор того же направления (<{SIGNAL_COOLDOWN_HOURS:g}ч)",
                        "send_failed": "⚠️ Сбой отправки в Telegram",
                        "stale_entry": "🏃 Цена ушла из зоны (погоня)",
@@ -3742,7 +3746,169 @@ def _check_open_signals():
 
 
 
-# ── Shadow-outcome tracker (rejected + sent setups) ───────────────────────────
+# ── Exact counterfactual tracker for blocked venue setups ────────────────────
+def _fixed_be_counterfactual(setup: dict, candles: dict):
+    """Replay a fixed-runner setup with breakeven active from the next bar.
+
+    This mirrors the live monitor's stop-first ordering. On the candle that
+    first reaches TP1 the runner still uses the original stop; breakeven starts
+    on the following strategy candle. Returns a terminal tuple for the supplied
+    bars, or an EXPIRED mark when no bracket event occurs.
+    """
+    direction = str(setup["direction"])
+    sign = 1.0 if direction == "LONG" else -1.0
+    entry = float(setup["entry_price"])
+    stop = float(setup["sl"])
+    tp1 = float(setup["tp1"])
+    tp2 = float(setup["tp2"])
+    risk = abs(entry - stop)
+    if risk <= 0:
+        raise ValueError("blocked setup has no positive stop distance")
+    fraction = max(0.0, min(1.0, float(
+        setup.get("strategy_tp1_close_frac") or 0.0)))
+    tp1_r = sign * (tp1 - entry) / risk
+    tp2_r = sign * (tp2 - entry) / risk
+    stop_on_close = bool(setup.get("strategy_stop_on_close"))
+    reached = False
+    activation_index = None
+    banked = 0.0
+
+    for i in range(len(candles.get("time") or [])):
+        o = float(candles["open"][i])
+        h = float(candles["high"][i])
+        l = float(candles["low"][i])
+        c = float(candles["close"][i])
+        active_stop = entry if reached and i > int(activation_index) else stop
+        stop_hit = (c <= active_stop if sign > 0 else c >= active_stop)
+        if not stop_on_close:
+            stop_hit = l <= active_stop if sign > 0 else h >= active_stop
+        if stop_hit:
+            fill = (min(o, active_stop) if sign > 0
+                    else max(o, active_stop))
+            runner_r = sign * (fill - entry) / risk
+            net_r = banked + (1.0 - fraction) * runner_r if reached else runner_r
+            return ("TP1" if reached else "SL", int(reached), 0, net_r)
+
+        target2_hit = h >= tp2 if sign > 0 else l <= tp2
+        if target2_hit:
+            if not reached:
+                banked = fraction * tp1_r
+            net_r = banked + (1.0 - fraction) * tp2_r
+            return "TP2", 1, 1, net_r
+
+        target1_hit = h >= tp1 if sign > 0 else l <= tp1
+        if not reached and target1_hit:
+            reached = True
+            activation_index = i
+            banked = fraction * tp1_r
+            if fraction >= 1.0:
+                return "TP1", 1, 0, banked
+
+    last_close = float(candles["close"][-1])
+    if reached:
+        # The runner is still open. The caller decides whether the persisted
+        # horizon has actually ended; resolving TP1 here would discard a later
+        # TP2 or breakeven on the next scheduler pass.
+        return "PENDING_TP1", 1, 0, banked
+    return "EXPIRED", 0, 0, sign * (last_close - entry) / risk
+
+
+def _resolve_unsent_venue_setup(setup: dict, candles: dict,
+                                now: float | None = None):
+    """Resolve one capped market entry under its persisted execution contract."""
+    now = time.time() if now is None else float(now)
+    bar_seconds = int(setup.get("strategy_bar_seconds") or 0)
+    max_bars = int(setup.get("strategy_max_bars") or 0)
+    entry_bar = float(setup.get("strategy_entry_bar_ts") or 0.0)
+    if bar_seconds <= 0 or max_bars <= 0 or entry_bar <= 0:
+        return None
+    sliced = _slice_candles_from_open(candles, entry_bar)
+    expire_at = float(setup.get("strategy_expire_at") or 0.0)
+    if expire_at:
+        keep = [i for i, stamp in enumerate(sliced.get("time") or [])
+                if float(stamp) < expire_at]
+        sliced = {key: [values[i] for i in keep]
+                  for key, values in sliced.items()}
+    if not sliced.get("time"):
+        return None
+    sliced = {key: values[:max_bars] for key, values in sliced.items()}
+
+    runner_mode = str(setup.get("strategy_runner_mode") or "").lower()
+    if runner_mode == "fixed_be":
+        value = _fixed_be_counterfactual(setup, sliced)
+    else:
+        result = simulate_exit(
+            sliced, range(len(sliced["time"])),
+            direction=setup["direction"],
+            entry=float(setup["entry_price"]), sl=float(setup["sl"]),
+            tp1=float(setup["tp1"]), tp2=float(setup["tp2"]),
+            atr=float(setup.get("atr") or abs(
+                float(setup["entry_price"]) - float(setup["sl"]))),
+            tp1_fraction=1.0, trail=False, trail_mult=0.0,
+            stop_on_close=bool(setup.get("strategy_stop_on_close")),
+            backstop_r=STOP_EXCHANGE_BACKSTOP_R,
+            choose_trail=lambda _h, _l, _c: 0.0,
+        )
+        value = (result.outcome, int(result.reached_tp1),
+                 int(result.outcome == "TP2"), result.gross_r)
+
+    if value[0] not in {"EXPIRED", "PENDING_TP1"}:
+        return value
+    horizon_end = entry_bar + max_bars * bar_seconds
+    terminal = (len(sliced["time"]) >= max_bars and now >= horizon_end)
+    if expire_at:
+        terminal = terminal or now >= expire_at
+    if not terminal:
+        return None
+    if value[0] == "PENDING_TP1":
+        return "TP1", value[1], value[2], value[3]
+    return value
+
+
+def _track_blocked_venue_setups() -> None:
+    """Resolve capped paper entries on the same X-Perp bars as live signals."""
+    try:
+        pending = get_unresolved_venue_setups(limit=200)
+        if not pending:
+            return
+        grouped: dict[tuple[str, int], list[dict]] = {}
+        for row in pending:
+            key = (str(row["symbol"]), int(row["strategy_bar_seconds"]))
+            grouped.setdefault(key, []).append(row)
+        resolved = 0
+        now = time.time()
+        interval_for = {300: "5m", 900: "15m", 3600: "1H"}
+        for (symbol, bar_seconds), rows in grouped.items():
+            interval = interval_for.get(bar_seconds)
+            if not interval:
+                log.warning("Blocked setup tracker: unsupported %ss bars for %s",
+                            bar_seconds, symbol)
+                continue
+            oldest = min(float(row["strategy_entry_bar_ts"]) for row in rows)
+            age_bars = max(0, int((now - oldest) // bar_seconds) + 3)
+            needed = max(age_bars,
+                         max(int(row["strategy_max_bars"]) for row in rows) + 3)
+            candles = get_klines_xperp(
+                symbol, limit=min(2000, needed), include_forming=False,
+                interval=interval)
+            if not candles:
+                continue
+            for row in rows:
+                value = _resolve_unsent_venue_setup(row, candles, now=now)
+                if value is None:
+                    continue
+                outcome, reached_tp1, reached_tp2, net_r = value
+                mark_setup_resolved(
+                    row["id"], outcome, reached_tp1, reached_tp2,
+                    net_r=net_r)
+                resolved += 1
+        if resolved:
+            log.info("Blocked venue tracker: resolved %s setup outcome(s)",
+                     resolved)
+    except Exception as exc:
+        log.warning("Blocked venue tracker failed: %s", exc)
+
+
 # ── Main scanning function ────────────────────────────────────────────────────
 _OI_MIN_DELTA_PCT = 0.3  # ignore OI moves below this (noise floor)
 _MAX_VENUE_ENTRY_DELAY_SEC = SCAN_INTERVAL_MINUTES * 60 + 90
@@ -4459,9 +4625,14 @@ def start_bot():
         timezone="UTC",
     )
 
-    # Zone watch and the Claude outcome tracker went with the SMC scan: the venue
-    # path enters at market, so nothing is ever parked in a zone waiting for a
-    # touch, and nothing asks Claude for a verdict that would need scoring later.
+    # The venue path enters at market, so no zone watcher is needed. Capped
+    # candidates still need exact paper outcomes: otherwise the correlation and
+    # hourly limits can never be measured and the admin report quietly lies.
+    scheduler.add_job(
+        _track_blocked_venue_setups, "cron",
+        minute="3,18,33,48",
+        timezone="UTC",
+    )
 
     # Profit sweep — hourly check, but PROFIT_SWEEP_MIN_GAP_H is what actually
     # decides how often a user hears from it. Offer only; nothing is bought
