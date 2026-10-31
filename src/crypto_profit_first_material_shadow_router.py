@@ -16,10 +16,6 @@ from src.crypto_venue_router import (
     btc_context, family_signals,
 )
 from src.portable_hgb import score_named
-from src.tp1_volume_bank import (
-    EXTRA_CLOSE_FRACTION as TP1_VOLUME_EXTRA_CLOSE_FRACTION,
-    VOLUME_RATIO_THRESHOLD as TP1_VOLUME_RATIO_THRESHOLD,
-)
 
 
 ARTIFACT_PATH = Path(__file__).with_name(
@@ -176,8 +172,6 @@ def shadow_setups(candles: dict, btc_candles: dict, *, entry_time: float,
             "target_r": near_r,
             "runner_target_r": runner_r,
             "tp1_close_fraction": float(MODEL["near_close_fraction"]),
-            "tp1_volume_ratio_threshold": TP1_VOLUME_RATIO_THRESHOLD,
-            "tp1_volume_extra_close_fraction": TP1_VOLUME_EXTRA_CLOSE_FRACTION,
             "hold_bars": int(MODEL["hold_bars"]),
             "model_quality": probability,
             "risk_pct": risk_pct,

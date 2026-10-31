@@ -67,7 +67,6 @@ from src.result_summary import format_results_message
 from src.db import (
     init_db, get_open_signals, update_signal_status, get_stats, set_sl_xperp_only,
     record_tp1_volume_observation,
-    get_tp1_volume_forward_stats,
     get_sl_wick_stats, get_variant_rows, mark_setup_blocked, get_cap_impact_stats,
     get_skew_response_stats, get_all_setups_since, get_all_signals_since,
     get_active_symbol_blocks, unblock_symbol, set_symbol_block, get_symbols_performance,
@@ -2110,21 +2109,6 @@ def _paper_results_text(user_id: int) -> str:
     text = format_results_message(
         today, week, month, _riga_tz(), margin_pct, AUTOTRADE_LEVERAGE,
         configured=configured)
-    challenger = get_tp1_volume_forward_stats(
-        days=30, margin_pct=margin_pct, leverage=AUTOTRADE_LEVERAGE)
-    if challenger["n"]:
-        text += (
-            "\n\n🧪 *Новый TP1 volume-bank — отдельный теневой счётчик*\n"
-            f"Закрыто новых парных наблюдений: *{challenger['n']}* · "
-            f"слабый объём: {challenger['weak_volume_banks']}\n"
-            f"Базовый выход: {challenger['baseline_return_pct']:+.2f}% · "
-            f"просадка {challenger['baseline_dd_pct']:.2f}% · "
-            f"прибыльных {challenger['baseline_win_rate']:.1f}%\n"
-            f"Volume-bank: *{challenger['candidate_return_pct']:+.2f}%* · "
-            f"просадка {challenger['candidate_dd_pct']:.2f}% · "
-            f"прибыльных {challenger['candidate_win_rate']:.1f}%\n"
-            "Сравнение идёт на одинаковых PAPER-сделках и пока не управляет ордерами."
-        )
     return text
 
 
@@ -3970,8 +3954,6 @@ def _venue_analysis(symbol: str, setup: dict, btc_change: float = 0.0) -> dict:
             f"{(1-tp1_close_fraction) * 100:.0f}% @ +{runner_move_pct:.2f}%")
     if profit_first:
         tags.append(f"Frozen material HGB quality {float(setup['model_quality']):.4f}")
-        tags.append(
-            "Shadow TP1 volume bank: extra 75% at candle close below 1.5x volume")
     return {
         "symbol": symbol, "direction": direction, "decision": direction,
         "confidence": "HIGH", "risk_score": 1,
@@ -3988,12 +3970,11 @@ def _venue_analysis(symbol: str, setup: dict, btc_change: float = 0.0) -> dict:
                                   if fixed_runner else None),
         "strategy_tp1_close_frac": (tp1_close_fraction
                                     if fixed_runner else None),
-        "strategy_tp1_volume_threshold": (
-            float(setup.get("tp1_volume_ratio_threshold", 1.5))
-            if profit_first else None),
-        "strategy_tp1_extra_close_frac": (
-            float(setup.get("tp1_volume_extra_close_fraction", .75))
-            if profit_first else None),
+        # The TP1 volume-bank challenger failed the first genuinely new
+        # return non-inferiority gate on 2026-10-31.  Keep the historical DB
+        # columns readable, but stop scheduling observations for new signals.
+        "strategy_tp1_volume_threshold": None,
+        "strategy_tp1_extra_close_frac": None,
         "strategy_runner_mode": ("fixed_be"
                                  if fixed_runner else None),
         "strategy_bar_seconds": (300 if five_minute_oi else
