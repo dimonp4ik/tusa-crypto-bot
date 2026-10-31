@@ -1,4 +1,8 @@
-from shared_account_dual_bot_oct31_audit import account_metrics, shared_gate
+import json
+
+from shared_account_dual_bot_oct31_audit import (
+    CRYPTO_ROWS, REPORT, account_metrics, shared_gate,
+)
 
 
 def row(bot, symbol, direction, entry, exit_, ret=0.01, quality=1.0):
@@ -42,3 +46,12 @@ def test_account_metrics_uses_shared_equity():
     assert result["return_pct"] == 6.09
     assert result["by_bot"]["crypto"]["account_contribution_pct"] == 3.0
     assert result["by_bot"]["stocks"]["account_contribution_pct"] == 3.09
+
+
+def test_shared_report_uses_latest_exact_crypto_snapshot_and_exchange_guard():
+    report = json.loads(REPORT.read_text(encoding="utf-8"))
+    assert "oct31_1700" in CRYPTO_ROWS.name
+    assert str(CRYPTO_ROWS) in report["sources"]
+    assert report["runtime_shared_cap"]["authoritative_source"] == (
+        "OKX /api/v5/account/positions")
+    assert report["runtime_shared_cap"]["configured_max_margin_fraction"] == .90

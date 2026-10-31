@@ -7,6 +7,7 @@ shared admission gate; it does not change either strategy or place orders.
 from __future__ import annotations
 
 import collections
+import hashlib
 import heapq
 import json
 import math
@@ -18,11 +19,15 @@ import pandas as pd
 
 ROOT = Path(__file__).resolve().parent
 STOCK_ROOT = Path(os.getenv("STOCK_BOT_REPO", ROOT.parent / "tusa stocks"))
-CRYPTO_ROWS = ROOT / "reports/audit_2026_09_08/crypto_profit_first_exact_oct30_2030.pkl"
+CRYPTO_ROWS = ROOT / "reports/audit_2026_09_08/crypto_profit_first_exact_oct31_1700.pkl"
 STOCK_ROWS = STOCK_ROOT / "reports/audit_2026_09_08/stock_xperp_regime_target_router_oct30_2000_forward.csv"
 REPORT = ROOT / "reports/audit_2026_09_08/shared_account_dual_bot_oct31.json"
 MARGIN_FRACTION = 0.03
 LEVERAGE = 10.0
+
+
+def digest(path: Path) -> str:
+    return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
 def load_rows() -> list[dict]:
@@ -252,7 +257,16 @@ def main() -> None:
                 "2026-10": "confirmation plus short append-only forward period",
             },
         },
-        "finding": "Separate Railway databases cannot enforce a shared account limit.",
+        "finding": (
+            "The services have separate databases, so the runtime now reads "
+            "all open OKX positions before entry and fails closed.  This "
+            "historical replay independently verifies the same 90% boundary."),
+        "runtime_shared_cap": {
+            "authoritative_source": "OKX /api/v5/account/positions",
+            "configured_max_margin_fraction": 0.90,
+            "cross_service_race_reservation": "one peer entry of the requested size",
+            "local_database_only_guard": False,
+        },
         "ungated_baseline": baseline,
         "authorized_90pct_margin_policy": authorized_margin_policy,
         "authorized_margin_cap_binding_in_sample": bool(
@@ -270,6 +284,11 @@ def main() -> None:
             "october_grid_policies_meeting_combined_target": sum(
                 item["worst_october_combined_pct"] >= 60 for item in robustness),
             "reason": "No tested common-cap policy reaches the requested target, and overlapping selection plus short forward data cannot prove a monthly guarantee.",
+        },
+        "sources": {
+            str(CRYPTO_ROWS): digest(CRYPTO_ROWS),
+            str(STOCK_ROWS): digest(STOCK_ROWS),
+            str(Path(__file__).resolve()): digest(Path(__file__).resolve()),
         },
     }
     REPORT.parent.mkdir(parents=True, exist_ok=True)

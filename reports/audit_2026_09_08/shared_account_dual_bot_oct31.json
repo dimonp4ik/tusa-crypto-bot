@@ -19,7 +19,13 @@
       "2026-10": "confirmation plus short append-only forward period"
     }
   },
-  "finding": "Separate Railway databases cannot enforce a shared account limit.",
+  "finding": "The services have separate databases, so the runtime now reads all open OKX positions before entry and fails closed.  This historical replay independently verifies the same 90% boundary.",
+  "runtime_shared_cap": {
+    "authoritative_source": "OKX /api/v5/account/positions",
+    "configured_max_margin_fraction": 0.9,
+    "cross_service_race_reservation": "one peer entry of the requested size",
+    "local_database_only_guard": false
+  },
   "ungated_baseline": {
     "limits": {
       "max_total": null,
@@ -2963,5 +2969,10 @@
     "october_grid_policies_meeting_each_bot_target": 0,
     "october_grid_policies_meeting_combined_target": 0,
     "reason": "No tested common-cap policy reaches the requested target, and overlapping selection plus short forward data cannot prove a monthly guarantee."
+  },
+  "sources": {
+    "C:\\Users\\Lenovo\\Desktop\\telegram bot\\reports\\audit_2026_09_08\\crypto_profit_first_exact_oct31_1700.pkl": "759ad01a5d5ad9cbe505e40366e571057a8f33f79d0493e43400c88ec13a0d42",
+    "C:\\Users\\Lenovo\\Desktop\\tusa stocks\\reports\\audit_2026_09_08\\stock_xperp_regime_target_router_oct30_2000_forward.csv": "3829ea9d542ce79b6d8e8831b4d45f8f8d99fc7a43848415f2f5b1d7c85679af",
+    "C:\\Users\\Lenovo\\Desktop\\telegram bot\\shared_account_dual_bot_oct31_audit.py": "9c2e867c48902a4e0918b6270109cfd1155ed7620ad7dce8a7d4b601374d1f98"
   }
 }
