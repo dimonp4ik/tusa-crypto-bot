@@ -1,0 +1,2967 @@
+{
+  "scope": {
+    "first_entry_utc": "2026-06-28T00:30:00+00:00",
+    "last_entry_utc": "2026-10-30T04:15:00+00:00",
+    "margin_fraction": 0.03,
+    "leverage": 10.0,
+    "authorized_total_margin_pct": 90.0,
+    "authorized_max_simultaneous_3pct_positions": 30,
+    "candidate_counts": {
+      "crypto": 646,
+      "stocks": 928
+    },
+    "fees_and_funding_included": false,
+    "period_interpretation": {
+      "2026-06": "partial overlap beginning June 28; not a full month",
+      "2026-07": "stock router selection period",
+      "2026-08": "stock router selection period",
+      "2026-09": "stock router held-out test period",
+      "2026-10": "confirmation plus short append-only forward period"
+    }
+  },
+  "finding": "Separate Railway databases cannot enforce a shared account limit.",
+  "ungated_baseline": {
+    "limits": {
+      "max_total": null,
+      "max_direction": null,
+      "max_rolling_hour": null,
+      "priority": "balanced"
+    },
+    "gate": {
+      "candidate_count": 1574,
+      "accepted_count": 1574,
+      "rejected": {},
+      "peak_open_positions": 12,
+      "peak_margin_occupied_pct_at_3pct_each": 36.0,
+      "peak_same_direction": 7
+    },
+    "metrics": {
+      "n": 1574,
+      "return_pct": 243.9958,
+      "max_drawdown_pct": 9.1844,
+      "max_loss_streak": 10,
+      "by_bot": {
+        "crypto": {
+          "n": 646,
+          "profitable_exit_rate_pct": 65.48,
+          "account_contribution_pct": 57.5151
+        },
+        "stocks": {
+          "n": 928,
+          "profitable_exit_rate_pct": 44.073,
+          "account_contribution_pct": 186.4807
+        }
+      },
+      "monthly": {
+        "2026-06": {
+          "combined_return_pct": -6.9927,
+          "crypto_contribution_pct": -0.651,
+          "stocks_contribution_pct": -6.3417
+        },
+        "2026-07": {
+          "combined_return_pct": 46.8474,
+          "crypto_contribution_pct": -0.8564,
+          "stocks_contribution_pct": 47.7039
+        },
+        "2026-08": {
+          "combined_return_pct": 24.8128,
+          "crypto_contribution_pct": 1.2399,
+          "stocks_contribution_pct": 23.5729
+        },
+        "2026-09": {
+          "combined_return_pct": 37.6118,
+          "crypto_contribution_pct": 7.5198,
+          "stocks_contribution_pct": 30.0919
+        },
+        "2026-10": {
+          "combined_return_pct": 46.6409,
+          "crypto_contribution_pct": 18.9486,
+          "stocks_contribution_pct": 27.6923
+        }
+      }
+    }
+  },
+  "authorized_90pct_margin_policy": {
+    "limits": {
+      "max_total": 30,
+      "max_direction": null,
+      "max_rolling_hour": null,
+      "priority": "balanced"
+    },
+    "gate": {
+      "candidate_count": 1574,
+      "accepted_count": 1574,
+      "rejected": {},
+      "peak_open_positions": 12,
+      "peak_margin_occupied_pct_at_3pct_each": 36.0,
+      "peak_same_direction": 7
+    },
+    "metrics": {
+      "n": 1574,
+      "return_pct": 243.9958,
+      "max_drawdown_pct": 9.1844,
+      "max_loss_streak": 10,
+      "by_bot": {
+        "crypto": {
+          "n": 646,
+          "profitable_exit_rate_pct": 65.48,
+          "account_contribution_pct": 57.5151
+        },
+        "stocks": {
+          "n": 928,
+          "profitable_exit_rate_pct": 44.073,
+          "account_contribution_pct": 186.4807
+        }
+      },
+      "monthly": {
+        "2026-06": {
+          "combined_return_pct": -6.9927,
+          "crypto_contribution_pct": -0.651,
+          "stocks_contribution_pct": -6.3417
+        },
+        "2026-07": {
+          "combined_return_pct": 46.8474,
+          "crypto_contribution_pct": -0.8564,
+          "stocks_contribution_pct": 47.7039
+        },
+        "2026-08": {
+          "combined_return_pct": 24.8128,
+          "crypto_contribution_pct": 1.2399,
+          "stocks_contribution_pct": 23.5729
+        },
+        "2026-09": {
+          "combined_return_pct": 37.6118,
+          "crypto_contribution_pct": 7.5198,
+          "stocks_contribution_pct": 30.0919
+        },
+        "2026-10": {
+          "combined_return_pct": 46.6409,
+          "crypto_contribution_pct": 18.9486,
+          "stocks_contribution_pct": 27.6923
+        }
+      }
+    }
+  },
+  "authorized_margin_cap_binding_in_sample": false,
+  "lowest_drawdown_frontier": [
+    {
+      "limits": {
+        "max_total": 3,
+        "max_direction": 2,
+        "max_rolling_hour": 4,
+        "priority": "crypto_first"
+      },
+      "gate": {
+        "candidate_count": 1574,
+        "accepted_count": 841,
+        "rejected": {
+          "direction_cap": 230,
+          "total_cap": 503
+        },
+        "peak_open_positions": 3,
+        "peak_margin_occupied_pct_at_3pct_each": 9.0,
+        "peak_same_direction": 2
+      },
+      "metrics": {
+        "n": 841,
+        "return_pct": 71.2372,
+        "max_drawdown_pct": 4.6409,
+        "max_loss_streak": 10,
+        "by_bot": {
+          "crypto": {
+            "n": 454,
+            "profitable_exit_rate_pct": 64.978,
+            "account_contribution_pct": 16.4225
+          },
+          "stocks": {
+            "n": 387,
+            "profitable_exit_rate_pct": 44.186,
+            "account_contribution_pct": 54.8147
+          }
+        },
+        "monthly": {
+          "2026-06": {
+            "combined_return_pct": -3.7467,
+            "crypto_contribution_pct": -0.6585,
+            "stocks_contribution_pct": -3.0882
+          },
+          "2026-07": {
+            "combined_return_pct": 14.4476,
+            "crypto_contribution_pct": -3.1998,
+            "stocks_contribution_pct": 17.6475
+          },
+          "2026-08": {
+            "combined_return_pct": 8.9793,
+            "crypto_contribution_pct": 1.5877,
+            "stocks_contribution_pct": 7.3915
+          },
+          "2026-09": {
+            "combined_return_pct": 15.0532,
+            "crypto_contribution_pct": 5.3698,
+            "stocks_contribution_pct": 9.6833
+          },
+          "2026-10": {
+            "combined_return_pct": 23.9748,
+            "crypto_contribution_pct": 8.6629,
+            "stocks_contribution_pct": 15.3119
+          }
+        }
+      }
+    },
+    {
+      "limits": {
+        "max_total": 3,
+        "max_direction": 2,
+        "max_rolling_hour": 6,
+        "priority": "crypto_first"
+      },
+      "gate": {
+        "candidate_count": 1574,
+        "accepted_count": 841,
+        "rejected": {
+          "direction_cap": 230,
+          "total_cap": 503
+        },
+        "peak_open_positions": 3,
+        "peak_margin_occupied_pct_at_3pct_each": 9.0,
+        "peak_same_direction": 2
+      },
+      "metrics": {
+        "n": 841,
+        "return_pct": 71.2372,
+        "max_drawdown_pct": 4.6409,
+        "max_loss_streak": 10,
+        "by_bot": {
+          "crypto": {
+            "n": 454,
+            "profitable_exit_rate_pct": 64.978,
+            "account_contribution_pct": 16.4225
+          },
+          "stocks": {
+            "n": 387,
+            "profitable_exit_rate_pct": 44.186,
+            "account_contribution_pct": 54.8147
+          }
+        },
+        "monthly": {
+          "2026-06": {
+            "combined_return_pct": -3.7467,
+            "crypto_contribution_pct": -0.6585,
+            "stocks_contribution_pct": -3.0882
+          },
+          "2026-07": {
+            "combined_return_pct": 14.4476,
+            "crypto_contribution_pct": -3.1998,
+            "stocks_contribution_pct": 17.6475
+          },
+          "2026-08": {
+            "combined_return_pct": 8.9793,
+            "crypto_contribution_pct": 1.5877,
+            "stocks_contribution_pct": 7.3915
+          },
+          "2026-09": {
+            "combined_return_pct": 15.0532,
+            "crypto_contribution_pct": 5.3698,
+            "stocks_contribution_pct": 9.6833
+          },
+          "2026-10": {
+            "combined_return_pct": 23.9748,
+            "crypto_contribution_pct": 8.6629,
+            "stocks_contribution_pct": 15.3119
+          }
+        }
+      }
+    },
+    {
+      "limits": {
+        "max_total": 3,
+        "max_direction": 2,
+        "max_rolling_hour": 3,
+        "priority": "stocks_first"
+      },
+      "gate": {
+        "candidate_count": 1574,
+        "accepted_count": 831,
+        "rejected": {
+          "direction_cap": 238,
+          "rolling_hour_cap": 7,
+          "total_cap": 498
+        },
+        "peak_open_positions": 3,
+        "peak_margin_occupied_pct_at_3pct_each": 9.0,
+        "peak_same_direction": 2
+      },
+      "metrics": {
+        "n": 831,
+        "return_pct": 70.7943,
+        "max_drawdown_pct": 4.6409,
+        "max_loss_streak": 10,
+        "by_bot": {
+          "crypto": {
+            "n": 439,
+            "profitable_exit_rate_pct": 64.692,
+            "account_contribution_pct": 14.5398
+          },
+          "stocks": {
+            "n": 392,
+            "profitable_exit_rate_pct": 44.643,
+            "account_contribution_pct": 56.2545
+          }
+        },
+        "monthly": {
+          "2026-06": {
+            "combined_return_pct": -3.7467,
+            "crypto_contribution_pct": -0.6585,
+            "stocks_contribution_pct": -3.0882
+          },
+          "2026-07": {
+            "combined_return_pct": 15.5403,
+            "crypto_contribution_pct": -2.93,
+            "stocks_contribution_pct": 18.4703
+          },
+          "2026-08": {
+            "combined_return_pct": 8.4629,
+            "crypto_contribution_pct": -0.0902,
+            "stocks_contribution_pct": 8.5531
+          },
+          "2026-09": {
+            "combined_return_pct": 15.0908,
+            "crypto_contribution_pct": 5.7186,
+            "stocks_contribution_pct": 9.3722
+          },
+          "2026-10": {
+            "combined_return_pct": 23.0275,
+            "crypto_contribution_pct": 8.0828,
+            "stocks_contribution_pct": 14.9448
+          }
+        }
+      }
+    },
+    {
+      "limits": {
+        "max_total": 3,
+        "max_direction": 2,
+        "max_rolling_hour": 4,
+        "priority": "balanced"
+      },
+      "gate": {
+        "candidate_count": 1574,
+        "accepted_count": 840,
+        "rejected": {
+          "direction_cap": 233,
+          "total_cap": 501
+        },
+        "peak_open_positions": 3,
+        "peak_margin_occupied_pct_at_3pct_each": 9.0,
+        "peak_same_direction": 2
+      },
+      "metrics": {
+        "n": 840,
+        "return_pct": 70.7091,
+        "max_drawdown_pct": 4.6409,
+        "max_loss_streak": 10,
+        "by_bot": {
+          "crypto": {
+            "n": 447,
+            "profitable_exit_rate_pct": 64.877,
+            "account_contribution_pct": 16.405
+          },
+          "stocks": {
+            "n": 393,
+            "profitable_exit_rate_pct": 44.02,
+            "account_contribution_pct": 54.3041
+          }
+        },
+        "monthly": {
+          "2026-06": {
+            "combined_return_pct": -3.7467,
+            "crypto_contribution_pct": -0.6585,
+            "stocks_contribution_pct": -3.0882
+          },
+          "2026-07": {
+            "combined_return_pct": 14.4476,
+            "crypto_contribution_pct": -3.1998,
+            "stocks_contribution_pct": 17.6475
+          },
+          "2026-08": {
+            "combined_return_pct": 7.7104,
+            "crypto_contribution_pct": 0.9824,
+            "stocks_contribution_pct": 6.728
+          },
+          "2026-09": {
+            "combined_return_pct": 15.0908,
+            "crypto_contribution_pct": 5.7186,
+            "stocks_contribution_pct": 9.3722
+          },
+          "2026-10": {
+            "combined_return_pct": 25.0075,
+            "crypto_contribution_pct": 8.9895,
+            "stocks_contribution_pct": 16.018
+          }
+        }
+      }
+    },
+    {
+      "limits": {
+        "max_total": 3,
+        "max_direction": 2,
+        "max_rolling_hour": 6,
+        "priority": "balanced"
+      },
+      "gate": {
+        "candidate_count": 1574,
+        "accepted_count": 840,
+        "rejected": {
+          "direction_cap": 233,
+          "total_cap": 501
+        },
+        "peak_open_positions": 3,
+        "peak_margin_occupied_pct_at_3pct_each": 9.0,
+        "peak_same_direction": 2
+      },
+      "metrics": {
+        "n": 840,
+        "return_pct": 70.7091,
+        "max_drawdown_pct": 4.6409,
+        "max_loss_streak": 10,
+        "by_bot": {
+          "crypto": {
+            "n": 447,
+            "profitable_exit_rate_pct": 64.877,
+            "account_contribution_pct": 16.405
+          },
+          "stocks": {
+            "n": 393,
+            "profitable_exit_rate_pct": 44.02,
+            "account_contribution_pct": 54.3041
+          }
+        },
+        "monthly": {
+          "2026-06": {
+            "combined_return_pct": -3.7467,
+            "crypto_contribution_pct": -0.6585,
+            "stocks_contribution_pct": -3.0882
+          },
+          "2026-07": {
+            "combined_return_pct": 14.4476,
+            "crypto_contribution_pct": -3.1998,
+            "stocks_contribution_pct": 17.6475
+          },
+          "2026-08": {
+            "combined_return_pct": 7.7104,
+            "crypto_contribution_pct": 0.9824,
+            "stocks_contribution_pct": 6.728
+          },
+          "2026-09": {
+            "combined_return_pct": 15.0908,
+            "crypto_contribution_pct": 5.7186,
+            "stocks_contribution_pct": 9.3722
+          },
+          "2026-10": {
+            "combined_return_pct": 25.0075,
+            "crypto_contribution_pct": 8.9895,
+            "stocks_contribution_pct": 16.018
+          }
+        }
+      }
+    },
+    {
+      "limits": {
+        "max_total": 3,
+        "max_direction": 2,
+        "max_rolling_hour": 3,
+        "priority": "crypto_first"
+      },
+      "gate": {
+        "candidate_count": 1574,
+        "accepted_count": 836,
+        "rejected": {
+          "direction_cap": 232,
+          "rolling_hour_cap": 7,
+          "total_cap": 499
+        },
+        "peak_open_positions": 3,
+        "peak_margin_occupied_pct_at_3pct_each": 9.0,
+        "peak_same_direction": 2
+      },
+      "metrics": {
+        "n": 836,
+        "return_pct": 70.0128,
+        "max_drawdown_pct": 4.6409,
+        "max_loss_streak": 10,
+        "by_bot": {
+          "crypto": {
+            "n": 451,
+            "profitable_exit_rate_pct": 64.967,
+            "account_contribution_pct": 15.4103
+          },
+          "stocks": {
+            "n": 385,
+            "profitable_exit_rate_pct": 44.416,
+            "account_contribution_pct": 54.6025
+          }
+        },
+        "monthly": {
+          "2026-06": {
+            "combined_return_pct": -3.7467,
+            "crypto_contribution_pct": -0.6585,
+            "stocks_contribution_pct": -3.0882
+          },
+          "2026-07": {
+            "combined_return_pct": 15.4498,
+            "crypto_contribution_pct": -2.9096,
+            "stocks_contribution_pct": 18.3594
+          },
+          "2026-08": {
+            "combined_return_pct": 7.8947,
+            "crypto_contribution_pct": 1.5554,
+            "stocks_contribution_pct": 6.3393
+          },
+          "2026-09": {
+            "combined_return_pct": 15.0532,
+            "crypto_contribution_pct": 5.3698,
+            "stocks_contribution_pct": 9.6833
+          },
+          "2026-10": {
+            "combined_return_pct": 23.2465,
+            "crypto_contribution_pct": 7.7587,
+            "stocks_contribution_pct": 15.4878
+          }
+        }
+      }
+    },
+    {
+      "limits": {
+        "max_total": 3,
+        "max_direction": 2,
+        "max_rolling_hour": 3,
+        "priority": "balanced"
+      },
+      "gate": {
+        "candidate_count": 1574,
+        "accepted_count": 835,
+        "rejected": {
+          "direction_cap": 235,
+          "rolling_hour_cap": 7,
+          "total_cap": 497
+        },
+        "peak_open_positions": 3,
+        "peak_margin_occupied_pct_at_3pct_each": 9.0,
+        "peak_same_direction": 2
+      },
+      "metrics": {
+        "n": 835,
+        "return_pct": 69.4886,
+        "max_drawdown_pct": 4.6409,
+        "max_loss_streak": 10,
+        "by_bot": {
+          "crypto": {
+            "n": 444,
+            "profitable_exit_rate_pct": 64.865,
+            "account_contribution_pct": 15.3973
+          },
+          "stocks": {
+            "n": 391,
+            "profitable_exit_rate_pct": 44.246,
+            "account_contribution_pct": 54.0913
+          }
+        },
+        "monthly": {
+          "2026-06": {
+            "combined_return_pct": -3.7467,
+            "crypto_contribution_pct": -0.6585,
+            "stocks_contribution_pct": -3.0882
+          },
+          "2026-07": {
+            "combined_return_pct": 15.4498,
+            "crypto_contribution_pct": -2.9096,
+            "stocks_contribution_pct": 18.3594
+          },
+          "2026-08": {
+            "combined_return_pct": 6.6385,
+            "crypto_contribution_pct": 0.9561,
+            "stocks_contribution_pct": 5.6824
+          },
+          "2026-09": {
+            "combined_return_pct": 15.0908,
+            "crypto_contribution_pct": 5.7186,
+            "stocks_contribution_pct": 9.3722
+          },
+          "2026-10": {
+            "combined_return_pct": 24.2731,
+            "crypto_contribution_pct": 8.0782,
+            "stocks_contribution_pct": 16.1949
+          }
+        }
+      }
+    },
+    {
+      "limits": {
+        "max_total": 3,
+        "max_direction": 2,
+        "max_rolling_hour": 4,
+        "priority": "stocks_first"
+      },
+      "gate": {
+        "candidate_count": 1574,
+        "accepted_count": 836,
+        "rejected": {
+          "direction_cap": 236,
+          "total_cap": 502
+        },
+        "peak_open_positions": 3,
+        "peak_margin_occupied_pct_at_3pct_each": 9.0,
+        "peak_same_direction": 2
+      },
+      "metrics": {
+        "n": 836,
+        "return_pct": 69.1563,
+        "max_drawdown_pct": 4.6409,
+        "max_loss_streak": 10,
+        "by_bot": {
+          "crypto": {
+            "n": 442,
+            "profitable_exit_rate_pct": 64.706,
+            "account_contribution_pct": 15.2274
+          },
+          "stocks": {
+            "n": 394,
+            "profitable_exit_rate_pct": 44.162,
+            "account_contribution_pct": 53.9289
+          }
+        },
+        "monthly": {
+          "2026-06": {
+            "combined_return_pct": -3.7467,
+            "crypto_contribution_pct": -0.6585,
+            "stocks_contribution_pct": -3.0882
+          },
+          "2026-07": {
+            "combined_return_pct": 14.5374,
+            "crypto_contribution_pct": -3.22,
+            "stocks_contribution_pct": 17.7574
+          },
+          "2026-08": {
+            "combined_return_pct": 7.7267,
+            "crypto_contribution_pct": -0.0795,
+            "stocks_contribution_pct": 7.8062
+          },
+          "2026-09": {
+            "combined_return_pct": 15.0908,
+            "crypto_contribution_pct": 5.7186,
+            "stocks_contribution_pct": 9.3722
+          },
+          "2026-10": {
+            "combined_return_pct": 23.7546,
+            "crypto_contribution_pct": 8.9849,
+            "stocks_contribution_pct": 14.7696
+          }
+        }
+      }
+    },
+    {
+      "limits": {
+        "max_total": 3,
+        "max_direction": 2,
+        "max_rolling_hour": 6,
+        "priority": "stocks_first"
+      },
+      "gate": {
+        "candidate_count": 1574,
+        "accepted_count": 836,
+        "rejected": {
+          "direction_cap": 236,
+          "total_cap": 502
+        },
+        "peak_open_positions": 3,
+        "peak_margin_occupied_pct_at_3pct_each": 9.0,
+        "peak_same_direction": 2
+      },
+      "metrics": {
+        "n": 836,
+        "return_pct": 69.1563,
+        "max_drawdown_pct": 4.6409,
+        "max_loss_streak": 10,
+        "by_bot": {
+          "crypto": {
+            "n": 442,
+            "profitable_exit_rate_pct": 64.706,
+            "account_contribution_pct": 15.2274
+          },
+          "stocks": {
+            "n": 394,
+            "profitable_exit_rate_pct": 44.162,
+            "account_contribution_pct": 53.9289
+          }
+        },
+        "monthly": {
+          "2026-06": {
+            "combined_return_pct": -3.7467,
+            "crypto_contribution_pct": -0.6585,
+            "stocks_contribution_pct": -3.0882
+          },
+          "2026-07": {
+            "combined_return_pct": 14.5374,
+            "crypto_contribution_pct": -3.22,
+            "stocks_contribution_pct": 17.7574
+          },
+          "2026-08": {
+            "combined_return_pct": 7.7267,
+            "crypto_contribution_pct": -0.0795,
+            "stocks_contribution_pct": 7.8062
+          },
+          "2026-09": {
+            "combined_return_pct": 15.0908,
+            "crypto_contribution_pct": 5.7186,
+            "stocks_contribution_pct": 9.3722
+          },
+          "2026-10": {
+            "combined_return_pct": 23.7546,
+            "crypto_contribution_pct": 8.9849,
+            "stocks_contribution_pct": 14.7696
+          }
+        }
+      }
+    },
+    {
+      "limits": {
+        "max_total": 4,
+        "max_direction": 2,
+        "max_rolling_hour": 4,
+        "priority": "balanced"
+      },
+      "gate": {
+        "candidate_count": 1574,
+        "accepted_count": 928,
+        "rejected": {
+          "direction_cap": 387,
+          "total_cap": 259
+        },
+        "peak_open_positions": 4,
+        "peak_margin_occupied_pct_at_3pct_each": 12.0,
+        "peak_same_direction": 2
+      },
+      "metrics": {
+        "n": 928,
+        "return_pct": 102.1581,
+        "max_drawdown_pct": 5.0777,
+        "max_loss_streak": 10,
+        "by_bot": {
+          "crypto": {
+            "n": 458,
+            "profitable_exit_rate_pct": 66.157,
+            "account_contribution_pct": 26.7186
+          },
+          "stocks": {
+            "n": 470,
+            "profitable_exit_rate_pct": 44.255,
+            "account_contribution_pct": 75.4395
+          }
+        },
+        "monthly": {
+          "2026-06": {
+            "combined_return_pct": -3.7467,
+            "crypto_contribution_pct": -0.6585,
+            "stocks_contribution_pct": -3.0882
+          },
+          "2026-07": {
+            "combined_return_pct": 13.4021,
+            "crypto_contribution_pct": -2.6908,
+            "stocks_contribution_pct": 16.0929
+          },
+          "2026-08": {
+            "combined_return_pct": 17.6527,
+            "crypto_contribution_pct": 3.13,
+            "stocks_contribution_pct": 14.5227
+          },
+          "2026-09": {
+            "combined_return_pct": 22.2463,
+            "crypto_contribution_pct": 8.497,
+            "stocks_contribution_pct": 13.7493
+          },
+          "2026-10": {
+            "combined_return_pct": 28.7706,
+            "crypto_contribution_pct": 9.9615,
+            "stocks_contribution_pct": 18.8092
+          }
+        }
+      }
+    },
+    {
+      "limits": {
+        "max_total": 4,
+        "max_direction": 2,
+        "max_rolling_hour": 6,
+        "priority": "balanced"
+      },
+      "gate": {
+        "candidate_count": 1574,
+        "accepted_count": 928,
+        "rejected": {
+          "direction_cap": 387,
+          "total_cap": 259
+        },
+        "peak_open_positions": 4,
+        "peak_margin_occupied_pct_at_3pct_each": 12.0,
+        "peak_same_direction": 2
+      },
+      "metrics": {
+        "n": 928,
+        "return_pct": 102.1581,
+        "max_drawdown_pct": 5.0777,
+        "max_loss_streak": 10,
+        "by_bot": {
+          "crypto": {
+            "n": 458,
+            "profitable_exit_rate_pct": 66.157,
+            "account_contribution_pct": 26.7186
+          },
+          "stocks": {
+            "n": 470,
+            "profitable_exit_rate_pct": 44.255,
+            "account_contribution_pct": 75.4395
+          }
+        },
+        "monthly": {
+          "2026-06": {
+            "combined_return_pct": -3.7467,
+            "crypto_contribution_pct": -0.6585,
+            "stocks_contribution_pct": -3.0882
+          },
+          "2026-07": {
+            "combined_return_pct": 13.4021,
+            "crypto_contribution_pct": -2.6908,
+            "stocks_contribution_pct": 16.0929
+          },
+          "2026-08": {
+            "combined_return_pct": 17.6527,
+            "crypto_contribution_pct": 3.13,
+            "stocks_contribution_pct": 14.5227
+          },
+          "2026-09": {
+            "combined_return_pct": 22.2463,
+            "crypto_contribution_pct": 8.497,
+            "stocks_contribution_pct": 13.7493
+          },
+          "2026-10": {
+            "combined_return_pct": 28.7706,
+            "crypto_contribution_pct": 9.9615,
+            "stocks_contribution_pct": 18.8092
+          }
+        }
+      }
+    },
+    {
+      "limits": {
+        "max_total": 5,
+        "max_direction": 2,
+        "max_rolling_hour": 4,
+        "priority": "balanced"
+      },
+      "gate": {
+        "candidate_count": 1574,
+        "accepted_count": 928,
+        "rejected": {
+          "direction_cap": 646
+        },
+        "peak_open_positions": 4,
+        "peak_margin_occupied_pct_at_3pct_each": 12.0,
+        "peak_same_direction": 2
+      },
+      "metrics": {
+        "n": 928,
+        "return_pct": 102.1581,
+        "max_drawdown_pct": 5.0777,
+        "max_loss_streak": 10,
+        "by_bot": {
+          "crypto": {
+            "n": 458,
+            "profitable_exit_rate_pct": 66.157,
+            "account_contribution_pct": 26.7186
+          },
+          "stocks": {
+            "n": 470,
+            "profitable_exit_rate_pct": 44.255,
+            "account_contribution_pct": 75.4395
+          }
+        },
+        "monthly": {
+          "2026-06": {
+            "combined_return_pct": -3.7467,
+            "crypto_contribution_pct": -0.6585,
+            "stocks_contribution_pct": -3.0882
+          },
+          "2026-07": {
+            "combined_return_pct": 13.4021,
+            "crypto_contribution_pct": -2.6908,
+            "stocks_contribution_pct": 16.0929
+          },
+          "2026-08": {
+            "combined_return_pct": 17.6527,
+            "crypto_contribution_pct": 3.13,
+            "stocks_contribution_pct": 14.5227
+          },
+          "2026-09": {
+            "combined_return_pct": 22.2463,
+            "crypto_contribution_pct": 8.497,
+            "stocks_contribution_pct": 13.7493
+          },
+          "2026-10": {
+            "combined_return_pct": 28.7706,
+            "crypto_contribution_pct": 9.9615,
+            "stocks_contribution_pct": 18.8092
+          }
+        }
+      }
+    },
+    {
+      "limits": {
+        "max_total": 5,
+        "max_direction": 2,
+        "max_rolling_hour": 6,
+        "priority": "balanced"
+      },
+      "gate": {
+        "candidate_count": 1574,
+        "accepted_count": 928,
+        "rejected": {
+          "direction_cap": 646
+        },
+        "peak_open_positions": 4,
+        "peak_margin_occupied_pct_at_3pct_each": 12.0,
+        "peak_same_direction": 2
+      },
+      "metrics": {
+        "n": 928,
+        "return_pct": 102.1581,
+        "max_drawdown_pct": 5.0777,
+        "max_loss_streak": 10,
+        "by_bot": {
+          "crypto": {
+            "n": 458,
+            "profitable_exit_rate_pct": 66.157,
+            "account_contribution_pct": 26.7186
+          },
+          "stocks": {
+            "n": 470,
+            "profitable_exit_rate_pct": 44.255,
+            "account_contribution_pct": 75.4395
+          }
+        },
+        "monthly": {
+          "2026-06": {
+            "combined_return_pct": -3.7467,
+            "crypto_contribution_pct": -0.6585,
+            "stocks_contribution_pct": -3.0882
+          },
+          "2026-07": {
+            "combined_return_pct": 13.4021,
+            "crypto_contribution_pct": -2.6908,
+            "stocks_contribution_pct": 16.0929
+          },
+          "2026-08": {
+            "combined_return_pct": 17.6527,
+            "crypto_contribution_pct": 3.13,
+            "stocks_contribution_pct": 14.5227
+          },
+          "2026-09": {
+            "combined_return_pct": 22.2463,
+            "crypto_contribution_pct": 8.497,
+            "stocks_contribution_pct": 13.7493
+          },
+          "2026-10": {
+            "combined_return_pct": 28.7706,
+            "crypto_contribution_pct": 9.9615,
+            "stocks_contribution_pct": 18.8092
+          }
+        }
+      }
+    },
+    {
+      "limits": {
+        "max_total": 6,
+        "max_direction": 2,
+        "max_rolling_hour": 4,
+        "priority": "balanced"
+      },
+      "gate": {
+        "candidate_count": 1574,
+        "accepted_count": 928,
+        "rejected": {
+          "direction_cap": 646
+        },
+        "peak_open_positions": 4,
+        "peak_margin_occupied_pct_at_3pct_each": 12.0,
+        "peak_same_direction": 2
+      },
+      "metrics": {
+        "n": 928,
+        "return_pct": 102.1581,
+        "max_drawdown_pct": 5.0777,
+        "max_loss_streak": 10,
+        "by_bot": {
+          "crypto": {
+            "n": 458,
+            "profitable_exit_rate_pct": 66.157,
+            "account_contribution_pct": 26.7186
+          },
+          "stocks": {
+            "n": 470,
+            "profitable_exit_rate_pct": 44.255,
+            "account_contribution_pct": 75.4395
+          }
+        },
+        "monthly": {
+          "2026-06": {
+            "combined_return_pct": -3.7467,
+            "crypto_contribution_pct": -0.6585,
+            "stocks_contribution_pct": -3.0882
+          },
+          "2026-07": {
+            "combined_return_pct": 13.4021,
+            "crypto_contribution_pct": -2.6908,
+            "stocks_contribution_pct": 16.0929
+          },
+          "2026-08": {
+            "combined_return_pct": 17.6527,
+            "crypto_contribution_pct": 3.13,
+            "stocks_contribution_pct": 14.5227
+          },
+          "2026-09": {
+            "combined_return_pct": 22.2463,
+            "crypto_contribution_pct": 8.497,
+            "stocks_contribution_pct": 13.7493
+          },
+          "2026-10": {
+            "combined_return_pct": 28.7706,
+            "crypto_contribution_pct": 9.9615,
+            "stocks_contribution_pct": 18.8092
+          }
+        }
+      }
+    },
+    {
+      "limits": {
+        "max_total": 6,
+        "max_direction": 2,
+        "max_rolling_hour": 6,
+        "priority": "balanced"
+      },
+      "gate": {
+        "candidate_count": 1574,
+        "accepted_count": 928,
+        "rejected": {
+          "direction_cap": 646
+        },
+        "peak_open_positions": 4,
+        "peak_margin_occupied_pct_at_3pct_each": 12.0,
+        "peak_same_direction": 2
+      },
+      "metrics": {
+        "n": 928,
+        "return_pct": 102.1581,
+        "max_drawdown_pct": 5.0777,
+        "max_loss_streak": 10,
+        "by_bot": {
+          "crypto": {
+            "n": 458,
+            "profitable_exit_rate_pct": 66.157,
+            "account_contribution_pct": 26.7186
+          },
+          "stocks": {
+            "n": 470,
+            "profitable_exit_rate_pct": 44.255,
+            "account_contribution_pct": 75.4395
+          }
+        },
+        "monthly": {
+          "2026-06": {
+            "combined_return_pct": -3.7467,
+            "crypto_contribution_pct": -0.6585,
+            "stocks_contribution_pct": -3.0882
+          },
+          "2026-07": {
+            "combined_return_pct": 13.4021,
+            "crypto_contribution_pct": -2.6908,
+            "stocks_contribution_pct": 16.0929
+          },
+          "2026-08": {
+            "combined_return_pct": 17.6527,
+            "crypto_contribution_pct": 3.13,
+            "stocks_contribution_pct": 14.5227
+          },
+          "2026-09": {
+            "combined_return_pct": 22.2463,
+            "crypto_contribution_pct": 8.497,
+            "stocks_contribution_pct": 13.7493
+          },
+          "2026-10": {
+            "combined_return_pct": 28.7706,
+            "crypto_contribution_pct": 9.9615,
+            "stocks_contribution_pct": 18.8092
+          }
+        }
+      }
+    },
+    {
+      "limits": {
+        "max_total": 4,
+        "max_direction": 2,
+        "max_rolling_hour": 4,
+        "priority": "stocks_first"
+      },
+      "gate": {
+        "candidate_count": 1574,
+        "accepted_count": 928,
+        "rejected": {
+          "direction_cap": 383,
+          "total_cap": 263
+        },
+        "peak_open_positions": 4,
+        "peak_margin_occupied_pct_at_3pct_each": 12.0,
+        "peak_same_direction": 2
+      },
+      "metrics": {
+        "n": 928,
+        "return_pct": 100.9758,
+        "max_drawdown_pct": 5.0777,
+        "max_loss_streak": 10,
+        "by_bot": {
+          "crypto": {
+            "n": 456,
+            "profitable_exit_rate_pct": 66.009,
+            "account_contribution_pct": 26.522
+          },
+          "stocks": {
+            "n": 472,
+            "profitable_exit_rate_pct": 44.068,
+            "account_contribution_pct": 74.4538
+          }
+        },
+        "monthly": {
+          "2026-06": {
+            "combined_return_pct": -3.7467,
+            "crypto_contribution_pct": -0.6585,
+            "stocks_contribution_pct": -3.0882
+          },
+          "2026-07": {
+            "combined_return_pct": 13.0894,
+            "crypto_contribution_pct": -2.6942,
+            "stocks_contribution_pct": 15.7835
+          },
+          "2026-08": {
+            "combined_return_pct": 17.2882,
+            "crypto_contribution_pct": 3.1037,
+            "stocks_contribution_pct": 14.1845
+          },
+          "2026-09": {
+            "combined_return_pct": 22.2463,
+            "crypto_contribution_pct": 8.497,
+            "stocks_contribution_pct": 13.7493
+          },
+          "2026-10": {
+            "combined_return_pct": 28.7706,
+            "crypto_contribution_pct": 9.9615,
+            "stocks_contribution_pct": 18.8092
+          }
+        }
+      }
+    },
+    {
+      "limits": {
+        "max_total": 4,
+        "max_direction": 2,
+        "max_rolling_hour": 6,
+        "priority": "stocks_first"
+      },
+      "gate": {
+        "candidate_count": 1574,
+        "accepted_count": 928,
+        "rejected": {
+          "direction_cap": 383,
+          "total_cap": 263
+        },
+        "peak_open_positions": 4,
+        "peak_margin_occupied_pct_at_3pct_each": 12.0,
+        "peak_same_direction": 2
+      },
+      "metrics": {
+        "n": 928,
+        "return_pct": 100.9758,
+        "max_drawdown_pct": 5.0777,
+        "max_loss_streak": 10,
+        "by_bot": {
+          "crypto": {
+            "n": 456,
+            "profitable_exit_rate_pct": 66.009,
+            "account_contribution_pct": 26.522
+          },
+          "stocks": {
+            "n": 472,
+            "profitable_exit_rate_pct": 44.068,
+            "account_contribution_pct": 74.4538
+          }
+        },
+        "monthly": {
+          "2026-06": {
+            "combined_return_pct": -3.7467,
+            "crypto_contribution_pct": -0.6585,
+            "stocks_contribution_pct": -3.0882
+          },
+          "2026-07": {
+            "combined_return_pct": 13.0894,
+            "crypto_contribution_pct": -2.6942,
+            "stocks_contribution_pct": 15.7835
+          },
+          "2026-08": {
+            "combined_return_pct": 17.2882,
+            "crypto_contribution_pct": 3.1037,
+            "stocks_contribution_pct": 14.1845
+          },
+          "2026-09": {
+            "combined_return_pct": 22.2463,
+            "crypto_contribution_pct": 8.497,
+            "stocks_contribution_pct": 13.7493
+          },
+          "2026-10": {
+            "combined_return_pct": 28.7706,
+            "crypto_contribution_pct": 9.9615,
+            "stocks_contribution_pct": 18.8092
+          }
+        }
+      }
+    },
+    {
+      "limits": {
+        "max_total": 5,
+        "max_direction": 2,
+        "max_rolling_hour": 4,
+        "priority": "stocks_first"
+      },
+      "gate": {
+        "candidate_count": 1574,
+        "accepted_count": 928,
+        "rejected": {
+          "direction_cap": 646
+        },
+        "peak_open_positions": 4,
+        "peak_margin_occupied_pct_at_3pct_each": 12.0,
+        "peak_same_direction": 2
+      },
+      "metrics": {
+        "n": 928,
+        "return_pct": 100.9758,
+        "max_drawdown_pct": 5.0777,
+        "max_loss_streak": 10,
+        "by_bot": {
+          "crypto": {
+            "n": 456,
+            "profitable_exit_rate_pct": 66.009,
+            "account_contribution_pct": 26.522
+          },
+          "stocks": {
+            "n": 472,
+            "profitable_exit_rate_pct": 44.068,
+            "account_contribution_pct": 74.4538
+          }
+        },
+        "monthly": {
+          "2026-06": {
+            "combined_return_pct": -3.7467,
+            "crypto_contribution_pct": -0.6585,
+            "stocks_contribution_pct": -3.0882
+          },
+          "2026-07": {
+            "combined_return_pct": 13.0894,
+            "crypto_contribution_pct": -2.6942,
+            "stocks_contribution_pct": 15.7835
+          },
+          "2026-08": {
+            "combined_return_pct": 17.2882,
+            "crypto_contribution_pct": 3.1037,
+            "stocks_contribution_pct": 14.1845
+          },
+          "2026-09": {
+            "combined_return_pct": 22.2463,
+            "crypto_contribution_pct": 8.497,
+            "stocks_contribution_pct": 13.7493
+          },
+          "2026-10": {
+            "combined_return_pct": 28.7706,
+            "crypto_contribution_pct": 9.9615,
+            "stocks_contribution_pct": 18.8092
+          }
+        }
+      }
+    },
+    {
+      "limits": {
+        "max_total": 5,
+        "max_direction": 2,
+        "max_rolling_hour": 6,
+        "priority": "stocks_first"
+      },
+      "gate": {
+        "candidate_count": 1574,
+        "accepted_count": 928,
+        "rejected": {
+          "direction_cap": 646
+        },
+        "peak_open_positions": 4,
+        "peak_margin_occupied_pct_at_3pct_each": 12.0,
+        "peak_same_direction": 2
+      },
+      "metrics": {
+        "n": 928,
+        "return_pct": 100.9758,
+        "max_drawdown_pct": 5.0777,
+        "max_loss_streak": 10,
+        "by_bot": {
+          "crypto": {
+            "n": 456,
+            "profitable_exit_rate_pct": 66.009,
+            "account_contribution_pct": 26.522
+          },
+          "stocks": {
+            "n": 472,
+            "profitable_exit_rate_pct": 44.068,
+            "account_contribution_pct": 74.4538
+          }
+        },
+        "monthly": {
+          "2026-06": {
+            "combined_return_pct": -3.7467,
+            "crypto_contribution_pct": -0.6585,
+            "stocks_contribution_pct": -3.0882
+          },
+          "2026-07": {
+            "combined_return_pct": 13.0894,
+            "crypto_contribution_pct": -2.6942,
+            "stocks_contribution_pct": 15.7835
+          },
+          "2026-08": {
+            "combined_return_pct": 17.2882,
+            "crypto_contribution_pct": 3.1037,
+            "stocks_contribution_pct": 14.1845
+          },
+          "2026-09": {
+            "combined_return_pct": 22.2463,
+            "crypto_contribution_pct": 8.497,
+            "stocks_contribution_pct": 13.7493
+          },
+          "2026-10": {
+            "combined_return_pct": 28.7706,
+            "crypto_contribution_pct": 9.9615,
+            "stocks_contribution_pct": 18.8092
+          }
+        }
+      }
+    },
+    {
+      "limits": {
+        "max_total": 6,
+        "max_direction": 2,
+        "max_rolling_hour": 4,
+        "priority": "stocks_first"
+      },
+      "gate": {
+        "candidate_count": 1574,
+        "accepted_count": 928,
+        "rejected": {
+          "direction_cap": 646
+        },
+        "peak_open_positions": 4,
+        "peak_margin_occupied_pct_at_3pct_each": 12.0,
+        "peak_same_direction": 2
+      },
+      "metrics": {
+        "n": 928,
+        "return_pct": 100.9758,
+        "max_drawdown_pct": 5.0777,
+        "max_loss_streak": 10,
+        "by_bot": {
+          "crypto": {
+            "n": 456,
+            "profitable_exit_rate_pct": 66.009,
+            "account_contribution_pct": 26.522
+          },
+          "stocks": {
+            "n": 472,
+            "profitable_exit_rate_pct": 44.068,
+            "account_contribution_pct": 74.4538
+          }
+        },
+        "monthly": {
+          "2026-06": {
+            "combined_return_pct": -3.7467,
+            "crypto_contribution_pct": -0.6585,
+            "stocks_contribution_pct": -3.0882
+          },
+          "2026-07": {
+            "combined_return_pct": 13.0894,
+            "crypto_contribution_pct": -2.6942,
+            "stocks_contribution_pct": 15.7835
+          },
+          "2026-08": {
+            "combined_return_pct": 17.2882,
+            "crypto_contribution_pct": 3.1037,
+            "stocks_contribution_pct": 14.1845
+          },
+          "2026-09": {
+            "combined_return_pct": 22.2463,
+            "crypto_contribution_pct": 8.497,
+            "stocks_contribution_pct": 13.7493
+          },
+          "2026-10": {
+            "combined_return_pct": 28.7706,
+            "crypto_contribution_pct": 9.9615,
+            "stocks_contribution_pct": 18.8092
+          }
+        }
+      }
+    }
+  ],
+  "highest_return_frontier": [
+    {
+      "limits": {
+        "max_total": 6,
+        "max_direction": 4,
+        "max_rolling_hour": 6,
+        "priority": "balanced"
+      },
+      "gate": {
+        "candidate_count": 1574,
+        "accepted_count": 1315,
+        "rejected": {
+          "direction_cap": 75,
+          "total_cap": 184
+        },
+        "peak_open_positions": 6,
+        "peak_margin_occupied_pct_at_3pct_each": 18.0,
+        "peak_same_direction": 4
+      },
+      "metrics": {
+        "n": 1315,
+        "return_pct": 194.5414,
+        "max_drawdown_pct": 8.0205,
+        "max_loss_streak": 7,
+        "by_bot": {
+          "crypto": {
+            "n": 563,
+            "profitable_exit_rate_pct": 66.785,
+            "account_contribution_pct": 48.4126
+          },
+          "stocks": {
+            "n": 752,
+            "profitable_exit_rate_pct": 44.681,
+            "account_contribution_pct": 146.1287
+          }
+        },
+        "monthly": {
+          "2026-06": {
+            "combined_return_pct": -6.9927,
+            "crypto_contribution_pct": -0.651,
+            "stocks_contribution_pct": -6.3417
+          },
+          "2026-07": {
+            "combined_return_pct": 36.4603,
+            "crypto_contribution_pct": -1.9329,
+            "stocks_contribution_pct": 38.3933
+          },
+          "2026-08": {
+            "combined_return_pct": 23.6207,
+            "crypto_contribution_pct": 4.2007,
+            "stocks_contribution_pct": 19.4199
+          },
+          "2026-09": {
+            "combined_return_pct": 35.4313,
+            "crypto_contribution_pct": 11.0638,
+            "stocks_contribution_pct": 24.3674
+          },
+          "2026-10": {
+            "combined_return_pct": 38.6158,
+            "crypto_contribution_pct": 13.2578,
+            "stocks_contribution_pct": 25.358
+          }
+        }
+      }
+    },
+    {
+      "limits": {
+        "max_total": 6,
+        "max_direction": 4,
+        "max_rolling_hour": 6,
+        "priority": "crypto_first"
+      },
+      "gate": {
+        "candidate_count": 1574,
+        "accepted_count": 1315,
+        "rejected": {
+          "direction_cap": 75,
+          "total_cap": 184
+        },
+        "peak_open_positions": 6,
+        "peak_margin_occupied_pct_at_3pct_each": 18.0,
+        "peak_same_direction": 4
+      },
+      "metrics": {
+        "n": 1315,
+        "return_pct": 193.9373,
+        "max_drawdown_pct": 8.0205,
+        "max_loss_streak": 7,
+        "by_bot": {
+          "crypto": {
+            "n": 565,
+            "profitable_exit_rate_pct": 66.726,
+            "account_contribution_pct": 47.6179
+          },
+          "stocks": {
+            "n": 750,
+            "profitable_exit_rate_pct": 44.667,
+            "account_contribution_pct": 146.3194
+          }
+        },
+        "monthly": {
+          "2026-06": {
+            "combined_return_pct": -6.9927,
+            "crypto_contribution_pct": -0.651,
+            "stocks_contribution_pct": -6.3417
+          },
+          "2026-07": {
+            "combined_return_pct": 36.4603,
+            "crypto_contribution_pct": -1.9329,
+            "stocks_contribution_pct": 38.3933
+          },
+          "2026-08": {
+            "combined_return_pct": 23.6207,
+            "crypto_contribution_pct": 4.2007,
+            "stocks_contribution_pct": 19.4199
+          },
+          "2026-09": {
+            "combined_return_pct": 34.901,
+            "crypto_contribution_pct": 10.5805,
+            "stocks_contribution_pct": 24.3205
+          },
+          "2026-10": {
+            "combined_return_pct": 38.8753,
+            "crypto_contribution_pct": 13.2927,
+            "stocks_contribution_pct": 25.5826
+          }
+        }
+      }
+    },
+    {
+      "limits": {
+        "max_total": 6,
+        "max_direction": 4,
+        "max_rolling_hour": 3,
+        "priority": "crypto_first"
+      },
+      "gate": {
+        "candidate_count": 1574,
+        "accepted_count": 1273,
+        "rejected": {
+          "direction_cap": 63,
+          "rolling_hour_cap": 110,
+          "total_cap": 128
+        },
+        "peak_open_positions": 6,
+        "peak_margin_occupied_pct_at_3pct_each": 18.0,
+        "peak_same_direction": 4
+      },
+      "metrics": {
+        "n": 1273,
+        "return_pct": 193.1615,
+        "max_drawdown_pct": 8.8685,
+        "max_loss_streak": 7,
+        "by_bot": {
+          "crypto": {
+            "n": 563,
+            "profitable_exit_rate_pct": 65.719,
+            "account_contribution_pct": 47.1215
+          },
+          "stocks": {
+            "n": 710,
+            "profitable_exit_rate_pct": 45.493,
+            "account_contribution_pct": 146.04
+          }
+        },
+        "monthly": {
+          "2026-06": {
+            "combined_return_pct": -6.9927,
+            "crypto_contribution_pct": -0.651,
+            "stocks_contribution_pct": -6.3417
+          },
+          "2026-07": {
+            "combined_return_pct": 36.0451,
+            "crypto_contribution_pct": -2.4638,
+            "stocks_contribution_pct": 38.5089
+          },
+          "2026-08": {
+            "combined_return_pct": 24.9487,
+            "crypto_contribution_pct": 3.945,
+            "stocks_contribution_pct": 21.0037
+          },
+          "2026-09": {
+            "combined_return_pct": 33.6168,
+            "crypto_contribution_pct": 8.7746,
+            "stocks_contribution_pct": 24.8421
+          },
+          "2026-10": {
+            "combined_return_pct": 38.7759,
+            "crypto_contribution_pct": 14.7692,
+            "stocks_contribution_pct": 24.0067
+          }
+        }
+      }
+    },
+    {
+      "limits": {
+        "max_total": 6,
+        "max_direction": 4,
+        "max_rolling_hour": 6,
+        "priority": "stocks_first"
+      },
+      "gate": {
+        "candidate_count": 1574,
+        "accepted_count": 1314,
+        "rejected": {
+          "direction_cap": 73,
+          "total_cap": 187
+        },
+        "peak_open_positions": 6,
+        "peak_margin_occupied_pct_at_3pct_each": 18.0,
+        "peak_same_direction": 4
+      },
+      "metrics": {
+        "n": 1314,
+        "return_pct": 191.66,
+        "max_drawdown_pct": 8.0205,
+        "max_loss_streak": 7,
+        "by_bot": {
+          "crypto": {
+            "n": 559,
+            "profitable_exit_rate_pct": 66.547,
+            "account_contribution_pct": 47.9276
+          },
+          "stocks": {
+            "n": 755,
+            "profitable_exit_rate_pct": 44.503,
+            "account_contribution_pct": 143.7324
+          }
+        },
+        "monthly": {
+          "2026-06": {
+            "combined_return_pct": -6.9927,
+            "crypto_contribution_pct": -0.651,
+            "stocks_contribution_pct": -6.3417
+          },
+          "2026-07": {
+            "combined_return_pct": 36.4603,
+            "crypto_contribution_pct": -1.9329,
+            "stocks_contribution_pct": 38.3933
+          },
+          "2026-08": {
+            "combined_return_pct": 23.2406,
+            "crypto_contribution_pct": 4.1703,
+            "stocks_contribution_pct": 19.0703
+          },
+          "2026-09": {
+            "combined_return_pct": 35.0155,
+            "crypto_contribution_pct": 11.0206,
+            "stocks_contribution_pct": 23.9949
+          },
+          "2026-10": {
+            "combined_return_pct": 38.1071,
+            "crypto_contribution_pct": 13.1855,
+            "stocks_contribution_pct": 24.9216
+          }
+        }
+      }
+    },
+    {
+      "limits": {
+        "max_total": 6,
+        "max_direction": 4,
+        "max_rolling_hour": 3,
+        "priority": "stocks_first"
+      },
+      "gate": {
+        "candidate_count": 1574,
+        "accepted_count": 1267,
+        "rejected": {
+          "direction_cap": 60,
+          "rolling_hour_cap": 108,
+          "total_cap": 139
+        },
+        "peak_open_positions": 6,
+        "peak_margin_occupied_pct_at_3pct_each": 18.0,
+        "peak_same_direction": 4
+      },
+      "metrics": {
+        "n": 1267,
+        "return_pct": 190.4859,
+        "max_drawdown_pct": 8.8685,
+        "max_loss_streak": 8,
+        "by_bot": {
+          "crypto": {
+            "n": 543,
+            "profitable_exit_rate_pct": 65.562,
+            "account_contribution_pct": 44.712
+          },
+          "stocks": {
+            "n": 724,
+            "profitable_exit_rate_pct": 45.58,
+            "account_contribution_pct": 145.774
+          }
+        },
+        "monthly": {
+          "2026-06": {
+            "combined_return_pct": -6.9927,
+            "crypto_contribution_pct": -0.651,
+            "stocks_contribution_pct": -6.3417
+          },
+          "2026-07": {
+            "combined_return_pct": 35.6182,
+            "crypto_contribution_pct": -2.4664,
+            "stocks_contribution_pct": 38.0845
+          },
+          "2026-08": {
+            "combined_return_pct": 24.0834,
+            "crypto_contribution_pct": 2.427,
+            "stocks_contribution_pct": 21.6564
+          },
+          "2026-09": {
+            "combined_return_pct": 35.6906,
+            "crypto_contribution_pct": 9.1129,
+            "stocks_contribution_pct": 26.5777
+          },
+          "2026-10": {
+            "combined_return_pct": 36.7814,
+            "crypto_contribution_pct": 14.2829,
+            "stocks_contribution_pct": 22.4985
+          }
+        }
+      }
+    },
+    {
+      "limits": {
+        "max_total": 6,
+        "max_direction": 4,
+        "max_rolling_hour": 3,
+        "priority": "balanced"
+      },
+      "gate": {
+        "candidate_count": 1574,
+        "accepted_count": 1273,
+        "rejected": {
+          "direction_cap": 64,
+          "rolling_hour_cap": 109,
+          "total_cap": 128
+        },
+        "peak_open_positions": 6,
+        "peak_margin_occupied_pct_at_3pct_each": 18.0,
+        "peak_same_direction": 4
+      },
+      "metrics": {
+        "n": 1273,
+        "return_pct": 187.2717,
+        "max_drawdown_pct": 8.8685,
+        "max_loss_streak": 8,
+        "by_bot": {
+          "crypto": {
+            "n": 558,
+            "profitable_exit_rate_pct": 65.412,
+            "account_contribution_pct": 44.1546
+          },
+          "stocks": {
+            "n": 715,
+            "profitable_exit_rate_pct": 45.315,
+            "account_contribution_pct": 143.1171
+          }
+        },
+        "monthly": {
+          "2026-06": {
+            "combined_return_pct": -6.9927,
+            "crypto_contribution_pct": -0.651,
+            "stocks_contribution_pct": -6.3417
+          },
+          "2026-07": {
+            "combined_return_pct": 36.0451,
+            "crypto_contribution_pct": -2.4638,
+            "stocks_contribution_pct": 38.5089
+          },
+          "2026-08": {
+            "combined_return_pct": 24.275,
+            "crypto_contribution_pct": 2.6677,
+            "stocks_contribution_pct": 21.6074
+          },
+          "2026-09": {
+            "combined_return_pct": 32.2951,
+            "crypto_contribution_pct": 8.371,
+            "stocks_contribution_pct": 23.9241
+          },
+          "2026-10": {
+            "combined_return_pct": 38.0909,
+            "crypto_contribution_pct": 14.6894,
+            "stocks_contribution_pct": 23.4015
+          }
+        }
+      }
+    },
+    {
+      "limits": {
+        "max_total": 6,
+        "max_direction": 4,
+        "max_rolling_hour": 4,
+        "priority": "stocks_first"
+      },
+      "gate": {
+        "candidate_count": 1574,
+        "accepted_count": 1304,
+        "rejected": {
+          "direction_cap": 72,
+          "rolling_hour_cap": 23,
+          "total_cap": 175
+        },
+        "peak_open_positions": 6,
+        "peak_margin_occupied_pct_at_3pct_each": 18.0,
+        "peak_same_direction": 4
+      },
+      "metrics": {
+        "n": 1304,
+        "return_pct": 182.1173,
+        "max_drawdown_pct": 8.0205,
+        "max_loss_streak": 8,
+        "by_bot": {
+          "crypto": {
+            "n": 553,
+            "profitable_exit_rate_pct": 66.004,
+            "account_contribution_pct": 41.5104
+          },
+          "stocks": {
+            "n": 751,
+            "profitable_exit_rate_pct": 44.607,
+            "account_contribution_pct": 140.6069
+          }
+        },
+        "monthly": {
+          "2026-06": {
+            "combined_return_pct": -6.9927,
+            "crypto_contribution_pct": -0.651,
+            "stocks_contribution_pct": -6.3417
+          },
+          "2026-07": {
+            "combined_return_pct": 34.2879,
+            "crypto_contribution_pct": -1.8714,
+            "stocks_contribution_pct": 36.1593
+          },
+          "2026-08": {
+            "combined_return_pct": 22.5138,
+            "crypto_contribution_pct": 2.8745,
+            "stocks_contribution_pct": 19.6394
+          },
+          "2026-09": {
+            "combined_return_pct": 31.7401,
+            "crypto_contribution_pct": 8.7688,
+            "stocks_contribution_pct": 22.9714
+          },
+          "2026-10": {
+            "combined_return_pct": 39.9499,
+            "crypto_contribution_pct": 13.3414,
+            "stocks_contribution_pct": 26.6085
+          }
+        }
+      }
+    },
+    {
+      "limits": {
+        "max_total": 6,
+        "max_direction": 4,
+        "max_rolling_hour": 4,
+        "priority": "crypto_first"
+      },
+      "gate": {
+        "candidate_count": 1574,
+        "accepted_count": 1308,
+        "rejected": {
+          "direction_cap": 71,
+          "rolling_hour_cap": 23,
+          "total_cap": 172
+        },
+        "peak_open_positions": 6,
+        "peak_margin_occupied_pct_at_3pct_each": 18.0,
+        "peak_same_direction": 4
+      },
+      "metrics": {
+        "n": 1308,
+        "return_pct": 181.9651,
+        "max_drawdown_pct": 8.0205,
+        "max_loss_streak": 8,
+        "by_bot": {
+          "crypto": {
+            "n": 565,
+            "profitable_exit_rate_pct": 66.195,
+            "account_contribution_pct": 41.8646
+          },
+          "stocks": {
+            "n": 743,
+            "profitable_exit_rate_pct": 44.684,
+            "account_contribution_pct": 140.1005
+          }
+        },
+        "monthly": {
+          "2026-06": {
+            "combined_return_pct": -6.9927,
+            "crypto_contribution_pct": -0.651,
+            "stocks_contribution_pct": -6.3417
+          },
+          "2026-07": {
+            "combined_return_pct": 34.2879,
+            "crypto_contribution_pct": -1.8714,
+            "stocks_contribution_pct": 36.1593
+          },
+          "2026-08": {
+            "combined_return_pct": 23.5207,
+            "crypto_contribution_pct": 3.1452,
+            "stocks_contribution_pct": 20.3755
+          },
+          "2026-09": {
+            "combined_return_pct": 30.1091,
+            "crypto_contribution_pct": 7.7797,
+            "stocks_contribution_pct": 22.3294
+          },
+          "2026-10": {
+            "combined_return_pct": 40.4734,
+            "crypto_contribution_pct": 14.1117,
+            "stocks_contribution_pct": 26.3617
+          }
+        }
+      }
+    },
+    {
+      "limits": {
+        "max_total": 6,
+        "max_direction": 4,
+        "max_rolling_hour": 4,
+        "priority": "balanced"
+      },
+      "gate": {
+        "candidate_count": 1574,
+        "accepted_count": 1306,
+        "rejected": {
+          "direction_cap": 72,
+          "rolling_hour_cap": 23,
+          "total_cap": 173
+        },
+        "peak_open_positions": 6,
+        "peak_margin_occupied_pct_at_3pct_each": 18.0,
+        "peak_same_direction": 4
+      },
+      "metrics": {
+        "n": 1306,
+        "return_pct": 181.1929,
+        "max_drawdown_pct": 8.0205,
+        "max_loss_streak": 8,
+        "by_bot": {
+          "crypto": {
+            "n": 560,
+            "profitable_exit_rate_pct": 66.25,
+            "account_contribution_pct": 42.0893
+          },
+          "stocks": {
+            "n": 746,
+            "profitable_exit_rate_pct": 44.638,
+            "account_contribution_pct": 139.1036
+          }
+        },
+        "monthly": {
+          "2026-06": {
+            "combined_return_pct": -6.9927,
+            "crypto_contribution_pct": -0.651,
+            "stocks_contribution_pct": -6.3417
+          },
+          "2026-07": {
+            "combined_return_pct": 34.2879,
+            "crypto_contribution_pct": -1.8714,
+            "stocks_contribution_pct": 36.1593
+          },
+          "2026-08": {
+            "combined_return_pct": 22.8917,
+            "crypto_contribution_pct": 2.901,
+            "stocks_contribution_pct": 19.9907
+          },
+          "2026-09": {
+            "combined_return_pct": 30.6205,
+            "crypto_contribution_pct": 8.2459,
+            "stocks_contribution_pct": 22.3746
+          },
+          "2026-10": {
+            "combined_return_pct": 40.2544,
+            "crypto_contribution_pct": 14.0662,
+            "stocks_contribution_pct": 26.1882
+          }
+        }
+      }
+    },
+    {
+      "limits": {
+        "max_total": 6,
+        "max_direction": 3,
+        "max_rolling_hour": 6,
+        "priority": "balanced"
+      },
+      "gate": {
+        "candidate_count": 1574,
+        "accepted_count": 1211,
+        "rejected": {
+          "direction_cap": 251,
+          "total_cap": 112
+        },
+        "peak_open_positions": 6,
+        "peak_margin_occupied_pct_at_3pct_each": 18.0,
+        "peak_same_direction": 3
+      },
+      "metrics": {
+        "n": 1211,
+        "return_pct": 161.2798,
+        "max_drawdown_pct": 7.3549,
+        "max_loss_streak": 7,
+        "by_bot": {
+          "crypto": {
+            "n": 531,
+            "profitable_exit_rate_pct": 67.043,
+            "account_contribution_pct": 43.046
+          },
+          "stocks": {
+            "n": 680,
+            "profitable_exit_rate_pct": 44.559,
+            "account_contribution_pct": 118.2337
+          }
+        },
+        "monthly": {
+          "2026-06": {
+            "combined_return_pct": -5.8337,
+            "crypto_contribution_pct": -0.6527,
+            "stocks_contribution_pct": -5.181
+          },
+          "2026-07": {
+            "combined_return_pct": 30.546,
+            "crypto_contribution_pct": -1.8583,
+            "stocks_contribution_pct": 32.4043
+          },
+          "2026-08": {
+            "combined_return_pct": 22.2099,
+            "crypto_contribution_pct": 3.7654,
+            "stocks_contribution_pct": 18.4445
+          },
+          "2026-09": {
+            "combined_return_pct": 28.468,
+            "crypto_contribution_pct": 8.2439,
+            "stocks_contribution_pct": 20.224
+          },
+          "2026-10": {
+            "combined_return_pct": 35.3772,
+            "crypto_contribution_pct": 14.7329,
+            "stocks_contribution_pct": 20.6443
+          }
+        }
+      }
+    },
+    {
+      "limits": {
+        "max_total": 5,
+        "max_direction": 4,
+        "max_rolling_hour": 6,
+        "priority": "balanced"
+      },
+      "gate": {
+        "candidate_count": 1574,
+        "accepted_count": 1221,
+        "rejected": {
+          "direction_cap": 45,
+          "total_cap": 308
+        },
+        "peak_open_positions": 5,
+        "peak_margin_occupied_pct_at_3pct_each": 15.0,
+        "peak_same_direction": 4
+      },
+      "metrics": {
+        "n": 1221,
+        "return_pct": 159.6878,
+        "max_drawdown_pct": 7.5942,
+        "max_loss_streak": 8,
+        "by_bot": {
+          "crypto": {
+            "n": 542,
+            "profitable_exit_rate_pct": 66.236,
+            "account_contribution_pct": 39.4279
+          },
+          "stocks": {
+            "n": 679,
+            "profitable_exit_rate_pct": 44.477,
+            "account_contribution_pct": 120.26
+          }
+        },
+        "monthly": {
+          "2026-06": {
+            "combined_return_pct": -6.9927,
+            "crypto_contribution_pct": -0.651,
+            "stocks_contribution_pct": -6.3417
+          },
+          "2026-07": {
+            "combined_return_pct": 31.9587,
+            "crypto_contribution_pct": -1.8343,
+            "stocks_contribution_pct": 33.793
+          },
+          "2026-08": {
+            "combined_return_pct": 19.7597,
+            "crypto_contribution_pct": 2.4861,
+            "stocks_contribution_pct": 17.2736
+          },
+          "2026-09": {
+            "combined_return_pct": 31.0272,
+            "crypto_contribution_pct": 10.7316,
+            "stocks_contribution_pct": 20.2957
+          },
+          "2026-10": {
+            "combined_return_pct": 34.8417,
+            "crypto_contribution_pct": 11.9219,
+            "stocks_contribution_pct": 22.9198
+          }
+        }
+      }
+    },
+    {
+      "limits": {
+        "max_total": 6,
+        "max_direction": 3,
+        "max_rolling_hour": 6,
+        "priority": "crypto_first"
+      },
+      "gate": {
+        "candidate_count": 1574,
+        "accepted_count": 1213,
+        "rejected": {
+          "direction_cap": 248,
+          "total_cap": 113
+        },
+        "peak_open_positions": 6,
+        "peak_margin_occupied_pct_at_3pct_each": 18.0,
+        "peak_same_direction": 3
+      },
+      "metrics": {
+        "n": 1213,
+        "return_pct": 159.3696,
+        "max_drawdown_pct": 7.3549,
+        "max_loss_streak": 7,
+        "by_bot": {
+          "crypto": {
+            "n": 538,
+            "profitable_exit_rate_pct": 66.914,
+            "account_contribution_pct": 41.0843
+          },
+          "stocks": {
+            "n": 675,
+            "profitable_exit_rate_pct": 44.593,
+            "account_contribution_pct": 118.2853
+          }
+        },
+        "monthly": {
+          "2026-06": {
+            "combined_return_pct": -5.8337,
+            "crypto_contribution_pct": -0.6527,
+            "stocks_contribution_pct": -5.181
+          },
+          "2026-07": {
+            "combined_return_pct": 30.546,
+            "crypto_contribution_pct": -1.8583,
+            "stocks_contribution_pct": 32.4043
+          },
+          "2026-08": {
+            "combined_return_pct": 22.2099,
+            "crypto_contribution_pct": 3.7654,
+            "stocks_contribution_pct": 18.4445
+          },
+          "2026-09": {
+            "combined_return_pct": 27.8992,
+            "crypto_contribution_pct": 7.4505,
+            "stocks_contribution_pct": 20.4487
+          },
+          "2026-10": {
+            "combined_return_pct": 34.9851,
+            "crypto_contribution_pct": 14.3978,
+            "stocks_contribution_pct": 20.5873
+          }
+        }
+      }
+    },
+    {
+      "limits": {
+        "max_total": 6,
+        "max_direction": 3,
+        "max_rolling_hour": 6,
+        "priority": "stocks_first"
+      },
+      "gate": {
+        "candidate_count": 1574,
+        "accepted_count": 1207,
+        "rejected": {
+          "direction_cap": 251,
+          "total_cap": 116
+        },
+        "peak_open_positions": 6,
+        "peak_margin_occupied_pct_at_3pct_each": 18.0,
+        "peak_same_direction": 3
+      },
+      "metrics": {
+        "n": 1207,
+        "return_pct": 159.1125,
+        "max_drawdown_pct": 7.3549,
+        "max_loss_streak": 7,
+        "by_bot": {
+          "crypto": {
+            "n": 521,
+            "profitable_exit_rate_pct": 66.795,
+            "account_contribution_pct": 42.1844
+          },
+          "stocks": {
+            "n": 686,
+            "profitable_exit_rate_pct": 44.315,
+            "account_contribution_pct": 116.9281
+          }
+        },
+        "monthly": {
+          "2026-06": {
+            "combined_return_pct": -5.8337,
+            "crypto_contribution_pct": -0.6527,
+            "stocks_contribution_pct": -5.181
+          },
+          "2026-07": {
+            "combined_return_pct": 28.9368,
+            "crypto_contribution_pct": -1.7924,
+            "stocks_contribution_pct": 30.7291
+          },
+          "2026-08": {
+            "combined_return_pct": 21.8296,
+            "crypto_contribution_pct": 3.7359,
+            "stocks_contribution_pct": 18.0936
+          },
+          "2026-09": {
+            "combined_return_pct": 29.6659,
+            "crypto_contribution_pct": 8.8697,
+            "stocks_contribution_pct": 20.7962
+          },
+          "2026-10": {
+            "combined_return_pct": 35.0946,
+            "crypto_contribution_pct": 14.0088,
+            "stocks_contribution_pct": 21.0858
+          }
+        }
+      }
+    },
+    {
+      "limits": {
+        "max_total": 5,
+        "max_direction": 4,
+        "max_rolling_hour": 6,
+        "priority": "crypto_first"
+      },
+      "gate": {
+        "candidate_count": 1574,
+        "accepted_count": 1222,
+        "rejected": {
+          "direction_cap": 42,
+          "total_cap": 310
+        },
+        "peak_open_positions": 5,
+        "peak_margin_occupied_pct_at_3pct_each": 15.0,
+        "peak_same_direction": 4
+      },
+      "metrics": {
+        "n": 1222,
+        "return_pct": 156.0045,
+        "max_drawdown_pct": 7.5942,
+        "max_loss_streak": 7,
+        "by_bot": {
+          "crypto": {
+            "n": 549,
+            "profitable_exit_rate_pct": 66.12,
+            "account_contribution_pct": 38.1867
+          },
+          "stocks": {
+            "n": 673,
+            "profitable_exit_rate_pct": 44.428,
+            "account_contribution_pct": 117.8178
+          }
+        },
+        "monthly": {
+          "2026-06": {
+            "combined_return_pct": -6.9927,
+            "crypto_contribution_pct": -0.651,
+            "stocks_contribution_pct": -6.3417
+          },
+          "2026-07": {
+            "combined_return_pct": 31.9587,
+            "crypto_contribution_pct": -1.8343,
+            "stocks_contribution_pct": 33.793
+          },
+          "2026-08": {
+            "combined_return_pct": 20.3727,
+            "crypto_contribution_pct": 2.726,
+            "stocks_contribution_pct": 17.6467
+          },
+          "2026-09": {
+            "combined_return_pct": 28.4397,
+            "crypto_contribution_pct": 9.8277,
+            "stocks_contribution_pct": 18.612
+          },
+          "2026-10": {
+            "combined_return_pct": 34.9165,
+            "crypto_contribution_pct": 11.9521,
+            "stocks_contribution_pct": 22.9645
+          }
+        }
+      }
+    },
+    {
+      "limits": {
+        "max_total": 5,
+        "max_direction": 4,
+        "max_rolling_hour": 6,
+        "priority": "stocks_first"
+      },
+      "gate": {
+        "candidate_count": 1574,
+        "accepted_count": 1219,
+        "rejected": {
+          "direction_cap": 45,
+          "total_cap": 310
+        },
+        "peak_open_positions": 5,
+        "peak_margin_occupied_pct_at_3pct_each": 15.0,
+        "peak_same_direction": 4
+      },
+      "metrics": {
+        "n": 1219,
+        "return_pct": 154.3799,
+        "max_drawdown_pct": 7.5341,
+        "max_loss_streak": 8,
+        "by_bot": {
+          "crypto": {
+            "n": 536,
+            "profitable_exit_rate_pct": 66.045,
+            "account_contribution_pct": 37.0234
+          },
+          "stocks": {
+            "n": 683,
+            "profitable_exit_rate_pct": 44.363,
+            "account_contribution_pct": 117.3565
+          }
+        },
+        "monthly": {
+          "2026-06": {
+            "combined_return_pct": -6.9927,
+            "crypto_contribution_pct": -0.651,
+            "stocks_contribution_pct": -6.3417
+          },
+          "2026-07": {
+            "combined_return_pct": 32.0445,
+            "crypto_contribution_pct": -1.3132,
+            "stocks_contribution_pct": 33.3577
+          },
+          "2026-08": {
+            "combined_return_pct": 18.8313,
+            "crypto_contribution_pct": 1.6708,
+            "stocks_contribution_pct": 17.1606
+          },
+          "2026-09": {
+            "combined_return_pct": 29.7425,
+            "crypto_contribution_pct": 9.8659,
+            "stocks_contribution_pct": 19.8766
+          },
+          "2026-10": {
+            "combined_return_pct": 34.3484,
+            "crypto_contribution_pct": 11.8545,
+            "stocks_contribution_pct": 22.4938
+          }
+        }
+      }
+    },
+    {
+      "limits": {
+        "max_total": 5,
+        "max_direction": 4,
+        "max_rolling_hour": 4,
+        "priority": "balanced"
+      },
+      "gate": {
+        "candidate_count": 1574,
+        "accepted_count": 1220,
+        "rejected": {
+          "direction_cap": 45,
+          "rolling_hour_cap": 13,
+          "total_cap": 296
+        },
+        "peak_open_positions": 5,
+        "peak_margin_occupied_pct_at_3pct_each": 15.0,
+        "peak_same_direction": 4
+      },
+      "metrics": {
+        "n": 1220,
+        "return_pct": 154.3775,
+        "max_drawdown_pct": 7.5942,
+        "max_loss_streak": 8,
+        "by_bot": {
+          "crypto": {
+            "n": 542,
+            "profitable_exit_rate_pct": 66.052,
+            "account_contribution_pct": 36.4415
+          },
+          "stocks": {
+            "n": 678,
+            "profitable_exit_rate_pct": 44.395,
+            "account_contribution_pct": 117.936
+          }
+        },
+        "monthly": {
+          "2026-06": {
+            "combined_return_pct": -6.9927,
+            "crypto_contribution_pct": -0.651,
+            "stocks_contribution_pct": -6.3417
+          },
+          "2026-07": {
+            "combined_return_pct": 31.9587,
+            "crypto_contribution_pct": -1.8343,
+            "stocks_contribution_pct": 33.793
+          },
+          "2026-08": {
+            "combined_return_pct": 20.1143,
+            "crypto_contribution_pct": 2.4852,
+            "stocks_contribution_pct": 17.6292
+          },
+          "2026-09": {
+            "combined_return_pct": 28.2788,
+            "crypto_contribution_pct": 8.1785,
+            "stocks_contribution_pct": 20.1003
+          },
+          "2026-10": {
+            "combined_return_pct": 34.516,
+            "crypto_contribution_pct": 12.5284,
+            "stocks_contribution_pct": 21.9876
+          }
+        }
+      }
+    },
+    {
+      "limits": {
+        "max_total": 6,
+        "max_direction": 3,
+        "max_rolling_hour": 4,
+        "priority": "balanced"
+      },
+      "gate": {
+        "candidate_count": 1574,
+        "accepted_count": 1207,
+        "rejected": {
+          "direction_cap": 250,
+          "rolling_hour_cap": 12,
+          "total_cap": 105
+        },
+        "peak_open_positions": 6,
+        "peak_margin_occupied_pct_at_3pct_each": 18.0,
+        "peak_same_direction": 3
+      },
+      "metrics": {
+        "n": 1207,
+        "return_pct": 154.2052,
+        "max_drawdown_pct": 7.3549,
+        "max_loss_streak": 7,
+        "by_bot": {
+          "crypto": {
+            "n": 530,
+            "profitable_exit_rate_pct": 66.604,
+            "account_contribution_pct": 38.4862
+          },
+          "stocks": {
+            "n": 677,
+            "profitable_exit_rate_pct": 44.461,
+            "account_contribution_pct": 115.7189
+          }
+        },
+        "monthly": {
+          "2026-06": {
+            "combined_return_pct": -5.8337,
+            "crypto_contribution_pct": -0.6527,
+            "stocks_contribution_pct": -5.181
+          },
+          "2026-07": {
+            "combined_return_pct": 30.546,
+            "crypto_contribution_pct": -1.8583,
+            "stocks_contribution_pct": 32.4043
+          },
+          "2026-08": {
+            "combined_return_pct": 22.9403,
+            "crypto_contribution_pct": 3.779,
+            "stocks_contribution_pct": 19.1612
+          },
+          "2026-09": {
+            "combined_return_pct": 25.2665,
+            "crypto_contribution_pct": 6.0858,
+            "stocks_contribution_pct": 19.1806
+          },
+          "2026-10": {
+            "combined_return_pct": 34.2755,
+            "crypto_contribution_pct": 14.286,
+            "stocks_contribution_pct": 19.9894
+          }
+        }
+      }
+    },
+    {
+      "limits": {
+        "max_total": 6,
+        "max_direction": 3,
+        "max_rolling_hour": 4,
+        "priority": "stocks_first"
+      },
+      "gate": {
+        "candidate_count": 1574,
+        "accepted_count": 1203,
+        "rejected": {
+          "direction_cap": 251,
+          "rolling_hour_cap": 12,
+          "total_cap": 108
+        },
+        "peak_open_positions": 6,
+        "peak_margin_occupied_pct_at_3pct_each": 18.0,
+        "peak_same_direction": 3
+      },
+      "metrics": {
+        "n": 1203,
+        "return_pct": 152.4204,
+        "max_drawdown_pct": 7.3549,
+        "max_loss_streak": 7,
+        "by_bot": {
+          "crypto": {
+            "n": 519,
+            "profitable_exit_rate_pct": 66.474,
+            "account_contribution_pct": 38.4373
+          },
+          "stocks": {
+            "n": 684,
+            "profitable_exit_rate_pct": 44.152,
+            "account_contribution_pct": 113.9831
+          }
+        },
+        "monthly": {
+          "2026-06": {
+            "combined_return_pct": -5.8337,
+            "crypto_contribution_pct": -0.6527,
+            "stocks_contribution_pct": -5.181
+          },
+          "2026-07": {
+            "combined_return_pct": 28.9368,
+            "crypto_contribution_pct": -1.7924,
+            "stocks_contribution_pct": 30.7291
+          },
+          "2026-08": {
+            "combined_return_pct": 22.5576,
+            "crypto_contribution_pct": 3.7494,
+            "stocks_contribution_pct": 18.8082
+          },
+          "2026-09": {
+            "combined_return_pct": 26.597,
+            "crypto_contribution_pct": 7.1682,
+            "stocks_contribution_pct": 19.4288
+          },
+          "2026-10": {
+            "combined_return_pct": 33.9951,
+            "crypto_contribution_pct": 13.5678,
+            "stocks_contribution_pct": 20.4273
+          }
+        }
+      }
+    },
+    {
+      "limits": {
+        "max_total": 6,
+        "max_direction": 3,
+        "max_rolling_hour": 4,
+        "priority": "crypto_first"
+      },
+      "gate": {
+        "candidate_count": 1574,
+        "accepted_count": 1209,
+        "rejected": {
+          "direction_cap": 247,
+          "rolling_hour_cap": 12,
+          "total_cap": 106
+        },
+        "peak_open_positions": 6,
+        "peak_margin_occupied_pct_at_3pct_each": 18.0,
+        "peak_same_direction": 3
+      },
+      "metrics": {
+        "n": 1209,
+        "return_pct": 152.3467,
+        "max_drawdown_pct": 7.3549,
+        "max_loss_streak": 7,
+        "by_bot": {
+          "crypto": {
+            "n": 537,
+            "profitable_exit_rate_pct": 66.48,
+            "account_contribution_pct": 36.5602
+          },
+          "stocks": {
+            "n": 672,
+            "profitable_exit_rate_pct": 44.494,
+            "account_contribution_pct": 115.7865
+          }
+        },
+        "monthly": {
+          "2026-06": {
+            "combined_return_pct": -5.8337,
+            "crypto_contribution_pct": -0.6527,
+            "stocks_contribution_pct": -5.181
+          },
+          "2026-07": {
+            "combined_return_pct": 30.546,
+            "crypto_contribution_pct": -1.8583,
+            "stocks_contribution_pct": 32.4043
+          },
+          "2026-08": {
+            "combined_return_pct": 22.9403,
+            "crypto_contribution_pct": 3.779,
+            "stocks_contribution_pct": 19.1612
+          },
+          "2026-09": {
+            "combined_return_pct": 24.7119,
+            "crypto_contribution_pct": 5.3051,
+            "stocks_contribution_pct": 19.4067
+          },
+          "2026-10": {
+            "combined_return_pct": 33.8866,
+            "crypto_contribution_pct": 13.9537,
+            "stocks_contribution_pct": 19.9329
+          }
+        }
+      }
+    },
+    {
+      "limits": {
+        "max_total": 6,
+        "max_direction": 4,
+        "max_rolling_hour": 2,
+        "priority": "stocks_first"
+      },
+      "gate": {
+        "candidate_count": 1574,
+        "accepted_count": 1169,
+        "rejected": {
+          "direction_cap": 30,
+          "rolling_hour_cap": 304,
+          "total_cap": 71
+        },
+        "peak_open_positions": 6,
+        "peak_margin_occupied_pct_at_3pct_each": 18.0,
+        "peak_same_direction": 4
+      },
+      "metrics": {
+        "n": 1169,
+        "return_pct": 152.2615,
+        "max_drawdown_pct": 8.715,
+        "max_loss_streak": 10,
+        "by_bot": {
+          "crypto": {
+            "n": 551,
+            "profitable_exit_rate_pct": 64.973,
+            "account_contribution_pct": 30.9824
+          },
+          "stocks": {
+            "n": 618,
+            "profitable_exit_rate_pct": 46.278,
+            "account_contribution_pct": 121.2791
+          }
+        },
+        "monthly": {
+          "2026-06": {
+            "combined_return_pct": -6.7073,
+            "crypto_contribution_pct": -0.6517,
+            "stocks_contribution_pct": -6.0557
+          },
+          "2026-07": {
+            "combined_return_pct": 25.4844,
+            "crypto_contribution_pct": -2.7072,
+            "stocks_contribution_pct": 28.1916
+          },
+          "2026-08": {
+            "combined_return_pct": 24.5623,
+            "crypto_contribution_pct": 1.4807,
+            "stocks_contribution_pct": 23.0815
+          },
+          "2026-09": {
+            "combined_return_pct": 30.8302,
+            "crypto_contribution_pct": 6.9498,
+            "stocks_contribution_pct": 23.8803
+          },
+          "2026-10": {
+            "combined_return_pct": 32.2268,
+            "crypto_contribution_pct": 11.6846,
+            "stocks_contribution_pct": 20.5422
+          }
+        }
+      }
+    }
+  ],
+  "priority_robust_policies": [
+    {
+      "limits": {
+        "max_total": 6,
+        "max_direction": 4,
+        "max_rolling_hour": 6
+      },
+      "worst_total_return_pct": 191.66,
+      "worst_october_combined_pct": 38.1071,
+      "worst_october_crypto_contribution_pct": 13.1855,
+      "worst_october_stocks_contribution_pct": 24.9216,
+      "worst_drawdown_pct": 8.0205
+    },
+    {
+      "limits": {
+        "max_total": 6,
+        "max_direction": 4,
+        "max_rolling_hour": 3
+      },
+      "worst_total_return_pct": 187.2717,
+      "worst_october_combined_pct": 36.7814,
+      "worst_october_crypto_contribution_pct": 14.2829,
+      "worst_october_stocks_contribution_pct": 22.4985,
+      "worst_drawdown_pct": 8.8685
+    },
+    {
+      "limits": {
+        "max_total": 6,
+        "max_direction": 4,
+        "max_rolling_hour": 4
+      },
+      "worst_total_return_pct": 181.1929,
+      "worst_october_combined_pct": 39.9499,
+      "worst_october_crypto_contribution_pct": 13.3414,
+      "worst_october_stocks_contribution_pct": 26.1882,
+      "worst_drawdown_pct": 8.0205
+    },
+    {
+      "limits": {
+        "max_total": 6,
+        "max_direction": 3,
+        "max_rolling_hour": 6
+      },
+      "worst_total_return_pct": 159.1125,
+      "worst_october_combined_pct": 34.9851,
+      "worst_october_crypto_contribution_pct": 14.0088,
+      "worst_october_stocks_contribution_pct": 20.5873,
+      "worst_drawdown_pct": 7.3549
+    },
+    {
+      "limits": {
+        "max_total": 5,
+        "max_direction": 4,
+        "max_rolling_hour": 6
+      },
+      "worst_total_return_pct": 154.3799,
+      "worst_october_combined_pct": 34.3484,
+      "worst_october_crypto_contribution_pct": 11.8545,
+      "worst_october_stocks_contribution_pct": 22.4938,
+      "worst_drawdown_pct": 7.5942
+    },
+    {
+      "limits": {
+        "max_total": 6,
+        "max_direction": 3,
+        "max_rolling_hour": 4
+      },
+      "worst_total_return_pct": 152.3467,
+      "worst_october_combined_pct": 33.8866,
+      "worst_october_crypto_contribution_pct": 13.5678,
+      "worst_october_stocks_contribution_pct": 19.9329,
+      "worst_drawdown_pct": 7.3549
+    },
+    {
+      "limits": {
+        "max_total": 5,
+        "max_direction": 4,
+        "max_rolling_hour": 4
+      },
+      "worst_total_return_pct": 150.7695,
+      "worst_october_combined_pct": 34.2202,
+      "worst_october_crypto_contribution_pct": 11.8332,
+      "worst_october_stocks_contribution_pct": 21.9876,
+      "worst_drawdown_pct": 7.5942
+    },
+    {
+      "limits": {
+        "max_total": 6,
+        "max_direction": 4,
+        "max_rolling_hour": 2
+      },
+      "worst_total_return_pct": 148.8418,
+      "worst_october_combined_pct": 32.2268,
+      "worst_october_crypto_contribution_pct": 11.6846,
+      "worst_october_stocks_contribution_pct": 20.5422,
+      "worst_drawdown_pct": 8.715
+    },
+    {
+      "limits": {
+        "max_total": 6,
+        "max_direction": 3,
+        "max_rolling_hour": 3
+      },
+      "worst_total_return_pct": 147.6758,
+      "worst_october_combined_pct": 30.517,
+      "worst_october_crypto_contribution_pct": 13.1522,
+      "worst_october_stocks_contribution_pct": 17.3647,
+      "worst_drawdown_pct": 7.3549
+    },
+    {
+      "limits": {
+        "max_total": 5,
+        "max_direction": 4,
+        "max_rolling_hour": 3
+      },
+      "worst_total_return_pct": 145.9073,
+      "worst_october_combined_pct": 33.5981,
+      "worst_october_crypto_contribution_pct": 13.8213,
+      "worst_october_stocks_contribution_pct": 19.7768,
+      "worst_drawdown_pct": 8.4465
+    },
+    {
+      "limits": {
+        "max_total": 5,
+        "max_direction": 4,
+        "max_rolling_hour": 2
+      },
+      "worst_total_return_pct": 140.2744,
+      "worst_october_combined_pct": 31.8869,
+      "worst_october_crypto_contribution_pct": 11.7941,
+      "worst_october_stocks_contribution_pct": 20.0928,
+      "worst_drawdown_pct": 8.2917
+    },
+    {
+      "limits": {
+        "max_total": 5,
+        "max_direction": 3,
+        "max_rolling_hour": 6
+      },
+      "worst_total_return_pct": 140.112,
+      "worst_october_combined_pct": 32.0533,
+      "worst_october_crypto_contribution_pct": 12.7714,
+      "worst_october_stocks_contribution_pct": 19.0687,
+      "worst_drawdown_pct": 7.3549
+    },
+    {
+      "limits": {
+        "max_total": 5,
+        "max_direction": 3,
+        "max_rolling_hour": 4
+      },
+      "worst_total_return_pct": 135.9183,
+      "worst_october_combined_pct": 31.22,
+      "worst_october_crypto_contribution_pct": 12.3625,
+      "worst_october_stocks_contribution_pct": 18.6446,
+      "worst_drawdown_pct": 7.3549
+    },
+    {
+      "limits": {
+        "max_total": 5,
+        "max_direction": 3,
+        "max_rolling_hour": 3
+      },
+      "worst_total_return_pct": 135.2526,
+      "worst_october_combined_pct": 30.193,
+      "worst_october_crypto_contribution_pct": 12.8972,
+      "worst_october_stocks_contribution_pct": 17.1202,
+      "worst_drawdown_pct": 7.3549
+    },
+    {
+      "limits": {
+        "max_total": 6,
+        "max_direction": 3,
+        "max_rolling_hour": 2
+      },
+      "worst_total_return_pct": 133.5902,
+      "worst_october_combined_pct": 25.2231,
+      "worst_october_crypto_contribution_pct": 10.8544,
+      "worst_october_stocks_contribution_pct": 14.3687,
+      "worst_drawdown_pct": 7.5138
+    },
+    {
+      "limits": {
+        "max_total": 5,
+        "max_direction": 3,
+        "max_rolling_hour": 2
+      },
+      "worst_total_return_pct": 125.949,
+      "worst_october_combined_pct": 25.162,
+      "worst_october_crypto_contribution_pct": 10.5422,
+      "worst_october_stocks_contribution_pct": 14.6197,
+      "worst_drawdown_pct": 7.5138
+    },
+    {
+      "limits": {
+        "max_total": 4,
+        "max_direction": 4,
+        "max_rolling_hour": 6
+      },
+      "worst_total_return_pct": 113.4665,
+      "worst_october_combined_pct": 30.2593,
+      "worst_october_crypto_contribution_pct": 10.1482,
+      "worst_october_stocks_contribution_pct": 20.1111,
+      "worst_drawdown_pct": 7.3334
+    },
+    {
+      "limits": {
+        "max_total": 4,
+        "max_direction": 4,
+        "max_rolling_hour": 4
+      },
+      "worst_total_return_pct": 109.7935,
+      "worst_october_combined_pct": 30.2593,
+      "worst_october_crypto_contribution_pct": 10.1482,
+      "worst_october_stocks_contribution_pct": 20.1111,
+      "worst_drawdown_pct": 7.3334
+    },
+    {
+      "limits": {
+        "max_total": 4,
+        "max_direction": 3,
+        "max_rolling_hour": 4
+      },
+      "worst_total_return_pct": 107.4765,
+      "worst_october_combined_pct": 29.5207,
+      "worst_october_crypto_contribution_pct": 11.1934,
+      "worst_october_stocks_contribution_pct": 18.0823,
+      "worst_drawdown_pct": 6.9277
+    },
+    {
+      "limits": {
+        "max_total": 4,
+        "max_direction": 3,
+        "max_rolling_hour": 6
+      },
+      "worst_total_return_pct": 107.4765,
+      "worst_october_combined_pct": 29.5207,
+      "worst_october_crypto_contribution_pct": 11.1934,
+      "worst_october_stocks_contribution_pct": 18.0823,
+      "worst_drawdown_pct": 6.9277
+    }
+  ],
+  "target": {
+    "per_bot_monthly_pct": 30.0,
+    "combined_monthly_pct": 60.0,
+    "proven": false,
+    "october_grid_policies_meeting_each_bot_target": 0,
+    "october_grid_policies_meeting_combined_target": 0,
+    "reason": "No tested common-cap policy reaches the requested target, and overlapping selection plus short forward data cannot prove a monthly guarantee."
+  }
+}
