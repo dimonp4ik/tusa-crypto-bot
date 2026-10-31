@@ -1,0 +1,26 @@
+{
+  "coverage": "2022-01-07 through 2026-10-28; enough for frozen historical/direct datasets",
+  "created_at": "2026-11-01T00:00:00Z",
+  "event_count": 111,
+  "event_counts": {
+    "CPI": 42,
+    "EMPLOYMENT_SITUATION": 42,
+    "FOMC": 27
+  },
+  "events_sha256": "1be10691021d099bc1cb4b923098a7810f3220067e00c32cebad0c1b4696c356",
+  "normalization": {
+    "bls_time": "08:30 America/New_York per official BLS calendar; DST-aware conversion",
+    "fomc_date": "second scheduled meeting day",
+    "fomc_time": "14:00 America/New_York statement release; DST-aware conversion"
+  },
+  "sources": [
+    "https://www.bls.gov/schedule/2022/home.htm",
+    "https://www.bls.gov/schedule/2023/home.htm",
+    "https://www.bls.gov/schedule/2024/home.htm",
+    "https://www.bls.gov/schedule/2025/home.htm",
+    "https://www.bls.gov/schedule/2026/home.htm",
+    "https://www.bls.gov/about-bls/dissemination.htm",
+    "https://www.federalreserve.gov/monetarypolicy/fomccalendars.htm",
+    "https://www.federalreserve.gov/newsevents/pressreleases/monetary20240809a.htm"
+  ]
+}
