@@ -8,6 +8,14 @@ def test_shared_gate_never_exceeds_authorized_margin():
     report = json.loads(Path(audit.REPORT).read_text(encoding="utf-8"))
     for item in report["scenarios"]:
         assert item["gate"]["peak_margin_occupied_pct"] <= 90
+        assert item["gate"]["peak_open_positions"] <= audit.MAX_POSITIONS
+
+
+def test_position_cap_does_not_remove_frozen_route_history():
+    report = json.loads(Path(audit.REPORT).read_text(encoding="utf-8"))
+    assert report["scope"]["shared_position_cap"] == 12
+    for item in report["scenarios"]:
+        assert item["gate"]["rejected_by_position_cap"] == {}
 
 
 def test_five_pct_scenario_uses_latest_complete_months():

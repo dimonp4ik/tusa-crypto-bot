@@ -19,6 +19,7 @@ STOCK_ROWS = STOCK_ROOT / "reports/audit_2026_09_08/stock_xperp_regime_target_ro
 REPORT = ROOT / "reports/audit_2026_09_08/shared_account_dual_bot_nov1.json"
 LEVERAGE = 10.0
 MAX_MARGIN = .90
+MAX_POSITIONS = 12
 SCENARIOS = ((.03, .03), (.03, .05), (.05, .03), (.05, .05))
 
 
@@ -59,6 +60,7 @@ def shared_margin_gate(rows: list[dict], crypto_margin: float,
         grouped[float(row["entry_time"])].append(row)
     accepted = []
     rejected = collections.Counter()
+    rejected_positions = collections.Counter()
     active: list[tuple[float, int, dict, float]] = []
     sequence = 0
     peak_margin = 0.0
@@ -74,6 +76,10 @@ def shared_margin_gate(rows: list[dict], crypto_margin: float,
         for row in batch:
             requested = margin_for(row, crypto_margin, stock_margin)
             occupied = sum(item[3] for item in active)
+            if len(active) >= MAX_POSITIONS:
+                rejected[row["bot"]] += 1
+                rejected_positions[row["bot"]] += 1
+                continue
             if occupied + requested > MAX_MARGIN + 1e-12:
                 rejected[row["bot"]] += 1
                 continue
@@ -91,6 +97,7 @@ def shared_margin_gate(rows: list[dict], crypto_margin: float,
         "candidate_count": len(rows),
         "accepted_count": len(accepted),
         "rejected_by_bot": dict(rejected),
+        "rejected_by_position_cap": dict(rejected_positions),
         "peak_open_positions": peak_positions,
         "peak_margin_occupied_pct": round(100 * peak_margin, 4),
         "peak_open_by_bot": dict(peak_by_bot),
@@ -208,6 +215,7 @@ def main() -> None:
                 max(row["entry_time"] for row in rows), unit="s", tz="UTC").isoformat(),
             "leverage": LEVERAGE,
             "shared_margin_cap_pct": 100 * MAX_MARGIN,
+            "shared_position_cap": MAX_POSITIONS,
             "candidate_counts": dict(collections.Counter(
                 row["bot"] for row in rows)),
         },
