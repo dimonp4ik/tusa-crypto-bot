@@ -707,8 +707,12 @@ def _crypto_scan_status_text() -> str:
 
 @app.route("/status")
 def status():
+    deploy_sha = (os.getenv("RAILWAY_GIT_COMMIT_SHA")
+                  or os.getenv("GIT_COMMIT_SHA") or "unknown")[:8]
     return (f"Mode: {DEPLOYMENT_MODE}. Strategy: audited direct-venue router. "
+            f"Build: {deploy_sha}. "
             f"Scanning every {SCAN_INTERVAL_MINUTES} min. "
+            f"Max entry delay: {_MAX_VENUE_ENTRY_DELAY_SEC}s. "
             f"Max signals/scan: {VENUE_MAX_SIGNALS_PER_SCAN}. "
             f"Signal cache: {len(_signal_cache)} entries. "
             f"{_crypto_scan_status_text().replace(chr(10), ' | ')}"), 200

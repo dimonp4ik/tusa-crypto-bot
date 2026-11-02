@@ -13,6 +13,14 @@ from src import telegram_notifier as notifier
 
 
 class ShadowDeploymentTests(unittest.TestCase):
+    def test_status_exposes_deployed_build_and_entry_age_contract(self):
+        with patch.dict(os.environ, {"RAILWAY_GIT_COMMIT_SHA": "1234567890abcdef"}), \
+             patch.object(main, "_crypto_scan_status_text", return_value="scan ok"):
+            body, code = main.status()
+        self.assertEqual(code, 200)
+        self.assertIn("Build: 12345678", body)
+        self.assertIn("Max entry delay: 180s", body)
+
     def test_scan_universe_contains_only_frozen_profit_first_symbols(self):
         with patch.object(main, "ROBUST_SYMBOLS", {"BTCUSDT"}), \
              patch.object(main, "FIVE_MINUTE_OI_SHADOW_SYMBOLS", {"ONDOUSDT"}), \
