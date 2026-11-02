@@ -552,6 +552,7 @@ class ShadowDeploymentTests(unittest.TestCase):
         publish.assert_called_once_with([], {"LONG": 0, "SHORT": 0})
 
     def test_scan_drops_stale_closed_bar_instead_of_entering_late(self):
+        self.assertEqual(main._MAX_VENUE_ENTRY_DELAY_SEC, 180)
         fifteen = {"time": [900.0], "close": [100.0]}
         with patch.object(main, "ROBUST_SYMBOLS", {"BTCUSDT"}), \
              patch.object(main, "REGIME_FILTER_MODE", "paper"), \
