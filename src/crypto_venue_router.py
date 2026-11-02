@@ -76,6 +76,24 @@ SHADOW_EXPERIMENTAL_MODULES = (
     ),
 )
 
+# Both rules were in the 2R frontier frozen before 2025-2026.  Their union
+# improves aggregate sealed periods only after the existing causal cluster
+# admission, but it does not improve every direct month.  Runtime therefore
+# records them silently for new forward evidence; callers must never publish
+# or trade them.  See crypto_profit_first_prequalified_2r_union_nov1_audit.py.
+PREQUALIFIED_2R_SHADOW_MODULES = (
+    Module(
+        "shadow_2r_breakout_long_bull_europe",
+        "breakout", "LONG", "bull", "06_11", 2.0,
+        (("btc_eff20", "ge", .5), ("abs_z", "ge", 3.0)),
+    ),
+    Module(
+        "shadow_2r_pullback_short_bull_asia",
+        "trend_pullback", "SHORT", "bull", "00_05", 2.0,
+        (("btc_return96_atr", "ge", 4.0),),
+    ),
+)
+
 AUDITED_SYMBOLS = frozenset({
     "AAVEUSDT", "ADAUSDT", "AVAXUSDT", "BILLUSDT", "BTCUSDT", "DOTUSDT",
     "ETHUSDT", "HYPEUSDT", "LINKUSDT", "NEARUSDT", "SOLUSDT", "SUIUSDT",
@@ -295,3 +313,19 @@ def shadow_experimental_setups(
         entry_time=entry_time, market_price=market_price, symbol=symbol,
         shadow_experiment=True,
     )
+
+
+def prequalified_2r_shadow_setups(
+        candles: dict, btc_candles: dict, *, entry_time: float,
+        market_price: float | None = None,
+        symbol: str | None = None) -> list[dict]:
+    """Return silent 2R research rows which are permanently order-ineligible."""
+    rows = _setups_for_modules(
+        candles, btc_candles, PREQUALIFIED_2R_SHADOW_MODULES,
+        entry_time=entry_time, market_price=market_price, symbol=symbol,
+        shadow_experiment=True,
+    )
+    for row in rows:
+        row["_prequalified_2r_shadow"] = True
+        row["hold_bars"] = 48
+    return rows

@@ -4,6 +4,7 @@ from unittest.mock import patch
 from src.crypto_venue_router import (
     BTC_CONTEXT_HISTORY_BARS, FAMILY_SIGNAL_HISTORY_BARS, MODULES,
     ROBUST_EXCLUDED_SYMBOLS, ROBUST_SYMBOLS,
+    PREQUALIFIED_2R_SHADOW_MODULES, prequalified_2r_shadow_setups,
     SHADOW_EXPERIMENTAL_MODULES, btc_context, shadow_experimental_setups,
     venue_setups,
 )
@@ -256,6 +257,37 @@ class CryptoVenueRouterTests(unittest.TestCase):
         self.assertTrue(shadow[0]["_shadow_experiment"])
         self.assertEqual((shadow[0]["target_r"], shadow[0]["entry_source"]),
                          (.25, "MARKET"))
+
+    def test_prequalified_2r_union_is_separate_and_permanently_shadow_only(self):
+        context = {
+            "btc_regime": "bull", "btc_atr_pct": .004,
+            "btc_return20_atr": 2.0, "btc_fast_slow_atr": 2.0,
+            "btc_slow_long_atr": 4.0, "btc_eff20": .5,
+            "btc_eff96": .2, "btc_return96_atr": 5.0,
+        }
+        breakout = {"family": "breakout", "direction": "LONG",
+                    "atr": 2.0, "eff_ratio": .4, "z": 3.1, "abs_z": 3.1}
+        with patch("src.crypto_venue_router.btc_context", return_value=context), \
+                patch("src.crypto_venue_router.family_signals",
+                      return_value=[breakout]):
+            production = venue_setups(
+                {}, {}, entry_time=8 * 3600, market_price=100.0,
+                symbol="AAVEUSDT",
+            )
+            shadow = prequalified_2r_shadow_setups(
+                {}, {}, entry_time=8 * 3600, market_price=100.0,
+                symbol="AAVEUSDT",
+            )
+        self.assertEqual(len(PREQUALIFIED_2R_SHADOW_MODULES), 2)
+        self.assertEqual(production, [])
+        self.assertEqual(len(shadow), 1)
+        self.assertEqual(shadow[0]["module"],
+                         "shadow_2r_breakout_long_bull_europe")
+        self.assertTrue(shadow[0]["_shadow_experiment"])
+        self.assertTrue(shadow[0]["_prequalified_2r_shadow"])
+        self.assertEqual(shadow[0]["hold_bars"], 48)
+        self.assertEqual((shadow[0]["entry"], shadow[0]["sl"], shadow[0]["tp"]),
+                         (100.0, 96.0, 108.0))
 
     def test_robust_symbol_gate_fails_closed(self):
         self.assertEqual(ROBUST_EXCLUDED_SYMBOLS,

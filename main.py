@@ -37,7 +37,7 @@ from src.binance_client import (
     get_klines_xperp, get_xperp_open_interest_history,
 )
 from src.filter_variants import VARIANTS
-from src.crypto_venue_router import ROBUST_SYMBOLS
+from src.crypto_venue_router import ROBUST_SYMBOLS, prequalified_2r_shadow_setups
 from src.crypto_profit_first_material_shadow_router import (
     REQUIRED_BTC_HISTORY_BARS, REQUIRED_SYMBOL_HISTORY_BARS,
     shadow_setups as profit_first_material_shadow_setups,
@@ -3910,6 +3910,7 @@ def _venue_analysis(symbol: str, setup: dict, btc_change: float = 0.0) -> dict:
     hourly_hgb = bool(setup.get("_hourly_hgb_shadow"))
     literal_material = bool(setup.get("_literal_material_shadow"))
     profit_first = bool(setup.get("_profit_first_material_shadow"))
+    prequalified_2r = bool(setup.get("_prequalified_2r_shadow"))
     tags = [f"Venue module {setup['module']}",
             f"BTC regime {setup['btc_regime']}",
             f"Fixed target {setup['target_r']:.2f}R"]
@@ -3978,20 +3979,24 @@ def _venue_analysis(symbol: str, setup: dict, btc_change: float = 0.0) -> dict:
         "strategy_runner_mode": ("fixed_be"
                                  if fixed_runner else None),
         "strategy_bar_seconds": (300 if five_minute_oi else
-                                 900 if literal_material or profit_first
+                                 900 if (literal_material or profit_first
+                                         or prequalified_2r)
                                  else 3600 if hourly_hgb else None),
         "strategy_entry_bar_ts": (
             float(setup["signal_bar_ts"]) + (
                 300 if five_minute_oi else
-                900 if literal_material or profit_first else 3600)
-            if five_minute_oi or literal_material or profit_first or hourly_hgb
+                900 if (literal_material or profit_first or prequalified_2r)
+                else 3600)
+            if (five_minute_oi or literal_material or profit_first
+                or prequalified_2r or hourly_hgb)
             else None),
         "strategy_stop_on_close": (
-            False if five_minute_oi or literal_material or profit_first or hourly_hgb
+            False if (five_minute_oi or literal_material or profit_first
+                      or prequalified_2r or hourly_hgb)
             else None),
         "strategy_max_bars": (72 if five_minute_oi else
                               int(setup.get("hold_bars") or 48)
-                              if profit_first else
+                              if profit_first or prequalified_2r else
                               int(setup.get("hold_bars") or 64)
                               if literal_material else
                               int(setup.get("hold_bars") or 12)
@@ -4004,13 +4009,15 @@ def _venue_analysis(symbol: str, setup: dict, btc_change: float = 0.0) -> dict:
         "source": ("venue_shadow_1h_hgb" if hourly_hgb
                    else "venue_shadow_5m_oi" if five_minute_oi
                    else "venue_shadow_profit_first_2r" if profit_first
+                   else "venue_shadow_2r_union" if prequalified_2r
                    else "venue_shadow_experiment" if shadow_experiment
                    else "venue_regime"),
         "signal_bar_ts": float(setup["signal_bar_ts"]),
         "route_policy": setup.get("route_policy"),
         "eff_ratio": setup["eff_ratio"], "btc_change": btc_change,
-        # Every signal in the current deployment is visible in Telegram and
-        # tracked in the DB, but is permanently ineligible for real orders.
+        # Every published signal in the current deployment is visible in
+        # Telegram and tracked in the DB.  Silent research rows reuse this
+        # schema but are blocked before publication below.
         # Experimental modules remain untradeable even if the deployment is
         # later switched to live.  This is a second barrier in addition to the
         # live-mode scan gate below and autotrader's shadow-only refusal.
@@ -4020,6 +4027,7 @@ def _venue_analysis(symbol: str, setup: dict, btc_change: float = 0.0) -> dict:
         "_hourly_hgb_shadow": hourly_hgb,
         "_literal_material_shadow": literal_material,
         "_profit_first_material_shadow": profit_first,
+        "_prequalified_2r_shadow": prequalified_2r,
     }
 
 
@@ -4220,7 +4228,7 @@ def _run_venue_strategy_scan() -> None:
     raw_setups = 0
     strategy_audit = {
         "symbols_evaluated": 0, "family_signals": 0,
-        "results": {}, "rejected": {},
+        "results": {}, "rejected": {}, "silent_2r_candidates": 0,
     }
     portfolio_rejects = {
         "already_open": 0, "symbol_blocked": 0, "missing_history": 0,
@@ -4281,6 +4289,25 @@ def _run_venue_strategy_scan() -> None:
                     mark_setup_blocked(setup_id, "cooldown")
                     continue
                 candidates.append((analysis, setup_id))
+
+            # The prequalified 2R union improved aggregate sealed checks but
+            # missed the newest monthly non-inferiority gate.  Persist exact
+            # paper outcomes without consuming Telegram or portfolio capacity.
+            # A distinct source keeps its atomic dedup independent from the
+            # published Profit-First shadow signal on the same closed bar.
+            silent_rows = prequalified_2r_shadow_setups(
+                candles, btc,
+                entry_time=entry_time,
+                market_price=float(market), symbol=symbol,
+            )
+            strategy_audit["silent_2r_candidates"] += len(silent_rows)
+            for row in silent_rows:
+                row.setdefault("signal_bar_ts", candles["time"][-1])
+                analysis = _venue_analysis(symbol, row)
+                setup_id = log_setup_candidate_once(analysis)
+                if not setup_id:
+                    continue
+                mark_setup_blocked(setup_id, "research_shadow")
         except Exception as exc:
             portfolio_rejects["strategy_error"] += 1
             log.warning("Venue strategy failed for %s: %s", symbol, exc)

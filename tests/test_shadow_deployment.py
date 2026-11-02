@@ -260,6 +260,33 @@ class ShadowDeploymentTests(unittest.TestCase):
         self.assertTrue(any("0.50% target / 1.00% stop" in tag
                             for tag in analysis["signals"]))
 
+    def test_prequalified_2r_union_is_silent_and_has_exact_replay_contract(self):
+        setup = {
+            "direction": "LONG", "entry": 100.0, "atr": 2.0,
+            "target_r": 2.0, "first_target_move_pct": 8.0,
+            "hold_bars": 48, "utc_session": "06_11",
+            "btc_regime": "bull", "eff_ratio": .4,
+            "signal_bar_ts": 900.0,
+            "module": "shadow_2r_breakout_long_bull_europe",
+            "_shadow_experiment": True,
+            "_prequalified_2r_shadow": True,
+        }
+        with patch.object(main, "DEPLOYMENT_MODE", "live"):
+            analysis = main._venue_analysis("AAVEUSDT", setup)
+        self.assertTrue(analysis["_shadow_only"])
+        self.assertTrue(analysis["_prequalified_2r_shadow"])
+        self.assertEqual(analysis["source"], "venue_shadow_2r_union")
+        self.assertEqual(analysis["fixed_target_r"], 2.0)
+        self.assertEqual(analysis["strategy_bar_seconds"], 900)
+        self.assertEqual(analysis["strategy_entry_bar_ts"], 1800.0)
+        self.assertFalse(analysis["strategy_stop_on_close"])
+        self.assertEqual(analysis["strategy_max_bars"], 48)
+
+        import inspect
+        scan = inspect.getsource(main._run_venue_strategy_scan)
+        self.assertIn("silent_rows = prequalified_2r_shadow_setups", scan)
+        self.assertIn('mark_setup_blocked(setup_id, "research_shadow")', scan)
+
     def test_five_minute_fixed_runner_uses_5m_bars_and_next_bar_breakeven(self):
         start = 2_000_000_100.0
         frame = {
@@ -482,6 +509,47 @@ class ShadowDeploymentTests(unittest.TestCase):
         self.assertTrue(analysis["_shadow_only"])
         self.assertEqual(analysis["strategy_bar_seconds"], 900)
         self.assertEqual(analysis["strategy_max_bars"], 48)
+
+    def test_scan_tracks_prequalified_2r_union_without_publishing_it(self):
+        closed_at = datetime.now(timezone.utc).timestamp() - 900
+        fifteen = {"time": [closed_at], "close": [100.0]}
+        setup = {
+            "direction": "LONG", "entry": 100.0, "atr": 2.0,
+            "target_r": 2.0, "first_target_move_pct": 8.0,
+            "hold_bars": 48, "utc_session": "06_11",
+            "btc_regime": "bull", "eff_ratio": .4,
+            "signal_bar_ts": closed_at,
+            "module": "shadow_2r_breakout_long_bull_europe",
+            "_shadow_experiment": True,
+            "_prequalified_2r_shadow": True,
+        }
+        with patch.object(main, "ROBUST_SYMBOLS", {"BTCUSDT"}), \
+             patch.object(main, "REGIME_FILTER_MODE", "paper"), \
+             patch.object(main, "TRADE_WEEKENDS", True), \
+             patch.object(main, "TRADING_HOURS_START", 0), \
+             patch.object(main, "TRADING_HOURS_END", 24), \
+             patch.object(main, "_venue_daily_loss_pause", return_value=False), \
+             patch.object(main, "get_xperp_instruments",
+                          return_value={"BTC": "BTC-XPERP"}), \
+             patch.object(main, "get_klines_xperp", return_value=fifteen), \
+             patch.object(main, "get_xperp_price", return_value=100.0), \
+             patch.object(main, "get_open_signals", return_value=[]), \
+             patch.object(main, "get_active_symbol_blocks", return_value=[]), \
+             patch.object(main, "profit_first_material_shadow_setups",
+                          return_value=[]), \
+             patch.object(main, "prequalified_2r_shadow_setups",
+                          return_value=[setup]) as router, \
+             patch.object(main, "log_setup_candidate_once", return_value=12) as log, \
+             patch.object(main, "mark_setup_blocked") as blocked, \
+             patch.object(main, "_publish_venue_candidates", return_value=0) as publish:
+            main._run_venue_strategy_scan()
+
+        router.assert_called_once()
+        analysis = log.call_args.args[0]
+        self.assertEqual(analysis["source"], "venue_shadow_2r_union")
+        self.assertTrue(analysis["_shadow_only"])
+        blocked.assert_called_once_with(12, "research_shadow")
+        publish.assert_called_once_with([], {"LONG": 0, "SHORT": 0})
 
     def test_scan_drops_stale_closed_bar_instead_of_entering_late(self):
         fifteen = {"time": [900.0], "close": [100.0]}
