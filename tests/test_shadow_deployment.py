@@ -21,6 +21,9 @@ class ShadowDeploymentTests(unittest.TestCase):
         self.assertIn("Build: 12345678", body)
         self.assertIn("Max entry delay: 180s", body)
         self.assertIn(
+            "Entry contract: forming 15m open model / current X-Perp market",
+            body)
+        self.assertIn(
             "Shared account cap: 12 positions / 90% margin / 2 writers", body)
 
     def test_scan_status_explains_every_candidate_stage(self):
@@ -533,6 +536,10 @@ class ShadowDeploymentTests(unittest.TestCase):
     def test_scan_uses_frozen_profit_first_router_in_shadow_mode(self):
         closed_at = datetime.now(timezone.utc).timestamp() - 900
         fifteen = {"time": [closed_at], "close": [100.0]}
+        forming = {
+            "time": [closed_at + 900], "open": [100.0],
+            "close": [99.0], "confirmed": [0],
+        }
         setup = {
             "direction": "SHORT", "entry": 99.0, "atr": .495,
             "target_r": .5, "runner_target_r": 2.0,
@@ -555,8 +562,8 @@ class ShadowDeploymentTests(unittest.TestCase):
              patch.object(main, "_venue_daily_loss_pause", return_value=False), \
              patch.object(main, "get_xperp_instruments",
                           return_value={"BTC": "BTC-XPERP"}), \
-             patch.object(main, "get_klines_xperp", return_value=fifteen), \
-             patch.object(main, "get_xperp_price", return_value=99.0), \
+             patch.object(main, "get_klines_xperp",
+                          side_effect=[fifteen, forming]) as klines, \
              patch.object(main, "get_open_signals", return_value=[]), \
              patch.object(main, "get_active_symbol_blocks", return_value=[]), \
              patch.object(main, "profit_first_material_shadow_setups",
@@ -568,6 +575,11 @@ class ShadowDeploymentTests(unittest.TestCase):
             main._run_venue_strategy_scan()
 
         router.assert_called_once()
+        self.assertEqual(klines.call_count, 2)
+        self.assertEqual(klines.call_args_list[1].kwargs,
+                         {"limit": 1, "include_forming": True})
+        self.assertEqual(router.call_args.kwargs["market_price"], 99.0)
+        self.assertEqual(router.call_args.kwargs["model_price"], 100.0)
         oi.assert_not_called()
         analysis = publish.call_args.args[0][0][0]
         self.assertEqual(analysis["signal_bar_ts"], closed_at)
@@ -579,6 +591,10 @@ class ShadowDeploymentTests(unittest.TestCase):
     def test_scan_tracks_prequalified_2r_union_without_publishing_it(self):
         closed_at = datetime.now(timezone.utc).timestamp() - 900
         fifteen = {"time": [closed_at], "close": [100.0]}
+        forming = {
+            "time": [closed_at + 900], "open": [100.0],
+            "close": [100.0], "confirmed": [0],
+        }
         setup = {
             "direction": "LONG", "entry": 100.0, "atr": 2.0,
             "target_r": 2.0, "first_target_move_pct": 8.0,
@@ -597,8 +613,8 @@ class ShadowDeploymentTests(unittest.TestCase):
              patch.object(main, "_venue_daily_loss_pause", return_value=False), \
              patch.object(main, "get_xperp_instruments",
                           return_value={"BTC": "BTC-XPERP"}), \
-             patch.object(main, "get_klines_xperp", return_value=fifteen), \
-             patch.object(main, "get_xperp_price", return_value=100.0), \
+             patch.object(main, "get_klines_xperp",
+                          side_effect=[fifteen, forming]), \
              patch.object(main, "get_open_signals", return_value=[]), \
              patch.object(main, "get_active_symbol_blocks", return_value=[]), \
              patch.object(main, "profit_first_material_shadow_setups",
@@ -618,6 +634,32 @@ class ShadowDeploymentTests(unittest.TestCase):
         self.assertEqual(publish.call_args.args[:2],
                          ([], {"LONG": 0, "SHORT": 0}))
         self.assertEqual(publish.call_args.args[2], {})
+
+    def test_scan_fails_closed_without_forming_entry_snapshot(self):
+        closed_at = datetime.now(timezone.utc).timestamp() - 900
+        fifteen = {"time": [closed_at], "close": [100.0]}
+        with patch.object(main, "ROBUST_SYMBOLS", {"BTCUSDT"}), \
+             patch.object(main, "REGIME_FILTER_MODE", "paper"), \
+             patch.object(main, "TRADE_WEEKENDS", True), \
+             patch.object(main, "TRADING_HOURS_START", 0), \
+             patch.object(main, "TRADING_HOURS_END", 24), \
+             patch.object(main, "_venue_daily_loss_pause", return_value=False), \
+             patch.object(main, "get_xperp_instruments",
+                          return_value={"BTC": "BTC-XPERP"}), \
+             patch.object(main, "get_klines_xperp",
+                          side_effect=[fifteen, fifteen]), \
+             patch.object(main, "get_open_signals", return_value=[]), \
+             patch.object(main, "get_active_symbol_blocks", return_value=[]), \
+             patch.object(main, "profit_first_material_shadow_setups") as router, \
+             patch.object(main, "_persist_crypto_scan_audit") as persist, \
+             patch.object(main, "_publish_venue_candidates", return_value=0) as publish:
+            main._run_venue_strategy_scan()
+        router.assert_not_called()
+        self.assertEqual(
+            persist.call_args.args[0]["portfolio_rejects"]["missing_entry_snapshot"],
+            1)
+        self.assertEqual(publish.call_args.args[:2],
+                         ([], {"LONG": 0, "SHORT": 0}))
 
     def test_scan_drops_stale_closed_bar_instead_of_entering_late(self):
         self.assertEqual(main._MAX_VENUE_ENTRY_DELAY_SEC, 180)

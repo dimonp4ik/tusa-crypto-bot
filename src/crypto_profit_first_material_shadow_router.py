@@ -89,6 +89,7 @@ def model_probability(*, symbol: str, signal: dict, context: dict,
 
 def shadow_setups(candles: dict, btc_candles: dict, *, entry_time: float,
                   market_price: float | None = None,
+                  model_price: float | None = None,
                   symbol: str | None = None,
                   diagnostics: dict | None = None) -> list[dict]:
     """Return at most one frozen-model setup, permanently marked shadow-only."""
@@ -130,6 +131,19 @@ def shadow_setups(candles: dict, btc_candles: dict, *, entry_time: float,
     if not math.isfinite(entry) or entry <= 0:
         audit["result"] = "invalid_market_price"
         return []
+    try:
+        reference = float(model_price if model_price is not None else entry)
+    except (TypeError, ValueError):
+        audit["result"] = "invalid_model_price"
+        return []
+    if not math.isfinite(reference) or reference <= 0:
+        audit["result"] = "invalid_model_price"
+        return []
+    audit.update({
+        "market_price": entry,
+        "model_price": reference,
+        "entry_drift_pct": 100.0 * (entry / reference - 1.0),
+    })
 
     signals = family_signals(candles)
     audit["family_signals"] = len(signals)
@@ -138,15 +152,27 @@ def shadow_setups(candles: dict, btc_candles: dict, *, entry_time: float,
         return []
     for signal in signals:
         risk = float(MODEL["stop_atr"]) * float(signal["atr"])
-        risk_pct = risk / entry
-        if (not math.isfinite(risk_pct)
-                or risk_pct < float(MODEL["risk_pct_min"])
-                or risk_pct > float(MODEL["risk_pct_max"])):
-            _increment(audit["rejected"], "risk_outside_1_to_2pct")
+        model_risk_pct = risk / reference
+        execution_risk_pct = risk / entry
+        if (not math.isfinite(model_risk_pct)
+                or model_risk_pct < float(MODEL["risk_pct_min"])
+                or model_risk_pct > float(MODEL["risk_pct_max"])):
+            _increment(audit["rejected"],
+                       "model_risk_outside_1_to_2pct")
+            continue
+        # The frozen classifier is evaluated at the forming bar's immutable
+        # open, exactly as in replay.  The actual market bracket still has to
+        # honour the same risk band; a delayed ticker may remove a candidate
+        # but can never manufacture one that the replay rejected.
+        if (not math.isfinite(execution_risk_pct)
+                or execution_risk_pct < float(MODEL["risk_pct_min"])
+                or execution_risk_pct > float(MODEL["risk_pct_max"])):
+            _increment(audit["rejected"],
+                       "execution_risk_outside_1_to_2pct")
             continue
         probability = model_probability(
             symbol=symbol, signal=signal, context=context,
-            entry_time=entry_time, risk_pct=risk_pct)
+            entry_time=entry_time, risk_pct=model_risk_pct)
         if probability < float(MODEL["quality_threshold"]):
             _increment(audit["rejected"], "model_quality_below_threshold")
             continue
@@ -174,9 +200,12 @@ def shadow_setups(candles: dict, btc_candles: dict, *, entry_time: float,
             "tp1_close_fraction": float(MODEL["near_close_fraction"]),
             "hold_bars": int(MODEL["hold_bars"]),
             "model_quality": probability,
-            "risk_pct": risk_pct,
-            "first_target_move_pct": 100.0 * risk_pct * near_r,
-            "runner_target_move_pct": 100.0 * risk_pct * runner_r,
+            "risk_pct": execution_risk_pct,
+            "model_risk_pct": model_risk_pct,
+            "entry_reference_price": reference,
+            "entry_drift_pct": 100.0 * (entry / reference - 1.0),
+            "first_target_move_pct": 100.0 * execution_risk_pct * near_r,
+            "runner_target_move_pct": 100.0 * execution_risk_pct * runner_r,
             "utc_session": _session(entry_time),
             "_shadow_experiment": True,
             "_profit_first_material_shadow": True,

@@ -752,6 +752,7 @@ def status():
             f"Build: {deploy_sha}. "
             f"Scanning every {SCAN_INTERVAL_MINUTES} min. "
             f"Max entry delay: {_MAX_VENUE_ENTRY_DELAY_SEC}s. "
+            "Entry contract: forming 15m open model / current X-Perp market. "
             f"Max signals/scan: {VENUE_MAX_SIGNALS_PER_SCAN}. "
             f"Shared account cap: {AUTOTRADE_MAX_ACCOUNT_POSITIONS} positions / "
             f"{100 * AUTOTRADE_MAX_ACCOUNT_MARGIN_FRACTION:g}% margin / "
@@ -4004,6 +4005,10 @@ def _venue_analysis(symbol: str, setup: dict, btc_change: float = 0.0) -> dict:
             f"{(1-tp1_close_fraction) * 100:.0f}% @ +{runner_move_pct:.2f}%")
     if profit_first:
         tags.append(f"Frozen material HGB quality {float(setup['model_quality']):.4f}")
+        if setup.get("entry_reference_price") is not None:
+            tags.append(
+                f"Model entry {float(setup['entry_reference_price']):.8g}; "
+                f"market drift {float(setup.get('entry_drift_pct') or 0):+.3f}%")
     return {
         "symbol": symbol, "direction": direction, "decision": direction,
         "confidence": "HIGH", "risk_score": 1,
@@ -4235,6 +4240,7 @@ def _run_venue_strategy_scan() -> None:
         return
     fetched = {}
     market_prices = {}
+    entry_references = {}
     def _fetch(symbol: str):
         # These constants come from the feature builders themselves.  Keeping
         # the fetch tied to them prevents a shorter magic limit from silently
@@ -4243,20 +4249,33 @@ def _run_venue_strategy_scan() -> None:
             symbol, limit=(REQUIRED_BTC_HISTORY_BARS
                            if symbol == "BTCUSDT"
                            else REQUIRED_SYMBOL_HISTORY_BARS))
+        # Replay enters at this forming 15m bar's immutable open.  Read the
+        # same public candle so model admission cannot drift with the ticker
+        # during the scheduler's settlement minute.  Its live close remains
+        # the market entry shown to the client.
+        snapshot = get_klines_xperp(
+            symbol, limit=1, include_forming=True)
+        reference = market = None
         try:
-            market = get_xperp_price(symbol)
-        except Exception as exc:
-            log.warning("Venue market-price fetch failed for %s: %s", symbol, exc)
-            market = None
-        return symbol, fifteen, market
+            if (fifteen and snapshot
+                    and int(snapshot["time"][-1])
+                    == int(fifteen["time"][-1]) + KLINES_INTERVAL_SEC
+                    and not bool(snapshot.get("confirmed", [0])[-1])):
+                reference = float(snapshot["open"][-1])
+                market = float(snapshot["close"][-1])
+        except (KeyError, IndexError, TypeError, ValueError):
+            reference = market = None
+        return symbol, fifteen, market, reference
     with ThreadPoolExecutor(max_workers=4) as pool:
         for future in as_completed([pool.submit(_fetch, symbol) for symbol in symbols]):
             try:
-                symbol, candles, market = future.result()
+                symbol, candles, market, reference = future.result()
                 if candles:
                     fetched[symbol] = candles
                 if market:
                     market_prices[symbol] = float(market)
+                if reference:
+                    entry_references[symbol] = float(reference)
             except Exception as exc:
                 log.warning("Venue candle fetch failed: %s", exc)
 
@@ -4269,10 +4288,6 @@ def _run_venue_strategy_scan() -> None:
         })
         log.warning("Venue scan refused: BTC candles are unavailable")
         return
-    # Market fallback remains X-Perp and is used only when the public ticker
-    # endpoint is temporarily unavailable.
-    for symbol, candles in fetched.items():
-        market_prices.setdefault(symbol, float(candles["close"][-1]))
     active_rows = get_open_signals()
     active = {row["symbol"] for row in active_rows}
     open_direction_counts = {
@@ -4292,6 +4307,7 @@ def _run_venue_strategy_scan() -> None:
     }
     portfolio_rejects = {
         "already_open": 0, "symbol_blocked": 0, "missing_history": 0,
+        "missing_entry_snapshot": 0,
         "stale_bar": 0, "duplicate_bar": 0, "cooldown": 0,
         "strategy_error": 0,
     }
@@ -4316,12 +4332,20 @@ def _run_venue_strategy_scan() -> None:
                 portfolio_rejects["stale_bar"] += 1
                 log.info("Venue setup skipped for %s: closed bar is stale", symbol)
                 continue
-            market = market_prices.get(symbol) or float(candles["close"][-1])
+            market = market_prices.get(symbol)
+            reference = entry_references.get(symbol)
+            if market is None or reference is None:
+                portfolio_rejects["missing_entry_snapshot"] += 1
+                log.info(
+                    "Venue setup skipped for %s: forming entry snapshot unavailable",
+                    symbol)
+                continue
             route_audit = {}
             rows = profit_first_material_shadow_setups(
                 candles, btc,
                 entry_time=entry_time,
-                market_price=float(market), symbol=symbol,
+                market_price=float(market), model_price=float(reference),
+                symbol=symbol,
                 diagnostics=route_audit,
             )
             strategy_audit["symbols_evaluated"] += 1

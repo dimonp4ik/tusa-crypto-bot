@@ -101,7 +101,51 @@ class ProfitFirstMaterialShadowRouterTests(unittest.TestCase):
                 symbol="BTCUSDT", diagnostics=audit)
         self.assertEqual(rows, [])
         self.assertEqual(audit["result"], "all_family_signals_filtered")
-        self.assertEqual(audit["rejected"], {"risk_outside_1_to_2pct": 1})
+        self.assertEqual(
+            audit["rejected"], {"model_risk_outside_1_to_2pct": 1})
+
+    def test_model_uses_immutable_bar_open_while_bracket_uses_market(self):
+        signal = {
+            **SAMPLE["signal"], "atr": .75,
+            "abs_z": abs(SAMPLE["signal"]["z"]),
+        }
+        with patch.object(router, "btc_context", return_value=SAMPLE["context"]), \
+             patch.object(router, "family_signals", return_value=[signal]), \
+             patch.object(router, "model_probability",
+                          return_value=router.MODEL["quality_threshold"] + .01) as score:
+            rows = router.shadow_setups(
+                {"close": [100.0] * router.REQUIRED_SYMBOL_HISTORY_BARS},
+                {"close": [1.0] * router.REQUIRED_BTC_HISTORY_BARS},
+                entry_time=SAMPLE["entry_time"], market_price=101.0,
+                model_price=100.0, symbol="BTCUSDT")
+        self.assertEqual(len(rows), 1)
+        setup = rows[0]
+        self.assertAlmostEqual(score.call_args.kwargs["risk_pct"], .015)
+        self.assertAlmostEqual(setup["model_risk_pct"], .015)
+        self.assertAlmostEqual(setup["risk_pct"], 1.5 / 101.0)
+        self.assertAlmostEqual(setup["entry_reference_price"], 100.0)
+        self.assertAlmostEqual(setup["entry_drift_pct"], 1.0)
+        self.assertAlmostEqual(setup["entry"], 101.0)
+        self.assertAlmostEqual(setup["sl"], 102.5)
+
+    def test_market_drift_can_only_remove_out_of_band_execution(self):
+        signal = {
+            **SAMPLE["signal"], "atr": .75,
+            "abs_z": abs(SAMPLE["signal"]["z"]),
+        }
+        audit = {}
+        with patch.object(router, "btc_context", return_value=SAMPLE["context"]), \
+             patch.object(router, "family_signals", return_value=[signal]), \
+             patch.object(router, "model_probability") as score:
+            rows = router.shadow_setups(
+                {"close": [100.0] * router.REQUIRED_SYMBOL_HISTORY_BARS},
+                {"close": [1.0] * router.REQUIRED_BTC_HISTORY_BARS},
+                entry_time=SAMPLE["entry_time"], market_price=200.0,
+                model_price=100.0, symbol="BTCUSDT", diagnostics=audit)
+        self.assertEqual(rows, [])
+        score.assert_not_called()
+        self.assertEqual(
+            audit["rejected"], {"execution_risk_outside_1_to_2pct": 1})
 
 
 if __name__ == "__main__":
