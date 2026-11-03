@@ -21,6 +21,29 @@ class ShadowDeploymentTests(unittest.TestCase):
         self.assertIn("Build: 12345678", body)
         self.assertIn("Max entry delay: 180s", body)
 
+    def test_scan_status_explains_every_candidate_stage(self):
+        audit = {
+            "ts": main.time.time(), "result": "qualified_but_not_published",
+            "targets": 12, "fetched": 12, "raw_setups": 2,
+            "publish_candidates": 2, "published": 0,
+            "strategy": {
+                "family_signals": 3, "silent_2r_candidates": 1,
+                "results": {"candidate": 2, "no_setup": 10},
+                "rejected": {"btc_regime": 1},
+            },
+            "portfolio_rejects": {"already_open": 1, "cooldown": 0},
+            "publish_rejects": {"hour_cap": 2},
+        }
+        with patch.object(main, "get_bot_state",
+                          return_value=main.json.dumps(audit)):
+            body = main._crypto_scan_status_text()
+        self.assertIn("семейных сетапов 3", body)
+        self.assertIn("production 2", body)
+        self.assertIn("research 2R 1", body)
+        self.assertIn('"btc_regime": 1', body)
+        self.assertIn('"already_open": 1', body)
+        self.assertIn('"hour_cap": 2', body)
+
     def test_scan_universe_contains_only_frozen_profit_first_symbols(self):
         with patch.object(main, "ROBUST_SYMBOLS", {"BTCUSDT"}), \
              patch.object(main, "FIVE_MINUTE_OI_SHADOW_SYMBOLS", {"ONDOUSDT"}), \
@@ -446,14 +469,17 @@ class ShadowDeploymentTests(unittest.TestCase):
         candidates = [({
             "symbol": "XUSDT", "direction": "LONG", "source": "venue_regime",
         }, 8)]
+        reject_audit = {}
         with patch.object(main, "get_recent_signals", return_value=[
                 {"opened_at": main.time.time() - 60},
                 {"opened_at": main.time.time() - 120},
              ]), patch.object(main, "send_signal") as send, \
              patch.object(main, "mark_setup_blocked") as blocked:
-            self.assertEqual(main._publish_venue_candidates(candidates), 0)
+            self.assertEqual(main._publish_venue_candidates(
+                candidates, reject_audit=reject_audit), 0)
         send.assert_not_called()
         blocked.assert_called_once_with(8, "hour_cap")
+        self.assertEqual(reject_audit, {"hour_cap": 1})
 
     def test_production_has_priority_over_five_minute_supplement(self):
         candidates = [
@@ -557,7 +583,9 @@ class ShadowDeploymentTests(unittest.TestCase):
         self.assertEqual(analysis["source"], "venue_shadow_2r_union")
         self.assertTrue(analysis["_shadow_only"])
         blocked.assert_called_once_with(12, "research_shadow")
-        publish.assert_called_once_with([], {"LONG": 0, "SHORT": 0})
+        self.assertEqual(publish.call_args.args[:2],
+                         ([], {"LONG": 0, "SHORT": 0}))
+        self.assertEqual(publish.call_args.args[2], {})
 
     def test_scan_drops_stale_closed_bar_instead_of_entering_late(self):
         self.assertEqual(main._MAX_VENUE_ENTRY_DELAY_SEC, 180)
@@ -577,7 +605,9 @@ class ShadowDeploymentTests(unittest.TestCase):
              patch.object(main, "_publish_venue_candidates", return_value=0) as publish:
             main._run_venue_strategy_scan()
         router.assert_not_called()
-        publish.assert_called_once_with([], {"LONG": 0, "SHORT": 0})
+        self.assertEqual(publish.call_args.args[:2],
+                         ([], {"LONG": 0, "SHORT": 0}))
+        self.assertEqual(publish.call_args.args[2], {})
 
     def test_scan_does_not_fetch_oi_without_price_candidate(self):
         with patch.object(main, "DEPLOYMENT_MODE", "shadow"), \

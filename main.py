@@ -675,6 +675,15 @@ def health():
 
 
 def _crypto_scan_status_text() -> str:
+    def _counts(value) -> str:
+        rows = {
+            str(key): int(count)
+            for key, count in (value or {}).items()
+            if int(count or 0)
+        }
+        return (json.dumps(rows, ensure_ascii=False, sort_keys=True)
+                if rows else "нет")
+
     try:
         row = json.loads(get_bot_state("crypto_scan_audit") or "{}")
         if not row:
@@ -693,13 +702,21 @@ def _crypto_scan_status_text() -> str:
         }
         result = result_names.get(
             str(row.get("result")), str(row.get("result") or "неизвестно"))
+        strategy = row.get("strategy") or {}
         return (
             f"Последний скан: {age_minutes} мин назад · {result}\n"
             f"Данные: {int(row.get('fetched') or 0)}/{int(row.get('targets') or 0)} "
             f"инструментов · семейных сетапов "
-            f"{int((row.get('strategy') or {}).get('family_signals') or 0)} · "
+            f"{int(strategy.get('family_signals') or 0)} · "
+            f"production {int(row.get('raw_setups') or 0)} · "
+            f"research 2R {int(strategy.get('silent_2r_candidates') or 0)} · "
             f"к публикации {int(row.get('publish_candidates') or 0)} · "
-            f"отправлено {int(row.get('published') or 0)}"
+            f"отправлено {int(row.get('published') or 0)}\n"
+            f"Модель: итог {_counts(strategy.get('results'))} · "
+            f"отсев {_counts(strategy.get('rejected'))}\n"
+            f"Портфель: до публикации "
+            f"{_counts(row.get('portfolio_rejects'))} · на публикации "
+            f"{_counts(row.get('publish_rejects'))}"
         )
     except Exception:
         return "Последний скан: аудит временно недоступен"
@@ -4066,8 +4083,10 @@ def _venue_scan_universe(available: set[str]) -> list[str]:
         symbol for symbol in scan_universe if _base_of_symbol(symbol) in available)
 
 
-def _publish_venue_candidates(candidates: list[tuple[dict, int]],
-                              open_direction_counts: dict[str, int] | None = None) -> int:
+def _publish_venue_candidates(
+        candidates: list[tuple[dict, int]],
+        open_direction_counts: dict[str, int] | None = None,
+        reject_audit: dict[str, int] | None = None) -> int:
     """Publish a bounded, deterministic slice of one scan's candidates.
 
     Candidates are already stored in setup_log. Overflow rows are marked so
@@ -4101,16 +4120,24 @@ def _publish_venue_candidates(candidates: list[tuple[dict, int]],
     for analysis, setup_id in ordered:
         if recent_hour_count >= 2:
             mark_setup_blocked(setup_id, "hour_cap")
+            if reject_audit is not None:
+                reject_audit["hour_cap"] = reject_audit.get("hour_cap", 0) + 1
             continue
         if published >= VENUE_MAX_SIGNALS_PER_SCAN:
             mark_setup_blocked(setup_id, "scan_cap")
+            if reject_audit is not None:
+                reject_audit["scan_cap"] = reject_audit.get("scan_cap", 0) + 1
             continue
         direction = analysis.get("direction", "")
         if direction_counts.get(direction, 0) >= MAX_SAME_DIRECTION_POSITIONS:
             mark_setup_blocked(setup_id, "dir_cap")
+            if reject_audit is not None:
+                reject_audit["dir_cap"] = reject_audit.get("dir_cap", 0) + 1
             continue
         if not send_signal(analysis):
             mark_setup_blocked(setup_id, "send_failed")
+            if reject_audit is not None:
+                reject_audit["send_failed"] = reject_audit.get("send_failed", 0) + 1
             continue
         mark_setup_sent(setup_id)
         _cache_signal(analysis["symbol"], analysis["direction"])
@@ -4318,7 +4345,9 @@ def _run_venue_strategy_scan() -> None:
         except Exception as exc:
             portfolio_rejects["strategy_error"] += 1
             log.warning("Venue strategy failed for %s: %s", symbol, exc)
-    published = _publish_venue_candidates(candidates, open_direction_counts)
+    publish_rejects = {}
+    published = _publish_venue_candidates(
+        candidates, open_direction_counts, publish_rejects)
     now = time.time()
     symbol_lengths = [len(row.get("close") or []) for key, row in fetched.items()
                       if key != "BTCUSDT"]
@@ -4338,6 +4367,7 @@ def _run_venue_strategy_scan() -> None:
         "strategy": strategy_audit,
         "raw_setups": raw_setups,
         "portfolio_rejects": portfolio_rejects,
+        "publish_rejects": publish_rejects,
         "publish_candidates": len(candidates),
         "published": published,
         "open_long": open_direction_counts.get("LONG", 0),
