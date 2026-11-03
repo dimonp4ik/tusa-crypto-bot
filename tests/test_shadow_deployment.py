@@ -20,6 +20,8 @@ class ShadowDeploymentTests(unittest.TestCase):
         self.assertEqual(code, 200)
         self.assertIn("Build: 12345678", body)
         self.assertIn("Max entry delay: 180s", body)
+        self.assertIn(
+            "Shared account cap: 12 positions / 90% margin / 2 writers", body)
 
     def test_scan_status_explains_every_candidate_stage(self):
         audit = {

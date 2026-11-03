@@ -31,6 +31,9 @@ from config import (
     POST_TP1_STRONG_TRAIL_ATR_MULT, POST_TP1_WEAK_TRAIL_ATR_MULT,
     POST_TP1_STRONG_CLOSE_PROGRESS, POST_TP1_STRONG_WICK_PROGRESS,
     POST_TP1_WEAK_CLOSE_PROGRESS, REGIME_FILTER_MODE, DEPLOYMENT_MODE,
+    AUTOTRADE_MAX_ACCOUNT_MARGIN_FRACTION,
+    AUTOTRADE_ACCOUNT_WRITER_COUNT,
+    AUTOTRADE_MAX_ACCOUNT_POSITIONS,
 )
 from src.binance_client import (
     get_klines, get_current_price, get_xperp_instruments, get_xperp_price,
@@ -750,6 +753,9 @@ def status():
             f"Scanning every {SCAN_INTERVAL_MINUTES} min. "
             f"Max entry delay: {_MAX_VENUE_ENTRY_DELAY_SEC}s. "
             f"Max signals/scan: {VENUE_MAX_SIGNALS_PER_SCAN}. "
+            f"Shared account cap: {AUTOTRADE_MAX_ACCOUNT_POSITIONS} positions / "
+            f"{100 * AUTOTRADE_MAX_ACCOUNT_MARGIN_FRACTION:g}% margin / "
+            f"{AUTOTRADE_ACCOUNT_WRITER_COUNT} writers. "
             f"Signal cache: {len(_signal_cache)} entries. "
             f"{_crypto_scan_status_text().replace(chr(10), ' | ')}"), 200
 
