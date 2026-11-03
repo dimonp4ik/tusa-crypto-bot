@@ -44,6 +44,36 @@ class ShadowDeploymentTests(unittest.TestCase):
         self.assertIn('"already_open": 1', body)
         self.assertIn('"hour_cap": 2', body)
 
+    def test_stale_scheduler_cycle_keeps_last_real_decision_visible(self):
+        now = main.time.time()
+        current = {
+            "ts": now, "result": "waiting_fresh_bar",
+            "portfolio_rejects": {"stale_bar": 11},
+        }
+        decision = {
+            "ts": now - 360, "result": "no_candidate_passed",
+            "targets": 12, "fetched": 12, "raw_setups": 0,
+            "publish_candidates": 0, "published": 0,
+            "strategy": {
+                "family_signals": 3, "silent_2r_candidates": 0,
+                "results": {"no_setup": 12},
+                "rejected": {"route_gate": 3},
+            },
+            "portfolio_rejects": {}, "publish_rejects": {},
+        }
+
+        def state(key):
+            value = current if key == "crypto_scan_audit" else decision
+            return main.json.dumps(value)
+
+        with patch.object(main, "get_bot_state", side_effect=state):
+            body = main._crypto_scan_status_text()
+        self.assertIn("ожидание свежей 15m свечи", body)
+        self.assertIn("старых баров 11", body)
+        self.assertIn("Последнее решение: 6 мин назад", body)
+        self.assertIn("семейных сетапов 3", body)
+        self.assertIn('"route_gate": 3', body)
+
     def test_scan_universe_contains_only_frozen_profit_first_symbols(self):
         with patch.object(main, "ROBUST_SYMBOLS", {"BTCUSDT"}), \
              patch.object(main, "FIVE_MINUTE_OI_SHADOW_SYMBOLS", {"ONDOUSDT"}), \

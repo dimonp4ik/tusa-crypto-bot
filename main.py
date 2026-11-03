@@ -688,11 +688,11 @@ def _crypto_scan_status_text() -> str:
         row = json.loads(get_bot_state("crypto_scan_audit") or "{}")
         if not row:
             return "Последний скан: данных ещё нет"
-        age_minutes = max(0, int((time.time() - float(row.get("ts") or 0)) / 60))
         result_names = {
             "published": "сигнал опубликован",
             "no_candidate_passed": "рынок проверен, сетапов нет",
             "qualified_but_not_published": "сетап отфильтрован портфелем",
+            "waiting_fresh_bar": "ожидание следующей закрытой 15m свечи",
             "weekend": "пауза на выходных",
             "outside_trading_hours": "вне торговых часов",
             "filter_disabled": "фильтр отключён настройкой",
@@ -700,11 +700,30 @@ def _crypto_scan_status_text() -> str:
             "btc_instrument_unavailable": "контракт BTC недоступен",
             "btc_history_unavailable": "история BTC недоступна",
         }
+        current_age = max(
+            0, int((time.time() - float(row.get("ts") or 0)) / 60))
+        prefix = "Последний скан"
+        if row.get("result") == "waiting_fresh_bar":
+            stale = int((row.get("portfolio_rejects") or {}).get(
+                "stale_bar") or 0)
+            prefix = (
+                f"Последний цикл: {current_age} мин назад · "
+                f"ожидание свежей 15m свечи · старых баров {stale}\n"
+                "Последнее решение")
+            decision = json.loads(
+                get_bot_state("crypto_decision_audit") or "{}")
+            if decision:
+                row = decision
+            else:
+                result = result_names["waiting_fresh_bar"]
+                return f"{prefix}: данных ещё нет · {result}"
+        age_minutes = max(
+            0, int((time.time() - float(row.get("ts") or 0)) / 60))
         result = result_names.get(
             str(row.get("result")), str(row.get("result") or "неизвестно"))
         strategy = row.get("strategy") or {}
         return (
-            f"Последний скан: {age_minutes} мин назад · {result}\n"
+            f"{prefix}: {age_minutes} мин назад · {result}\n"
             f"Данные: {int(row.get('fetched') or 0)}/{int(row.get('targets') or 0)} "
             f"инструментов · семейных сетапов "
             f"{int(strategy.get('family_signals') or 0)} · "
@@ -4150,10 +4169,11 @@ def _publish_venue_candidates(
     return published
 
 
-def _persist_crypto_scan_audit(payload: dict) -> None:
+def _persist_crypto_scan_audit(
+        payload: dict, state_key: str = "crypto_scan_audit") -> None:
     """Persist why the latest scan did or did not produce a paper signal."""
     try:
-        set_bot_state("crypto_scan_audit", json.dumps(payload, ensure_ascii=False))
+        set_bot_state(state_key, json.dumps(payload, ensure_ascii=False))
     except Exception as exc:
         log.warning("Crypto scan audit persistence failed: %s", exc)
 
@@ -4353,9 +4373,13 @@ def _run_venue_strategy_scan() -> None:
                       if key != "BTCUSDT"]
     audit = {
         "ts": now,
-        "result": ("published" if published else
-                   "qualified_but_not_published" if candidates else
-                   "no_candidate_passed"),
+        "result": (
+            "published" if published else
+            "qualified_but_not_published" if candidates else
+            "waiting_fresh_bar"
+            if (not strategy_audit["symbols_evaluated"]
+                and portfolio_rejects["stale_bar"])
+            else "no_candidate_passed"),
         "available_instruments": len(available),
         "targets": len(symbols),
         "fetched": len(fetched),
@@ -4374,6 +4398,8 @@ def _run_venue_strategy_scan() -> None:
         "open_short": open_direction_counts.get("SHORT", 0),
     }
     _persist_crypto_scan_audit(audit)
+    if strategy_audit["symbols_evaluated"]:
+        _persist_crypto_scan_audit(audit, "crypto_decision_audit")
     _last_scan_stats.update(
         coins=len(fetched), setups=raw_setups, fresh=len(candidates),
         enriched=len(candidates), sent=published, ts=now)
