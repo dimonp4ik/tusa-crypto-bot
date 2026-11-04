@@ -13,6 +13,16 @@ from src import telegram_notifier as notifier
 
 
 class ShadowDeploymentTests(unittest.TestCase):
+    def test_execution_label_matches_real_order_configuration(self):
+        with patch.object(main, "DEPLOYMENT_MODE", "live"), \
+             patch.object(main, "AUTOTRADE_ENABLED", True):
+            self.assertIn("LIVE", main._execution_state_text())
+            self.assertIn("реальные ордера доступны",
+                          main._execution_state_text())
+        with patch.object(main, "DEPLOYMENT_MODE", "shadow"), \
+             patch.object(main, "AUTOTRADE_ENABLED", False):
+            self.assertIn("PAPER", main._execution_state_text())
+
     def test_status_exposes_deployed_build_and_entry_age_contract(self):
         with patch.dict(os.environ, {"RAILWAY_GIT_COMMIT_SHA": "1234567890abcdef"}), \
              patch.object(main, "_crypto_scan_status_text", return_value="scan ok"):

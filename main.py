@@ -1,7 +1,8 @@
-"""Crypto paper-trading bot driven by frozen direct-venue strategies.
+"""Crypto signal bot driven by frozen direct-venue strategies.
 
 Every shadow scan loads the audited symbols from X-Perp and publishes
-market-entry paper signals. This deployment cannot open an order.
+market-entry signals. A live deployment can mirror eligible signals for an
+opted-in user; the same paper ledger remains the source of forward results.
 """
 
 import json
@@ -140,6 +141,12 @@ _MODERATOR_ALLOWED_PREFIX = (
     "adm_users_p", "adm_users_q_",
     "adm_at_rm_",
 )
+
+
+def _execution_state_text() -> str:
+    if DEPLOYMENT_MODE == "live" and AUTOTRADE_ENABLED:
+        return "LIVE: реальные ордера доступны подключённым пользователям"
+    return "PAPER: биржевые ордера выключены"
 
 
 def _moderator_may(data: str) -> bool:
@@ -750,6 +757,7 @@ def status():
                   or os.getenv("GIT_COMMIT_SHA") or "unknown")[:8]
     return (f"Mode: {DEPLOYMENT_MODE}. Strategy: audited direct-venue router. "
             f"Build: {deploy_sha}. "
+            f"Execution: {_execution_state_text()}. "
             f"Scanning every {SCAN_INTERVAL_MINUTES} min. "
             f"Max entry delay: {_MAX_VENUE_ENTRY_DELAY_SEC}s. "
             "Entry contract: forming 15m open model / current X-Perp market. "
@@ -1262,7 +1270,7 @@ def _handle_admin_callback(callback_id: str, chat_id: int,
         _edit_admin_text(
             chat_id, message_id,
             "🧩 *АКТИВНАЯ СТРАТЕГИЯ*\n\n"
-            "Режим: *SHADOW / PAPER*\n"
+            f"Исполнение: *{_execution_state_text()}*\n"
             "Модель: замороженный 15m Profit-First HGB, повторная точная проверка\n"
             "Вход: по текущей рыночной цене\n"
             "Выход: 5% на 0.5R, 95% на 2R; стоп 1R\n"
@@ -1272,8 +1280,7 @@ def _handle_admin_callback(callback_id: str, chat_id: int,
             "параллельно считаем рыночную фиксацию ещё 75%; базовый сигнал не меняется\n"
             "Готовность: *НЕ ПОДТВЕРЖДЕНА* — прежний forward-гейт отозван после "
             "проверки порядка TP1 → б/у → TP2\n"
-            "Генеративная нейросеть: отключена от решения\n"
-            "Реальные ордера: *ЗАПРЕЩЕНЫ КОДОМ*\n\n"
+            "Генеративная нейросеть: отключена от решения\n\n"
             "Все сигналы и исходы записываются для новой последовательной forward-проверки.",
             _kb_settings(),
         )
@@ -3058,12 +3065,12 @@ def webhook():
     # 🤖 Автотрейдинг — только в личке, только для допущенных админом
     elif text == "🛡 режим":
         _reply(chat_id,
-               "🛡 *ТЕНЕВОЙ РЕЖИМ*\n\n"
+               "🛡 *РЕЖИМ ИСПОЛНЕНИЯ*\n\n"
                "Работает замороженная 15m Profit-First модель X-Perp.\n"
-               "Сигналы входят по рынку и считаются виртуально.\n"
+               "Сигналы фиксируются по рынку и проверяются одинаково в PAPER и LIVE.\n"
                "Прежний forward-гейт отозван; идёт точная проверка порядка выходов.\n"
                "Нейросеть не принимает торговых решений.\n"
-               "Реальные ордера отключены на уровне конфигурации и кода.\n\n"
+               f"{_execution_state_text()}.\n\n"
                + _crypto_scan_status_text())
 
     elif text == "🤖 автотрейдинг":
@@ -3149,7 +3156,7 @@ def webhook():
                f"📊 Сигналов в кэше: {len(_signal_cache)}\n"
                f"💾 Данные: OKX\n"
                f"🧩 Решение: 15m Profit-First HGB\n"
-               f"🚫 Реальные ордера отключены\n\n"
+               f"🛡 {_execution_state_text()}\n\n"
                f"{_crypto_scan_status_text()}")
 
     # /stats — тот же проверяемый расчёт, что и у кнопки.
@@ -4707,11 +4714,11 @@ def start_bot():
                 _sched = (f"{_days}, {TRADING_HOURS_START:02d}:00–"
                           f"{TRADING_HOURS_END % 24:02d}:00 UTC")
             send_status(
-                "🧪 *Crypto Bot Online — SHADOW*\n"
+                "🤖 *Crypto Bot Online*\n"
                 f"15m Profit-First X-Perp, скан каждые "
                 f"{SCAN_INTERVAL_MINUTES} мин ({_sched}).\n"
-                "5% @ 0.5R, 95% @ 2R; точный последовательный forward-гейт не пройден.\n"
-                "Реальные ордера отключены. Генеративная нейросеть не принимает решений."
+                "5% @ 0.5R, 95% @ 2R; последовательная forward-проверка продолжается.\n"
+                f"{_execution_state_text()}. Генеративная нейросеть не принимает решений."
             )
     except Exception as e:
         log.warning(f"Could not send startup message: {e}")
