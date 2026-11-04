@@ -149,9 +149,12 @@ class ShadowDeploymentTests(unittest.TestCase):
         self.assertIn("TP2, остаток 30%", sent[0])
         self.assertIn("`4.00R`", sent[0])
 
-    def test_menu_has_no_autotrading_button(self):
-        labels = str(main._USER_KB) + str(main._ADMIN_KB) + str(main._KB_PEOPLE)
-        self.assertNotIn("Автотрейдинг", labels)
+    def test_autotrading_button_is_dm_only(self):
+        dm_labels = str(main._USER_KB) + str(main._ADMIN_KB)
+        group_labels = str(main._GROUP_KB) + str(main._GROUP_ADMIN_KB)
+        self.assertIn("Автотрейдинг", dm_labels)
+        self.assertNotIn("Автотрейдинг", group_labels)
+        labels = dm_labels + str(main._KB_PEOPLE)
         self.assertIn("Открытые сделки", labels)
         self.assertIn("Результаты", labels)
 
@@ -217,7 +220,7 @@ class ShadowDeploymentTests(unittest.TestCase):
         }
         with patch.object(main, "DEPLOYMENT_MODE", "live"):
             analysis = main._venue_analysis("AAVEUSDT", setup)
-        self.assertTrue(analysis["_shadow_only"])
+        self.assertFalse(analysis["_shadow_only"])
         self.assertTrue(analysis["_profit_first_material_shadow"])
         self.assertEqual(analysis["source"], "venue_shadow_profit_first_2r")
         self.assertEqual(analysis["fixed_target_r"], .5)
@@ -232,6 +235,51 @@ class ShadowDeploymentTests(unittest.TestCase):
         self.assertEqual(analysis["strategy_entry_bar_ts"], 1800.0)
         self.assertFalse(analysis["strategy_stop_on_close"])
         self.assertEqual(analysis["strategy_max_bars"], 48)
+
+    def test_live_profit_first_candidate_reaches_autotrader_after_persistence(self):
+        analysis = {
+            "symbol": "AAVEUSDT", "direction": "SHORT",
+            "source": "venue_shadow_profit_first_2r", "_shadow_only": False,
+        }
+        persisted = {"id": 81, "symbol": "AAVEUSDT",
+                     "direction": "SHORT", "autotrade_eligible": 1}
+
+        def send(candidate):
+            candidate["_signal_id"] = 81
+            return True
+
+        with patch.object(main, "send_signal", side_effect=send), \
+             patch.object(main, "get_recent_signals", return_value=[]), \
+             patch.object(main, "get_signal_by_id", return_value=persisted), \
+             patch.object(main, "mark_setup_sent"), \
+             patch.object(main, "link_setup_to_signal"), \
+             patch.object(main, "_cache_signal"), \
+             patch.object(main.autotrader, "open_positions_for_signal") as open_live:
+            self.assertEqual(main._publish_venue_candidates([(analysis, 8)]), 1)
+
+        open_live.assert_called_once_with(persisted)
+
+    def test_shadow_profit_first_candidate_never_reaches_autotrader(self):
+        analysis = {
+            "symbol": "AAVEUSDT", "direction": "SHORT",
+            "source": "venue_shadow_profit_first_2r", "_shadow_only": True,
+        }
+
+        def send(candidate):
+            candidate["_signal_id"] = 82
+            return True
+
+        with patch.object(main, "send_signal", side_effect=send), \
+             patch.object(main, "get_recent_signals", return_value=[]), \
+             patch.object(main, "get_signal_by_id") as read_signal, \
+             patch.object(main, "mark_setup_sent"), \
+             patch.object(main, "link_setup_to_signal"), \
+             patch.object(main, "_cache_signal"), \
+             patch.object(main.autotrader, "open_positions_for_signal") as open_live:
+            self.assertEqual(main._publish_venue_candidates([(analysis, 9)]), 1)
+
+        read_signal.assert_not_called()
+        open_live.assert_not_called()
 
     def test_five_minute_oi_analysis_is_permanently_shadow_only(self):
         setup = {

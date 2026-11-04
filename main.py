@@ -82,7 +82,7 @@ from src.db import (
     get_unresolved_venue_setups, mark_setup_resolved,
     at_add_allowed, at_remove, at_get, at_all_allowed, at_set_keys, at_set_mode,
     at_set_active, at_set_balance, at_set_tp1_close_pct, watch_stats,
-    get_today_sl_streak, get_recent_signals,
+    get_today_sl_streak, get_recent_signals, get_signal_by_id,
 )
 from src import autotrader
 from src import okx_trader as _okx
@@ -767,6 +767,7 @@ def status():
 _USER_KB = {
     "keyboard": [
         [{"text": "📋 Открытые сделки"}, {"text": "📈 Результаты"}],
+        [{"text": "🤖 Автотрейдинг"}],
         [{"text": "🛡 Режим"}, {"text": "❓ Помощь"}],
     ],
     "resize_keyboard": True, "is_persistent": True,
@@ -775,12 +776,26 @@ _ADMIN_KB = {
     "keyboard": [
         [{"text": "🛠 Админ панель"}],
         [{"text": "📋 Открытые сделки"}, {"text": "📈 Результаты"}],
+        [{"text": "🤖 Автотрейдинг"}],
         [{"text": "🛡 Режим"}, {"text": "❓ Помощь"}],
     ],
     "resize_keyboard": True, "is_persistent": True,
 }
-_GROUP_KB = _USER_KB
-_GROUP_ADMIN_KB = _ADMIN_KB
+_GROUP_KB = {
+    "keyboard": [
+        [{"text": "📋 Открытые сделки"}, {"text": "📈 Результаты"}],
+        [{"text": "🛡 Режим"}, {"text": "❓ Помощь"}],
+    ],
+    "resize_keyboard": True, "is_persistent": True,
+}
+_GROUP_ADMIN_KB = {
+    "keyboard": [
+        [{"text": "🛠 Админ панель"}],
+        [{"text": "📋 Открытые сделки"}, {"text": "📈 Результаты"}],
+        [{"text": "🛡 Режим"}, {"text": "❓ Помощь"}],
+    ],
+    "resize_keyboard": True, "is_persistent": True,
+}
 
 _ADMIN_KEYBOARD = {"inline_keyboard": [
     [{"text": "📊 Сигналы и сделки", "callback_data": "adm_sec_trading"},
@@ -2752,6 +2767,10 @@ def _at_handle_callback(cb_id: str, chat_id: int, user_id: int, data: str) -> bo
         return True
 
     if data == "at_confirm":
+        if not AUTOTRADE_ENABLED:
+            _answer_callback(cb_id, "Живая торговля пока не включена.")
+            _reply(chat_id, "⏸ Живая торговля сейчас выключена глобально. Настройки сохранены, но новые позиции не откроются.")
+            return True
         at_set_active(user_id, True)
         _answer_callback(cb_id, "Автотрейдинг включён!")
         _reply(chat_id, "🟢 *Автотрейдинг включён.* Сделки будут открываться автоматически по сигналам бота.")
@@ -2760,6 +2779,10 @@ def _at_handle_callback(cb_id: str, chat_id: int, user_id: int, data: str) -> bo
         _reply(chat_id, "Ок, автотрейдинг не включён. Нажми «🤖 Автотрейдинг» когда будешь готов.")
     elif data == "at_toggle":
         newly_active = not u.get("active")
+        if newly_active and not AUTOTRADE_ENABLED:
+            _answer_callback(cb_id, "Живая торговля пока не включена.")
+            _reply(chat_id, "⏸ Живая торговля сейчас выключена глобально. Попробуй включить её позже.")
+            return True
         at_set_active(user_id, newly_active)
         _answer_callback(cb_id)
         if newly_active:
@@ -4075,7 +4098,7 @@ def _venue_analysis(symbol: str, setup: dict, btc_change: float = 0.0) -> dict:
         # Experimental modules remain untradeable even if the deployment is
         # later switched to live.  This is a second barrier in addition to the
         # live-mode scan gate below and autotrader's shadow-only refusal.
-        "_shadow_only": (profit_first or shadow_experiment
+        "_shadow_only": ((shadow_experiment and not profit_first)
                          or DEPLOYMENT_MODE == "shadow"),
         "_five_minute_oi_shadow": five_minute_oi,
         "_hourly_hgb_shadow": hourly_hgb,
@@ -4174,6 +4197,12 @@ def _publish_venue_candidates(
         signal_id = analysis.get("_signal_id")
         if signal_id:
             link_setup_to_signal(setup_id, signal_id)
+            if not analysis.get("_shadow_only", True):
+                signal = get_signal_by_id(signal_id)
+                if signal is None:
+                    log.error("Live signal %s disappeared before autotrade", signal_id)
+                else:
+                    autotrader.open_positions_for_signal(signal)
         published += 1
         recent_hour_count += 1
         direction_counts[direction] = direction_counts.get(direction, 0) + 1

@@ -489,6 +489,19 @@ def init_db():
                 mode_prompt_pending = 0
             WHERE size_mode = 'fixed'
         """)
+        # Require every user to opt into the new live strategy rollout.  This
+        # runs once per persisted database and prevents an old active flag from
+        # opening orders immediately after Railway changes deployment mode.
+        rollout_key = "autotrade_reconsent_20261104"
+        rollout = c.execute(
+            "SELECT value FROM bot_state WHERE key = ?", (rollout_key,)
+        ).fetchone()
+        if rollout is None:
+            c.execute("UPDATE autotrade_users SET active = 0")
+            c.execute(
+                "INSERT INTO bot_state (key, value) VALUES (?, ?)",
+                (rollout_key, "done"),
+            )
 
         # ── Zone watch: setups approved but not yet published ─────────────────
         # Claude has said yes; we are holding until price trades back INTO the
