@@ -81,6 +81,7 @@ from src.db import (
     get_setups_by_date, get_setup_accuracy, link_setup_to_signal,
     resolve_sent_setups_from_signals, backfill_setup_signal_links, get_weekly_stats,
     get_unresolved_venue_setups, mark_setup_resolved,
+    record_setup_decision_book,
     at_add_allowed, at_remove, at_get, at_all_allowed, at_set_keys, at_set_mode,
     at_set_active, at_set_balance, at_set_tp1_close_pct, watch_stats,
     get_today_sl_streak, get_recent_signals, get_signal_by_id,
@@ -101,6 +102,7 @@ from config import (
 )
 from src.keystore import keystore_ready, encrypt_secret
 from src import okx_trader as _okx_trade
+from src.execution_guard import order_book_snapshot
 from config import ADMIN_IDS, AUTOTRADE_CONTACT
 
 # ── Admin helpers ─────────────────────────────────────────────────────────────
@@ -4005,6 +4007,44 @@ def _base_of_symbol(symbol: str) -> str:
     return symbol[:-4] if symbol.endswith("USDT") else symbol
 
 
+def _record_candidate_decision_books(
+        candidates: list[tuple[dict, int]]) -> None:
+    """Collect public books for PAPER and rejected candidates after publishing.
+
+    A live published signal is skipped here: its account thread records the
+    exact executable pre-entry book.  Running after publication keeps this
+    research I/O off the market-entry critical path.
+    """
+    if not candidates:
+        return
+    try:
+        instruments = get_xperp_instruments()
+    except Exception as exc:
+        log.warning("Decision-book instrument map unavailable: %s", exc)
+        return
+    for analysis, setup_id in candidates:
+        if (analysis.get("_signal_id")
+                and not analysis.get("_shadow_only", True)):
+            continue
+        symbol = str(analysis.get("symbol") or "")
+        inst_id = instruments.get(_base_of_symbol(symbol))
+        if not setup_id or not inst_id:
+            continue
+        try:
+            spec = _okx_trade.get_xperp_spec(inst_id)
+            book = _okx_trade.get_order_book(inst_id)
+            if not spec or not book:
+                continue
+            snap = order_book_snapshot(book, spec["ctVal"])
+            record_setup_decision_book(
+                setup_id, spread_bps=snap.spread_bps,
+                depth_usd=snap.depth_usd, imbalance=snap.imbalance)
+        except Exception as exc:
+            # A missing research snapshot must never affect signal delivery or
+            # a live account. The next candidate will retry independently.
+            log.warning("Decision-book snapshot failed for %s: %s", symbol, exc)
+
+
 def _venue_analysis(symbol: str, setup: dict, btc_change: float = 0.0) -> dict:
     """Translate the frozen direct-venue setup into the existing signal schema."""
     direction = setup["direction"]
@@ -4457,6 +4497,7 @@ def _run_venue_strategy_scan() -> None:
     publish_rejects = {}
     published = _publish_venue_candidates(
         candidates, open_direction_counts, publish_rejects)
+    _record_candidate_decision_books(candidates)
     now = time.time()
     symbol_lengths = [len(row.get("close") or []) for key, row in fetched.items()
                       if key != "BTCUSDT"]

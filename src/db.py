@@ -440,6 +440,8 @@ def init_db():
             "book_spread_bps":  "REAL",   # (ask-bid)/mid in basis points
             "book_depth_usd":   "REAL",   # notional across 20 levels, both sides
             "book_imbalance":   "REAL",   # (bid_depth-ask_depth)/total, -1..+1
+            "book_sample_kind": "TEXT",   # live_execution / decision_snapshot
+            "book_observed_ts": "REAL",
             # Hours until the next high-impact scheduled macro event, and its
             # title. Genuinely absent from candles by construction.
             "hours_to_event":   "REAL",
@@ -1907,12 +1909,40 @@ def record_signal_execution_book(signal_id: int, *, spread_bps: float,
     with _conn() as c:
         cur = c.execute("""
             UPDATE setup_log
-               SET book_spread_bps=?, book_depth_usd=?, book_imbalance=?
+               SET book_spread_bps=?, book_depth_usd=?, book_imbalance=?,
+                   book_sample_kind='live_execution', book_observed_ts=?
              WHERE signal_id=?
                AND book_spread_bps IS NULL
                AND book_depth_usd IS NULL
                AND book_imbalance IS NULL
-        """, (*values, int(signal_id)))
+        """, (*values, time_mod.time(), int(signal_id)))
+        return bool(cur.rowcount)
+
+
+def record_setup_decision_book(setup_id: int, *, spread_bps: float,
+                               depth_usd: float, imbalance: float) -> bool:
+    """Attach a public decision-time book to a paper or rejected setup.
+
+    Live published signals are intentionally excluded by the caller because
+    their account thread records the exact executable pre-entry book.  Keeping
+    the sample kind makes the two observation contracts impossible to confuse
+    in later filter research.
+    """
+    values = (float(spread_bps), float(depth_usd), float(imbalance))
+    if (not setup_id or any(not math.isfinite(value) for value in values)
+            or values[0] < 0 or values[1] <= 0
+            or not -1.0 <= values[2] <= 1.0):
+        return False
+    with _conn() as c:
+        cur = c.execute("""
+            UPDATE setup_log
+               SET book_spread_bps=?, book_depth_usd=?, book_imbalance=?,
+                   book_sample_kind='decision_snapshot', book_observed_ts=?
+             WHERE id=?
+               AND book_spread_bps IS NULL
+               AND book_depth_usd IS NULL
+               AND book_imbalance IS NULL
+        """, (*values, time_mod.time(), int(setup_id)))
         return bool(cur.rowcount)
 
 
