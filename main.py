@@ -81,7 +81,7 @@ from src.db import (
     get_setups_by_date, get_setup_accuracy, link_setup_to_signal,
     resolve_sent_setups_from_signals, backfill_setup_signal_links, get_weekly_stats,
     get_unresolved_venue_setups, mark_setup_resolved,
-    record_setup_decision_book,
+    record_setup_decision_book, get_book_factor_stats,
     at_add_allowed, at_remove, at_get, at_all_allowed, at_set_keys, at_set_mode,
     at_set_active, at_set_balance, at_set_tp1_close_pct, watch_stats,
     get_today_sl_streak, get_recent_signals, get_signal_by_id,
@@ -440,6 +440,32 @@ def _build_and_send_report(chat_id: int, message_id: int,
                 A("  данных ещё нет после запуска этой версии")
         except Exception as _scan_exc:
             A(f"  ошибка чтения аудита: {_scan_exc}")
+        A("")
+
+        A(f"## СТАКАН В МОМЕНТ РЕШЕНИЯ ({window_label})")
+        try:
+            _books = get_book_factor_stats(since_ts)
+            _total = int(_books.get("total") or 0)
+            _sampled = int(_books.get("sampled") or 0)
+            _coverage = 100 * _sampled / _total if _total else 0.0
+            A(f"  покрытие: {_sampled}/{_total} ({_coverage:.1f}%); "
+              f"типы {json.dumps(_books.get('kinds') or {}, ensure_ascii=False, sort_keys=True)}")
+            for _key, _title in (("positive", "прибыльные"),
+                                 ("negative", "убыточные"),
+                                 ("flat", "нулевые")):
+                _b = _books.get(_key) or {}
+                if not _b.get("n"):
+                    A(f"  {_title}: данных пока нет")
+                    continue
+                A(f"  {_title}: n={_b['n']} · медиана спреда "
+                  f"{_b['median_spread_bps']:.2f} бп · глубина "
+                  f"${_b['median_depth_usd']:,.0f} · дисбаланс по направлению "
+                  f"{_b['median_directional_imbalance']:+.3f} · "
+                  f"средний итог {_b['mean_net_r']:+.3f}R")
+            if int((_books.get("resolved") or {}).get("n") or 0) < 30:
+                A("  выборка меньше 30 исходов: это диагностика, торговый фильтр ещё не разрешён")
+        except Exception as _book_exc:
+            A(f"  ошибка расчёта: {_book_exc}")
         A("")
 
         # 2. Claude approval rate + accuracy
@@ -4011,9 +4037,10 @@ def _record_candidate_decision_books(
         candidates: list[tuple[dict, int]]) -> None:
     """Collect public books for PAPER and rejected candidates after publishing.
 
-    A live published signal is skipped here: its account thread records the
-    exact executable pre-entry book.  Running after publication keeps this
-    research I/O off the market-entry critical path.
+    The account thread may later replace this with the exact executable
+    pre-entry book after a protected fill. Recording every decision first keeps
+    skipped live entries measurable while keeping this research I/O off the
+    market-entry critical path.
     """
     if not candidates:
         return
@@ -4023,9 +4050,6 @@ def _record_candidate_decision_books(
         log.warning("Decision-book instrument map unavailable: %s", exc)
         return
     for analysis, setup_id in candidates:
-        if (analysis.get("_signal_id")
-                and not analysis.get("_shadow_only", True)):
-            continue
         symbol = str(analysis.get("symbol") or "")
         inst_id = instruments.get(_base_of_symbol(symbol))
         if not setup_id or not inst_id:
