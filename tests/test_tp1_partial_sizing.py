@@ -73,7 +73,8 @@ def test_live_open_keeps_full_runner_and_reports_unplaceable_five_percent():
         stack.enter_context(patch.object(
             at, "_dm", side_effect=lambda _uid, text: messages.append(text)))
         for name, value in [
-            ("get_position_mode", (True, "net_mode")),
+            ("validate_autotrade_account", (True, {
+                "position_mode": "net_mode", "permissions": ("read_only", "trade")})),
             ("get_balance", (True, 130)),
             ("get_open_position_margin", (
                 True, {"margin_usd": 0, "count": 0, "inst_ids": ()})),
