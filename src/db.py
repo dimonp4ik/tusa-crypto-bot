@@ -1891,6 +1891,31 @@ def link_setup_to_signal(setup_log_id: int, signal_id: int) -> None:
         c.execute("UPDATE setup_log SET signal_id=? WHERE id=?", (signal_id, setup_log_id))
 
 
+def record_signal_execution_book(signal_id: int, *, spread_bps: float,
+                                 depth_usd: float, imbalance: float) -> bool:
+    """Attach the first real pre-entry X-Perp book to its published setup.
+
+    The setup is linked before autotrading starts. Keep the first snapshot when
+    several users mirror the same signal so the research row has one stable,
+    causal observation rather than whichever account happened to enter last.
+    """
+    values = (float(spread_bps), float(depth_usd), float(imbalance))
+    if (not signal_id or any(not math.isfinite(value) for value in values)
+            or values[0] < 0 or values[1] <= 0
+            or not -1.0 <= values[2] <= 1.0):
+        return False
+    with _conn() as c:
+        cur = c.execute("""
+            UPDATE setup_log
+               SET book_spread_bps=?, book_depth_usd=?, book_imbalance=?
+             WHERE signal_id=?
+               AND book_spread_bps IS NULL
+               AND book_depth_usd IS NULL
+               AND book_imbalance IS NULL
+        """, (*values, int(signal_id)))
+        return bool(cur.rowcount)
+
+
 # Real signal status -> (outcome, reached_tp1, reached_tp2). Mirrors the
 # shadow tracker's own SL/TP1/TP2/EXPIRED vocabulary (see
 # _simulate_setup_outcome in main.py) so get_setup_accuracy's counting logic

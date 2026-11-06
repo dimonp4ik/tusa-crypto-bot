@@ -2330,6 +2330,18 @@ def _at_show_menu(chat_id: int, u: dict):
     state = "🟢 включён" if u.get("active") else "⏸ выключен"
     tp1_pct = float(u.get("tp1_close_pct") or 0)
     tp1_str = "не закрывать (весь объём под трейлинг)" if tp1_pct <= 0 else f"{tp1_pct:.0f}%"
+    skip_line = ""
+    try:
+        last_skip = json.loads(
+            get_bot_state(f"autotrade_last_skip:{chat_id}") or "{}")
+        if last_skip.get("reason"):
+            age_min = max(0, int((time.time() - float(last_skip.get("ts") or 0)) / 60))
+            symbol = str(last_skip.get("symbol") or "?").replace("USDT", "")
+            direction = str(last_skip.get("direction") or "")
+            skip_line = (f"\nПоследний пропуск ({age_min} мин назад): "
+                         f"*{symbol} {direction}* — {last_skip['reason']}\n")
+    except Exception as exc:
+        log.warning("autotrade last-skip status unavailable for %s: %s", chat_id, exc)
     rows = [[{"text": ("⏸ Выключить" if u.get("active") else "▶️ Включить"),
               "callback_data": "at_toggle"}],
             [{"text": "⚙️ Изменить размер сделки", "callback_data": "at_resize"}],
@@ -2338,9 +2350,10 @@ def _at_show_menu(chat_id: int, u: dict):
             [{"text": "🔑 Заменить API-ключи", "callback_data": "at_rekey"}]]
     _at_reply_kb(chat_id,
                  f"🤖 *Автотрейдинг*\n\nСтатус: {state}\nМаржа каждой сделки: *{mode_str}*\n"
-                 f"Закрытие на TP1: *{tp1_str}*\n"
-                 f"Баланс (посл. известный): {bal_str}\nПлечо: 10x, изолированная маржа\n\n"
-                 "_Маленький процент TP1 может быть меньше одного контракта. "
+                  f"Закрытие на TP1: *{tp1_str}*\n"
+                  f"Баланс (посл. известный): {bal_str}\nПлечо: 10x, изолированная маржа\n"
+                  f"{skip_line}\n"
+                  "_Маленький процент TP1 может быть меньше одного контракта. "
                  "При открытии бот покажет фактически выставленную долю._",
                  rows)
 
