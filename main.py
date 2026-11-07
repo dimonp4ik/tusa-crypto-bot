@@ -783,6 +783,18 @@ def _crypto_scan_status_text() -> str:
 def status():
     deploy_sha = (os.getenv("RAILWAY_GIT_COMMIT_SHA")
                   or os.getenv("GIT_COMMIT_SHA") or "unknown")[:8]
+    from src.db import get_tp1_volume_forward_stats
+
+    try:
+        tp1 = get_tp1_volume_forward_stats(since=1794009600)
+        tp1_status = (
+            f"TP1 next-open shadow: {tp1['n']} closed, "
+            f"{tp1['weak_volume_banks']} adjusted, "
+            f"{tp1['baseline_return_pct']:+.2f}% baseline / "
+            f"{tp1['candidate_return_pct']:+.2f}% candidate. "
+        )
+    except Exception:
+        tp1_status = "TP1 next-open shadow: unavailable. "
     return (f"Mode: {DEPLOYMENT_MODE}. Strategy: audited direct-venue router. "
             f"Build: {deploy_sha}. "
             f"Execution: {_execution_state_text()}. "
@@ -794,6 +806,7 @@ def status():
             f"{100 * AUTOTRADE_MAX_ACCOUNT_MARGIN_FRACTION:g}% margin / "
             f"{AUTOTRADE_ACCOUNT_WRITER_COUNT} writers. "
             f"Signal cache: {len(_signal_cache)} entries. "
+            f"{tp1_status}"
             f"{_crypto_scan_status_text().replace(chr(10), ' | ')}"), 200
 
 
