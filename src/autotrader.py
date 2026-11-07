@@ -431,14 +431,18 @@ def _open_for_user_locked(u: dict, sig: dict, inst_id: str, disp: str) -> None:
         log.warning("autotrade duplicate client order refused %s %s %s",
                     uid, inst_id, client_order_id)
         return
+    deadline_ms = None
     entry_bar = sig.get("strategy_entry_bar_ts")
-    if entry_bar and time.time() - float(entry_bar) > VENUE_MAX_ENTRY_DELAY_SEC:
+    if entry_bar and time.time() > float(entry_bar) + VENUE_MAX_ENTRY_DELAY_SEC:
         at_close_position(intent_id, "ENTRY_EXPIRED")
         _entry_skip(uid, sig, inst_id, "истёк срок входа",
                     f"ℹ️ Автотрейдинг: {disp} пропущен — истёк срок входа.")
         return
+    if entry_bar:
+        deadline_ms = int((float(entry_bar) + VENUE_MAX_ENTRY_DELAY_SEC) * 1000)
     ok, ord_id = okx.place_market_entry(
-        creds, inst_id, sig["direction"], sz, client_order_id)
+        creds, inst_id, sig["direction"], sz, client_order_id,
+        deadline_ms=deadline_ms)
     if not ok:
         ambiguous = okx.is_ambiguous_request_error(ord_id)
         if ambiguous:
