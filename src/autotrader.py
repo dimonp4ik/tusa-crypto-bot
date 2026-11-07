@@ -638,11 +638,14 @@ def _open_for_user_locked(u: dict, sig: dict, inst_id: str, disp: str) -> None:
         ]))
         raise
     if _avg_px and planned > 0:
+        reference = sig.get("entry_reference_price")
         sign = 1 if sig["direction"] == "LONG" else -1
         log.info(
-            "entry execution signal=%s inst=%s adverse_vs_model_bps=%.2f "
-            "adverse_vs_book_bps=%.2f",
+            "entry execution signal=%s inst=%s adverse_vs_signal_bps=%.2f "
+            "adverse_vs_model_bps=%s adverse_vs_book_bps=%.2f",
             sig["id"], inst_id, sign * (_avg_px / planned - 1) * 10_000,
+            f"{sign * (_avg_px / reference - 1) * 10_000:.2f}"
+            if reference and reference > 0 else "unavailable",
             sign * (_avg_px / px - 1) * 10_000,
         )
     # Diagnostics come strictly after the live fill has both exchange protection

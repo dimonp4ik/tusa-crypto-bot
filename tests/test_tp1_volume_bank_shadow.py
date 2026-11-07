@@ -75,6 +75,7 @@ def test_database_persists_baseline_and_challenger_separately(
             signal_id = db.log_signal({
                 "symbol": "TEST", "direction": "LONG",
                 "current_price": 100.0, "_shadow_only": True,
+                "entry_reference_price": 99.9,
                 "strategy_tp1_close_frac": .05,
                 "strategy_runner_mode": "fixed_be",
                 "fixed_runner_target_r": 2.0,
@@ -92,6 +93,7 @@ def test_database_persists_baseline_and_challenger_separately(
                 signal_id, "TP2_HIT", 102.0, realized_r=1.925,
                 tp1_volume_candidate_r=.725)
             row = db.get_signal_by_id(signal_id)
+            assert row["entry_reference_price"] == 99.9
             assert row["strategy_tp1_volume_threshold"] == 1.5
             assert row["strategy_tp1_extra_close_frac"] == .75
             assert row["tp1_hit_volume_ratio"] == 1.2

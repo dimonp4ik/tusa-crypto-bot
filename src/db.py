@@ -162,6 +162,7 @@ def init_db():
             "entry_source":  "TEXT",
             "market_price":  "REAL",
             "zone_entry_price": "REAL",
+            "entry_reference_price": "REAL",
             "mtf_score":     "INTEGER",
             "mtf_score_max": "INTEGER",
             "premium":       "INTEGER DEFAULT 0",
@@ -686,7 +687,7 @@ def log_signal(analysis: dict, tp1: float, tp2: float, sl: float) -> int:
                 strategy_entry_bar_ts = ?, strategy_stop_on_close = ?,
                 strategy_max_bars = ?, strategy_expire_at = ?,
                 strategy_tp1_volume_threshold = ?,
-                strategy_tp1_extra_close_frac = ?
+                strategy_tp1_extra_close_frac = ?, entry_reference_price = ?
             WHERE id = ?
         """, (
             analysis.get("strategy_tp1_close_frac"),
@@ -699,6 +700,7 @@ def log_signal(analysis: dict, tp1: float, tp2: float, sl: float) -> int:
             analysis.get("strategy_expire_at"),
             analysis.get("strategy_tp1_volume_threshold"),
             analysis.get("strategy_tp1_extra_close_frac"),
+            analysis.get("entry_reference_price"),
             cur.lastrowid,
         ))
         if analysis.get("_shadow_only"):
