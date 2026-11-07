@@ -760,8 +760,14 @@ def _crypto_scan_status_text() -> str:
         result = result_names.get(
             str(row.get("result")), str(row.get("result") or "неизвестно"))
         strategy = row.get("strategy") or {}
+        timing = ""
+        if row.get("entry_bar") and row.get("scan_started_at"):
+            delay = float(row["scan_started_at"]) - float(row["entry_bar"])
+            duration = float(row["ts"]) - float(row["scan_started_at"])
+            phase = "ранний" if row.get("early") else "обычный"
+            timing = f" · {phase} проход +{delay:.1f} с, занял {duration:.1f} с"
         return (
-            f"{prefix}: {age_minutes} мин назад · {result}\n"
+            f"{prefix}: {age_minutes} мин назад · {result}{timing}\n"
             f"Данные: {int(row.get('fetched') or 0)}/{int(row.get('targets') or 0)} "
             f"инструментов · семейных сетапов "
             f"{int(strategy.get('family_signals') or 0)} · "
@@ -4588,6 +4594,9 @@ def _run_venue_strategy_scan(*, early: bool = False) -> None:
                       if key != "BTCUSDT"]
     audit = {
         "ts": now,
+        "entry_bar": entry_bar,
+        "scan_started_at": now_utc.timestamp(),
+        "early": early,
         "result": (
             "published" if published else
             "qualified_but_not_published" if candidates else
