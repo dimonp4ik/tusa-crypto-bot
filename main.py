@@ -4340,6 +4340,12 @@ def _publish_venue_candidates(
             if reject_audit is not None:
                 reject_audit["dir_cap"] = reject_audit.get("dir_cap", 0) + 1
             continue
+        entry_bar = analysis.get("strategy_entry_bar_ts")
+        if entry_bar and time.time() - float(entry_bar) > _MAX_VENUE_ENTRY_DELAY_SEC:
+            mark_setup_blocked(setup_id, "stale_at_publish")
+            if reject_audit is not None:
+                reject_audit["stale_at_publish"] = reject_audit.get("stale_at_publish", 0) + 1
+            continue
         if not send_signal(analysis):
             mark_setup_blocked(setup_id, "send_failed")
             if reject_audit is not None:
@@ -4518,7 +4524,7 @@ def _run_venue_strategy_scan(*, early: bool = False) -> None:
             # middle of that bar must not turn an old close into a late market
             # entry. One scheduler interval plus feed-settlement tolerance is
             # the maximum admissible delay.
-            if now_utc.timestamp() - entry_time > _MAX_VENUE_ENTRY_DELAY_SEC:
+            if time.time() - entry_time > _MAX_VENUE_ENTRY_DELAY_SEC:
                 portfolio_rejects["stale_bar"] += 1
                 log.info("Venue setup skipped for %s: closed bar is stale", symbol)
                 continue

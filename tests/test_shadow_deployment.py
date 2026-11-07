@@ -733,6 +733,20 @@ class ShadowDeploymentTests(unittest.TestCase):
         self.assertEqual(publish.call_args.args[:2],
                          ([], {"LONG": 0, "SHORT": 0}))
 
+    def test_expired_entry_is_not_published_after_scan_delay(self):
+        candidate = {"symbol": "BTCUSDT", "direction": "LONG",
+                     "strategy_entry_bar_ts": 1800}
+        rejects = {}
+        with patch.object(main.time, "time", return_value=1981), \
+             patch.object(main, "get_recent_signals", return_value=[]), \
+             patch.object(main, "mark_setup_blocked") as blocked, \
+             patch.object(main, "send_signal") as send:
+            count = main._publish_venue_candidates([(candidate, 7)], {}, rejects)
+        self.assertEqual(count, 0)
+        self.assertEqual(rejects, {"stale_at_publish": 1})
+        blocked.assert_called_once_with(7, "stale_at_publish")
+        send.assert_not_called()
+
     def test_scan_drops_stale_closed_bar_instead_of_entering_late(self):
         self.assertEqual(main._MAX_VENUE_ENTRY_DELAY_SEC, 180)
         fifteen = {"time": [900.0], "close": [100.0], "confirmed": [1]}
