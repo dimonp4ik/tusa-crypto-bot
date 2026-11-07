@@ -91,6 +91,37 @@ def test_single_target_does_not_invent_intermediate_tp1_transition():
     assert [item.args[1] for item in mirror.call_args_list] == ["TP2_HIT"]
 
 
+def test_gap_through_stop_uses_later_bar_open_and_real_loss_r():
+    row = signal(
+        direction="SHORT", entry_price=100.0, sl=101.0,
+        tp1=97.5, tp2=97.5, strategy_runner_mode="single_target",
+        strategy_tp1_close_frac=1.0,
+    )
+    bars = {
+        "time": [1000.0, 1300.0],
+        "open": [100.0, 102.5], "high": [100.4, 103.0],
+        "low": [99.8, 102.0], "close": [100.1, 102.7],
+        "confirmed": [True, False],
+    }
+    update, notify, mirror = run_monitor(row, bars)
+
+    assert update.call_args.args[1] == "SL_HIT"
+    assert update.call_args.args[2] == 102.5
+    assert update.call_args.kwargs["realized_r"] == -2.5
+    assert notify.call_args.args[2] == 102.5
+    assert mirror.call_args.args[2] == 102.5
+
+
+def test_stop_notification_shows_gap_adjusted_r():
+    sent = []
+    row = signal(direction="SHORT", entry_price=100.0, sl=101.0)
+    with patch.object(notifier, "_send_message",
+                      side_effect=lambda message: sent.append(message) or True):
+        assert notifier.send_signal_update(row, "SL_HIT", 102.5)
+
+    assert "-2.50R" in sent[0]
+
+
 def test_single_target_update_uses_single_target_wording():
     sent = []
     row = signal(tp1=102.0, tp2=102.0,
