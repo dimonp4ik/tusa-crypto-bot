@@ -55,6 +55,28 @@ def completed_observation(candles: dict, *, activation_ts: float,
     }
 
 
+def next_open_observation(candles: dict, *, activation_ts: float,
+                          bar_seconds: int, now: float) -> dict | None:
+    """Price the shadow exit at the adjacent bar's open after TP1 confirmation."""
+    action_at = float(activation_ts) + bar_seconds
+    if now < action_at:
+        return None
+    observation = completed_observation(
+        candles, activation_ts=activation_ts, bar_seconds=bar_seconds, now=now)
+    if observation is None:
+        return None
+    for index, timestamp in enumerate(candles.get("time") or []):
+        if float(timestamp) == action_at:
+            opens = candles.get("open") or []
+            if index >= len(opens):
+                return None
+            price = float(opens[index])
+            if math.isfinite(price) and price > 0:
+                return {**observation, "exit_price": price}
+            return None
+    return None
+
+
 def candidate_r(*, tp1_fraction: float, tp1_r: float,
                 extra_fraction: float, extra_r: float,
                 runner_r: float) -> float:

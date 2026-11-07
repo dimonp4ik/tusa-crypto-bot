@@ -65,7 +65,7 @@ from src.news_agent import get_daily_digest, get_day_events, generate_weekly_com
 from src.r_model import blended_r
 from src.backtest_integrity import simulate_exit
 from src.tp1_volume_bank import candidate_r as tp1_volume_candidate_r
-from src.tp1_volume_bank import completed_observation as tp1_volume_observation
+from src.tp1_volume_bank import next_open_observation as tp1_volume_observation
 from src.tp1_volume_bank import VOLUME_LOOKBACK as TP1_VOLUME_LOOKBACK
 from src.result_summary import format_results_message
 from src.db import (
@@ -3586,6 +3586,10 @@ def _check_open_signals():
                     bar_seconds=bar_seconds, now=now)
                 if observed is None:
                     return
+                price = float(observed["exit_price"])
+                # At the next open, breakeven and TP2 have priority.
+                if not min(entry, tp2) < price < max(entry, tp2):
+                    return
                 threshold = float(sig["strategy_tp1_volume_threshold"])
                 configured_extra = float(
                     sig.get("strategy_tp1_extra_close_frac") or 0.0)
@@ -3594,12 +3598,12 @@ def _check_open_signals():
                 inserted = record_tp1_volume_observation(
                     sig["id"], volume_ratio=float(observed["volume_ratio"]),
                     extra_fraction=extra,
-                    exit_price=float(observed["close"]),
+                    exit_price=float(observed["exit_price"]),
                     observed_at=float(observed["observed_at"]))
                 if inserted:
                     sig["tp1_hit_volume_ratio"] = float(observed["volume_ratio"])
                     sig["tp1_extra_close_frac"] = extra
-                    sig["tp1_extra_exit_price"] = float(observed["close"])
+                    sig["tp1_extra_exit_price"] = float(observed["exit_price"])
                     sig["tp1_extra_exit_at"] = float(observed["observed_at"])
                     log.info(
                         "  Signal #%s %s volume-bank shadow: %.3fx, extra %.0f%%",
@@ -4177,11 +4181,9 @@ def _venue_analysis(symbol: str, setup: dict, btc_change: float = 0.0) -> dict:
                                   if fixed_runner else None),
         "strategy_tp1_close_frac": (tp1_close_fraction
                                     if fixed_runner else None),
-        # The TP1 volume-bank challenger failed the first genuinely new
-        # return non-inferiority gate on 2026-10-31.  Keep the historical DB
-        # columns readable, but stop scheduling observations for new signals.
-        "strategy_tp1_volume_threshold": None,
-        "strategy_tp1_extra_close_frac": None,
+        # Paper comparison only. The exchange order path ignores these fields.
+        "strategy_tp1_volume_threshold": 1.5 if profit_first else None,
+        "strategy_tp1_extra_close_frac": .75 if profit_first else None,
         "strategy_runner_mode": ("fixed_be"
                                  if fixed_runner else None),
         "strategy_bar_seconds": (300 if five_minute_oi else

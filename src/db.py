@@ -1533,9 +1533,9 @@ def get_stats(days: int = 7, since_ts: float = None,
 
 
 def get_tp1_volume_forward_stats(days: int = 30, *, margin_pct: float = 3.0,
-                                 leverage: float = 10.0) -> dict:
+                                 leverage: float = 10.0, since: float = 0.0) -> dict:
     """Compare baseline and volume-bank R on the same new shadow closures."""
-    cutoff = max(time_mod.time() - days * 86400, LIVE_HIST_EPOCH_TS or 0.0)
+    cutoff = max(time_mod.time() - days * 86400, LIVE_HIST_EPOCH_TS or 0.0, since)
     with _conn() as c:
         rows = c.execute("""
             SELECT opened_at, entry_price, sl, realized_r,

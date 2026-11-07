@@ -110,10 +110,10 @@ def test_monitor_records_closed_tp1_bar_then_keeps_baseline_and_candidate():
     activation = start + 20 * 900
     frame = {
         "time": [start + index * 900 for index in range(22)],
-        "open": [100.0] * 22,
+        "open": [100.0] * 21 + [100.4],
         "high": [100.2] * 20 + [101.0, 102.1],
         "low": [99.5] * 20 + [100.1, 100.2],
-        "close": [100.0] * 20 + [100.4, 102.0],
+        "close": [100.0] * 20 + [100.3, 102.0],
         "volume": [100.0] * 20 + [120.0, 150.0],
         "confirmed": [True] * 22,
     }
@@ -149,3 +149,20 @@ def test_monitor_records_closed_tp1_bar_then_keeps_baseline_and_candidate():
     assert update.call_args.args[1:3] == ("TP2_HIT", 102.0)
     assert update.call_args.kwargs["realized_r"] == pytest.approx(1.925)
     assert update.call_args.kwargs["tp1_volume_candidate_r"] == pytest.approx(.725)
+
+
+def test_next_open_waits_for_exact_adjacent_bar():
+    from src.tp1_volume_bank import next_open_observation
+
+    candles = {
+        "time": [900 * i for i in range(22)],
+        "open": [100.0] * 21 + [100.4],
+        "close": [100.0] * 21 + [101.0],
+        "volume": [100.0] * 22,
+        "confirmed": [True] * 21 + [False],
+    }
+    args = dict(activation_ts=18000, bar_seconds=900)
+    assert next_open_observation(candles, now=18899, **args) is None
+    assert next_open_observation(candles, now=18900, **args)["exit_price"] == 100.4
+    candles["time"][-1] = 19800
+    assert next_open_observation(candles, now=19800, **args) is None
