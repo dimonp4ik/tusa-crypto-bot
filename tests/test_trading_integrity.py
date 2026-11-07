@@ -210,6 +210,20 @@ class ExchangeTests(unittest.TestCase):
             at.open_positions_for_signal(sig)
         traders.assert_not_called()
 
+    def test_live_protection_lookup_requires_matching_active_algo(self):
+        row = {"algoId": "123", "instId": "TEST", "state": "live",
+               "slTriggerPx": "102"}
+        with patch.object(okx, "_request", return_value=(True, [row])) as request:
+            self.assertEqual(okx.get_live_protection_sl({}, "TEST", "123"),
+                             (True, 102))
+            request.assert_called_once_with({}, "GET", "/api/v5/trade/order-algo",
+                                            params={"algoId": "123"})
+        for invalid in ([], [dict(row, state="effective")],
+                        [dict(row, instId="OTHER")], [dict(row, slTriggerPx="nan")]):
+            with self.subTest(invalid=invalid), patch.object(
+                    okx, "_request", return_value=(True, invalid)):
+                self.assertFalse(okx.get_live_protection_sl({}, "TEST", "123")[0])
+
     def test_missing_protection_id_is_failure(self):
         with patch.object(okx,'_request',return_value=(True,[{'algoId':''}])):
             self.assertFalse(okx.place_protection_oco({},'TEST','LONG',90,120)[0])

@@ -164,6 +164,9 @@ class UnprotectedPositionTests(unittest.TestCase):
                                              return_value=(True, .01)))
             stack.enter_context(patch.object(at.okx, "get_xperp_spec",
                                              return_value={"tickSz": .01}))
+            stack.enter_context(patch.object(
+                at.okx, "get_live_protection_sl",
+                side_effect=[(True, 98), (True, 98), (True, 102)]))
             amend = stack.enter_context(patch.object(
                 at.okx, "amend_protection_sl",
                 side_effect=[(False, "timeout"), (True, None)]))
@@ -171,7 +174,9 @@ class UnprotectedPositionTests(unittest.TestCase):
             at.poll_exchange_closes()
             update.assert_not_called()
             at.poll_exchange_closes()
-            update.assert_called_once_with(1, 101)
+            update.assert_not_called()
+            at.poll_exchange_closes()
+            update.assert_called_once_with(1, 102)
             pos["sl_px"] = 102
             at.poll_exchange_closes()
         self.assertEqual(amend.call_count, 2)

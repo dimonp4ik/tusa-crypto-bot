@@ -752,12 +752,19 @@ def _move_stop_to_breakeven(pos: dict, sig: dict, creds: dict) -> None:
     old = float(pos.get("sl_px") or 0)
     if old and (old >= target if pos["direction"] == "LONG" else old <= target):
         return
+    ok, live = okx.get_live_protection_sl(
+        creds, pos["inst_id"], pos["sl_algo_id"])
+    if not ok:
+        log.warning("autotrade breakeven lookup failed pos#%s: %s", pos["id"], live)
+        return
+    if live >= target if pos["direction"] == "LONG" else live <= target:
+        at_update_position_sl(pos["id"], live)
+        return
     ok, error = okx.amend_protection_sl(
         creds, pos["inst_id"], pos["sl_algo_id"], target)
-    if ok:
-        at_update_position_sl(pos["id"], target)
-    else:
+    if not ok:
         log.warning("autotrade breakeven amend failed pos#%s: %s", pos["id"], error)
+    # The next reconciliation reads the actual trigger before updating local state.
 
 
 def mirror_transition(sig: dict, new_status: str, exit_px: float) -> None:
