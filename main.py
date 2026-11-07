@@ -791,7 +791,9 @@ def status():
             f"TP1 next-open shadow: {tp1['n']} closed, "
             f"{tp1['weak_volume_banks']} adjusted, "
             f"{tp1['baseline_return_pct']:+.2f}% baseline / "
-            f"{tp1['candidate_return_pct']:+.2f}% candidate. "
+            f"{tp1['candidate_return_pct']:+.2f}% volume only / "
+            f"{tp1['continuation_return_pct']:+.2f}% volume + continuation "
+            f"({tp1['continuation_banks']} adjusted). "
         )
     except Exception:
         tp1_status = "TP1 next-open shadow: unavailable. "

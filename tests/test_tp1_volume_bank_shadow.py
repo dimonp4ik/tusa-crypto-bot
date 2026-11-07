@@ -65,7 +65,9 @@ def test_parallel_r_does_not_replace_baseline_accounting():
         entry=100.0, sl=99.0, tp1=100.5) == -1.0
 
 
-def test_database_persists_baseline_and_challenger_separately():
+@pytest.mark.parametrize("exit_price, continuation_banks", [(100.4, 1), (100.7, 0)])
+def test_database_persists_baseline_and_challenger_separately(
+        exit_price, continuation_banks):
     with tempfile.TemporaryDirectory() as tmp:
         path = str(Path(tmp) / "signals.db")
         with patch.object(db, "DB_PATH", path):
@@ -82,7 +84,7 @@ def test_database_persists_baseline_and_challenger_separately():
             }, 100.5, 102.0, 99.0)
             assert db.record_tp1_volume_observation(
                 signal_id, volume_ratio=1.2, extra_fraction=.75,
-                exit_price=100.4, observed_at=18000.0)
+                exit_price=exit_price, observed_at=18000.0)
             assert not db.record_tp1_volume_observation(
                 signal_id, volume_ratio=2.0, extra_fraction=0.0,
                 exit_price=100.8, observed_at=18900.0)
@@ -94,7 +96,7 @@ def test_database_persists_baseline_and_challenger_separately():
             assert row["strategy_tp1_extra_close_frac"] == .75
             assert row["tp1_hit_volume_ratio"] == 1.2
             assert row["tp1_extra_close_frac"] == .75
-            assert row["tp1_extra_exit_price"] == 100.4
+            assert row["tp1_extra_exit_price"] == exit_price
             assert row["realized_r"] == 1.925
             assert row["tp1_volume_candidate_r"] == .725
             stats = db.get_tp1_volume_forward_stats(
@@ -103,6 +105,9 @@ def test_database_persists_baseline_and_challenger_separately():
             assert stats["weak_volume_banks"] == 1
             assert stats["baseline_return_pct"] == pytest.approx(.578)
             assert stats["candidate_return_pct"] == pytest.approx(.218)
+            assert stats["continuation_banks"] == continuation_banks
+            expected = .218 if continuation_banks else .578
+            assert stats["continuation_return_pct"] == pytest.approx(expected)
 
 
 def test_monitor_records_closed_tp1_bar_then_keeps_baseline_and_candidate():

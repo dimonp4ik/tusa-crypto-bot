@@ -1535,11 +1535,13 @@ def get_stats(days: int = 7, since_ts: float = None,
 def get_tp1_volume_forward_stats(days: int = 30, *, margin_pct: float = 3.0,
                                  leverage: float = 10.0, since: float = 0.0) -> dict:
     """Compare baseline and volume-bank R on the same new shadow closures."""
+    from src.tp1_volume_bank import CONTINUATION_R_THRESHOLD
+
     cutoff = max(time_mod.time() - days * 86400, LIVE_HIST_EPOCH_TS or 0.0, since)
     with _conn() as c:
         rows = c.execute("""
             SELECT opened_at, entry_price, sl, realized_r,
-                   tp1_volume_candidate_r, tp1_extra_close_frac
+                   tp1_volume_candidate_r, tp1_extra_close_frac, tp1_extra_exit_price
             FROM signals
             WHERE opened_at >= ?
               AND strategy_tp1_volume_threshold IS NOT NULL
@@ -1547,6 +1549,18 @@ def get_tp1_volume_forward_stats(days: int = 30, *, margin_pct: float = 3.0,
             ORDER BY opened_at, rowid
         """, (cutoff,)).fetchall()
     records = [dict(row) for row in rows]
+
+    continuation_banks = 0
+    for row in records:
+        row["continuation_r"] = row["realized_r"]
+        price = row["tp1_extra_exit_price"]
+        risk = abs(float(row["entry_price"]) - float(row["sl"]))
+        if (float(row["tp1_extra_close_frac"] or 0) > 0
+                and price is not None and risk > 0):
+            progress_r = abs(float(price) - float(row["entry_price"])) / risk
+            if progress_r < CONTINUATION_R_THRESHOLD:
+                row["continuation_r"] = row["tp1_volume_candidate_r"]
+                continuation_banks += 1
 
     def account(field: str) -> tuple[float, float]:
         equity = peak = 1.0
@@ -1564,6 +1578,7 @@ def get_tp1_volume_forward_stats(days: int = 30, *, margin_pct: float = 3.0,
 
     base_return, base_dd = account("realized_r")
     candidate_return, candidate_dd = account("tp1_volume_candidate_r")
+    continuation_return, continuation_dd = account("continuation_r")
     total = len(records)
     return {
         "since": cutoff,
@@ -1578,6 +1593,9 @@ def get_tp1_volume_forward_stats(days: int = 30, *, margin_pct: float = 3.0,
             if total else 0.0,
         "baseline_return_pct": base_return,
         "candidate_return_pct": candidate_return,
+        "continuation_banks": continuation_banks,
+        "continuation_return_pct": continuation_return,
+        "continuation_dd_pct": continuation_dd,
         "baseline_dd_pct": base_dd,
         "candidate_dd_pct": candidate_dd,
     }
