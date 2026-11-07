@@ -146,6 +146,36 @@ class UnprotectedPositionTests(unittest.TestCase):
         self.assertEqual(activate.call_args.args[4],'')
         self.assertEqual(activate.call_args.args[1],.01)
 
+    def test_fixed_be_retries_failed_amend_without_tp1_order(self):
+        pos = dict(id=1, user_id=7, inst_id="TEST", signal_id=2,
+                   direction="LONG", sl_algo_id="stop", sl_px=98, entry_px=101)
+        sig = dict(status="TP1_PARTIAL", strategy_runner_mode="fixed_be",
+                   entry_price=100)
+        with ExitStack() as stack:
+            for name, value in [
+                    ("AUTOTRADE_ENABLED", True), ("at_all_open_positions", [pos]),
+                    ("at_get", {"user_id": 7}), ("_creds_of", {"test": True}),
+                    ("get_signal_by_id", sig)]:
+                if name == "AUTOTRADE_ENABLED":
+                    stack.enter_context(patch.object(at, name, value))
+                else:
+                    stack.enter_context(patch.object(at, name, return_value=value))
+            stack.enter_context(patch.object(at.okx, "get_position_size",
+                                             return_value=(True, .01)))
+            stack.enter_context(patch.object(at.okx, "get_xperp_spec",
+                                             return_value={"tickSz": .01}))
+            amend = stack.enter_context(patch.object(
+                at.okx, "amend_protection_sl",
+                side_effect=[(False, "timeout"), (True, None)]))
+            update = stack.enter_context(patch.object(at, "at_update_position_sl"))
+            at.poll_exchange_closes()
+            update.assert_not_called()
+            at.poll_exchange_closes()
+            update.assert_called_once_with(1, 101)
+            pos["sl_px"] = 102
+            at.poll_exchange_closes()
+        self.assertEqual(amend.call_count, 2)
+
     def test_reconciler_closes_unprotected_position_even_with_open_signal(self):
         pos=dict(id=1,user_id=7,inst_id='TEST',signal_id=2,sl_algo_id='',sz=.01)
         with ExitStack() as stack:

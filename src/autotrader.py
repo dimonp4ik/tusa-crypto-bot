@@ -746,6 +746,20 @@ def update_trailing(sig: dict, stop_px: float) -> None:
             log.warning(f"autotrade trailing failed pos#{pos['id']}: {e}")
 
 
+def _move_stop_to_breakeven(pos: dict, sig: dict, creds: dict) -> None:
+    tick = (okx.get_xperp_spec(pos["inst_id"]) or {}).get("tickSz", 0)
+    target = okx.round_to_tick(float(pos.get("entry_px") or sig["entry_price"]), tick)
+    old = float(pos.get("sl_px") or 0)
+    if old and (old >= target if pos["direction"] == "LONG" else old <= target):
+        return
+    ok, error = okx.amend_protection_sl(
+        creds, pos["inst_id"], pos["sl_algo_id"], target)
+    if ok:
+        at_update_position_sl(pos["id"], target)
+    else:
+        log.warning("autotrade breakeven amend failed pos#%s: %s", pos["id"], error)
+
+
 def mirror_transition(sig: dict, new_status: str, exit_px: float) -> None:
     """Engine transitioned a signal → mirror it on the exchange for every user."""
     if not AUTOTRADE_ENABLED:
@@ -818,24 +832,8 @@ def mirror_transition(sig: dict, new_status: str, exit_px: float) -> None:
                 _dm(pos["user_id"],
                     f"🤖 *{disp}*: {label} (~{okx.fmt_px_display(exit_px, _tick)}).")
             elif new_status == "TP1_PARTIAL":
-                # Move the exchange stop to breakeven RIGHT NOW — don't wait
-                # for the next monitor cycle's trail computation, which would
-                # leave the original (loss) SL live on the exchange for up to
-                # ~1 min after TP1 actually triggered. update_trailing() only
-                # ever raises this further (max(entry, ...)), so moving to
-                # entry immediately is always safe, never premature.
                 try:
-                    tick = (okx.get_xperp_spec(pos["inst_id"]) or {}).get("tickSz", 0)
-                    # Breakeven means THIS user's breakeven: their real fill,
-                    # not the signal's global-feed entry. Off by the basis
-                    # otherwise, which on a 10x position is not cosmetic.
-                    _be_src = float(pos.get("entry_px") or sig["entry_price"])
-                    be_px = okx.round_to_tick(_be_src, tick)
-                    ok, err = okx.amend_protection_sl(creds, pos["inst_id"], pos["sl_algo_id"], be_px)
-                    if ok:
-                        at_update_position_sl(pos["id"], be_px)
-                    else:
-                        log.warning(f"autotrade breakeven amend failed pos#{pos['id']}: {err}")
+                    _move_stop_to_breakeven(pos, sig, creds)
                 except Exception as e:
                     log.warning(f"autotrade breakeven amend failed pos#{pos['id']}: {e}")
 
@@ -969,6 +967,10 @@ def poll_exchange_closes() -> None:
                 # already asking the exchange what is really open.
                 unprotected = not pos.get("sl_algo_id")
                 _sig = {"status": "UNPROTECTED_CLOSED"} if unprotected else get_signal_by_id(pos["signal_id"])
+                if (_sig and _sig.get("status") == "TP1_PARTIAL"
+                        and _sig.get("strategy_runner_mode") == "fixed_be"):
+                    _move_stop_to_breakeven(pos, _sig, creds)
+                    continue
                 if not unprotected and (not _sig or _sig.get("status") not in _CLOSE_STATUSES):
                     continue   # still open on the exchange, nothing to do
                 log.warning(f"autotrade reconcile pos#{pos['id']} "
