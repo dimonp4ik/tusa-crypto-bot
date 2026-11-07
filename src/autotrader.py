@@ -508,7 +508,9 @@ def _open_for_user_locked(u: dict, sig: dict, inst_id: str, disp: str) -> None:
     # 10x position would be naked and liquidates ~9% away. TP levels are NOT
     # touched: they stay anchored to the original 1R risk.
     _sl_level = float(sig["sl"])
-    if STOP_CLOSE_CONFIRM:
+    strategy_stop = sig.get("strategy_stop_on_close")
+    close_confirm = STOP_CLOSE_CONFIRM if strategy_stop is None else bool(strategy_stop)
+    if close_confirm:
         # Risk distance stays the signal's (that is the strategy's 1R); only the
         # point it is measured FROM moves to the real fill.
         _risk = abs(float(sig["entry_price"]) - _sl_level)
