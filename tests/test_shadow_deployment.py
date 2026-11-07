@@ -127,6 +127,19 @@ class ShadowDeploymentTests(unittest.TestCase):
             self.assertIsNone(main.run_scan())
         scan.assert_not_called()
 
+    def test_completed_early_scan_suppresses_only_same_bar_retry(self):
+        stamp = 1800
+        with patch.object(main.time, "time", return_value=stamp + 60), \
+             patch.object(main, "get_bot_state", return_value=str(stamp)) as state, \
+             patch.object(main, "_check_open_signals") as reconcile, \
+             patch.object(main, "_run_venue_strategy_scan") as scan:
+            main.run_scan()
+            reconcile.assert_not_called()
+            scan.assert_not_called()
+            state.return_value = str(stamp - 900)
+            main.run_scan()
+            scan.assert_called_once_with()
+
     def test_telegram_paper_signal_is_explicit_and_untradeable(self):
         analysis = {
             "symbol": "BTCUSDT", "direction": "LONG", "decision": "LONG",
@@ -709,6 +722,9 @@ class ShadowDeploymentTests(unittest.TestCase):
              patch.object(main, "profit_first_material_shadow_setups") as router, \
              patch.object(main, "_persist_crypto_scan_audit") as persist, \
              patch.object(main, "_publish_venue_candidates", return_value=0) as publish:
+            main._run_venue_strategy_scan(early=True)
+            publish.assert_not_called()
+            self.assertEqual(persist.call_args.args[0]["result"], "waiting_fresh_bar")
             main._run_venue_strategy_scan()
         router.assert_not_called()
         self.assertEqual(

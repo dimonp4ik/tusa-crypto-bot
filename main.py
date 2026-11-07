@@ -4365,7 +4365,7 @@ def _persist_crypto_scan_audit(
         log.warning("Crypto scan audit persistence failed: %s", exc)
 
 
-def _run_venue_strategy_scan() -> None:
+def _run_venue_strategy_scan(*, early: bool = False) -> None:
     """Fast deterministic path for the frozen X-Perp precision portfolio.
 
     It deliberately skips Claude, news scoring, legacy SMC and adaptive sizing.
@@ -4453,6 +4453,16 @@ def _run_venue_strategy_scan() -> None:
             except Exception as exc:
                 log.warning("Venue candle fetch failed: %s", exc)
 
+    entry_bar = int(now_utc.timestamp()) // KLINES_INTERVAL_SEC * KLINES_INTERVAL_SEC
+    if early and any(
+            symbol not in market_prices
+            or fetched[symbol]["time"][-1] + KLINES_INTERVAL_SEC != entry_bar
+            for symbol in symbols):
+        _persist_crypto_scan_audit({
+            "ts": time.time(), "result": "waiting_fresh_bar",
+            "targets": len(symbols), "fetched": len(fetched), "published": 0,
+        })
+        return
     btc = fetched.get("BTCUSDT")
     if not btc:
         _persist_crypto_scan_audit({
@@ -4602,6 +4612,8 @@ def _run_venue_strategy_scan() -> None:
         "open_long": open_direction_counts.get("LONG", 0),
         "open_short": open_direction_counts.get("SHORT", 0),
     }
+    if early:
+        set_bot_state("crypto_completed_early_bar", str(entry_bar))
     _persist_crypto_scan_audit(audit)
     if strategy_audit["symbols_evaluated"]:
         _persist_crypto_scan_audit(audit, "crypto_decision_audit")
@@ -4612,7 +4624,7 @@ def _run_venue_strategy_scan() -> None:
              len(symbols), len(candidates), published)
 
 
-def run_scan():
+def run_scan(early: bool = False):
     """Publish paper signals from the frozen X-Perp precision portfolio.
 
     The old SMC scan was removed on 2026-09-16. It was not a fallback but a
@@ -4620,6 +4632,10 @@ def run_scan():
     back on is a trapdoor rather than an off switch.
     """
     with _portfolio_state_lock:
+        if not early:
+            entry_bar = int(time.time()) // KLINES_INTERVAL_SEC * KLINES_INTERVAL_SEC
+            if get_bot_state("crypto_completed_early_bar") == str(entry_bar):
+                return
         try:
             _check_open_signals()
         except Exception as exc:
@@ -4628,6 +4644,8 @@ def run_scan():
             # admitting a new batch after stops or while positions are open.
             log.warning("Venue scan refused: open-signal reconciliation failed: %s", exc)
             return None
+        if early:
+            return _run_venue_strategy_scan(early=True)
         return _run_venue_strategy_scan()
 
 
@@ -4885,6 +4903,12 @@ def start_bot():
     scheduler.add_listener(_job_problem,
                            EVENT_JOB_MISSED | EVENT_JOB_MAX_INSTANCES |
                            EVENT_JOB_ERROR)
+
+    # Try a complete fresh snapshot at +10s before the existing retry.
+    scheduler.add_job(
+        run_scan, "cron", minute="0,15,30,45", second=10,
+        kwargs={"early": True}, timezone="UTC",
+    )
 
     # Signal scan — every 5 min aligned to candle closes.
     # 15m candles close at :00/:15/:30/:45 → scan at :01/:16/:31/:46 (+1 min buffer).
