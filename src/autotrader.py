@@ -38,7 +38,7 @@ from src.risk_limits import (
 from config import (
     AUTOTRADE_MAX_DAILY_LOSS, AUTOTRADE_MAX_DRAWDOWN, AUTOTRADE_EQUITY_PEAK_FLOOR,
     AUTOTRADE_MAX_ACCOUNT_MARGIN_FRACTION, AUTOTRADE_ACCOUNT_WRITER_COUNT,
-    AUTOTRADE_MAX_ACCOUNT_POSITIONS,
+    AUTOTRADE_MAX_ACCOUNT_POSITIONS, VENUE_MAX_ENTRY_DELAY_SEC,
     TELEGRAM_TOKEN,
     AUTOTRADE_ENABLED, AUTOTRADE_LEVERAGE,
     AUTOTRADE_CONTACT,
@@ -430,6 +430,12 @@ def _open_for_user_locked(u: dict, sig: dict, inst_id: str, disp: str) -> None:
     if not intent_id:
         log.warning("autotrade duplicate client order refused %s %s %s",
                     uid, inst_id, client_order_id)
+        return
+    entry_bar = sig.get("strategy_entry_bar_ts")
+    if entry_bar and time.time() - float(entry_bar) > VENUE_MAX_ENTRY_DELAY_SEC:
+        at_close_position(intent_id, "ENTRY_EXPIRED")
+        _entry_skip(uid, sig, inst_id, "истёк срок входа",
+                    f"ℹ️ Автотрейдинг: {disp} пропущен — истёк срок входа.")
         return
     ok, ord_id = okx.place_market_entry(
         creds, inst_id, sig["direction"], sz, client_order_id)

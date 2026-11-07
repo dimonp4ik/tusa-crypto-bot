@@ -35,6 +35,7 @@ from config import (
     AUTOTRADE_MAX_ACCOUNT_MARGIN_FRACTION,
     AUTOTRADE_ACCOUNT_WRITER_COUNT,
     AUTOTRADE_MAX_ACCOUNT_POSITIONS,
+    VENUE_MAX_ENTRY_DELAY_SEC as _MAX_VENUE_ENTRY_DELAY_SEC,
 )
 from src.binance_client import (
     get_klines, get_current_price, get_xperp_instruments, get_xperp_price,
@@ -4086,7 +4087,6 @@ _OI_MIN_DELTA_PCT = 0.3  # ignore OI moves below this (noise floor)
 # The exact replay enters at the next 15-minute bar open.  The normal :01 scan
 # needs a short OKX settlement buffer, but the :06 retry is already a different
 # market entry and must not inherit the replay's result.
-_MAX_VENUE_ENTRY_DELAY_SEC = 180
 
 
 def _base_of_symbol(symbol: str) -> str:
