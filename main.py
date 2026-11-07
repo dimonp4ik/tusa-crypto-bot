@@ -4421,26 +4421,24 @@ def _run_venue_strategy_scan() -> None:
         # These constants come from the feature builders themselves.  Keeping
         # the fetch tied to them prevents a shorter magic limit from silently
         # making every model call return no setup.
-        fifteen = get_klines_xperp(
+        candles = get_klines_xperp(
             symbol, limit=(REQUIRED_BTC_HISTORY_BARS
                            if symbol == "BTCUSDT"
-                           else REQUIRED_SYMBOL_HISTORY_BARS))
-        # Replay enters at this forming 15m bar's immutable open.  Read the
-        # same public candle so model admission cannot drift with the ticker
-        # during the scheduler's settlement minute.  Its live close remains
-        # the market entry shown to the client.
-        snapshot = get_klines_xperp(
-            symbol, limit=1, include_forming=True)
+                           else REQUIRED_SYMBOL_HISTORY_BARS),
+            include_forming=True)
+        fifteen = candles
         reference = market = None
         try:
-            if (fifteen and snapshot
-                    and int(snapshot["time"][-1])
-                    == int(fifteen["time"][-1]) + KLINES_INTERVAL_SEC
-                    and not bool(snapshot.get("confirmed", [0])[-1])):
-                reference = float(snapshot["open"][-1])
-                market = float(snapshot["close"][-1])
+            if candles and not bool(candles["confirmed"][-1]):
+                fifteen = {key: values[:-1] for key, values in candles.items()}
+                if (len(candles["time"]) >= 2
+                        and candles["time"][-1] - candles["time"][-2] == KLINES_INTERVAL_SEC):
+                    reference = float(candles["open"][-1])
+                    market = float(candles["close"][-1])
         except (KeyError, IndexError, TypeError, ValueError):
-            reference = market = None
+            fifteen = None
+        if not fifteen or not fifteen.get("time"):
+            fifteen = None
         return symbol, fifteen, market, reference
     with ThreadPoolExecutor(max_workers=4) as pool:
         for future in as_completed([pool.submit(_fetch, symbol) for symbol in symbols]):

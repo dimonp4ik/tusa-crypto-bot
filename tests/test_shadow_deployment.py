@@ -593,10 +593,9 @@ class ShadowDeploymentTests(unittest.TestCase):
 
     def test_scan_uses_frozen_profit_first_router_in_shadow_mode(self):
         closed_at = datetime.now(timezone.utc).timestamp() - 900
-        fifteen = {"time": [closed_at], "close": [100.0]}
-        forming = {
-            "time": [closed_at + 900], "open": [100.0],
-            "close": [99.0], "confirmed": [0],
+        candles = {
+            "time": [closed_at, closed_at + 900], "open": [100.0, 100.0],
+            "close": [100.0, 99.0], "confirmed": [1, 0],
         }
         setup = {
             "direction": "SHORT", "entry": 99.0, "atr": .495,
@@ -621,7 +620,7 @@ class ShadowDeploymentTests(unittest.TestCase):
              patch.object(main, "get_xperp_instruments",
                           return_value={"BTC": "BTC-XPERP"}), \
              patch.object(main, "get_klines_xperp",
-                          side_effect=[fifteen, forming]) as klines, \
+                          return_value=candles) as klines, \
              patch.object(main, "get_open_signals", return_value=[]), \
              patch.object(main, "get_active_symbol_blocks", return_value=[]), \
              patch.object(main, "profit_first_material_shadow_setups",
@@ -633,9 +632,9 @@ class ShadowDeploymentTests(unittest.TestCase):
             main._run_venue_strategy_scan()
 
         router.assert_called_once()
-        self.assertEqual(klines.call_count, 2)
-        self.assertEqual(klines.call_args_list[1].kwargs,
-                         {"limit": 1, "include_forming": True})
+        klines.assert_called_once_with(
+            "BTCUSDT", limit=main.REQUIRED_BTC_HISTORY_BARS, include_forming=True)
+        self.assertEqual(router.call_args.args[0]["close"], [100.0])
         self.assertEqual(router.call_args.kwargs["market_price"], 99.0)
         self.assertEqual(router.call_args.kwargs["model_price"], 100.0)
         oi.assert_not_called()
@@ -648,10 +647,9 @@ class ShadowDeploymentTests(unittest.TestCase):
 
     def test_scan_tracks_prequalified_2r_union_without_publishing_it(self):
         closed_at = datetime.now(timezone.utc).timestamp() - 900
-        fifteen = {"time": [closed_at], "close": [100.0]}
-        forming = {
-            "time": [closed_at + 900], "open": [100.0],
-            "close": [100.0], "confirmed": [0],
+        candles = {
+            "time": [closed_at, closed_at + 900], "open": [100.0, 100.0],
+            "close": [100.0, 100.0], "confirmed": [1, 0],
         }
         setup = {
             "direction": "LONG", "entry": 100.0, "atr": 2.0,
@@ -672,7 +670,7 @@ class ShadowDeploymentTests(unittest.TestCase):
              patch.object(main, "get_xperp_instruments",
                           return_value={"BTC": "BTC-XPERP"}), \
              patch.object(main, "get_klines_xperp",
-                          side_effect=[fifteen, forming]), \
+                          return_value=candles), \
              patch.object(main, "get_open_signals", return_value=[]), \
              patch.object(main, "get_active_symbol_blocks", return_value=[]), \
              patch.object(main, "profit_first_material_shadow_setups",
@@ -695,7 +693,7 @@ class ShadowDeploymentTests(unittest.TestCase):
 
     def test_scan_fails_closed_without_forming_entry_snapshot(self):
         closed_at = datetime.now(timezone.utc).timestamp() - 900
-        fifteen = {"time": [closed_at], "close": [100.0]}
+        fifteen = {"time": [closed_at], "close": [100.0], "confirmed": [1]}
         with patch.object(main, "ROBUST_SYMBOLS", {"BTCUSDT"}), \
              patch.object(main, "REGIME_FILTER_MODE", "paper"), \
              patch.object(main, "TRADE_WEEKENDS", True), \
@@ -705,7 +703,7 @@ class ShadowDeploymentTests(unittest.TestCase):
              patch.object(main, "get_xperp_instruments",
                           return_value={"BTC": "BTC-XPERP"}), \
              patch.object(main, "get_klines_xperp",
-                          side_effect=[fifteen, fifteen]), \
+                          return_value=fifteen), \
              patch.object(main, "get_open_signals", return_value=[]), \
              patch.object(main, "get_active_symbol_blocks", return_value=[]), \
              patch.object(main, "profit_first_material_shadow_setups") as router, \
@@ -721,7 +719,7 @@ class ShadowDeploymentTests(unittest.TestCase):
 
     def test_scan_drops_stale_closed_bar_instead_of_entering_late(self):
         self.assertEqual(main._MAX_VENUE_ENTRY_DELAY_SEC, 180)
-        fifteen = {"time": [900.0], "close": [100.0]}
+        fifteen = {"time": [900.0], "close": [100.0], "confirmed": [1]}
         with patch.object(main, "ROBUST_SYMBOLS", {"BTCUSDT"}), \
              patch.object(main, "REGIME_FILTER_MODE", "paper"), \
              patch.object(main, "TRADE_WEEKENDS", True), \
