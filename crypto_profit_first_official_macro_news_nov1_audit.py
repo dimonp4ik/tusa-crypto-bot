@@ -75,7 +75,7 @@ def event_mask(frame: pd.DataFrame, events: pd.DataFrame,
     entries = frame.entry_time.to_numpy(dtype=float)
     if not len(event_times) or not len(entries):
         return pd.Series(False, index=frame.index)
-    event_times.sort()
+    event_times = np.sort(event_times)
     previous = np.searchsorted(event_times, entries, side="right") - 1
     following = previous + 1
     hit = np.zeros(len(entries), dtype=bool)
