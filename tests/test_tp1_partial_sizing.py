@@ -66,6 +66,7 @@ def test_live_open_keeps_full_runner_and_reports_unplaceable_five_percent():
             ("set_bot_state", None),
             ("set_signal_size_mult", None),
             ("at_create_entry_intent", 91),
+            ("at_mark_entry_submitting", True),
             ("at_update_entry_intent_protection", None),
             ("at_activate_entry_intent", True),
         ]:
