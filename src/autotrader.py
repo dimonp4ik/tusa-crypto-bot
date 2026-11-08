@@ -447,15 +447,15 @@ def _open_for_user_locked(u: dict, sig: dict, inst_id: str, disp: str) -> None:
         return
     deadline_ms = None
     entry_bar = sig.get("strategy_entry_bar_ts")
-    if entry_bar and time.time() > float(entry_bar) + VENUE_MAX_ENTRY_DELAY_SEC:
-        at_close_position(intent_id, "ENTRY_EXPIRED")
-        _entry_skip(uid, sig, inst_id, "истёк срок входа",
-                    f"ℹ️ Автотрейдинг: {disp} пропущен — истёк срок входа.")
-        return
     if entry_bar:
         deadline_ms = int((float(entry_bar) + VENUE_MAX_ENTRY_DELAY_SEC) * 1000)
     account_snapshot_started = time.monotonic()
     margin_ok, latest_positions = okx.get_open_position_margin(creds)
+    if deadline_ms is not None and time.time() * 1000 >= deadline_ms:
+        at_close_position(intent_id, "ENTRY_EXPIRED")
+        _entry_skip(uid, sig, inst_id, "истёк срок входа",
+                    f"ℹ️ Автотрейдинг: {disp} пропущен — истёк срок входа.")
+        return
     if (not margin_ok or inst_id in latest_positions["inst_ids"]
             or not account_position_count_allows(
                 occupied_positions=latest_positions["count"],
