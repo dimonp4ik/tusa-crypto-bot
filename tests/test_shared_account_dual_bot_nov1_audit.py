@@ -45,3 +45,36 @@ def test_margin_releases_only_after_exit_timestamp():
     accepted, gate = audit.shared_margin_gate(rows, .90, .90)
     assert accepted == rows
     assert gate["peak_open_positions"] == 1
+
+
+def test_btc_cap_uses_only_candles_closed_strictly_before_entry():
+    entry = 172800
+    rows = [
+        {"bot": "crypto", "symbol": "ETH", "direction": "LONG",
+         "entry_time": entry - 900, "exit_time": entry + 900,
+         "signed_return": 0.01},
+        {"bot": "stocks", "symbol": "SPY", "direction": "LONG",
+         "entry_time": entry, "exit_time": entry + 900,
+         "signed_return": 0.01},
+    ]
+    closes = {
+        entry - 1800: 100, entry - 1800 - 86400: 100,
+        entry - 900: 100, entry - 900 - 86400: 100,
+        entry: 97, entry - 86400: 100,
+    }
+    accepted, gate = audit.shared_margin_gate(
+        rows, .03, .03, max_per_direction=1, btc_closes=closes)
+    assert accepted == rows
+    assert gate["missing_btc_context"] == {}
+
+    rows[1]["entry_time"] += 1
+    accepted, gate = audit.shared_margin_gate(
+        rows, .03, .03, max_per_direction=1, btc_closes=closes)
+    assert accepted == rows[:1]
+    assert gate["rejected_by_direction_cap"] == {"stocks": 1}
+
+    del closes[entry - 86400]
+    accepted, gate = audit.shared_margin_gate(
+        rows, .03, .03, max_per_direction=1, btc_closes=closes)
+    assert accepted == rows
+    assert gate["missing_btc_context"] == {"stocks": 1}
