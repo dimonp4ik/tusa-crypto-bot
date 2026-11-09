@@ -58,6 +58,7 @@ def margin_for(row: dict, crypto_margin: float, stock_margin: float) -> float:
 def shared_margin_gate(rows: list[dict], crypto_margin: float,
                        stock_margin: float, *, max_shorts: int | None = None,
                        max_per_direction: int | None = None,
+                       btc_closes: dict | None = None,
                        position_writers: int = 1, margin_writers: int = 1,
                        slot_release_delay: float = 0.0
                        ) -> tuple[list[dict], dict]:
@@ -82,6 +83,7 @@ def shared_margin_gate(rows: list[dict], crypto_margin: float,
     rejected_instrument = collections.Counter()
     rejected_shorts = collections.Counter()
     rejected_direction = collections.Counter()
+    missing_btc_context = collections.Counter()
     active: list[tuple[float, int, dict, float]] = []
     exits: list[tuple[float, int, float]] = []
     sequence = 0
@@ -101,6 +103,17 @@ def shared_margin_gate(rows: list[dict], crypto_margin: float,
             counts[row["bot"]], -float(row.get("quality") or 0),
             str(row["bot"]), str(row["symbol"])))
         for row in batch:
+            apply_direction_cap = True
+            if btc_closes is not None:
+                stamp = (math.ceil(now / 900) - 1) * 900
+                current = btc_closes.get(stamp)
+                previous = btc_closes.get(stamp - 86400)
+                if current is None or previous is None:
+                    missing_btc_context[row["bot"]] += 1
+                    apply_direction_cap = False
+                else:
+                    sign = 1 if row["direction"] == "LONG" else -1
+                    apply_direction_cap = sign * (current / previous - 1) < -.01
             requested = equity * margin_for(row, crypto_margin, stock_margin)
             occupied = sum(item[3] for item in active)
             instrument = row.get("inst_id") or row["symbol"]
@@ -121,7 +134,7 @@ def shared_margin_gate(rows: list[dict], crypto_margin: float,
                 rejected[row["bot"]] += 1
                 rejected_shorts[row["bot"]] += 1
                 continue
-            if (max_per_direction is not None
+            if (max_per_direction is not None and apply_direction_cap
                     and sum(item[2]["direction"] == row["direction"]
                             for item in active) >= max_per_direction):
                 rejected[row["bot"]] += 1
@@ -156,6 +169,7 @@ def shared_margin_gate(rows: list[dict], crypto_margin: float,
         "rejected_by_bot": dict(rejected),
         "rejected_by_margin_cap": dict(rejected_margin),
         "rejected_by_open_instrument": dict(rejected_instrument),
+        "missing_btc_context": dict(missing_btc_context),
         "rejected_by_direction_cap": dict(rejected_direction),
         "rejected_by_short_cap": dict(rejected_shorts),
         "rejected_by_position_cap": dict(rejected_positions),
@@ -311,10 +325,11 @@ def account_metrics(rows: list[dict], crypto_margin: float,
 def scenario(rows: list[dict], crypto_margin: float,
              stock_margin: float, *, max_per_direction: int | None = None,
              slot_release_delay: float = 0.0,
-             candle_marks: tuple[dict, dict] | None = None) -> dict:
+             candle_marks: tuple[dict, dict] | None = None,
+             btc_closes: dict | None = None) -> dict:
     accepted, gate = shared_margin_gate(
         rows, crypto_margin, stock_margin, max_per_direction=max_per_direction,
-        slot_release_delay=slot_release_delay,
+        slot_release_delay=slot_release_delay, btc_closes=btc_closes,
     )
     metrics = account_metrics(accepted, crypto_margin, stock_margin)
     if candle_marks is not None:
@@ -362,6 +377,12 @@ def main() -> None:
         },
         "scenarios": scenarios,
         "five_pct_each": five,
+        "btc_countertrend_cap": [
+            scenario(rows, margin, margin, max_per_direction=4,
+                     slot_release_delay=delay, candle_marks=candle_marks,
+                     btc_closes=candle_marks[0]["crypto", "BTCUSDT"])
+            for margin in (.03, .05) for delay in (0, 900, 3600)
+        ],
         "direction_cap_sensitivity": [
             scenario(rows, margin, margin, max_per_direction=cap,
                      slot_release_delay=delay, candle_marks=candle_marks)
