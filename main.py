@@ -443,6 +443,9 @@ def _build_and_send_report(chat_id: int, message_id: int,
                   f"нужно {REQUIRED_SYMBOL_HISTORY_BARS}; "
                   f"BTC {_scan.get('btc_history_bars', 0)}, нужно {REQUIRED_BTC_HISTORY_BARS}")
                 _sa = _scan.get("strategy") or {}
+                if "weak_long_impulse_candidates" in _sa:
+                    A("  Слабый импульс лонга, пробный фильтр: "
+                      f"{_sa['weak_long_impulse_candidates']} кандидатов за скан")
                 A(f"  проверено моделью: {_sa.get('symbols_evaluated', 0)}; "
                   f"семейных сетапов {_sa.get('family_signals', 0)}; "
                   f"сырых кандидатов {_scan.get('raw_setups', 0)}; "
