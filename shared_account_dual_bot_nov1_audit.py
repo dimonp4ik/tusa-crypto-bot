@@ -36,8 +36,10 @@ def load_rows() -> list[dict]:
     stocks = stocks.assign(
         bot="stocks", signed_return=stocks.signed_return.astype(float),
         quality=stocks.cross_z.abs().astype(float))
+    stocks = stocks.assign(sequential_banked=False, near_exit_time=math.nan)
     keep = ["bot", "symbol", "direction", "entry_time", "exit_time",
-            "signed_return", "quality", "module"]
+            "signed_return", "quality", "module", "entry", "risk_pct",
+            "sequential_banked", "near_exit_time"]
     both = pd.concat([crypto[keep], stocks[keep]], ignore_index=True)
     for key in ("entry_time", "exit_time", "signed_return", "quality"):
         both[key] = pd.to_numeric(both[key], errors="coerce")
@@ -210,6 +212,23 @@ def candle_close_drawdown(rows: list[dict], close_prices: dict,
     return 100 * drawdown
 
 
+def load_candle_marks(rows: list[dict]) -> tuple[dict, dict]:
+    folders = {
+        "crypto": CRYPTO_ROWS.parent / "xperp_15m_oct31_1700_material",
+        "stocks": STOCK_ROWS.parent / "stock_xperp_forward_nov1",
+    }
+    closes = {}
+    adverse = {}
+    for bot, symbol in sorted({(row["bot"], row["symbol"]) for row in rows}):
+        candles = pd.read_pickle(folders[bot] / f"{symbol}_15min_current.pkl")
+        close_times = [int(stamp) + 900 for stamp in candles["time"]]
+        closes[bot, symbol] = dict(zip(close_times, candles["close"], strict=True))
+        for direction, field in (("LONG", "low"), ("SHORT", "high")):
+            adverse[bot, symbol, direction] = dict(
+                zip(close_times, candles[field], strict=True))
+    return closes, adverse
+
+
 def account_metrics(rows: list[dict], crypto_margin: float,
                     stock_margin: float) -> dict:
     ordered = sorted(rows, key=lambda row: (
@@ -291,12 +310,19 @@ def account_metrics(rows: list[dict], crypto_margin: float,
 
 def scenario(rows: list[dict], crypto_margin: float,
              stock_margin: float, *, max_per_direction: int | None = None,
-             slot_release_delay: float = 0.0) -> dict:
+             slot_release_delay: float = 0.0,
+             candle_marks: tuple[dict, dict] | None = None) -> dict:
     accepted, gate = shared_margin_gate(
         rows, crypto_margin, stock_margin, max_per_direction=max_per_direction,
         slot_release_delay=slot_release_delay,
     )
     metrics = account_metrics(accepted, crypto_margin, stock_margin)
+    if candle_marks is not None:
+        closes, adverse = candle_marks
+        metrics["candle_close_drawdown_pct"] = round(candle_close_drawdown(
+            accepted, closes, crypto_margin, stock_margin), 4)
+        metrics["candle_adverse_stress_drawdown_pct"] = round(candle_close_drawdown(
+            accepted, closes, crypto_margin, stock_margin, adverse_prices=adverse), 4)
     complete = {month: values for month, values in metrics["monthly"].items()
                 if month in {"2026-07", "2026-08", "2026-09", "2026-10"}}
     return {
@@ -313,7 +339,8 @@ def scenario(rows: list[dict], crypto_margin: float,
 
 def main() -> None:
     rows = load_rows()
-    scenarios = [scenario(rows, crypto, stocks)
+    candle_marks = load_candle_marks(rows)
+    scenarios = [scenario(rows, crypto, stocks, candle_marks=candle_marks)
                  for crypto, stocks in SCENARIOS]
     five = next(item for item in scenarios
                 if item["crypto_margin_pct"] == 5
@@ -337,7 +364,7 @@ def main() -> None:
         "five_pct_each": five,
         "direction_cap_sensitivity": [
             scenario(rows, margin, margin, max_per_direction=cap,
-                     slot_release_delay=delay)
+                     slot_release_delay=delay, candle_marks=candle_marks)
             for margin in (.03, .05) for delay in (0, 900, 3600)
             for cap in (None, 4, 5)
         ],
