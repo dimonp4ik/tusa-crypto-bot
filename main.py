@@ -3395,7 +3395,8 @@ def _venue_signal_on_cooldown(symbol: str, direction: str, now: float | None = N
 def _venue_daily_loss_pause() -> bool:
     day_start = int(time.time() // 86400) * 86400
     return (VENUE_LOSS_PAUSE_STREAK > 0
-            and get_today_sl_streak(day_start) >= VENUE_LOSS_PAUSE_STREAK)
+            and get_today_sl_streak(day_start, live_only=DEPLOYMENT_MODE == 'live')
+            >= VENUE_LOSS_PAUSE_STREAK)
 
 
 # ── Reject cooldown ────────────────────────────────────────────────────────────

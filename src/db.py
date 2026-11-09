@@ -2367,15 +2367,15 @@ def seed_backtest_outcomes(rows: list) -> int:
     return ins
 
 
-def get_today_sl_streak(day_start_ts: float) -> int:
+def get_today_sl_streak(day_start_ts: float, *, live_only: bool = False) -> int:
     """Consecutive SL_HIT streak among signals closed since day_start_ts,
     counted from the most recent close backwards. Any non-SL close breaks it.
     Powers the daily kill-switch."""
     with _conn() as c:
         rows = c.execute(
             "SELECT status FROM signals WHERE closed_at IS NOT NULL AND closed_at >= ? "
-            "ORDER BY closed_at DESC",
-            (day_start_ts,),
+            "AND (? = 0 OR autotrade_eligible = 1) ORDER BY closed_at DESC, id DESC",
+            (day_start_ts, live_only),
         ).fetchall()
     n = 0
     for r in rows:
