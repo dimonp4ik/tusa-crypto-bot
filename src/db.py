@@ -177,6 +177,7 @@ def init_db():
             "strategy_runner_target_r": "REAL",
             "strategy_bar_seconds": "INTEGER",
             "strategy_entry_bar_ts": "REAL",
+            "weak_long_impulse_candidate": "INTEGER",
             "strategy_stop_on_close": "INTEGER",
             "strategy_max_bars": "INTEGER",
             "strategy_expire_at": "REAL",
@@ -691,7 +692,8 @@ def log_signal(analysis: dict, tp1: float, tp2: float, sl: float) -> int:
                 strategy_entry_bar_ts = ?, strategy_stop_on_close = ?,
                 strategy_max_bars = ?, strategy_expire_at = ?,
                 strategy_tp1_volume_threshold = ?,
-                strategy_tp1_extra_close_frac = ?, entry_reference_price = ?
+                strategy_tp1_extra_close_frac = ?, entry_reference_price = ?,
+                weak_long_impulse_candidate = ?
             WHERE id = ?
         """, (
             analysis.get("strategy_tp1_close_frac"),
@@ -705,6 +707,7 @@ def log_signal(analysis: dict, tp1: float, tp2: float, sl: float) -> int:
             analysis.get("strategy_tp1_volume_threshold"),
             analysis.get("strategy_tp1_extra_close_frac"),
             analysis.get("entry_reference_price"),
+            analysis.get("weak_long_impulse_candidate"),
             cur.lastrowid,
         ))
         if analysis.get("_shadow_only"):
