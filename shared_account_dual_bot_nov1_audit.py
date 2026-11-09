@@ -20,6 +20,7 @@ REPORT = ROOT / "reports/audit_2026_09_08/shared_account_dual_bot_nov1.json"
 LEVERAGE = 10.0
 MAX_MARGIN = .90
 MAX_POSITIONS = 12
+LOCAL_SLOTS = {"crypto": 4, "stocks": 8}
 SCENARIOS = ((.03, .03), (.03, .05), (.05, .03), (.05, .05))
 
 
@@ -59,6 +60,7 @@ def shared_margin_gate(rows: list[dict], crypto_margin: float,
                        stock_margin: float, *, max_shorts: int | None = None,
                        max_per_direction: int | None = None,
                        btc_closes: dict | None = None,
+                       model_live_slots: bool = False,
                        position_writers: int = 1, margin_writers: int = 1,
                        slot_release_delay: float = 0.0
                        ) -> tuple[list[dict], dict]:
@@ -83,6 +85,7 @@ def shared_margin_gate(rows: list[dict], crypto_margin: float,
     rejected_instrument = collections.Counter()
     rejected_shorts = collections.Counter()
     rejected_direction = collections.Counter()
+    rejected_local = collections.Counter()
     missing_btc_context = collections.Counter()
     active: list[tuple[float, int, dict, float]] = []
     exits: list[tuple[float, int, float]] = []
@@ -103,6 +106,10 @@ def shared_margin_gate(rows: list[dict], crypto_margin: float,
             counts[row["bot"]], -float(row.get("quality") or 0),
             str(row["bot"]), str(row["symbol"])))
         for row in batch:
+            if model_live_slots and counts[row["bot"]] >= LOCAL_SLOTS[row["bot"]]:
+                rejected[row["bot"]] += 1
+                rejected_local[row["bot"]] += 1
+                continue
             apply_direction_cap = True
             if btc_closes is not None:
                 stamp = (math.ceil(now / 900) - 1) * 900
@@ -170,6 +177,7 @@ def shared_margin_gate(rows: list[dict], crypto_margin: float,
         "rejected_by_margin_cap": dict(rejected_margin),
         "rejected_by_open_instrument": dict(rejected_instrument),
         "missing_btc_context": dict(missing_btc_context),
+        "rejected_by_local_slots": dict(rejected_local),
         "rejected_by_direction_cap": dict(rejected_direction),
         "rejected_by_short_cap": dict(rejected_shorts),
         "rejected_by_position_cap": dict(rejected_positions),
@@ -326,10 +334,13 @@ def scenario(rows: list[dict], crypto_margin: float,
              stock_margin: float, *, max_per_direction: int | None = None,
              slot_release_delay: float = 0.0,
              candle_marks: tuple[dict, dict] | None = None,
-             btc_closes: dict | None = None) -> dict:
+             btc_closes: dict | None = None, model_live_slots: bool = False) -> dict:
     accepted, gate = shared_margin_gate(
         rows, crypto_margin, stock_margin, max_per_direction=max_per_direction,
         slot_release_delay=slot_release_delay, btc_closes=btc_closes,
+        model_live_slots=model_live_slots,
+        position_writers=2 if model_live_slots else 1,
+        margin_writers=2 if model_live_slots else 1,
     )
     metrics = account_metrics(accepted, crypto_margin, stock_margin)
     if candle_marks is not None:
@@ -377,6 +388,11 @@ def main() -> None:
         },
         "scenarios": scenarios,
         "five_pct_each": five,
+        "live_slot_sensitivity": [
+            scenario(rows, margin, margin, slot_release_delay=delay,
+                     candle_marks=candle_marks, model_live_slots=True)
+            for margin in (.03, .05) for delay in (0, 900, 3600)
+        ],
         "btc_countertrend_cap": [
             scenario(rows, margin, margin, max_per_direction=4,
                      slot_release_delay=delay, candle_marks=candle_marks,

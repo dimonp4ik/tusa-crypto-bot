@@ -36,6 +36,7 @@
         "rejected_by_margin_cap": {},
         "rejected_by_open_instrument": {},
         "missing_btc_context": {},
+        "rejected_by_local_slots": {},
         "rejected_by_direction_cap": {},
         "rejected_by_short_cap": {},
         "rejected_by_position_cap": {},
@@ -129,6 +130,7 @@
         "rejected_by_margin_cap": {},
         "rejected_by_open_instrument": {},
         "missing_btc_context": {},
+        "rejected_by_local_slots": {},
         "rejected_by_direction_cap": {},
         "rejected_by_short_cap": {},
         "rejected_by_position_cap": {},
@@ -222,6 +224,7 @@
         "rejected_by_margin_cap": {},
         "rejected_by_open_instrument": {},
         "missing_btc_context": {},
+        "rejected_by_local_slots": {},
         "rejected_by_direction_cap": {},
         "rejected_by_short_cap": {},
         "rejected_by_position_cap": {},
@@ -315,6 +318,7 @@
         "rejected_by_margin_cap": {},
         "rejected_by_open_instrument": {},
         "missing_btc_context": {},
+        "rejected_by_local_slots": {},
         "rejected_by_direction_cap": {},
         "rejected_by_short_cap": {},
         "rejected_by_position_cap": {},
@@ -409,6 +413,7 @@
       "rejected_by_margin_cap": {},
       "rejected_by_open_instrument": {},
       "missing_btc_context": {},
+      "rejected_by_local_slots": {},
       "rejected_by_direction_cap": {},
       "rejected_by_short_cap": {},
       "rejected_by_position_cap": {},
@@ -480,6 +485,644 @@
     "complete_months_both_bots_ge_30": 1,
     "complete_months_combined_ge_60": 3
   },
+  "live_slot_sensitivity": [
+    {
+      "crypto_margin_pct": 3.0,
+      "stock_margin_pct": 3.0,
+      "gate": {
+        "candidate_count": 1578,
+        "position_writers": 2,
+        "margin_writers": 2,
+        "slot_release_delay": 0,
+        "max_per_direction": null,
+        "accepted_count": 1576,
+        "candidate_count_by_bot": {
+          "crypto": 652,
+          "stocks": 926
+        },
+        "accepted_count_by_bot": {
+          "stocks": 926,
+          "crypto": 650
+        },
+        "rejected_by_bot": {
+          "crypto": 2
+        },
+        "rejected_by_margin_cap": {},
+        "rejected_by_open_instrument": {},
+        "missing_btc_context": {},
+        "rejected_by_local_slots": {
+          "crypto": 1
+        },
+        "rejected_by_direction_cap": {},
+        "rejected_by_short_cap": {},
+        "rejected_by_position_cap": {
+          "crypto": 1
+        },
+        "position_rejections_with_other_bot_open": {
+          "crypto": 1
+        },
+        "peak_open_positions": 11,
+        "peak_margin_occupied_pct": 33.1602,
+        "peak_open_by_bot": {
+          "stocks": 8,
+          "crypto": 4
+        }
+      },
+      "metrics": {
+        "n": 1576,
+        "return_pct": 260.2437,
+        "max_drawdown_pct": 6.2069,
+        "drawdown_basis": "realized_equity_after_exit_batches",
+        "by_bot": {
+          "crypto": {
+            "n": 650,
+            "profitable_exit_rate_pct": 66.1538,
+            "account_contribution_pct": 65.7493
+          },
+          "stocks": {
+            "n": 926,
+            "profitable_exit_rate_pct": 44.3844,
+            "account_contribution_pct": 194.4944
+          }
+        },
+        "monthly": {
+          "2026-06": {
+            "combined_return_pct": -3.9433,
+            "crypto_contribution_pct": -0.2177,
+            "stocks_contribution_pct": -3.7257,
+            "both_bots_ge_30pct": false,
+            "combined_ge_60pct": false
+          },
+          "2026-07": {
+            "combined_return_pct": 46.8474,
+            "crypto_contribution_pct": -0.8564,
+            "stocks_contribution_pct": 47.7039,
+            "both_bots_ge_30pct": false,
+            "combined_ge_60pct": false
+          },
+          "2026-08": {
+            "combined_return_pct": 24.8128,
+            "crypto_contribution_pct": 1.2399,
+            "stocks_contribution_pct": 23.5729,
+            "both_bots_ge_30pct": false,
+            "combined_ge_60pct": false
+          },
+          "2026-09": {
+            "combined_return_pct": 38.0157,
+            "crypto_contribution_pct": 7.8815,
+            "stocks_contribution_pct": 30.1342,
+            "both_bots_ge_30pct": false,
+            "combined_ge_60pct": false
+          },
+          "2026-10": {
+            "combined_return_pct": 48.2569,
+            "crypto_contribution_pct": 21.0566,
+            "stocks_contribution_pct": 27.2003,
+            "both_bots_ge_30pct": false,
+            "combined_ge_60pct": false
+          }
+        },
+        "candle_close_drawdown_pct": 6.6371,
+        "candle_adverse_stress_drawdown_pct": 6.8264
+      },
+      "complete_months_both_bots_ge_30": 0,
+      "complete_months_combined_ge_60": 0
+    },
+    {
+      "crypto_margin_pct": 3.0,
+      "stock_margin_pct": 3.0,
+      "gate": {
+        "candidate_count": 1578,
+        "position_writers": 2,
+        "margin_writers": 2,
+        "slot_release_delay": 900,
+        "max_per_direction": null,
+        "accepted_count": 1523,
+        "candidate_count_by_bot": {
+          "crypto": 652,
+          "stocks": 926
+        },
+        "accepted_count_by_bot": {
+          "stocks": 892,
+          "crypto": 631
+        },
+        "rejected_by_bot": {
+          "crypto": 21,
+          "stocks": 34
+        },
+        "rejected_by_margin_cap": {},
+        "rejected_by_open_instrument": {
+          "crypto": 16,
+          "stocks": 22
+        },
+        "missing_btc_context": {},
+        "rejected_by_local_slots": {
+          "stocks": 12,
+          "crypto": 3
+        },
+        "rejected_by_direction_cap": {},
+        "rejected_by_short_cap": {},
+        "rejected_by_position_cap": {
+          "crypto": 2
+        },
+        "position_rejections_with_other_bot_open": {
+          "crypto": 2
+        },
+        "peak_open_positions": 11,
+        "peak_margin_occupied_pct": 33.1422,
+        "peak_open_by_bot": {
+          "stocks": 8,
+          "crypto": 4
+        }
+      },
+      "metrics": {
+        "n": 1523,
+        "return_pct": 228.6309,
+        "max_drawdown_pct": 5.4171,
+        "drawdown_basis": "realized_equity_after_exit_batches",
+        "by_bot": {
+          "crypto": {
+            "n": 631,
+            "profitable_exit_rate_pct": 66.2441,
+            "account_contribution_pct": 55.412
+          },
+          "stocks": {
+            "n": 892,
+            "profitable_exit_rate_pct": 44.1704,
+            "account_contribution_pct": 173.2189
+          }
+        },
+        "monthly": {
+          "2026-06": {
+            "combined_return_pct": -3.9433,
+            "crypto_contribution_pct": -0.2177,
+            "stocks_contribution_pct": -3.7257,
+            "both_bots_ge_30pct": false,
+            "combined_ge_60pct": false
+          },
+          "2026-07": {
+            "combined_return_pct": 44.0236,
+            "crypto_contribution_pct": 0.1798,
+            "stocks_contribution_pct": 43.8438,
+            "both_bots_ge_30pct": false,
+            "combined_ge_60pct": false
+          },
+          "2026-08": {
+            "combined_return_pct": 24.2625,
+            "crypto_contribution_pct": 1.7208,
+            "stocks_contribution_pct": 22.5417,
+            "both_bots_ge_30pct": false,
+            "combined_ge_60pct": false
+          },
+          "2026-09": {
+            "combined_return_pct": 34.2206,
+            "crypto_contribution_pct": 7.1349,
+            "stocks_contribution_pct": 27.0857,
+            "both_bots_ge_30pct": false,
+            "combined_ge_60pct": false
+          },
+          "2026-10": {
+            "combined_return_pct": 42.4255,
+            "crypto_contribution_pct": 17.687,
+            "stocks_contribution_pct": 24.7385,
+            "both_bots_ge_30pct": false,
+            "combined_ge_60pct": false
+          }
+        },
+        "candle_close_drawdown_pct": 7.3101,
+        "candle_adverse_stress_drawdown_pct": 7.5085
+      },
+      "complete_months_both_bots_ge_30": 0,
+      "complete_months_combined_ge_60": 0
+    },
+    {
+      "crypto_margin_pct": 3.0,
+      "stock_margin_pct": 3.0,
+      "gate": {
+        "candidate_count": 1578,
+        "position_writers": 2,
+        "margin_writers": 2,
+        "slot_release_delay": 3600,
+        "max_per_direction": null,
+        "accepted_count": 1465,
+        "candidate_count_by_bot": {
+          "crypto": 652,
+          "stocks": 926
+        },
+        "accepted_count_by_bot": {
+          "stocks": 859,
+          "crypto": 606
+        },
+        "rejected_by_bot": {
+          "crypto": 46,
+          "stocks": 67
+        },
+        "rejected_by_margin_cap": {},
+        "rejected_by_open_instrument": {
+          "crypto": 31,
+          "stocks": 46
+        },
+        "missing_btc_context": {},
+        "rejected_by_local_slots": {
+          "stocks": 19,
+          "crypto": 14
+        },
+        "rejected_by_direction_cap": {},
+        "rejected_by_short_cap": {},
+        "rejected_by_position_cap": {
+          "crypto": 1,
+          "stocks": 2
+        },
+        "position_rejections_with_other_bot_open": {
+          "crypto": 1,
+          "stocks": 2
+        },
+        "peak_open_positions": 11,
+        "peak_margin_occupied_pct": 33.235,
+        "peak_open_by_bot": {
+          "stocks": 8,
+          "crypto": 4
+        }
+      },
+      "metrics": {
+        "n": 1465,
+        "return_pct": 207.7864,
+        "max_drawdown_pct": 5.707,
+        "drawdown_basis": "realized_equity_after_exit_batches",
+        "by_bot": {
+          "crypto": {
+            "n": 606,
+            "profitable_exit_rate_pct": 65.6766,
+            "account_contribution_pct": 43.5497
+          },
+          "stocks": {
+            "n": 859,
+            "profitable_exit_rate_pct": 44.3539,
+            "account_contribution_pct": 164.2367
+          }
+        },
+        "monthly": {
+          "2026-06": {
+            "combined_return_pct": -3.9433,
+            "crypto_contribution_pct": -0.2177,
+            "stocks_contribution_pct": -3.7257,
+            "both_bots_ge_30pct": false,
+            "combined_ge_60pct": false
+          },
+          "2026-07": {
+            "combined_return_pct": 43.1192,
+            "crypto_contribution_pct": -0.4924,
+            "stocks_contribution_pct": 43.6116,
+            "both_bots_ge_30pct": false,
+            "combined_ge_60pct": false
+          },
+          "2026-08": {
+            "combined_return_pct": 21.9195,
+            "crypto_contribution_pct": -0.8834,
+            "stocks_contribution_pct": 22.8029,
+            "both_bots_ge_30pct": false,
+            "combined_ge_60pct": false
+          },
+          "2026-09": {
+            "combined_return_pct": 29.7987,
+            "crypto_contribution_pct": 3.4075,
+            "stocks_contribution_pct": 26.3912,
+            "both_bots_ge_30pct": false,
+            "combined_ge_60pct": false
+          },
+          "2026-10": {
+            "combined_return_pct": 41.4752,
+            "crypto_contribution_pct": 18.2682,
+            "stocks_contribution_pct": 23.207,
+            "both_bots_ge_30pct": false,
+            "combined_ge_60pct": false
+          }
+        },
+        "candle_close_drawdown_pct": 7.9468,
+        "candle_adverse_stress_drawdown_pct": 7.9877
+      },
+      "complete_months_both_bots_ge_30": 0,
+      "complete_months_combined_ge_60": 0
+    },
+    {
+      "crypto_margin_pct": 5.0,
+      "stock_margin_pct": 5.0,
+      "gate": {
+        "candidate_count": 1578,
+        "position_writers": 2,
+        "margin_writers": 2,
+        "slot_release_delay": 0,
+        "max_per_direction": null,
+        "accepted_count": 1576,
+        "candidate_count_by_bot": {
+          "crypto": 652,
+          "stocks": 926
+        },
+        "accepted_count_by_bot": {
+          "stocks": 926,
+          "crypto": 650
+        },
+        "rejected_by_bot": {
+          "crypto": 2
+        },
+        "rejected_by_margin_cap": {},
+        "rejected_by_open_instrument": {},
+        "missing_btc_context": {},
+        "rejected_by_local_slots": {
+          "crypto": 1
+        },
+        "rejected_by_direction_cap": {},
+        "rejected_by_short_cap": {},
+        "rejected_by_position_cap": {
+          "crypto": 1
+        },
+        "position_rejections_with_other_bot_open": {
+          "crypto": 1
+        },
+        "peak_open_positions": 11,
+        "peak_margin_occupied_pct": 55.4465,
+        "peak_open_by_bot": {
+          "stocks": 8,
+          "crypto": 4
+        }
+      },
+      "metrics": {
+        "n": 1576,
+        "return_pct": 722.1151,
+        "max_drawdown_pct": 10.226,
+        "drawdown_basis": "realized_equity_after_exit_batches",
+        "by_bot": {
+          "crypto": {
+            "n": 650,
+            "profitable_exit_rate_pct": 66.1538,
+            "account_contribution_pct": 213.9938
+          },
+          "stocks": {
+            "n": 926,
+            "profitable_exit_rate_pct": 44.3844,
+            "account_contribution_pct": 508.1212
+          }
+        },
+        "monthly": {
+          "2026-06": {
+            "combined_return_pct": -6.525,
+            "crypto_contribution_pct": -0.3592,
+            "stocks_contribution_pct": -6.1659,
+            "both_bots_ge_30pct": false,
+            "combined_ge_60pct": false
+          },
+          "2026-07": {
+            "combined_return_pct": 87.7434,
+            "crypto_contribution_pct": -3.0908,
+            "stocks_contribution_pct": 90.8342,
+            "both_bots_ge_30pct": false,
+            "combined_ge_60pct": true
+          },
+          "2026-08": {
+            "combined_return_pct": 43.999,
+            "crypto_contribution_pct": 2.3323,
+            "stocks_contribution_pct": 41.6666,
+            "both_bots_ge_30pct": false,
+            "combined_ge_60pct": false
+          },
+          "2026-09": {
+            "combined_return_pct": 70.0797,
+            "crypto_contribution_pct": 15.1945,
+            "stocks_contribution_pct": 54.8852,
+            "both_bots_ge_30pct": false,
+            "combined_ge_60pct": true
+          },
+          "2026-10": {
+            "combined_return_pct": 91.2761,
+            "crypto_contribution_pct": 40.6582,
+            "stocks_contribution_pct": 50.6179,
+            "both_bots_ge_30pct": true,
+            "combined_ge_60pct": true
+          }
+        },
+        "candle_close_drawdown_pct": 10.7821,
+        "candle_adverse_stress_drawdown_pct": 11.0914
+      },
+      "complete_months_both_bots_ge_30": 1,
+      "complete_months_combined_ge_60": 3
+    },
+    {
+      "crypto_margin_pct": 5.0,
+      "stock_margin_pct": 5.0,
+      "gate": {
+        "candidate_count": 1578,
+        "position_writers": 2,
+        "margin_writers": 2,
+        "slot_release_delay": 900,
+        "max_per_direction": null,
+        "accepted_count": 1523,
+        "candidate_count_by_bot": {
+          "crypto": 652,
+          "stocks": 926
+        },
+        "accepted_count_by_bot": {
+          "stocks": 892,
+          "crypto": 631
+        },
+        "rejected_by_bot": {
+          "crypto": 21,
+          "stocks": 34
+        },
+        "rejected_by_margin_cap": {},
+        "rejected_by_open_instrument": {
+          "crypto": 16,
+          "stocks": 22
+        },
+        "missing_btc_context": {},
+        "rejected_by_local_slots": {
+          "stocks": 12,
+          "crypto": 3
+        },
+        "rejected_by_direction_cap": {},
+        "rejected_by_short_cap": {},
+        "rejected_by_position_cap": {
+          "crypto": 2
+        },
+        "position_rejections_with_other_bot_open": {
+          "crypto": 2
+        },
+        "peak_open_positions": 11,
+        "peak_margin_occupied_pct": 55.3965,
+        "peak_open_by_bot": {
+          "stocks": 8,
+          "crypto": 4
+        }
+      },
+      "metrics": {
+        "n": 1523,
+        "return_pct": 607.5513,
+        "max_drawdown_pct": 8.927,
+        "drawdown_basis": "realized_equity_after_exit_batches",
+        "by_bot": {
+          "crypto": {
+            "n": 631,
+            "profitable_exit_rate_pct": 66.2441,
+            "account_contribution_pct": 170.9047
+          },
+          "stocks": {
+            "n": 892,
+            "profitable_exit_rate_pct": 44.1704,
+            "account_contribution_pct": 436.6466
+          }
+        },
+        "monthly": {
+          "2026-06": {
+            "combined_return_pct": -6.525,
+            "crypto_contribution_pct": -0.3592,
+            "stocks_contribution_pct": -6.1659,
+            "both_bots_ge_30pct": false,
+            "combined_ge_60pct": false
+          },
+          "2026-07": {
+            "combined_return_pct": 81.9789,
+            "crypto_contribution_pct": -1.113,
+            "stocks_contribution_pct": 83.0919,
+            "both_bots_ge_30pct": false,
+            "combined_ge_60pct": true
+          },
+          "2026-08": {
+            "combined_return_pct": 42.9584,
+            "crypto_contribution_pct": 3.1479,
+            "stocks_contribution_pct": 39.8105,
+            "both_bots_ge_30pct": false,
+            "combined_ge_60pct": false
+          },
+          "2026-09": {
+            "combined_return_pct": 62.5028,
+            "crypto_contribution_pct": 13.5728,
+            "stocks_contribution_pct": 48.9299,
+            "both_bots_ge_30pct": false,
+            "combined_ge_60pct": true
+          },
+          "2026-10": {
+            "combined_return_pct": 79.0487,
+            "crypto_contribution_pct": 33.8949,
+            "stocks_contribution_pct": 45.1538,
+            "both_bots_ge_30pct": true,
+            "combined_ge_60pct": true
+          }
+        },
+        "candle_close_drawdown_pct": 11.8514,
+        "candle_adverse_stress_drawdown_pct": 12.1737
+      },
+      "complete_months_both_bots_ge_30": 1,
+      "complete_months_combined_ge_60": 3
+    },
+    {
+      "crypto_margin_pct": 5.0,
+      "stock_margin_pct": 5.0,
+      "gate": {
+        "candidate_count": 1578,
+        "position_writers": 2,
+        "margin_writers": 2,
+        "slot_release_delay": 3600,
+        "max_per_direction": null,
+        "accepted_count": 1465,
+        "candidate_count_by_bot": {
+          "crypto": 652,
+          "stocks": 926
+        },
+        "accepted_count_by_bot": {
+          "stocks": 859,
+          "crypto": 606
+        },
+        "rejected_by_bot": {
+          "crypto": 46,
+          "stocks": 67
+        },
+        "rejected_by_margin_cap": {},
+        "rejected_by_open_instrument": {
+          "crypto": 31,
+          "stocks": 46
+        },
+        "missing_btc_context": {},
+        "rejected_by_local_slots": {
+          "stocks": 19,
+          "crypto": 14
+        },
+        "rejected_by_direction_cap": {},
+        "rejected_by_short_cap": {},
+        "rejected_by_position_cap": {
+          "crypto": 1,
+          "stocks": 2
+        },
+        "position_rejections_with_other_bot_open": {
+          "crypto": 1,
+          "stocks": 2
+        },
+        "peak_open_positions": 11,
+        "peak_margin_occupied_pct": 55.6587,
+        "peak_open_by_bot": {
+          "stocks": 8,
+          "crypto": 4
+        }
+      },
+      "metrics": {
+        "n": 1465,
+        "return_pct": 534.4912,
+        "max_drawdown_pct": 9.4995,
+        "drawdown_basis": "realized_equity_after_exit_batches",
+        "by_bot": {
+          "crypto": {
+            "n": 606,
+            "profitable_exit_rate_pct": 65.6766,
+            "account_contribution_pct": 134.7048
+          },
+          "stocks": {
+            "n": 859,
+            "profitable_exit_rate_pct": 44.3539,
+            "account_contribution_pct": 399.7864
+          }
+        },
+        "monthly": {
+          "2026-06": {
+            "combined_return_pct": -6.525,
+            "crypto_contribution_pct": -0.3592,
+            "stocks_contribution_pct": -6.1659,
+            "both_bots_ge_30pct": false,
+            "combined_ge_60pct": false
+          },
+          "2026-07": {
+            "combined_return_pct": 80.0869,
+            "crypto_contribution_pct": -2.2281,
+            "stocks_contribution_pct": 82.315,
+            "both_bots_ge_30pct": false,
+            "combined_ge_60pct": true
+          },
+          "2026-08": {
+            "combined_return_pct": 38.487,
+            "crypto_contribution_pct": -1.699,
+            "stocks_contribution_pct": 40.186,
+            "both_bots_ge_30pct": false,
+            "combined_ge_60pct": false
+          },
+          "2026-09": {
+            "combined_return_pct": 53.7012,
+            "crypto_contribution_pct": 6.7766,
+            "stocks_contribution_pct": 46.9246,
+            "both_bots_ge_30pct": false,
+            "combined_ge_60pct": false
+          },
+          "2026-10": {
+            "combined_return_pct": 77.0768,
+            "crypto_contribution_pct": 34.6647,
+            "stocks_contribution_pct": 42.4121,
+            "both_bots_ge_30pct": true,
+            "combined_ge_60pct": true
+          }
+        },
+        "candle_close_drawdown_pct": 12.8794,
+        "candle_adverse_stress_drawdown_pct": 12.9443
+      },
+      "complete_months_both_bots_ge_30": 1,
+      "complete_months_combined_ge_60": 2
+    }
+  ],
   "btc_countertrend_cap": [
     {
       "crypto_margin_pct": 3.0,
@@ -506,6 +1149,7 @@
         "rejected_by_margin_cap": {},
         "rejected_by_open_instrument": {},
         "missing_btc_context": {},
+        "rejected_by_local_slots": {},
         "rejected_by_direction_cap": {
           "stocks": 13,
           "crypto": 12
@@ -608,6 +1252,7 @@
           "stocks": 25
         },
         "missing_btc_context": {},
+        "rejected_by_local_slots": {},
         "rejected_by_direction_cap": {
           "stocks": 19,
           "crypto": 10
@@ -714,6 +1359,7 @@
           "stocks": 50
         },
         "missing_btc_context": {},
+        "rejected_by_local_slots": {},
         "rejected_by_direction_cap": {
           "stocks": 26,
           "crypto": 11
@@ -817,6 +1463,7 @@
         "rejected_by_margin_cap": {},
         "rejected_by_open_instrument": {},
         "missing_btc_context": {},
+        "rejected_by_local_slots": {},
         "rejected_by_direction_cap": {
           "stocks": 13,
           "crypto": 12
@@ -919,6 +1566,7 @@
           "stocks": 25
         },
         "missing_btc_context": {},
+        "rejected_by_local_slots": {},
         "rejected_by_direction_cap": {
           "stocks": 19,
           "crypto": 10
@@ -1025,6 +1673,7 @@
           "stocks": 50
         },
         "missing_btc_context": {},
+        "rejected_by_local_slots": {},
         "rejected_by_direction_cap": {
           "stocks": 26,
           "crypto": 11
@@ -1127,6 +1776,7 @@
         "rejected_by_margin_cap": {},
         "rejected_by_open_instrument": {},
         "missing_btc_context": {},
+        "rejected_by_local_slots": {},
         "rejected_by_direction_cap": {},
         "rejected_by_short_cap": {},
         "rejected_by_position_cap": {},
@@ -1223,6 +1873,7 @@
         "rejected_by_margin_cap": {},
         "rejected_by_open_instrument": {},
         "missing_btc_context": {},
+        "rejected_by_local_slots": {},
         "rejected_by_direction_cap": {
           "stocks": 77,
           "crypto": 76
@@ -1322,6 +1973,7 @@
         "rejected_by_margin_cap": {},
         "rejected_by_open_instrument": {},
         "missing_btc_context": {},
+        "rejected_by_local_slots": {},
         "rejected_by_direction_cap": {
           "crypto": 27,
           "stocks": 19
@@ -1424,6 +2076,7 @@
           "stocks": 25
         },
         "missing_btc_context": {},
+        "rejected_by_local_slots": {},
         "rejected_by_direction_cap": {},
         "rejected_by_short_cap": {},
         "rejected_by_position_cap": {
@@ -1527,6 +2180,7 @@
           "stocks": 24
         },
         "missing_btc_context": {},
+        "rejected_by_local_slots": {},
         "rejected_by_direction_cap": {
           "stocks": 105,
           "crypto": 80
@@ -1629,6 +2283,7 @@
           "stocks": 25
         },
         "missing_btc_context": {},
+        "rejected_by_local_slots": {},
         "rejected_by_direction_cap": {
           "crypto": 34,
           "stocks": 30
@@ -1731,6 +2386,7 @@
           "stocks": 50
         },
         "missing_btc_context": {},
+        "rejected_by_local_slots": {},
         "rejected_by_direction_cap": {},
         "rejected_by_short_cap": {},
         "rejected_by_position_cap": {
@@ -1834,6 +2490,7 @@
           "stocks": 49
         },
         "missing_btc_context": {},
+        "rejected_by_local_slots": {},
         "rejected_by_direction_cap": {
           "stocks": 143,
           "crypto": 86
@@ -1936,6 +2593,7 @@
           "stocks": 50
         },
         "missing_btc_context": {},
+        "rejected_by_local_slots": {},
         "rejected_by_direction_cap": {
           "crypto": 44,
           "stocks": 53
@@ -2032,6 +2690,7 @@
         "rejected_by_margin_cap": {},
         "rejected_by_open_instrument": {},
         "missing_btc_context": {},
+        "rejected_by_local_slots": {},
         "rejected_by_direction_cap": {},
         "rejected_by_short_cap": {},
         "rejected_by_position_cap": {},
@@ -2128,6 +2787,7 @@
         "rejected_by_margin_cap": {},
         "rejected_by_open_instrument": {},
         "missing_btc_context": {},
+        "rejected_by_local_slots": {},
         "rejected_by_direction_cap": {
           "stocks": 77,
           "crypto": 76
@@ -2227,6 +2887,7 @@
         "rejected_by_margin_cap": {},
         "rejected_by_open_instrument": {},
         "missing_btc_context": {},
+        "rejected_by_local_slots": {},
         "rejected_by_direction_cap": {
           "crypto": 27,
           "stocks": 19
@@ -2329,6 +2990,7 @@
           "stocks": 25
         },
         "missing_btc_context": {},
+        "rejected_by_local_slots": {},
         "rejected_by_direction_cap": {},
         "rejected_by_short_cap": {},
         "rejected_by_position_cap": {
@@ -2432,6 +3094,7 @@
           "stocks": 24
         },
         "missing_btc_context": {},
+        "rejected_by_local_slots": {},
         "rejected_by_direction_cap": {
           "stocks": 105,
           "crypto": 80
@@ -2534,6 +3197,7 @@
           "stocks": 25
         },
         "missing_btc_context": {},
+        "rejected_by_local_slots": {},
         "rejected_by_direction_cap": {
           "crypto": 34,
           "stocks": 30
@@ -2636,6 +3300,7 @@
           "stocks": 50
         },
         "missing_btc_context": {},
+        "rejected_by_local_slots": {},
         "rejected_by_direction_cap": {},
         "rejected_by_short_cap": {},
         "rejected_by_position_cap": {
@@ -2739,6 +3404,7 @@
           "stocks": 49
         },
         "missing_btc_context": {},
+        "rejected_by_local_slots": {},
         "rejected_by_direction_cap": {
           "stocks": 143,
           "crypto": 86
@@ -2841,6 +3507,7 @@
           "stocks": 50
         },
         "missing_btc_context": {},
+        "rejected_by_local_slots": {},
         "rejected_by_direction_cap": {
           "crypto": 44,
           "stocks": 53
@@ -2925,7 +3592,7 @@
   "sources": {
     "C:\\Users\\Lenovo\\Desktop\\telegram bot\\reports\\audit_2026_09_08\\crypto_profit_first_exact_oct31_1700.pkl": "759ad01a5d5ad9cbe505e40366e571057a8f33f79d0493e43400c88ec13a0d42",
     "C:\\Users\\Lenovo\\Desktop\\tusa stocks\\reports\\audit_2026_09_08\\stock_xperp_regime_target_router_nov1_forward.csv": "518bf187674394516d2cfa72ef3b1d826abeb96bb48717961fbb3685147909d2",
-    "C:\\Users\\Lenovo\\Desktop\\telegram bot\\shared_account_dual_bot_nov1_audit.py": "cac818146bd1aa8a659a326ebe01c100b1288488bb69494b47e9342822ef6a49"
+    "C:\\Users\\Lenovo\\Desktop\\telegram bot\\shared_account_dual_bot_nov1_audit.py": "6052707d20cdb76e91be50c3c11ec3b63729ca12b29bf7d8152799bf0515add1"
   },
   "limitations": [
     "The common stock X-Perp history begins in late June 2026.",
