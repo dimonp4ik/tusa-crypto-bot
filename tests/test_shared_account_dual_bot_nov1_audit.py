@@ -28,7 +28,7 @@ def test_five_pct_scenario_uses_latest_complete_months():
     assert report["target"]["proven"] is False
 
 
-def test_position_exiting_at_new_entry_time_releases_margin():
+def test_margin_releases_only_after_exit_timestamp():
     rows = [
         {"bot": "crypto", "symbol": "BTC", "direction": "LONG",
          "entry_time": 1, "exit_time": 2, "signed_return": 0.01,
@@ -38,5 +38,10 @@ def test_position_exiting_at_new_entry_time_releases_margin():
          "quality": 1, "module": "test"},
     ]
     accepted, gate = audit.shared_margin_gate(rows, .90, .90)
-    assert len(accepted) == 2
+    assert accepted == rows[:1]
+    assert gate["rejected_by_margin_cap"] == {"stocks": 1}
+
+    rows[1]["entry_time"] = 2.1
+    accepted, gate = audit.shared_margin_gate(rows, .90, .90)
+    assert accepted == rows
     assert gate["peak_open_positions"] == 1

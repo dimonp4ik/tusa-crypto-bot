@@ -54,54 +54,148 @@ def margin_for(row: dict, crypto_margin: float, stock_margin: float) -> float:
 
 
 def shared_margin_gate(rows: list[dict], crypto_margin: float,
-                       stock_margin: float) -> tuple[list[dict], dict]:
+                       stock_margin: float, *, max_shorts: int | None = None,
+                       position_writers: int = 1, margin_writers: int = 1,
+                       slot_release_delay: float = 0.0
+                       ) -> tuple[list[dict], dict]:
+    if max_shorts is not None and max_shorts < 0:
+        raise ValueError('max_shorts must be nonnegative')
+    if position_writers < 1:
+        raise ValueError('position_writers must be positive')
+    if margin_writers < 1:
+        raise ValueError('margin_writers must be positive')
+    if not 0 <= slot_release_delay < float("inf"):
+        raise ValueError("slot_release_delay must be finite and nonnegative")
     grouped = collections.defaultdict(list)
     for row in rows:
         grouped[float(row["entry_time"])].append(row)
     accepted = []
     rejected = collections.Counter()
     rejected_positions = collections.Counter()
+    rejected_positions_with_other_bot = collections.Counter()
+    rejected_margin = collections.Counter()
+    rejected_instrument = collections.Counter()
+    rejected_shorts = collections.Counter()
     active: list[tuple[float, int, dict, float]] = []
+    exits: list[tuple[float, int, float]] = []
     sequence = 0
+    equity = 1.0
     peak_margin = 0.0
     peak_positions = 0
     peak_by_bot = collections.Counter()
     for now in sorted(grouped):
-        while active and active[0][0] <= now:
+        # Equal timestamps do not prove that the exit preceded the entry.
+        while active and active[0][0] < now:
             heapq.heappop(active)
+        while exits and exits[0][0] < now:
+            _, _, pnl = heapq.heappop(exits)
+            equity += pnl
         counts = collections.Counter(item[2]["bot"] for item in active)
         batch = sorted(grouped[now], key=lambda row: (
             counts[row["bot"]], -float(row.get("quality") or 0),
             str(row["bot"]), str(row["symbol"])))
         for row in batch:
-            requested = margin_for(row, crypto_margin, stock_margin)
+            requested = equity * margin_for(row, crypto_margin, stock_margin)
             occupied = sum(item[3] for item in active)
-            if len(active) >= MAX_POSITIONS:
+            instrument = row.get("inst_id") or row["symbol"]
+            if any((item[2].get("inst_id") or item[2]["symbol"]) == instrument
+                   for item in active):
+                rejected[row["bot"]] += 1
+                rejected_instrument[row["bot"]] += 1
+                continue
+            if len(active) + position_writers > MAX_POSITIONS:
                 rejected[row["bot"]] += 1
                 rejected_positions[row["bot"]] += 1
+                if counts[row["bot"]] + position_writers <= MAX_POSITIONS:
+                    rejected_positions_with_other_bot[row["bot"]] += 1
                 continue
-            if occupied + requested > MAX_MARGIN + 1e-12:
+            if (max_shorts is not None and row["direction"] == "SHORT"
+                    and sum(item[2]["direction"] == "SHORT"
+                            for item in active) >= max_shorts):
                 rejected[row["bot"]] += 1
+                rejected_shorts[row["bot"]] += 1
+                continue
+            if equity <= 0 or occupied + requested * margin_writers > equity * MAX_MARGIN + 1e-12:
+                rejected[row["bot"]] += 1
+                rejected_margin[row["bot"]] += 1
                 continue
             accepted.append(row)
             sequence += 1
+            exit_time = float(row["exit_time"])
             heapq.heappush(active, (
-                float(row["exit_time"]), sequence, row, requested))
+                exit_time + slot_release_delay, sequence, row, requested))
+            heapq.heappush(exits, (
+                exit_time, sequence, requested * LEVERAGE * float(row["signed_return"])))
             counts[row["bot"]] += 1
             occupied += requested
-            peak_margin = max(peak_margin, occupied)
+            peak_margin = max(peak_margin, occupied / equity)
             peak_positions = max(peak_positions, len(active))
             peak_by_bot[row["bot"]] = max(
                 peak_by_bot[row["bot"]], counts[row["bot"]])
     return accepted, {
         "candidate_count": len(rows),
+        "position_writers": position_writers,
+        "margin_writers": margin_writers,
+        "slot_release_delay": slot_release_delay,
         "accepted_count": len(accepted),
+        "candidate_count_by_bot": dict(collections.Counter(row["bot"] for row in rows)),
+        "accepted_count_by_bot": dict(collections.Counter(row["bot"] for row in accepted)),
         "rejected_by_bot": dict(rejected),
+        "rejected_by_margin_cap": dict(rejected_margin),
+        "rejected_by_open_instrument": dict(rejected_instrument),
+        "rejected_by_short_cap": dict(rejected_shorts),
         "rejected_by_position_cap": dict(rejected_positions),
+        "position_rejections_with_other_bot_open": dict(
+            rejected_positions_with_other_bot),
         "peak_open_positions": peak_positions,
         "peak_margin_occupied_pct": round(100 * peak_margin, 4),
         "peak_open_by_bot": dict(peak_by_bot),
     }
+
+
+def candle_close_drawdown(rows: list[dict], close_prices: dict,
+                          crypto_margin: float, stock_margin: float,
+                          *, slippage: float = 0.0, adverse_prices: dict | None = None) -> float:
+    """Estimate drawdown using completed 15m candles and modeled trade exits."""
+    equity = 1.0
+    exits = []
+    changes = collections.defaultdict(float)
+    stress_adjustments = collections.defaultdict(float)
+    for sequence, row in enumerate(sorted(rows, key=lambda item: item["entry_time"])):
+        entry_time = row["entry_time"]
+        exit_time = row["exit_time"]
+        while exits and exits[0][0] < entry_time:
+            _, _, pnl = heapq.heappop(exits)
+            equity += pnl
+        notional = equity * margin_for(row, crypto_margin, stock_margin) * LEVERAGE
+        pnl = notional * row["signed_return"]
+        heapq.heappush(exits, (exit_time, sequence, pnl))
+        prices = close_prices[row["bot"], row["symbol"]]
+        sign = 1 if row["direction"] == "LONG" else -1
+        previous_mark = 0.0
+        for stamp in range((int(entry_time) // 900 + 1) * 900, int(exit_time), 900):
+            move = sign * (prices[stamp] / row["entry"] - 1)
+            remaining = 1.0
+            if (row["bot"] == "crypto" and row["sequential_banked"]
+                    and row["near_exit_time"] + 900 <= stamp):
+                remaining = .95
+                move = remaining * move + .025 * row["risk_pct"]
+            if adverse_prices is not None:
+                adverse = adverse_prices[row["bot"], row["symbol"], row["direction"]][stamp]
+                stress_adjustments[stamp] += min(
+                    0.0, notional * remaining * sign * (adverse - prices[stamp]) / row["entry"])
+            mark = notional * (move - slippage)
+            changes[stamp] += mark - previous_mark
+            previous_mark = mark
+        changes[exit_time] += pnl - previous_mark
+    equity = peak = 1.0
+    drawdown = 0.0
+    for stamp in sorted(changes):
+        equity += changes[stamp]
+        stressed_equity = equity + stress_adjustments[stamp]
+        drawdown = max(drawdown, (peak - stressed_equity) / peak)
+        peak = max(peak, equity)
+    return 100 * drawdown
 
 
 def account_metrics(rows: list[dict], crypto_margin: float,
@@ -116,12 +210,15 @@ def account_metrics(rows: list[dict], crypto_margin: float,
 
     def realize(until: float | None) -> None:
         nonlocal equity, peak, max_drawdown
-        while exits and (until is None or exits[0][0] <= until):
-            stamp, _, pnl, row = heapq.heappop(exits)
-            equity += pnl
+        while exits and (until is None or exits[0][0] < until):
+            stamp = exits[0][0]
+            # Exit timestamps do not establish an order within the batch.
+            while exits and exits[0][0] == stamp:
+                _, _, pnl, row = heapq.heappop(exits)
+                equity += pnl
+                completed.append((stamp, pnl, row))
             peak = max(peak, equity)
             max_drawdown = max(max_drawdown, (peak - equity) / peak)
-            completed.append((stamp, pnl, row))
 
     for row in ordered:
         realize(float(row["entry_time"]))
