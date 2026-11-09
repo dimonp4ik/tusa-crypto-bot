@@ -55,11 +55,14 @@ def margin_for(row: dict, crypto_margin: float, stock_margin: float) -> float:
 
 def shared_margin_gate(rows: list[dict], crypto_margin: float,
                        stock_margin: float, *, max_shorts: int | None = None,
+                       max_per_direction: int | None = None,
                        position_writers: int = 1, margin_writers: int = 1,
                        slot_release_delay: float = 0.0
                        ) -> tuple[list[dict], dict]:
     if max_shorts is not None and max_shorts < 0:
         raise ValueError('max_shorts must be nonnegative')
+    if max_per_direction is not None and max_per_direction < 1:
+        raise ValueError('max_per_direction must be positive')
     if position_writers < 1:
         raise ValueError('position_writers must be positive')
     if margin_writers < 1:
@@ -76,6 +79,7 @@ def shared_margin_gate(rows: list[dict], crypto_margin: float,
     rejected_margin = collections.Counter()
     rejected_instrument = collections.Counter()
     rejected_shorts = collections.Counter()
+    rejected_direction = collections.Counter()
     active: list[tuple[float, int, dict, float]] = []
     exits: list[tuple[float, int, float]] = []
     sequence = 0
@@ -115,6 +119,12 @@ def shared_margin_gate(rows: list[dict], crypto_margin: float,
                 rejected[row["bot"]] += 1
                 rejected_shorts[row["bot"]] += 1
                 continue
+            if (max_per_direction is not None
+                    and sum(item[2]["direction"] == row["direction"]
+                            for item in active) >= max_per_direction):
+                rejected[row["bot"]] += 1
+                rejected_direction[row["bot"]] += 1
+                continue
             if equity <= 0 or occupied + requested * margin_writers > equity * MAX_MARGIN + 1e-12:
                 rejected[row["bot"]] += 1
                 rejected_margin[row["bot"]] += 1
@@ -137,12 +147,14 @@ def shared_margin_gate(rows: list[dict], crypto_margin: float,
         "position_writers": position_writers,
         "margin_writers": margin_writers,
         "slot_release_delay": slot_release_delay,
+        "max_per_direction": max_per_direction,
         "accepted_count": len(accepted),
         "candidate_count_by_bot": dict(collections.Counter(row["bot"] for row in rows)),
         "accepted_count_by_bot": dict(collections.Counter(row["bot"] for row in accepted)),
         "rejected_by_bot": dict(rejected),
         "rejected_by_margin_cap": dict(rejected_margin),
         "rejected_by_open_instrument": dict(rejected_instrument),
+        "rejected_by_direction_cap": dict(rejected_direction),
         "rejected_by_short_cap": dict(rejected_shorts),
         "rejected_by_position_cap": dict(rejected_positions),
         "position_rejections_with_other_bot_open": dict(
@@ -277,8 +289,10 @@ def account_metrics(rows: list[dict], crypto_margin: float,
 
 
 def scenario(rows: list[dict], crypto_margin: float,
-             stock_margin: float) -> dict:
-    accepted, gate = shared_margin_gate(rows, crypto_margin, stock_margin)
+             stock_margin: float, *, max_per_direction: int | None = None) -> dict:
+    accepted, gate = shared_margin_gate(
+        rows, crypto_margin, stock_margin, max_per_direction=max_per_direction,
+    )
     metrics = account_metrics(accepted, crypto_margin, stock_margin)
     complete = {month: values for month, values in metrics["monthly"].items()
                 if month in {"2026-07", "2026-08", "2026-09", "2026-10"}}
@@ -318,6 +332,10 @@ def main() -> None:
         },
         "scenarios": scenarios,
         "five_pct_each": five,
+        "direction_cap_sensitivity": [
+            scenario(rows, margin, margin, max_per_direction=cap)
+            for margin in (.03, .05) for cap in (4, 5)
+        ],
         "finding": (
             "Five percent per trade stays below the authorized shared margin "
             "ceiling in this overlap, but the crypto route does not contribute "
