@@ -78,3 +78,23 @@ def test_btc_cap_uses_only_candles_closed_strictly_before_entry():
         rows, .03, .03, max_per_direction=1, btc_closes=closes)
     assert accepted == rows
     assert gate["missing_btc_context"] == {"stocks": 1}
+
+
+def test_short_health_uses_only_resolved_shadow_outcomes():
+    entry = 2_000_000
+    seed = [
+        {"bot": "crypto", "direction": "SHORT", "entry_time": entry - 100,
+         "exit_time": entry - 1, "signed_return": -0.01}
+        for _ in range(14)
+    ]
+    boundary = dict(seed[0], exit_time=entry)
+    first = dict(seed[0], entry_time=entry, exit_time=entry + 1)
+    blocked = dict(seed[0], entry_time=entry + 2, exit_time=entry + 3,
+                   signed_return=0.5)
+    recovered = dict(seed[0], entry_time=entry + 4, exit_time=entry + 5)
+    stock = dict(blocked, bot="stocks")
+    rows = [recovered, stock, first, *seed, blocked, boundary]
+
+    selected = audit.filter_crypto_shorts(rows)
+
+    assert selected == [recovered, stock, first, *seed, boundary]
