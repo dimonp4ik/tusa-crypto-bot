@@ -186,6 +186,9 @@ def shadow_setups(candles: dict, btc_candles: dict, *, entry_time: float,
             continue
         audit["result"] = "candidate"
         audit["model_quality"] = probability
+        audit["weak_long_impulse_candidate"] = (
+            signal["direction"] == "LONG" and probability < .335
+            and float(signal["z"]) < 2.5)
         return [{
             **signal,
             **context,

@@ -4521,6 +4521,7 @@ def _run_venue_strategy_scan(*, early: bool = False) -> None:
     candidates = []
     raw_setups = 0
     strategy_audit = {
+        "weak_long_impulse_candidates": 0,
         "symbols_evaluated": 0, "family_signals": 0,
         "results": {}, "rejected": {}, "silent_2r_candidates": 0,
     }
@@ -4568,6 +4569,8 @@ def _run_venue_strategy_scan(*, early: bool = False) -> None:
                 diagnostics=route_audit,
             )
             strategy_audit["symbols_evaluated"] += 1
+            strategy_audit["weak_long_impulse_candidates"] += int(
+                route_audit.get("weak_long_impulse_candidate", False))
             strategy_audit["family_signals"] += int(
                 route_audit.get("family_signals") or 0)
             route_result = str(route_audit.get("result") or "unknown")
