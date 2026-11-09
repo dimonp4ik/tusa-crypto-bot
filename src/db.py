@@ -2768,6 +2768,18 @@ def at_mark_entry_submitting(
         ).rowcount == 1
 
 
+def weak_long_impulse_outcomes(since_ts: float) -> dict:
+    """Outcomes of published signals the experimental filter would skip."""
+    with _conn() as c:
+        row = c.execute("""
+            SELECT COUNT(*) AS marked, COUNT(realized_r) AS resolved,
+                   COALESCE(SUM(realized_r), 0) AS total_r
+            FROM signals
+            WHERE weak_long_impulse_candidate = 1 AND opened_at >= ?
+        """, (since_ts,)).fetchone()
+        return dict(row)
+
+
 def at_short_exposure_audit(since_ts: float) -> dict:
     """Summarize short submission claims without exposing account identifiers."""
     with _conn() as c:
