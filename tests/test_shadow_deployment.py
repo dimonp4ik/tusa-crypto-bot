@@ -833,6 +833,27 @@ class ShadowDeploymentTests(unittest.TestCase):
         send.assert_not_called()
         blocked.assert_called_once_with(1, "dir_cap")
 
+    def test_live_stop_streak_ignores_shadow_stops_and_wins(self):
+        import sqlite3
+        from contextlib import closing
+        from src import db
+
+        with closing(sqlite3.connect(":memory:")) as conn:
+            conn.row_factory = sqlite3.Row
+            conn.execute(
+                "CREATE TABLE signals (id, status, closed_at, autotrade_eligible)")
+            conn.executemany("INSERT INTO signals VALUES (?, ?, ?, ?)", [
+                (1, "SL_HIT", 10, 1), (2, "SL_HIT", 11, 1),
+                (3, "SL_HIT", 12, 0),
+            ])
+            with patch.object(db, "_conn", return_value=conn):
+                self.assertEqual(db.get_today_sl_streak(0, live_only=True), 2)
+                conn.executemany("INSERT INTO signals VALUES (?, ?, ?, ?)", [
+                    (4, "SL_HIT", 13, 1), (5, "TP2_HIT", 14, 0),
+                ])
+                self.assertEqual(db.get_today_sl_streak(0, live_only=True), 3)
+                self.assertEqual(db.get_today_sl_streak(0), 0)
+
     def test_daily_loss_pause_uses_only_closed_signal_streak(self):
         with patch.object(main, "get_today_sl_streak",
                           return_value=config.VENUE_LOSS_PAUSE_STREAK):
