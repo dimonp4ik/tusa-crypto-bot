@@ -1,6 +1,7 @@
 """Replay the latest frozen crypto and stock routes on one shared account."""
 from __future__ import annotations
 
+from bisect import bisect_left
 import collections
 import hashlib
 import heapq
@@ -50,6 +51,22 @@ def load_rows() -> list[dict]:
     first = max(float(crypto.entry_time.min()), float(stocks.entry_time.min()))
     last = min(float(crypto.entry_time.max()), float(stocks.entry_time.max()))
     return both[both.entry_time.between(first, last)].to_dict("records")
+
+
+def filter_crypto_shorts(rows: list[dict]) -> list[dict]:
+    """Use completed shadow shorts, including those previously filtered out."""
+    shorts = [row for row in rows
+              if row["bot"] == "crypto" and row["direction"] == "SHORT"]
+    outcomes = sorted((row["exit_time"], row["signed_return"]) for row in shorts)
+    times = [stamp for stamp, _ in outcomes]
+    blocked = set()
+    for row in shorts:
+        entry = row["entry_time"]
+        start = bisect_left(times, entry - 14 * 86400)
+        end = bisect_left(times, entry)
+        if end - start >= 15 and sum(value for _, value in outcomes[start:end]) < 0:
+            blocked.add(id(row))
+    return [row for row in rows if id(row) not in blocked]
 
 
 def margin_for(row: dict, crypto_margin: float, stock_margin: float) -> float:
@@ -366,6 +383,7 @@ def scenario(rows: list[dict], crypto_margin: float,
 def main() -> None:
     rows = load_rows()
     candle_marks = load_candle_marks(rows)
+    short_filtered = filter_crypto_shorts(rows)
     scenarios = [scenario(rows, crypto, stocks, candle_marks=candle_marks)
                  for crypto, stocks in SCENARIOS]
     five = next(item for item in scenarios
@@ -388,6 +406,16 @@ def main() -> None:
         },
         "scenarios": scenarios,
         "five_pct_each": five,
+        "crypto_short_health": {
+            "filtered_signals": len(rows) - len(short_filtered),
+            "scenarios": [
+                scenario(short_filtered, margin, margin, slot_release_delay=900,
+                         model_live_slots=True, candle_marks=candle_marks,
+                         max_per_direction=4 if use_btc else None,
+                         btc_closes=candle_marks[0]["crypto", "BTCUSDT"] if use_btc else None)
+                for margin in (.03, .05) for use_btc in (False, True)
+            ],
+        },
         "live_slot_sensitivity": [
             scenario(rows, margin, margin, slot_release_delay=delay,
                      candle_marks=candle_marks, model_live_slots=True)
