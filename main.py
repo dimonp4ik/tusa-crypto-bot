@@ -784,6 +784,8 @@ def _crypto_scan_status_text() -> str:
             0, int((time.time() - float(row.get("ts") or 0)) / 60))
         result = result_names.get(
             str(row.get("result")), str(row.get("result") or "неизвестно"))
+        if row.get("result") == "daily_loss_pause" and row.get("loss_pause_streak"):
+            result += f" · порог {int(row['loss_pause_streak'])} стопа подряд"
         strategy = row.get("strategy") or {}
         timing = ""
         if row.get("entry_bar") and row.get("scan_started_at"):
