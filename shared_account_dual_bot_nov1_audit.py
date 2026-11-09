@@ -276,6 +276,7 @@ def account_metrics(rows: list[dict], crypto_margin: float,
         "n": len(rows),
         "return_pct": round(100 * (equity - 1), 4),
         "max_drawdown_pct": round(100 * max_drawdown, 4),
+        "drawdown_basis": "realized_equity_after_exit_batches",
         "by_bot": {
             bot: {
                 "n": bot_n[bot],
@@ -289,9 +290,11 @@ def account_metrics(rows: list[dict], crypto_margin: float,
 
 
 def scenario(rows: list[dict], crypto_margin: float,
-             stock_margin: float, *, max_per_direction: int | None = None) -> dict:
+             stock_margin: float, *, max_per_direction: int | None = None,
+             slot_release_delay: float = 0.0) -> dict:
     accepted, gate = shared_margin_gate(
         rows, crypto_margin, stock_margin, max_per_direction=max_per_direction,
+        slot_release_delay=slot_release_delay,
     )
     metrics = account_metrics(accepted, crypto_margin, stock_margin)
     complete = {month: values for month, values in metrics["monthly"].items()
@@ -333,8 +336,10 @@ def main() -> None:
         "scenarios": scenarios,
         "five_pct_each": five,
         "direction_cap_sensitivity": [
-            scenario(rows, margin, margin, max_per_direction=cap)
-            for margin in (.03, .05) for cap in (4, 5)
+            scenario(rows, margin, margin, max_per_direction=cap,
+                     slot_release_delay=delay)
+            for margin in (.03, .05) for delay in (0, 900, 3600)
+            for cap in (None, 4, 5)
         ],
         "finding": (
             "Five percent per trade stays below the authorized shared margin "
