@@ -2789,7 +2789,12 @@ def model_quality_shadow_outcomes(since_ts: float) -> list[dict]:
         rows = c.execute("""
             SELECT strategy_model_quality < ? AS below,
                    COUNT(*) AS signals, COUNT(realized_r) AS resolved,
-                   COALESCE(SUM(realized_r), 0) AS total_r
+                   COALESCE(SUM(realized_r), 0) AS total_r,
+                   COUNT(CASE WHEN entry_price > 0 AND sl > 0 AND sl != entry_price
+                              THEN realized_r END) AS priced,
+                   SUM(CASE WHEN entry_price > 0 AND sl > 0 AND sl != entry_price
+                            THEN realized_r * ABS(entry_price - sl) / entry_price
+                       END) AS total_price_return
             FROM signals
             WHERE strategy_model_quality IS NOT NULL AND opened_at >= ?
             GROUP BY below ORDER BY below

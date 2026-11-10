@@ -385,6 +385,9 @@ def _build_and_send_report(chat_id: int, message_id: int,
             label = "ниже порога" if group["below"] else "на пороге или выше"
             A(f"  {label}: {group['signals']} сигналов, "
               f"исход известен у {group['resolved']}, сумма {group['total_r']:+.2f} R")
+            if group["priced"]:
+                A(f"    Сумма доходностей по цене: "
+                  f"{group['total_price_return']:+.2%} ({group['priced']} сделок)")
         A("")
         exposure = at_short_exposure_audit(since_ts)
         A("## ШОРТЫ НА ОБЩЕМ СЧЁТЕ OKX")
