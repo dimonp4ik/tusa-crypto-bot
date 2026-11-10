@@ -237,6 +237,15 @@ def _open_for_account_locked(
     account_key: str | None,
 ) -> None:
     uid = u["user_id"]
+    deadline_ms = None
+    entry_bar = sig.get("strategy_entry_bar_ts")
+    if entry_bar:
+        deadline_ms = int((float(entry_bar) + VENUE_MAX_ENTRY_DELAY_SEC) * 1000)
+    if deadline_ms is not None and time.time() * 1000 >= deadline_ms:
+        _entry_skip(uid, sig, inst_id, "истёк срок входа",
+                    f"ℹ️ Автотрейдинг: {disp} пропущен — истёк срок входа.")
+        return
+
     ok, balance = okx.get_balance(creds)
     if not ok:
         log.warning(f"autotrade balance failed for {uid}: {balance}")
@@ -438,10 +447,6 @@ def _open_for_account_locked(
         # never turn a valid entry into a skipped trade.
         log.warning("autotrade book snapshot unavailable %s: %s", inst_id, exc)
 
-    deadline_ms = None
-    entry_bar = sig.get("strategy_entry_bar_ts")
-    if entry_bar:
-        deadline_ms = int((float(entry_bar) + VENUE_MAX_ENTRY_DELAY_SEC) * 1000)
     if deadline_ms is not None and time.time() * 1000 >= deadline_ms:
         _entry_skip(uid, sig, inst_id, "истёк срок входа",
                     f"ℹ️ Автотрейдинг: {disp} пропущен — истёк срок входа.")
