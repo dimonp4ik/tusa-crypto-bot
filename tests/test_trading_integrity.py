@@ -382,6 +382,13 @@ class ExchangeTests(unittest.TestCase):
                 self.assertEqual(balances.call_count, 2)
                 close.assert_called_once_with(91, "ENTRY_SNAPSHOT_EXPIRED")
                 order.assert_called_once()
+            expired = dict(sig, strategy_entry_bar_ts=(
+                at.time.time() - at.VENUE_MAX_ENTRY_DELAY_SEC - 60))
+            with patch.object(at, "at_create_entry_intent") as reserve:
+                at._open_for_user(dict(user_id=7, size_mode="percent", size_value=3),
+                                  expired, "TEST", "TEST")
+                reserve.assert_not_called()
+                order.assert_called_once()
             visible = dict(margin_usd=5, count=1, inst_ids=("OTHER",))
             missing = dict(margin_usd=0, count=0, inst_ids=())
             with patch.object(at, "at_all_open_positions", return_value=[
