@@ -383,7 +383,7 @@ def _build_and_send_report(chat_id: int, message_id: int,
             A("  Сигналов с сохранённой оценкой пока нет.")
         for group in quality:
             label = "ниже порога" if group["below"] else "на пороге или выше"
-            A(f"  {label}: {group['signals']} сигналов, "
+            A(f"  {group['direction']}, {label}: {group['signals']} сигналов, "
               f"исход известен у {group['resolved']}, сумма {group['total_r']:+.2f} R")
             if group["priced"]:
                 A(f"    Сумма доходностей по цене: "
