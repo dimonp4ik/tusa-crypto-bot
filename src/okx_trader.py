@@ -817,7 +817,8 @@ def calc_partial_close(position_sz: float, close_pct: float, spec: dict) -> dict
         minimum = Decimal(str((spec or {}).get("minSz") or lot))
     except (ValueError, TypeError, ArithmeticError):
         return empty
-    if position <= 0 or requested_pct <= 0 or lot <= 0 or minimum <= 0:
+    if any(not value.is_finite() or value <= 0
+           for value in (position, requested_pct, lot, minimum)):
         return empty
 
     minimum = max(lot, minimum)
