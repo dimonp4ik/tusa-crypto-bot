@@ -21,6 +21,7 @@ REPORT = ROOT / "reports/audit_2026_09_08/shared_account_dual_bot_nov1.json"
 LEVERAGE = 10.0
 MAX_MARGIN = .90
 MAX_POSITIONS = 12
+STOCK_CRYPTO_CLUSTER = {"COINUSDT", "MSTRUSDT", "CRCLUSDT"}
 LOCAL_SLOTS = {"crypto": 4, "stocks": 8}
 SCENARIOS = ((.03, .03), (.03, .05), (.05, .03), (.05, .05))
 
@@ -78,6 +79,7 @@ def shared_margin_gate(rows: list[dict], crypto_margin: float,
                        max_per_direction: int | None = None,
                        btc_closes: dict | None = None,
                        model_live_slots: bool = False,
+                       limit_stock_crypto_cluster: bool = False,
                        position_writers: int = 1, margin_writers: int = 1,
                        slot_release_delay: float = 0.0
                        ) -> tuple[list[dict], dict]:
@@ -103,6 +105,7 @@ def shared_margin_gate(rows: list[dict], crypto_margin: float,
     rejected_shorts = collections.Counter()
     rejected_direction = collections.Counter()
     rejected_local = collections.Counter()
+    rejected_cluster = 0
     missing_btc_context = collections.Counter()
     active: list[tuple[float, int, dict, float]] = []
     exits: list[tuple[float, int, float]] = []
@@ -168,6 +171,14 @@ def shared_margin_gate(rows: list[dict], crypto_margin: float,
                 rejected[row["bot"]] += 1
                 rejected_margin[row["bot"]] += 1
                 continue
+            if (limit_stock_crypto_cluster and row["bot"] == "stocks"
+                    and row["direction"] == "SHORT" and row["symbol"] in STOCK_CRYPTO_CLUSTER
+                    and any(other["bot"] == "stocks" and other["direction"] == "SHORT"
+                            and other["symbol"] in STOCK_CRYPTO_CLUSTER
+                            for _, _, other, _ in active)):
+                rejected["stocks"] += 1
+                rejected_cluster += 1
+                continue
             accepted.append(row)
             sequence += 1
             exit_time = float(row["exit_time"])
@@ -194,6 +205,7 @@ def shared_margin_gate(rows: list[dict], crypto_margin: float,
         "rejected_by_margin_cap": dict(rejected_margin),
         "rejected_by_open_instrument": dict(rejected_instrument),
         "missing_btc_context": dict(missing_btc_context),
+        "rejected_by_stock_crypto_cluster": rejected_cluster,
         "rejected_by_local_slots": dict(rejected_local),
         "rejected_by_direction_cap": dict(rejected_direction),
         "rejected_by_short_cap": dict(rejected_shorts),
@@ -351,11 +363,13 @@ def scenario(rows: list[dict], crypto_margin: float,
              stock_margin: float, *, max_per_direction: int | None = None,
              slot_release_delay: float = 0.0,
              candle_marks: tuple[dict, dict] | None = None,
-             btc_closes: dict | None = None, model_live_slots: bool = False) -> dict:
+             btc_closes: dict | None = None, model_live_slots: bool = False,
+             limit_stock_crypto_cluster: bool = False) -> dict:
     accepted, gate = shared_margin_gate(
         rows, crypto_margin, stock_margin, max_per_direction=max_per_direction,
         slot_release_delay=slot_release_delay, btc_closes=btc_closes,
         model_live_slots=model_live_slots,
+        limit_stock_crypto_cluster=limit_stock_crypto_cluster,
         position_writers=2 if model_live_slots else 1,
         margin_writers=2 if model_live_slots else 1,
     )
@@ -416,6 +430,12 @@ def main() -> None:
                 for margin in (.03, .05) for use_btc in (False, True)
             ],
         },
+        "stock_crypto_cluster": [
+            scenario(data, margin, margin, slot_release_delay=900,
+                     candle_marks=candle_marks, model_live_slots=True,
+                     limit_stock_crypto_cluster=True)
+            for margin in (.03, .05) for data in (rows, short_filtered)
+        ],
         "live_slot_sensitivity": [
             scenario(rows, margin, margin, slot_release_delay=delay,
                      candle_marks=candle_marks, model_live_slots=True)
