@@ -98,3 +98,20 @@ def test_short_health_uses_only_resolved_shadow_outcomes():
     selected = audit.filter_crypto_shorts(rows)
 
     assert selected == [recovered, stock, first, *seed, boundary]
+
+
+def test_stock_cluster_holds_short_slot_until_confirmed_release():
+    def trade(symbol, entry, exit_time, direction="SHORT"):
+        return dict(bot="stocks", symbol=symbol, direction=direction,
+                    entry_time=entry, exit_time=exit_time, signed_return=.01)
+
+    first = trade("COINUSDT", 10, 20)
+    same_release = trade("MSTRUSDT", 25, 29)
+    long = trade("CRCLUSDT", 16, 23, "LONG")
+    after_release = trade("MSTRUSDT", 26, 30)
+    accepted, gate = audit.shared_margin_gate(
+        [first, same_release, long, after_release], .03, .03,
+        limit_stock_crypto_cluster=True, slot_release_delay=5)
+
+    assert accepted == [first, long, after_release]
+    assert gate["rejected_by_stock_crypto_cluster"] == 1
