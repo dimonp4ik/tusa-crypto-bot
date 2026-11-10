@@ -368,13 +368,23 @@ def _build_and_send_report(chat_id: int, message_id: int,
         else:
             A("  всё, что есть в базе")
         A("")
-        from src.db import at_short_exposure_audit, weak_long_impulse_outcomes
+        from src.db import (at_short_exposure_audit, model_quality_shadow_outcomes,
+                            weak_long_impulse_outcomes)
         impulse = weak_long_impulse_outcomes(since_ts)
         A("## ПРОБНЫЙ ФИЛЬТР КРИПТОЛОНГОВ")
         A(f"  Отсеял бы сигналов: {impulse['marked']}, "
           f"с известным результатом: {impulse['resolved']}")
         if impulse["resolved"]:
             A(f"  Суммарный результат этих сигналов: {impulse['total_r']:+.2f} R")
+        A("")
+        A("## ТЕНЕВАЯ ПРОВЕРКА ПОРОГА КАЧЕСТВА")
+        quality = model_quality_shadow_outcomes(since_ts)
+        if not quality:
+            A("  Сигналов с сохранённой оценкой пока нет.")
+        for group in quality:
+            label = "ниже порога" if group["below"] else "на пороге или выше"
+            A(f"  {label}: {group['signals']} сигналов, "
+              f"исход известен у {group['resolved']}, сумма {group['total_r']:+.2f} R")
         A("")
         exposure = at_short_exposure_audit(since_ts)
         A("## ШОРТЫ НА ОБЩЕМ СЧЁТЕ OKX")

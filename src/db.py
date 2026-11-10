@@ -2783,6 +2783,20 @@ def weak_long_impulse_outcomes(since_ts: float) -> dict:
         return dict(row)
 
 
+def model_quality_shadow_outcomes(since_ts: float) -> list[dict]:
+    """Compare scored signals against the frozen July cutoff."""
+    with _conn() as c:
+        rows = c.execute("""
+            SELECT strategy_model_quality < ? AS below,
+                   COUNT(*) AS signals, COUNT(realized_r) AS resolved,
+                   COALESCE(SUM(realized_r), 0) AS total_r
+            FROM signals
+            WHERE strategy_model_quality IS NOT NULL AND opened_at >= ?
+            GROUP BY below ORDER BY below
+        """, (.3356824161327173, since_ts)).fetchall()
+    return [dict(row) for row in rows]
+
+
 def at_short_exposure_audit(since_ts: float) -> dict:
     """Summarize short submission claims without exposing account identifiers."""
     with _conn() as c:
