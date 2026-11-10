@@ -4233,6 +4233,7 @@ def _venue_analysis(symbol: str, setup: dict, btc_change: float = 0.0) -> dict:
         "current_price": setup["entry"], "market_price": setup["entry"],
         "entry_reference_price": setup.get("entry_reference_price"),
         "weak_long_impulse_candidate": setup.get("weak_long_impulse_candidate"),
+        "strategy_model_quality": setup.get("model_quality"),
         "atr": setup["atr"], "fixed_stop_atr": 2.0,
         "fixed_target_r": setup["target_r"], "entry_source": "MARKET",
         # Persist the shadow module's fixed absolute-move bracket so a restart
