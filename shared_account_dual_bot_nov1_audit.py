@@ -74,6 +74,22 @@ def margin_for(row: dict, crypto_margin: float, stock_margin: float) -> float:
     return crypto_margin if row["bot"] == "crypto" else stock_margin
 
 
+def open_position_return(row: dict, now: float, close_prices: dict) -> float:
+    """Mark from the last 15m close strictly preceding the entry decision."""
+    stamp = (math.ceil(now / 900) - 1) * 900
+    if stamp <= row["entry_time"]:
+        return 0.0
+    price = float(close_prices[row["bot"], row["symbol"]][stamp])
+    if not math.isfinite(price) or price <= 0:
+        raise ValueError("invalid position mark")
+    sign = 1 if row["direction"] == "LONG" else -1
+    move = sign * (price / row["entry"] - 1)
+    if (row["bot"] == "crypto" and row["sequential_banked"]
+            and row["near_exit_time"] + 900 <= stamp):
+        move = .95 * move + .025 * row["risk_pct"]
+    return move
+
+
 def shared_margin_gate(rows: list[dict], crypto_margin: float,
                        stock_margin: float, *, max_shorts: int | None = None,
                        max_per_direction: int | None = None,
@@ -81,7 +97,8 @@ def shared_margin_gate(rows: list[dict], crypto_margin: float,
                        model_live_slots: bool = False,
                        limit_stock_crypto_cluster: bool = False,
                        position_writers: int = 1, margin_writers: int = 1,
-                       slot_release_delay: float = 0.0
+                       slot_release_delay: float = 0.0,
+                       sizing_marks: dict | None = None
                        ) -> tuple[list[dict], dict]:
     if max_shorts is not None and max_shorts < 0:
         raise ValueError('max_shorts must be nonnegative')
@@ -141,7 +158,13 @@ def shared_margin_gate(rows: list[dict], crypto_margin: float,
                 else:
                     sign = 1 if row["direction"] == "LONG" else -1
                     apply_direction_cap = sign * (current / previous - 1) < -.01
-            requested = equity * margin_for(row, crypto_margin, stock_margin)
+            sizing_equity = equity
+            if sizing_marks is not None:
+                sizing_equity += sum(
+                    reserved * LEVERAGE * open_position_return(other, now, sizing_marks)
+                    for _, _, other, reserved in active
+                    if other["exit_time"] >= now)
+            requested = sizing_equity * margin_for(row, crypto_margin, stock_margin)
             occupied = sum(item[3] for item in active)
             instrument = row.get("inst_id") or row["symbol"]
             if any((item[2].get("inst_id") or item[2]["symbol"]) == instrument
@@ -167,7 +190,7 @@ def shared_margin_gate(rows: list[dict], crypto_margin: float,
                 rejected[row["bot"]] += 1
                 rejected_direction[row["bot"]] += 1
                 continue
-            if equity <= 0 or occupied + requested * margin_writers > equity * MAX_MARGIN + 1e-12:
+            if sizing_equity <= 0 or occupied + requested * margin_writers > sizing_equity * MAX_MARGIN + 1e-12:
                 rejected[row["bot"]] += 1
                 rejected_margin[row["bot"]] += 1
                 continue
@@ -179,6 +202,8 @@ def shared_margin_gate(rows: list[dict], crypto_margin: float,
                 rejected["stocks"] += 1
                 rejected_cluster += 1
                 continue
+            if sizing_marks is not None:
+                row = dict(row, entry_margin_fraction=requested)
             accepted.append(row)
             sequence += 1
             exit_time = float(row["exit_time"])
@@ -188,11 +213,12 @@ def shared_margin_gate(rows: list[dict], crypto_margin: float,
                 exit_time, sequence, requested * LEVERAGE * float(row["signed_return"])))
             counts[row["bot"]] += 1
             occupied += requested
-            peak_margin = max(peak_margin, occupied / equity)
+            peak_margin = max(peak_margin, occupied / sizing_equity)
             peak_positions = max(peak_positions, len(active))
             peak_by_bot[row["bot"]] = max(
                 peak_by_bot[row["bot"]], counts[row["bot"]])
     return accepted, {
+        "sizing_basis": "prior_candle_marked_equity" if sizing_marks is not None else "realized_equity",
         "candidate_count": len(rows),
         "position_writers": position_writers,
         "margin_writers": margin_writers,
@@ -232,7 +258,8 @@ def candle_close_drawdown(rows: list[dict], close_prices: dict,
         while exits and exits[0][0] < entry_time:
             _, _, pnl = heapq.heappop(exits)
             equity += pnl
-        notional = equity * margin_for(row, crypto_margin, stock_margin) * LEVERAGE
+        notional = row.get("entry_margin_fraction",
+                           equity * margin_for(row, crypto_margin, stock_margin)) * LEVERAGE
         pnl = notional * row["signed_return"]
         heapq.heappush(exits, (exit_time, sequence, pnl))
         prices = close_prices[row["bot"], row["symbol"]]
@@ -305,7 +332,7 @@ def account_metrics(rows: list[dict], crypto_margin: float,
     for row in ordered:
         realize(float(row["entry_time"]))
         margin = margin_for(row, crypto_margin, stock_margin)
-        pnl = equity * margin * LEVERAGE * float(row["signed_return"])
+        pnl = row.get("entry_margin_fraction", equity * margin) * LEVERAGE * float(row["signed_return"])
         sequence += 1
         heapq.heappush(exits, (
             float(row["exit_time"]), sequence, pnl, row))
@@ -364,7 +391,10 @@ def scenario(rows: list[dict], crypto_margin: float,
              slot_release_delay: float = 0.0,
              candle_marks: tuple[dict, dict] | None = None,
              btc_closes: dict | None = None, model_live_slots: bool = False,
-             limit_stock_crypto_cluster: bool = False) -> dict:
+             limit_stock_crypto_cluster: bool = False,
+             mark_entry_equity: bool = False) -> dict:
+    if mark_entry_equity and candle_marks is None:
+        raise ValueError("marked sizing requires candle prices")
     accepted, gate = shared_margin_gate(
         rows, crypto_margin, stock_margin, max_per_direction=max_per_direction,
         slot_release_delay=slot_release_delay, btc_closes=btc_closes,
@@ -372,6 +402,7 @@ def scenario(rows: list[dict], crypto_margin: float,
         limit_stock_crypto_cluster=limit_stock_crypto_cluster,
         position_writers=2 if model_live_slots else 1,
         margin_writers=2 if model_live_slots else 1,
+        sizing_marks=candle_marks[0] if mark_entry_equity else None,
     )
     metrics = account_metrics(accepted, crypto_margin, stock_margin)
     if candle_marks is not None:
@@ -438,6 +469,12 @@ def main() -> None:
             scenario(data, margin, margin, slot_release_delay=900,
                      candle_marks=candle_marks, model_live_slots=True,
                      limit_stock_crypto_cluster=True)
+            for margin in (.03, .05) for data in (rows, short_filtered)
+        ],
+        "marked_equity_sensitivity": [
+            scenario(data, margin, margin, slot_release_delay=900,
+                     candle_marks=candle_marks, model_live_slots=True,
+                     mark_entry_equity=True)
             for margin in (.03, .05) for data in (rows, short_filtered)
         ],
         "live_slot_sensitivity": [

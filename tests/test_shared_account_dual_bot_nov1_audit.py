@@ -119,3 +119,30 @@ def test_stock_cluster_holds_short_slot_until_confirmed_release():
 
     assert accepted == [first, long, after_release]
     assert gate["rejected_by_stock_crypto_cluster"] == 1
+
+
+def test_marked_entry_allocation_is_reused_in_profit_calculation():
+    import pytest
+
+    first = dict(bot="stocks", symbol="A", direction="LONG", entry=100,
+                 entry_time=0, exit_time=3600, signed_return=.02)
+    second = dict(bot="stocks", symbol="B", direction="LONG", entry=100,
+                  entry_time=1800, exit_time=4500, signed_return=-.01)
+    marks = {("stocks", "A"): {900: 110, 1800: 1}}
+    accepted, gate = audit.shared_margin_gate(
+        [first, second], .1, .1, sizing_marks=marks)
+
+    assert gate["sizing_basis"] == "prior_candle_marked_equity"
+    assert accepted[0]["entry_margin_fraction"] == pytest.approx(.1)
+    assert accepted[1]["entry_margin_fraction"] == pytest.approx(.11)
+    assert "entry_margin_fraction" not in first
+    metrics = audit.account_metrics(accepted, .1, .1)
+    assert metrics["return_pct"] == pytest.approx(.9)
+
+    # The mark at exactly the entry timestamp is excluded.
+    marks["stocks", "A"][1800] = 1000
+    again, _ = audit.shared_margin_gate([first, second], .1, .1, sizing_marks=marks)
+    assert again[1]["entry_margin_fraction"] == pytest.approx(.11)
+
+    with pytest.raises(KeyError):
+        audit.shared_margin_gate([first, second], .1, .1, sizing_marks={})
