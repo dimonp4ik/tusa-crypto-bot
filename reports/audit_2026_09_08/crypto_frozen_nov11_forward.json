@@ -1,0 +1,311 @@
+{
+  "status": "FROZEN_FORWARD_DIAGNOSTIC_NOT_LIVE_FILLS",
+  "start_exclusive_utc": "2026-11-07T11:00:00+00:00",
+  "snapshot_last_bar_utc": "2026-11-11T04:45:00+00:00",
+  "warning": "Short new sample; no monthly extrapolation. Not account PnL. dd_pct is closed-trade equity drawdown and excludes unrealized swings. Gross results exclude costs.",
+  "raw_entry_horizon_bars": 48,
+  "last_exported_entry_utc": "2026-11-10T04:45:00+00:00",
+  "historical_prefix_parity": {
+    "passes": true,
+    "matched_rows": 881,
+    "through_entry_utc": "2026-11-06T23:00:00+00:00"
+  },
+  "sources": {
+    "reports\\audit_2026_09_08\\xperp_15m_nov7_tp1\\manifest.json": "9a167fcb4037a7f3c5152315309aa6fabfacde3a15ec0ee6dd855e137caa1472",
+    "reports\\audit_2026_09_08\\xperp_15m_nov11_merged\\manifest.json": "eb572ac7f34cf4f0f99ce763d3a022c272f6de20c56571cd980cb515cd149b85",
+    "reports\\audit_2026_09_08\\crypto_profit_first_tp1_volume_next_open_nov1.json": "cf4ea55ef5b52bbd9f571d1e634db7ec92c58eed568d7bedf898137eaaa12a45",
+    "src\\frozen_crypto_profit_first_material_2r.json": "6e91a987a5c36a759c6d6c73edf0fb3ee3482aeb679a30ba894e3852f54ffd6f",
+    "C:\\Users\\Lenovo\\Desktop\\telegram bot\\crypto_frozen_nov11_forward.py": "a9f4d36e7da1f4812dba98916980291204809f78ceb35dc3c586254e6d8f90f5"
+  },
+  "frozen_tp1_parameters": {
+    "volume_ratio_below": 1.5,
+    "extra_close_fraction_at_next_open": 0.75
+  },
+  "baseline": {
+    "margin_3pct": {
+      "n": 9,
+      "wr": 33.33,
+      "return_pct": -1.4673,
+      "dd_pct": 1.5187,
+      "max_loss_streak": 4,
+      "outcome_counts": {
+        "LOCK": 2,
+        "SL": 6,
+        "TP_RUNNER": 1
+      },
+      "mean_signed_price_return_pct": -0.54409
+    },
+    "margin_5pct": {
+      "n": 9,
+      "wr": 33.33,
+      "return_pct": -2.4434,
+      "dd_pct": 2.5233,
+      "max_loss_streak": 4,
+      "outcome_counts": {
+        "LOCK": 2,
+        "SL": 6,
+        "TP_RUNNER": 1
+      },
+      "mean_signed_price_return_pct": -0.54409
+    },
+    "trades": [
+      {
+        "symbol": "ZECUSDT",
+        "direction": "SHORT",
+        "entry_time": 1794065400,
+        "exit_time": 1794076200.0,
+        "runner_outcome": "SL",
+        "net_r": -1.0,
+        "signed_price_return": -0.0147929735368747,
+        "model_probability": 0.3432787583091161,
+        "tp1_extra_close_fraction": 0.0
+      },
+      {
+        "symbol": "ZECUSDT",
+        "direction": "SHORT",
+        "entry_time": 1794119400,
+        "exit_time": 1794137400.0,
+        "runner_outcome": "SL",
+        "net_r": -1.0,
+        "signed_price_return": -0.0100915640335386,
+        "model_probability": 0.3527821372893877,
+        "tp1_extra_close_fraction": 0.0
+      },
+      {
+        "symbol": "ZECUSDT",
+        "direction": "SHORT",
+        "entry_time": 1794156300,
+        "exit_time": 1794162600.0,
+        "runner_outcome": "LOCK",
+        "net_r": 0.025,
+        "signed_price_return": 0.00028616924476797,
+        "model_probability": 0.34664061506987326,
+        "tp1_extra_close_fraction": 0.0
+      },
+      {
+        "symbol": "ZECUSDT",
+        "direction": "SHORT",
+        "entry_time": 1794173400,
+        "exit_time": 1794175200.0,
+        "runner_outcome": "TP_RUNNER",
+        "net_r": 1.9249999999999998,
+        "signed_price_return": 0.026201703246456237,
+        "model_probability": 0.3305498636159126,
+        "tp1_extra_close_fraction": 0.0
+      },
+      {
+        "symbol": "AAVEUSDT",
+        "direction": "SHORT",
+        "entry_time": 1794175200,
+        "exit_time": 1794176100.0,
+        "runner_outcome": "SL",
+        "net_r": -1.0,
+        "signed_price_return": -0.0122331494363156,
+        "model_probability": 0.32761371862399835,
+        "tp1_extra_close_fraction": 0.0
+      },
+      {
+        "symbol": "AAVEUSDT",
+        "direction": "LONG",
+        "entry_time": 1794192300,
+        "exit_time": 1794208500.0,
+        "runner_outcome": "SL",
+        "net_r": -1.0,
+        "signed_price_return": -0.0166650242529754,
+        "model_probability": 0.34689348548817084,
+        "tp1_extra_close_fraction": 0.0
+      },
+      {
+        "symbol": "SUIUSDT",
+        "direction": "LONG",
+        "entry_time": 1794202200,
+        "exit_time": 1794206700.0,
+        "runner_outcome": "SL",
+        "net_r": -1.0,
+        "signed_price_return": -0.0114638447971782,
+        "model_probability": 0.3332416039498544,
+        "tp1_extra_close_fraction": 0.0
+      },
+      {
+        "symbol": "LINKUSDT",
+        "direction": "LONG",
+        "entry_time": 1794204900,
+        "exit_time": 1794208500.0,
+        "runner_outcome": "SL",
+        "net_r": -1.0,
+        "signed_price_return": -0.0104959075589792,
+        "model_probability": 0.3403992059063153,
+        "tp1_extra_close_fraction": 0.0
+      },
+      {
+        "symbol": "AAVEUSDT",
+        "direction": "SHORT",
+        "entry_time": 1794285900,
+        "exit_time": 1794293100.0,
+        "runner_outcome": "LOCK",
+        "net_r": 0.025,
+        "signed_price_return": 0.000286472178545975,
+        "model_probability": 0.349843066266956,
+        "tp1_extra_close_fraction": 0.0
+      }
+    ]
+  },
+  "tp1_research": {
+    "margin_3pct": {
+      "n": 9,
+      "wr": 33.33,
+      "return_pct": -1.3518,
+      "dd_pct": 1.5187,
+      "max_loss_streak": 4,
+      "outcome_counts": {
+        "LOCK": 2,
+        "SL": 6,
+        "TP_RUNNER": 1
+      },
+      "mean_signed_price_return_pct": -0.500698
+    },
+    "margin_5pct": {
+      "n": 9,
+      "wr": 33.33,
+      "return_pct": -2.2529,
+      "dd_pct": 2.5233,
+      "max_loss_streak": 4,
+      "outcome_counts": {
+        "LOCK": 2,
+        "SL": 6,
+        "TP_RUNNER": 1
+      },
+      "mean_signed_price_return_pct": -0.500698
+    },
+    "trades": [
+      {
+        "symbol": "ZECUSDT",
+        "direction": "SHORT",
+        "entry_time": 1794065400,
+        "exit_time": 1794076200.0,
+        "runner_outcome": "SL",
+        "net_r": -1.0,
+        "signed_price_return": -0.0147929735368747,
+        "model_probability": 0.3432787583091161,
+        "tp1_extra_close_fraction": 0.0
+      },
+      {
+        "symbol": "ZECUSDT",
+        "direction": "SHORT",
+        "entry_time": 1794119400,
+        "exit_time": 1794137400.0,
+        "runner_outcome": "SL",
+        "net_r": -1.0,
+        "signed_price_return": -0.0100915640335386,
+        "model_probability": 0.3527821372893877,
+        "tp1_extra_close_fraction": 0.0
+      },
+      {
+        "symbol": "ZECUSDT",
+        "direction": "SHORT",
+        "entry_time": 1794156300,
+        "exit_time": 1794162600.0,
+        "runner_outcome": "LOCK",
+        "net_r": 0.36616653418123785,
+        "signed_price_return": 0.004191424021837997,
+        "model_probability": 0.34664061506987326,
+        "tp1_extra_close_fraction": 0.75
+      },
+      {
+        "symbol": "ZECUSDT",
+        "direction": "SHORT",
+        "entry_time": 1794173400,
+        "exit_time": 1794175200.0,
+        "runner_outcome": "TP_RUNNER",
+        "net_r": 1.9249999999999998,
+        "signed_price_return": 0.026201703246456237,
+        "model_probability": 0.3305498636159126,
+        "tp1_extra_close_fraction": 0.0
+      },
+      {
+        "symbol": "AAVEUSDT",
+        "direction": "SHORT",
+        "entry_time": 1794175200,
+        "exit_time": 1794176100.0,
+        "runner_outcome": "SL",
+        "net_r": -1.0,
+        "signed_price_return": -0.0122331494363156,
+        "model_probability": 0.32761371862399835,
+        "tp1_extra_close_fraction": 0.0
+      },
+      {
+        "symbol": "AAVEUSDT",
+        "direction": "LONG",
+        "entry_time": 1794192300,
+        "exit_time": 1794208500.0,
+        "runner_outcome": "SL",
+        "net_r": -1.0,
+        "signed_price_return": -0.0166650242529754,
+        "model_probability": 0.34689348548817084,
+        "tp1_extra_close_fraction": 0.0
+      },
+      {
+        "symbol": "SUIUSDT",
+        "direction": "LONG",
+        "entry_time": 1794202200,
+        "exit_time": 1794206700.0,
+        "runner_outcome": "SL",
+        "net_r": -1.0,
+        "signed_price_return": -0.0114638447971782,
+        "model_probability": 0.3332416039498544,
+        "tp1_extra_close_fraction": 0.0
+      },
+      {
+        "symbol": "LINKUSDT",
+        "direction": "LONG",
+        "entry_time": 1794204900,
+        "exit_time": 1794208500.0,
+        "runner_outcome": "SL",
+        "net_r": -1.0,
+        "signed_price_return": -0.0104959075589792,
+        "model_probability": 0.3403992059063153,
+        "tp1_extra_close_fraction": 0.0
+      },
+      {
+        "symbol": "AAVEUSDT",
+        "direction": "SHORT",
+        "entry_time": 1794285900,
+        "exit_time": 1794293100.0,
+        "runner_outcome": "LOCK",
+        "net_r": 0.025,
+        "signed_price_return": 0.000286472178545975,
+        "model_probability": 0.349843066266956,
+        "tp1_extra_close_fraction": 0.0
+      }
+    ]
+  },
+  "previously_frozen_guard_diagnostics": {
+    "scope": "Post-signal veto only; no newly freed-slot replacements; not approval for deployment",
+    "quality_threshold": 0.3356824161327173,
+    "short_health_14d_min15": {
+      "n": 9,
+      "wr": 33.33,
+      "return_pct": -1.4673,
+      "dd_pct": 1.5187,
+      "max_loss_streak": 4,
+      "outcome_counts": {
+        "LOCK": 2,
+        "SL": 6,
+        "TP_RUNNER": 1
+      },
+      "mean_signed_price_return_pct": -0.54409
+    },
+    "quality_shadow_veto": {
+      "n": 6,
+      "wr": 33.33,
+      "return_pct": -1.537,
+      "dd_pct": 1.5455,
+      "max_loss_streak": 2,
+      "outcome_counts": {
+        "LOCK": 2,
+        "SL": 4
+      },
+      "mean_signed_price_return_pct": -0.85788
+    }
+  }
+}
