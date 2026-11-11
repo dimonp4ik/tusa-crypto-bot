@@ -146,3 +146,26 @@ def test_marked_entry_allocation_is_reused_in_profit_calculation():
 
     with pytest.raises(KeyError):
         audit.shared_margin_gate([first, second], .1, .1, sizing_marks={})
+
+
+def test_monthly_marked_profit_carries_forward_without_double_counting():
+    import pytest
+    import pandas as pd
+
+    stamp = lambda value: pd.Timestamp(value, tz="UTC").timestamp()
+    position = dict(
+        bot="stocks", symbol="A", direction="LONG", entry=100,
+        entry_time=stamp("2026-01-01"), exit_time=stamp("2026-02-15"),
+        signed_return=.2, entry_margin_fraction=.1)
+    last_entry = dict(
+        bot="stocks", symbol="B", direction="LONG", entry=100,
+        entry_time=stamp("2026-03-01"), exit_time=stamp("2026-03-02"),
+        signed_return=0, entry_margin_fraction=.1)
+    prices = {("stocks", "A"): {stamp("2026-01-31 23:45"): 110}}
+    monthly = audit.marked_monthly_returns([position, last_entry], prices)
+
+    assert monthly["2026-01"]["stocks_contribution_pct"] == pytest.approx(10)
+    assert monthly["2026-02"]["stocks_contribution_pct"] == pytest.approx(
+        100 * (.2 - .1) / 1.1, abs=.0001)
+    assert monthly["2026-01"]["crypto_contribution_pct"] == 0
+    assert set(monthly) == {"2026-01", "2026-02"}
