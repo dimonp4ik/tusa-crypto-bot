@@ -398,7 +398,8 @@ def main() -> None:
     rows = load_rows()
     candle_marks = load_candle_marks(rows)
     short_filtered = filter_crypto_shorts(rows)
-    scenarios = [scenario(rows, crypto, stocks, candle_marks=candle_marks)
+    scenarios = [scenario(rows, crypto, stocks, candle_marks=candle_marks,
+                          model_live_slots=True, slot_release_delay=900)
                  for crypto, stocks in SCENARIOS]
     five = next(item for item in scenarios
                 if item["crypto_margin_pct"] == 5
@@ -415,6 +416,9 @@ def main() -> None:
             "leverage": LEVERAGE,
             "shared_margin_cap_pct": 100 * MAX_MARGIN,
             "shared_position_cap": MAX_POSITIONS,
+            "local_slots": LOCAL_SLOTS,
+            "slot_release_delay_seconds_assumed": 900,
+            "sizing_basis": "realized_equity_at_entry_excludes_open_pnl",
             "candidate_counts": dict(collections.Counter(
                 row["bot"] for row in rows)),
         },
@@ -471,6 +475,8 @@ def main() -> None:
             "The common stock X-Perp history begins in late June 2026.",
             "July-August were used while selecting the stock route.",
             "Public OHLC cannot reproduce latency or order-book slippage.",
+            "The 900-second slot release delay is a sensitivity assumption, not measured live latency.",
+            "Entry sizes use realized equity; live totalEq also includes unrealized PnL.",
             "Gross returns exclude fees at user request.",
         ],
     }

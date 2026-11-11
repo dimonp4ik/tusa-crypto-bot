@@ -11,11 +11,15 @@ def test_shared_gate_never_exceeds_authorized_margin():
         assert item["gate"]["peak_open_positions"] <= audit.MAX_POSITIONS
 
 
-def test_position_cap_does_not_remove_frozen_route_history():
+def test_primary_report_models_live_account_reservations():
     report = json.loads(Path(audit.REPORT).read_text(encoding="utf-8"))
     assert report["scope"]["shared_position_cap"] == 12
     for item in report["scenarios"]:
-        assert item["gate"]["rejected_by_position_cap"] == {}
+        assert item["gate"]["position_writers"] == 2
+        assert item["gate"]["margin_writers"] == 2
+        assert item["gate"]["slot_release_delay"] == 900
+        assert item["gate"]["peak_open_by_bot"]["crypto"] <= 4
+        assert item["gate"]["peak_open_by_bot"]["stocks"] <= 8
 
 
 def test_five_pct_scenario_uses_latest_complete_months():
