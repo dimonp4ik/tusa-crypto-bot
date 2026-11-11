@@ -386,6 +386,42 @@ def account_metrics(rows: list[dict], crypto_margin: float,
     }
 
 
+def marked_monthly_returns(rows: list[dict], close_prices: dict) -> dict:
+    """Full months with both boundaries inside the observed entry interval."""
+    if not rows:
+        return {}
+    first = pd.Timestamp(min(row["entry_time"] for row in rows), unit="s", tz="UTC")
+    last = pd.Timestamp(max(row["entry_time"] for row in rows), unit="s", tz="UTC")
+    states = []
+    for boundary in pd.date_range(first.normalize().replace(day=1), last, freq="MS"):
+        if boundary < first:
+            continue
+        stamp = boundary.timestamp()
+        pnl = collections.Counter()
+        for row in rows:
+            if row["entry_time"] >= stamp:
+                continue
+            move = (row["signed_return"] if row["exit_time"] < stamp else
+                    open_position_return(row, stamp, close_prices))
+            pnl[row["bot"]] += row["entry_margin_fraction"] * LEVERAGE * move
+        states.append((boundary, 1 + sum(pnl.values()), pnl))
+    result = {}
+    for left, right in zip(states, states[1:]):
+        if left[1] <= 0:
+            raise ValueError("nonpositive monthly starting equity")
+        contributions = {
+            bot: 100 * (right[2][bot] - left[2][bot]) / left[1]
+            for bot in ("crypto", "stocks")
+        }
+        result[left[0].strftime("%Y-%m")] = {
+            "crypto_contribution_pct": round(contributions["crypto"], 4),
+            "stocks_contribution_pct": round(contributions["stocks"], 4),
+            "combined_return_pct": round(sum(contributions.values()), 4),
+            "both_bots_ge_30pct": all(value >= 30 for value in contributions.values()),
+        }
+    return result
+
+
 def scenario(rows: list[dict], crypto_margin: float,
              stock_margin: float, *, max_per_direction: int | None = None,
              slot_release_delay: float = 0.0,
@@ -411,6 +447,9 @@ def scenario(rows: list[dict], crypto_margin: float,
             accepted, closes, crypto_margin, stock_margin), 4)
         metrics["candle_adverse_stress_drawdown_pct"] = round(candle_close_drawdown(
             accepted, closes, crypto_margin, stock_margin, adverse_prices=adverse), 4)
+    if mark_entry_equity:
+        metrics["marked_monthly_complete"] = marked_monthly_returns(
+            accepted, candle_marks[0])
     complete = {month: values for month, values in metrics["monthly"].items()
                 if month in {"2026-07", "2026-08", "2026-09", "2026-10"}}
     return {
