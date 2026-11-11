@@ -1,0 +1,331 @@
+{
+  "status": "COMPLETE_CALENDAR_YEAR_RESEARCH_NOT_LIVE_FILLS",
+  "margin_fraction": 0.03,
+  "leverage": 10,
+  "model_refit": false,
+  "threshold_retuned": false,
+  "warning": "Archived public non-X-Perp candles are a transfer stress test. Symbols without full coverage are excluded explicitly. Prior research has inspected these eras. Gross closed-trade equity; no monthly promise.",
+  "years": {
+    "2023": {
+      "symbols": [
+        "AAVEUSDT",
+        "AVAXUSDT",
+        "BTCUSDT",
+        "ETHUSDT",
+        "LINKUSDT",
+        "SOLUSDT",
+        "XLMUSDT",
+        "XRPUSDT"
+      ],
+      "excluded": {
+        "BILLUSDT": "missing archive window",
+        "HYPEUSDT": "missing archive window",
+        "SUIUSDT": "missing archive window",
+        "ZECUSDT": "missing archive window"
+      },
+      "matched_overlap_bars": {
+        "AAVEUSDT": 960,
+        "AVAXUSDT": 960,
+        "BTCUSDT": 960,
+        "ETHUSDT": 960,
+        "LINKUSDT": 960,
+        "SOLUSDT": 960,
+        "XLMUSDT": 960,
+        "XRPUSDT": 960
+      },
+      "raw_candidates": 14377,
+      "preportfolio": 3124,
+      "metrics": {
+        "n": 779,
+        "wr": 64.96,
+        "return_pct": 4.8094,
+        "dd_pct": 10.3491,
+        "max_loss_streak": 5,
+        "outcome_counts": {
+          "EXPIRED": 7,
+          "LOCK": 371,
+          "SL": 246,
+          "TP_EXPIRED": 22,
+          "TP_RUNNER": 133
+        },
+        "mean_signed_price_return_pct": 0.022988
+      },
+      "monthly_return_pct": {
+        "2023-01": -2.05,
+        "2023-02": -3.7456,
+        "2023-03": 8.125,
+        "2023-04": -0.8746,
+        "2023-05": -1.3193,
+        "2023-06": -1.8993,
+        "2023-07": -1.2189,
+        "2023-08": 1.4202,
+        "2023-09": -2.4615,
+        "2023-10": -2.0343,
+        "2023-11": 1.0918,
+        "2023-12": 11.1623,
+        "2024-01": -0.4049
+      },
+      "evaluated_core": [
+        "BTCUSDT",
+        "ETHUSDT",
+        "LINKUSDT",
+        "XLMUSDT",
+        "XRPUSDT"
+      ],
+      "expanded_universe_metrics": {
+        "n": 1406,
+        "wr": 64.58,
+        "return_pct": 19.4575,
+        "dd_pct": 8.6508,
+        "max_loss_streak": 7,
+        "outcome_counts": {
+          "EXPIRED": 7,
+          "LOCK": 660,
+          "SL": 449,
+          "TP_EXPIRED": 32,
+          "TP_RUNNER": 258
+        },
+        "mean_signed_price_return_pct": 0.045372
+      },
+      "first_entry_utc": "2023-01-02T16:45:00+00:00",
+      "last_entry_utc": "2023-12-31T23:00:00+00:00",
+      "note": "Each annual cohort starts flat on January 1; no previous-year carry-in. Monthly returns are attributed by close time; January of the next year may contain carried exits. Core matches the original five historical symbols; expanded universe is reported separately."
+    },
+    "2024": {
+      "symbols": [
+        "AAVEUSDT",
+        "AVAXUSDT",
+        "BTCUSDT",
+        "ETHUSDT",
+        "LINKUSDT",
+        "SOLUSDT",
+        "SUIUSDT",
+        "XLMUSDT",
+        "XRPUSDT"
+      ],
+      "excluded": {
+        "BILLUSDT": "missing archive window",
+        "HYPEUSDT": "missing archive window",
+        "ZECUSDT": "missing archive window"
+      },
+      "matched_overlap_bars": {
+        "AAVEUSDT": 864,
+        "AVAXUSDT": 864,
+        "BTCUSDT": 864,
+        "ETHUSDT": 864,
+        "LINKUSDT": 864,
+        "SOLUSDT": 864,
+        "SUIUSDT": 864,
+        "XLMUSDT": 864,
+        "XRPUSDT": 864
+      },
+      "raw_candidates": 26858,
+      "preportfolio": 5525,
+      "metrics": {
+        "n": 1078,
+        "wr": 65.4,
+        "return_pct": 7.9043,
+        "dd_pct": 10.5006,
+        "max_loss_streak": 7,
+        "outcome_counts": {
+          "EXPIRED": 2,
+          "LOCK": 520,
+          "SL": 344,
+          "TP_EXPIRED": 28,
+          "TP_RUNNER": 184
+        },
+        "mean_signed_price_return_pct": 0.026918
+      },
+      "monthly_return_pct": {
+        "2024-01": -5.4005,
+        "2024-02": 2.373,
+        "2024-03": 7.6764,
+        "2024-04": -3.6901,
+        "2024-05": 0.4855,
+        "2024-06": 1.5797,
+        "2024-07": -6.092,
+        "2024-08": 1.5608,
+        "2024-09": -3.1734,
+        "2024-10": 0.8753,
+        "2024-11": 4.9221,
+        "2024-12": 7.693
+      },
+      "evaluated_core": [
+        "BTCUSDT",
+        "ETHUSDT",
+        "LINKUSDT",
+        "XLMUSDT",
+        "XRPUSDT"
+      ],
+      "expanded_universe_metrics": {
+        "n": 2108,
+        "wr": 63.61,
+        "return_pct": 0.2634,
+        "dd_pct": 25.6778,
+        "max_loss_streak": 12,
+        "outcome_counts": {
+          "EXPIRED": 4,
+          "LOCK": 1005,
+          "SL": 706,
+          "TP_EXPIRED": 33,
+          "TP_RUNNER": 360
+        },
+        "mean_signed_price_return_pct": 0.003952
+      },
+      "first_entry_utc": "2024-01-02T12:15:00+00:00",
+      "last_entry_utc": "2024-12-31T08:30:00+00:00",
+      "note": "Each annual cohort starts flat on January 1; no previous-year carry-in. Monthly returns are attributed by close time; January of the next year may contain carried exits. Core matches the original five historical symbols; expanded universe is reported separately."
+    },
+    "2025": {
+      "symbols": [
+        "AAVEUSDT",
+        "AVAXUSDT",
+        "BTCUSDT",
+        "ETHUSDT",
+        "LINKUSDT",
+        "SOLUSDT",
+        "SUIUSDT",
+        "XLMUSDT",
+        "XRPUSDT"
+      ],
+      "excluded": {
+        "BILLUSDT": "missing archive window",
+        "HYPEUSDT": "missing archive window",
+        "ZECUSDT": "missing archive window"
+      },
+      "matched_overlap_bars": {
+        "AAVEUSDT": 960,
+        "AVAXUSDT": 960,
+        "BTCUSDT": 960,
+        "ETHUSDT": 960,
+        "LINKUSDT": 960,
+        "SOLUSDT": 960,
+        "SUIUSDT": 960,
+        "XLMUSDT": 960,
+        "XRPUSDT": 960
+      },
+      "raw_candidates": 30587,
+      "preportfolio": 6761,
+      "metrics": {
+        "n": 1350,
+        "wr": 65.78,
+        "return_pct": 5.8276,
+        "dd_pct": 11.2327,
+        "max_loss_streak": 6,
+        "outcome_counts": {
+          "EXPIRED": 6,
+          "LOCK": 692,
+          "SL": 414,
+          "TP_EXPIRED": 19,
+          "TP_RUNNER": 219
+        },
+        "mean_signed_price_return_pct": 0.01708
+      },
+      "monthly_return_pct": {
+        "2025-01": -6.038,
+        "2025-02": 5.3502,
+        "2025-03": 0.3702,
+        "2025-04": -0.3471,
+        "2025-05": 5.0975,
+        "2025-06": 1.0412,
+        "2025-07": 9.0058,
+        "2025-08": -7.6744,
+        "2025-09": -0.7445,
+        "2025-10": -1.3948,
+        "2025-11": 4.5068,
+        "2025-12": -2.155,
+        "2026-01": -0.0652
+      },
+      "evaluated_core": [
+        "BTCUSDT",
+        "ETHUSDT",
+        "LINKUSDT",
+        "XLMUSDT",
+        "XRPUSDT"
+      ],
+      "expanded_universe_metrics": {
+        "n": 2195,
+        "wr": 65.88,
+        "return_pct": 0.2021,
+        "dd_pct": 15.8378,
+        "max_loss_streak": 9,
+        "outcome_counts": {
+          "EXPIRED": 7,
+          "LOCK": 1120,
+          "SL": 686,
+          "TP_EXPIRED": 31,
+          "TP_RUNNER": 351
+        },
+        "mean_signed_price_return_pct": 0.003622
+      },
+      "first_entry_utc": "2025-01-01T10:45:00+00:00",
+      "last_entry_utc": "2025-12-31T19:00:00+00:00",
+      "note": "Each annual cohort starts flat on January 1; no previous-year carry-in. Monthly returns are attributed by close time; January of the next year may contain carried exits. Core matches the original five historical symbols; expanded universe is reported separately."
+    }
+  },
+  "sources": {
+    "backtest_cache\\AAVEUSDT_15min_18000_end1675123200000.pkl": "09175858dd442eeb9a46de2465523e437baf1a145d99e3960440d46552836eea",
+    "backtest_cache\\AAVEUSDT_15min_18000_end1690761600000.pkl": "8ac5b0ea4c72017b291b2d12c3f622c3dc3a3be6a54b546c872d782dec7fefa7",
+    "backtest_cache\\AAVEUSDT_15min_18000_end1706659200000.pkl": "00bc20799b8d7f6fa8150e7e4c25a02b9deeb65164778f3bed75dcd18798ca9f",
+    "backtest_cache\\AVAXUSDT_15min_18000_end1675123200000.pkl": "5101800eb6dbed20a7b19907dc5ef6356ebf988b1dd249a3100a032f09e18968",
+    "backtest_cache\\AVAXUSDT_15min_18000_end1690761600000.pkl": "cb956201dc81c7541826e912ceb15f444a28af4a4c85c6ce2168c95525538277",
+    "backtest_cache\\AVAXUSDT_15min_18000_end1706659200000.pkl": "20cc9fe1dc3a41408a1fab580a81afac48cd0da56b046740f45aedb6c24f722f",
+    "backtest_cache\\BTCUSDT_15min_18000_end1675123200000.pkl": "113a887c77744fcd3d8fa800754af8fa925e38a7c7cb9eec38964ecd8c811494",
+    "backtest_cache\\BTCUSDT_15min_18000_end1690761600000.pkl": "57a415a1350f5bd6d966df45f6f553b2cd23aa15f8bb833481efb06cc4c7e00b",
+    "backtest_cache\\BTCUSDT_15min_18000_end1706659200000.pkl": "eaaa7f4f034820f9377966cf4a9e5077924d5b83135e82b9747dc06f7dad81a4",
+    "backtest_cache\\ETHUSDT_15min_18000_end1675123200000.pkl": "be59b9633f5c93a59d4d71a71356cac24fac60b7c80fb3dfafa955dd023d699c",
+    "backtest_cache\\ETHUSDT_15min_18000_end1690761600000.pkl": "29df6d14fdc54cb2b95db32c986337fd8c65dedc89878a07d1c76853baefd149",
+    "backtest_cache\\ETHUSDT_15min_18000_end1706659200000.pkl": "51ced5c6ecb422cf506e205891663c88becf54b35e17c70d832bfdbea79aa095",
+    "backtest_cache\\LINKUSDT_15min_18000_end1675123200000.pkl": "e147c4a5988d6b8bbf29a04bfffa456b8598e53ee350639425d10c69a9f280e2",
+    "backtest_cache\\LINKUSDT_15min_18000_end1690761600000.pkl": "3c48870c89cd383367bed376a99f9bc748b72621c09480be19c999b27ed65073",
+    "backtest_cache\\LINKUSDT_15min_18000_end1706659200000.pkl": "d8eabf3447e6d2002fca102be4a83c91c109ab5077b018b953fce172efa76944",
+    "backtest_cache\\SOLUSDT_15min_18000_end1675123200000.pkl": "83dea65fe6baa0bb2759e59e1a379ed292c672628be71fea23dfbb426b03f295",
+    "backtest_cache\\SOLUSDT_15min_18000_end1690761600000.pkl": "6cef1a0f4dc4e047b9e3dfd46a3184a457f30390ad9b2f612b78491a94d89d78",
+    "backtest_cache\\SOLUSDT_15min_18000_end1706659200000.pkl": "de52f70cafb81343e50df9a27a1670b5bc687c19f8e6fdc1f346147ef7efdd2f",
+    "backtest_cache\\XLMUSDT_15min_18000_end1675123200000.pkl": "ed29cfc755e16bb9f7d78b906ca38eeb053e6b92c3f583b2bda245fcf324dd49",
+    "backtest_cache\\XLMUSDT_15min_18000_end1690761600000.pkl": "50656fb24398f46ab50acf7242f436e6c9b42f9e1cb1dfd03ffcec4c27b576b3",
+    "backtest_cache\\XLMUSDT_15min_18000_end1706659200000.pkl": "6a30b2810e448630c5389548a0d316d542230751ed1c433b4965dadb0d0e901c",
+    "backtest_cache\\XRPUSDT_15min_18000_end1675123200000.pkl": "9bee3d9a0da1ef4bd4c1b4ed0ceef9d7a4d8f03c512ee4286d305cba55b2334d",
+    "backtest_cache\\XRPUSDT_15min_18000_end1690761600000.pkl": "2cd00e089fb16fc6cf63f2c5fd1813e7432ddb03c48612759c00b89df2cc8df7",
+    "backtest_cache\\XRPUSDT_15min_18000_end1706659200000.pkl": "2585efe09c43432104a6f7db961a700779bc07867b23edef38405851f1ed2b6a",
+    "backtest_cache\\AAVEUSDT_15min_18000_end1722384000000.pkl": "15aa37791d6a69f49a0d3d8e5f7b726ca3342eb76d84a4f63ffeadc3add65f47",
+    "backtest_cache\\AAVEUSDT_15min_18000_end1738281600000.pkl": "15551a123253414ada842e9df923990bad86a787b6efb596814bb934bbb09226",
+    "backtest_cache\\AVAXUSDT_15min_18000_end1722384000000.pkl": "d4a0a50b1793923e19e7d9ea948bdba0a0d3785457b5eb91b439dfc5e6c7301e",
+    "backtest_cache\\AVAXUSDT_15min_18000_end1738281600000.pkl": "1c8fa0ee609728c75339e0ec8c9ba0772067abf0f3a5a33bb5820f69ee031172",
+    "backtest_cache\\BTCUSDT_15min_18000_end1722384000000.pkl": "54d7ba0fcf6e3fa3cc5c483ffabc29decbfc55d987fea499c66c115bdc8a9600",
+    "backtest_cache\\BTCUSDT_15min_18000_end1738281600000.pkl": "8cd1fae2f436e0953c81861adbb849820aa4e0d73ebebc399b5d5e7bf4026b89",
+    "backtest_cache\\ETHUSDT_15min_18000_end1722384000000.pkl": "2710207140ce83b2c59ee828591c7fdff82b0d7de6c82073583bf8a883074d93",
+    "backtest_cache\\ETHUSDT_15min_18000_end1738281600000.pkl": "703833665623fb4fe720068e9a3bdf3a08165d96a0b692dcdb8ecb483bbb80ea",
+    "backtest_cache\\LINKUSDT_15min_18000_end1722384000000.pkl": "62e274bd77ff9e2beb1dab678d032687829ee1e749609025112525835beaa71a",
+    "backtest_cache\\LINKUSDT_15min_18000_end1738281600000.pkl": "8b3b80f9047061990ea0a76a9be847d663434f5b09eb385eb2b81a3eb8b39f87",
+    "backtest_cache\\SOLUSDT_15min_18000_end1722384000000.pkl": "217903ed33601626307eadf875af4dd9c34be2c36da6b93a205b424c52d80af2",
+    "backtest_cache\\SOLUSDT_15min_18000_end1738281600000.pkl": "14210c37f257845d7a474ebe26c1d11312ad986bf8c014dcb02c5dce8f04f2e1",
+    "backtest_cache\\SUIUSDT_15min_18000_end1706659200000.pkl": "39177214f00d85e12976bbee4eb768080f554030b034e274c6bcd14575a1b594",
+    "backtest_cache\\SUIUSDT_15min_18000_end1722384000000.pkl": "6e8e4218bdac6c3516cd0e66995f6188510dcbc5a0e719226955eb4f12275a4a",
+    "backtest_cache\\SUIUSDT_15min_18000_end1738281600000.pkl": "97a36289ecfc20234bf703917ce601b655bbad59dd89a5f25cb3f12e5b8d72c2",
+    "backtest_cache\\XLMUSDT_15min_18000_end1722384000000.pkl": "f39352e274ead4ac15ef3513c4be39c4762fa9c2ac3f0ffdf93e64881a99dd7f",
+    "backtest_cache\\XLMUSDT_15min_18000_end1738281600000.pkl": "b92832dee1dd7ce91d87424f2e567e8fc74314b0417f65d2807b78812ab41474",
+    "backtest_cache\\XRPUSDT_15min_18000_end1722384000000.pkl": "e3a93bdd23f18b936c3dbafff53c1e2a780b9d3f82633daf7447c02eec193055",
+    "backtest_cache\\XRPUSDT_15min_18000_end1738281600000.pkl": "756e5dc58e4162d70638b6c495770ee6b2d0b56d2dfe6797c4a614b03d3d53a5",
+    "backtest_cache\\AAVEUSDT_15min_18000_end1753920000000.pkl": "2267edf0c78f49978397bbc35eba82e2a3efaab98e38498d2982259eee83e89a",
+    "backtest_cache\\AAVEUSDT_15min_18000_end1769817600000.pkl": "662e7275cfde60bce1ef1d20d30444db4e05177992317c3e3d2820f78a726526",
+    "backtest_cache\\AVAXUSDT_15min_18000_end1753920000000.pkl": "42f196e3b7b85f177c65424df2bdd6d039867d7ee1486a54d8030e379a889b5e",
+    "backtest_cache\\AVAXUSDT_15min_18000_end1769817600000.pkl": "a68e53d348ab956dc23563e8ac8dab54934af206764c482dc727aa7e9af8bdbe",
+    "backtest_cache\\BTCUSDT_15min_18000_end1753920000000.pkl": "45c2c1c476e0f5c25a95e92b3cfef62fba51a83e0583f912c60869bf526ec7fe",
+    "backtest_cache\\BTCUSDT_15min_18000_end1769817600000.pkl": "95303472274648fd20da599f027a8fe8d77c4dede7d218c242f666778bae0800",
+    "backtest_cache\\ETHUSDT_15min_18000_end1753920000000.pkl": "fa39de96a7a0e2ba4cb4ba29c50313ed34d76d998ae45f2abcc7a3cd34bb5c6e",
+    "backtest_cache\\ETHUSDT_15min_18000_end1769817600000.pkl": "7ff35cb9d950f27785cb5ced3f16c0a9425d4d72593c79721fd353291b5e4ee1",
+    "backtest_cache\\LINKUSDT_15min_18000_end1753920000000.pkl": "7d7f5bdaa54e386971560d20a0bdce96785e3547c73181b2d8bf0c409afce2da",
+    "backtest_cache\\LINKUSDT_15min_18000_end1769817600000.pkl": "f5f05bba8fde7bd585a93f68cc1c9fb087aeb23d373d68bf5602c675e0dd1946",
+    "backtest_cache\\SOLUSDT_15min_18000_end1753920000000.pkl": "8613ed6259d6eaf89d2da16be633f6beb07aa34dcadf7ce64841ed09fd0aa2e2",
+    "backtest_cache\\SOLUSDT_15min_18000_end1769817600000.pkl": "9e8461dee5bda81deb628f32fcaf21fde35957191fd6c37c50551ed42f11f606",
+    "backtest_cache\\SUIUSDT_15min_18000_end1753920000000.pkl": "2e952da6d734e20ee7e8ffdd17417c99bac13341354f12f73aab34ca346cfa69",
+    "backtest_cache\\SUIUSDT_15min_18000_end1769817600000.pkl": "4c8a7a663d54ecab27428d75da261204cac9abfeee01d6db4fa9dd2b2276c27b",
+    "backtest_cache\\XLMUSDT_15min_18000_end1753920000000.pkl": "e15dbf286577e84cce8c4f47fdc40b68f45a94a01042452f89a56a265e9a6b83",
+    "backtest_cache\\XLMUSDT_15min_18000_end1769817600000.pkl": "c65f1ce319fbcb12a1ff30266ae58fac04e31ca24ec2262d4c18828227d04d4a",
+    "backtest_cache\\XRPUSDT_15min_18000_end1753920000000.pkl": "39a373e3bd1607a0a8fcc62028bde775cb16050752d80f8dba7049996c26cb81",
+    "backtest_cache\\XRPUSDT_15min_18000_end1769817600000.pkl": "94aacbdeccf010610d2f66369c3865278e03a1ad0b44ff77d2a9a8dfbcc094df",
+    "C:\\Users\\Lenovo\\Desktop\\telegram bot\\crypto_complete_years_nov11_audit.py": "59b66a7d9c6fe6a611cff7542842f3114d8d946b77f993a9823ac8f0feb4ff1c",
+    "C:\\Users\\Lenovo\\Desktop\\telegram bot\\src\\frozen_crypto_profit_first_material_2r.json": "6e91a987a5c36a759c6d6c73edf0fb3ee3482aeb679a30ba894e3852f54ffd6f"
+  }
+}
