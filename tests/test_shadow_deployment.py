@@ -504,7 +504,7 @@ class ShadowDeploymentTests(unittest.TestCase):
             main._check_open_signals()
         self.assertEqual(update.call_args.args[1], "EXPIRED")
 
-    def test_fixed_be_runner_expiry_uses_audited_zero_runner_value(self):
+    def test_fixed_be_runner_expiry_marks_remaining_position_value(self):
         start = 2_000_050_000.0
         frame = {
             "time": [start + 900 * index for index in range(48)],
@@ -529,7 +529,7 @@ class ShadowDeploymentTests(unittest.TestCase):
              patch.object(main.autotrader, "mirror_transition"):
             main._check_open_signals()
         self.assertEqual(update.call_args.args[1], "TP1_EXPIRED")
-        self.assertAlmostEqual(update.call_args.kwargs["realized_r"], .025)
+        self.assertAlmostEqual(update.call_args.kwargs["realized_r"], 1.2125)
 
     def test_hourly_target_after_12_bars_is_ignored(self):
         start = 2_000_100_000.0

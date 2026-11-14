@@ -38,6 +38,7 @@ FIRST_TARGET_R = .5
 FIRST_FRACTION = .05
 RUNNER_FRACTION = 1 - FIRST_FRACTION
 FINAL_TARGET_R = 2.0
+LABEL_REVISION = "expiry_mark_v2"
 ACTIVATIONS = (.5, .75, 1.0, 1.25, 99.0)
 LOCKS = (0.0, .10, .25, .50)
 FRACTIONS = (.05, .10, .25, .50, .75)
@@ -123,10 +124,10 @@ def replay_runner(candle: dict, index: int, *, direction: str, entry: float,
             protected = True
 
     exit_time = int(candle["time"][last]) + INTERVAL
-    if reached_first:
-        return "TP_EXPIRED", 0.0, True, exit_time
     close = float(candle["close"][last])
     marked_r = sign * (close - entry) / risk
+    if reached_first:
+        return "TP_EXPIRED", marked_r, True, exit_time
     return "EXPIRED", marked_r, False, exit_time
 
 

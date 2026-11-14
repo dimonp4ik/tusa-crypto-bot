@@ -57,6 +57,20 @@ def test_no_protection_allows_a_runner_after_an_entry_retest():
     assert (outcome, runner_r, banked) == ("TP_RUNNER", 2.0, True)
 
 
+def test_expired_runner_is_marked_at_terminal_close_after_tp1():
+    bars=[(100.,100.6,99.5,100.5)]+[(100.5,101.,100.1,100.8)]*47
+    outcome,runner,banked,end=replay(bars)
+    assert (outcome,banked,end)==('TP_EXPIRED',True,48*audit.INTERVAL)
+    assert runner==pytest.approx(.8)
+
+
+def test_last_bar_tp1_can_expire_below_entry_before_breakeven_activates():
+    bars=[(100.,100.4,99.8,100.1)]*47+[(100.1,100.6,99.5,99.8)]
+    outcome,runner,banked,_=replay(bars)
+    assert (outcome,banked)==('TP_EXPIRED',True)
+    assert runner==pytest.approx(-.2)
+
+
 def test_first_bank_fraction_is_applied_only_after_tp1():
     frame = pd.DataFrame({
         "sequential_runner_r": [0.0, -1.0, 2.0],

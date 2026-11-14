@@ -39,7 +39,7 @@ def main():
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--asset-features',action='store_true')
     args=parser.parse_args()
-    path = ROOT / "expected_cash_edge_literal_pool_nov14.pkl"
+    path = ROOT / f"expected_cash_edge_literal_pool_{runtime.sequential.exact.LABEL_REVISION}_nov14.pkl"
     if not path.exists():
         frame = runtime.base.load_target(2.0)
         model = runtime.router.MODEL
@@ -92,6 +92,7 @@ def main():
         v["confirmation"]["worst_observed_month_pct"]),
         min(v["selection"]["return_pct"],v["confirmation"]["return_pct"]))) if eligible else None
     report = dict(status="RESEARCH_ONLY_NO_DEPLOYMENT", training_rows=len(train),
+        label_revision=runtime.sequential.exact.LABEL_REVISION,
         target_verified=False,
         asset_features=args.asset_features,missing_feature_rows=missing_feature_rows,
         input_feature_names=[*schema['feature_names'],*(FIELDS if args.asset_features else ())],
@@ -141,7 +142,7 @@ def main():
     if args.asset_features:
         p=Path('asset_entry_features_research.py')
         report['sources'][str(p)]=hashlib.sha256(p.read_bytes()).hexdigest()
-    output='crypto_expected_cash_edge_asset_features_nov14.json' if args.asset_features else 'crypto_expected_cash_edge_nov14.json'
+    output=f"crypto_expected_cash_edge_{'asset_features_' if args.asset_features else ''}{runtime.sequential.exact.LABEL_REVISION}_nov14.json"
     (ROOT/output).write_text(json.dumps(report,indent=2),encoding="utf-8")
     print(json.dumps({k:v for k,v in report.items() if k!='variants'},indent=2),flush=True)
 

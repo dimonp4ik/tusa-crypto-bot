@@ -6,6 +6,7 @@ opted-in user; the same paper ledger remains the source of forward results.
 """
 
 import json
+import math
 import logging
 import os
 import time
@@ -3601,13 +3602,14 @@ def _check_open_signals():
                       for key, values in df.items()}
             max_bars = int(sig.get("strategy_max_bars") or 0)
             max_bars_reached = False
-            if max_bars > 0 and len(df.get("time", [])) >= max_bars:
-                last_i = max_bars - 1
-                flags = df.get("confirmed") or []
-                max_bars_reached = (
-                    bool(flags[last_i]) if last_i < len(flags)
-                    else float(df["time"][last_i]) + bar_seconds <= now)
-                df = {key: values[:max_bars] for key, values in df.items()}
+            if max_bars > 0:
+                strategy_start = float(sig.get("strategy_entry_bar_ts")
+                                       or math.floor(opened_at / bar_seconds) * bar_seconds)
+                strategy_end = strategy_start + max_bars * bar_seconds
+                max_bars_reached = now >= strategy_end
+                keep = [i for i, stamp in enumerate(df.get("time", []))
+                        if float(stamp) < strategy_end]
+                df = {key: [values[i] for i in keep] for key, values in df.items()}
 
             new_status   = None
             realized_r   = None
@@ -3875,20 +3877,12 @@ def _check_open_signals():
                               and age_hours > SIGNAL_EXPIRY_HOURS)
             if new_status is None and (strategy_expired or global_expired):
                 new_status = "TP1_EXPIRED" if status == "TP1_PARTIAL" else "EXPIRED"
-                if fixed_be_runner and status == "TP1_PARTIAL":
-                    # The audited barbell assigns zero to a runner that reaches
-                    # neither 2R nor the original stop within the horizon.
-                    # A final mark would silently change that tested outcome.
-                    exit_px = entry
-                    realized_r = blended_r(
-                        tp1_close_frac, tp1_r, 0.0, 0.0)
-                else:
-                    exit_px = (float(df["close"][-1])
-                               if strategy_expired and df.get("close") else latest_quote)
-                    realized_r = marked_r(
-                        direction=direction, entry=entry, exit_price=exit_px,
-                        sl=sl, tp1=tp1, tp1_fraction=tp1_close_frac,
-                        reached_tp1=status == 'TP1_PARTIAL')
+                exit_px = (float(df["close"][-1])
+                           if strategy_expired and df.get("close") else latest_quote)
+                realized_r = marked_r(
+                    direction=direction, entry=entry, exit_price=exit_px,
+                    sl=sl, tp1=tp1, tp1_fraction=tp1_close_frac,
+                    reached_tp1=status == 'TP1_PARTIAL')
 
             # Optional second opinion before closing: the position trades on the
             # X-Perp, but the levels come from the deep feed and so does every
