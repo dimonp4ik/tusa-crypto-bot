@@ -1,12 +1,14 @@
 """Prototype: predict literal price return instead of an incompatible far-TP label."""
 import json
 import hashlib
+import argparse
 from pathlib import Path
 import numpy as np
 import pandas as pd
 from sklearn.ensemble import HistGradientBoostingRegressor
 import verify_crypto_profit_first_runtime_parity_nov3 as runtime
 from lot_aware_tp1_audit import simulate
+from asset_entry_features_research import FIELDS,attach
 
 ROOT = Path("reports/audit_2026_09_08")
 
@@ -34,6 +36,9 @@ def metrics(rows, start, end):
 
 
 def main():
+    parser=argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--asset-features',action='store_true')
+    args=parser.parse_args()
     path = ROOT / "expected_cash_edge_literal_pool_nov14.pkl"
     if not path.exists():
         frame = runtime.base.load_target(2.0)
@@ -45,14 +50,23 @@ def main():
     frame = pd.read_pickle(path)
     frame = frame.drop_duplicates(["symbol", "entry_time", "direction", "family"])
     frame = runtime.sequential.apply_fraction(frame, .5)
+    asset_sources={}
+    missing_feature_rows=0
+    if args.asset_features:
+        frame=attach(frame,runtime.sequential.exact.candle_paths(tuple(frame.period.unique())))
+        asset_sources.update(frame.attrs['asset_sources'])
+        missing_feature_rows=frame.attrs['missing_feature_rows']
+    def matrix(values,schema):
+        base=runtime.base.matrix(values,schema)
+        return np.column_stack((base,values[list(FIELDS)].to_numpy(dtype=np.float32))) if args.asset_features else base
     train = frame[frame.entry_time.ge(timestamp("2020-01-01"))
         & frame.exit_time.lt(timestamp("2022-01-01"))].copy()
     if train.empty:
         raise ValueError("no strictly historical training rows")
     schema = runtime.base.design(train)
-    xfit = runtime.base.matrix(train, schema)
+    xfit = matrix(train, schema)
     yfit = (train.net_r * train.risk_pct).to_numpy(float)
-    xall = runtime.base.matrix(frame, schema)
+    xall = matrix(frame, schema)
     select_start, select_end, confirm_end = map(timestamp, ("2022-01-01", "2023-01-01", "2024-01-01"))
     sel = frame.entry_time.ge(select_start) & frame.exit_time.lt(select_end)
     variants, candidates, estimators = [], {}, {}
@@ -79,6 +93,8 @@ def main():
         min(v["selection"]["return_pct"],v["confirmation"]["return_pct"]))) if eligible else None
     report = dict(status="RESEARCH_ONLY_NO_DEPLOYMENT", training_rows=len(train),
         target_verified=False,
+        asset_features=args.asset_features,missing_feature_rows=missing_feature_rows,
+        input_feature_names=[*schema['feature_names'],*(FIELDS if args.asset_features else ())],
         training_last_exit_utc=pd.Timestamp(train.exit_time.max(),unit="s",tz="UTC").isoformat(),
         first_bank_fraction=.5, variants=variants, selected=best,
         limitations=["Archived half-year windows; not full-year proof",
@@ -97,7 +113,11 @@ def main():
         current = runtime.router.MODEL
         direct = direct[direct.symbol.isin(runtime.base.ROBUST_SYMBOLS)
             & direct.risk_pct.between(current["risk_pct_min"],current["risk_pct_max"])].copy()
-        scores = estimators[best["leaves"]].predict(runtime.base.matrix(direct,schema))
+        if args.asset_features:
+            direct['period']='direct'
+            direct=attach(direct,runtime.exact.paths(ROOT/'xperp_15m_nov14_merged'))
+            asset_sources.update(direct.attrs['asset_sources'])
+        scores = estimators[best["leaves"]].predict(matrix(direct,schema))
         direct = direct.assign(expected_price_return=scores, period="direct")
         direct = direct[direct.expected_price_return.ge(best["cutoff"])].copy()
         direct = direct.sort_values(["symbol","entry_time","expected_price_return","family"],
@@ -117,7 +137,12 @@ def main():
             ROOT/"xperp_specs_nov14.json",runtime.router.ARTIFACT_PATH,
             ROOT/"crypto_xperp_raw_router_audit_2_0_nov14_merged_raw_families.csv",
             ROOT/"crypto_xperp_raw_router_audit_0_5_nov14_merged_raw_families.csv")}
-    (ROOT/"crypto_expected_cash_edge_nov14.json").write_text(json.dumps(report,indent=2),encoding="utf-8")
+    report['sources'].update(asset_sources)
+    if args.asset_features:
+        p=Path('asset_entry_features_research.py')
+        report['sources'][str(p)]=hashlib.sha256(p.read_bytes()).hexdigest()
+    output='crypto_expected_cash_edge_asset_features_nov14.json' if args.asset_features else 'crypto_expected_cash_edge_nov14.json'
+    (ROOT/output).write_text(json.dumps(report,indent=2),encoding="utf-8")
     print(json.dumps({k:v for k,v in report.items() if k!='variants'},indent=2),flush=True)
 
 
