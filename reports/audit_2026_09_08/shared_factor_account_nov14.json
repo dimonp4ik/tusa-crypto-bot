@@ -1,0 +1,610 @@
+{
+  "status": "SHARED_ACCOUNT_RESEARCH_NOT_LIVE_PNL",
+  "objective_verified": false,
+  "deposit": 125.64,
+  "client_margin_pct_each": 3,
+  "leverage": 10,
+  "local_slots": {
+    "crypto": 4,
+    "stocks": 8
+  },
+  "global_cap": 12,
+  "simultaneous_writers": 2,
+  "slot_release_delay": 900,
+  "margin_cap": 0.9,
+  "stock_health": "20 completed shadow outcomes strictly before entry, sum R positive; no inherited pre-snapshot history",
+  "limitations": [
+    "Month scenarios start flat at 125.64; they are not reconstructed client history",
+    "Entry cohorts exclude inherited positions and exits at/after the next month boundary",
+    "Candle-trigger fills; no spread, fees, latency reconstruction or open PnL in sizing",
+    "Full entry margin stays reserved until delayed slot release; partial releases not modelled",
+    "Current contract specifications assumed across the cohort",
+    "Same-bar ordering is tested in two directions but real arrival times remain unknown",
+    "Factor cap changes shadow signal admission and therefore its hypothetical readiness history",
+    "No pristine unseen market era and no forecast of 30 percent monthly"
+  ],
+  "results": {
+    "baseline": {
+      "shadow_stock_signals": 934,
+      "stock_ready_signals": 801,
+      "months": {
+        "2026-07": {
+          "crypto_first": {
+            "starting_capital": 125.64,
+            "ending_capital": 166.789138,
+            "return_pct": 32.751622,
+            "cash_drawdown_pct": 3.582018,
+            "trades": 254,
+            "skipped": {
+              "slots": 11,
+              "minimum_size": 0
+            },
+            "unplaceable_partials": 120,
+            "tp1_hits_without_bank": 49,
+            "peak_positions": 10,
+            "peak_by_bot": {
+              "crypto": 3,
+              "stocks": 8
+            },
+            "peak_reserved_margin_pct": 28.352705462820637,
+            "pnl_by_bot": {
+              "crypto": -0.6588999999999671,
+              "stocks": 41.80803774999998
+            },
+            "return_contribution_pct": {
+              "crypto": -0.5244348933460419,
+              "stocks": 33.276056789239085
+            }
+          },
+          "stocks_first": {
+            "starting_capital": 125.64,
+            "ending_capital": 166.789138,
+            "return_pct": 32.751622,
+            "cash_drawdown_pct": 3.582018,
+            "trades": 254,
+            "skipped": {
+              "slots": 11,
+              "minimum_size": 0
+            },
+            "unplaceable_partials": 120,
+            "tp1_hits_without_bank": 49,
+            "peak_positions": 10,
+            "peak_by_bot": {
+              "crypto": 3,
+              "stocks": 8
+            },
+            "peak_reserved_margin_pct": 28.352705462820637,
+            "pnl_by_bot": {
+              "crypto": -0.6588999999999671,
+              "stocks": 41.80803774999998
+            },
+            "return_contribution_pct": {
+              "crypto": -0.5244348933460419,
+              "stocks": 33.276056789239085
+            }
+          }
+        },
+        "2026-08": {
+          "crypto_first": {
+            "starting_capital": 125.64,
+            "ending_capital": 157.396464,
+            "return_pct": 25.275759,
+            "cash_drawdown_pct": 4.148085,
+            "trades": 338,
+            "skipped": {
+              "slots": 14,
+              "minimum_size": 0
+            },
+            "unplaceable_partials": 155,
+            "tp1_hits_without_bank": 69,
+            "peak_positions": 9,
+            "peak_by_bot": {
+              "crypto": 4,
+              "stocks": 8
+            },
+            "peak_reserved_margin_pct": 25.784791650474006,
+            "pnl_by_bot": {
+              "crypto": 2.377440714285676,
+              "stocks": 29.379022800000026
+            },
+            "return_contribution_pct": {
+              "crypto": 1.8922641788329162,
+              "stocks": 23.383494746895913
+            }
+          },
+          "stocks_first": {
+            "starting_capital": 125.64,
+            "ending_capital": 157.396464,
+            "return_pct": 25.275759,
+            "cash_drawdown_pct": 4.148085,
+            "trades": 338,
+            "skipped": {
+              "slots": 14,
+              "minimum_size": 0
+            },
+            "unplaceable_partials": 155,
+            "tp1_hits_without_bank": 69,
+            "peak_positions": 9,
+            "peak_by_bot": {
+              "crypto": 4,
+              "stocks": 8
+            },
+            "peak_reserved_margin_pct": 25.784791650474006,
+            "pnl_by_bot": {
+              "crypto": 2.377440714285676,
+              "stocks": 29.379022800000026
+            },
+            "return_contribution_pct": {
+              "crypto": 1.8922641788329162,
+              "stocks": 23.383494746895913
+            }
+          }
+        },
+        "2026-09": {
+          "crypto_first": {
+            "starting_capital": 125.64,
+            "ending_capital": 159.316895,
+            "return_pct": 26.804278,
+            "cash_drawdown_pct": 4.961535,
+            "trades": 385,
+            "skipped": {
+              "slots": 12,
+              "minimum_size": 0
+            },
+            "unplaceable_partials": 199,
+            "tp1_hits_without_bank": 65,
+            "peak_positions": 11,
+            "peak_by_bot": {
+              "crypto": 4,
+              "stocks": 8
+            },
+            "peak_reserved_margin_pct": 32.15385171081921,
+            "pnl_by_bot": {
+              "crypto": 8.408659999999632,
+              "stocks": 25.268234600000003
+            },
+            "return_contribution_pct": {
+              "crypto": 6.692661572747239,
+              "stocks": 20.11161620503025
+            }
+          },
+          "stocks_first": {
+            "starting_capital": 125.64,
+            "ending_capital": 159.316895,
+            "return_pct": 26.804278,
+            "cash_drawdown_pct": 4.961535,
+            "trades": 385,
+            "skipped": {
+              "slots": 12,
+              "minimum_size": 0
+            },
+            "unplaceable_partials": 199,
+            "tp1_hits_without_bank": 65,
+            "peak_positions": 11,
+            "peak_by_bot": {
+              "crypto": 4,
+              "stocks": 8
+            },
+            "peak_reserved_margin_pct": 32.15385171081921,
+            "pnl_by_bot": {
+              "crypto": 8.408659999999632,
+              "stocks": 25.268234600000003
+            },
+            "return_contribution_pct": {
+              "crypto": 6.692661572747239,
+              "stocks": 20.11161620503025
+            }
+          }
+        },
+        "2026-10": {
+          "crypto_first": {
+            "starting_capital": 125.64,
+            "ending_capital": 174.76256,
+            "return_pct": 39.097867,
+            "cash_drawdown_pct": 2.695827,
+            "trades": 374,
+            "skipped": {
+              "slots": 10,
+              "minimum_size": 0
+            },
+            "unplaceable_partials": 172,
+            "tp1_hits_without_bank": 75,
+            "peak_positions": 10,
+            "peak_by_bot": {
+              "stocks": 8,
+              "crypto": 4
+            },
+            "peak_reserved_margin_pct": 29.011740417164216,
+            "pnl_by_bot": {
+              "crypto": 19.500101428572187,
+              "stocks": 29.622459000000013
+            },
+            "return_contribution_pct": {
+              "crypto": 15.520615591031667,
+              "stocks": 23.577251671442227
+            }
+          },
+          "stocks_first": {
+            "starting_capital": 125.64,
+            "ending_capital": 174.76256,
+            "return_pct": 39.097867,
+            "cash_drawdown_pct": 2.695827,
+            "trades": 374,
+            "skipped": {
+              "slots": 10,
+              "minimum_size": 0
+            },
+            "unplaceable_partials": 172,
+            "tp1_hits_without_bank": 75,
+            "peak_positions": 10,
+            "peak_by_bot": {
+              "stocks": 8,
+              "crypto": 4
+            },
+            "peak_reserved_margin_pct": 29.011740417164216,
+            "pnl_by_bot": {
+              "crypto": 19.500101428572187,
+              "stocks": 29.622459000000013
+            },
+            "return_contribution_pct": {
+              "crypto": 15.520615591031667,
+              "stocks": 23.577251671442227
+            }
+          }
+        },
+        "2026-11": {
+          "crypto_first": {
+            "starting_capital": 125.64,
+            "ending_capital": 128.320851,
+            "return_pct": 2.133756,
+            "cash_drawdown_pct": 2.936831,
+            "trades": 108,
+            "skipped": {
+              "slots": 3,
+              "minimum_size": 0
+            },
+            "unplaceable_partials": 58,
+            "tp1_hits_without_bank": 27,
+            "peak_positions": 8,
+            "peak_by_bot": {
+              "stocks": 7,
+              "crypto": 4
+            },
+            "peak_reserved_margin_pct": 23.369187603802168,
+            "pnl_by_bot": {
+              "crypto": 1.3085385714285644,
+              "stocks": 1.372311999999978
+            },
+            "return_contribution_pct": {
+              "crypto": 1.0414983854095545,
+              "stocks": 1.0922572429162514
+            }
+          },
+          "stocks_first": {
+            "starting_capital": 125.64,
+            "ending_capital": 128.320851,
+            "return_pct": 2.133756,
+            "cash_drawdown_pct": 2.936831,
+            "trades": 108,
+            "skipped": {
+              "slots": 3,
+              "minimum_size": 0
+            },
+            "unplaceable_partials": 58,
+            "tp1_hits_without_bank": 27,
+            "peak_positions": 8,
+            "peak_by_bot": {
+              "stocks": 7,
+              "crypto": 4
+            },
+            "peak_reserved_margin_pct": 23.369187603802168,
+            "pnl_by_bot": {
+              "crypto": 1.3085385714285644,
+              "stocks": 1.372311999999978
+            },
+            "return_contribution_pct": {
+              "crypto": 1.0414983854095545,
+              "stocks": 1.0922572429162514
+            }
+          }
+        }
+      }
+    },
+    "etf_same_benchmark_cap1": {
+      "shadow_stock_signals": 918,
+      "stock_ready_signals": 755,
+      "months": {
+        "2026-07": {
+          "crypto_first": {
+            "starting_capital": 125.64,
+            "ending_capital": 166.789138,
+            "return_pct": 32.751622,
+            "cash_drawdown_pct": 3.582018,
+            "trades": 254,
+            "skipped": {
+              "slots": 11,
+              "minimum_size": 0
+            },
+            "unplaceable_partials": 120,
+            "tp1_hits_without_bank": 49,
+            "peak_positions": 10,
+            "peak_by_bot": {
+              "crypto": 3,
+              "stocks": 8
+            },
+            "peak_reserved_margin_pct": 28.352705462820637,
+            "pnl_by_bot": {
+              "crypto": -0.6588999999999671,
+              "stocks": 41.80803774999998
+            },
+            "return_contribution_pct": {
+              "crypto": -0.5244348933460419,
+              "stocks": 33.276056789239085
+            }
+          },
+          "stocks_first": {
+            "starting_capital": 125.64,
+            "ending_capital": 166.789138,
+            "return_pct": 32.751622,
+            "cash_drawdown_pct": 3.582018,
+            "trades": 254,
+            "skipped": {
+              "slots": 11,
+              "minimum_size": 0
+            },
+            "unplaceable_partials": 120,
+            "tp1_hits_without_bank": 49,
+            "peak_positions": 10,
+            "peak_by_bot": {
+              "crypto": 3,
+              "stocks": 8
+            },
+            "peak_reserved_margin_pct": 28.352705462820637,
+            "pnl_by_bot": {
+              "crypto": -0.6588999999999671,
+              "stocks": 41.80803774999998
+            },
+            "return_contribution_pct": {
+              "crypto": -0.5244348933460419,
+              "stocks": 33.276056789239085
+            }
+          }
+        },
+        "2026-08": {
+          "crypto_first": {
+            "starting_capital": 125.64,
+            "ending_capital": 157.396464,
+            "return_pct": 25.275759,
+            "cash_drawdown_pct": 4.148085,
+            "trades": 338,
+            "skipped": {
+              "slots": 14,
+              "minimum_size": 0
+            },
+            "unplaceable_partials": 155,
+            "tp1_hits_without_bank": 69,
+            "peak_positions": 9,
+            "peak_by_bot": {
+              "crypto": 4,
+              "stocks": 8
+            },
+            "peak_reserved_margin_pct": 25.784791650474006,
+            "pnl_by_bot": {
+              "crypto": 2.377440714285676,
+              "stocks": 29.379022800000026
+            },
+            "return_contribution_pct": {
+              "crypto": 1.8922641788329162,
+              "stocks": 23.383494746895913
+            }
+          },
+          "stocks_first": {
+            "starting_capital": 125.64,
+            "ending_capital": 157.396464,
+            "return_pct": 25.275759,
+            "cash_drawdown_pct": 4.148085,
+            "trades": 338,
+            "skipped": {
+              "slots": 14,
+              "minimum_size": 0
+            },
+            "unplaceable_partials": 155,
+            "tp1_hits_without_bank": 69,
+            "peak_positions": 9,
+            "peak_by_bot": {
+              "crypto": 4,
+              "stocks": 8
+            },
+            "peak_reserved_margin_pct": 25.784791650474006,
+            "pnl_by_bot": {
+              "crypto": 2.377440714285676,
+              "stocks": 29.379022800000026
+            },
+            "return_contribution_pct": {
+              "crypto": 1.8922641788329162,
+              "stocks": 23.383494746895913
+            }
+          }
+        },
+        "2026-09": {
+          "crypto_first": {
+            "starting_capital": 125.64,
+            "ending_capital": 154.365769,
+            "return_pct": 22.863554,
+            "cash_drawdown_pct": 5.826224,
+            "trades": 361,
+            "skipped": {
+              "slots": 10,
+              "minimum_size": 0
+            },
+            "unplaceable_partials": 195,
+            "tp1_hits_without_bank": 67,
+            "peak_positions": 11,
+            "peak_by_bot": {
+              "crypto": 4,
+              "stocks": 8
+            },
+            "peak_reserved_margin_pct": 31.930309558870672,
+            "pnl_by_bot": {
+              "crypto": 8.687238571428193,
+              "stocks": 20.03853050000001
+            },
+            "return_contribution_pct": {
+              "crypto": 6.914389184517823,
+              "stocks": 15.949164676854513
+            }
+          },
+          "stocks_first": {
+            "starting_capital": 125.64,
+            "ending_capital": 154.365769,
+            "return_pct": 22.863554,
+            "cash_drawdown_pct": 5.826224,
+            "trades": 361,
+            "skipped": {
+              "slots": 10,
+              "minimum_size": 0
+            },
+            "unplaceable_partials": 195,
+            "tp1_hits_without_bank": 67,
+            "peak_positions": 11,
+            "peak_by_bot": {
+              "crypto": 4,
+              "stocks": 8
+            },
+            "peak_reserved_margin_pct": 31.930309558870672,
+            "pnl_by_bot": {
+              "crypto": 8.687238571428193,
+              "stocks": 20.03853050000001
+            },
+            "return_contribution_pct": {
+              "crypto": 6.914389184517823,
+              "stocks": 15.949164676854513
+            }
+          }
+        },
+        "2026-10": {
+          "crypto_first": {
+            "starting_capital": 125.64,
+            "ending_capital": 166.557559,
+            "return_pct": 32.567303,
+            "cash_drawdown_pct": 4.549759,
+            "trades": 356,
+            "skipped": {
+              "slots": 9,
+              "minimum_size": 0
+            },
+            "unplaceable_partials": 164,
+            "tp1_hits_without_bank": 75,
+            "peak_positions": 10,
+            "peak_by_bot": {
+              "stocks": 8,
+              "crypto": 4
+            },
+            "peak_reserved_margin_pct": 28.858136789923183,
+            "pnl_by_bot": {
+              "crypto": 18.685292857143583,
+              "stocks": 22.232266500000005
+            },
+            "return_contribution_pct": {
+              "crypto": 14.872089189066845,
+              "stocks": 17.695213705826173
+            }
+          },
+          "stocks_first": {
+            "starting_capital": 125.64,
+            "ending_capital": 166.557559,
+            "return_pct": 32.567303,
+            "cash_drawdown_pct": 4.549759,
+            "trades": 356,
+            "skipped": {
+              "slots": 9,
+              "minimum_size": 0
+            },
+            "unplaceable_partials": 164,
+            "tp1_hits_without_bank": 75,
+            "peak_positions": 10,
+            "peak_by_bot": {
+              "stocks": 8,
+              "crypto": 4
+            },
+            "peak_reserved_margin_pct": 28.858136789923183,
+            "pnl_by_bot": {
+              "crypto": 18.685292857143583,
+              "stocks": 22.232266500000005
+            },
+            "return_contribution_pct": {
+              "crypto": 14.872089189066845,
+              "stocks": 17.695213705826173
+            }
+          }
+        },
+        "2026-11": {
+          "crypto_first": {
+            "starting_capital": 125.64,
+            "ending_capital": 128.700434,
+            "return_pct": 2.435876,
+            "cash_drawdown_pct": 3.213451,
+            "trades": 107,
+            "skipped": {
+              "slots": 3,
+              "minimum_size": 0
+            },
+            "unplaceable_partials": 58,
+            "tp1_hits_without_bank": 27,
+            "peak_positions": 8,
+            "peak_by_bot": {
+              "stocks": 7,
+              "crypto": 4
+            },
+            "peak_reserved_margin_pct": 23.299308577463464,
+            "pnl_by_bot": {
+              "crypto": 1.3085385714285644,
+              "stocks": 1.7518954999999778
+            },
+            "return_contribution_pct": {
+              "crypto": 1.0414983854095545,
+              "stocks": 1.3943771887933603
+            }
+          },
+          "stocks_first": {
+            "starting_capital": 125.64,
+            "ending_capital": 128.700434,
+            "return_pct": 2.435876,
+            "cash_drawdown_pct": 3.213451,
+            "trades": 107,
+            "skipped": {
+              "slots": 3,
+              "minimum_size": 0
+            },
+            "unplaceable_partials": 58,
+            "tp1_hits_without_bank": 27,
+            "peak_positions": 8,
+            "peak_by_bot": {
+              "stocks": 7,
+              "crypto": 4
+            },
+            "peak_reserved_margin_pct": 23.299308577463464,
+            "pnl_by_bot": {
+              "crypto": 1.3085385714285644,
+              "stocks": 1.7518954999999778
+            },
+            "return_contribution_pct": {
+              "crypto": 1.0414983854095545,
+              "stocks": 1.3943771887933603
+            }
+          }
+        }
+      }
+    }
+  },
+  "sources": {
+    "reports\\audit_2026_09_08\\crypto_frozen_nov14_baseline.pkl": "fd41f65b1d54b05121cb2d1f968c719b9d3f362b2e339261be8f4ffce91295e0",
+    "reports\\audit_2026_09_08\\shared_xperp_specs_nov14.json": "7a4a76b813dfe6a5a08c9e858b17d453285dddc99529cdc293885682cf2bee0e",
+    "reports\\audit_2026_09_08\\xperp_15m_nov14_merged\\manifest.json": "6ebba73ab8fe00a7a0740feaf3b6fdc867d4773dd36277be53d42f8e20a236b5",
+    "..\\tusa stocks\\reports\\audit_2026_09_08\\stock_xperp_forward_nov14_merged\\manifest.json": "50d0e0ce982332be100adc2e2bcb1e79d83fa05b367b2481e1be7cd0b5bb248d",
+    "C:\\Users\\Lenovo\\Desktop\\telegram bot\\shared_factor_account_nov14_audit.py": "cd385644515bb374274781ac1768e039a28be2e39e24e396f50933fa302e1f99",
+    "lot_aware_tp1_audit.py": "519da86a9ceb92b899887e590a6f891bd7f9cb20a07c5676b0dcfe93571a2e16",
+    "..\\tusa stocks\\reports\\audit_2026_09_08\\stock_factor_nov14_baseline.pkl": "a1d9b4c623e3023f1b2a012b2536e3481b0fcb99809d17bc7981922effd144ce",
+    "..\\tusa stocks\\reports\\audit_2026_09_08\\stock_factor_nov14_etf_same_benchmark_cap1.pkl": "1137cb72585876c4f43e52b0ba5cf2a37a927e927a3e56c2ff5b437d1bdb03d9"
+  }
+}

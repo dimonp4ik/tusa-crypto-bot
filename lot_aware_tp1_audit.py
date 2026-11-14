@@ -5,14 +5,21 @@ import math
 from src.okx_trader import calc_contracts, calc_partial_close
 
 
-def simulate(rows, specs, *, capital=125.64, margin_fraction=.03, tp1_pct=5, slots=4):
+def simulate(rows, specs, *, capital=125.64, margin_fraction=.03, tp1_pct=5, slots=4,
+             bot_slots=None, simultaneous_writers=1, release_delay=0, margin_cap=.9, tie_key=None):
     if not (math.isfinite(capital) and capital > 0 and 0 < margin_fraction <= .1
             and 0 <= tp1_pct < 100 and slots > 0):
         raise ValueError("invalid simulation settings")
+    if (simultaneous_writers<1 or release_delay<0 or not 0<margin_cap<=.9
+            or (bot_slots is not None and any(v<1 for v in bot_slots.values()))):
+        raise ValueError("invalid account settings")
     equity = peak = capital
     drawdown = 0.0
     pending = []
-    active = set()
+    active = {}
+    peak_positions=0
+    peak_margin=0.
+    peak_by_bot={}
     trades = []
     skipped = dict(slots=0, minimum_size=0)
     sequence = 0
@@ -23,11 +30,11 @@ def simulate(rows, specs, *, capital=125.64, margin_fraction=.03, tp1_pct=5, slo
             _, _, pnl, release = heapq.heappop(pending)
             equity += pnl
             if release is not None:
-                active.remove(release)
+                del active[release]
             peak = max(peak, equity)
             drawdown = max(drawdown, (peak-equity)/peak)
 
-    for row in sorted(rows, key=lambda r: (r["entry_time"], r["symbol"])):
+    for row in sorted(rows, key=lambda r: (r["entry_time"], tie_key(r) if tie_key else r["symbol"])):
         now = float(row["entry_time"])
         required = [float(row[k]) for k in ("entry", "risk_pct", "sequential_runner_r", "exit_time")]
         if (not all(math.isfinite(v) for v in (now, *required))
@@ -35,8 +42,15 @@ def simulate(rows, specs, *, capital=125.64, margin_fraction=.03, tp1_pct=5, slo
             raise ValueError("invalid trade inputs")
         realize(now)
         symbol = row["symbol"]
-        if len(active) >= slots or symbol in active:
+        bot=row.get('bot','crypto')
+        if bot_slots is not None and bot not in bot_slots:
+            raise ValueError('unknown bot allocation')
+        local_full=bot_slots is not None and sum(v['bot']==bot for v in active.values())>=bot_slots[bot]
+        if len(active)+simultaneous_writers > slots or symbol in active or local_full:
             skipped["slots"] += 1
+            continue
+        if equity<=0 or sum(v['margin'] for v in active.values())+equity*margin_fraction*simultaneous_writers>equity*margin_cap+1e-9:
+            skipped['margin']=skipped.get('margin',0)+1
             continue
         spec = specs[symbol]
         size = calc_contracts(equity*margin_fraction, 10, row["entry"], spec)
@@ -57,16 +71,31 @@ def simulate(rows, specs, *, capital=125.64, margin_fraction=.03, tp1_pct=5, slo
             sequence += 1
             heapq.heappush(pending, (bank_time, sequence, bank_pnl, None))
         sequence += 1
-        heapq.heappush(pending, (end, sequence, runner_pnl, symbol))
-        active.add(symbol)
+        heapq.heappush(pending, (end, sequence, runner_pnl, symbol if release_delay==0 else None))
+        if release_delay:
+            sequence+=1
+            heapq.heappush(pending,(end+release_delay,sequence,0.,symbol))
+        actual_margin=size*float(spec['ctVal'])*float(row['entry'])/10
+        active[symbol]=dict(bot=bot,margin=actual_margin)
+        peak_positions=max(peak_positions,len(active))
+        peak_margin=max(peak_margin,sum(v['margin'] for v in active.values())/equity)
+        peak_by_bot[bot]=max(peak_by_bot.get(bot,0),sum(v['bot']==bot for v in active.values()))
         trades.append(dict(symbol=symbol, direction=row["direction"], entry_time=now,
             contracts=size, planned_partial=partial["size"],
             actual_partial_pct=partial["actual_pct"], tp1_hit=banked,
             bank_pnl=bank_pnl, runner_pnl=runner_pnl))
+        if bot_slots is not None:
+            trades[-1]['bot']=bot
     realize(None)
-    return dict(starting_capital=capital, ending_capital=round(equity, 6),
+    result=dict(starting_capital=capital, ending_capital=round(equity, 6),
         return_pct=round(100*(equity/capital-1), 6), cash_drawdown_pct=round(100*drawdown, 6),
         trades=len(trades), skipped=skipped,
         unplaceable_partials=sum(t["planned_partial"] == 0 for t in trades),
         tp1_hits_without_bank=sum(t["tp1_hit"] and t["planned_partial"] == 0 for t in trades),
         ledger=trades)
+    if bot_slots is not None:
+        cash={bot:sum(t['bank_pnl']+t['runner_pnl'] for t in trades if t['bot']==bot) for bot in bot_slots}
+        result.update(peak_positions=peak_positions,peak_by_bot=peak_by_bot,
+            peak_reserved_margin_pct=100*peak_margin,pnl_by_bot=cash,
+            return_contribution_pct={bot:100*pnl/capital for bot,pnl in cash.items()})
+    return result
