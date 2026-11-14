@@ -1,0 +1,319 @@
+{
+  "status": "BOUNDED_MINUTE_DIAGNOSTIC_NOT_ACCOUNT_PNL",
+  "objective_verified": false,
+  "selection": "First twelve chronologically admitted entries after the Nov11 snapshot, without outcome filtering",
+  "assumptions": [
+    "Same selected entries and planned fills; no portfolio rerouting or profit extrapolation",
+    "Only confirmed native X-Perp minute bars; all 720 minutes must exist",
+    "Breakeven amendment after the activation minute; same-minute ordering remains uncertain",
+    "Original stop wins ambiguous stop/target bars; resting targets assumed filled at their levels",
+    "Initial order latency, actual fill prices, order-book liquidity and amendment acknowledgments not reconstructed",
+    "Exclude zero-volume previous-close placeholders when reaggregating traded OHLC; any remaining 15-minute mismatch rejects the row",
+    "Replay retains zero-volume minute last prices as observations, without asserting new execution liquidity"
+  ],
+  "results": [
+    {
+      "symbol": "AVAXUSDT",
+      "direction": "LONG",
+      "entry_time": 1794384900,
+      "entry": 8.644,
+      "sl": 8.547571428571429,
+      "signal_runner_r": 0.0,
+      "signal_outcome": "LOCK",
+      "zero_volume_minutes": 173,
+      "first_traded_minute": 1794384900,
+      "minute_callback": {
+        "outcome": "LOCK",
+        "runner_r": -0.06222222222222452,
+        "banked": true,
+        "exit_time": 1794395040
+      },
+      "minute_activation_stress": {
+        "outcome": "LOCK",
+        "runner_r": -0.06222222222222452,
+        "banked": true,
+        "exit_time": 1794395040
+      }
+    },
+    {
+      "symbol": "AAVEUSDT",
+      "direction": "SHORT",
+      "entry_time": 1794433500,
+      "entry": 122.3,
+      "sl": 123.57142857142856,
+      "signal_runner_r": 2.0,
+      "signal_outcome": "TP_RUNNER",
+      "zero_volume_minutes": 252,
+      "first_traded_minute": 1794433560,
+      "minute_callback": {
+        "outcome": "TP_RUNNER",
+        "runner_r": 2.0,
+        "banked": true,
+        "exit_time": 1794437340
+      },
+      "minute_activation_stress": {
+        "outcome": "TP_RUNNER",
+        "runner_r": 2.0,
+        "banked": true,
+        "exit_time": 1794437340
+      }
+    },
+    {
+      "symbol": "LINKUSDT",
+      "direction": "SHORT",
+      "entry_time": 1794434400,
+      "entry": 10.345,
+      "sl": 10.452142857142858,
+      "signal_runner_r": 2.0,
+      "signal_outcome": "TP_RUNNER",
+      "zero_volume_minutes": 158,
+      "first_traded_minute": 1794434400,
+      "minute_callback": {
+        "outcome": "TP_RUNNER",
+        "runner_r": 2.0,
+        "banked": true,
+        "exit_time": 1794437340
+      },
+      "minute_activation_stress": {
+        "outcome": "TP_RUNNER",
+        "runner_r": 2.0,
+        "banked": true,
+        "exit_time": 1794437340
+      }
+    },
+    {
+      "symbol": "HYPEUSDT",
+      "direction": "SHORT",
+      "entry_time": 1794437100,
+      "entry": 71.666,
+      "sl": 72.46157142857143,
+      "signal_runner_r": -0.0,
+      "signal_outcome": "LOCK",
+      "zero_volume_minutes": 103,
+      "first_traded_minute": 1794437100,
+      "minute_callback": {
+        "outcome": "LOCK",
+        "runner_r": -0.0,
+        "banked": true,
+        "exit_time": 1794440880
+      },
+      "minute_activation_stress": {
+        "outcome": "LOCK",
+        "runner_r": -0.0,
+        "banked": true,
+        "exit_time": 1794440880
+      }
+    },
+    {
+      "symbol": "AVAXUSDT",
+      "direction": "SHORT",
+      "entry_time": 1794438900,
+      "entry": 8.413,
+      "sl": 8.50657142857143,
+      "signal_runner_r": -1.0,
+      "signal_outcome": "SL",
+      "zero_volume_minutes": 219,
+      "first_traded_minute": 1794438900,
+      "minute_callback": {
+        "outcome": "SL",
+        "runner_r": -1.0,
+        "banked": false,
+        "exit_time": 1794441420
+      },
+      "minute_activation_stress": {
+        "outcome": "SL",
+        "runner_r": -1.0,
+        "banked": false,
+        "exit_time": 1794441420
+      }
+    },
+    {
+      "symbol": "AVAXUSDT",
+      "direction": "LONG",
+      "entry_time": 1794476700,
+      "entry": 8.652,
+      "sl": 8.564571428571428,
+      "signal_runner_r": -1.0,
+      "signal_outcome": "SL",
+      "zero_volume_minutes": 161,
+      "first_traded_minute": 1794476700,
+      "minute_callback": {
+        "outcome": "SL",
+        "runner_r": -1.0,
+        "banked": false,
+        "exit_time": 1794479520
+      },
+      "minute_activation_stress": {
+        "outcome": "SL",
+        "runner_r": -1.0,
+        "banked": false,
+        "exit_time": 1794479520
+      }
+    },
+    {
+      "symbol": "BTCUSDT",
+      "direction": "SHORT",
+      "entry_time": 1794494700,
+      "entry": 71557.9,
+      "sl": 72308.74285714286,
+      "signal_runner_r": -0.0,
+      "signal_outcome": "LOCK",
+      "zero_volume_minutes": 0,
+      "first_traded_minute": 1794494700,
+      "minute_callback": {
+        "outcome": "LOCK",
+        "runner_r": -0.0,
+        "banked": true,
+        "exit_time": 1794499140
+      },
+      "minute_activation_stress": {
+        "outcome": "LOCK",
+        "runner_r": -0.0,
+        "banked": true,
+        "exit_time": 1794499140
+      }
+    },
+    {
+      "symbol": "SUIUSDT",
+      "direction": "SHORT",
+      "entry_time": 1794514500,
+      "entry": 0.7999,
+      "sl": 0.8087857142857143,
+      "signal_runner_r": 2.0,
+      "signal_outcome": "TP_RUNNER",
+      "zero_volume_minutes": 12,
+      "first_traded_minute": 1794514500,
+      "minute_callback": {
+        "outcome": "TP_RUNNER",
+        "runner_r": 2.0,
+        "banked": true,
+        "exit_time": 1794539760
+      },
+      "minute_activation_stress": {
+        "outcome": "TP_RUNNER",
+        "runner_r": 2.0,
+        "banked": true,
+        "exit_time": 1794539760
+      }
+    },
+    {
+      "symbol": "HYPEUSDT",
+      "direction": "SHORT",
+      "entry_time": 1794515400,
+      "entry": 71.313,
+      "sl": 72.08528571428572,
+      "signal_runner_r": -1.0,
+      "signal_outcome": "SL",
+      "zero_volume_minutes": 29,
+      "first_traded_minute": 1794515400,
+      "minute_callback": {
+        "outcome": "SL",
+        "runner_r": -1.0,
+        "banked": false,
+        "exit_time": 1794518880
+      },
+      "minute_activation_stress": {
+        "outcome": "SL",
+        "runner_r": -1.0,
+        "banked": false,
+        "exit_time": 1794518880
+      }
+    },
+    {
+      "symbol": "HYPEUSDT",
+      "direction": "LONG",
+      "entry_time": 1794531600,
+      "entry": 73.084,
+      "sl": 72.32142857142857,
+      "signal_runner_r": -1.0,
+      "signal_outcome": "SL",
+      "zero_volume_minutes": 11,
+      "first_traded_minute": 1794531600,
+      "minute_callback": {
+        "outcome": "SL",
+        "runner_r": -1.0,
+        "banked": false,
+        "exit_time": 1794536100
+      },
+      "minute_activation_stress": {
+        "outcome": "SL",
+        "runner_r": -1.0,
+        "banked": false,
+        "exit_time": 1794536100
+      }
+    },
+    {
+      "symbol": "AVAXUSDT",
+      "direction": "LONG",
+      "entry_time": 1794536100,
+      "entry": 8.283,
+      "sl": 8.198857142857142,
+      "signal_runner_r": -1.0,
+      "signal_outcome": "SL",
+      "zero_volume_minutes": 122,
+      "first_traded_minute": 1794536100,
+      "minute_callback": {
+        "outcome": "SL",
+        "runner_r": -1.0,
+        "banked": false,
+        "exit_time": 1794537720
+      },
+      "minute_activation_stress": {
+        "outcome": "SL",
+        "runner_r": -1.0,
+        "banked": false,
+        "exit_time": 1794537720
+      }
+    },
+    {
+      "symbol": "XLMUSDT",
+      "direction": "LONG",
+      "entry_time": 1794537000,
+      "entry": 0.14603,
+      "sl": 0.14435,
+      "signal_runner_r": -1.0,
+      "signal_outcome": "SL",
+      "zero_volume_minutes": 191,
+      "first_traded_minute": 1794537000,
+      "minute_callback": {
+        "outcome": "SL",
+        "runner_r": -1.0,
+        "banked": false,
+        "exit_time": 1794539640
+      },
+      "minute_activation_stress": {
+        "outcome": "SL",
+        "runner_r": -1.0,
+        "banked": false,
+        "exit_time": 1794539640
+      }
+    }
+  ],
+  "sources": {
+    "reports\\audit_2026_09_08\\minute_be_parity_nov15_cache\\AVAX-USD_UM_XPERP-310530_1794384900_1794428100.json": "bca123425c2ba9db07fcfa2468c6ee4e078bd7650c07de358e90ded06f8b917d",
+    "reports\\audit_2026_09_08\\xperp_15m_nov14_merged\\AVAXUSDT_15min_current.pkl": "e3a4d205975ee0e6eca0db0a9ed0205fb824d7c695d8982a28f401516749cf4a",
+    "reports\\audit_2026_09_08\\crypto_frozen_nov14_expiry_mark_v2_be_0.5.pkl": "66264dfb23590f3a0cf7dcbbfe58ce6cba5f29d762c79f79eb63b7add471b0ba",
+    "reports\\audit_2026_09_08\\shared_xperp_specs_nov14.json": "7a4a76b813dfe6a5a08c9e858b17d453285dddc99529cdc293885682cf2bee0e",
+    "reports\\audit_2026_09_08\\xperp_15m_nov11_merged\\manifest.json": "eb572ac7f34cf4f0f99ce763d3a022c272f6de20c56571cd980cb515cd149b85",
+    "C:\\Users\\Lenovo\\Desktop\\telegram bot\\crypto_minute_be_parity_nov15.py": "eef0cbfc44864b7b3ac3f778631c2028b96c7739eea6965c3cfa63041c1d35a5",
+    "crypto_profit_first_runner_protection_oct30_audit.py": "39884e91cbced61683cac9bee69614b712694d24d72e97407abe48b376f84e5f",
+    "minute_zone_entries.py": "85db3562eddf24146834c1f8f2f2db0656de8d74bec805dfb5b1caa30ef8edf0",
+    "reports\\audit_2026_09_08\\minute_be_parity_nov15_cache\\AAVE-USD_UM_XPERP-310704_1794433500_1794476700.json": "39319017afda4bc3756bef56301503a748fb4ceb9f9b4182f0c2436cdfc88e7d",
+    "reports\\audit_2026_09_08\\xperp_15m_nov14_merged\\AAVEUSDT_15min_current.pkl": "4fec164d0f4bf3116b2b25bf85391581d3bc4af7f9fb1d519606a8ecb499d8d4",
+    "reports\\audit_2026_09_08\\minute_be_parity_nov15_cache\\LINK-USD_UM_XPERP-310523_1794434400_1794477600.json": "51daf81516615bab26f9b6043ec36553d7e5c2b97563b2339d6f2203e86523da",
+    "reports\\audit_2026_09_08\\xperp_15m_nov14_merged\\LINKUSDT_15min_current.pkl": "040ce8728d836ad20ea095c9857601d56c6b4a6734a6ca4be3e215061cbfc811",
+    "reports\\audit_2026_09_08\\minute_be_parity_nov15_cache\\HYPE-USD_UM_XPERP-310523_1794437100_1794480300.json": "562228fd8174c106e983d078feb17a1b81f26b845f3c7b4773928cae1d6a7300",
+    "reports\\audit_2026_09_08\\xperp_15m_nov14_merged\\HYPEUSDT_15min_current.pkl": "a89131690b812248f2fab6ade2960cbec05cf6bcf3074839487b907d3d103759",
+    "reports\\audit_2026_09_08\\minute_be_parity_nov15_cache\\AVAX-USD_UM_XPERP-310530_1794438900_1794482100.json": "653e1e947c5ef4bce56777c9bc04ff4b00bd352a4a01809d3670cdacc1c7a314",
+    "reports\\audit_2026_09_08\\minute_be_parity_nov15_cache\\AVAX-USD_UM_XPERP-310530_1794476700_1794519900.json": "626fe7c1cc2c0a4c8f0e7b47f5858db873e6289b99bcfc538c7851fd78570348",
+    "reports\\audit_2026_09_08\\minute_be_parity_nov15_cache\\BTC-USD_UM_XPERP-310404_1794494700_1794537900.json": "ddc7ad8e06fe537b1806e14d5d8e18eb8200b3d8af2f4e2ab1defbe3d6c1d4f3",
+    "reports\\audit_2026_09_08\\xperp_15m_nov14_merged\\BTCUSDT_15min_current.pkl": "49dea2d9da7944bc1f344722460910108e33f1cd17d5dfd0a91dccd4124dd44c",
+    "reports\\audit_2026_09_08\\minute_be_parity_nov15_cache\\SUI-USD_UM_XPERP-310404_1794514500_1794557700.json": "d78b0540c42bacfb0b6295a668ef3618d5a8ae30d7f908e7da66f76f30a7a148",
+    "reports\\audit_2026_09_08\\xperp_15m_nov14_merged\\SUIUSDT_15min_current.pkl": "9457f5af0d0dee542a0ebb663ddebc9a5fc72439b8ee52c1048da5eeb3cef38d",
+    "reports\\audit_2026_09_08\\minute_be_parity_nov15_cache\\HYPE-USD_UM_XPERP-310523_1794515400_1794558600.json": "f6eb692b1a5d6aa78fa2e9fc6bb802e9f3f30f74e3f186b0da504b8233308f10",
+    "reports\\audit_2026_09_08\\minute_be_parity_nov15_cache\\HYPE-USD_UM_XPERP-310523_1794531600_1794574800.json": "cc695fce669ca72ff4e808865d77343d7b612f6f650573a61929d0b2a52c4994",
+    "reports\\audit_2026_09_08\\minute_be_parity_nov15_cache\\AVAX-USD_UM_XPERP-310530_1794536100_1794579300.json": "93b95e4d16961d9d7409184a7a1faa876cf6bf4be4df8984c4c1cacc225ae38f",
+    "reports\\audit_2026_09_08\\minute_be_parity_nov15_cache\\XLM-USD_UM_XPERP-310704_1794537000_1794580200.json": "f9d9b02207055b209e193db5b052ed6e050e55638cacfef53c8c087e6b8b4aae",
+    "reports\\audit_2026_09_08\\xperp_15m_nov14_merged\\XLMUSDT_15min_current.pkl": "37f9271f0df066f7b7cadb82ac83aff1801d1f500c340bfb9993e5a8afa8ba86"
+  }
+}

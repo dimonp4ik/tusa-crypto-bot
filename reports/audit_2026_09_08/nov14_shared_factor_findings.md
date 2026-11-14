@@ -1,5 +1,7 @@
 # Shared-account factor-cap study
 
+> Archived on November 15: the crypto leg below uses superseded zero-valued expired-runner labels. These cash returns are not current profit estimates. See `nov15_profit_target_revalidation.md` and the `expiry_mark_v2` reports. No old numbers were silently replaced.
+
 No live policy is changed. The +30% contribution from each bot every month remains unverified.
 
 ## Verified mechanism

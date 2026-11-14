@@ -76,10 +76,20 @@ def _stop_fill(opened: float, level: float, sign: int) -> float:
 
 def replay_runner(candle: dict, index: int, *, direction: str, entry: float,
                   stop: float, activation_r: float,
-                  lock_r: float) -> tuple[str, float, bool, int]:
-    """Replay one runner policy with runtime-equivalent activation timing."""
+                  lock_r: float, activation_bar_stress: bool = False,
+                  bar_seconds: int = INTERVAL, max_bars: int = HORIZON) -> tuple[str, float, bool, int]:
+    """Replay signal timing, optionally stress unknown activation-bar ordering.
+
+    The live exchange amendment can happen within the activation candle,
+    whereas the signal monitor enables protection on the next candle.
+    Stress mode resolves an ambiguous new-stop/target touch as new-stop first.
+    It is a sensitivity scenario, not a reconstruction of execution or a
+    guaranteed lower bound on a portfolio with outcome-dependent admission.
+    """
     if lock_r > activation_r:
         raise ValueError("a locked stop cannot exceed its activation level")
+    if bar_seconds <= 0 or max_bars <= 0:
+        raise ValueError("non-positive replay horizon")
     sign = 1 if direction == "LONG" else -1
     risk = abs(entry - stop)
     if risk <= 0:
@@ -90,11 +100,11 @@ def replay_runner(candle: dict, index: int, *, direction: str, entry: float,
     protected_stop = entry + sign * risk * lock_r
     reached_first = False
     protected = False
-    last = min(index + HORIZON - 1, len(candle["time"]) - 1)
+    last = min(index + max_bars - 1, len(candle["time"]) - 1)
     previous_time = None
     for bar in range(index, last + 1):
         timestamp = int(candle["time"][bar])
-        if previous_time is not None and timestamp - previous_time != INTERVAL:
+        if previous_time is not None and timestamp - previous_time != bar_seconds:
             last = bar - 1
             break
         previous_time = timestamp
@@ -107,23 +117,30 @@ def replay_runner(candle: dict, index: int, *, direction: str, entry: float,
             fill = _stop_fill(opened, stop_level, sign)
             runner_r = sign * (fill - entry) / risk
             if not reached_first:
-                return "SL", runner_r, False, timestamp + INTERVAL
+                return "SL", runner_r, False, timestamp + bar_seconds
             label = "LOCK" if protected else "TP1_STOP"
-            return label, runner_r, True, timestamp + INTERVAL
+            return label, runner_r, True, timestamp + bar_seconds
+
+        first_hit = high >= first_target if sign > 0 else low <= first_target
+        activation_hit = high >= activation if sign > 0 else low <= activation
+        protected_touch = low <= protected_stop if sign > 0 else high >= protected_stop
+        if (activation_bar_stress and not protected and (reached_first or first_hit)
+                and activation_hit and protected_touch):
+            # The open can precede activation; it is not a valid fill for the
+            # newly amended stop. Use its level and keep the ambiguity explicit.
+            return "LOCK_ACTIVATION_AMBIGUOUS", lock_r, True, timestamp + bar_seconds
 
         target_hit = high >= final_target if sign > 0 else low <= final_target
         if target_hit:
-            return "TP_RUNNER", FINAL_TARGET_R, True, timestamp + INTERVAL
+            return "TP_RUNNER", FINAL_TARGET_R, True, timestamp + bar_seconds
 
-        first_hit = high >= first_target if sign > 0 else low <= first_target
         reached_first = reached_first or first_hit
-        activation_hit = high >= activation if sign > 0 else low <= activation
         # As in main.py, the old stop remains active for the entire activation
         # candle.  The new stop participates from the following candle.
         if reached_first and activation_hit:
             protected = True
 
-    exit_time = int(candle["time"][last]) + INTERVAL
+    exit_time = int(candle["time"][last]) + bar_seconds
     close = float(candle["close"][last])
     marked_r = sign * (close - entry) / risk
     if reached_first:

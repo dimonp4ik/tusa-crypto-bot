@@ -84,3 +84,41 @@ def test_first_bank_fraction_is_applied_only_after_tp1():
         ~frame.sequential_banked,
         fraction * .5 + (1 - fraction) * frame.sequential_runner_r)
     assert net.tolist() == pytest.approx([.375, -1.0, .875])
+
+
+@pytest.mark.parametrize('direction,stop,bar', [
+    ('LONG',99.,(100.,102.1,99.5,102.)),
+    ('SHORT',101.,(100.,100.5,97.9,98.)),
+])
+def test_activation_bar_stress_resolves_new_stop_before_target(direction,stop,bar):
+    kwargs=dict(direction=direction,entry=100.,stop=stop,activation_r=.5,lock_r=0.)
+    data=candles([bar])
+    normal=audit.replay_runner(data,0,**kwargs)
+    stress=audit.replay_runner(data,0,activation_bar_stress=True,**kwargs)
+    assert normal[:3]==('TP_RUNNER',2.,True)
+    assert stress==('LOCK_ACTIVATION_AMBIGUOUS',0.,True,audit.INTERVAL)
+
+
+def test_activation_bar_stress_does_not_enable_protection_below_activation():
+    result=audit.replay_runner(candles([(100.,100.6,99.5,100.4)]),0,
+        direction='LONG',entry=100.,stop=99.,activation_r=1.,lock_r=0.,
+        activation_bar_stress=True)
+    assert result[0]=='TP_EXPIRED'
+    assert result[1]==pytest.approx(.4)
+
+
+def test_activation_bar_stress_keeps_original_stop_priority():
+    result=audit.replay_runner(candles([(100.,102.1,98.9,102.)]),0,
+        direction='LONG',entry=100.,stop=99.,activation_r=.5,lock_r=0.,
+        activation_bar_stress=True)
+    assert result[:3]==('SL',-1.,False)
+
+
+def test_minute_replay_preserves_horizon_and_gap_detection():
+    data=candles([(100.,100.4,99.8,100.1)]*4)
+    data['time']=[0,60,120,240]
+    result=audit.replay_runner(data,0,direction='LONG',entry=100.,stop=99.,
+        activation_r=.5,lock_r=0.,bar_seconds=60,max_bars=4)
+    assert result[0]=='EXPIRED'
+    assert result[1]==pytest.approx(.1)
+    assert result[-1]==180
