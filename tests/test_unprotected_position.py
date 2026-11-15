@@ -35,7 +35,7 @@ class UnprotectedPositionTests(unittest.TestCase):
                 ('at_set_balance',None),('get_bot_state',None),
                 ('set_bot_state',None),('set_signal_size_mult',None),('_dm',None)]:
                 stack.enter_context(patch.object(at,name,return_value=value))
-            for name,value in [('validate_autotrade_account',(True,{'position_mode':'net_mode','permissions':('read_only','trade')})),('get_balance',(True,128)),('get_xperp_spec',spec),('get_last_price',100),
+            for name,value in [('validate_autotrade_account',(True,{'position_mode':'net_mode','permissions':('read_only','trade'),'account_uid':'123'})),('get_balance',(True,128)),('get_xperp_spec',spec),('get_last_price',100),
                 ('get_open_position_margin',(True,{'margin_usd':0,'count':0,'inst_ids':()})),
                 ('ensure_leverage',(True,None)),
                 ('get_order_book',{'ts':at.time.time()*1000,'bids':[[99.99,1000]],'asks':[[100.01,1000]]}),
@@ -90,7 +90,7 @@ class UnprotectedPositionTests(unittest.TestCase):
                 ('at_set_balance',None),('get_bot_state',None),
                 ('set_bot_state',None),('set_signal_size_mult',None),('_dm',None)]:
                 stack.enter_context(patch.object(at,name,return_value=value))
-            for name,value in [('validate_autotrade_account',(True,{'position_mode':'net_mode','permissions':('read_only','trade')})),('get_balance',(True,128)),('get_xperp_spec',spec),('get_last_price',100),
+            for name,value in [('validate_autotrade_account',(True,{'position_mode':'net_mode','permissions':('read_only','trade'),'account_uid':'123'})),('get_balance',(True,128)),('get_xperp_spec',spec),('get_last_price',100),
                 ('get_open_position_margin',(True,{'margin_usd':0,'count':0,'inst_ids':()})),
                 ('ensure_leverage',(True,None)),
                 ('get_order_book',{'ts':at.time.time()*1000,'bids':[[99.99,1000]],'asks':[[100.01,1000]]}),
@@ -118,7 +118,7 @@ class UnprotectedPositionTests(unittest.TestCase):
                 ('at_set_balance',None),('get_bot_state',None),
                 ('set_bot_state',None),('set_signal_size_mult',None),('_dm',None)]:
                 stack.enter_context(patch.object(at,name,return_value=value))
-            for name,value in [('validate_autotrade_account',(True,{'position_mode':'net_mode','permissions':('read_only','trade')})),('get_balance',(True,128)),('get_xperp_spec',spec),('get_last_price',100),
+            for name,value in [('validate_autotrade_account',(True,{'position_mode':'net_mode','permissions':('read_only','trade'),'account_uid':'123'})),('get_balance',(True,128)),('get_xperp_spec',spec),('get_last_price',100),
                 ('get_open_position_margin',(True,{'margin_usd':0,'count':1,'inst_ids':('PENDING',)})),
                 ('ensure_leverage',(True,None)),
                 ('get_order_book',{'ts':at.time.time()*1000,'bids':[[99.99,1000]],'asks':[[100.01,1000]]}),
@@ -154,7 +154,7 @@ class UnprotectedPositionTests(unittest.TestCase):
                 ('at_set_balance',None),('get_bot_state',None),('set_bot_state',None),
                 ('set_signal_size_mult',None),('_dm',None)]:
                 stack.enter_context(patch.object(at,name,return_value=value))
-            for name,value in [('validate_autotrade_account',(True,{'position_mode':'net_mode','permissions':('read_only','trade')})),('get_balance',(True,128)),('get_xperp_spec',spec),('get_last_price',100),
+            for name,value in [('validate_autotrade_account',(True,{'position_mode':'net_mode','permissions':('read_only','trade'),'account_uid':'123'})),('get_balance',(True,128)),('get_xperp_spec',spec),('get_last_price',100),
                 ('get_open_position_margin',(True,{'margin_usd':0,'count':0,'inst_ids':()})),
                 ('ensure_leverage',(True,None)),('get_position_avg_px',100),
                 ('get_order_book',{'ts':at.time.time()*1000,'bids':[[99.99,1000]],'asks':[[100.01,1000]]}),
@@ -191,7 +191,7 @@ class UnprotectedPositionTests(unittest.TestCase):
                 ('at_set_balance',None),('get_bot_state',None),
                 ('set_bot_state',None),('set_signal_size_mult',None),('at_all_open_positions',[]),('_dm',None)]:
                 stack.enter_context(patch.object(at,name,return_value=value))
-            for name,value in [('validate_autotrade_account',(True,{'position_mode':'net_mode','permissions':('read_only','trade')})),('get_balance',(True,128)),('get_xperp_spec',spec),('get_last_price',100),
+            for name,value in [('validate_autotrade_account',(True,{'position_mode':'net_mode','permissions':('read_only','trade'),'account_uid':'123'})),('get_balance',(True,128)),('get_xperp_spec',spec),('get_last_price',100),
                 ('get_open_position_margin',(True,{'margin_usd':0,'count':0,'inst_ids':()})),
                 ('ensure_leverage',(True,None)),('get_position_avg_px',100),
                 ('get_order_book',{'ts':at.time.time()*1000,'bids':[[99.99,1000]],'asks':[[100.01,1000]]}),
