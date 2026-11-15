@@ -122,3 +122,23 @@ def test_minute_replay_preserves_horizon_and_gap_detection():
     assert result[0]=='EXPIRED'
     assert result[1]==pytest.approx(.1)
     assert result[-1]==180
+
+
+def test_first_target_observer_includes_same_bar_far_target_but_not_stop_first():
+    events=[]
+    kwargs=dict(direction='LONG',entry=100.,stop=99.,activation_r=.5,lock_r=0.,on_first_target=events.append)
+    audit.replay_runner(candles([(100.,102.1,99.5,102.)]),0,**kwargs)
+    assert events==[audit.INTERVAL]
+    events.clear()
+    audit.replay_runner(candles([(100.,102.1,98.9,102.)]),0,**kwargs)
+    assert events==[]
+
+
+def test_first_target_observer_fires_once_and_never_changes_outcome():
+    data=candles([(100.,100.6,99.9,100.5),(100.5,101.,100.1,100.7),(100.7,102.1,100.6,102.)])
+    kwargs=dict(direction='LONG',entry=100.,stop=99.,activation_r=.5,lock_r=0.)
+    events=[]
+    baseline=audit.replay_runner(data,0,**kwargs)
+    observed=audit.replay_runner(data,0,on_first_target=events.append,**kwargs)
+    assert observed==baseline
+    assert events==[audit.INTERVAL]

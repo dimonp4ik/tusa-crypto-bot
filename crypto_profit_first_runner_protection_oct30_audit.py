@@ -13,6 +13,7 @@ import json
 import math
 import pickle
 from pathlib import Path
+from typing import Callable
 
 import numpy as np
 import pandas as pd
@@ -77,7 +78,8 @@ def _stop_fill(opened: float, level: float, sign: int) -> float:
 def replay_runner(candle: dict, index: int, *, direction: str, entry: float,
                   stop: float, activation_r: float,
                   lock_r: float, activation_bar_stress: bool = False,
-                  bar_seconds: int = INTERVAL, max_bars: int = HORIZON) -> tuple[str, float, bool, int]:
+                  bar_seconds: int = INTERVAL, max_bars: int = HORIZON,
+                  on_first_target: Callable[[int], None] | None = None) -> tuple[str, float, bool, int]:
     """Replay signal timing, optionally stress unknown activation-bar ordering.
 
     The live exchange amendment can happen within the activation candle,
@@ -85,6 +87,8 @@ def replay_runner(candle: dict, index: int, *, direction: str, entry: float,
     Stress mode resolves an ambiguous new-stop/target touch as new-stop first.
     It is a sensitivity scenario, not a reconstruction of execution or a
     guaranteed lower bound on a portfolio with outcome-dependent admission.
+    An optional observer records the first-target candle's end using exactly
+    these reconstructed levels and stop-first semantics, including TP2 bars.
     """
     if lock_r > activation_r:
         raise ValueError("a locked stop cannot exceed its activation level")
@@ -122,6 +126,8 @@ def replay_runner(candle: dict, index: int, *, direction: str, entry: float,
             return label, runner_r, True, timestamp + bar_seconds
 
         first_hit = high >= first_target if sign > 0 else low <= first_target
+        if first_hit and not reached_first and on_first_target is not None:
+            on_first_target(timestamp + bar_seconds)
         activation_hit = high >= activation if sign > 0 else low <= activation
         protected_touch = low <= protected_stop if sign > 0 else high >= protected_stop
         if (activation_bar_stress and not protected and (reached_first or first_hit)
