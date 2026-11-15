@@ -740,6 +740,9 @@ log = logging.getLogger(__name__)
 
 # ── Flask (keeps Render dyno alive) ──────────────────────────────────────────
 app = Flask(__name__)
+autotrader._shared_capacity.initialize(app)
+from src.trade_audit_api import register_trade_audit_api
+register_trade_audit_api(app,os.getenv('SHARED_CAPACITY_TOKEN'))
 ADMIN_PANEL_IMAGE_PATH = os.path.join(
     os.path.dirname(os.path.abspath(__file__)),
     "assets",
@@ -855,6 +858,8 @@ def status():
             f"Shared account cap: {AUTOTRADE_MAX_ACCOUNT_POSITIONS} positions / "
             f"{100 * AUTOTRADE_MAX_ACCOUNT_MARGIN_FRACTION:g}% margin / "
             f"{AUTOTRADE_ACCOUNT_WRITER_COUNT} writers. "
+            f"{autotrader._shared_capacity.status_text()} "
+            f"Persistent intent storage: {autotrader._shared_capacity.persistent_storage_ready()}. "
             f"Signal cache: {len(_signal_cache)} entries. "
             f"{tp1_status}"
             f"{_crypto_scan_status_text().replace(chr(10), ' | ')}"), 200
@@ -3210,7 +3215,8 @@ def webhook():
                "Сигналы фиксируются по рынку и проверяются одинаково в PAPER и LIVE.\n"
                "Прежний forward-гейт отозван; идёт точная проверка порядка выходов.\n"
                "Нейросеть не принимает торговых решений.\n"
-               f"{_execution_state_text()}.\n\n"
+               f"{_execution_state_text()}.\n"
+               f"{autotrader._shared_capacity.status_text()}\n\n"
                + _crypto_scan_status_text())
 
     elif text == "🤖 автотрейдинг":
@@ -5034,6 +5040,10 @@ def start_bot():
         timezone="Europe/Riga",
     )
     scheduler.start()
+    if autotrader._shared_capacity.enabled:
+        scheduler.add_job(autotrader.maintain_shared_capacity,'interval',seconds=60,
+                          id='shared_capacity_maintenance',max_instances=1,coalesce=True)
+        threading.Thread(target=autotrader.maintain_shared_capacity,daemon=True).start()
     log.info("Scheduler: signal scan every 5 min (:01/:06/...), TP/SL monitor every 1 min")
 
     # Register Telegram webhook
