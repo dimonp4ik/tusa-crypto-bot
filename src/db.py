@@ -20,6 +20,7 @@ import logging
 import sys
 import os
 from contextlib import contextmanager
+from src.decision_context import context_json
 
 _log = logging.getLogger(__name__)
 
@@ -377,6 +378,7 @@ def init_db():
             # historical outcome (Claude memory prior, excluded from stats).
             "source":       "TEXT NOT NULL DEFAULT 'live'",
             "signal_bar_ts": "REAL",
+            "decision_context_json": "TEXT",
             # Immutable execution contract for blocked venue candidates. The
             # signal row already carries these fields, but a capped candidate
             # never becomes a signal. Without a copy here its counterfactual
@@ -1683,6 +1685,7 @@ def _prepared_setup_candidate(analysis: dict) -> tuple:
             analysis.get("strategy_stop_on_close"),
             analysis.get("strategy_max_bars"),
             analysis.get("strategy_expire_at"),
+            context_json(analysis.get('_decision_context')),
         )
 
 
@@ -1699,9 +1702,9 @@ def _insert_setup_candidate(c, values: tuple) -> int:
              strategy_tp1_close_frac, strategy_runner_mode,
              strategy_runner_target_r, strategy_bar_seconds,
              strategy_entry_bar_ts, strategy_stop_on_close,
-             strategy_max_bars, strategy_expire_at)
+             strategy_max_bars, strategy_expire_at, decision_context_json)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
-                ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     """, values)
     return cur.lastrowid
 

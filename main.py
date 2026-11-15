@@ -4245,6 +4245,7 @@ def _venue_analysis(symbol: str, setup: dict, btc_change: float = 0.0) -> dict:
         "counter": "The active direct-venue regime may change after entry",
         "current_price": setup["entry"], "market_price": setup["entry"],
         "entry_reference_price": setup.get("entry_reference_price"),
+        "_decision_context": setup,
         "weak_long_impulse_candidate": setup.get("weak_long_impulse_candidate"),
         "strategy_model_quality": setup.get("model_quality"),
         "atr": setup["atr"], "fixed_stop_atr": 2.0,
