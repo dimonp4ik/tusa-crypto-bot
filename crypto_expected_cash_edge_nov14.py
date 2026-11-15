@@ -130,11 +130,16 @@ def main():
             specs = json.loads((ROOT/"xperp_specs_nov14.json").read_text())
             old = json.loads((ROOT/"xperp_15m_nov11_merged/manifest.json").read_text())
             cutoff = max(v["end"] for v in old["symbols"].values())
+            current_meta=json.loads((ROOT/'xperp_15m_nov14_merged/manifest.json').read_text())
+            mature_end=min(v['end'] for v in current_meta['symbols'].values())-64*900
+            report['direct_last_entry_utc']=pd.Timestamp(mature_end,unit='s',tz='UTC').isoformat()
             report["direct_lot_rounded"] = {name:simulate(
-                [r for r in direct_rows if r["entry_time"] > start],specs,tp1_pct=50)
+                [r for r in direct_rows if start < r["entry_time"] <= mature_end],specs,tp1_pct=50)
                 for name,start in (("november",timestamp("2026-11-01")),("after_nov11",cutoff))}
     report["sources"] = {str(p):hashlib.sha256(p.read_bytes()).hexdigest()
         for p in (path,Path(__file__),Path("lot_aware_tp1_audit.py"),
+            Path('crypto_profit_first_runner_protection_oct30_audit.py'),
+            ROOT/'xperp_15m_nov14_merged/manifest.json',
             ROOT/"xperp_specs_nov14.json",runtime.router.ARTIFACT_PATH,
             ROOT/"crypto_xperp_raw_router_audit_2_0_nov14_merged_raw_families.csv",
             ROOT/"crypto_xperp_raw_router_audit_0_5_nov14_merged_raw_families.csv")}

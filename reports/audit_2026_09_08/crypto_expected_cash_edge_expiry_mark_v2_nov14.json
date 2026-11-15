@@ -1,0 +1,1688 @@
+{
+  "status": "RESEARCH_ONLY_NO_DEPLOYMENT",
+  "training_rows": 28938,
+  "label_revision": "expiry_mark_v2",
+  "target_verified": false,
+  "asset_features": false,
+  "missing_feature_rows": 0,
+  "input_feature_names": [
+    "risk_pct",
+    "eff_ratio",
+    "dir_z",
+    "abs_z",
+    "hour_sin",
+    "hour_cos",
+    "btc_fast_slow_atr",
+    "btc_eff20",
+    "btc_return20_atr",
+    "btc_z20",
+    "btc_atr_pct",
+    "btc_slow_long_atr",
+    "btc_return96_atr",
+    "btc_eff96",
+    "btc_trend_dir_atr",
+    "btc_return_dir_atr",
+    "symbol=BTCUSDT",
+    "symbol=ETHUSDT",
+    "symbol=LINKUSDT",
+    "symbol=XLMUSDT",
+    "symbol=XRPUSDT",
+    "direction=LONG",
+    "direction=SHORT",
+    "family=breakout",
+    "family=range_reversion",
+    "family=trend_pullback",
+    "utc_session=00_05",
+    "utc_session=06_11",
+    "utc_session=12_17",
+    "utc_session=18_23",
+    "btc_regime=bear",
+    "btc_regime=bear_rally",
+    "btc_regime=bull",
+    "btc_regime=bull_pullback"
+  ],
+  "training_last_exit_utc": "2021-12-31T22:15:00+00:00",
+  "first_bank_fraction": 0.5,
+  "variants": [
+    {
+      "key": "leaves_7_q_0.5",
+      "leaves": 7,
+      "quantile": 0.5,
+      "cutoff": 1.4542604646348246e-05,
+      "selection": {
+        "n": 2435,
+        "wr": 68.09,
+        "return_pct": 39.5975,
+        "dd_pct": 13.4878,
+        "trades_per_calendar_day": 6.69,
+        "monthly_return_pct": {
+          "2022-01": -1.4341,
+          "2022-02": 11.9002,
+          "2022-03": -0.9697,
+          "2022-04": 0.7997,
+          "2022-05": -7.3864,
+          "2022-06": 6.5414,
+          "2022-07": 12.1975,
+          "2022-08": 3.8915,
+          "2022-09": 4.6946,
+          "2022-10": 3.3611,
+          "2022-11": 4.8737,
+          "2022-12": -2.8622
+        },
+        "worst_observed_month_pct": -7.3864,
+        "months_ge_30": 0
+      },
+      "confirmation": {
+        "n": 757,
+        "wr": 67.64,
+        "return_pct": 7.8267,
+        "dd_pct": 11.1499,
+        "trades_per_calendar_day": 3.639,
+        "monthly_return_pct": {
+          "2023-01": 1.0664,
+          "2023-02": 9.4494,
+          "2023-03": 6.3669,
+          "2023-04": -1.9962,
+          "2023-05": -3.0194,
+          "2023-06": -1.5711,
+          "2023-07": -2.0398
+        },
+        "worst_observed_month_pct": -3.0194,
+        "months_ge_30": 0
+      }
+    },
+    {
+      "key": "leaves_7_q_0.6",
+      "leaves": 7,
+      "quantile": 0.6,
+      "cutoff": 0.00026787749691884393,
+      "selection": {
+        "n": 2144,
+        "wr": 68.52,
+        "return_pct": 48.5102,
+        "dd_pct": 7.0534,
+        "trades_per_calendar_day": 5.89,
+        "monthly_return_pct": {
+          "2022-01": -2.6728,
+          "2022-02": 12.8662,
+          "2022-03": -0.0219,
+          "2022-04": 1.2374,
+          "2022-05": 2.7991,
+          "2022-06": 6.9932,
+          "2022-07": 9.3675,
+          "2022-08": -0.9398,
+          "2022-09": 9.4316,
+          "2022-10": 0.5403,
+          "2022-11": 2.9147,
+          "2022-12": -1.0037
+        },
+        "worst_observed_month_pct": -2.6728,
+        "months_ge_30": 0
+      },
+      "confirmation": {
+        "n": 597,
+        "wr": 68.34,
+        "return_pct": 9.0614,
+        "dd_pct": 6.9698,
+        "trades_per_calendar_day": 2.884,
+        "monthly_return_pct": {
+          "2023-01": 3.8969,
+          "2023-02": 7.9816,
+          "2023-03": 1.129,
+          "2023-04": 0.3551,
+          "2023-05": -2.1371,
+          "2023-06": -0.928,
+          "2023-07": -1.2051
+        },
+        "worst_observed_month_pct": -2.1371,
+        "months_ge_30": 0
+      }
+    },
+    {
+      "key": "leaves_7_q_0.7",
+      "leaves": 7,
+      "quantile": 0.7,
+      "cutoff": 0.0005204562820590169,
+      "selection": {
+        "n": 1777,
+        "wr": 68.71,
+        "return_pct": 36.3404,
+        "dd_pct": 10.9323,
+        "trades_per_calendar_day": 4.992,
+        "monthly_return_pct": {
+          "2022-01": -1.4536,
+          "2022-02": 6.1987,
+          "2022-03": -1.5733,
+          "2022-04": 1.5835,
+          "2022-05": -4.1331,
+          "2022-06": 5.3806,
+          "2022-07": 10.673,
+          "2022-08": 6.5971,
+          "2022-09": 3.2395,
+          "2022-10": 2.8289,
+          "2022-11": 2.1124,
+          "2022-12": 0.8493
+        },
+        "worst_observed_month_pct": -4.1331,
+        "months_ge_30": 0
+      },
+      "confirmation": {
+        "n": 464,
+        "wr": 67.67,
+        "return_pct": 7.7223,
+        "dd_pct": 3.6112,
+        "trades_per_calendar_day": 2.242,
+        "monthly_return_pct": {
+          "2023-01": 1.3375,
+          "2023-02": 5.1124,
+          "2023-03": 0.8834,
+          "2023-04": 1.3819,
+          "2023-05": -1.3978,
+          "2023-06": 0.8228,
+          "2023-07": -0.5384
+        },
+        "worst_observed_month_pct": -1.3978,
+        "months_ge_30": 0
+      }
+    },
+    {
+      "key": "leaves_7_q_0.8",
+      "leaves": 7,
+      "quantile": 0.8,
+      "cutoff": 0.0008849974841044142,
+      "selection": {
+        "n": 1273,
+        "wr": 69.76,
+        "return_pct": 35.1952,
+        "dd_pct": 8.0232,
+        "trades_per_calendar_day": 3.576,
+        "monthly_return_pct": {
+          "2022-01": 5.3394,
+          "2022-02": 5.9239,
+          "2022-03": 0.362,
+          "2022-04": 3.5147,
+          "2022-05": -1.5837,
+          "2022-06": 6.0267,
+          "2022-07": 8.4694,
+          "2022-08": 3.4858,
+          "2022-09": -0.0551,
+          "2022-10": 0.5139,
+          "2022-11": -1.1204,
+          "2022-12": 0.2399
+        },
+        "worst_observed_month_pct": -1.5837,
+        "months_ge_30": 0
+      },
+      "confirmation": {
+        "n": 325,
+        "wr": 69.54,
+        "return_pct": 8.5864,
+        "dd_pct": 4.0991,
+        "trades_per_calendar_day": 1.585,
+        "monthly_return_pct": {
+          "2023-01": -2.202,
+          "2023-02": 2.882,
+          "2023-03": 5.4143,
+          "2023-04": -0.5609,
+          "2023-05": -1.0137,
+          "2023-06": 3.0425,
+          "2023-07": 0.9386
+        },
+        "worst_observed_month_pct": -2.202,
+        "months_ge_30": 0
+      }
+    },
+    {
+      "key": "leaves_7_q_0.9",
+      "leaves": 7,
+      "quantile": 0.9,
+      "cutoff": 0.0016700821648496056,
+      "selection": {
+        "n": 666,
+        "wr": 68.77,
+        "return_pct": 16.4613,
+        "dd_pct": 5.3002,
+        "trades_per_calendar_day": 1.925,
+        "monthly_return_pct": {
+          "2022-01": 3.7643,
+          "2022-02": 1.2301,
+          "2022-03": -1.2481,
+          "2022-04": -0.0463,
+          "2022-05": 0.956,
+          "2022-06": 5.3701,
+          "2022-07": 0.3188,
+          "2022-08": 3.47,
+          "2022-09": 0.3895,
+          "2022-10": 1.5192,
+          "2022-11": 0.4356,
+          "2022-12": -0.6177
+        },
+        "worst_observed_month_pct": -1.2481,
+        "months_ge_30": 0
+      },
+      "confirmation": {
+        "n": 182,
+        "wr": 68.68,
+        "return_pct": 4.2856,
+        "dd_pct": 2.339,
+        "trades_per_calendar_day": 0.919,
+        "monthly_return_pct": {
+          "2023-01": -1.6086,
+          "2023-02": 1.8275,
+          "2023-03": 1.592,
+          "2023-04": 0.0086,
+          "2023-05": 0.4542,
+          "2023-06": 1.743,
+          "2023-07": 0.238
+        },
+        "worst_observed_month_pct": -1.6086,
+        "months_ge_30": 0
+      }
+    },
+    {
+      "key": "leaves_7_q_0.95",
+      "leaves": 7,
+      "quantile": 0.95,
+      "cutoff": 0.002397652391510714,
+      "selection": {
+        "n": 343,
+        "wr": 71.72,
+        "return_pct": 21.2128,
+        "dd_pct": 2.7836,
+        "trades_per_calendar_day": 0.994,
+        "monthly_return_pct": {
+          "2022-01": 1.6879,
+          "2022-02": 2.6626,
+          "2022-03": 1.1715,
+          "2022-04": -0.9184,
+          "2022-05": 2.9298,
+          "2022-06": 3.6753,
+          "2022-07": 3.0649,
+          "2022-08": 3.0046,
+          "2022-09": 0.8925,
+          "2022-10": 0.6944,
+          "2022-11": 1.5595,
+          "2022-12": -0.9059
+        },
+        "worst_observed_month_pct": -0.9184,
+        "months_ge_30": 0
+      },
+      "confirmation": {
+        "n": 87,
+        "wr": 70.11,
+        "return_pct": 0.7448,
+        "dd_pct": 3.5711,
+        "trades_per_calendar_day": 0.446,
+        "monthly_return_pct": {
+          "2023-01": 0.8249,
+          "2023-02": -0.2608,
+          "2023-03": -1.9444,
+          "2023-04": 0.1399,
+          "2023-05": -0.483,
+          "2023-06": 2.1492,
+          "2023-07": 0.3639
+        },
+        "worst_observed_month_pct": -1.9444,
+        "months_ge_30": 0
+      }
+    },
+    {
+      "key": "leaves_7_q_0.975",
+      "leaves": 7,
+      "quantile": 0.975,
+      "cutoff": 0.0029597414895366258,
+      "selection": {
+        "n": 180,
+        "wr": 70.0,
+        "return_pct": 6.0829,
+        "dd_pct": 3.194,
+        "trades_per_calendar_day": 0.522,
+        "monthly_return_pct": {
+          "2022-01": 0.8455,
+          "2022-02": -0.4377,
+          "2022-03": 0.8237,
+          "2022-04": -0.9608,
+          "2022-05": 2.9421,
+          "2022-06": -1.1158,
+          "2022-07": -0.6336,
+          "2022-08": 1.5405,
+          "2022-09": 0.7562,
+          "2022-10": 0.748,
+          "2022-11": 1.8619,
+          "2022-12": -0.3664
+        },
+        "worst_observed_month_pct": -1.1158,
+        "months_ge_30": 0
+      },
+      "confirmation": {
+        "n": 47,
+        "wr": 63.83,
+        "return_pct": -0.9989,
+        "dd_pct": 3.4343,
+        "trades_per_calendar_day": 0.241,
+        "monthly_return_pct": {
+          "2023-01": -0.2274,
+          "2023-02": 0.0758,
+          "2023-03": -1.9372,
+          "2023-04": 0.1747,
+          "2023-05": -0.2658,
+          "2023-06": 0.9067,
+          "2023-07": 0.2936
+        },
+        "worst_observed_month_pct": -1.9372,
+        "months_ge_30": 0
+      }
+    },
+    {
+      "key": "leaves_7_q_0.99",
+      "leaves": 7,
+      "quantile": 0.99,
+      "cutoff": 0.00360566248172621,
+      "selection": {
+        "n": 84,
+        "wr": 71.43,
+        "return_pct": 3.6595,
+        "dd_pct": 2.0804,
+        "trades_per_calendar_day": 0.257,
+        "monthly_return_pct": {
+          "2022-01": 0.2854,
+          "2022-02": 0.7543,
+          "2022-03": 0.5408,
+          "2022-04": -0.3711,
+          "2022-05": 0.5127,
+          "2022-06": -1.5464,
+          "2022-07": 0.9408,
+          "2022-08": 0.6254,
+          "2022-09": 0.6447,
+          "2022-10": 0.748,
+          "2022-11": 0.4907
+        },
+        "worst_observed_month_pct": -1.5464,
+        "months_ge_30": 0
+      },
+      "confirmation": {
+        "n": 23,
+        "wr": 56.52,
+        "return_pct": -2.1316,
+        "dd_pct": 3.2148,
+        "trades_per_calendar_day": 0.12,
+        "monthly_return_pct": {
+          "2023-01": 0.1093,
+          "2023-03": -2.5619,
+          "2023-04": 0.1777,
+          "2023-06": -0.0092,
+          "2023-07": 0.1632
+        },
+        "worst_observed_month_pct": -2.5619,
+        "months_ge_30": 0
+      }
+    },
+    {
+      "key": "leaves_15_q_0.5",
+      "leaves": 15,
+      "quantile": 0.5,
+      "cutoff": 2.6926199465339992e-06,
+      "selection": {
+        "n": 2423,
+        "wr": 67.07,
+        "return_pct": 17.8678,
+        "dd_pct": 15.6475,
+        "trades_per_calendar_day": 6.657,
+        "monthly_return_pct": {
+          "2022-01": -1.2396,
+          "2022-02": 5.7652,
+          "2022-03": -2.5429,
+          "2022-04": 2.4273,
+          "2022-05": -8.1501,
+          "2022-06": 0.7322,
+          "2022-07": 8.5835,
+          "2022-08": -0.3583,
+          "2022-09": 4.8573,
+          "2022-10": 2.3845,
+          "2022-11": 4.5728,
+          "2022-12": 0.5857
+        },
+        "worst_observed_month_pct": -8.1501,
+        "months_ge_30": 0
+      },
+      "confirmation": {
+        "n": 733,
+        "wr": 67.53,
+        "return_pct": 4.4379,
+        "dd_pct": 8.1509,
+        "trades_per_calendar_day": 3.49,
+        "monthly_return_pct": {
+          "2023-01": 0.2083,
+          "2023-02": 5.6063,
+          "2023-03": 4.5547,
+          "2023-04": -0.5477,
+          "2023-05": -0.6583,
+          "2023-06": -2.6906,
+          "2023-07": -1.8207
+        },
+        "worst_observed_month_pct": -2.6906,
+        "months_ge_30": 0
+      }
+    },
+    {
+      "key": "leaves_15_q_0.6",
+      "leaves": 15,
+      "quantile": 0.6,
+      "cutoff": 0.00033704485342857417,
+      "selection": {
+        "n": 2114,
+        "wr": 68.12,
+        "return_pct": 30.1371,
+        "dd_pct": 9.5604,
+        "trades_per_calendar_day": 5.808,
+        "monthly_return_pct": {
+          "2022-01": 2.3799,
+          "2022-02": 5.521,
+          "2022-03": -1.6052,
+          "2022-04": 1.6558,
+          "2022-05": -3.8393,
+          "2022-06": 4.0313,
+          "2022-07": 9.6483,
+          "2022-08": 3.5417,
+          "2022-09": 1.8238,
+          "2022-10": 0.2295,
+          "2022-11": 3.3795,
+          "2022-12": 0.5043
+        },
+        "worst_observed_month_pct": -3.8393,
+        "months_ge_30": 0
+      },
+      "confirmation": {
+        "n": 616,
+        "wr": 68.67,
+        "return_pct": 8.9668,
+        "dd_pct": 3.2361,
+        "trades_per_calendar_day": 2.933,
+        "monthly_return_pct": {
+          "2023-01": -0.3589,
+          "2023-02": 4.2762,
+          "2023-03": 3.7082,
+          "2023-04": -0.3931,
+          "2023-05": 0.6697,
+          "2023-06": 1.6328,
+          "2023-07": -0.7717
+        },
+        "worst_observed_month_pct": -0.7717,
+        "months_ge_30": 0
+      }
+    },
+    {
+      "key": "leaves_15_q_0.7",
+      "leaves": 15,
+      "quantile": 0.7,
+      "cutoff": 0.000701942466401181,
+      "selection": {
+        "n": 1731,
+        "wr": 67.53,
+        "return_pct": 23.0783,
+        "dd_pct": 9.0728,
+        "trades_per_calendar_day": 4.755,
+        "monthly_return_pct": {
+          "2022-01": -1.0005,
+          "2022-02": 6.3407,
+          "2022-03": -2.4922,
+          "2022-04": 6.2031,
+          "2022-05": -2.3985,
+          "2022-06": 2.7327,
+          "2022-07": 6.2785,
+          "2022-08": 3.3451,
+          "2022-09": 0.3346,
+          "2022-10": -1.3887,
+          "2022-11": 4.0533,
+          "2022-12": -0.4278
+        },
+        "worst_observed_month_pct": -2.4922,
+        "months_ge_30": 0
+      },
+      "confirmation": {
+        "n": 484,
+        "wr": 69.21,
+        "return_pct": 9.5108,
+        "dd_pct": 3.7223,
+        "trades_per_calendar_day": 2.338,
+        "monthly_return_pct": {
+          "2023-01": -1.4249,
+          "2023-02": 1.44,
+          "2023-03": 5.1878,
+          "2023-04": 0.7088,
+          "2023-05": 0.5982,
+          "2023-06": 1.1361,
+          "2023-07": 1.6136
+        },
+        "worst_observed_month_pct": -1.4249,
+        "months_ge_30": 0
+      }
+    },
+    {
+      "key": "leaves_15_q_0.8",
+      "leaves": 15,
+      "quantile": 0.8,
+      "cutoff": 0.0011615509980628274,
+      "selection": {
+        "n": 1242,
+        "wr": 69.08,
+        "return_pct": 42.2763,
+        "dd_pct": 7.0638,
+        "trades_per_calendar_day": 3.412,
+        "monthly_return_pct": {
+          "2022-01": 5.6885,
+          "2022-02": 8.0184,
+          "2022-03": -0.9769,
+          "2022-04": 2.0105,
+          "2022-05": -0.1364,
+          "2022-06": 1.5221,
+          "2022-07": 9.9632,
+          "2022-08": 3.4377,
+          "2022-09": 1.2963,
+          "2022-10": -0.0256,
+          "2022-11": 5.8067,
+          "2022-12": -0.1527
+        },
+        "worst_observed_month_pct": -0.9769,
+        "months_ge_30": 0
+      },
+      "confirmation": {
+        "n": 328,
+        "wr": 71.34,
+        "return_pct": 13.6156,
+        "dd_pct": 3.4782,
+        "trades_per_calendar_day": 1.64,
+        "monthly_return_pct": {
+          "2023-01": 2.9079,
+          "2023-02": 2.0595,
+          "2023-03": 6.8183,
+          "2023-04": -0.2231,
+          "2023-05": -0.6156,
+          "2023-06": 2.0575,
+          "2023-07": 0.0683
+        },
+        "worst_observed_month_pct": -0.6156,
+        "months_ge_30": 0
+      }
+    },
+    {
+      "key": "leaves_15_q_0.9",
+      "leaves": 15,
+      "quantile": 0.9,
+      "cutoff": 0.0019808390544118937,
+      "selection": {
+        "n": 712,
+        "wr": 70.51,
+        "return_pct": 28.9749,
+        "dd_pct": 5.5185,
+        "trades_per_calendar_day": 1.956,
+        "monthly_return_pct": {
+          "2022-01": 2.6626,
+          "2022-02": 6.5582,
+          "2022-03": -2.4974,
+          "2022-04": -0.5078,
+          "2022-05": 2.2425,
+          "2022-06": 2.2632,
+          "2022-07": 5.3249,
+          "2022-08": 2.9184,
+          "2022-09": 2.1141,
+          "2022-10": 2.5551,
+          "2022-11": 3.0267,
+          "2022-12": -0.6122
+        },
+        "worst_observed_month_pct": -2.4974,
+        "months_ge_30": 0
+      },
+      "confirmation": {
+        "n": 171,
+        "wr": 68.42,
+        "return_pct": 2.387,
+        "dd_pct": 3.5465,
+        "trades_per_calendar_day": 0.868,
+        "monthly_return_pct": {
+          "2023-01": -1.3442,
+          "2023-02": -0.1125,
+          "2023-03": -0.0213,
+          "2023-04": 0.3455,
+          "2023-05": -0.2771,
+          "2023-06": 1.9526,
+          "2023-07": 1.862
+        },
+        "worst_observed_month_pct": -1.3442,
+        "months_ge_30": 0
+      }
+    },
+    {
+      "key": "leaves_15_q_0.95",
+      "leaves": 15,
+      "quantile": 0.95,
+      "cutoff": 0.002760681761904069,
+      "selection": {
+        "n": 374,
+        "wr": 68.18,
+        "return_pct": 9.9113,
+        "dd_pct": 3.1916,
+        "trades_per_calendar_day": 1.094,
+        "monthly_return_pct": {
+          "2022-01": 1.173,
+          "2022-02": 1.5905,
+          "2022-03": -0.7873,
+          "2022-04": -0.4734,
+          "2022-05": 1.5644,
+          "2022-06": 3.3665,
+          "2022-07": 1.4784,
+          "2022-08": 0.027,
+          "2022-09": 0.0962,
+          "2022-10": -0.1228,
+          "2022-11": 1.7905,
+          "2022-12": -0.1345
+        },
+        "worst_observed_month_pct": -0.7873,
+        "months_ge_30": 0
+      },
+      "confirmation": {
+        "n": 93,
+        "wr": 69.89,
+        "return_pct": 4.3246,
+        "dd_pct": 2.2986,
+        "trades_per_calendar_day": 0.477,
+        "monthly_return_pct": {
+          "2023-01": -0.9328,
+          "2023-02": 0.3108,
+          "2023-03": 1.1108,
+          "2023-04": 0.5839,
+          "2023-05": -0.5711,
+          "2023-06": 2.0898,
+          "2023-07": 1.6923
+        },
+        "worst_observed_month_pct": -0.9328,
+        "months_ge_30": 0
+      }
+    },
+    {
+      "key": "leaves_15_q_0.975",
+      "leaves": 15,
+      "quantile": 0.975,
+      "cutoff": 0.003459693565822907,
+      "selection": {
+        "n": 202,
+        "wr": 66.34,
+        "return_pct": 2.3968,
+        "dd_pct": 3.6697,
+        "trades_per_calendar_day": 0.591,
+        "monthly_return_pct": {
+          "2022-01": 0.757,
+          "2022-02": 0.8179,
+          "2022-03": -0.4644,
+          "2022-04": -1.5907,
+          "2022-05": -0.1002,
+          "2022-06": 1.594,
+          "2022-07": -1.1442,
+          "2022-08": 1.1623,
+          "2022-09": 0.6843,
+          "2022-10": 1.0595,
+          "2022-11": -0.016,
+          "2022-12": -0.3365
+        },
+        "worst_observed_month_pct": -1.5907,
+        "months_ge_30": 0
+      },
+      "confirmation": {
+        "n": 47,
+        "wr": 65.96,
+        "return_pct": -1.2944,
+        "dd_pct": 2.8063,
+        "trades_per_calendar_day": 0.245,
+        "monthly_return_pct": {
+          "2023-01": -0.6612,
+          "2023-02": 0.0758,
+          "2023-03": -0.7764,
+          "2023-04": -0.7217,
+          "2023-05": -0.2658,
+          "2023-06": 0.1293,
+          "2023-07": 0.9297
+        },
+        "worst_observed_month_pct": -0.7764,
+        "months_ge_30": 0
+      }
+    },
+    {
+      "key": "leaves_15_q_0.99",
+      "leaves": 15,
+      "quantile": 0.99,
+      "cutoff": 0.004291795803729971,
+      "selection": {
+        "n": 89,
+        "wr": 68.54,
+        "return_pct": 0.1276,
+        "dd_pct": 2.6187,
+        "trades_per_calendar_day": 0.285,
+        "monthly_return_pct": {
+          "2022-01": 0.223,
+          "2022-02": -0.7683,
+          "2022-03": 1.1926,
+          "2022-04": -0.8441,
+          "2022-05": -0.1257,
+          "2022-06": -0.7887,
+          "2022-07": -0.1277,
+          "2022-08": 0.0529,
+          "2022-09": 0.4219,
+          "2022-10": 0.748,
+          "2022-11": 0.1646
+        },
+        "worst_observed_month_pct": -0.8441,
+        "months_ge_30": 0
+      },
+      "confirmation": {
+        "n": 22,
+        "wr": 63.64,
+        "return_pct": -1.4491,
+        "dd_pct": 2.4356,
+        "trades_per_calendar_day": 0.122,
+        "monthly_return_pct": {
+          "2023-01": -0.5865,
+          "2023-02": 0.0758,
+          "2023-03": -1.7653,
+          "2023-04": -0.172,
+          "2023-05": 0.0831,
+          "2023-06": 0.7629,
+          "2023-07": 0.1632
+        },
+        "worst_observed_month_pct": -1.7653,
+        "months_ge_30": 0
+      }
+    }
+  ],
+  "selected": {
+    "key": "leaves_15_q_0.8",
+    "leaves": 15,
+    "quantile": 0.8,
+    "cutoff": 0.0011615509980628274,
+    "selection": {
+      "n": 1242,
+      "wr": 69.08,
+      "return_pct": 42.2763,
+      "dd_pct": 7.0638,
+      "trades_per_calendar_day": 3.412,
+      "monthly_return_pct": {
+        "2022-01": 5.6885,
+        "2022-02": 8.0184,
+        "2022-03": -0.9769,
+        "2022-04": 2.0105,
+        "2022-05": -0.1364,
+        "2022-06": 1.5221,
+        "2022-07": 9.9632,
+        "2022-08": 3.4377,
+        "2022-09": 1.2963,
+        "2022-10": -0.0256,
+        "2022-11": 5.8067,
+        "2022-12": -0.1527
+      },
+      "worst_observed_month_pct": -0.9769,
+      "months_ge_30": 0
+    },
+    "confirmation": {
+      "n": 328,
+      "wr": 71.34,
+      "return_pct": 13.6156,
+      "dd_pct": 3.4782,
+      "trades_per_calendar_day": 1.64,
+      "monthly_return_pct": {
+        "2023-01": 2.9079,
+        "2023-02": 2.0595,
+        "2023-03": 6.8183,
+        "2023-04": -0.2231,
+        "2023-05": -0.6156,
+        "2023-06": 2.0575,
+        "2023-07": 0.0683
+      },
+      "worst_observed_month_pct": -0.6156,
+      "months_ge_30": 0
+    }
+  },
+  "limitations": [
+    "Archived half-year windows; not full-year proof",
+    "Ideal partial fills, no lot rounding in model targets",
+    "Five-symbol historical universe, not current 12-symbol live universe",
+    "Existing signal rails; shared-account admission still requires separate replay",
+    "All historical eras have already been examined in prior research",
+    "No claim of 30 percent monthly profit"
+  ],
+  "later": {
+    "2024": {
+      "n": 414,
+      "wr": 66.91,
+      "return_pct": 6.981,
+      "dd_pct": 8.3218,
+      "trades_per_calendar_day": 2.262,
+      "monthly_return_pct": {
+        "2024-01": -0.4214,
+        "2024-02": 2.257,
+        "2024-03": 3.7087,
+        "2024-04": 4.6172,
+        "2024-05": 2.077,
+        "2024-06": 0.2784,
+        "2024-07": -5.3992
+      },
+      "worst_observed_month_pct": -5.3992,
+      "months_ge_30": 0
+    },
+    "2025": {
+      "n": 498,
+      "wr": 67.67,
+      "return_pct": 3.4435,
+      "dd_pct": 5.5013,
+      "trades_per_calendar_day": 2.707,
+      "monthly_return_pct": {
+        "2025-01": -0.6196,
+        "2025-02": 0.656,
+        "2025-03": -0.4787,
+        "2025-04": 0.9912,
+        "2025-05": -0.2325,
+        "2025-06": 0.6019,
+        "2025-07": 2.5104
+      },
+      "worst_observed_month_pct": -0.6196,
+      "months_ge_30": 0
+    },
+    "2026": {
+      "n": 260,
+      "wr": 65.0,
+      "return_pct": -5.6991,
+      "dd_pct": 7.0595,
+      "trades_per_calendar_day": 1.429,
+      "monthly_return_pct": {
+        "2026-02": -1.7183,
+        "2026-03": -3.7117,
+        "2026-04": 0.1623,
+        "2026-05": -1.6722,
+        "2026-06": 1.9389,
+        "2026-07": -0.652,
+        "2026-08": -0.0945
+      },
+      "worst_observed_month_pct": -3.7117,
+      "months_ge_30": 0
+    }
+  },
+  "direct_last_entry_utc": "2026-11-14T04:30:00+00:00",
+  "direct_lot_rounded": {
+    "november": {
+      "starting_capital": 125.64,
+      "ending_capital": 130.055247,
+      "return_pct": 3.514205,
+      "cash_drawdown_pct": 1.365123,
+      "trades": 56,
+      "skipped": {
+        "slots": 0,
+        "minimum_size": 0
+      },
+      "unplaceable_partials": 0,
+      "tp1_hits_without_bank": 0,
+      "ledger": [
+        {
+          "symbol": "ZECUSDT",
+          "direction": "SHORT",
+          "entry_time": 1793579400.0,
+          "contracts": 3.0,
+          "planned_partial": 1.0,
+          "actual_partial_pct": 33.333333333333336,
+          "tp1_hit": true,
+          "bank_pnl": 0.0930214285714281,
+          "runner_pnl": -0.0
+        },
+        {
+          "symbol": "AAVEUSDT",
+          "direction": "SHORT",
+          "entry_time": 1793580300.0,
+          "contracts": 2.7,
+          "planned_partial": 1.3,
+          "actual_partial_pct": 48.148148148148145,
+          "tp1_hit": false,
+          "bank_pnl": 0.0,
+          "runner_pnl": -0.393814285714283
+        },
+        {
+          "symbol": "LINKUSDT",
+          "direction": "SHORT",
+          "entry_time": 1793583000.0,
+          "contracts": 3.0,
+          "planned_partial": 1.0,
+          "actual_partial_pct": 33.333333333333336,
+          "tp1_hit": true,
+          "bank_pnl": 0.06557142857142818,
+          "runner_pnl": -0.0
+        },
+        {
+          "symbol": "SOLUSDT",
+          "direction": "SHORT",
+          "entry_time": 1793584800.0,
+          "contracts": 39.0,
+          "planned_partial": 19.0,
+          "actual_partial_pct": 48.717948717948715,
+          "tp1_hit": false,
+          "bank_pnl": 0.0,
+          "runner_pnl": -0.37161428571428257
+        },
+        {
+          "symbol": "LINKUSDT",
+          "direction": "SHORT",
+          "entry_time": 1793661300.0,
+          "contracts": 3.0,
+          "planned_partial": 1.0,
+          "actual_partial_pct": 33.333333333333336,
+          "tp1_hit": true,
+          "bank_pnl": 0.05671428571428554,
+          "runner_pnl": -0.0
+        },
+        {
+          "symbol": "HYPEUSDT",
+          "direction": "LONG",
+          "entry_time": 1793752200.0,
+          "contracts": 4.0,
+          "planned_partial": 2.0,
+          "actual_partial_pct": 50.0,
+          "tp1_hit": true,
+          "bank_pnl": 0.08967142857142839,
+          "runner_pnl": -0.09660000000000105
+        },
+        {
+          "symbol": "SUIUSDT",
+          "direction": "LONG",
+          "entry_time": 1793752200.0,
+          "contracts": 42.0,
+          "planned_partial": 21.0,
+          "actual_partial_pct": 50.0,
+          "tp1_hit": true,
+          "bank_pnl": 0.09344999999999894,
+          "runner_pnl": -0.12180000000000045
+        },
+        {
+          "symbol": "SUIUSDT",
+          "direction": "SHORT",
+          "entry_time": 1793761200.0,
+          "contracts": 43.0,
+          "planned_partial": 21.0,
+          "actual_partial_pct": 48.83720930232558,
+          "tp1_hit": true,
+          "bank_pnl": 0.14504999999999965,
+          "runner_pnl": -0.0
+        },
+        {
+          "symbol": "ETHUSDT",
+          "direction": "SHORT",
+          "entry_time": 1793762100.0,
+          "contracts": 16.0,
+          "planned_partial": 8.0,
+          "actual_partial_pct": 50.0,
+          "tp1_hit": false,
+          "bank_pnl": 0.0,
+          "runner_pnl": -0.37387428571428016
+        },
+        {
+          "symbol": "LINKUSDT",
+          "direction": "LONG",
+          "entry_time": 1793778300.0,
+          "contracts": 3.0,
+          "planned_partial": 1.0,
+          "actual_partial_pct": 33.333333333333336,
+          "tp1_hit": true,
+          "bank_pnl": 0.07007142857142815,
+          "runner_pnl": 0.0
+        },
+        {
+          "symbol": "AAVEUSDT",
+          "direction": "LONG",
+          "entry_time": 1793780100.0,
+          "contracts": 2.8,
+          "planned_partial": 1.4,
+          "actual_partial_pct": 50.0,
+          "tp1_hit": true,
+          "bank_pnl": 0.12199999999999873,
+          "runner_pnl": 0.0
+        },
+        {
+          "symbol": "AVAXUSDT",
+          "direction": "LONG",
+          "entry_time": 1793781900.0,
+          "contracts": 0.4,
+          "planned_partial": 0.2,
+          "actual_partial_pct": 50.0,
+          "tp1_hit": true,
+          "bank_pnl": 0.09328571428571353,
+          "runner_pnl": 0.0
+        },
+        {
+          "symbol": "SUIUSDT",
+          "direction": "LONG",
+          "entry_time": 1793794500.0,
+          "contracts": 41.0,
+          "planned_partial": 20.0,
+          "actual_partial_pct": 48.78048780487805,
+          "tp1_hit": true,
+          "bank_pnl": 0.09657142857142831,
+          "runner_pnl": 0.0
+        },
+        {
+          "symbol": "AAVEUSDT",
+          "direction": "LONG",
+          "entry_time": 1793798100.0,
+          "contracts": 2.8,
+          "planned_partial": 1.4,
+          "actual_partial_pct": 50.0,
+          "tp1_hit": true,
+          "bank_pnl": 0.1144999999999995,
+          "runner_pnl": 0.0
+        },
+        {
+          "symbol": "ZECUSDT",
+          "direction": "LONG",
+          "entry_time": 1793802600.0,
+          "contracts": 2.0,
+          "planned_partial": 1.0,
+          "actual_partial_pct": 50.0,
+          "tp1_hit": true,
+          "bank_pnl": 0.1193285714285711,
+          "runner_pnl": 0.4773142857142844
+        },
+        {
+          "symbol": "ETHUSDT",
+          "direction": "LONG",
+          "entry_time": 1793805300.0,
+          "contracts": 15.0,
+          "planned_partial": 7.0,
+          "actual_partial_pct": 46.666666666666664,
+          "tp1_hit": false,
+          "bank_pnl": 0.0,
+          "runner_pnl": -0.09735000000000324
+        },
+        {
+          "symbol": "AVAXUSDT",
+          "direction": "LONG",
+          "entry_time": 1793823300.0,
+          "contracts": 0.4,
+          "planned_partial": 0.2,
+          "actual_partial_pct": 50.0,
+          "tp1_hit": true,
+          "bank_pnl": 0.12971428571428592,
+          "runner_pnl": 0.0
+        },
+        {
+          "symbol": "LINKUSDT",
+          "direction": "LONG",
+          "entry_time": 1793823300.0,
+          "contracts": 3.0,
+          "planned_partial": 1.0,
+          "actual_partial_pct": 33.333333333333336,
+          "tp1_hit": true,
+          "bank_pnl": 0.0736428571428571,
+          "runner_pnl": 0.0
+        },
+        {
+          "symbol": "AAVEUSDT",
+          "direction": "LONG",
+          "entry_time": 1793828700.0,
+          "contracts": 2.8,
+          "planned_partial": 1.4,
+          "actual_partial_pct": 50.0,
+          "tp1_hit": true,
+          "bank_pnl": 0.11209999999999952,
+          "runner_pnl": 0.0
+        },
+        {
+          "symbol": "ZECUSDT",
+          "direction": "SHORT",
+          "entry_time": 1793832300.0,
+          "contracts": 2.0,
+          "planned_partial": 1.0,
+          "actual_partial_pct": 50.0,
+          "tp1_hit": true,
+          "bank_pnl": 0.10122857142857127,
+          "runner_pnl": -0.0
+        },
+        {
+          "symbol": "HYPEUSDT",
+          "direction": "SHORT",
+          "entry_time": 1793844000.0,
+          "contracts": 4.0,
+          "planned_partial": 2.0,
+          "actual_partial_pct": 50.0,
+          "tp1_hit": true,
+          "bank_pnl": 0.0852714285714285,
+          "runner_pnl": 0.341085714285714
+        },
+        {
+          "symbol": "AVAXUSDT",
+          "direction": "SHORT",
+          "entry_time": 1793889900.0,
+          "contracts": 0.4,
+          "planned_partial": 0.2,
+          "actual_partial_pct": 50.0,
+          "tp1_hit": true,
+          "bank_pnl": 0.09299999999999993,
+          "runner_pnl": 0.3719999999999997
+        },
+        {
+          "symbol": "HYPEUSDT",
+          "direction": "SHORT",
+          "entry_time": 1793889900.0,
+          "contracts": 4.0,
+          "planned_partial": 2.0,
+          "actual_partial_pct": 50.0,
+          "tp1_hit": true,
+          "bank_pnl": 0.0851142857142851,
+          "runner_pnl": 0.3404571428571404
+        },
+        {
+          "symbol": "BILLUSDT",
+          "direction": "SHORT",
+          "entry_time": 1793893500.0,
+          "contracts": 85.0,
+          "planned_partial": 42.0,
+          "actual_partial_pct": 49.411764705882355,
+          "tp1_hit": true,
+          "bank_pnl": 0.10859999999999972,
+          "runner_pnl": 0.44474285714285605
+        },
+        {
+          "symbol": "XLMUSDT",
+          "direction": "SHORT",
+          "entry_time": 1793893500.0,
+          "contracts": 2.4,
+          "planned_partial": 1.2,
+          "actual_partial_pct": 50.0,
+          "tp1_hit": true,
+          "bank_pnl": 0.179571428571428,
+          "runner_pnl": -0.0
+        },
+        {
+          "symbol": "HYPEUSDT",
+          "direction": "LONG",
+          "entry_time": 1793919600.0,
+          "contracts": 5.0,
+          "planned_partial": 2.0,
+          "actual_partial_pct": 40.0,
+          "tp1_hit": true,
+          "bank_pnl": 0.13531428571428558,
+          "runner_pnl": 0.0
+        },
+        {
+          "symbol": "AAVEUSDT",
+          "direction": "LONG",
+          "entry_time": 1793920500.0,
+          "contracts": 3.0,
+          "planned_partial": 1.5,
+          "actual_partial_pct": 50.0,
+          "tp1_hit": true,
+          "bank_pnl": 0.14153571428571413,
+          "runner_pnl": 0.5661428571428565
+        },
+        {
+          "symbol": "AVAXUSDT",
+          "direction": "SHORT",
+          "entry_time": 1793926800.0,
+          "contracts": 0.4,
+          "planned_partial": 0.2,
+          "actual_partial_pct": 50.0,
+          "tp1_hit": true,
+          "bank_pnl": 0.11228571428571305,
+          "runner_pnl": -0.0
+        },
+        {
+          "symbol": "ETHUSDT",
+          "direction": "SHORT",
+          "entry_time": 1793926800.0,
+          "contracts": 17.0,
+          "planned_partial": 8.0,
+          "actual_partial_pct": 47.05882352941177,
+          "tp1_hit": true,
+          "bank_pnl": 0.09646285714285753,
+          "runner_pnl": -0.0
+        },
+        {
+          "symbol": "AAVEUSDT",
+          "direction": "SHORT",
+          "entry_time": 1793931300.0,
+          "contracts": 2.9,
+          "planned_partial": 1.4,
+          "actual_partial_pct": 48.275862068965516,
+          "tp1_hit": true,
+          "bank_pnl": 0.1646999999999997,
+          "runner_pnl": -0.0
+        },
+        {
+          "symbol": "LINKUSDT",
+          "direction": "SHORT",
+          "entry_time": 1793933100.0,
+          "contracts": 3.0,
+          "planned_partial": 1.0,
+          "actual_partial_pct": 33.333333333333336,
+          "tp1_hit": true,
+          "bank_pnl": 0.06935714285714267,
+          "runner_pnl": -0.0
+        },
+        {
+          "symbol": "AAVEUSDT",
+          "direction": "SHORT",
+          "entry_time": 1793956500.0,
+          "contracts": 2.9,
+          "planned_partial": 1.4,
+          "actual_partial_pct": 48.275862068965516,
+          "tp1_hit": true,
+          "bank_pnl": 0.11769999999999893,
+          "runner_pnl": 0.5044285714285669
+        },
+        {
+          "symbol": "XLMUSDT",
+          "direction": "LONG",
+          "entry_time": 1793984400.0,
+          "contracts": 2.4,
+          "planned_partial": 1.2,
+          "actual_partial_pct": 50.0,
+          "tp1_hit": false,
+          "bank_pnl": 0.0,
+          "runner_pnl": -0.5403428571428552
+        },
+        {
+          "symbol": "SOLUSDT",
+          "direction": "LONG",
+          "entry_time": 1793988000.0,
+          "contracts": 43.0,
+          "planned_partial": 21.0,
+          "actual_partial_pct": 48.83720930232558,
+          "tp1_hit": false,
+          "bank_pnl": 0.0,
+          "runner_pnl": 0.10319999999999797
+        },
+        {
+          "symbol": "AAVEUSDT",
+          "direction": "SHORT",
+          "entry_time": 1794175200.0,
+          "contracts": 3.1,
+          "planned_partial": 1.5,
+          "actual_partial_pct": 48.38709677419355,
+          "tp1_hit": false,
+          "bank_pnl": 0.0,
+          "runner_pnl": -0.4742999999999976
+        },
+        {
+          "symbol": "AVAXUSDT",
+          "direction": "SHORT",
+          "entry_time": 1794175200.0,
+          "contracts": 0.4,
+          "planned_partial": 0.2,
+          "actual_partial_pct": 50.0,
+          "tp1_hit": false,
+          "bank_pnl": 0.0,
+          "runner_pnl": -0.3594285714285701
+        },
+        {
+          "symbol": "AAVEUSDT",
+          "direction": "SHORT",
+          "entry_time": 1794208500.0,
+          "contracts": 3.0,
+          "planned_partial": 1.5,
+          "actual_partial_pct": 50.0,
+          "tp1_hit": true,
+          "bank_pnl": 0.11807142857142724,
+          "runner_pnl": -0.0
+        },
+        {
+          "symbol": "AVAXUSDT",
+          "direction": "SHORT",
+          "entry_time": 1794208500.0,
+          "contracts": 0.4,
+          "planned_partial": 0.2,
+          "actual_partial_pct": 50.0,
+          "tp1_hit": false,
+          "bank_pnl": 0.0,
+          "runner_pnl": -0.3188571428571416
+        },
+        {
+          "symbol": "HYPEUSDT",
+          "direction": "SHORT",
+          "entry_time": 1794264300.0,
+          "contracts": 5.0,
+          "planned_partial": 2.0,
+          "actual_partial_pct": 40.0,
+          "tp1_hit": true,
+          "bank_pnl": 0.08827142857142854,
+          "runner_pnl": 0.5296285714285712
+        },
+        {
+          "symbol": "XRPUSDT",
+          "direction": "SHORT",
+          "entry_time": 1794264300.0,
+          "contracts": 35.0,
+          "planned_partial": 17.0,
+          "actual_partial_pct": 48.57142857142857,
+          "tp1_hit": true,
+          "bank_pnl": 0.11511428571428613,
+          "runner_pnl": -0.0
+        },
+        {
+          "symbol": "BTCUSDT",
+          "direction": "LONG",
+          "entry_time": 1794326400.0,
+          "contracts": 5.0,
+          "planned_partial": 2.0,
+          "actual_partial_pct": 40.0,
+          "tp1_hit": true,
+          "bank_pnl": 0.09911999999999987,
+          "runner_pnl": 0.0
+        },
+        {
+          "symbol": "AAVEUSDT",
+          "direction": "SHORT",
+          "entry_time": 1794343500.0,
+          "contracts": 3.1,
+          "planned_partial": 1.5,
+          "actual_partial_pct": 48.38709677419355,
+          "tp1_hit": false,
+          "bank_pnl": 0.0,
+          "runner_pnl": -0.48847142857142717
+        },
+        {
+          "symbol": "SOLUSDT",
+          "direction": "SHORT",
+          "entry_time": 1794343500.0,
+          "contracts": 46.0,
+          "planned_partial": 23.0,
+          "actual_partial_pct": 50.0,
+          "tp1_hit": true,
+          "bank_pnl": 0.09742142857142815,
+          "runner_pnl": -0.0
+        },
+        {
+          "symbol": "ZECUSDT",
+          "direction": "LONG",
+          "entry_time": 1794359700.0,
+          "contracts": 3.0,
+          "planned_partial": 1.0,
+          "actual_partial_pct": 33.333333333333336,
+          "tp1_hit": true,
+          "bank_pnl": 0.09116428571428556,
+          "runner_pnl": 0.0
+        },
+        {
+          "symbol": "AAVEUSDT",
+          "direction": "LONG",
+          "entry_time": 1794366900.0,
+          "contracts": 3.1,
+          "planned_partial": 1.5,
+          "actual_partial_pct": 48.38709677419355,
+          "tp1_hit": false,
+          "bank_pnl": 0.0,
+          "runner_pnl": -0.45437142857142504
+        },
+        {
+          "symbol": "ETHUSDT",
+          "direction": "SHORT",
+          "entry_time": 1794411900.0,
+          "contracts": 18.0,
+          "planned_partial": 9.0,
+          "actual_partial_pct": 50.0,
+          "tp1_hit": false,
+          "bank_pnl": 0.0,
+          "runner_pnl": -0.3835542857142825
+        },
+        {
+          "symbol": "SOLUSDT",
+          "direction": "SHORT",
+          "entry_time": 1794411900.0,
+          "contracts": 45.0,
+          "planned_partial": 22.0,
+          "actual_partial_pct": 48.888888888888886,
+          "tp1_hit": true,
+          "bank_pnl": 0.11549999999999976,
+          "runner_pnl": 0.482999999999999
+        },
+        {
+          "symbol": "HYPEUSDT",
+          "direction": "SHORT",
+          "entry_time": 1794436200.0,
+          "contracts": 5.0,
+          "planned_partial": 2.0,
+          "actual_partial_pct": 40.0,
+          "tp1_hit": true,
+          "bank_pnl": 0.07695714285714263,
+          "runner_pnl": 0.4617428571428558
+        },
+        {
+          "symbol": "LINKUSDT",
+          "direction": "SHORT",
+          "entry_time": 1794436200.0,
+          "contracts": 3.0,
+          "planned_partial": 1.0,
+          "actual_partial_pct": 33.333333333333336,
+          "tp1_hit": true,
+          "bank_pnl": 0.05842857142857141,
+          "runner_pnl": 0.4674285714285713
+        },
+        {
+          "symbol": "AAVEUSDT",
+          "direction": "SHORT",
+          "entry_time": 1794447900.0,
+          "contracts": 3.2,
+          "planned_partial": 1.6,
+          "actual_partial_pct": 50.0,
+          "tp1_hit": true,
+          "bank_pnl": 0.1661714285714287,
+          "runner_pnl": 0.6646857142857148
+        },
+        {
+          "symbol": "XLMUSDT",
+          "direction": "LONG",
+          "entry_time": 1794508200.0,
+          "contracts": 2.6,
+          "planned_partial": 1.3,
+          "actual_partial_pct": 50.0,
+          "tp1_hit": true,
+          "bank_pnl": 0.1325999999999984,
+          "runner_pnl": 0.0
+        },
+        {
+          "symbol": "SUIUSDT",
+          "direction": "SHORT",
+          "entry_time": 1794514500.0,
+          "contracts": 49.0,
+          "planned_partial": 24.0,
+          "actual_partial_pct": 48.97959183673469,
+          "tp1_hit": true,
+          "bank_pnl": 0.1066285714285714,
+          "runner_pnl": 0.4442857142857142
+        },
+        {
+          "symbol": "HYPEUSDT",
+          "direction": "SHORT",
+          "entry_time": 1794515400.0,
+          "contracts": 5.0,
+          "planned_partial": 2.0,
+          "actual_partial_pct": 40.0,
+          "tp1_hit": false,
+          "bank_pnl": 0.0,
+          "runner_pnl": -0.38614285714285407
+        },
+        {
+          "symbol": "HYPEUSDT",
+          "direction": "LONG",
+          "entry_time": 1794531600.0,
+          "contracts": 5.0,
+          "planned_partial": 2.0,
+          "actual_partial_pct": 40.0,
+          "tp1_hit": false,
+          "bank_pnl": 0.0,
+          "runner_pnl": -0.381285714285714
+        },
+        {
+          "symbol": "AVAXUSDT",
+          "direction": "LONG",
+          "entry_time": 1794536100.0,
+          "contracts": 0.4,
+          "planned_partial": 0.2,
+          "actual_partial_pct": 50.0,
+          "tp1_hit": false,
+          "bank_pnl": 0.0,
+          "runner_pnl": -0.3365714285714274
+        },
+        {
+          "symbol": "XLMUSDT",
+          "direction": "LONG",
+          "entry_time": 1794537000.0,
+          "contracts": 2.6,
+          "planned_partial": 1.3,
+          "actual_partial_pct": 50.0,
+          "tp1_hit": false,
+          "bank_pnl": 0.0,
+          "runner_pnl": -0.43679999999999636
+        }
+      ]
+    },
+    "after_nov11": {
+      "starting_capital": 125.64,
+      "ending_capital": 126.84986,
+      "return_pct": 0.962958,
+      "cash_drawdown_pct": 1.125131,
+      "trades": 11,
+      "skipped": {
+        "slots": 0,
+        "minimum_size": 0
+      },
+      "unplaceable_partials": 0,
+      "tp1_hits_without_bank": 0,
+      "ledger": [
+        {
+          "symbol": "ETHUSDT",
+          "direction": "SHORT",
+          "entry_time": 1794411900.0,
+          "contracts": 18.0,
+          "planned_partial": 9.0,
+          "actual_partial_pct": 50.0,
+          "tp1_hit": false,
+          "bank_pnl": 0.0,
+          "runner_pnl": -0.3835542857142825
+        },
+        {
+          "symbol": "SOLUSDT",
+          "direction": "SHORT",
+          "entry_time": 1794411900.0,
+          "contracts": 44.0,
+          "planned_partial": 22.0,
+          "actual_partial_pct": 50.0,
+          "tp1_hit": true,
+          "bank_pnl": 0.11549999999999976,
+          "runner_pnl": 0.461999999999999
+        },
+        {
+          "symbol": "HYPEUSDT",
+          "direction": "SHORT",
+          "entry_time": 1794436200.0,
+          "contracts": 5.0,
+          "planned_partial": 2.0,
+          "actual_partial_pct": 40.0,
+          "tp1_hit": true,
+          "bank_pnl": 0.07695714285714263,
+          "runner_pnl": 0.4617428571428558
+        },
+        {
+          "symbol": "LINKUSDT",
+          "direction": "SHORT",
+          "entry_time": 1794436200.0,
+          "contracts": 3.0,
+          "planned_partial": 1.0,
+          "actual_partial_pct": 33.333333333333336,
+          "tp1_hit": true,
+          "bank_pnl": 0.05842857142857141,
+          "runner_pnl": 0.4674285714285713
+        },
+        {
+          "symbol": "AAVEUSDT",
+          "direction": "SHORT",
+          "entry_time": 1794447900.0,
+          "contracts": 3.2,
+          "planned_partial": 1.6,
+          "actual_partial_pct": 50.0,
+          "tp1_hit": true,
+          "bank_pnl": 0.1661714285714287,
+          "runner_pnl": 0.6646857142857148
+        },
+        {
+          "symbol": "XLMUSDT",
+          "direction": "LONG",
+          "entry_time": 1794508200.0,
+          "contracts": 2.6,
+          "planned_partial": 1.3,
+          "actual_partial_pct": 50.0,
+          "tp1_hit": true,
+          "bank_pnl": 0.1325999999999984,
+          "runner_pnl": 0.0
+        },
+        {
+          "symbol": "SUIUSDT",
+          "direction": "SHORT",
+          "entry_time": 1794514500.0,
+          "contracts": 47.0,
+          "planned_partial": 23.0,
+          "actual_partial_pct": 48.93617021276596,
+          "tp1_hit": true,
+          "bank_pnl": 0.10218571428571425,
+          "runner_pnl": 0.4265142857142856
+        },
+        {
+          "symbol": "HYPEUSDT",
+          "direction": "SHORT",
+          "entry_time": 1794515400.0,
+          "contracts": 5.0,
+          "planned_partial": 2.0,
+          "actual_partial_pct": 40.0,
+          "tp1_hit": false,
+          "bank_pnl": 0.0,
+          "runner_pnl": -0.38614285714285407
+        },
+        {
+          "symbol": "HYPEUSDT",
+          "direction": "LONG",
+          "entry_time": 1794531600.0,
+          "contracts": 5.0,
+          "planned_partial": 2.0,
+          "actual_partial_pct": 40.0,
+          "tp1_hit": false,
+          "bank_pnl": 0.0,
+          "runner_pnl": -0.381285714285714
+        },
+        {
+          "symbol": "AVAXUSDT",
+          "direction": "LONG",
+          "entry_time": 1794536100.0,
+          "contracts": 0.4,
+          "planned_partial": 0.2,
+          "actual_partial_pct": 50.0,
+          "tp1_hit": false,
+          "bank_pnl": 0.0,
+          "runner_pnl": -0.3365714285714274
+        },
+        {
+          "symbol": "XLMUSDT",
+          "direction": "LONG",
+          "entry_time": 1794537000.0,
+          "contracts": 2.6,
+          "planned_partial": 1.3,
+          "actual_partial_pct": 50.0,
+          "tp1_hit": false,
+          "bank_pnl": 0.0,
+          "runner_pnl": -0.43679999999999636
+        }
+      ]
+    }
+  },
+  "sources": {
+    "reports\\audit_2026_09_08\\expected_cash_edge_literal_pool_expiry_mark_v2_nov14.pkl": "75b168a432ffdd1e80f860a1f78bb9b95a4ddaa9385aad5a036170d49a9a948a",
+    "C:\\Users\\Lenovo\\Desktop\\telegram bot\\crypto_expected_cash_edge_nov14.py": "3e285947fd5f6080d86abc2f5122bc1eb06a1130b209eb21d3c53464f6eea813",
+    "lot_aware_tp1_audit.py": "519da86a9ceb92b899887e590a6f891bd7f9cb20a07c5676b0dcfe93571a2e16",
+    "crypto_profit_first_runner_protection_oct30_audit.py": "39884e91cbced61683cac9bee69614b712694d24d72e97407abe48b376f84e5f",
+    "reports\\audit_2026_09_08\\xperp_15m_nov14_merged\\manifest.json": "6ebba73ab8fe00a7a0740feaf3b6fdc867d4773dd36277be53d42f8e20a236b5",
+    "reports\\audit_2026_09_08\\xperp_specs_nov14.json": "e3a39d212a7a147813bda22d2bc09f3267c9e9beae3f386279a1fdc1d48f0457",
+    "C:\\Users\\Lenovo\\Desktop\\telegram bot\\src\\frozen_crypto_profit_first_material_2r.json": "6e91a987a5c36a759c6d6c73edf0fb3ee3482aeb679a30ba894e3852f54ffd6f",
+    "reports\\audit_2026_09_08\\crypto_xperp_raw_router_audit_2_0_nov14_merged_raw_families.csv": "fd9800fcd1822ace6e1b2fd1cc9d31f7f6924e0572cccc759c07ac536d8b893a",
+    "reports\\audit_2026_09_08\\crypto_xperp_raw_router_audit_0_5_nov14_merged_raw_families.csv": "24faa7e3ef2848e4277a1fc95a04754b3ba01f67cb628d4fb52fcf9a45421760"
+  }
+}

@@ -1,0 +1,2961 @@
+{
+  "status": "RESEARCH_ONLY_NO_LIVE_ROUTER_CHANGE",
+  "objective_verified": false,
+  "label_revision": "expiry_mark_v2",
+  "experts": {
+    "b": {
+      "training_rows": 28938,
+      "leaves": 15,
+      "cutoff": 0.0011615509980628274,
+      "training_last_exit": 1640988900.0
+    },
+    "a": {
+      "training_rows": 28904,
+      "leaves": 7,
+      "cutoff": 0.0008944889492341088,
+      "training_last_exit": 1640988900.0
+    }
+  },
+  "phase_order": [
+    "range",
+    "trend",
+    "shock"
+  ],
+  "fixed_phase_rules": "shock: volume ratio >=2 and abs(body/ATR)>=1; else trend: efficiency96>=.30 and abs(SMA20-SMA96)/ATR>=1; else range",
+  "development": [
+    {
+      "policy": "bbb",
+      "selection": {
+        "n": 1242,
+        "wr": 69.08,
+        "return_pct": 42.2763,
+        "dd_pct": 7.0638,
+        "trades_per_calendar_day": 3.412,
+        "monthly_return_pct": {
+          "2022-01": 5.6885,
+          "2022-02": 8.0184,
+          "2022-03": -0.9769,
+          "2022-04": 2.0105,
+          "2022-05": -0.1364,
+          "2022-06": 1.5221,
+          "2022-07": 9.9632,
+          "2022-08": 3.4377,
+          "2022-09": 1.2963,
+          "2022-10": -0.0256,
+          "2022-11": 5.8067,
+          "2022-12": -0.1527
+        },
+        "worst_observed_month_pct": -0.9769,
+        "months_ge_30": 0
+      },
+      "confirmation": {
+        "n": 328,
+        "wr": 71.34,
+        "return_pct": 13.6156,
+        "dd_pct": 3.4782,
+        "trades_per_calendar_day": 1.64,
+        "monthly_return_pct": {
+          "2023-01": 2.9079,
+          "2023-02": 2.0595,
+          "2023-03": 6.8183,
+          "2023-04": -0.2231,
+          "2023-05": -0.6156,
+          "2023-06": 2.0575,
+          "2023-07": 0.0683
+        },
+        "worst_observed_month_pct": -0.6156,
+        "months_ge_30": 0
+      }
+    },
+    {
+      "policy": "bba",
+      "selection": {
+        "n": 1311,
+        "wr": 68.5,
+        "return_pct": 31.9565,
+        "dd_pct": 10.9256,
+        "trades_per_calendar_day": 3.602,
+        "monthly_return_pct": {
+          "2022-01": 5.0957,
+          "2022-02": 7.1974,
+          "2022-03": -0.1326,
+          "2022-04": 2.521,
+          "2022-05": -2.1674,
+          "2022-06": 4.9533,
+          "2022-07": 8.53,
+          "2022-08": 3.3354,
+          "2022-09": -0.3953,
+          "2022-10": -2.2557,
+          "2022-11": 1.5304,
+          "2022-12": 0.503
+        },
+        "worst_observed_month_pct": -2.2557,
+        "months_ge_30": 0
+      },
+      "confirmation": {
+        "n": 344,
+        "wr": 70.35,
+        "return_pct": 12.9857,
+        "dd_pct": 3.5396,
+        "trades_per_calendar_day": 1.662,
+        "monthly_return_pct": {
+          "2023-01": -0.064,
+          "2023-02": 2.2905,
+          "2023-03": 7.0451,
+          "2023-04": 1.0415,
+          "2023-05": -0.9056,
+          "2023-06": 2.8076,
+          "2023-07": 0.3056
+        },
+        "worst_observed_month_pct": -0.9056,
+        "months_ge_30": 0
+      }
+    },
+    {
+      "policy": "bab",
+      "selection": {
+        "n": 1243,
+        "wr": 68.95,
+        "return_pct": 39.6632,
+        "dd_pct": 7.5919,
+        "trades_per_calendar_day": 3.415,
+        "monthly_return_pct": {
+          "2022-01": 5.6603,
+          "2022-02": 6.9647,
+          "2022-03": -0.6406,
+          "2022-04": 2.7233,
+          "2022-05": -0.0182,
+          "2022-06": 1.5221,
+          "2022-07": 9.2319,
+          "2022-08": 3.0557,
+          "2022-09": 0.7207,
+          "2022-10": -0.4181,
+          "2022-11": 5.8067,
+          "2022-12": -0.1527
+        },
+        "worst_observed_month_pct": -0.6406,
+        "months_ge_30": 0
+      },
+      "confirmation": {
+        "n": 331,
+        "wr": 71.0,
+        "return_pct": 12.3187,
+        "dd_pct": 3.4782,
+        "trades_per_calendar_day": 1.655,
+        "monthly_return_pct": {
+          "2023-01": 1.996,
+          "2023-02": 2.1594,
+          "2023-03": 6.7932,
+          "2023-04": -0.2231,
+          "2023-05": -0.6156,
+          "2023-06": 2.0575,
+          "2023-07": -0.2637
+        },
+        "worst_observed_month_pct": -0.6156,
+        "months_ge_30": 0
+      }
+    },
+    {
+      "policy": "baa",
+      "selection": {
+        "n": 1319,
+        "wr": 68.61,
+        "return_pct": 32.9972,
+        "dd_pct": 10.51,
+        "trades_per_calendar_day": 3.624,
+        "monthly_return_pct": {
+          "2022-01": 5.625,
+          "2022-02": 6.6792,
+          "2022-03": -0.1314,
+          "2022-04": 3.237,
+          "2022-05": -2.0516,
+          "2022-06": 4.9533,
+          "2022-07": 7.8083,
+          "2022-08": 2.9538,
+          "2022-09": 1.1425,
+          "2022-10": -2.7846,
+          "2022-11": 1.5304,
+          "2022-12": 0.503
+        },
+        "worst_observed_month_pct": -2.7846,
+        "months_ge_30": 0
+      },
+      "confirmation": {
+        "n": 344,
+        "wr": 70.35,
+        "return_pct": 11.5079,
+        "dd_pct": 3.5396,
+        "trades_per_calendar_day": 1.662,
+        "monthly_return_pct": {
+          "2023-01": -0.5779,
+          "2023-02": 2.39,
+          "2023-03": 6.441,
+          "2023-04": 1.0415,
+          "2023-05": -0.9056,
+          "2023-06": 2.8076,
+          "2023-07": -0.0271
+        },
+        "worst_observed_month_pct": -0.9056,
+        "months_ge_30": 0
+      }
+    },
+    {
+      "policy": "abb",
+      "selection": {
+        "n": 1192,
+        "wr": 69.38,
+        "return_pct": 38.799,
+        "dd_pct": 6.2043,
+        "trades_per_calendar_day": 3.275,
+        "monthly_return_pct": {
+          "2022-01": 1.8697,
+          "2022-02": 8.1214,
+          "2022-03": -0.7548,
+          "2022-04": 3.2214,
+          "2022-05": 0.5261,
+          "2022-06": 3.618,
+          "2022-07": 7.7657,
+          "2022-08": 2.9681,
+          "2022-09": 0.3797,
+          "2022-10": 0.8676,
+          "2022-11": 5.162,
+          "2022-12": -0.0467
+        },
+        "worst_observed_month_pct": -0.7548,
+        "months_ge_30": 0
+      },
+      "confirmation": {
+        "n": 316,
+        "wr": 72.47,
+        "return_pct": 16.0495,
+        "dd_pct": 1.9471,
+        "trades_per_calendar_day": 1.541,
+        "monthly_return_pct": {
+          "2023-01": 3.5582,
+          "2023-02": 3.7903,
+          "2023-03": 5.1812,
+          "2023-04": 0.5053,
+          "2023-05": 0.1339,
+          "2023-06": 1.0501,
+          "2023-07": 0.9387
+        },
+        "worst_observed_month_pct": 0.1339,
+        "months_ge_30": 0
+      }
+    },
+    {
+      "policy": "aba",
+      "selection": {
+        "n": 1230,
+        "wr": 68.78,
+        "return_pct": 29.379,
+        "dd_pct": 7.0653,
+        "trades_per_calendar_day": 3.379,
+        "monthly_return_pct": {
+          "2022-01": 1.4758,
+          "2022-02": 9.2293,
+          "2022-03": -0.6392,
+          "2022-04": 2.326,
+          "2022-05": -1.3093,
+          "2022-06": 2.7499,
+          "2022-07": 7.1778,
+          "2022-08": 4.5365,
+          "2022-09": -0.4719,
+          "2022-10": -0.2341,
+          "2022-11": 1.235,
+          "2022-12": 0.5244
+        },
+        "worst_observed_month_pct": -1.3093,
+        "months_ge_30": 0
+      },
+      "confirmation": {
+        "n": 323,
+        "wr": 70.28,
+        "return_pct": 13.2244,
+        "dd_pct": 2.9776,
+        "trades_per_calendar_day": 1.568,
+        "monthly_return_pct": {
+          "2023-01": 0.157,
+          "2023-02": 2.8352,
+          "2023-03": 4.1333,
+          "2023-04": 2.1642,
+          "2023-05": -0.1838,
+          "2023-06": 1.7307,
+          "2023-07": 1.7596
+        },
+        "worst_observed_month_pct": -0.1838,
+        "months_ge_30": 0
+      }
+    },
+    {
+      "policy": "aab",
+      "selection": {
+        "n": 1198,
+        "wr": 69.28,
+        "return_pct": 36.1579,
+        "dd_pct": 6.1893,
+        "trades_per_calendar_day": 3.291,
+        "monthly_return_pct": {
+          "2022-01": 1.8425,
+          "2022-02": 7.2117,
+          "2022-03": -0.739,
+          "2022-04": 3.9446,
+          "2022-05": 0.6455,
+          "2022-06": 3.618,
+          "2022-07": 7.0461,
+          "2022-08": 2.7131,
+          "2022-09": -0.1907,
+          "2022-10": 0.4704,
+          "2022-11": 5.162,
+          "2022-12": -0.0467
+        },
+        "worst_observed_month_pct": -0.739,
+        "months_ge_30": 0
+      },
+      "confirmation": {
+        "n": 319,
+        "wr": 72.1,
+        "return_pct": 14.9615,
+        "dd_pct": 1.9471,
+        "trades_per_calendar_day": 1.556,
+        "monthly_return_pct": {
+          "2023-01": 2.6407,
+          "2023-02": 3.8912,
+          "2023-03": 5.374,
+          "2023-04": 0.5053,
+          "2023-05": 0.1339,
+          "2023-06": 1.0501,
+          "2023-07": 0.6038
+        },
+        "worst_observed_month_pct": 0.1339,
+        "months_ge_30": 0
+      }
+    },
+    {
+      "policy": "aaa",
+      "selection": {
+        "n": 1238,
+        "wr": 68.82,
+        "return_pct": 28.6108,
+        "dd_pct": 6.8006,
+        "trades_per_calendar_day": 3.401,
+        "monthly_return_pct": {
+          "2022-01": 1.9869,
+          "2022-02": 8.3079,
+          "2022-03": -0.6124,
+          "2022-04": 3.0425,
+          "2022-05": -1.1921,
+          "2022-06": 2.7499,
+          "2022-07": 6.4621,
+          "2022-08": 4.2776,
+          "2022-09": -0.1055,
+          "2022-10": -0.7751,
+          "2022-11": 1.235,
+          "2022-12": 0.5244
+        },
+        "worst_observed_month_pct": -1.1921,
+        "months_ge_30": 0
+      },
+      "confirmation": {
+        "n": 325,
+        "wr": 70.15,
+        "return_pct": 12.8102,
+        "dd_pct": 2.9776,
+        "trades_per_calendar_day": 1.578,
+        "monthly_return_pct": {
+          "2023-01": 0.0254,
+          "2023-02": 2.9353,
+          "2023-03": 4.1333,
+          "2023-04": 2.1642,
+          "2023-05": -0.1838,
+          "2023-06": 1.7307,
+          "2023-07": 1.4221
+        },
+        "worst_observed_month_pct": -0.1838,
+        "months_ge_30": 0
+      }
+    },
+    {
+      "policy": "intersection",
+      "selection": {
+        "n": 951,
+        "wr": 69.51,
+        "return_pct": 33.3372,
+        "dd_pct": 8.258,
+        "trades_per_calendar_day": 2.613,
+        "monthly_return_pct": {
+          "2022-01": 6.2044,
+          "2022-02": 6.3221,
+          "2022-03": -1.2293,
+          "2022-04": 1.6635,
+          "2022-05": -2.4792,
+          "2022-06": 1.436,
+          "2022-07": 3.4886,
+          "2022-08": 6.4434,
+          "2022-09": 2.3029,
+          "2022-10": 0.6468,
+          "2022-11": 4.5693,
+          "2022-12": 0.2305
+        },
+        "worst_observed_month_pct": -2.4792,
+        "months_ge_30": 0
+      },
+      "confirmation": {
+        "n": 236,
+        "wr": 70.76,
+        "return_pct": 11.9224,
+        "dd_pct": 2.285,
+        "trades_per_calendar_day": 1.192,
+        "monthly_return_pct": {
+          "2023-01": -0.4394,
+          "2023-02": 3.4411,
+          "2023-03": 4.5219,
+          "2023-04": 1.2364,
+          "2023-05": -0.1204,
+          "2023-06": 2.2498,
+          "2023-07": 0.5664
+        },
+        "worst_observed_month_pct": -0.4394,
+        "months_ge_30": 0
+      }
+    },
+    {
+      "policy": "union",
+      "selection": {
+        "n": 1503,
+        "wr": 69.19,
+        "return_pct": 42.5335,
+        "dd_pct": 7.9716,
+        "trades_per_calendar_day": 4.129,
+        "monthly_return_pct": {
+          "2022-01": 1.4982,
+          "2022-02": 9.3671,
+          "2022-03": -0.1956,
+          "2022-04": 3.225,
+          "2022-05": 2.8195,
+          "2022-06": 3.3547,
+          "2022-07": 11.3655,
+          "2022-08": 2.183,
+          "2022-09": 1.0779,
+          "2022-10": -1.2045,
+          "2022-11": 3.0626,
+          "2022-12": 0.1402
+        },
+        "worst_observed_month_pct": -1.2045,
+        "months_ge_30": 0
+      },
+      "confirmation": {
+        "n": 407,
+        "wr": 70.27,
+        "return_pct": 12.2974,
+        "dd_pct": 3.5859,
+        "trades_per_calendar_day": 1.966,
+        "monthly_return_pct": {
+          "2023-01": 2.4418,
+          "2023-02": 2.0863,
+          "2023-03": 5.0693,
+          "2023-04": 0.6913,
+          "2023-05": -0.314,
+          "2023-06": 1.3439,
+          "2023-07": 0.4675
+        },
+        "worst_observed_month_pct": -0.314,
+        "months_ge_30": 0
+      }
+    }
+  ],
+  "selected": {
+    "policy": "bab",
+    "selection": {
+      "n": 1243,
+      "wr": 68.95,
+      "return_pct": 39.6632,
+      "dd_pct": 7.5919,
+      "trades_per_calendar_day": 3.415,
+      "monthly_return_pct": {
+        "2022-01": 5.6603,
+        "2022-02": 6.9647,
+        "2022-03": -0.6406,
+        "2022-04": 2.7233,
+        "2022-05": -0.0182,
+        "2022-06": 1.5221,
+        "2022-07": 9.2319,
+        "2022-08": 3.0557,
+        "2022-09": 0.7207,
+        "2022-10": -0.4181,
+        "2022-11": 5.8067,
+        "2022-12": -0.1527
+      },
+      "worst_observed_month_pct": -0.6406,
+      "months_ge_30": 0
+    },
+    "confirmation": {
+      "n": 331,
+      "wr": 71.0,
+      "return_pct": 12.3187,
+      "dd_pct": 3.4782,
+      "trades_per_calendar_day": 1.655,
+      "monthly_return_pct": {
+        "2023-01": 1.996,
+        "2023-02": 2.1594,
+        "2023-03": 6.7932,
+        "2023-04": -0.2231,
+        "2023-05": -0.6156,
+        "2023-06": 2.0575,
+        "2023-07": -0.2637
+      },
+      "worst_observed_month_pct": -0.6156,
+      "months_ge_30": 0
+    }
+  },
+  "results": {
+    "bab": {
+      "2026-07": {
+        "5": {
+          "starting_capital": 125.64,
+          "ending_capital": 176.816818,
+          "return_pct": 40.732902,
+          "cash_drawdown_pct": 3.697606,
+          "trades": 221,
+          "skipped": {
+            "slots": 10,
+            "minimum_size": 0
+          },
+          "unplaceable_partials": 99,
+          "tp1_hits_without_bank": 37,
+          "peak_positions": 9,
+          "peak_by_bot": {
+            "crypto": 3,
+            "stocks": 8
+          },
+          "peak_reserved_margin_pct": 25.588789536650207,
+          "pnl_by_bot": {
+            "crypto": 8.704771428571405,
+            "stocks": 42.47204664999998
+          },
+          "return_contribution_pct": {
+            "crypto": 6.928344021467212,
+            "stocks": 33.80455798312638
+          }
+        },
+        "50": {
+          "starting_capital": 125.64,
+          "ending_capital": 171.716805,
+          "return_pct": 36.673675,
+          "cash_drawdown_pct": 3.419741,
+          "trades": 221,
+          "skipped": {
+            "slots": 10,
+            "minimum_size": 0
+          },
+          "unplaceable_partials": 0,
+          "tp1_hits_without_bank": 0,
+          "peak_positions": 9,
+          "peak_by_bot": {
+            "crypto": 3,
+            "stocks": 8
+          },
+          "peak_reserved_margin_pct": 25.231678900896476,
+          "pnl_by_bot": {
+            "crypto": 4.052202857142848,
+            "stocks": 42.02460209999998
+          },
+          "return_contribution_pct": {
+            "crypto": 3.2252490107790894,
+            "stocks": 33.44842574021011
+          }
+        }
+      },
+      "2026-08": {
+        "5": {
+          "starting_capital": 125.64,
+          "ending_capital": 159.209274,
+          "return_pct": 26.71862,
+          "cash_drawdown_pct": 2.781198,
+          "trades": 265,
+          "skipped": {
+            "slots": 11,
+            "minimum_size": 0
+          },
+          "unplaceable_partials": 109,
+          "tp1_hits_without_bank": 33,
+          "peak_positions": 9,
+          "peak_by_bot": {
+            "crypto": 4,
+            "stocks": 8
+          },
+          "peak_reserved_margin_pct": 26.303500950135067,
+          "pnl_by_bot": {
+            "crypto": 3.8938457142857263,
+            "stocks": 29.675428150000027
+          },
+          "return_contribution_pct": {
+            "crypto": 3.0992086232774008,
+            "stocks": 23.619411134988876
+          }
+        },
+        "50": {
+          "starting_capital": 125.64,
+          "ending_capital": 159.300606,
+          "return_pct": 26.791313,
+          "cash_drawdown_pct": 2.495111,
+          "trades": 265,
+          "skipped": {
+            "slots": 11,
+            "minimum_size": 0
+          },
+          "unplaceable_partials": 0,
+          "tp1_hits_without_bank": 0,
+          "peak_positions": 9,
+          "peak_by_bot": {
+            "crypto": 4,
+            "stocks": 8
+          },
+          "peak_reserved_margin_pct": 26.21759810566472,
+          "pnl_by_bot": {
+            "crypto": 3.962670000000009,
+            "stocks": 29.697935650000026
+          },
+          "return_contribution_pct": {
+            "crypto": 3.153987583572118,
+            "stocks": 23.63732541388095
+          }
+        }
+      },
+      "2026-09": {
+        "5": {
+          "starting_capital": 125.64,
+          "ending_capital": 150.433603,
+          "return_pct": 19.733845,
+          "cash_drawdown_pct": 4.347112,
+          "trades": 315,
+          "skipped": {
+            "slots": 9,
+            "minimum_size": 0
+          },
+          "unplaceable_partials": 165,
+          "tp1_hits_without_bank": 46,
+          "peak_positions": 11,
+          "peak_by_bot": {
+            "crypto": 4,
+            "stocks": 8
+          },
+          "peak_reserved_margin_pct": 30.954327048828752,
+          "pnl_by_bot": {
+            "crypto": -0.3390228571428474,
+            "stocks": 25.132625600000004
+          },
+          "return_contribution_pct": {
+            "crypto": -0.26983672169917816,
+            "stocks": 20.00368163005413
+          }
+        },
+        "50": {
+          "starting_capital": 125.64,
+          "ending_capital": 151.626548,
+          "return_pct": 20.68334,
+          "cash_drawdown_pct": 3.207449,
+          "trades": 315,
+          "skipped": {
+            "slots": 9,
+            "minimum_size": 0
+          },
+          "unplaceable_partials": 0,
+          "tp1_hits_without_bank": 0,
+          "peak_positions": 11,
+          "peak_by_bot": {
+            "crypto": 4,
+            "stocks": 8
+          },
+          "peak_reserved_margin_pct": 31.098007903828606,
+          "pnl_by_bot": {
+            "crypto": 0.7180871428571516,
+            "stocks": 25.268460700000002
+          },
+          "return_contribution_pct": {
+            "crypto": 0.5715434120161983,
+            "stocks": 20.111796163642154
+          }
+        }
+      },
+      "2026-10": {
+        "5": {
+          "starting_capital": 125.64,
+          "ending_capital": 158.363555,
+          "return_pct": 26.045491,
+          "cash_drawdown_pct": 4.606361,
+          "trades": 309,
+          "skipped": {
+            "slots": 6,
+            "minimum_size": 0
+          },
+          "unplaceable_partials": 140,
+          "tp1_hits_without_bank": 44,
+          "peak_positions": 10,
+          "peak_by_bot": {
+            "stocks": 8,
+            "crypto": 4
+          },
+          "peak_reserved_margin_pct": 28.871154472732325,
+          "pnl_by_bot": {
+            "crypto": 3.9478400000000153,
+            "stocks": 28.775715000000016
+          },
+          "return_contribution_pct": {
+            "crypto": 3.142184017828729,
+            "stocks": 22.903307067812808
+          }
+        },
+        "50": {
+          "starting_capital": 125.64,
+          "ending_capital": 157.324641,
+          "return_pct": 25.218594,
+          "cash_drawdown_pct": 4.61732,
+          "trades": 309,
+          "skipped": {
+            "slots": 6,
+            "minimum_size": 0
+          },
+          "unplaceable_partials": 0,
+          "tp1_hits_without_bank": 0,
+          "peak_positions": 10,
+          "peak_by_bot": {
+            "stocks": 8,
+            "crypto": 4
+          },
+          "peak_reserved_margin_pct": 28.70003874074687,
+          "pnl_by_bot": {
+            "crypto": 3.130808571428586,
+            "stocks": 28.553832500000016
+          },
+          "return_contribution_pct": {
+            "crypto": 2.491888388593271,
+            "stocks": 22.726705269022617
+          }
+        }
+      },
+      "2026-11": {
+        "5": {
+          "starting_capital": 125.64,
+          "ending_capital": 131.45212,
+          "return_pct": 4.626011,
+          "cash_drawdown_pct": 3.052386,
+          "trades": 100,
+          "skipped": {
+            "slots": 2,
+            "minimum_size": 0
+          },
+          "unplaceable_partials": 48,
+          "tp1_hits_without_bank": 22,
+          "peak_positions": 7,
+          "peak_by_bot": {
+            "stocks": 7,
+            "crypto": 4
+          },
+          "peak_reserved_margin_pct": 20.539053791069,
+          "pnl_by_bot": {
+            "crypto": 4.423525714285718,
+            "stocks": 1.3885939999999781
+          },
+          "return_contribution_pct": {
+            "crypto": 3.5207941056078624,
+            "stocks": 1.105216491563179
+          }
+        },
+        "50": {
+          "starting_capital": 125.64,
+          "ending_capital": 131.297836,
+          "return_pct": 4.503212,
+          "cash_drawdown_pct": 3.103785,
+          "trades": 100,
+          "skipped": {
+            "slots": 2,
+            "minimum_size": 0
+          },
+          "unplaceable_partials": 0,
+          "tp1_hits_without_bank": 0,
+          "peak_positions": 7,
+          "peak_by_bot": {
+            "stocks": 7,
+            "crypto": 4
+          },
+          "peak_reserved_margin_pct": 20.4350181703309,
+          "pnl_by_bot": {
+            "crypto": 4.337417142857143,
+            "stocks": 1.3204184999999777
+          },
+          "return_contribution_pct": {
+            "crypto": 3.452258152544686,
+            "stocks": 1.0509539159503165
+          }
+        }
+      }
+    },
+    "bbb": {
+      "2026-07": {
+        "5": {
+          "starting_capital": 125.64,
+          "ending_capital": 176.816818,
+          "return_pct": 40.732902,
+          "cash_drawdown_pct": 3.697606,
+          "trades": 221,
+          "skipped": {
+            "slots": 10,
+            "minimum_size": 0
+          },
+          "unplaceable_partials": 99,
+          "tp1_hits_without_bank": 37,
+          "peak_positions": 9,
+          "peak_by_bot": {
+            "crypto": 3,
+            "stocks": 8
+          },
+          "peak_reserved_margin_pct": 25.588789536650207,
+          "pnl_by_bot": {
+            "crypto": 8.704771428571405,
+            "stocks": 42.47204664999998
+          },
+          "return_contribution_pct": {
+            "crypto": 6.928344021467212,
+            "stocks": 33.80455798312638
+          }
+        },
+        "50": {
+          "starting_capital": 125.64,
+          "ending_capital": 171.716805,
+          "return_pct": 36.673675,
+          "cash_drawdown_pct": 3.419741,
+          "trades": 221,
+          "skipped": {
+            "slots": 10,
+            "minimum_size": 0
+          },
+          "unplaceable_partials": 0,
+          "tp1_hits_without_bank": 0,
+          "peak_positions": 9,
+          "peak_by_bot": {
+            "crypto": 3,
+            "stocks": 8
+          },
+          "peak_reserved_margin_pct": 25.231678900896476,
+          "pnl_by_bot": {
+            "crypto": 4.052202857142848,
+            "stocks": 42.02460209999998
+          },
+          "return_contribution_pct": {
+            "crypto": 3.2252490107790894,
+            "stocks": 33.44842574021011
+          }
+        }
+      },
+      "2026-08": {
+        "5": {
+          "starting_capital": 125.64,
+          "ending_capital": 158.461614,
+          "return_pct": 26.123539,
+          "cash_drawdown_pct": 2.776874,
+          "trades": 264,
+          "skipped": {
+            "slots": 11,
+            "minimum_size": 0
+          },
+          "unplaceable_partials": 109,
+          "tp1_hits_without_bank": 33,
+          "peak_positions": 9,
+          "peak_by_bot": {
+            "crypto": 4,
+            "stocks": 8
+          },
+          "peak_reserved_margin_pct": 26.303500950135067,
+          "pnl_by_bot": {
+            "crypto": 3.027320714285722,
+            "stocks": 29.794293650000025
+          },
+          "return_contribution_pct": {
+            "crypto": 2.409519829899492,
+            "stocks": 23.714019141993017
+          }
+        },
+        "50": {
+          "starting_capital": 125.64,
+          "ending_capital": 158.704147,
+          "return_pct": 26.316577,
+          "cash_drawdown_pct": 2.479977,
+          "trades": 264,
+          "skipped": {
+            "slots": 11,
+            "minimum_size": 0
+          },
+          "unplaceable_partials": 0,
+          "tp1_hits_without_bank": 0,
+          "peak_positions": 9,
+          "peak_by_bot": {
+            "crypto": 4,
+            "stocks": 8
+          },
+          "peak_reserved_margin_pct": 26.21759810566472,
+          "pnl_by_bot": {
+            "crypto": 3.2915771428571494,
+            "stocks": 29.772569650000026
+          },
+          "return_contribution_pct": {
+            "crypto": 2.6198480920544007,
+            "stocks": 23.696728470232433
+          }
+        }
+      },
+      "2026-09": {
+        "5": {
+          "starting_capital": 125.64,
+          "ending_capital": 151.134613,
+          "return_pct": 20.291796,
+          "cash_drawdown_pct": 4.347112,
+          "trades": 315,
+          "skipped": {
+            "slots": 9,
+            "minimum_size": 0
+          },
+          "unplaceable_partials": 166,
+          "tp1_hits_without_bank": 47,
+          "peak_positions": 11,
+          "peak_by_bot": {
+            "crypto": 4,
+            "stocks": 8
+          },
+          "peak_reserved_margin_pct": 30.973010531541416,
+          "pnl_by_bot": {
+            "crypto": 0.283620000000012,
+            "stocks": 25.210993100000003
+          },
+          "return_contribution_pct": {
+            "crypto": 0.2257402101241738,
+            "stocks": 20.066056271887938
+          }
+        },
+        "50": {
+          "starting_capital": 125.64,
+          "ending_capital": 151.880278,
+          "return_pct": 20.88529,
+          "cash_drawdown_pct": 3.207449,
+          "trades": 315,
+          "skipped": {
+            "slots": 9,
+            "minimum_size": 0
+          },
+          "unplaceable_partials": 0,
+          "tp1_hits_without_bank": 0,
+          "peak_positions": 11,
+          "peak_by_bot": {
+            "crypto": 4,
+            "stocks": 8
+          },
+          "peak_reserved_margin_pct": 31.162143454917313,
+          "pnl_by_bot": {
+            "crypto": 1.0396442857142958,
+            "stocks": 25.2006337
+          },
+          "return_contribution_pct": {
+            "crypto": 0.8274787374357655,
+            "stocks": 20.057810967844638
+          }
+        }
+      },
+      "2026-10": {
+        "5": {
+          "starting_capital": 125.64,
+          "ending_capital": 159.360604,
+          "return_pct": 26.839068,
+          "cash_drawdown_pct": 3.860942,
+          "trades": 310,
+          "skipped": {
+            "slots": 6,
+            "minimum_size": 0
+          },
+          "unplaceable_partials": 139,
+          "tp1_hits_without_bank": 45,
+          "peak_positions": 10,
+          "peak_by_bot": {
+            "stocks": 8,
+            "crypto": 4
+          },
+          "peak_reserved_margin_pct": 28.871154472732325,
+          "pnl_by_bot": {
+            "crypto": 4.777911428571443,
+            "stocks": 28.942693000000016
+          },
+          "return_contribution_pct": {
+            "crypto": 3.802858507299779,
+            "stocks": 23.03620900986948
+          }
+        },
+        "50": {
+          "starting_capital": 125.64,
+          "ending_capital": 158.800219,
+          "return_pct": 26.393042,
+          "cash_drawdown_pct": 3.710439,
+          "trades": 310,
+          "skipped": {
+            "slots": 6,
+            "minimum_size": 0
+          },
+          "unplaceable_partials": 0,
+          "tp1_hits_without_bank": 0,
+          "peak_positions": 10,
+          "peak_by_bot": {
+            "stocks": 8,
+            "crypto": 4
+          },
+          "peak_reserved_margin_pct": 28.70003874074687,
+          "pnl_by_bot": {
+            "crypto": 4.3955885714285845,
+            "stocks": 28.764630000000015
+          },
+          "return_contribution_pct": {
+            "crypto": 3.4985582389593954,
+            "stocks": 22.894484240687692
+          }
+        }
+      },
+      "2026-11": {
+        "5": {
+          "starting_capital": 125.64,
+          "ending_capital": 131.45212,
+          "return_pct": 4.626011,
+          "cash_drawdown_pct": 3.052386,
+          "trades": 100,
+          "skipped": {
+            "slots": 2,
+            "minimum_size": 0
+          },
+          "unplaceable_partials": 48,
+          "tp1_hits_without_bank": 22,
+          "peak_positions": 7,
+          "peak_by_bot": {
+            "stocks": 7,
+            "crypto": 4
+          },
+          "peak_reserved_margin_pct": 20.539053791069,
+          "pnl_by_bot": {
+            "crypto": 4.423525714285718,
+            "stocks": 1.3885939999999781
+          },
+          "return_contribution_pct": {
+            "crypto": 3.5207941056078624,
+            "stocks": 1.105216491563179
+          }
+        },
+        "50": {
+          "starting_capital": 125.64,
+          "ending_capital": 131.297836,
+          "return_pct": 4.503212,
+          "cash_drawdown_pct": 3.103785,
+          "trades": 100,
+          "skipped": {
+            "slots": 2,
+            "minimum_size": 0
+          },
+          "unplaceable_partials": 0,
+          "tp1_hits_without_bank": 0,
+          "peak_positions": 7,
+          "peak_by_bot": {
+            "stocks": 7,
+            "crypto": 4
+          },
+          "peak_reserved_margin_pct": 20.4350181703309,
+          "pnl_by_bot": {
+            "crypto": 4.337417142857143,
+            "stocks": 1.3204184999999777
+          },
+          "return_contribution_pct": {
+            "crypto": 3.452258152544686,
+            "stocks": 1.0509539159503165
+          }
+        }
+      }
+    },
+    "aaa": {
+      "2026-07": {
+        "5": {
+          "starting_capital": 125.64,
+          "ending_capital": 174.126122,
+          "return_pct": 38.59131,
+          "cash_drawdown_pct": 3.708522,
+          "trades": 227,
+          "skipped": {
+            "slots": 10,
+            "minimum_size": 0
+          },
+          "unplaceable_partials": 101,
+          "tp1_hits_without_bank": 39,
+          "peak_positions": 9,
+          "peak_by_bot": {
+            "crypto": 3,
+            "stocks": 8
+          },
+          "peak_reserved_margin_pct": 25.65389621947629,
+          "pnl_by_bot": {
+            "crypto": 6.101468571428536,
+            "stocks": 42.38465309999998
+          },
+          "return_contribution_pct": {
+            "crypto": 4.856310547141464,
+            "stocks": 33.734999283667605
+          }
+        },
+        "50": {
+          "starting_capital": 125.64,
+          "ending_capital": 169.94707,
+          "return_pct": 35.265099,
+          "cash_drawdown_pct": 3.358538,
+          "trades": 227,
+          "skipped": {
+            "slots": 10,
+            "minimum_size": 0
+          },
+          "unplaceable_partials": 0,
+          "tp1_hits_without_bank": 0,
+          "peak_positions": 9,
+          "peak_by_bot": {
+            "crypto": 3,
+            "stocks": 8
+          },
+          "peak_reserved_margin_pct": 25.300393050960835,
+          "pnl_by_bot": {
+            "crypto": 2.2820528571428342,
+            "stocks": 42.025016999999984
+          },
+          "return_contribution_pct": {
+            "crypto": 1.8163426115431665,
+            "stocks": 33.44875596943647
+          }
+        }
+      },
+      "2026-08": {
+        "5": {
+          "starting_capital": 125.64,
+          "ending_capital": 157.117691,
+          "return_pct": 25.053877,
+          "cash_drawdown_pct": 4.420629,
+          "trades": 281,
+          "skipped": {
+            "slots": 12,
+            "minimum_size": 0
+          },
+          "unplaceable_partials": 114,
+          "tp1_hits_without_bank": 38,
+          "peak_positions": 9,
+          "peak_by_bot": {
+            "crypto": 4,
+            "stocks": 8
+          },
+          "peak_reserved_margin_pct": 26.345967329408836,
+          "pnl_by_bot": {
+            "crypto": 1.9719335714286772,
+            "stocks": 29.505757350000025
+          },
+          "return_contribution_pct": {
+            "crypto": 1.5695109610225064,
+            "stocks": 23.48436592645656
+          }
+        },
+        "50": {
+          "starting_capital": 125.64,
+          "ending_capital": 157.212726,
+          "return_pct": 25.129518,
+          "cash_drawdown_pct": 3.834314,
+          "trades": 281,
+          "skipped": {
+            "slots": 12,
+            "minimum_size": 0
+          },
+          "unplaceable_partials": 0,
+          "tp1_hits_without_bank": 0,
+          "peak_positions": 9,
+          "peak_by_bot": {
+            "crypto": 4,
+            "stocks": 8
+          },
+          "peak_reserved_margin_pct": 26.25393292332517,
+          "pnl_by_bot": {
+            "crypto": 1.9151814285714868,
+            "stocks": 29.657544850000026
+          },
+          "return_contribution_pct": {
+            "crypto": 1.5243405193978723,
+            "stocks": 23.60517737185612
+          }
+        }
+      },
+      "2026-09": {
+        "5": {
+          "starting_capital": 125.64,
+          "ending_capital": 152.416751,
+          "return_pct": 21.312282,
+          "cash_drawdown_pct": 4.900061,
+          "trades": 331,
+          "skipped": {
+            "slots": 10,
+            "minimum_size": 0
+          },
+          "unplaceable_partials": 163,
+          "tp1_hits_without_bank": 47,
+          "peak_positions": 11,
+          "peak_by_bot": {
+            "crypto": 4,
+            "stocks": 8
+          },
+          "peak_reserved_margin_pct": 32.086047737848794,
+          "pnl_by_bot": {
+            "crypto": 2.063731428571432,
+            "stocks": 24.713019300000003
+          },
+          "return_contribution_pct": {
+            "crypto": 1.6425751580479402,
+            "stocks": 19.66970654250239
+          }
+        },
+        "50": {
+          "starting_capital": 125.64,
+          "ending_capital": 151.722014,
+          "return_pct": 20.759324,
+          "cash_drawdown_pct": 4.125251,
+          "trades": 331,
+          "skipped": {
+            "slots": 10,
+            "minimum_size": 0
+          },
+          "unplaceable_partials": 0,
+          "tp1_hits_without_bank": 0,
+          "peak_positions": 11,
+          "peak_by_bot": {
+            "crypto": 4,
+            "stocks": 8
+          },
+          "peak_reserved_margin_pct": 32.06262196999629,
+          "pnl_by_bot": {
+            "crypto": 1.4379928571428664,
+            "stocks": 24.644021200000005
+          },
+          "return_contribution_pct": {
+            "crypto": 1.14453427025061,
+            "stocks": 19.614789239095835
+          }
+        }
+      },
+      "2026-10": {
+        "5": {
+          "starting_capital": 125.64,
+          "ending_capital": 163.142432,
+          "return_pct": 29.849118,
+          "cash_drawdown_pct": 4.601618,
+          "trades": 309,
+          "skipped": {
+            "slots": 6,
+            "minimum_size": 0
+          },
+          "unplaceable_partials": 136,
+          "tp1_hits_without_bank": 42,
+          "peak_positions": 10,
+          "peak_by_bot": {
+            "stocks": 8,
+            "crypto": 4
+          },
+          "peak_reserved_margin_pct": 28.051010501735234,
+          "pnl_by_bot": {
+            "crypto": 8.231287142857152,
+            "stocks": 29.271145000000015
+          },
+          "return_contribution_pct": {
+            "crypto": 6.551486105425941,
+            "stocks": 23.29763212352755
+          }
+        },
+        "50": {
+          "starting_capital": 125.64,
+          "ending_capital": 161.508538,
+          "return_pct": 28.548661,
+          "cash_drawdown_pct": 4.51834,
+          "trades": 309,
+          "skipped": {
+            "slots": 6,
+            "minimum_size": 0
+          },
+          "unplaceable_partials": 0,
+          "tp1_hits_without_bank": 0,
+          "peak_positions": 10,
+          "peak_by_bot": {
+            "stocks": 8,
+            "crypto": 4
+          },
+          "peak_reserved_margin_pct": 27.986807671775203,
+          "pnl_by_bot": {
+            "crypto": 6.925572142857147,
+            "stocks": 28.942966000000016
+          },
+          "return_contribution_pct": {
+            "crypto": 5.512235070723613,
+            "stocks": 23.03642629735754
+          }
+        }
+      },
+      "2026-11": {
+        "5": {
+          "starting_capital": 125.64,
+          "ending_capital": 126.454206,
+          "return_pct": 0.648047,
+          "cash_drawdown_pct": 3.090914,
+          "trades": 107,
+          "skipped": {
+            "slots": 3,
+            "minimum_size": 0
+          },
+          "unplaceable_partials": 57,
+          "tp1_hits_without_bank": 26,
+          "peak_positions": 7,
+          "peak_by_bot": {
+            "stocks": 7,
+            "crypto": 4
+          },
+          "peak_reserved_margin_pct": 20.477619443179304,
+          "pnl_by_bot": {
+            "crypto": -0.6203742857142747,
+            "stocks": 1.4345799999999789
+          },
+          "return_contribution_pct": {
+            "crypto": -0.49377131941600977,
+            "stocks": 1.1418178923909414
+          }
+        },
+        "50": {
+          "starting_capital": 125.64,
+          "ending_capital": 126.97492,
+          "return_pct": 1.062496,
+          "cash_drawdown_pct": 3.497116,
+          "trades": 107,
+          "skipped": {
+            "slots": 3,
+            "minimum_size": 0
+          },
+          "unplaceable_partials": 0,
+          "tp1_hits_without_bank": 0,
+          "peak_positions": 7,
+          "peak_by_bot": {
+            "stocks": 7,
+            "crypto": 4
+          },
+          "peak_reserved_margin_pct": 20.50620281143669,
+          "pnl_by_bot": {
+            "crypto": -0.007441428571420723,
+            "stocks": 1.342360999999978
+          },
+          "return_contribution_pct": {
+            "crypto": -0.005922818028828974,
+            "stocks": 1.068418497293838
+          }
+        }
+      }
+    },
+    "intersection": {
+      "2026-07": {
+        "5": {
+          "starting_capital": 125.64,
+          "ending_capital": 180.028275,
+          "return_pct": 43.28898,
+          "cash_drawdown_pct": 3.614338,
+          "trades": 197,
+          "skipped": {
+            "slots": 9,
+            "minimum_size": 0
+          },
+          "unplaceable_partials": 81,
+          "tp1_hits_without_bank": 27,
+          "peak_positions": 9,
+          "peak_by_bot": {
+            "crypto": 3,
+            "stocks": 8
+          },
+          "peak_reserved_margin_pct": 25.386240244465462,
+          "pnl_by_bot": {
+            "crypto": 11.496522857142812,
+            "stocks": 42.89175199999998
+          },
+          "return_contribution_pct": {
+            "crypto": 9.150368399508766,
+            "stocks": 34.13861190703596
+          }
+        },
+        "50": {
+          "starting_capital": 125.64,
+          "ending_capital": 175.990355,
+          "return_pct": 40.0751,
+          "cash_drawdown_pct": 3.458681,
+          "trades": 197,
+          "skipped": {
+            "slots": 9,
+            "minimum_size": 0
+          },
+          "unplaceable_partials": 0,
+          "tp1_hits_without_bank": 0,
+          "peak_positions": 9,
+          "peak_by_bot": {
+            "crypto": 3,
+            "stocks": 8
+          },
+          "peak_reserved_margin_pct": 25.69781583031505,
+          "pnl_by_bot": {
+            "crypto": 7.978224285714251,
+            "stocks": 42.37213109999998
+          },
+          "return_contribution_pct": {
+            "crypto": 6.350067085095711,
+            "stocks": 33.72503271251192
+          }
+        }
+      },
+      "2026-08": {
+        "5": {
+          "starting_capital": 125.64,
+          "ending_capital": 164.597233,
+          "return_pct": 31.00703,
+          "cash_drawdown_pct": 2.602137,
+          "trades": 252,
+          "skipped": {
+            "slots": 11,
+            "minimum_size": 0
+          },
+          "unplaceable_partials": 99,
+          "tp1_hits_without_bank": 29,
+          "peak_positions": 9,
+          "peak_by_bot": {
+            "crypto": 4,
+            "stocks": 8
+          },
+          "peak_reserved_margin_pct": 26.14097322819927,
+          "pnl_by_bot": {
+            "crypto": 9.067182142857147,
+            "stocks": 29.890050550000026
+          },
+          "return_contribution_pct": {
+            "crypto": 7.216795720198302,
+            "stocks": 23.790234439668918
+          }
+        },
+        "50": {
+          "starting_capital": 125.64,
+          "ending_capital": 162.298674,
+          "return_pct": 29.17755,
+          "cash_drawdown_pct": 2.475419,
+          "trades": 252,
+          "skipped": {
+            "slots": 11,
+            "minimum_size": 0
+          },
+          "unplaceable_partials": 0,
+          "tp1_hits_without_bank": 0,
+          "peak_positions": 9,
+          "peak_by_bot": {
+            "crypto": 4,
+            "stocks": 8
+          },
+          "peak_reserved_margin_pct": 26.19090110496173,
+          "pnl_by_bot": {
+            "crypto": 6.946413571428577,
+            "stocks": 29.712260450000024
+          },
+          "return_contribution_pct": {
+            "crypto": 5.528823281939332,
+            "stocks": 23.648726878382696
+          }
+        }
+      },
+      "2026-09": {
+        "5": {
+          "starting_capital": 125.64,
+          "ending_capital": 146.727329,
+          "return_pct": 16.783929,
+          "cash_drawdown_pct": 3.917102,
+          "trades": 281,
+          "skipped": {
+            "slots": 9,
+            "minimum_size": 0
+          },
+          "unplaceable_partials": 143,
+          "tp1_hits_without_bank": 30,
+          "peak_positions": 11,
+          "peak_by_bot": {
+            "crypto": 4,
+            "stocks": 8
+          },
+          "peak_reserved_margin_pct": 31.250353530694174,
+          "pnl_by_bot": {
+            "crypto": -3.2526371428571386,
+            "stocks": 24.3399658
+          },
+          "return_contribution_pct": {
+            "crypto": -2.5888547778232556,
+            "stocks": 19.372783985991724
+          }
+        },
+        "50": {
+          "starting_capital": 125.64,
+          "ending_capital": 149.874305,
+          "return_pct": 19.288686,
+          "cash_drawdown_pct": 3.687719,
+          "trades": 281,
+          "skipped": {
+            "slots": 9,
+            "minimum_size": 0
+          },
+          "unplaceable_partials": 0,
+          "tp1_hits_without_bank": 0,
+          "peak_positions": 11,
+          "peak_by_bot": {
+            "crypto": 4,
+            "stocks": 8
+          },
+          "peak_reserved_margin_pct": 30.838797734175806,
+          "pnl_by_bot": {
+            "crypto": -0.5428928571428583,
+            "stocks": 24.777197800000003
+          },
+          "return_contribution_pct": {
+            "crypto": -0.43210192386410246,
+            "stocks": 19.720787806431076
+          }
+        }
+      },
+      "2026-10": {
+        "5": {
+          "starting_capital": 125.64,
+          "ending_capital": 156.837967,
+          "return_pct": 24.831238,
+          "cash_drawdown_pct": 3.887414,
+          "trades": 282,
+          "skipped": {
+            "slots": 5,
+            "minimum_size": 0
+          },
+          "unplaceable_partials": 122,
+          "tp1_hits_without_bank": 32,
+          "peak_positions": 10,
+          "peak_by_bot": {
+            "stocks": 8,
+            "crypto": 4
+          },
+          "peak_reserved_margin_pct": 28.728016969548705,
+          "pnl_by_bot": {
+            "crypto": 2.6600442857143003,
+            "stocks": 28.537923000000013
+          },
+          "return_contribution_pct": {
+            "crypto": 2.1171953881839385,
+            "stocks": 22.714042502387787
+          }
+        },
+        "50": {
+          "starting_capital": 125.64,
+          "ending_capital": 156.888481,
+          "return_pct": 24.871443,
+          "cash_drawdown_pct": 3.732659,
+          "trades": 282,
+          "skipped": {
+            "slots": 5,
+            "minimum_size": 0
+          },
+          "unplaceable_partials": 0,
+          "tp1_hits_without_bank": 0,
+          "peak_positions": 10,
+          "peak_by_bot": {
+            "stocks": 8,
+            "crypto": 4
+          },
+          "peak_reserved_margin_pct": 28.851453347335365,
+          "pnl_by_bot": {
+            "crypto": 2.61953000000001,
+            "stocks": 28.628951000000015
+          },
+          "return_contribution_pct": {
+            "crypto": 2.0849490608086674,
+            "stocks": 22.78649395097104
+          }
+        }
+      },
+      "2026-11": {
+        "5": {
+          "starting_capital": 125.64,
+          "ending_capital": 127.358596,
+          "return_pct": 1.367874,
+          "cash_drawdown_pct": 2.76703,
+          "trades": 85,
+          "skipped": {
+            "slots": 2,
+            "minimum_size": 0
+          },
+          "unplaceable_partials": 42,
+          "tp1_hits_without_bank": 15,
+          "peak_positions": 7,
+          "peak_by_bot": {
+            "stocks": 7,
+            "crypto": 4
+          },
+          "peak_reserved_margin_pct": 20.459782311147418,
+          "pnl_by_bot": {
+            "crypto": 0.26494142857144853,
+            "stocks": 1.4536549999999786
+          },
+          "return_contribution_pct": {
+            "crypto": 0.21087347068724016,
+            "stocks": 1.157000159184956
+          }
+        },
+        "50": {
+          "starting_capital": 125.64,
+          "ending_capital": 126.806294,
+          "return_pct": 0.928282,
+          "cash_drawdown_pct": 2.727628,
+          "trades": 85,
+          "skipped": {
+            "slots": 2,
+            "minimum_size": 0
+          },
+          "unplaceable_partials": 0,
+          "tp1_hits_without_bank": 0,
+          "peak_positions": 7,
+          "peak_by_bot": {
+            "stocks": 7,
+            "crypto": 4
+          },
+          "peak_reserved_margin_pct": 20.57689175133794,
+          "pnl_by_bot": {
+            "crypto": -0.29850999999998,
+            "stocks": 1.4648039999999787
+          },
+          "return_contribution_pct": {
+            "crypto": -0.23759153135942376,
+            "stocks": 1.1658739255014157
+          }
+        }
+      }
+    },
+    "union": {
+      "2026-07": {
+        "5": {
+          "starting_capital": 125.64,
+          "ending_capital": 170.693493,
+          "return_pct": 35.859195,
+          "cash_drawdown_pct": 3.538762,
+          "trades": 240,
+          "skipped": {
+            "slots": 11,
+            "minimum_size": 0
+          },
+          "unplaceable_partials": 114,
+          "tp1_hits_without_bank": 44,
+          "peak_positions": 9,
+          "peak_by_bot": {
+            "crypto": 3,
+            "stocks": 8
+          },
+          "peak_reserved_margin_pct": 25.23208455229826,
+          "pnl_by_bot": {
+            "crypto": 2.901931428571417,
+            "stocks": 42.15156134999998
+          },
+          "return_contribution_pct": {
+            "crypto": 2.309719379633411,
+            "stocks": 33.54947576408786
+          }
+        },
+        "50": {
+          "starting_capital": 125.64,
+          "ending_capital": 165.415194,
+          "return_pct": 31.658066,
+          "cash_drawdown_pct": 3.404308,
+          "trades": 240,
+          "skipped": {
+            "slots": 11,
+            "minimum_size": 0
+          },
+          "unplaceable_partials": 0,
+          "tp1_hits_without_bank": 0,
+          "peak_positions": 9,
+          "peak_by_bot": {
+            "crypto": 3,
+            "stocks": 8
+          },
+          "peak_reserved_margin_pct": 25.574162917844244,
+          "pnl_by_bot": {
+            "crypto": -1.7803685714285664,
+            "stocks": 41.55556254999998
+          },
+          "return_contribution_pct": {
+            "crypto": -1.4170396143175472,
+            "stocks": 33.0751054998408
+          }
+        }
+      },
+      "2026-08": {
+        "5": {
+          "starting_capital": 125.64,
+          "ending_capital": 155.863075,
+          "return_pct": 24.055297,
+          "cash_drawdown_pct": 5.159511,
+          "trades": 294,
+          "skipped": {
+            "slots": 12,
+            "minimum_size": 0
+          },
+          "unplaceable_partials": 120,
+          "tp1_hits_without_bank": 43,
+          "peak_positions": 9,
+          "peak_by_bot": {
+            "crypto": 4,
+            "stocks": 8
+          },
+          "peak_reserved_margin_pct": 26.182041571383564,
+          "pnl_by_bot": {
+            "crypto": 0.49365785714296573,
+            "stocks": 29.729416850000025
+          },
+          "return_contribution_pct": {
+            "crypto": 0.39291456315103923,
+            "stocks": 23.662382083731316
+          }
+        },
+        "50": {
+          "starting_capital": 125.64,
+          "ending_capital": 156.886582,
+          "return_pct": 24.869931,
+          "cash_drawdown_pct": 4.821364,
+          "trades": 294,
+          "skipped": {
+            "slots": 12,
+            "minimum_size": 0
+          },
+          "unplaceable_partials": 0,
+          "tp1_hits_without_bank": 0,
+          "peak_positions": 9,
+          "peak_by_bot": {
+            "crypto": 4,
+            "stocks": 8
+          },
+          "peak_reserved_margin_pct": 26.229195722965276,
+          "pnl_by_bot": {
+            "crypto": 1.4692157142857702,
+            "stocks": 29.777365950000025
+          },
+          "return_contribution_pct": {
+            "crypto": 1.1693853185973975,
+            "stocks": 23.700545964660957
+          }
+        }
+      },
+      "2026-09": {
+        "5": {
+          "starting_capital": 125.64,
+          "ending_capital": 152.88002,
+          "return_pct": 21.681009,
+          "cash_drawdown_pct": 5.76617,
+          "trades": 355,
+          "skipped": {
+            "slots": 9,
+            "minimum_size": 0
+          },
+          "unplaceable_partials": 183,
+          "tp1_hits_without_bank": 60,
+          "peak_positions": 11,
+          "peak_by_bot": {
+            "crypto": 4,
+            "stocks": 8
+          },
+          "peak_reserved_margin_pct": 32.71871288050969,
+          "pnl_by_bot": {
+            "crypto": 1.7096028571429043,
+            "stocks": 25.530416800000005
+          },
+          "return_contribution_pct": {
+            "crypto": 1.3607154227498441,
+            "stocks": 20.3202935370901
+          }
+        },
+        "50": {
+          "starting_capital": 125.64,
+          "ending_capital": 149.744334,
+          "return_pct": 19.185239,
+          "cash_drawdown_pct": 5.16006,
+          "trades": 355,
+          "skipped": {
+            "slots": 9,
+            "minimum_size": 0
+          },
+          "unplaceable_partials": 0,
+          "tp1_hits_without_bank": 0,
+          "peak_positions": 11,
+          "peak_by_bot": {
+            "crypto": 4,
+            "stocks": 8
+          },
+          "peak_reserved_margin_pct": 32.01793246768807,
+          "pnl_by_bot": {
+            "crypto": -0.9091414285713788,
+            "stocks": 25.013475200000002
+          },
+          "return_contribution_pct": {
+            "crypto": -0.723608268522269,
+            "stocks": 19.908846864056034
+          }
+        }
+      },
+      "2026-10": {
+        "5": {
+          "starting_capital": 125.64,
+          "ending_capital": 165.818552,
+          "return_pct": 31.979108,
+          "cash_drawdown_pct": 4.730356,
+          "trades": 336,
+          "skipped": {
+            "slots": 7,
+            "minimum_size": 0
+          },
+          "unplaceable_partials": 153,
+          "tp1_hits_without_bank": 52,
+          "peak_positions": 10,
+          "peak_by_bot": {
+            "stocks": 8,
+            "crypto": 4
+          },
+          "peak_reserved_margin_pct": 27.989532587883907,
+          "pnl_by_bot": {
+            "crypto": 10.739745714285725,
+            "stocks": 29.438806000000014
+          },
+          "return_contribution_pct": {
+            "crypto": 8.548030654477655,
+            "stocks": 23.431077682266803
+          }
+        },
+        "50": {
+          "starting_capital": 125.64,
+          "ending_capital": 162.911856,
+          "return_pct": 29.665597,
+          "cash_drawdown_pct": 4.631839,
+          "trades": 336,
+          "skipped": {
+            "slots": 7,
+            "minimum_size": 0
+          },
+          "unplaceable_partials": 0,
+          "tp1_hits_without_bank": 0,
+          "peak_positions": 10,
+          "peak_by_bot": {
+            "stocks": 8,
+            "crypto": 4
+          },
+          "peak_reserved_margin_pct": 27.976577352605,
+          "pnl_by_bot": {
+            "crypto": 8.121532857142869,
+            "stocks": 29.150323500000017
+          },
+          "return_contribution_pct": {
+            "crypto": 6.4641299404193475,
+            "stocks": 23.201467287488075
+          }
+        }
+      },
+      "2026-11": {
+        "5": {
+          "starting_capital": 125.64,
+          "ending_capital": 130.697604,
+          "return_pct": 4.025472,
+          "cash_drawdown_pct": 3.274186,
+          "trades": 110,
+          "skipped": {
+            "slots": 3,
+            "minimum_size": 0
+          },
+          "unplaceable_partials": 55,
+          "tp1_hits_without_bank": 28,
+          "peak_positions": 7,
+          "peak_by_bot": {
+            "stocks": 7,
+            "crypto": 4
+          },
+          "peak_reserved_margin_pct": 20.454202500110792,
+          "pnl_by_bot": {
+            "crypto": 3.6211885714285637,
+            "stocks": 1.436414999999979
+          },
+          "return_contribution_pct": {
+            "crypto": 2.8821940237412953,
+            "stocks": 1.1432784145176529
+          }
+        },
+        "50": {
+          "starting_capital": 125.64,
+          "ending_capital": 130.788527,
+          "return_pct": 4.097841,
+          "cash_drawdown_pct": 3.315462,
+          "trades": 110,
+          "skipped": {
+            "slots": 3,
+            "minimum_size": 0
+          },
+          "unplaceable_partials": 0,
+          "tp1_hits_without_bank": 0,
+          "peak_positions": 7,
+          "peak_by_bot": {
+            "stocks": 7,
+            "crypto": 4
+          },
+          "peak_reserved_margin_pct": 20.503873746165258,
+          "pnl_by_bot": {
+            "crypto": 3.8111714285714178,
+            "stocks": 1.3373554999999782
+          },
+          "return_contribution_pct": {
+            "crypto": 3.0334061036066684,
+            "stocks": 1.0644344953836185
+          }
+        }
+      }
+    },
+    "current_frozen": {
+      "2026-07": {
+        "5": {
+          "starting_capital": 125.64,
+          "ending_capital": 166.789138,
+          "return_pct": 32.751622,
+          "cash_drawdown_pct": 3.582018,
+          "trades": 254,
+          "skipped": {
+            "slots": 11,
+            "minimum_size": 0
+          },
+          "unplaceable_partials": 120,
+          "tp1_hits_without_bank": 49,
+          "peak_positions": 10,
+          "peak_by_bot": {
+            "crypto": 3,
+            "stocks": 8
+          },
+          "peak_reserved_margin_pct": 28.352705462820637,
+          "pnl_by_bot": {
+            "crypto": -0.6588999999999671,
+            "stocks": 41.80803774999998
+          },
+          "return_contribution_pct": {
+            "crypto": -0.5244348933460419,
+            "stocks": 33.276056789239085
+          }
+        },
+        "50": {
+          "starting_capital": 125.64,
+          "ending_capital": 166.161571,
+          "return_pct": 32.252126,
+          "cash_drawdown_pct": 3.407937,
+          "trades": 254,
+          "skipped": {
+            "slots": 11,
+            "minimum_size": 0
+          },
+          "unplaceable_partials": 0,
+          "tp1_hits_without_bank": 0,
+          "peak_positions": 10,
+          "peak_by_bot": {
+            "crypto": 3,
+            "stocks": 8
+          },
+          "peak_reserved_margin_pct": 28.55382893422268,
+          "pnl_by_bot": {
+            "crypto": -0.8365285714285416,
+            "stocks": 41.35809914999998
+          },
+          "return_contribution_pct": {
+            "crypto": -0.6658138900259006,
+            "stocks": 32.917939469914025
+          }
+        }
+      },
+      "2026-08": {
+        "5": {
+          "starting_capital": 125.64,
+          "ending_capital": 157.396464,
+          "return_pct": 25.275759,
+          "cash_drawdown_pct": 4.148085,
+          "trades": 338,
+          "skipped": {
+            "slots": 14,
+            "minimum_size": 0
+          },
+          "unplaceable_partials": 155,
+          "tp1_hits_without_bank": 69,
+          "peak_positions": 9,
+          "peak_by_bot": {
+            "crypto": 4,
+            "stocks": 8
+          },
+          "peak_reserved_margin_pct": 25.784791650474006,
+          "pnl_by_bot": {
+            "crypto": 2.377440714285676,
+            "stocks": 29.379022800000026
+          },
+          "return_contribution_pct": {
+            "crypto": 1.8922641788329162,
+            "stocks": 23.383494746895913
+          }
+        },
+        "50": {
+          "starting_capital": 125.64,
+          "ending_capital": 158.061107,
+          "return_pct": 25.804766,
+          "cash_drawdown_pct": 4.142841,
+          "trades": 338,
+          "skipped": {
+            "slots": 14,
+            "minimum_size": 0
+          },
+          "unplaceable_partials": 0,
+          "tp1_hits_without_bank": 0,
+          "peak_positions": 9,
+          "peak_by_bot": {
+            "crypto": 4,
+            "stocks": 8
+          },
+          "peak_reserved_margin_pct": 25.908736167123614,
+          "pnl_by_bot": {
+            "crypto": 2.8906807142856903,
+            "stocks": 29.530426750000025
+          },
+          "return_contribution_pct": {
+            "crypto": 2.3007646563878468,
+            "stocks": 23.504000915313615
+          }
+        }
+      },
+      "2026-09": {
+        "5": {
+          "starting_capital": 125.64,
+          "ending_capital": 161.408288,
+          "return_pct": 28.46887,
+          "cash_drawdown_pct": 4.982558,
+          "trades": 385,
+          "skipped": {
+            "slots": 12,
+            "minimum_size": 0
+          },
+          "unplaceable_partials": 198,
+          "tp1_hits_without_bank": 65,
+          "peak_positions": 11,
+          "peak_by_bot": {
+            "crypto": 4,
+            "stocks": 8
+          },
+          "peak_reserved_margin_pct": 32.33197651789321,
+          "pnl_by_bot": {
+            "crypto": 10.253859999999387,
+            "stocks": 25.514428100000003
+          },
+          "return_contribution_pct": {
+            "crypto": 8.161302133078149,
+            "stocks": 20.30756773320599
+          }
+        },
+        "50": {
+          "starting_capital": 125.64,
+          "ending_capital": 155.765043,
+          "return_pct": 23.977271,
+          "cash_drawdown_pct": 4.86558,
+          "trades": 385,
+          "skipped": {
+            "slots": 12,
+            "minimum_size": 0
+          },
+          "unplaceable_partials": 0,
+          "tp1_hits_without_bank": 0,
+          "peak_positions": 11,
+          "peak_by_bot": {
+            "crypto": 4,
+            "stocks": 8
+          },
+          "peak_reserved_margin_pct": 32.18066383728736,
+          "pnl_by_bot": {
+            "crypto": 5.127405714285251,
+            "stocks": 24.997637600000004
+          },
+          "return_contribution_pct": {
+            "crypto": 4.0810296993674395,
+            "stocks": 19.896241324418977
+          }
+        }
+      },
+      "2026-10": {
+        "5": {
+          "starting_capital": 125.64,
+          "ending_capital": 174.76256,
+          "return_pct": 39.097867,
+          "cash_drawdown_pct": 2.695827,
+          "trades": 374,
+          "skipped": {
+            "slots": 10,
+            "minimum_size": 0
+          },
+          "unplaceable_partials": 172,
+          "tp1_hits_without_bank": 75,
+          "peak_positions": 10,
+          "peak_by_bot": {
+            "stocks": 8,
+            "crypto": 4
+          },
+          "peak_reserved_margin_pct": 29.011740417164216,
+          "pnl_by_bot": {
+            "crypto": 19.500101428572187,
+            "stocks": 29.622459000000013
+          },
+          "return_contribution_pct": {
+            "crypto": 15.520615591031667,
+            "stocks": 23.577251671442227
+          }
+        },
+        "50": {
+          "starting_capital": 125.64,
+          "ending_capital": 171.384659,
+          "return_pct": 36.409312,
+          "cash_drawdown_pct": 2.437225,
+          "trades": 374,
+          "skipped": {
+            "slots": 10,
+            "minimum_size": 0
+          },
+          "unplaceable_partials": 0,
+          "tp1_hits_without_bank": 0,
+          "peak_positions": 10,
+          "peak_by_bot": {
+            "stocks": 8,
+            "crypto": 4
+          },
+          "peak_reserved_margin_pct": 28.636731537453986,
+          "pnl_by_bot": {
+            "crypto": 16.25876142857218,
+            "stocks": 29.485898000000017
+          },
+          "return_contribution_pct": {
+            "crypto": 12.94075249010839,
+            "stocks": 23.468559375994918
+          }
+        }
+      },
+      "2026-11": {
+        "5": {
+          "starting_capital": 125.64,
+          "ending_capital": 129.264216,
+          "return_pct": 2.884604,
+          "cash_drawdown_pct": 2.928158,
+          "trades": 108,
+          "skipped": {
+            "slots": 3,
+            "minimum_size": 0
+          },
+          "unplaceable_partials": 58,
+          "tp1_hits_without_bank": 27,
+          "peak_positions": 8,
+          "peak_by_bot": {
+            "stocks": 7,
+            "crypto": 4
+          },
+          "peak_reserved_margin_pct": 23.197988575646807,
+          "pnl_by_bot": {
+            "crypto": 2.2822385714285662,
+            "stocks": 1.3419774999999778
+          },
+          "return_contribution_pct": {
+            "crypto": 1.8164904261609092,
+            "stocks": 1.0681132601082282
+          }
+        },
+        "50": {
+          "starting_capital": 125.64,
+          "ending_capital": 128.681912,
+          "return_pct": 2.421133,
+          "cash_drawdown_pct": 3.035314,
+          "trades": 108,
+          "skipped": {
+            "slots": 3,
+            "minimum_size": 0
+          },
+          "unplaceable_partials": 0,
+          "tp1_hits_without_bank": 0,
+          "peak_positions": 8,
+          "peak_by_bot": {
+            "stocks": 7,
+            "crypto": 4
+          },
+          "peak_reserved_margin_pct": 23.267649641193376,
+          "pnl_by_bot": {
+            "crypto": 1.679364285714284,
+            "stocks": 1.362547499999978
+          },
+          "return_contribution_pct": {
+            "crypto": 1.336647791877017,
+            "stocks": 1.0844854345749586
+          }
+        }
+      }
+    }
+  },
+  "sources": {
+    "backtest_cache\\BTCUSDT_15min_18000_end1596153600000.pkl": "0c6c43dd6be423496b315483386ca86892ebc21e0a97a276e5aef1f16d63ca5d",
+    "backtest_cache\\ETHUSDT_15min_18000_end1596153600000.pkl": "b0ac7d5494cf5aea1395413dbe228381584e1859561d2a8041c7fe2f7fc3ac9c",
+    "backtest_cache\\XRPUSDT_15min_18000_end1596153600000.pkl": "fada1924f8c0d7d98a77f07f7ae4dca0aec34db2847599332053c74182df5470",
+    "backtest_cache\\XLMUSDT_15min_18000_end1596153600000.pkl": "912f7a1f1e24079d228bff232432c356534952b2946c8158a18d011129e0c1bf",
+    "backtest_cache\\LINKUSDT_15min_18000_end1596153600000.pkl": "1165693a143c3d0ef4902dffb2887583c06019e8a3cefacfb020ee10bb1172f5",
+    "backtest_cache\\BTCUSDT_15min_18000_end1612051200000.pkl": "fbcb82c94e655c734cd908f66bdf4cf9de3e6fc01803273f1da386cc44bcf255",
+    "backtest_cache\\ETHUSDT_15min_18000_end1612051200000.pkl": "4a8eefdebf32fd7fb9c31a125db0d3356e1cf3e720eeec98870e26aa6918dbe6",
+    "backtest_cache\\XRPUSDT_15min_18000_end1612051200000.pkl": "3f1319250b3cc0f00c2c128b06b3d0b0334054238e331694217d7dfb214e87ff",
+    "backtest_cache\\XLMUSDT_15min_18000_end1612051200000.pkl": "546297190111dc1b5a6b97112b3464643a810adc1fb29af8280ec2ec2b2cfc3e",
+    "backtest_cache\\LINKUSDT_15min_18000_end1612051200000.pkl": "787928c45a692fd812689aea9d9729577a8db24e2780db85f2b5ce68d94ba28b",
+    "backtest_cache\\BTCUSDT_15min_18000_end1627689600000.pkl": "b95fe06e81c5bfd3a06674805b3b7bbfdee868d6dee4f91c1d9dbcd5654a8e82",
+    "backtest_cache\\ETHUSDT_15min_18000_end1627689600000.pkl": "783cc8d284d8e9cf2167167ed411c50e0c0be5fcc48ae0451dec308545bbdb31",
+    "backtest_cache\\XRPUSDT_15min_18000_end1627689600000.pkl": "8b3bdd6836df6b762df5660101d67c021003a67f43b930526524c21ab99f45eb",
+    "backtest_cache\\XLMUSDT_15min_18000_end1627689600000.pkl": "78bcb8f2e57f94cad902686185b67810549776e93d310731402c5104d3ad5a43",
+    "backtest_cache\\LINKUSDT_15min_18000_end1627689600000.pkl": "1b47fcbde23a520ad11e91cc405a199177b158c5fdce9cd6443c6ea9355d80c1",
+    "backtest_cache\\BTCUSDT_15min_18000_end1643587200000.pkl": "a0d974d81678f66d34df4810fbf1eafaea035449d8caf6690f1e2898b71bc268",
+    "backtest_cache\\ETHUSDT_15min_18000_end1643587200000.pkl": "24fed69fed7fff0f13fe92e8610e9fcac4e33cba01bb4c87c9832c2cbfef93d2",
+    "backtest_cache\\XRPUSDT_15min_18000_end1643587200000.pkl": "8c44b10273f9e06fb79d9d6f8fedcb251091cef319d7438e1081dcf42d401ec8",
+    "backtest_cache\\XLMUSDT_15min_18000_end1643587200000.pkl": "ff5a49a1bafaa5b883f291ba520e951143f094bad0dfd6435685cfb8d95d3740",
+    "backtest_cache\\LINKUSDT_15min_18000_end1643587200000.pkl": "87bcd7fa4635a2e742ce943d70c4b0340ce0e0731b1d557d1fac717e59499773",
+    "backtest_cache\\BTCUSDT_15min_18000_end1659225600000.pkl": "0ec821c6d253c96000a8da3bc8d5038e30093b97033033f148ab99740128a28d",
+    "backtest_cache\\ETHUSDT_15min_18000_end1659225600000.pkl": "e3d0a1358ba0d55f8b9f2b98a64ebe32f166d5b25c347541ad6541c45382fb14",
+    "backtest_cache\\XRPUSDT_15min_18000_end1659225600000.pkl": "b88310cd673a5aca5db95bba2bb6e22c7b96d66f779e3555c4b35d46d5682b38",
+    "backtest_cache\\XLMUSDT_15min_18000_end1659225600000.pkl": "ee27314138805936abd6abd3923fe7d401d50a4f8d60f991e300069406c32cd4",
+    "backtest_cache\\LINKUSDT_15min_18000_end1659225600000.pkl": "afb80bce5c83210afb27e7b5fe69081657856e1b6490ac1a114d2d0c79f0840b",
+    "backtest_cache\\BTCUSDT_15min_18000_end1675123200000.pkl": "113a887c77744fcd3d8fa800754af8fa925e38a7c7cb9eec38964ecd8c811494",
+    "backtest_cache\\ETHUSDT_15min_18000_end1675123200000.pkl": "be59b9633f5c93a59d4d71a71356cac24fac60b7c80fb3dfafa955dd023d699c",
+    "backtest_cache\\XRPUSDT_15min_18000_end1675123200000.pkl": "9bee3d9a0da1ef4bd4c1b4ed0ceef9d7a4d8f03c512ee4286d305cba55b2334d",
+    "backtest_cache\\XLMUSDT_15min_18000_end1675123200000.pkl": "ed29cfc755e16bb9f7d78b906ca38eeb053e6b92c3f583b2bda245fcf324dd49",
+    "backtest_cache\\LINKUSDT_15min_18000_end1675123200000.pkl": "e147c4a5988d6b8bbf29a04bfffa456b8598e53ee350639425d10c69a9f280e2",
+    "backtest_cache\\BTCUSDT_15min_18000_end1690761600000.pkl": "57a415a1350f5bd6d966df45f6f553b2cd23aa15f8bb833481efb06cc4c7e00b",
+    "backtest_cache\\ETHUSDT_15min_18000_end1690761600000.pkl": "29df6d14fdc54cb2b95db32c986337fd8c65dedc89878a07d1c76853baefd149",
+    "backtest_cache\\XRPUSDT_15min_18000_end1690761600000.pkl": "2cd00e089fb16fc6cf63f2c5fd1813e7432ddb03c48612759c00b89df2cc8df7",
+    "backtest_cache\\XLMUSDT_15min_18000_end1690761600000.pkl": "50656fb24398f46ab50acf7242f436e6c9b42f9e1cb1dfd03ffcec4c27b576b3",
+    "backtest_cache\\LINKUSDT_15min_18000_end1690761600000.pkl": "3c48870c89cd383367bed376a99f9bc748b72621c09480be19c999b27ed65073",
+    "backtest_cache\\BTCUSDT_15min_18000_end1722384000000.pkl": "54d7ba0fcf6e3fa3cc5c483ffabc29decbfc55d987fea499c66c115bdc8a9600",
+    "backtest_cache\\ETHUSDT_15min_18000_end1722384000000.pkl": "2710207140ce83b2c59ee828591c7fdff82b0d7de6c82073583bf8a883074d93",
+    "backtest_cache\\XRPUSDT_15min_18000_end1722384000000.pkl": "e3a93bdd23f18b936c3dbafff53c1e2a780b9d3f82633daf7447c02eec193055",
+    "backtest_cache\\XLMUSDT_15min_18000_end1722384000000.pkl": "f39352e274ead4ac15ef3513c4be39c4762fa9c2ac3f0ffdf93e64881a99dd7f",
+    "backtest_cache\\LINKUSDT_15min_18000_end1722384000000.pkl": "62e274bd77ff9e2beb1dab678d032687829ee1e749609025112525835beaa71a",
+    "backtest_cache\\BTCUSDT_15min_18000_end1753920000000.pkl": "45c2c1c476e0f5c25a95e92b3cfef62fba51a83e0583f912c60869bf526ec7fe",
+    "backtest_cache\\ETHUSDT_15min_18000_end1753920000000.pkl": "fa39de96a7a0e2ba4cb4ba29c50313ed34d76d998ae45f2abcc7a3cd34bb5c6e",
+    "backtest_cache\\XRPUSDT_15min_18000_end1753920000000.pkl": "39a373e3bd1607a0a8fcc62028bde775cb16050752d80f8dba7049996c26cb81",
+    "backtest_cache\\XLMUSDT_15min_18000_end1753920000000.pkl": "e15dbf286577e84cce8c4f47fdc40b68f45a94a01042452f89a56a265e9a6b83",
+    "backtest_cache\\LINKUSDT_15min_18000_end1753920000000.pkl": "7d7f5bdaa54e386971560d20a0bdce96785e3547c73181b2d8bf0c409afce2da",
+    "backtest_cache\\BTCUSDT_15min_18000.pkl": "9fddc654964981fb9c44c83937da74f694a6e8246a3cef6f9732f6e4db620dc1",
+    "backtest_cache\\ETHUSDT_15min_18000.pkl": "af464efe40078935db46a52bbc186eb6f53ce68a2473bd27fd4a00f1c699549b",
+    "backtest_cache\\XRPUSDT_15min_18000.pkl": "aa1f5622ff08ad1e0cfbe24854d4957a4b1e3cab2febd8060941b4de60e69063",
+    "backtest_cache\\XLMUSDT_15min_18000.pkl": "e921344f0f843231f1e27d0368e71d282703fd5d031b79c965b9b6fd9504095e",
+    "backtest_cache\\LINKUSDT_15min_18000.pkl": "65e3502ccdb82748e78d96c9739b49bd7bc45ccca4f873b776f26f4c541bf565",
+    "reports\\audit_2026_09_08\\crypto_expected_cash_edge_expiry_mark_v2_nov14.json": "a01850792d1b813026a35de880982573ed35c98f629edbdd57279a79dbd77d0e",
+    "reports\\audit_2026_09_08\\crypto_expected_cash_edge_asset_features_expiry_mark_v2_nov14.json": "11b36f42f8fa86deac3f5486e1a49ef5dc2fce0286b4a0baea6b862cc1976e44",
+    "append_candle_snapshot.py": "a68f1a2640806e15e35c2b27ffae9ec9b2e651a93c02f35eca2ce1f2f8c5fadb",
+    "entry_hypotheses.py": "951e5cf4637b696be8007e49d476a1d94519c0e4d40c9225ec45311543bf4884",
+    "crypto_walk_forward_family_model.py": "8a69b0ac47aafc419d51e6b5b7b53ddafc4dca78db80b7a3e01ff6a0ab8dc22e",
+    "asset_entry_features_research.py": "1337735532565e9d7d1418e578446e6e53ea3895c64dd4005eb7b269e6f96f2a",
+    "crypto_profit_first_runner_protection_oct30_audit.py": "39884e91cbced61683cac9bee69614b712694d24d72e97407abe48b376f84e5f",
+    "C:\\Users\\Lenovo\\Desktop\\telegram bot\\src\\frozen_crypto_profit_first_material_2r.json": "6e91a987a5c36a759c6d6c73edf0fb3ee3482aeb679a30ba894e3852f54ffd6f",
+    "backtest_cache\\BTCUSDT_15min_18000_end1706659200000.pkl": "eaaa7f4f034820f9377966cf4a9e5077924d5b83135e82b9747dc06f7dad81a4",
+    "backtest_cache\\ETHUSDT_15min_18000_end1706659200000.pkl": "51ced5c6ecb422cf506e205891663c88becf54b35e17c70d832bfdbea79aa095",
+    "backtest_cache\\LINKUSDT_15min_18000_end1706659200000.pkl": "d8eabf3447e6d2002fca102be4a83c91c109ab5077b018b953fce172efa76944",
+    "backtest_cache\\XLMUSDT_15min_18000_end1706659200000.pkl": "6a30b2810e448630c5389548a0d316d542230751ed1c433b4965dadb0d0e901c",
+    "backtest_cache\\XRPUSDT_15min_18000_end1706659200000.pkl": "2585efe09c43432104a6f7db961a700779bc07867b23edef38405851f1ed2b6a",
+    "reports\\audit_2026_09_08\\phase_router_full_2023_expiry_mark_v2\\pool.pkl": "4788f87a0504f25956a0de8b885b11958c74242899e8dc30164dad74e02ffb3c",
+    "backtest_cache\\BTCUSDT_15min_18000_end1738281600000.pkl": "8cd1fae2f436e0953c81861adbb849820aa4e0d73ebebc399b5d5e7bf4026b89",
+    "backtest_cache\\ETHUSDT_15min_18000_end1738281600000.pkl": "703833665623fb4fe720068e9a3bdf3a08165d96a0b692dcdb8ecb483bbb80ea",
+    "backtest_cache\\LINKUSDT_15min_18000_end1738281600000.pkl": "8b3b80f9047061990ea0a76a9be847d663434f5b09eb385eb2b81a3eb8b39f87",
+    "backtest_cache\\XLMUSDT_15min_18000_end1738281600000.pkl": "b92832dee1dd7ce91d87424f2e567e8fc74314b0417f65d2807b78812ab41474",
+    "backtest_cache\\XRPUSDT_15min_18000_end1738281600000.pkl": "756e5dc58e4162d70638b6c495770ee6b2d0b56d2dfe6797c4a614b03d3d53a5",
+    "reports\\audit_2026_09_08\\phase_router_full_2024_expiry_mark_v2\\pool.pkl": "c31fb5843411925cde303e3c01c5a3f493d4c98f855a4b989da8433743f0118d",
+    "backtest_cache\\BTCUSDT_15min_18000_end1769817600000.pkl": "95303472274648fd20da599f027a8fe8d77c4dede7d218c242f666778bae0800",
+    "backtest_cache\\ETHUSDT_15min_18000_end1769817600000.pkl": "7ff35cb9d950f27785cb5ced3f16c0a9425d4d72593c79721fd353291b5e4ee1",
+    "backtest_cache\\LINKUSDT_15min_18000_end1769817600000.pkl": "f5f05bba8fde7bd585a93f68cc1c9fb087aeb23d373d68bf5602c675e0dd1946",
+    "backtest_cache\\XLMUSDT_15min_18000_end1769817600000.pkl": "c65f1ce319fbcb12a1ff30266ae58fac04e31ca24ec2262d4c18828227d04d4a",
+    "backtest_cache\\XRPUSDT_15min_18000_end1769817600000.pkl": "94aacbdeccf010610d2f66369c3865278e03a1ad0b44ff77d2a9a8dfbcc094df",
+    "reports\\audit_2026_09_08\\phase_router_full_2025_expiry_mark_v2\\pool.pkl": "983e1ea8fcd0a5c5385fbb65d712f76e5b4e72e93e366ded998209758a7b6fba",
+    "reports\\audit_2026_09_08\\xperp_15m_nov14_merged\\AAVEUSDT_15min_current.pkl": "4fec164d0f4bf3116b2b25bf85391581d3bc4af7f9fb1d519606a8ecb499d8d4",
+    "reports\\audit_2026_09_08\\xperp_15m_nov14_merged\\AVAXUSDT_15min_current.pkl": "e3a4d205975ee0e6eca0db0a9ed0205fb824d7c695d8982a28f401516749cf4a",
+    "reports\\audit_2026_09_08\\xperp_15m_nov14_merged\\BILLUSDT_15min_current.pkl": "885eb5fa2b223654aa3c9250a08cfb5cebc8be8fb9bd964c1e1c2714ed4c2c25",
+    "reports\\audit_2026_09_08\\xperp_15m_nov14_merged\\BTCUSDT_15min_current.pkl": "49dea2d9da7944bc1f344722460910108e33f1cd17d5dfd0a91dccd4124dd44c",
+    "reports\\audit_2026_09_08\\xperp_15m_nov14_merged\\ETHUSDT_15min_current.pkl": "654705d6f11986116c8c177e9117d0a8837f2aba662e245f63406b8b136e7eb4",
+    "reports\\audit_2026_09_08\\xperp_15m_nov14_merged\\HYPEUSDT_15min_current.pkl": "a89131690b812248f2fab6ade2960cbec05cf6bcf3074839487b907d3d103759",
+    "reports\\audit_2026_09_08\\xperp_15m_nov14_merged\\LINKUSDT_15min_current.pkl": "040ce8728d836ad20ea095c9857601d56c6b4a6734a6ca4be3e215061cbfc811",
+    "reports\\audit_2026_09_08\\xperp_15m_nov14_merged\\SOLUSDT_15min_current.pkl": "9be04e74d740c817fc510bb84abaab0fb3abc572984ab1c4a5550b36d510b8a3",
+    "reports\\audit_2026_09_08\\xperp_15m_nov14_merged\\SUIUSDT_15min_current.pkl": "9457f5af0d0dee542a0ebb663ddebc9a5fc72439b8ee52c1048da5eeb3cef38d",
+    "reports\\audit_2026_09_08\\xperp_15m_nov14_merged\\XLMUSDT_15min_current.pkl": "37f9271f0df066f7b7cadb82ac83aff1801d1f500c340bfb9993e5a8afa8ba86",
+    "reports\\audit_2026_09_08\\xperp_15m_nov14_merged\\XRPUSDT_15min_current.pkl": "ce39f87ca04a393119ea337cfd9b127f86473381258107e426a5d5d6747b8b51",
+    "reports\\audit_2026_09_08\\xperp_15m_nov14_merged\\ZECUSDT_15min_current.pkl": "a62e7f7d83ceb149c3fc020f91095b4ac1fd9440e18bc1c6d2c07f4c3dc3705b",
+    "reports\\audit_2026_09_08\\expected_cash_edge_literal_pool_expiry_mark_v2_nov14.pkl": "75b168a432ffdd1e80f860a1f78bb9b95a4ddaa9385aad5a036170d49a9a948a",
+    "reports\\audit_2026_09_08\\crypto_xperp_raw_router_audit_2_0_nov14_merged_raw_families.csv": "fd9800fcd1822ace6e1b2fd1cc9d31f7f6924e0572cccc759c07ac536d8b893a",
+    "reports\\audit_2026_09_08\\crypto_xperp_raw_router_audit_0_5_nov14_merged_raw_families.csv": "24faa7e3ef2848e4277a1fc95a04754b3ba01f67cb628d4fb52fcf9a45421760",
+    "..\\tusa stocks\\reports\\audit_2026_09_08\\stock_factor_nov14_baseline.pkl": "a1d9b4c623e3023f1b2a012b2536e3481b0fcb99809d17bc7981922effd144ce",
+    "..\\tusa stocks\\reports\\audit_2026_09_08\\stock_xperp_forward_nov14_merged\\manifest.json": "50d0e0ce982332be100adc2e2bcb1e79d83fa05b367b2481e1be7cd0b5bb248d",
+    "reports\\audit_2026_09_08\\xperp_15m_nov14_merged\\manifest.json": "6ebba73ab8fe00a7a0740feaf3b6fdc867d4773dd36277be53d42f8e20a236b5",
+    "reports\\audit_2026_09_08\\shared_xperp_specs_nov14.json": "7a4a76b813dfe6a5a08c9e858b17d453285dddc99529cdc293885682cf2bee0e",
+    "reports\\audit_2026_09_08\\crypto_frozen_nov14_expiry_mark_v2_be_0.5.pkl": "66264dfb23590f3a0cf7dcbbfe58ce6cba5f29d762c79f79eb63b7add471b0ba",
+    "C:\\Users\\Lenovo\\Desktop\\telegram bot\\crypto_phase_router_nov15.py": "a05c4fb3aaba464d9d39cfeed8b31ab68cf3f52889eb4d8db34f96fd5bd9a2bc",
+    "C:\\Users\\Lenovo\\Desktop\\telegram bot\\verify_crypto_profit_first_runtime_parity_nov3.py": "49e72046085241113fd2029bedba890debf1802008611b5041b29770d9a218bc",
+    "C:\\Users\\Lenovo\\Desktop\\telegram bot\\crypto_high_target_tree_oct5_audit.py": "540c573b8ccdb89f849550099e314cfef76dac8027d685b2a23ec4973d965bca",
+    "crypto_expected_cash_edge_nov14.py": "3e285947fd5f6080d86abc2f5122bc1eb06a1130b209eb21d3c53464f6eea813",
+    "lot_aware_tp1_audit.py": "519da86a9ceb92b899887e590a6f891bd7f9cb20a07c5676b0dcfe93571a2e16",
+    "shared_factor_account_nov14_audit.py": "cd385644515bb374274781ac1768e039a28be2e39e24e396f50933fa302e1f99"
+  },
+  "limitations": [
+    "All historical eras previously researched; no pristine unseen test",
+    "Entry targets use ideal 50 percent first bank; current lot rounding only in direct joint-account tests",
+    "Full-year candles outside native venue are transfer stress tests on five original assets",
+    "Signal BE activates next 15m bar; actual within-bar amendment remains uncertain",
+    "No historical spreads, fees, funding, book fills or live latency reconstruction",
+    "Monthly cohorts start flat, exclude inherited positions and next-month exits; not client-account PnL",
+    "Shock/trend/range labels are bounded price/volume proxies, not all possible market phases or news"
+  ],
+  "inspected_after_selection": [
+    "bab",
+    "bbb",
+    "aaa",
+    "intersection",
+    "union"
+  ],
+  "later_archived_windows": {
+    "bab": {
+      "2024": {
+        "n": 415,
+        "wr": 66.99,
+        "return_pct": 7.0631,
+        "dd_pct": 8.2515,
+        "trades_per_calendar_day": 2.268,
+        "monthly_return_pct": {
+          "2024-01": -0.4214,
+          "2024-02": 2.257,
+          "2024-03": 3.7087,
+          "2024-04": 4.6172,
+          "2024-05": 2.077,
+          "2024-06": 0.2784,
+          "2024-07": -5.3266
+        },
+        "worst_observed_month_pct": -5.3266,
+        "months_ge_30": 0
+      },
+      "2025": {
+        "n": 498,
+        "wr": 67.47,
+        "return_pct": 3.8842,
+        "dd_pct": 5.5013,
+        "trades_per_calendar_day": 2.707,
+        "monthly_return_pct": {
+          "2025-01": -0.6196,
+          "2025-02": 0.5312,
+          "2025-03": -0.4787,
+          "2025-04": 1.0342,
+          "2025-05": 0.362,
+          "2025-06": 0.5138,
+          "2025-07": 2.5104
+        },
+        "worst_observed_month_pct": -0.6196,
+        "months_ge_30": 0
+      },
+      "2026": {
+        "n": 262,
+        "wr": 64.89,
+        "return_pct": -5.0731,
+        "dd_pct": 6.4713,
+        "trades_per_calendar_day": 1.44,
+        "monthly_return_pct": {
+          "2026-02": -1.7183,
+          "2026-03": -3.7117,
+          "2026-04": 0.7962,
+          "2026-05": -1.6722,
+          "2026-06": 1.5278,
+          "2026-07": -0.652,
+          "2026-08": 0.341
+        },
+        "worst_observed_month_pct": -3.7117,
+        "months_ge_30": 0
+      }
+    },
+    "bbb": {
+      "2024": {
+        "n": 414,
+        "wr": 66.91,
+        "return_pct": 6.981,
+        "dd_pct": 8.3218,
+        "trades_per_calendar_day": 2.262,
+        "monthly_return_pct": {
+          "2024-01": -0.4214,
+          "2024-02": 2.257,
+          "2024-03": 3.7087,
+          "2024-04": 4.6172,
+          "2024-05": 2.077,
+          "2024-06": 0.2784,
+          "2024-07": -5.3992
+        },
+        "worst_observed_month_pct": -5.3992,
+        "months_ge_30": 0
+      },
+      "2025": {
+        "n": 498,
+        "wr": 67.67,
+        "return_pct": 3.4435,
+        "dd_pct": 5.5013,
+        "trades_per_calendar_day": 2.707,
+        "monthly_return_pct": {
+          "2025-01": -0.6196,
+          "2025-02": 0.656,
+          "2025-03": -0.4787,
+          "2025-04": 0.9912,
+          "2025-05": -0.2325,
+          "2025-06": 0.6019,
+          "2025-07": 2.5104
+        },
+        "worst_observed_month_pct": -0.6196,
+        "months_ge_30": 0
+      },
+      "2026": {
+        "n": 260,
+        "wr": 65.0,
+        "return_pct": -5.6991,
+        "dd_pct": 7.0595,
+        "trades_per_calendar_day": 1.429,
+        "monthly_return_pct": {
+          "2026-02": -1.7183,
+          "2026-03": -3.7117,
+          "2026-04": 0.1623,
+          "2026-05": -1.6722,
+          "2026-06": 1.9389,
+          "2026-07": -0.652,
+          "2026-08": -0.0945
+        },
+        "worst_observed_month_pct": -3.7117,
+        "months_ge_30": 0
+      }
+    },
+    "aaa": {
+      "2024": {
+        "n": 417,
+        "wr": 67.15,
+        "return_pct": 7.8299,
+        "dd_pct": 9.1478,
+        "trades_per_calendar_day": 2.291,
+        "monthly_return_pct": {
+          "2024-01": -0.9731,
+          "2024-02": 2.8344,
+          "2024-03": 2.6778,
+          "2024-04": 7.3104,
+          "2024-05": 2.731,
+          "2024-06": -3.2286,
+          "2024-07": -3.3324
+        },
+        "worst_observed_month_pct": -3.3324,
+        "months_ge_30": 0
+      },
+      "2025": {
+        "n": 481,
+        "wr": 70.06,
+        "return_pct": 14.7563,
+        "dd_pct": 4.3843,
+        "trades_per_calendar_day": 2.628,
+        "monthly_return_pct": {
+          "2025-01": -0.229,
+          "2025-02": -0.7403,
+          "2025-03": 5.6968,
+          "2025-04": 2.9243,
+          "2025-05": -1.796,
+          "2025-06": 3.4383,
+          "2025-07": 4.8597
+        },
+        "worst_observed_month_pct": -1.796,
+        "months_ge_30": 0
+      },
+      "2026": {
+        "n": 291,
+        "wr": 72.16,
+        "return_pct": 8.858,
+        "dd_pct": 3.4645,
+        "trades_per_calendar_day": 1.599,
+        "monthly_return_pct": {
+          "2026-02": 0.4252,
+          "2026-03": 0.908,
+          "2026-04": 3.8762,
+          "2026-05": -2.3147,
+          "2026-06": 5.3658,
+          "2026-07": -0.7117,
+          "2026-08": 1.1925
+        },
+        "worst_observed_month_pct": -2.3147,
+        "months_ge_30": 0
+      }
+    },
+    "intersection": {
+      "2024": {
+        "n": 310,
+        "wr": 67.1,
+        "return_pct": 7.5873,
+        "dd_pct": 9.3681,
+        "trades_per_calendar_day": 1.713,
+        "monthly_return_pct": {
+          "2024-01": -0.244,
+          "2024-02": 2.8266,
+          "2024-03": 2.8347,
+          "2024-04": 7.4006,
+          "2024-05": 2.1345,
+          "2024-06": -2.0925,
+          "2024-07": -5.0311
+        },
+        "worst_observed_month_pct": -5.0311,
+        "months_ge_30": 0
+      },
+      "2025": {
+        "n": 362,
+        "wr": 69.06,
+        "return_pct": 7.3545,
+        "dd_pct": 5.1119,
+        "trades_per_calendar_day": 1.978,
+        "monthly_return_pct": {
+          "2025-01": -0.5386,
+          "2025-02": -0.8658,
+          "2025-03": 2.7048,
+          "2025-04": 3.38,
+          "2025-05": -2.7673,
+          "2025-06": 0.7514,
+          "2025-07": 4.677
+        },
+        "worst_observed_month_pct": -2.7673,
+        "months_ge_30": 0
+      },
+      "2026": {
+        "n": 208,
+        "wr": 69.23,
+        "return_pct": 2.0509,
+        "dd_pct": 3.4311,
+        "trades_per_calendar_day": 1.143,
+        "monthly_return_pct": {
+          "2026-02": -0.6636,
+          "2026-03": -0.1214,
+          "2026-04": 1.2784,
+          "2026-05": -1.9058,
+          "2026-06": 3.2516,
+          "2026-07": 0.0684,
+          "2026-08": 0.2033
+        },
+        "worst_observed_month_pct": -1.9058,
+        "months_ge_30": 0
+      }
+    },
+    "union": {
+      "2024": {
+        "n": 512,
+        "wr": 67.38,
+        "return_pct": 8.9287,
+        "dd_pct": 8.2099,
+        "trades_per_calendar_day": 2.783,
+        "monthly_return_pct": {
+          "2024-01": -1.1493,
+          "2024-02": 2.6745,
+          "2024-03": 3.2369,
+          "2024-04": 5.1659,
+          "2024-05": 3.514,
+          "2024-06": -0.9771,
+          "2024-07": -3.5604
+        },
+        "worst_observed_month_pct": -3.5604,
+        "months_ge_30": 0
+      },
+      "2025": {
+        "n": 607,
+        "wr": 68.86,
+        "return_pct": 10.0146,
+        "dd_pct": 5.2679,
+        "trades_per_calendar_day": 3.299,
+        "monthly_return_pct": {
+          "2025-01": -0.3098,
+          "2025-02": 0.3613,
+          "2025-03": 2.3001,
+          "2025-04": 1.1599,
+          "2025-05": 0.7796,
+          "2025-06": 3.1271,
+          "2025-07": 2.2356
+        },
+        "worst_observed_month_pct": -0.3098,
+        "months_ge_30": 0
+      },
+      "2026": {
+        "n": 331,
+        "wr": 68.58,
+        "return_pct": 1.196,
+        "dd_pct": 5.4574,
+        "trades_per_calendar_day": 1.819,
+        "monthly_return_pct": {
+          "2026-02": -0.8364,
+          "2026-03": -1.7533,
+          "2026-04": 2.7314,
+          "2026-05": -2.082,
+          "2026-06": 4.0031,
+          "2026-07": -1.5091,
+          "2026-08": 0.8057
+        },
+        "worst_observed_month_pct": -2.082,
+        "months_ge_30": 0
+      }
+    }
+  },
+  "full_years": {
+    "2023": {
+      "bab": {
+        "n": 521,
+        "wr": 70.06,
+        "return_pct": 19.2345,
+        "dd_pct": 5.3992,
+        "trades_per_calendar_day": 1.463,
+        "monthly_return_pct": {
+          "2023-01": 1.996,
+          "2023-02": 2.1594,
+          "2023-03": 6.7932,
+          "2023-04": -0.2231,
+          "2023-05": -0.6156,
+          "2023-06": 2.0575,
+          "2023-07": 0.1295,
+          "2023-08": 4.3453,
+          "2023-09": 0.8366,
+          "2023-10": 0.137,
+          "2023-11": -2.1998,
+          "2023-12": 2.6162
+        },
+        "worst_observed_month_pct": -2.1998,
+        "months_ge_30": 0
+      },
+      "bbb": {
+        "n": 517,
+        "wr": 70.21,
+        "return_pct": 20.4766,
+        "dd_pct": 5.3992,
+        "trades_per_calendar_day": 1.452,
+        "monthly_return_pct": {
+          "2023-01": 2.9079,
+          "2023-02": 2.0595,
+          "2023-03": 6.8183,
+          "2023-04": -0.2231,
+          "2023-05": -0.6156,
+          "2023-06": 2.0575,
+          "2023-07": 0.4627,
+          "2023-08": 4.3453,
+          "2023-09": 0.8366,
+          "2023-10": 0.0253,
+          "2023-11": -2.1998,
+          "2023-12": 2.6162
+        },
+        "worst_observed_month_pct": -2.1998,
+        "months_ge_30": 0
+      },
+      "aaa": {
+        "n": 534,
+        "wr": 68.54,
+        "return_pct": 13.6942,
+        "dd_pct": 4.5344,
+        "trades_per_calendar_day": 1.471,
+        "monthly_return_pct": {
+          "2023-01": 0.0254,
+          "2023-02": 2.9353,
+          "2023-03": 4.1333,
+          "2023-04": 2.1642,
+          "2023-05": -0.1838,
+          "2023-06": 1.7307,
+          "2023-07": 0.7183,
+          "2023-08": 3.376,
+          "2023-09": -1.9409,
+          "2023-10": -1.2648,
+          "2023-11": 1.5047,
+          "2023-12": -0.104
+        },
+        "worst_observed_month_pct": -1.9409,
+        "months_ge_30": 0
+      },
+      "intersection": {
+        "n": 378,
+        "wr": 69.84,
+        "return_pct": 17.2789,
+        "dd_pct": 3.1025,
+        "trades_per_calendar_day": 1.062,
+        "monthly_return_pct": {
+          "2023-01": -0.4394,
+          "2023-02": 3.4411,
+          "2023-03": 4.5219,
+          "2023-04": 1.2364,
+          "2023-05": -0.1204,
+          "2023-06": 2.2498,
+          "2023-07": 0.5664,
+          "2023-08": 4.6123,
+          "2023-09": -1.7238,
+          "2023-10": -0.1258,
+          "2023-11": -0.8078,
+          "2023-12": 2.8824
+        },
+        "worst_observed_month_pct": -1.7238,
+        "months_ge_30": 0
+      },
+      "union": {
+        "n": 656,
+        "wr": 69.36,
+        "return_pct": 17.4254,
+        "dd_pct": 3.5859,
+        "trades_per_calendar_day": 1.807,
+        "monthly_return_pct": {
+          "2023-01": 2.4418,
+          "2023-02": 2.0863,
+          "2023-03": 5.0693,
+          "2023-04": 0.6913,
+          "2023-05": -0.314,
+          "2023-06": 1.3439,
+          "2023-07": 0.1637,
+          "2023-08": 3.1121,
+          "2023-09": 0.1251,
+          "2023-10": -1.0954,
+          "2023-11": 1.0002,
+          "2023-12": 1.6989
+        },
+        "worst_observed_month_pct": -1.0954,
+        "months_ge_30": 0
+      }
+    },
+    "2024": {
+      "bab": {
+        "n": 839,
+        "wr": 68.41,
+        "return_pct": 19.4012,
+        "dd_pct": 10.167,
+        "trades_per_calendar_day": 2.299,
+        "monthly_return_pct": {
+          "2024-01": 2.6288,
+          "2024-02": 2.257,
+          "2024-03": 3.7087,
+          "2024-04": 4.6172,
+          "2024-05": 2.077,
+          "2024-06": 0.2784,
+          "2024-07": -5.32,
+          "2024-08": 2.0667,
+          "2024-09": -2.8589,
+          "2024-10": -0.9191,
+          "2024-11": 5.6629,
+          "2024-12": 4.2402
+        },
+        "worst_observed_month_pct": -5.32,
+        "months_ge_30": 0
+      },
+      "bbb": {
+        "n": 839,
+        "wr": 68.3,
+        "return_pct": 18.3345,
+        "dd_pct": 11.0407,
+        "trades_per_calendar_day": 2.299,
+        "monthly_return_pct": {
+          "2024-01": 2.6288,
+          "2024-02": 2.257,
+          "2024-03": 3.7087,
+          "2024-04": 4.6172,
+          "2024-05": 2.077,
+          "2024-06": 0.2784,
+          "2024-07": -5.3926,
+          "2024-08": 1.1516,
+          "2024-09": -2.8589,
+          "2024-10": -0.8399,
+          "2024-11": 5.6629,
+          "2024-12": 4.2402
+        },
+        "worst_observed_month_pct": -5.3926,
+        "months_ge_30": 0
+      },
+      "aaa": {
+        "n": 829,
+        "wr": 68.28,
+        "return_pct": 24.5346,
+        "dd_pct": 9.9429,
+        "trades_per_calendar_day": 2.271,
+        "monthly_return_pct": {
+          "2024-01": 2.4024,
+          "2024-02": 2.8344,
+          "2024-03": 2.6778,
+          "2024-04": 7.3104,
+          "2024-05": 2.731,
+          "2024-06": -3.2286,
+          "2024-07": -3.2537,
+          "2024-08": 1.3376,
+          "2024-09": -1.6631,
+          "2024-10": 0.8596,
+          "2024-11": 7.8222,
+          "2024-12": 2.9741
+        },
+        "worst_observed_month_pct": -3.2537,
+        "months_ge_30": 0
+      },
+      "intersection": {
+        "n": 619,
+        "wr": 69.63,
+        "return_pct": 22.3467,
+        "dd_pct": 10.0681,
+        "trades_per_calendar_day": 1.696,
+        "monthly_return_pct": {
+          "2024-01": 3.8662,
+          "2024-02": 2.8266,
+          "2024-03": 2.8347,
+          "2024-04": 7.4006,
+          "2024-05": 2.1345,
+          "2024-06": -2.0925,
+          "2024-07": -4.9537,
+          "2024-08": 0.5497,
+          "2024-09": -0.6461,
+          "2024-10": 0.3419,
+          "2024-11": 6.2202,
+          "2024-12": 2.4914
+        },
+        "worst_observed_month_pct": -4.9537,
+        "months_ge_30": 0
+      },
+      "union": {
+        "n": 1030,
+        "wr": 67.96,
+        "return_pct": 23.5956,
+        "dd_pct": 10.5489,
+        "trades_per_calendar_day": 2.822,
+        "monthly_return_pct": {
+          "2024-01": 1.3249,
+          "2024-02": 2.6745,
+          "2024-03": 3.2369,
+          "2024-04": 5.1659,
+          "2024-05": 3.514,
+          "2024-06": -0.9771,
+          "2024-07": -3.5536,
+          "2024-08": 2.0236,
+          "2024-09": -3.854,
+          "2024-10": -0.3283,
+          "2024-11": 7.0007,
+          "2024-12": 5.8042
+        },
+        "worst_observed_month_pct": -3.854,
+        "months_ge_30": 0
+      }
+    },
+    "2025": {
+      "bab": {
+        "n": 986,
+        "wr": 67.85,
+        "return_pct": 5.9681,
+        "dd_pct": 6.7335,
+        "trades_per_calendar_day": 2.716,
+        "monthly_return_pct": {
+          "2025-01": -0.2279,
+          "2025-02": 0.5312,
+          "2025-03": -0.4787,
+          "2025-04": 1.0342,
+          "2025-05": 0.362,
+          "2025-06": 0.5138,
+          "2025-07": 2.9281,
+          "2025-08": -1.891,
+          "2025-09": -2.846,
+          "2025-10": 1.1905,
+          "2025-11": 2.9191,
+          "2025-12": 1.9404
+        },
+        "worst_observed_month_pct": -2.846,
+        "months_ge_30": 0
+      },
+      "bbb": {
+        "n": 989,
+        "wr": 67.85,
+        "return_pct": 5.1274,
+        "dd_pct": 6.5446,
+        "trades_per_calendar_day": 2.725,
+        "monthly_return_pct": {
+          "2025-01": -0.2279,
+          "2025-02": 0.656,
+          "2025-03": -0.4787,
+          "2025-04": 0.9912,
+          "2025-05": -0.2325,
+          "2025-06": 0.6019,
+          "2025-07": 2.9281,
+          "2025-08": -1.6924,
+          "2025-09": -2.846,
+          "2025-10": 0.8217,
+          "2025-11": 2.9191,
+          "2025-12": 1.7279
+        },
+        "worst_observed_month_pct": -2.846,
+        "months_ge_30": 0
+      },
+      "aaa": {
+        "n": 941,
+        "wr": 68.65,
+        "return_pct": 19.2621,
+        "dd_pct": 6.6737,
+        "trades_per_calendar_day": 2.592,
+        "monthly_return_pct": {
+          "2025-01": -0.4351,
+          "2025-02": -0.7403,
+          "2025-03": 5.6968,
+          "2025-04": 2.9243,
+          "2025-05": -1.796,
+          "2025-06": 3.4383,
+          "2025-07": 5.8235,
+          "2025-08": -0.4038,
+          "2025-09": -3.6146,
+          "2025-10": 1.7929,
+          "2025-11": 5.6726,
+          "2025-12": -0.0653
+        },
+        "worst_observed_month_pct": -3.6146,
+        "months_ge_30": 0
+      },
+      "intersection": {
+        "n": 720,
+        "wr": 69.03,
+        "return_pct": 11.9767,
+        "dd_pct": 5.7422,
+        "trades_per_calendar_day": 1.994,
+        "monthly_return_pct": {
+          "2025-01": 1.4399,
+          "2025-02": -0.8658,
+          "2025-03": 2.7048,
+          "2025-04": 3.38,
+          "2025-05": -2.7673,
+          "2025-06": 0.7514,
+          "2025-07": 4.9211,
+          "2025-08": -1.2881,
+          "2025-09": -1.7812,
+          "2025-10": -0.2767,
+          "2025-11": 4.2794,
+          "2025-12": 1.2004
+        },
+        "worst_observed_month_pct": -2.7673,
+        "months_ge_30": 0
+      },
+      "union": {
+        "n": 1189,
+        "wr": 68.04,
+        "return_pct": 12.8258,
+        "dd_pct": 7.301,
+        "trades_per_calendar_day": 3.275,
+        "monthly_return_pct": {
+          "2025-01": -1.9725,
+          "2025-02": 0.3613,
+          "2025-03": 2.3001,
+          "2025-04": 1.1599,
+          "2025-05": 0.7796,
+          "2025-06": 3.1271,
+          "2025-07": 3.3545,
+          "2025-08": -0.1979,
+          "2025-09": -5.0391,
+          "2025-10": 2.4955,
+          "2025-11": 5.4055,
+          "2025-12": 0.7586
+        },
+        "worst_observed_month_pct": -5.0391,
+        "months_ge_30": 0
+      }
+    }
+  },
+  "direct_last_entry_utc": "2026-11-14T04:30:00+00:00"
+}
