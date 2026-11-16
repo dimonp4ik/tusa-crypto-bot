@@ -32,11 +32,11 @@ def validate_rows(rows,start,end,seconds):
 
 
 def fetch_window(inst,start,end,seconds,folder):
-    if seconds not in (1,60) or not isinstance(start,int) or not isinstance(end,int):
+    if seconds not in (1,60,900) or not isinstance(start,int) or not isinstance(end,int):
         raise ValueError('unsupported window')
     if not 0<end-start<=86400 or start%seconds or end%seconds:
         raise ValueError('unbounded or unaligned window')
-    bar='1s' if seconds==1 else '1m'
+    bar={1:'1s',60:'1m',900:'15m'}[seconds]
     path=Path(folder)/f'{inst}_{bar}_{start}_{end}.json'
     if path.exists():
         body=json.loads(path.read_text(encoding='utf-8'))

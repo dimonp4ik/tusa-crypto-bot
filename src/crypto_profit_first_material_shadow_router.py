@@ -160,10 +160,10 @@ def shadow_setups(candles: dict, btc_candles: dict, *, entry_time: float,
             _increment(audit["rejected"],
                        "model_risk_outside_1_to_2pct")
             continue
-        # The frozen classifier is evaluated at the forming bar's immutable
-        # open, exactly as in replay.  The actual market bracket still has to
-        # honour the same risk band; a delayed ticker may remove a candidate
-        # but can never manufacture one that the replay rejected.
+        # Evaluate at the open currently reported by the forming snapshot.
+        # If no trade has occurred yet, OKX carries the preceding close; the
+        # finalized historical open may subsequently differ. The snapshot is
+        # an observation, not proof of an executable fill or historical parity.
         if (not math.isfinite(execution_risk_pct)
                 or execution_risk_pct < float(MODEL["risk_pct_min"])
                 or execution_risk_pct > float(MODEL["risk_pct_max"])):

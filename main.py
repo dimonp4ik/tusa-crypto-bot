@@ -4167,12 +4167,14 @@ def _record_candidate_decision_books(
         try:
             spec = _okx_trade.get_xperp_spec(inst_id)
             book = _okx_trade.get_order_book(inst_id)
+            book_observed_at = time.time()
             if not spec or not book:
                 continue
             snap = order_book_snapshot(book, spec["ctVal"])
             record_setup_decision_book(
                 setup_id, spread_bps=snap.spread_bps,
-                depth_usd=snap.depth_usd, imbalance=snap.imbalance)
+                depth_usd=snap.depth_usd, imbalance=snap.imbalance,
+                observed_at=book_observed_at)
         except Exception as exc:
             # A missing research snapshot must never affect signal delivery or
             # a live account. The next candidate will retry independently.
@@ -4482,6 +4484,7 @@ def _run_venue_strategy_scan(*, early: bool = False) -> None:
     fetched = {}
     market_prices = {}
     entry_references = {}
+    reference_samples = {}
     def _fetch(symbol: str):
         # These constants come from the feature builders themselves.  Keeping
         # the fetch tied to them prevents a shorter magic limit from silently
@@ -4491,6 +4494,8 @@ def _run_venue_strategy_scan(*, early: bool = False) -> None:
                            if symbol == "BTCUSDT"
                            else REQUIRED_SYMBOL_HISTORY_BARS),
             include_forming=True)
+        from src.decision_context import forming_entry_evidence
+        sample = forming_entry_evidence(candles, time.time())
         fifteen = candles
         reference = market = None
         try:
@@ -4504,17 +4509,19 @@ def _run_venue_strategy_scan(*, early: bool = False) -> None:
             fifteen = None
         if not fifteen or not fifteen.get("time"):
             fifteen = None
-        return symbol, fifteen, market, reference
+        return symbol, fifteen, market, reference, sample
     with ThreadPoolExecutor(max_workers=4) as pool:
         for future in as_completed([pool.submit(_fetch, symbol) for symbol in symbols]):
             try:
-                symbol, candles, market, reference = future.result()
+                symbol, candles, market, reference, sample = future.result()
                 if candles:
                     fetched[symbol] = candles
                 if market:
                     market_prices[symbol] = float(market)
                 if reference:
                     entry_references[symbol] = float(reference)
+                if sample:
+                    reference_samples[symbol] = sample
             except Exception as exc:
                 log.warning("Venue candle fetch failed: %s", exc)
 
@@ -4611,6 +4618,7 @@ def _run_venue_strategy_scan(*, early: bool = False) -> None:
                     int(strategy_audit["rejected"].get(reason, 0)) + int(count))
             raw_setups += len(rows)
             for row in rows:
+                row.update(reference_samples.get(symbol, {}))
                 # The 5m supplement already carries its own bar timestamp.
                 # Production 15m rows do not, so only fill a missing value.
                 row.setdefault("signal_bar_ts", candles["time"][-1])
@@ -4638,6 +4646,7 @@ def _run_venue_strategy_scan(*, early: bool = False) -> None:
             )
             strategy_audit["silent_2r_candidates"] += len(silent_rows)
             for row in silent_rows:
+                row.update(reference_samples.get(symbol, {}))
                 row.setdefault("signal_bar_ts", candles["time"][-1])
                 analysis = _venue_analysis(symbol, row)
                 setup_id = log_setup_candidate_once(analysis)
