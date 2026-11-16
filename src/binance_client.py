@@ -389,7 +389,7 @@ def get_klines_xperp(symbol, limit=60, include_forming=False, interval="15m"):
     """
     try:
         bar = TIMEFRAME_MAP.get(interval, interval)
-        interval_seconds = {"5m": 300, "15m": 900, "1H": 3600}.get(bar, 900)
+        interval_seconds = {"1m": 60, "5m": 300, "15m": 900, "1H": 3600}.get(bar, 900)
         cache_key = ("xperp", symbol, bar, limit)
         if not include_forming:
             cached = _kl_cache_get(cache_key, interval_seconds)
