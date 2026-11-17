@@ -1,0 +1,4046 @@
+{
+  "status": "CONTINUOUS_REALIZED_CASH_GUARD_DIAGNOSTIC",
+  "objective_verified": false,
+  "live_activation_supported": false,
+  "capital": 130.0,
+  "daily_loss_limit": 0.01,
+  "max_drawdown": 0.03,
+  "starting_utc": "2026-07-01",
+  "candidate_path_parity": 2373,
+  "results": {
+    "baseline": {
+      "monthly_cash_baseline_parity": true,
+      "monthly_reset_guarded": {
+        "crypto": {
+          "2026-07": {
+            "summary": {
+              "starting_capital": 130.0,
+              "ending_capital": 130.497401,
+              "return_pct": 0.382616,
+              "cash_drawdown_pct": 4.16993,
+              "trades": 68,
+              "skipped": {
+                "slots": 3,
+                "minimum_size": 0,
+                "equity_guard": 116
+              },
+              "unplaceable_partials": 42,
+              "tp1_hits_without_bank": 20,
+              "peak_positions": 9,
+              "peak_by_bot": {
+                "crypto": 3,
+                "stocks": 8
+              },
+              "peak_reserved_margin_pct": 24.929177159605846,
+              "pnl_by_bot": {
+                "crypto": 4.680894285714271,
+                "stocks": -4.183493199999992
+              },
+              "return_contribution_pct": {
+                "crypto": 3.600687912087901,
+                "stocks": -3.218071692307686
+              }
+            },
+            "guard_states": {
+              "crypto": {
+                "peak": 135.55494800000002,
+                "day": "2026-07-31",
+                "daily_start": 130.4974010857143,
+                "paused": true,
+                "daily_paused": false
+              },
+              "stocks": {
+                "peak": 134.69456228571428,
+                "day": "2026-07-31",
+                "daily_start": 130.4974010857143,
+                "paused": true,
+                "daily_paused": false
+              }
+            },
+            "first_blocks": {
+              "crypto": {
+                "time": 1784034000.0,
+                "equity": 130.7096730857143,
+                "reason": "drawdown limit",
+                "peak": 135.55494800000002,
+                "day": "2026-07-14",
+                "daily_start": 132.93277308571427,
+                "paused": true,
+                "daily_paused": true
+              },
+              "stocks": {
+                "time": 1784419200.0,
+                "equity": 130.4974010857143,
+                "reason": "drawdown limit",
+                "peak": 134.69456228571428,
+                "day": "2026-07-19",
+                "daily_start": 130.4974010857143,
+                "paused": true,
+                "daily_paused": false
+              }
+            },
+            "first_drawdown_blocks": {
+              "crypto": {
+                "time": 1784034000.0,
+                "equity": 130.7096730857143,
+                "reason": "drawdown limit",
+                "peak": 135.55494800000002,
+                "day": "2026-07-14",
+                "daily_start": 132.93277308571427,
+                "paused": true,
+                "daily_paused": true
+              },
+              "stocks": {
+                "time": 1784419200.0,
+                "equity": 130.4974010857143,
+                "reason": "drawdown limit",
+                "peak": 134.69456228571428,
+                "day": "2026-07-19",
+                "daily_start": 130.4974010857143,
+                "paused": true,
+                "daily_paused": false
+              }
+            }
+          },
+          "2026-08": {
+            "summary": {
+              "starting_capital": 130.0,
+              "ending_capital": 140.245768,
+              "return_pct": 7.88136,
+              "cash_drawdown_pct": 3.788598,
+              "trades": 242,
+              "skipped": {
+                "slots": 7,
+                "minimum_size": 0,
+                "equity_guard": 86
+              },
+              "unplaceable_partials": 124,
+              "tp1_hits_without_bank": 52,
+              "peak_positions": 9,
+              "peak_by_bot": {
+                "crypto": 4,
+                "stocks": 8
+              },
+              "peak_reserved_margin_pct": 25.820327960753247,
+              "pnl_by_bot": {
+                "crypto": 1.838922857142098,
+                "stocks": 8.40684539999995
+              },
+              "return_contribution_pct": {
+                "crypto": 1.4145560439554599,
+                "stocks": 6.466804153846115
+              }
+            },
+            "guard_states": {
+              "crypto": {
+                "peak": 145.350584114285,
+                "day": "2026-08-31",
+                "daily_start": 140.24576825714212,
+                "paused": true,
+                "daily_paused": false
+              },
+              "stocks": {
+                "peak": 145.1303958285707,
+                "day": "2026-08-31",
+                "daily_start": 140.24576825714212,
+                "paused": true,
+                "daily_paused": false
+              }
+            },
+            "first_blocks": {
+              "crypto": {
+                "time": 1785620700.0,
+                "equity": 128.6059319428573,
+                "reason": "daily loss limit",
+                "peak": 130.0,
+                "day": "2026-08-01",
+                "daily_start": 130.0,
+                "paused": false,
+                "daily_paused": true
+              },
+              "stocks": {
+                "time": 1787877000.0,
+                "equity": 140.24576825714212,
+                "reason": "drawdown limit",
+                "peak": 145.1303958285707,
+                "day": "2026-08-28",
+                "daily_start": 140.24576825714212,
+                "paused": true,
+                "daily_paused": false
+              }
+            },
+            "first_drawdown_blocks": {
+              "crypto": {
+                "time": 1787642100.0,
+                "equity": 140.9805605428564,
+                "reason": "drawdown limit",
+                "peak": 145.350584114285,
+                "day": "2026-08-25",
+                "daily_start": 142.99112868571356,
+                "paused": true,
+                "daily_paused": true
+              },
+              "stocks": {
+                "time": 1787877000.0,
+                "equity": 140.24576825714212,
+                "reason": "drawdown limit",
+                "peak": 145.1303958285707,
+                "day": "2026-08-28",
+                "daily_start": 140.24576825714212,
+                "paused": true,
+                "daily_paused": false
+              }
+            }
+          },
+          "2026-09": {
+            "summary": {
+              "starting_capital": 130.0,
+              "ending_capital": 131.087158,
+              "return_pct": 0.836276,
+              "cash_drawdown_pct": 4.049301,
+              "trades": 112,
+              "skipped": {
+                "slots": 1,
+                "minimum_size": 0,
+                "equity_guard": 298
+              },
+              "unplaceable_partials": 56,
+              "tp1_hits_without_bank": 10,
+              "peak_positions": 10,
+              "peak_by_bot": {
+                "stocks": 8,
+                "crypto": 4
+              },
+              "peak_reserved_margin_pct": 28.586540440963255,
+              "pnl_by_bot": {
+                "crypto": -1.7223500000002194,
+                "stocks": 2.8095082999999987
+              },
+              "return_contribution_pct": {
+                "crypto": -1.3248846153847842,
+                "stocks": 2.1611602307692297
+              }
+            },
+            "guard_states": {
+              "stocks": {
+                "peak": 136.61928454285695,
+                "day": "2026-09-30",
+                "daily_start": 131.08715829999983,
+                "paused": true,
+                "daily_paused": false
+              },
+              "crypto": {
+                "peak": 135.53231954285695,
+                "day": "2026-09-30",
+                "daily_start": 131.08715829999983,
+                "paused": true,
+                "daily_paused": false
+              }
+            },
+            "first_blocks": {
+              "crypto": {
+                "time": 1788251400.0,
+                "equity": 128.5935457142857,
+                "reason": "daily loss limit",
+                "peak": 130.0,
+                "day": "2026-09-01",
+                "daily_start": 130.0,
+                "paused": false,
+                "daily_paused": true
+              },
+              "stocks": {
+                "time": 1789262100.0,
+                "equity": 131.08715829999983,
+                "reason": "drawdown limit",
+                "peak": 136.61928454285695,
+                "day": "2026-09-13",
+                "daily_start": 131.08715829999983,
+                "paused": true,
+                "daily_paused": false
+              }
+            },
+            "first_drawdown_blocks": {
+              "crypto": {
+                "time": 1789200000.0,
+                "equity": 131.08715829999983,
+                "reason": "drawdown limit",
+                "peak": 135.53231954285695,
+                "day": "2026-09-12",
+                "daily_start": 132.46381544285697,
+                "paused": true,
+                "daily_paused": true
+              },
+              "stocks": {
+                "time": 1789262100.0,
+                "equity": 131.08715829999983,
+                "reason": "drawdown limit",
+                "peak": 136.61928454285695,
+                "day": "2026-09-13",
+                "daily_start": 131.08715829999983,
+                "paused": true,
+                "daily_paused": false
+              }
+            }
+          },
+          "2026-10": {
+            "summary": {
+              "starting_capital": 130.0,
+              "ending_capital": 162.838334,
+              "return_pct": 25.260257,
+              "cash_drawdown_pct": 2.373306,
+              "trades": 332,
+              "skipped": {
+                "slots": 11,
+                "minimum_size": 0,
+                "equity_guard": 30
+              },
+              "unplaceable_partials": 153,
+              "tp1_hits_without_bank": 66,
+              "peak_positions": 11,
+              "peak_by_bot": {
+                "stocks": 8,
+                "crypto": 4
+              },
+              "peak_reserved_margin_pct": 31.63207272467473,
+              "pnl_by_bot": {
+                "crypto": 21.750675714284657,
+                "stocks": 11.087657999999973
+              },
+              "return_contribution_pct": {
+                "crypto": 16.7312890109882,
+                "stocks": 8.52896769230767
+              }
+            },
+            "guard_states": {
+              "stocks": {
+                "peak": 164.5377147857136,
+                "day": "2026-10-31",
+                "daily_start": 163.55196228571359,
+                "paused": false,
+                "daily_paused": false
+              },
+              "crypto": {
+                "peak": 164.51844764285647,
+                "day": "2026-10-31",
+                "daily_start": 163.55196228571359,
+                "paused": false,
+                "daily_paused": false
+              }
+            },
+            "first_blocks": {
+              "crypto": {
+                "time": 1790842500.0,
+                "equity": 128.36989857142862,
+                "reason": "daily loss limit",
+                "peak": 130.00920714285715,
+                "day": "2026-10-01",
+                "daily_start": 130.0,
+                "paused": false,
+                "daily_paused": true
+              }
+            },
+            "first_drawdown_blocks": {}
+          },
+          "2026-11": {
+            "summary": {
+              "starting_capital": 130.0,
+              "ending_capital": 130.518271,
+              "return_pct": 0.39867,
+              "cash_drawdown_pct": 4.114996,
+              "trades": 71,
+              "skipped": {
+                "slots": 1,
+                "minimum_size": 0,
+                "equity_guard": 47
+              },
+              "unplaceable_partials": 38,
+              "tp1_hits_without_bank": 18,
+              "peak_positions": 7,
+              "peak_by_bot": {
+                "stocks": 5,
+                "crypto": 4
+              },
+              "peak_reserved_margin_pct": 20.17426061417132,
+              "pnl_by_bot": {
+                "crypto": 3.8673714285699377,
+                "stocks": -3.349100000000022
+              },
+              "return_contribution_pct": {
+                "crypto": 2.9749010988999522,
+                "stocks": -2.5762307692307864
+              }
+            },
+            "guard_states": {
+              "stocks": {
+                "peak": 135.55015499999848,
+                "day": "2026-11-10",
+                "daily_start": 130.51827142856988,
+                "paused": true,
+                "daily_paused": false
+              },
+              "crypto": {
+                "peak": 135.55015499999848,
+                "day": "2026-11-14",
+                "daily_start": 130.51827142856988,
+                "paused": true,
+                "daily_paused": false
+              }
+            },
+            "first_blocks": {
+              "crypto": {
+                "time": 1793794500.0,
+                "equity": 131.81242500000002,
+                "reason": "daily loss limit",
+                "peak": 133.62003642857144,
+                "day": "2026-11-04",
+                "daily_start": 133.23869642857144,
+                "paused": false,
+                "daily_paused": true
+              },
+              "stocks": {
+                "time": 1794268800.0,
+                "equity": 130.51827142856988,
+                "reason": "drawdown limit",
+                "peak": 135.55015499999848,
+                "day": "2026-11-10",
+                "daily_start": 130.51827142856988,
+                "paused": true,
+                "daily_paused": false
+              }
+            },
+            "first_drawdown_blocks": {
+              "stocks": {
+                "time": 1794268800.0,
+                "equity": 130.51827142856988,
+                "reason": "drawdown limit",
+                "peak": 135.55015499999848,
+                "day": "2026-11-10",
+                "daily_start": 130.51827142856988,
+                "paused": true,
+                "daily_paused": false
+              },
+              "crypto": {
+                "time": 1794285900.0,
+                "equity": 130.51827142856988,
+                "reason": "drawdown limit",
+                "peak": 135.55015499999848,
+                "day": "2026-11-10",
+                "daily_start": 130.51827142856988,
+                "paused": true,
+                "daily_paused": false
+              }
+            }
+          }
+        },
+        "stocks": {
+          "2026-07": {
+            "summary": {
+              "starting_capital": 130.0,
+              "ending_capital": 130.497401,
+              "return_pct": 0.382616,
+              "cash_drawdown_pct": 4.16993,
+              "trades": 68,
+              "skipped": {
+                "slots": 3,
+                "minimum_size": 0,
+                "equity_guard": 116
+              },
+              "unplaceable_partials": 42,
+              "tp1_hits_without_bank": 20,
+              "peak_positions": 9,
+              "peak_by_bot": {
+                "crypto": 3,
+                "stocks": 8
+              },
+              "peak_reserved_margin_pct": 24.929177159605846,
+              "pnl_by_bot": {
+                "crypto": 4.680894285714271,
+                "stocks": -4.183493199999992
+              },
+              "return_contribution_pct": {
+                "crypto": 3.600687912087901,
+                "stocks": -3.218071692307686
+              }
+            },
+            "guard_states": {
+              "crypto": {
+                "peak": 135.55494800000002,
+                "day": "2026-07-31",
+                "daily_start": 130.4974010857143,
+                "paused": true,
+                "daily_paused": false
+              },
+              "stocks": {
+                "peak": 134.69456228571428,
+                "day": "2026-07-31",
+                "daily_start": 130.4974010857143,
+                "paused": true,
+                "daily_paused": false
+              }
+            },
+            "first_blocks": {
+              "crypto": {
+                "time": 1784034000.0,
+                "equity": 130.7096730857143,
+                "reason": "drawdown limit",
+                "peak": 135.55494800000002,
+                "day": "2026-07-14",
+                "daily_start": 132.93277308571427,
+                "paused": true,
+                "daily_paused": true
+              },
+              "stocks": {
+                "time": 1784419200.0,
+                "equity": 130.4974010857143,
+                "reason": "drawdown limit",
+                "peak": 134.69456228571428,
+                "day": "2026-07-19",
+                "daily_start": 130.4974010857143,
+                "paused": true,
+                "daily_paused": false
+              }
+            },
+            "first_drawdown_blocks": {
+              "crypto": {
+                "time": 1784034000.0,
+                "equity": 130.7096730857143,
+                "reason": "drawdown limit",
+                "peak": 135.55494800000002,
+                "day": "2026-07-14",
+                "daily_start": 132.93277308571427,
+                "paused": true,
+                "daily_paused": true
+              },
+              "stocks": {
+                "time": 1784419200.0,
+                "equity": 130.4974010857143,
+                "reason": "drawdown limit",
+                "peak": 134.69456228571428,
+                "day": "2026-07-19",
+                "daily_start": 130.4974010857143,
+                "paused": true,
+                "daily_paused": false
+              }
+            }
+          },
+          "2026-08": {
+            "summary": {
+              "starting_capital": 130.0,
+              "ending_capital": 140.245768,
+              "return_pct": 7.88136,
+              "cash_drawdown_pct": 3.788598,
+              "trades": 242,
+              "skipped": {
+                "slots": 7,
+                "minimum_size": 0,
+                "equity_guard": 86
+              },
+              "unplaceable_partials": 124,
+              "tp1_hits_without_bank": 52,
+              "peak_positions": 9,
+              "peak_by_bot": {
+                "crypto": 4,
+                "stocks": 8
+              },
+              "peak_reserved_margin_pct": 25.820327960753247,
+              "pnl_by_bot": {
+                "crypto": 1.838922857142098,
+                "stocks": 8.40684539999995
+              },
+              "return_contribution_pct": {
+                "crypto": 1.4145560439554599,
+                "stocks": 6.466804153846115
+              }
+            },
+            "guard_states": {
+              "crypto": {
+                "peak": 145.350584114285,
+                "day": "2026-08-31",
+                "daily_start": 140.24576825714212,
+                "paused": true,
+                "daily_paused": false
+              },
+              "stocks": {
+                "peak": 145.1303958285707,
+                "day": "2026-08-31",
+                "daily_start": 140.24576825714212,
+                "paused": true,
+                "daily_paused": false
+              }
+            },
+            "first_blocks": {
+              "crypto": {
+                "time": 1785620700.0,
+                "equity": 128.6059319428573,
+                "reason": "daily loss limit",
+                "peak": 130.0,
+                "day": "2026-08-01",
+                "daily_start": 130.0,
+                "paused": false,
+                "daily_paused": true
+              },
+              "stocks": {
+                "time": 1787877000.0,
+                "equity": 140.24576825714212,
+                "reason": "drawdown limit",
+                "peak": 145.1303958285707,
+                "day": "2026-08-28",
+                "daily_start": 140.24576825714212,
+                "paused": true,
+                "daily_paused": false
+              }
+            },
+            "first_drawdown_blocks": {
+              "crypto": {
+                "time": 1787642100.0,
+                "equity": 140.9805605428564,
+                "reason": "drawdown limit",
+                "peak": 145.350584114285,
+                "day": "2026-08-25",
+                "daily_start": 142.99112868571356,
+                "paused": true,
+                "daily_paused": true
+              },
+              "stocks": {
+                "time": 1787877000.0,
+                "equity": 140.24576825714212,
+                "reason": "drawdown limit",
+                "peak": 145.1303958285707,
+                "day": "2026-08-28",
+                "daily_start": 140.24576825714212,
+                "paused": true,
+                "daily_paused": false
+              }
+            }
+          },
+          "2026-09": {
+            "summary": {
+              "starting_capital": 130.0,
+              "ending_capital": 131.087158,
+              "return_pct": 0.836276,
+              "cash_drawdown_pct": 4.049301,
+              "trades": 112,
+              "skipped": {
+                "slots": 1,
+                "minimum_size": 0,
+                "equity_guard": 298
+              },
+              "unplaceable_partials": 56,
+              "tp1_hits_without_bank": 10,
+              "peak_positions": 10,
+              "peak_by_bot": {
+                "stocks": 8,
+                "crypto": 4
+              },
+              "peak_reserved_margin_pct": 28.586540440963255,
+              "pnl_by_bot": {
+                "crypto": -1.7223500000002194,
+                "stocks": 2.8095082999999987
+              },
+              "return_contribution_pct": {
+                "crypto": -1.3248846153847842,
+                "stocks": 2.1611602307692297
+              }
+            },
+            "guard_states": {
+              "stocks": {
+                "peak": 136.61928454285695,
+                "day": "2026-09-30",
+                "daily_start": 131.08715829999983,
+                "paused": true,
+                "daily_paused": false
+              },
+              "crypto": {
+                "peak": 135.53231954285695,
+                "day": "2026-09-30",
+                "daily_start": 131.08715829999983,
+                "paused": true,
+                "daily_paused": false
+              }
+            },
+            "first_blocks": {
+              "crypto": {
+                "time": 1788251400.0,
+                "equity": 128.5935457142857,
+                "reason": "daily loss limit",
+                "peak": 130.0,
+                "day": "2026-09-01",
+                "daily_start": 130.0,
+                "paused": false,
+                "daily_paused": true
+              },
+              "stocks": {
+                "time": 1789262100.0,
+                "equity": 131.08715829999983,
+                "reason": "drawdown limit",
+                "peak": 136.61928454285695,
+                "day": "2026-09-13",
+                "daily_start": 131.08715829999983,
+                "paused": true,
+                "daily_paused": false
+              }
+            },
+            "first_drawdown_blocks": {
+              "crypto": {
+                "time": 1789200000.0,
+                "equity": 131.08715829999983,
+                "reason": "drawdown limit",
+                "peak": 135.53231954285695,
+                "day": "2026-09-12",
+                "daily_start": 132.46381544285697,
+                "paused": true,
+                "daily_paused": true
+              },
+              "stocks": {
+                "time": 1789262100.0,
+                "equity": 131.08715829999983,
+                "reason": "drawdown limit",
+                "peak": 136.61928454285695,
+                "day": "2026-09-13",
+                "daily_start": 131.08715829999983,
+                "paused": true,
+                "daily_paused": false
+              }
+            }
+          },
+          "2026-10": {
+            "summary": {
+              "starting_capital": 130.0,
+              "ending_capital": 162.838334,
+              "return_pct": 25.260257,
+              "cash_drawdown_pct": 2.373306,
+              "trades": 332,
+              "skipped": {
+                "slots": 11,
+                "minimum_size": 0,
+                "equity_guard": 30
+              },
+              "unplaceable_partials": 153,
+              "tp1_hits_without_bank": 66,
+              "peak_positions": 11,
+              "peak_by_bot": {
+                "stocks": 8,
+                "crypto": 4
+              },
+              "peak_reserved_margin_pct": 31.63207272467473,
+              "pnl_by_bot": {
+                "crypto": 21.750675714284657,
+                "stocks": 11.087657999999973
+              },
+              "return_contribution_pct": {
+                "crypto": 16.7312890109882,
+                "stocks": 8.52896769230767
+              }
+            },
+            "guard_states": {
+              "stocks": {
+                "peak": 164.5377147857136,
+                "day": "2026-10-31",
+                "daily_start": 163.55196228571359,
+                "paused": false,
+                "daily_paused": false
+              },
+              "crypto": {
+                "peak": 164.51844764285647,
+                "day": "2026-10-31",
+                "daily_start": 163.55196228571359,
+                "paused": false,
+                "daily_paused": false
+              }
+            },
+            "first_blocks": {
+              "crypto": {
+                "time": 1790842500.0,
+                "equity": 128.36989857142862,
+                "reason": "daily loss limit",
+                "peak": 130.00920714285715,
+                "day": "2026-10-01",
+                "daily_start": 130.0,
+                "paused": false,
+                "daily_paused": true
+              }
+            },
+            "first_drawdown_blocks": {}
+          },
+          "2026-11": {
+            "summary": {
+              "starting_capital": 130.0,
+              "ending_capital": 130.518271,
+              "return_pct": 0.39867,
+              "cash_drawdown_pct": 4.114996,
+              "trades": 71,
+              "skipped": {
+                "slots": 1,
+                "minimum_size": 0,
+                "equity_guard": 47
+              },
+              "unplaceable_partials": 38,
+              "tp1_hits_without_bank": 18,
+              "peak_positions": 7,
+              "peak_by_bot": {
+                "stocks": 5,
+                "crypto": 4
+              },
+              "peak_reserved_margin_pct": 20.17426061417132,
+              "pnl_by_bot": {
+                "crypto": 3.8673714285699377,
+                "stocks": -3.349100000000022
+              },
+              "return_contribution_pct": {
+                "crypto": 2.9749010988999522,
+                "stocks": -2.5762307692307864
+              }
+            },
+            "guard_states": {
+              "stocks": {
+                "peak": 135.55015499999848,
+                "day": "2026-11-10",
+                "daily_start": 130.51827142856988,
+                "paused": true,
+                "daily_paused": false
+              },
+              "crypto": {
+                "peak": 135.55015499999848,
+                "day": "2026-11-14",
+                "daily_start": 130.51827142856988,
+                "paused": true,
+                "daily_paused": false
+              }
+            },
+            "first_blocks": {
+              "crypto": {
+                "time": 1793794500.0,
+                "equity": 131.81242500000002,
+                "reason": "daily loss limit",
+                "peak": 133.62003642857144,
+                "day": "2026-11-04",
+                "daily_start": 133.23869642857144,
+                "paused": false,
+                "daily_paused": true
+              },
+              "stocks": {
+                "time": 1794268800.0,
+                "equity": 130.51827142856988,
+                "reason": "drawdown limit",
+                "peak": 135.55015499999848,
+                "day": "2026-11-10",
+                "daily_start": 130.51827142856988,
+                "paused": true,
+                "daily_paused": false
+              }
+            },
+            "first_drawdown_blocks": {
+              "stocks": {
+                "time": 1794268800.0,
+                "equity": 130.51827142856988,
+                "reason": "drawdown limit",
+                "peak": 135.55015499999848,
+                "day": "2026-11-10",
+                "daily_start": 130.51827142856988,
+                "paused": true,
+                "daily_paused": false
+              },
+              "crypto": {
+                "time": 1794285900.0,
+                "equity": 130.51827142856988,
+                "reason": "drawdown limit",
+                "peak": 135.55015499999848,
+                "day": "2026-11-10",
+                "daily_start": 130.51827142856988,
+                "paused": true,
+                "daily_paused": false
+              }
+            }
+          }
+        }
+      },
+      "continuous": {
+        "crypto": {
+          "no_account_guard": {
+            "summary": {
+              "starting_capital": 130.0,
+              "ending_capital": 233.223157,
+              "return_pct": 79.402428,
+              "cash_drawdown_pct": 6.92437,
+              "trades": 1386,
+              "skipped": {
+                "slots": 48,
+                "minimum_size": 0
+              },
+              "unplaceable_partials": 676,
+              "tp1_hits_without_bank": 300,
+              "peak_positions": 11,
+              "peak_by_bot": {
+                "crypto": 4,
+                "stocks": 8
+              },
+              "peak_reserved_margin_pct": 32.00508902875964,
+              "pnl_by_bot": {
+                "crypto": 46.098956428567114,
+                "stocks": 57.124200449999854
+              },
+              "return_contribution_pct": {
+                "crypto": 35.4607357142824,
+                "stocks": 43.94169265384604
+              }
+            },
+            "calendar_months": {
+              "2026-07": {
+                "opening_cash": 130.0,
+                "closing_cash": 129.37006688571387,
+                "return_pct": -0.4845639340662511,
+                "cash_drawdown_pct": 6.9243696027134485,
+                "return_contribution_pct": {
+                  "crypto": 0.36649560439540274,
+                  "stocks": -0.8510595384615465
+                },
+                "entries": 181,
+                "rejected_by_account_guard": 0
+              },
+              "2026-08": {
+                "opening_cash": 129.370066885714,
+                "closing_cash": 142.81568275714184,
+                "return_pct": 10.393142861482584,
+                "cash_drawdown_pct": 6.625966689135586,
+                "return_contribution_pct": {
+                  "crypto": 0.4834878627530499,
+                  "stocks": 9.909654998729556
+                },
+                "entries": 324,
+                "rejected_by_account_guard": 0
+              },
+              "2026-09": {
+                "opening_cash": 142.81568275714187,
+                "closing_cash": 188.71018709285704,
+                "return_pct": 32.13547941633188,
+                "cash_drawdown_pct": 5.4377980960355305,
+                "return_contribution_pct": {
+                  "crypto": 8.89925674852363,
+                  "stocks": 23.236222667808168
+                },
+                "entries": 401,
+                "rejected_by_account_guard": 0
+              },
+              "2026-10": {
+                "opening_cash": 188.71018709285693,
+                "closing_cash": 236.0201085214268,
+                "return_pct": 25.070147063809813,
+                "cash_drawdown_pct": 2.2712055540618192,
+                "return_contribution_pct": {
+                  "crypto": 16.5299165398107,
+                  "stocks": 8.540230523999089
+                },
+                "entries": 367,
+                "rejected_by_account_guard": 0
+              },
+              "2026-11": {
+                "opening_cash": 236.02010852142675,
+                "closing_cash": 233.22315687856678,
+                "return_pct": -1.1850480284844256,
+                "cash_drawdown_pct": 4.613616666524352,
+                "return_contribution_pct": {
+                  "crypto": 0.46345748419183747,
+                  "stocks": -1.648505512676184
+                },
+                "entries": 113,
+                "rejected_by_account_guard": 0
+              }
+            },
+            "guard_states": {},
+            "first_blocks": {},
+            "first_drawdown_blocks": {}
+          },
+          "realized_cash_guard": {
+            "summary": {
+              "starting_capital": 130.0,
+              "ending_capital": 130.497401,
+              "return_pct": 0.382616,
+              "cash_drawdown_pct": 4.16993,
+              "trades": 68,
+              "skipped": {
+                "slots": 3,
+                "minimum_size": 0,
+                "equity_guard": 1363
+              },
+              "unplaceable_partials": 42,
+              "tp1_hits_without_bank": 20,
+              "peak_positions": 9,
+              "peak_by_bot": {
+                "crypto": 3,
+                "stocks": 8
+              },
+              "peak_reserved_margin_pct": 24.929177159605846,
+              "pnl_by_bot": {
+                "crypto": 4.680894285714271,
+                "stocks": -4.183493199999992
+              },
+              "return_contribution_pct": {
+                "crypto": 3.600687912087901,
+                "stocks": -3.218071692307686
+              }
+            },
+            "calendar_months": {
+              "2026-07": {
+                "opening_cash": 130.0,
+                "closing_cash": 130.4974010857143,
+                "return_pct": 0.38261621978024074,
+                "cash_drawdown_pct": 4.169930347570729,
+                "return_contribution_pct": {
+                  "crypto": 3.600687912087901,
+                  "stocks": -3.218071692307686
+                },
+                "entries": 68,
+                "rejected_by_account_guard": 116
+              },
+              "2026-08": {
+                "opening_cash": 130.49740108571427,
+                "closing_cash": 130.49740108571427,
+                "return_pct": 0.0,
+                "cash_drawdown_pct": 0.0,
+                "return_contribution_pct": {
+                  "crypto": 0.0,
+                  "stocks": 0.0
+                },
+                "entries": 0,
+                "rejected_by_account_guard": 336
+              },
+              "2026-09": {
+                "opening_cash": 130.49740108571427,
+                "closing_cash": 130.49740108571427,
+                "return_pct": 0.0,
+                "cash_drawdown_pct": 0.0,
+                "return_contribution_pct": {
+                  "crypto": 0.0,
+                  "stocks": 0.0
+                },
+                "entries": 0,
+                "rejected_by_account_guard": 413
+              },
+              "2026-10": {
+                "opening_cash": 130.49740108571427,
+                "closing_cash": 130.49740108571427,
+                "return_pct": 0.0,
+                "cash_drawdown_pct": 0.0,
+                "return_contribution_pct": {
+                  "crypto": 0.0,
+                  "stocks": 0.0
+                },
+                "entries": 0,
+                "rejected_by_account_guard": 379
+              },
+              "2026-11": {
+                "opening_cash": 130.49740108571427,
+                "closing_cash": 130.49740108571427,
+                "return_pct": 0.0,
+                "cash_drawdown_pct": 0.0,
+                "return_contribution_pct": {
+                  "crypto": 0.0,
+                  "stocks": 0.0
+                },
+                "entries": 0,
+                "rejected_by_account_guard": 119
+              }
+            },
+            "guard_states": {
+              "crypto": {
+                "peak": 135.55494800000002,
+                "day": "2026-11-14",
+                "daily_start": 130.4974010857143,
+                "paused": true,
+                "daily_paused": false
+              },
+              "stocks": {
+                "peak": 134.69456228571428,
+                "day": "2026-11-10",
+                "daily_start": 130.4974010857143,
+                "paused": true,
+                "daily_paused": false
+              }
+            },
+            "first_blocks": {
+              "crypto": {
+                "time": 1784034000.0,
+                "equity": 130.7096730857143,
+                "reason": "drawdown limit",
+                "peak": 135.55494800000002,
+                "day": "2026-07-14",
+                "daily_start": 132.93277308571427,
+                "paused": true,
+                "daily_paused": true
+              },
+              "stocks": {
+                "time": 1784419200.0,
+                "equity": 130.4974010857143,
+                "reason": "drawdown limit",
+                "peak": 134.69456228571428,
+                "day": "2026-07-19",
+                "daily_start": 130.4974010857143,
+                "paused": true,
+                "daily_paused": false
+              }
+            },
+            "first_drawdown_blocks": {
+              "crypto": {
+                "time": 1784034000.0,
+                "equity": 130.7096730857143,
+                "reason": "drawdown limit",
+                "peak": 135.55494800000002,
+                "day": "2026-07-14",
+                "daily_start": 132.93277308571427,
+                "paused": true,
+                "daily_paused": true
+              },
+              "stocks": {
+                "time": 1784419200.0,
+                "equity": 130.4974010857143,
+                "reason": "drawdown limit",
+                "peak": 134.69456228571428,
+                "day": "2026-07-19",
+                "daily_start": 130.4974010857143,
+                "paused": true,
+                "daily_paused": false
+              }
+            }
+          }
+        },
+        "stocks": {
+          "no_account_guard": {
+            "summary": {
+              "starting_capital": 130.0,
+              "ending_capital": 233.223157,
+              "return_pct": 79.402428,
+              "cash_drawdown_pct": 6.92437,
+              "trades": 1386,
+              "skipped": {
+                "slots": 48,
+                "minimum_size": 0
+              },
+              "unplaceable_partials": 676,
+              "tp1_hits_without_bank": 300,
+              "peak_positions": 11,
+              "peak_by_bot": {
+                "crypto": 4,
+                "stocks": 8
+              },
+              "peak_reserved_margin_pct": 32.00508902875964,
+              "pnl_by_bot": {
+                "crypto": 46.098956428567114,
+                "stocks": 57.124200449999854
+              },
+              "return_contribution_pct": {
+                "crypto": 35.4607357142824,
+                "stocks": 43.94169265384604
+              }
+            },
+            "calendar_months": {
+              "2026-07": {
+                "opening_cash": 130.0,
+                "closing_cash": 129.37006688571387,
+                "return_pct": -0.4845639340662511,
+                "cash_drawdown_pct": 6.9243696027134485,
+                "return_contribution_pct": {
+                  "crypto": 0.36649560439540274,
+                  "stocks": -0.8510595384615465
+                },
+                "entries": 181,
+                "rejected_by_account_guard": 0
+              },
+              "2026-08": {
+                "opening_cash": 129.370066885714,
+                "closing_cash": 142.81568275714184,
+                "return_pct": 10.393142861482584,
+                "cash_drawdown_pct": 6.625966689135586,
+                "return_contribution_pct": {
+                  "crypto": 0.4834878627530499,
+                  "stocks": 9.909654998729556
+                },
+                "entries": 324,
+                "rejected_by_account_guard": 0
+              },
+              "2026-09": {
+                "opening_cash": 142.81568275714187,
+                "closing_cash": 188.71018709285704,
+                "return_pct": 32.13547941633188,
+                "cash_drawdown_pct": 5.4377980960355305,
+                "return_contribution_pct": {
+                  "crypto": 8.89925674852363,
+                  "stocks": 23.236222667808168
+                },
+                "entries": 401,
+                "rejected_by_account_guard": 0
+              },
+              "2026-10": {
+                "opening_cash": 188.71018709285693,
+                "closing_cash": 236.0201085214268,
+                "return_pct": 25.070147063809813,
+                "cash_drawdown_pct": 2.2712055540618192,
+                "return_contribution_pct": {
+                  "crypto": 16.5299165398107,
+                  "stocks": 8.540230523999089
+                },
+                "entries": 367,
+                "rejected_by_account_guard": 0
+              },
+              "2026-11": {
+                "opening_cash": 236.02010852142675,
+                "closing_cash": 233.22315687856678,
+                "return_pct": -1.1850480284844256,
+                "cash_drawdown_pct": 4.613616666524352,
+                "return_contribution_pct": {
+                  "crypto": 0.46345748419183747,
+                  "stocks": -1.648505512676184
+                },
+                "entries": 113,
+                "rejected_by_account_guard": 0
+              }
+            },
+            "guard_states": {},
+            "first_blocks": {},
+            "first_drawdown_blocks": {}
+          },
+          "realized_cash_guard": {
+            "summary": {
+              "starting_capital": 130.0,
+              "ending_capital": 130.497401,
+              "return_pct": 0.382616,
+              "cash_drawdown_pct": 4.16993,
+              "trades": 68,
+              "skipped": {
+                "slots": 3,
+                "minimum_size": 0,
+                "equity_guard": 1363
+              },
+              "unplaceable_partials": 42,
+              "tp1_hits_without_bank": 20,
+              "peak_positions": 9,
+              "peak_by_bot": {
+                "crypto": 3,
+                "stocks": 8
+              },
+              "peak_reserved_margin_pct": 24.929177159605846,
+              "pnl_by_bot": {
+                "crypto": 4.680894285714271,
+                "stocks": -4.183493199999992
+              },
+              "return_contribution_pct": {
+                "crypto": 3.600687912087901,
+                "stocks": -3.218071692307686
+              }
+            },
+            "calendar_months": {
+              "2026-07": {
+                "opening_cash": 130.0,
+                "closing_cash": 130.4974010857143,
+                "return_pct": 0.38261621978024074,
+                "cash_drawdown_pct": 4.169930347570729,
+                "return_contribution_pct": {
+                  "crypto": 3.600687912087901,
+                  "stocks": -3.218071692307686
+                },
+                "entries": 68,
+                "rejected_by_account_guard": 116
+              },
+              "2026-08": {
+                "opening_cash": 130.49740108571427,
+                "closing_cash": 130.49740108571427,
+                "return_pct": 0.0,
+                "cash_drawdown_pct": 0.0,
+                "return_contribution_pct": {
+                  "crypto": 0.0,
+                  "stocks": 0.0
+                },
+                "entries": 0,
+                "rejected_by_account_guard": 336
+              },
+              "2026-09": {
+                "opening_cash": 130.49740108571427,
+                "closing_cash": 130.49740108571427,
+                "return_pct": 0.0,
+                "cash_drawdown_pct": 0.0,
+                "return_contribution_pct": {
+                  "crypto": 0.0,
+                  "stocks": 0.0
+                },
+                "entries": 0,
+                "rejected_by_account_guard": 413
+              },
+              "2026-10": {
+                "opening_cash": 130.49740108571427,
+                "closing_cash": 130.49740108571427,
+                "return_pct": 0.0,
+                "cash_drawdown_pct": 0.0,
+                "return_contribution_pct": {
+                  "crypto": 0.0,
+                  "stocks": 0.0
+                },
+                "entries": 0,
+                "rejected_by_account_guard": 379
+              },
+              "2026-11": {
+                "opening_cash": 130.49740108571427,
+                "closing_cash": 130.49740108571427,
+                "return_pct": 0.0,
+                "cash_drawdown_pct": 0.0,
+                "return_contribution_pct": {
+                  "crypto": 0.0,
+                  "stocks": 0.0
+                },
+                "entries": 0,
+                "rejected_by_account_guard": 119
+              }
+            },
+            "guard_states": {
+              "crypto": {
+                "peak": 135.55494800000002,
+                "day": "2026-11-14",
+                "daily_start": 130.4974010857143,
+                "paused": true,
+                "daily_paused": false
+              },
+              "stocks": {
+                "peak": 134.69456228571428,
+                "day": "2026-11-10",
+                "daily_start": 130.4974010857143,
+                "paused": true,
+                "daily_paused": false
+              }
+            },
+            "first_blocks": {
+              "crypto": {
+                "time": 1784034000.0,
+                "equity": 130.7096730857143,
+                "reason": "drawdown limit",
+                "peak": 135.55494800000002,
+                "day": "2026-07-14",
+                "daily_start": 132.93277308571427,
+                "paused": true,
+                "daily_paused": true
+              },
+              "stocks": {
+                "time": 1784419200.0,
+                "equity": 130.4974010857143,
+                "reason": "drawdown limit",
+                "peak": 134.69456228571428,
+                "day": "2026-07-19",
+                "daily_start": 130.4974010857143,
+                "paused": true,
+                "daily_paused": false
+              }
+            },
+            "first_drawdown_blocks": {
+              "crypto": {
+                "time": 1784034000.0,
+                "equity": 130.7096730857143,
+                "reason": "drawdown limit",
+                "peak": 135.55494800000002,
+                "day": "2026-07-14",
+                "daily_start": 132.93277308571427,
+                "paused": true,
+                "daily_paused": true
+              },
+              "stocks": {
+                "time": 1784419200.0,
+                "equity": 130.4974010857143,
+                "reason": "drawdown limit",
+                "peak": 134.69456228571428,
+                "day": "2026-07-19",
+                "daily_start": 130.4974010857143,
+                "paused": true,
+                "daily_paused": false
+              }
+            }
+          }
+        }
+      }
+    },
+    "opposition_both": {
+      "monthly_cash_baseline_parity": true,
+      "monthly_reset_guarded": {
+        "crypto": {
+          "2026-07": {
+            "summary": {
+              "starting_capital": 130.0,
+              "ending_capital": 127.974915,
+              "return_pct": -1.557757,
+              "cash_drawdown_pct": 3.679922,
+              "trades": 59,
+              "skipped": {
+                "slots": 1,
+                "minimum_size": 0,
+                "equity_guard": 118
+              },
+              "unplaceable_partials": 37,
+              "tp1_hits_without_bank": 16,
+              "peak_positions": 9,
+              "peak_by_bot": {
+                "crypto": 3,
+                "stocks": 8
+              },
+              "peak_reserved_margin_pct": 25.101892566482526,
+              "pnl_by_bot": {
+                "crypto": 1.765042857142852,
+                "stocks": -3.790127599999993
+              },
+              "return_contribution_pct": {
+                "crypto": 1.3577252747252708,
+                "stocks": -2.9154827692307634
+              }
+            },
+            "guard_states": {
+              "crypto": {
+                "peak": 132.40119085714286,
+                "day": "2026-07-31",
+                "daily_start": 127.97491525714288,
+                "paused": true,
+                "daily_paused": false
+              },
+              "stocks": {
+                "peak": 132.40119085714286,
+                "day": "2026-07-31",
+                "daily_start": 127.97491525714288,
+                "paused": true,
+                "daily_paused": false
+              }
+            },
+            "first_blocks": {
+              "crypto": {
+                "time": 1784034000.0,
+                "equity": 127.88531525714289,
+                "reason": "drawdown limit",
+                "peak": 132.40119085714286,
+                "day": "2026-07-14",
+                "daily_start": 130.07421525714287,
+                "paused": true,
+                "daily_paused": true
+              },
+              "stocks": {
+                "time": 1784348100.0,
+                "equity": 127.97491525714288,
+                "reason": "drawdown limit",
+                "peak": 132.40119085714286,
+                "day": "2026-07-18",
+                "daily_start": 127.97491525714288,
+                "paused": true,
+                "daily_paused": false
+              }
+            },
+            "first_drawdown_blocks": {
+              "crypto": {
+                "time": 1784034000.0,
+                "equity": 127.88531525714289,
+                "reason": "drawdown limit",
+                "peak": 132.40119085714286,
+                "day": "2026-07-14",
+                "daily_start": 130.07421525714287,
+                "paused": true,
+                "daily_paused": true
+              },
+              "stocks": {
+                "time": 1784348100.0,
+                "equity": 127.97491525714288,
+                "reason": "drawdown limit",
+                "peak": 132.40119085714286,
+                "day": "2026-07-18",
+                "daily_start": 127.97491525714288,
+                "paused": true,
+                "daily_paused": false
+              }
+            }
+          },
+          "2026-08": {
+            "summary": {
+              "starting_capital": 130.0,
+              "ending_capital": 142.058074,
+              "return_pct": 9.275441,
+              "cash_drawdown_pct": 3.183529,
+              "trades": 232,
+              "skipped": {
+                "slots": 8,
+                "minimum_size": 0,
+                "equity_guard": 65
+              },
+              "unplaceable_partials": 117,
+              "tp1_hits_without_bank": 46,
+              "peak_positions": 9,
+              "peak_by_bot": {
+                "crypto": 4,
+                "stocks": 8
+              },
+              "peak_reserved_margin_pct": 25.818429787557427,
+              "pnl_by_bot": {
+                "crypto": 3.6594742857137503,
+                "stocks": 8.39859939999995
+              },
+              "return_contribution_pct": {
+                "crypto": 2.814980219779808,
+                "stocks": 6.460461076923039
+              }
+            },
+            "guard_states": {
+              "crypto": {
+                "peak": 146.72924154285664,
+                "day": "2026-08-31",
+                "daily_start": 142.05807368571377,
+                "paused": true,
+                "daily_paused": false
+              },
+              "stocks": {
+                "peak": 146.72924154285664,
+                "day": "2026-08-31",
+                "daily_start": 142.05807368571377,
+                "paused": true,
+                "daily_paused": false
+              }
+            },
+            "first_blocks": {
+              "crypto": {
+                "time": 1785620700.0,
+                "equity": 128.6059319428573,
+                "reason": "daily loss limit",
+                "peak": 130.0,
+                "day": "2026-08-01",
+                "daily_start": 130.0,
+                "paused": false,
+                "daily_paused": true
+              },
+              "stocks": {
+                "time": 1787877000.0,
+                "equity": 142.05807368571377,
+                "reason": "drawdown limit",
+                "peak": 146.72924154285664,
+                "day": "2026-08-28",
+                "daily_start": 142.05807368571377,
+                "paused": true,
+                "daily_paused": false
+              }
+            },
+            "first_drawdown_blocks": {
+              "crypto": {
+                "time": 1787868000.0,
+                "equity": 142.05807368571377,
+                "reason": "drawdown limit",
+                "peak": 146.72924154285664,
+                "day": "2026-08-27",
+                "daily_start": 142.7043212571423,
+                "paused": true,
+                "daily_paused": false
+              },
+              "stocks": {
+                "time": 1787877000.0,
+                "equity": 142.05807368571377,
+                "reason": "drawdown limit",
+                "peak": 146.72924154285664,
+                "day": "2026-08-28",
+                "daily_start": 142.05807368571377,
+                "paused": true,
+                "daily_paused": false
+              }
+            }
+          },
+          "2026-09": {
+            "summary": {
+              "starting_capital": 130.0,
+              "ending_capital": 128.868372,
+              "return_pct": -0.870483,
+              "cash_drawdown_pct": 3.969473,
+              "trades": 107,
+              "skipped": {
+                "slots": 1,
+                "minimum_size": 0,
+                "equity_guard": 269
+              },
+              "unplaceable_partials": 56,
+              "tp1_hits_without_bank": 8,
+              "peak_positions": 10,
+              "peak_by_bot": {
+                "stocks": 8,
+                "crypto": 4
+              },
+              "peak_reserved_margin_pct": 28.53421248476044,
+              "pnl_by_bot": {
+                "crypto": -3.739235714285918,
+                "stocks": 2.6076078999999983
+              },
+              "return_contribution_pct": {
+                "crypto": -2.8763351648353215,
+                "stocks": 2.0058522307692295
+              }
+            },
+            "guard_states": {
+              "stocks": {
+                "peak": 134.19521517142843,
+                "day": "2026-09-30",
+                "daily_start": 128.86837218571418,
+                "paused": true,
+                "daily_paused": false
+              },
+              "crypto": {
+                "peak": 133.10317807142837,
+                "day": "2026-09-30",
+                "daily_start": 128.86837218571418,
+                "paused": true,
+                "daily_paused": false
+              }
+            },
+            "first_blocks": {
+              "crypto": {
+                "time": 1788263100.0,
+                "equity": 128.19946714285715,
+                "reason": "daily loss limit",
+                "peak": 130.0,
+                "day": "2026-09-01",
+                "daily_start": 129.63931,
+                "paused": false,
+                "daily_paused": true
+              },
+              "stocks": {
+                "time": 1789262100.0,
+                "equity": 129.2216436142856,
+                "reason": "drawdown limit",
+                "peak": 134.19521517142843,
+                "day": "2026-09-13",
+                "daily_start": 129.2216436142856,
+                "paused": true,
+                "daily_paused": false
+              }
+            },
+            "first_drawdown_blocks": {
+              "stocks": {
+                "time": 1789262100.0,
+                "equity": 129.2216436142856,
+                "reason": "drawdown limit",
+                "peak": 134.19521517142843,
+                "day": "2026-09-13",
+                "daily_start": 129.2216436142856,
+                "paused": true,
+                "daily_paused": false
+              },
+              "crypto": {
+                "time": 1789291800.0,
+                "equity": 128.86837218571418,
+                "reason": "drawdown limit",
+                "peak": 133.10317807142837,
+                "day": "2026-09-13",
+                "daily_start": 129.2216436142856,
+                "paused": true,
+                "daily_paused": false
+              }
+            }
+          },
+          "2026-10": {
+            "summary": {
+              "starting_capital": 130.0,
+              "ending_capital": 163.716641,
+              "return_pct": 25.935877,
+              "cash_drawdown_pct": 2.790321,
+              "trades": 310,
+              "skipped": {
+                "slots": 10,
+                "minimum_size": 0,
+                "equity_guard": 25
+              },
+              "unplaceable_partials": 145,
+              "tp1_hits_without_bank": 63,
+              "peak_positions": 11,
+              "peak_by_bot": {
+                "stocks": 8,
+                "crypto": 4
+              },
+              "peak_reserved_margin_pct": 31.11561628720379,
+              "pnl_by_bot": {
+                "crypto": 22.750959999999914,
+                "stocks": 10.965680499999971
+              },
+              "return_contribution_pct": {
+                "crypto": 17.500738461538393,
+                "stocks": 8.435138846153825
+              }
+            },
+            "guard_states": {
+              "stocks": {
+                "peak": 162.21866907142874,
+                "day": "2026-10-31",
+                "daily_start": 161.22054050000014,
+                "paused": false,
+                "daily_paused": false
+              },
+              "crypto": {
+                "peak": 163.2906119285716,
+                "day": "2026-10-31",
+                "daily_start": 163.2906119285716,
+                "paused": false,
+                "daily_paused": false
+              }
+            },
+            "first_blocks": {
+              "crypto": {
+                "time": 1790842500.0,
+                "equity": 128.3683485714286,
+                "reason": "daily loss limit",
+                "peak": 130.0,
+                "day": "2026-10-01",
+                "daily_start": 130.0,
+                "paused": false,
+                "daily_paused": true
+              }
+            },
+            "first_drawdown_blocks": {}
+          },
+          "2026-11": {
+            "summary": {
+              "starting_capital": 130.0,
+              "ending_capital": 127.624733,
+              "return_pct": -1.827129,
+              "cash_drawdown_pct": 4.559182,
+              "trades": 69,
+              "skipped": {
+                "slots": 0,
+                "minimum_size": 0,
+                "equity_guard": 40
+              },
+              "unplaceable_partials": 35,
+              "tp1_hits_without_bank": 16,
+              "peak_positions": 7,
+              "peak_by_bot": {
+                "stocks": 5,
+                "crypto": 4
+              },
+              "peak_reserved_margin_pct": 20.303769473334533,
+              "pnl_by_bot": {
+                "crypto": 0.9041928571413959,
+                "stocks": -3.2794600000000225
+              },
+              "return_contribution_pct": {
+                "crypto": 0.695532967031843,
+                "stocks": -2.5226615384615556
+              }
+            },
+            "guard_states": {
+              "stocks": {
+                "peak": 133.16679957142713,
+                "day": "2026-11-10",
+                "daily_start": 127.62473285714144,
+                "paused": true,
+                "daily_paused": false
+              },
+              "crypto": {
+                "peak": 133.16679957142713,
+                "day": "2026-11-14",
+                "daily_start": 127.62473285714144,
+                "paused": true,
+                "daily_paused": false
+              }
+            },
+            "first_blocks": {
+              "crypto": {
+                "time": 1793799900.0,
+                "equity": 130.14431814285723,
+                "reason": "daily loss limit",
+                "peak": 131.86021528571433,
+                "day": "2026-11-04",
+                "daily_start": 131.47887528571434,
+                "paused": false,
+                "daily_paused": true
+              },
+              "stocks": {
+                "time": 1794268800.0,
+                "equity": 127.62473285714144,
+                "reason": "drawdown limit",
+                "peak": 133.16679957142713,
+                "day": "2026-11-10",
+                "daily_start": 127.62473285714144,
+                "paused": true,
+                "daily_paused": false
+              }
+            },
+            "first_drawdown_blocks": {
+              "crypto": {
+                "time": 1794239100.0,
+                "equity": 127.62473285714144,
+                "reason": "drawdown limit",
+                "peak": 133.16679957142713,
+                "day": "2026-11-09",
+                "daily_start": 129.74645542857002,
+                "paused": true,
+                "daily_paused": true
+              },
+              "stocks": {
+                "time": 1794268800.0,
+                "equity": 127.62473285714144,
+                "reason": "drawdown limit",
+                "peak": 133.16679957142713,
+                "day": "2026-11-10",
+                "daily_start": 127.62473285714144,
+                "paused": true,
+                "daily_paused": false
+              }
+            }
+          }
+        },
+        "stocks": {
+          "2026-07": {
+            "summary": {
+              "starting_capital": 130.0,
+              "ending_capital": 127.974915,
+              "return_pct": -1.557757,
+              "cash_drawdown_pct": 3.679922,
+              "trades": 59,
+              "skipped": {
+                "slots": 1,
+                "minimum_size": 0,
+                "equity_guard": 118
+              },
+              "unplaceable_partials": 37,
+              "tp1_hits_without_bank": 16,
+              "peak_positions": 9,
+              "peak_by_bot": {
+                "crypto": 3,
+                "stocks": 8
+              },
+              "peak_reserved_margin_pct": 25.101892566482526,
+              "pnl_by_bot": {
+                "crypto": 1.765042857142852,
+                "stocks": -3.790127599999993
+              },
+              "return_contribution_pct": {
+                "crypto": 1.3577252747252708,
+                "stocks": -2.9154827692307634
+              }
+            },
+            "guard_states": {
+              "crypto": {
+                "peak": 132.40119085714286,
+                "day": "2026-07-31",
+                "daily_start": 127.97491525714288,
+                "paused": true,
+                "daily_paused": false
+              },
+              "stocks": {
+                "peak": 132.40119085714286,
+                "day": "2026-07-31",
+                "daily_start": 127.97491525714288,
+                "paused": true,
+                "daily_paused": false
+              }
+            },
+            "first_blocks": {
+              "crypto": {
+                "time": 1784034000.0,
+                "equity": 127.88531525714289,
+                "reason": "drawdown limit",
+                "peak": 132.40119085714286,
+                "day": "2026-07-14",
+                "daily_start": 130.07421525714287,
+                "paused": true,
+                "daily_paused": true
+              },
+              "stocks": {
+                "time": 1784348100.0,
+                "equity": 127.97491525714288,
+                "reason": "drawdown limit",
+                "peak": 132.40119085714286,
+                "day": "2026-07-18",
+                "daily_start": 127.97491525714288,
+                "paused": true,
+                "daily_paused": false
+              }
+            },
+            "first_drawdown_blocks": {
+              "crypto": {
+                "time": 1784034000.0,
+                "equity": 127.88531525714289,
+                "reason": "drawdown limit",
+                "peak": 132.40119085714286,
+                "day": "2026-07-14",
+                "daily_start": 130.07421525714287,
+                "paused": true,
+                "daily_paused": true
+              },
+              "stocks": {
+                "time": 1784348100.0,
+                "equity": 127.97491525714288,
+                "reason": "drawdown limit",
+                "peak": 132.40119085714286,
+                "day": "2026-07-18",
+                "daily_start": 127.97491525714288,
+                "paused": true,
+                "daily_paused": false
+              }
+            }
+          },
+          "2026-08": {
+            "summary": {
+              "starting_capital": 130.0,
+              "ending_capital": 142.058074,
+              "return_pct": 9.275441,
+              "cash_drawdown_pct": 3.183529,
+              "trades": 232,
+              "skipped": {
+                "slots": 8,
+                "minimum_size": 0,
+                "equity_guard": 65
+              },
+              "unplaceable_partials": 117,
+              "tp1_hits_without_bank": 46,
+              "peak_positions": 9,
+              "peak_by_bot": {
+                "crypto": 4,
+                "stocks": 8
+              },
+              "peak_reserved_margin_pct": 25.818429787557427,
+              "pnl_by_bot": {
+                "crypto": 3.6594742857137503,
+                "stocks": 8.39859939999995
+              },
+              "return_contribution_pct": {
+                "crypto": 2.814980219779808,
+                "stocks": 6.460461076923039
+              }
+            },
+            "guard_states": {
+              "crypto": {
+                "peak": 146.72924154285664,
+                "day": "2026-08-31",
+                "daily_start": 142.05807368571377,
+                "paused": true,
+                "daily_paused": false
+              },
+              "stocks": {
+                "peak": 146.72924154285664,
+                "day": "2026-08-31",
+                "daily_start": 142.05807368571377,
+                "paused": true,
+                "daily_paused": false
+              }
+            },
+            "first_blocks": {
+              "crypto": {
+                "time": 1785620700.0,
+                "equity": 128.6059319428573,
+                "reason": "daily loss limit",
+                "peak": 130.0,
+                "day": "2026-08-01",
+                "daily_start": 130.0,
+                "paused": false,
+                "daily_paused": true
+              },
+              "stocks": {
+                "time": 1787877000.0,
+                "equity": 142.05807368571377,
+                "reason": "drawdown limit",
+                "peak": 146.72924154285664,
+                "day": "2026-08-28",
+                "daily_start": 142.05807368571377,
+                "paused": true,
+                "daily_paused": false
+              }
+            },
+            "first_drawdown_blocks": {
+              "crypto": {
+                "time": 1787868000.0,
+                "equity": 142.05807368571377,
+                "reason": "drawdown limit",
+                "peak": 146.72924154285664,
+                "day": "2026-08-27",
+                "daily_start": 142.7043212571423,
+                "paused": true,
+                "daily_paused": false
+              },
+              "stocks": {
+                "time": 1787877000.0,
+                "equity": 142.05807368571377,
+                "reason": "drawdown limit",
+                "peak": 146.72924154285664,
+                "day": "2026-08-28",
+                "daily_start": 142.05807368571377,
+                "paused": true,
+                "daily_paused": false
+              }
+            }
+          },
+          "2026-09": {
+            "summary": {
+              "starting_capital": 130.0,
+              "ending_capital": 128.868372,
+              "return_pct": -0.870483,
+              "cash_drawdown_pct": 3.969473,
+              "trades": 107,
+              "skipped": {
+                "slots": 1,
+                "minimum_size": 0,
+                "equity_guard": 269
+              },
+              "unplaceable_partials": 56,
+              "tp1_hits_without_bank": 8,
+              "peak_positions": 10,
+              "peak_by_bot": {
+                "stocks": 8,
+                "crypto": 4
+              },
+              "peak_reserved_margin_pct": 28.53421248476044,
+              "pnl_by_bot": {
+                "crypto": -3.739235714285918,
+                "stocks": 2.6076078999999983
+              },
+              "return_contribution_pct": {
+                "crypto": -2.8763351648353215,
+                "stocks": 2.0058522307692295
+              }
+            },
+            "guard_states": {
+              "stocks": {
+                "peak": 134.19521517142843,
+                "day": "2026-09-30",
+                "daily_start": 128.86837218571418,
+                "paused": true,
+                "daily_paused": false
+              },
+              "crypto": {
+                "peak": 133.10317807142837,
+                "day": "2026-09-30",
+                "daily_start": 128.86837218571418,
+                "paused": true,
+                "daily_paused": false
+              }
+            },
+            "first_blocks": {
+              "crypto": {
+                "time": 1788263100.0,
+                "equity": 128.19946714285715,
+                "reason": "daily loss limit",
+                "peak": 130.0,
+                "day": "2026-09-01",
+                "daily_start": 129.63931,
+                "paused": false,
+                "daily_paused": true
+              },
+              "stocks": {
+                "time": 1789262100.0,
+                "equity": 129.2216436142856,
+                "reason": "drawdown limit",
+                "peak": 134.19521517142843,
+                "day": "2026-09-13",
+                "daily_start": 129.2216436142856,
+                "paused": true,
+                "daily_paused": false
+              }
+            },
+            "first_drawdown_blocks": {
+              "stocks": {
+                "time": 1789262100.0,
+                "equity": 129.2216436142856,
+                "reason": "drawdown limit",
+                "peak": 134.19521517142843,
+                "day": "2026-09-13",
+                "daily_start": 129.2216436142856,
+                "paused": true,
+                "daily_paused": false
+              },
+              "crypto": {
+                "time": 1789291800.0,
+                "equity": 128.86837218571418,
+                "reason": "drawdown limit",
+                "peak": 133.10317807142837,
+                "day": "2026-09-13",
+                "daily_start": 129.2216436142856,
+                "paused": true,
+                "daily_paused": false
+              }
+            }
+          },
+          "2026-10": {
+            "summary": {
+              "starting_capital": 130.0,
+              "ending_capital": 163.716641,
+              "return_pct": 25.935877,
+              "cash_drawdown_pct": 2.790321,
+              "trades": 310,
+              "skipped": {
+                "slots": 10,
+                "minimum_size": 0,
+                "equity_guard": 25
+              },
+              "unplaceable_partials": 145,
+              "tp1_hits_without_bank": 63,
+              "peak_positions": 11,
+              "peak_by_bot": {
+                "stocks": 8,
+                "crypto": 4
+              },
+              "peak_reserved_margin_pct": 31.11561628720379,
+              "pnl_by_bot": {
+                "crypto": 22.750959999999914,
+                "stocks": 10.965680499999971
+              },
+              "return_contribution_pct": {
+                "crypto": 17.500738461538393,
+                "stocks": 8.435138846153825
+              }
+            },
+            "guard_states": {
+              "stocks": {
+                "peak": 162.21866907142874,
+                "day": "2026-10-31",
+                "daily_start": 161.22054050000014,
+                "paused": false,
+                "daily_paused": false
+              },
+              "crypto": {
+                "peak": 163.2906119285716,
+                "day": "2026-10-31",
+                "daily_start": 163.2906119285716,
+                "paused": false,
+                "daily_paused": false
+              }
+            },
+            "first_blocks": {
+              "crypto": {
+                "time": 1790842500.0,
+                "equity": 128.3683485714286,
+                "reason": "daily loss limit",
+                "peak": 130.0,
+                "day": "2026-10-01",
+                "daily_start": 130.0,
+                "paused": false,
+                "daily_paused": true
+              }
+            },
+            "first_drawdown_blocks": {}
+          },
+          "2026-11": {
+            "summary": {
+              "starting_capital": 130.0,
+              "ending_capital": 127.624733,
+              "return_pct": -1.827129,
+              "cash_drawdown_pct": 4.559182,
+              "trades": 69,
+              "skipped": {
+                "slots": 0,
+                "minimum_size": 0,
+                "equity_guard": 40
+              },
+              "unplaceable_partials": 35,
+              "tp1_hits_without_bank": 16,
+              "peak_positions": 7,
+              "peak_by_bot": {
+                "stocks": 5,
+                "crypto": 4
+              },
+              "peak_reserved_margin_pct": 20.303769473334533,
+              "pnl_by_bot": {
+                "crypto": 0.9041928571413959,
+                "stocks": -3.2794600000000225
+              },
+              "return_contribution_pct": {
+                "crypto": 0.695532967031843,
+                "stocks": -2.5226615384615556
+              }
+            },
+            "guard_states": {
+              "stocks": {
+                "peak": 133.16679957142713,
+                "day": "2026-11-10",
+                "daily_start": 127.62473285714144,
+                "paused": true,
+                "daily_paused": false
+              },
+              "crypto": {
+                "peak": 133.16679957142713,
+                "day": "2026-11-14",
+                "daily_start": 127.62473285714144,
+                "paused": true,
+                "daily_paused": false
+              }
+            },
+            "first_blocks": {
+              "crypto": {
+                "time": 1793799900.0,
+                "equity": 130.14431814285723,
+                "reason": "daily loss limit",
+                "peak": 131.86021528571433,
+                "day": "2026-11-04",
+                "daily_start": 131.47887528571434,
+                "paused": false,
+                "daily_paused": true
+              },
+              "stocks": {
+                "time": 1794268800.0,
+                "equity": 127.62473285714144,
+                "reason": "drawdown limit",
+                "peak": 133.16679957142713,
+                "day": "2026-11-10",
+                "daily_start": 127.62473285714144,
+                "paused": true,
+                "daily_paused": false
+              }
+            },
+            "first_drawdown_blocks": {
+              "crypto": {
+                "time": 1794239100.0,
+                "equity": 127.62473285714144,
+                "reason": "drawdown limit",
+                "peak": 133.16679957142713,
+                "day": "2026-11-09",
+                "daily_start": 129.74645542857002,
+                "paused": true,
+                "daily_paused": true
+              },
+              "stocks": {
+                "time": 1794268800.0,
+                "equity": 127.62473285714144,
+                "reason": "drawdown limit",
+                "peak": 133.16679957142713,
+                "day": "2026-11-10",
+                "daily_start": 127.62473285714144,
+                "paused": true,
+                "daily_paused": false
+              }
+            }
+          }
+        }
+      },
+      "continuous": {
+        "crypto": {
+          "no_account_guard": {
+            "summary": {
+              "starting_capital": 130.0,
+              "ending_capital": 240.901175,
+              "return_pct": 85.308596,
+              "cash_drawdown_pct": 6.759784,
+              "trades": 1284,
+              "skipped": {
+                "slots": 38,
+                "minimum_size": 0
+              },
+              "unplaceable_partials": 620,
+              "tp1_hits_without_bank": 261,
+              "peak_positions": 11,
+              "peak_by_bot": {
+                "crypto": 4,
+                "stocks": 8
+              },
+              "peak_reserved_margin_pct": 32.424984758578205,
+              "pnl_by_bot": {
+                "crypto": 51.866587857139365,
+                "stocks": 59.03458679999985
+              },
+              "return_contribution_pct": {
+                "crypto": 39.89737527472259,
+                "stocks": 45.4112206153845
+              }
+            },
+            "calendar_months": {
+              "2026-07": {
+                "opening_cash": 130.0,
+                "closing_cash": 127.20829971428542,
+                "return_pct": -2.1474617582419864,
+                "cash_drawdown_pct": 6.759783740348996,
+                "return_contribution_pct": {
+                  "crypto": -1.5900494505497231,
+                  "stocks": -0.5574123076923173
+                },
+                "entries": 175,
+                "rejected_by_account_guard": 0
+              },
+              "2026-08": {
+                "opening_cash": 127.20829971428535,
+                "closing_cash": 145.46201874999912,
+                "return_pct": 14.349471753582366,
+                "cash_drawdown_pct": 5.067839828095621,
+                "return_contribution_pct": {
+                  "crypto": 4.283072958251329,
+                  "stocks": 10.06639879533105
+                },
+                "entries": 296,
+                "rejected_by_account_guard": 0
+              },
+              "2026-09": {
+                "opening_cash": 145.46201874999915,
+                "closing_cash": 194.00840522857075,
+                "return_pct": 33.37392598820364,
+                "cash_drawdown_pct": 5.418444581022285,
+                "return_contribution_pct": {
+                  "crypto": 9.748037013663163,
+                  "stocks": 23.625888974540434
+                },
+                "entries": 367,
+                "rejected_by_account_guard": 0
+              },
+              "2026-10": {
+                "opening_cash": 194.00840522857072,
+                "closing_cash": 245.26985187142745,
+                "return_pct": 26.422281334905627,
+                "cash_drawdown_pct": 2.9150523153623245,
+                "return_contribution_pct": {
+                  "crypto": 17.82317219819338,
+                  "stocks": 8.599109136712357
+                },
+                "entries": 341,
+                "rejected_by_account_guard": 0
+              },
+              "2026-11": {
+                "opening_cash": 245.26985187142765,
+                "closing_cash": 240.9011746571391,
+                "return_pct": -1.7811717098351831,
+                "cash_drawdown_pct": 4.177213077724059,
+                "return_contribution_pct": {
+                  "crypto": -0.11127161051634385,
+                  "stocks": -1.669900099318796
+                },
+                "entries": 105,
+                "rejected_by_account_guard": 0
+              }
+            },
+            "guard_states": {},
+            "first_blocks": {},
+            "first_drawdown_blocks": {}
+          },
+          "realized_cash_guard": {
+            "summary": {
+              "starting_capital": 130.0,
+              "ending_capital": 127.974915,
+              "return_pct": -1.557757,
+              "cash_drawdown_pct": 3.679922,
+              "trades": 59,
+              "skipped": {
+                "slots": 1,
+                "minimum_size": 0,
+                "equity_guard": 1262
+              },
+              "unplaceable_partials": 37,
+              "tp1_hits_without_bank": 16,
+              "peak_positions": 9,
+              "peak_by_bot": {
+                "crypto": 3,
+                "stocks": 8
+              },
+              "peak_reserved_margin_pct": 25.101892566482526,
+              "pnl_by_bot": {
+                "crypto": 1.765042857142852,
+                "stocks": -3.790127599999993
+              },
+              "return_contribution_pct": {
+                "crypto": 1.3577252747252708,
+                "stocks": -2.9154827692307634
+              }
+            },
+            "calendar_months": {
+              "2026-07": {
+                "opening_cash": 130.0,
+                "closing_cash": 127.97491525714288,
+                "return_pct": -1.557757494505474,
+                "cash_drawdown_pct": 3.6799215013873057,
+                "return_contribution_pct": {
+                  "crypto": 1.3577252747252704,
+                  "stocks": -2.915482769230764
+                },
+                "entries": 59,
+                "rejected_by_account_guard": 118
+              },
+              "2026-08": {
+                "opening_cash": 127.97491525714285,
+                "closing_cash": 127.97491525714285,
+                "return_pct": 0.0,
+                "cash_drawdown_pct": 0.0,
+                "return_contribution_pct": {
+                  "crypto": 0.0,
+                  "stocks": 0.0
+                },
+                "entries": 0,
+                "rejected_by_account_guard": 306
+              },
+              "2026-09": {
+                "opening_cash": 127.97491525714285,
+                "closing_cash": 127.97491525714285,
+                "return_pct": 0.0,
+                "cash_drawdown_pct": 0.0,
+                "return_contribution_pct": {
+                  "crypto": 0.0,
+                  "stocks": 0.0
+                },
+                "entries": 0,
+                "rejected_by_account_guard": 378
+              },
+              "2026-10": {
+                "opening_cash": 127.97491525714285,
+                "closing_cash": 127.97491525714285,
+                "return_pct": 0.0,
+                "cash_drawdown_pct": 0.0,
+                "return_contribution_pct": {
+                  "crypto": 0.0,
+                  "stocks": 0.0
+                },
+                "entries": 0,
+                "rejected_by_account_guard": 351
+              },
+              "2026-11": {
+                "opening_cash": 127.97491525714285,
+                "closing_cash": 127.97491525714285,
+                "return_pct": 0.0,
+                "cash_drawdown_pct": 0.0,
+                "return_contribution_pct": {
+                  "crypto": 0.0,
+                  "stocks": 0.0
+                },
+                "entries": 0,
+                "rejected_by_account_guard": 109
+              }
+            },
+            "guard_states": {
+              "crypto": {
+                "peak": 132.40119085714286,
+                "day": "2026-11-14",
+                "daily_start": 127.97491525714288,
+                "paused": true,
+                "daily_paused": false
+              },
+              "stocks": {
+                "peak": 132.40119085714286,
+                "day": "2026-11-10",
+                "daily_start": 127.97491525714288,
+                "paused": true,
+                "daily_paused": false
+              }
+            },
+            "first_blocks": {
+              "crypto": {
+                "time": 1784034000.0,
+                "equity": 127.88531525714289,
+                "reason": "drawdown limit",
+                "peak": 132.40119085714286,
+                "day": "2026-07-14",
+                "daily_start": 130.07421525714287,
+                "paused": true,
+                "daily_paused": true
+              },
+              "stocks": {
+                "time": 1784348100.0,
+                "equity": 127.97491525714288,
+                "reason": "drawdown limit",
+                "peak": 132.40119085714286,
+                "day": "2026-07-18",
+                "daily_start": 127.97491525714288,
+                "paused": true,
+                "daily_paused": false
+              }
+            },
+            "first_drawdown_blocks": {
+              "crypto": {
+                "time": 1784034000.0,
+                "equity": 127.88531525714289,
+                "reason": "drawdown limit",
+                "peak": 132.40119085714286,
+                "day": "2026-07-14",
+                "daily_start": 130.07421525714287,
+                "paused": true,
+                "daily_paused": true
+              },
+              "stocks": {
+                "time": 1784348100.0,
+                "equity": 127.97491525714288,
+                "reason": "drawdown limit",
+                "peak": 132.40119085714286,
+                "day": "2026-07-18",
+                "daily_start": 127.97491525714288,
+                "paused": true,
+                "daily_paused": false
+              }
+            }
+          }
+        },
+        "stocks": {
+          "no_account_guard": {
+            "summary": {
+              "starting_capital": 130.0,
+              "ending_capital": 240.901175,
+              "return_pct": 85.308596,
+              "cash_drawdown_pct": 6.759784,
+              "trades": 1284,
+              "skipped": {
+                "slots": 38,
+                "minimum_size": 0
+              },
+              "unplaceable_partials": 620,
+              "tp1_hits_without_bank": 261,
+              "peak_positions": 11,
+              "peak_by_bot": {
+                "crypto": 4,
+                "stocks": 8
+              },
+              "peak_reserved_margin_pct": 32.424984758578205,
+              "pnl_by_bot": {
+                "crypto": 51.866587857139365,
+                "stocks": 59.03458679999985
+              },
+              "return_contribution_pct": {
+                "crypto": 39.89737527472259,
+                "stocks": 45.4112206153845
+              }
+            },
+            "calendar_months": {
+              "2026-07": {
+                "opening_cash": 130.0,
+                "closing_cash": 127.20829971428542,
+                "return_pct": -2.1474617582419864,
+                "cash_drawdown_pct": 6.759783740348996,
+                "return_contribution_pct": {
+                  "crypto": -1.5900494505497231,
+                  "stocks": -0.5574123076923173
+                },
+                "entries": 175,
+                "rejected_by_account_guard": 0
+              },
+              "2026-08": {
+                "opening_cash": 127.20829971428535,
+                "closing_cash": 145.46201874999912,
+                "return_pct": 14.349471753582366,
+                "cash_drawdown_pct": 5.067839828095621,
+                "return_contribution_pct": {
+                  "crypto": 4.283072958251329,
+                  "stocks": 10.06639879533105
+                },
+                "entries": 296,
+                "rejected_by_account_guard": 0
+              },
+              "2026-09": {
+                "opening_cash": 145.46201874999915,
+                "closing_cash": 194.00840522857075,
+                "return_pct": 33.37392598820364,
+                "cash_drawdown_pct": 5.418444581022285,
+                "return_contribution_pct": {
+                  "crypto": 9.748037013663163,
+                  "stocks": 23.625888974540434
+                },
+                "entries": 367,
+                "rejected_by_account_guard": 0
+              },
+              "2026-10": {
+                "opening_cash": 194.00840522857072,
+                "closing_cash": 245.26985187142745,
+                "return_pct": 26.422281334905627,
+                "cash_drawdown_pct": 2.9150523153623245,
+                "return_contribution_pct": {
+                  "crypto": 17.82317219819338,
+                  "stocks": 8.599109136712357
+                },
+                "entries": 341,
+                "rejected_by_account_guard": 0
+              },
+              "2026-11": {
+                "opening_cash": 245.26985187142765,
+                "closing_cash": 240.9011746571391,
+                "return_pct": -1.7811717098351831,
+                "cash_drawdown_pct": 4.177213077724059,
+                "return_contribution_pct": {
+                  "crypto": -0.11127161051634385,
+                  "stocks": -1.669900099318796
+                },
+                "entries": 105,
+                "rejected_by_account_guard": 0
+              }
+            },
+            "guard_states": {},
+            "first_blocks": {},
+            "first_drawdown_blocks": {}
+          },
+          "realized_cash_guard": {
+            "summary": {
+              "starting_capital": 130.0,
+              "ending_capital": 127.974915,
+              "return_pct": -1.557757,
+              "cash_drawdown_pct": 3.679922,
+              "trades": 59,
+              "skipped": {
+                "slots": 1,
+                "minimum_size": 0,
+                "equity_guard": 1262
+              },
+              "unplaceable_partials": 37,
+              "tp1_hits_without_bank": 16,
+              "peak_positions": 9,
+              "peak_by_bot": {
+                "crypto": 3,
+                "stocks": 8
+              },
+              "peak_reserved_margin_pct": 25.101892566482526,
+              "pnl_by_bot": {
+                "crypto": 1.765042857142852,
+                "stocks": -3.790127599999993
+              },
+              "return_contribution_pct": {
+                "crypto": 1.3577252747252708,
+                "stocks": -2.9154827692307634
+              }
+            },
+            "calendar_months": {
+              "2026-07": {
+                "opening_cash": 130.0,
+                "closing_cash": 127.97491525714288,
+                "return_pct": -1.557757494505474,
+                "cash_drawdown_pct": 3.6799215013873057,
+                "return_contribution_pct": {
+                  "crypto": 1.3577252747252704,
+                  "stocks": -2.915482769230764
+                },
+                "entries": 59,
+                "rejected_by_account_guard": 118
+              },
+              "2026-08": {
+                "opening_cash": 127.97491525714285,
+                "closing_cash": 127.97491525714285,
+                "return_pct": 0.0,
+                "cash_drawdown_pct": 0.0,
+                "return_contribution_pct": {
+                  "crypto": 0.0,
+                  "stocks": 0.0
+                },
+                "entries": 0,
+                "rejected_by_account_guard": 306
+              },
+              "2026-09": {
+                "opening_cash": 127.97491525714285,
+                "closing_cash": 127.97491525714285,
+                "return_pct": 0.0,
+                "cash_drawdown_pct": 0.0,
+                "return_contribution_pct": {
+                  "crypto": 0.0,
+                  "stocks": 0.0
+                },
+                "entries": 0,
+                "rejected_by_account_guard": 378
+              },
+              "2026-10": {
+                "opening_cash": 127.97491525714285,
+                "closing_cash": 127.97491525714285,
+                "return_pct": 0.0,
+                "cash_drawdown_pct": 0.0,
+                "return_contribution_pct": {
+                  "crypto": 0.0,
+                  "stocks": 0.0
+                },
+                "entries": 0,
+                "rejected_by_account_guard": 351
+              },
+              "2026-11": {
+                "opening_cash": 127.97491525714285,
+                "closing_cash": 127.97491525714285,
+                "return_pct": 0.0,
+                "cash_drawdown_pct": 0.0,
+                "return_contribution_pct": {
+                  "crypto": 0.0,
+                  "stocks": 0.0
+                },
+                "entries": 0,
+                "rejected_by_account_guard": 109
+              }
+            },
+            "guard_states": {
+              "crypto": {
+                "peak": 132.40119085714286,
+                "day": "2026-11-14",
+                "daily_start": 127.97491525714288,
+                "paused": true,
+                "daily_paused": false
+              },
+              "stocks": {
+                "peak": 132.40119085714286,
+                "day": "2026-11-10",
+                "daily_start": 127.97491525714288,
+                "paused": true,
+                "daily_paused": false
+              }
+            },
+            "first_blocks": {
+              "crypto": {
+                "time": 1784034000.0,
+                "equity": 127.88531525714289,
+                "reason": "drawdown limit",
+                "peak": 132.40119085714286,
+                "day": "2026-07-14",
+                "daily_start": 130.07421525714287,
+                "paused": true,
+                "daily_paused": true
+              },
+              "stocks": {
+                "time": 1784348100.0,
+                "equity": 127.97491525714288,
+                "reason": "drawdown limit",
+                "peak": 132.40119085714286,
+                "day": "2026-07-18",
+                "daily_start": 127.97491525714288,
+                "paused": true,
+                "daily_paused": false
+              }
+            },
+            "first_drawdown_blocks": {
+              "crypto": {
+                "time": 1784034000.0,
+                "equity": 127.88531525714289,
+                "reason": "drawdown limit",
+                "peak": 132.40119085714286,
+                "day": "2026-07-14",
+                "daily_start": 130.07421525714287,
+                "paused": true,
+                "daily_paused": true
+              },
+              "stocks": {
+                "time": 1784348100.0,
+                "equity": 127.97491525714288,
+                "reason": "drawdown limit",
+                "peak": 132.40119085714286,
+                "day": "2026-07-18",
+                "daily_start": 127.97491525714288,
+                "paused": true,
+                "daily_paused": false
+              }
+            }
+          }
+        }
+      }
+    },
+    "daily_causal_rotation": {
+      "monthly_cash_baseline_parity": true,
+      "monthly_reset_guarded": {
+        "crypto": {
+          "2026-07": {
+            "summary": {
+              "starting_capital": 130.0,
+              "ending_capital": 126.594272,
+              "return_pct": -2.61979,
+              "cash_drawdown_pct": 3.679646,
+              "trades": 25,
+              "skipped": {
+                "slots": 2,
+                "minimum_size": 0,
+                "equity_guard": 57
+              },
+              "unplaceable_partials": 13,
+              "tp1_hits_without_bank": 1,
+              "peak_positions": 8,
+              "peak_by_bot": {
+                "crypto": 3,
+                "stocks": 8
+              },
+              "peak_reserved_margin_pct": 22.489810568577347,
+              "pnl_by_bot": {
+                "crypto": 0.3843999999999982,
+                "stocks": -3.790127599999993
+              },
+              "return_contribution_pct": {
+                "crypto": 0.2956923076923063,
+                "stocks": -2.9154827692307634
+              }
+            },
+            "guard_states": {
+              "crypto": {
+                "peak": 131.40571428571428,
+                "day": "2026-07-01",
+                "daily_start": 130.0,
+                "paused": false,
+                "daily_paused": false
+              },
+              "stocks": {
+                "peak": 131.060448,
+                "day": "2026-07-31",
+                "daily_start": 126.59427240000002,
+                "paused": true,
+                "daily_paused": false
+              }
+            },
+            "first_blocks": {
+              "stocks": {
+                "time": 1784348100.0,
+                "equity": 126.59427240000002,
+                "reason": "drawdown limit",
+                "peak": 131.060448,
+                "day": "2026-07-18",
+                "daily_start": 126.59427240000002,
+                "paused": true,
+                "daily_paused": false
+              }
+            },
+            "first_drawdown_blocks": {
+              "stocks": {
+                "time": 1784348100.0,
+                "equity": 126.59427240000002,
+                "reason": "drawdown limit",
+                "peak": 131.060448,
+                "day": "2026-07-18",
+                "daily_start": 126.59427240000002,
+                "paused": true,
+                "daily_paused": false
+              }
+            }
+          },
+          "2026-08": {
+            "summary": {
+              "starting_capital": 130.0,
+              "ending_capital": 139.951178,
+              "return_pct": 7.654752,
+              "cash_drawdown_pct": 3.574843,
+              "trades": 182,
+              "skipped": {
+                "slots": 6,
+                "minimum_size": 0,
+                "equity_guard": 70
+              },
+              "unplaceable_partials": 78,
+              "tp1_hits_without_bank": 20,
+              "peak_positions": 8,
+              "peak_by_bot": {
+                "stocks": 8,
+                "crypto": 4
+              },
+              "peak_reserved_margin_pct": 23.649204935849905,
+              "pnl_by_bot": {
+                "crypto": 1.3353057142857405,
+                "stocks": 8.615871899999949
+              },
+              "return_contribution_pct": {
+                "crypto": 1.027158241758262,
+                "stocks": 6.62759376923073
+              }
+            },
+            "guard_states": {
+              "stocks": {
+                "peak": 144.55434047142867,
+                "day": "2026-08-31",
+                "daily_start": 139.95117761428577,
+                "paused": true,
+                "daily_paused": false
+              },
+              "crypto": {
+                "peak": 144.72193447142868,
+                "day": "2026-08-31",
+                "daily_start": 139.95117761428577,
+                "paused": true,
+                "daily_paused": false
+              }
+            },
+            "first_blocks": {
+              "crypto": {
+                "time": 1787301000.0,
+                "equity": 142.80155890000012,
+                "reason": "daily loss limit",
+                "peak": 144.55434047142867,
+                "day": "2026-08-21",
+                "daily_start": 144.55434047142867,
+                "paused": false,
+                "daily_paused": true
+              },
+              "stocks": {
+                "time": 1787877000.0,
+                "equity": 139.95117761428577,
+                "reason": "drawdown limit",
+                "peak": 144.55434047142867,
+                "day": "2026-08-28",
+                "daily_start": 139.95117761428577,
+                "paused": true,
+                "daily_paused": false
+              }
+            },
+            "first_drawdown_blocks": {
+              "stocks": {
+                "time": 1787877000.0,
+                "equity": 139.95117761428577,
+                "reason": "drawdown limit",
+                "peak": 144.55434047142867,
+                "day": "2026-08-28",
+                "daily_start": 139.95117761428577,
+                "paused": true,
+                "daily_paused": false
+              },
+              "crypto": {
+                "time": 1787880600.0,
+                "equity": 139.95117761428577,
+                "reason": "drawdown limit",
+                "peak": 144.72193447142868,
+                "day": "2026-08-28",
+                "daily_start": 139.95117761428577,
+                "paused": true,
+                "daily_paused": false
+              }
+            }
+          },
+          "2026-09": {
+            "summary": {
+              "starting_capital": 130.0,
+              "ending_capital": 131.087158,
+              "return_pct": 0.836276,
+              "cash_drawdown_pct": 4.049301,
+              "trades": 112,
+              "skipped": {
+                "slots": 1,
+                "minimum_size": 0,
+                "equity_guard": 256
+              },
+              "unplaceable_partials": 56,
+              "tp1_hits_without_bank": 10,
+              "peak_positions": 10,
+              "peak_by_bot": {
+                "stocks": 8,
+                "crypto": 4
+              },
+              "peak_reserved_margin_pct": 28.586540440963255,
+              "pnl_by_bot": {
+                "crypto": -1.7223500000002194,
+                "stocks": 2.8095082999999987
+              },
+              "return_contribution_pct": {
+                "crypto": -1.3248846153847842,
+                "stocks": 2.1611602307692297
+              }
+            },
+            "guard_states": {
+              "stocks": {
+                "peak": 136.61928454285695,
+                "day": "2026-09-30",
+                "daily_start": 131.08715829999983,
+                "paused": true,
+                "daily_paused": false
+              },
+              "crypto": {
+                "peak": 135.53231954285695,
+                "day": "2026-09-30",
+                "daily_start": 131.08715829999983,
+                "paused": true,
+                "daily_paused": false
+              }
+            },
+            "first_blocks": {
+              "crypto": {
+                "time": 1788251400.0,
+                "equity": 128.5935457142857,
+                "reason": "daily loss limit",
+                "peak": 130.0,
+                "day": "2026-09-01",
+                "daily_start": 130.0,
+                "paused": false,
+                "daily_paused": true
+              },
+              "stocks": {
+                "time": 1789262100.0,
+                "equity": 131.08715829999983,
+                "reason": "drawdown limit",
+                "peak": 136.61928454285695,
+                "day": "2026-09-13",
+                "daily_start": 131.08715829999983,
+                "paused": true,
+                "daily_paused": false
+              }
+            },
+            "first_drawdown_blocks": {
+              "crypto": {
+                "time": 1789200000.0,
+                "equity": 131.08715829999983,
+                "reason": "drawdown limit",
+                "peak": 135.53231954285695,
+                "day": "2026-09-12",
+                "daily_start": 132.46381544285697,
+                "paused": true,
+                "daily_paused": true
+              },
+              "stocks": {
+                "time": 1789262100.0,
+                "equity": 131.08715829999983,
+                "reason": "drawdown limit",
+                "peak": 136.61928454285695,
+                "day": "2026-09-13",
+                "daily_start": 131.08715829999983,
+                "paused": true,
+                "daily_paused": false
+              }
+            }
+          },
+          "2026-10": {
+            "summary": {
+              "starting_capital": 130.0,
+              "ending_capital": 150.812762,
+              "return_pct": 16.009817,
+              "cash_drawdown_pct": 2.170148,
+              "trades": 292,
+              "skipped": {
+                "slots": 9,
+                "minimum_size": 0,
+                "equity_guard": 21
+              },
+              "unplaceable_partials": 140,
+              "tp1_hits_without_bank": 53,
+              "peak_positions": 11,
+              "peak_by_bot": {
+                "stocks": 8,
+                "crypto": 4
+              },
+              "peak_reserved_margin_pct": 31.2613339992714,
+              "pnl_by_bot": {
+                "crypto": 9.751207142857464,
+                "stocks": 11.061554499999973
+              },
+              "return_contribution_pct": {
+                "crypto": 7.500928571428818,
+                "stocks": 8.508888076923055
+              }
+            },
+            "guard_states": {
+              "stocks": {
+                "peak": 151.17412464285758,
+                "day": "2026-10-31",
+                "daily_start": 150.33189021428615,
+                "paused": false,
+                "daily_paused": false
+              },
+              "crypto": {
+                "peak": 151.15485750000045,
+                "day": "2026-10-31",
+                "daily_start": 150.33189021428615,
+                "paused": false,
+                "daily_paused": false
+              }
+            },
+            "first_blocks": {
+              "crypto": {
+                "time": 1790874000.0,
+                "equity": 128.49579000000006,
+                "reason": "daily loss limit",
+                "peak": 130.77762857142858,
+                "day": "2026-10-01",
+                "daily_start": 130.0,
+                "paused": false,
+                "daily_paused": true
+              }
+            },
+            "first_drawdown_blocks": {}
+          },
+          "2026-11": {
+            "summary": {
+              "starting_capital": 130.0,
+              "ending_capital": 131.219705,
+              "return_pct": 0.938235,
+              "cash_drawdown_pct": 4.413014,
+              "trades": 64,
+              "skipped": {
+                "slots": 1,
+                "minimum_size": 0,
+                "equity_guard": 36
+              },
+              "unplaceable_partials": 31,
+              "tp1_hits_without_bank": 13,
+              "peak_positions": 7,
+              "peak_by_bot": {
+                "stocks": 5,
+                "crypto": 4
+              },
+              "peak_reserved_margin_pct": 20.187011507136468,
+              "pnl_by_bot": {
+                "crypto": 4.14334285714137,
+                "stocks": -2.9236380000000146
+              },
+              "return_contribution_pct": {
+                "crypto": 3.187186813185669,
+                "stocks": -2.248952307692319
+              }
+            },
+            "guard_states": {
+              "stocks": {
+                "peak": 136.2546407142842,
+                "day": "2026-11-10",
+                "daily_start": 131.2197048571413,
+                "paused": true,
+                "daily_paused": false
+              },
+              "crypto": {
+                "peak": 136.2546407142842,
+                "day": "2026-11-13",
+                "daily_start": 131.2197048571413,
+                "paused": true,
+                "daily_paused": false
+              }
+            },
+            "first_blocks": {
+              "crypto": {
+                "time": 1793794500.0,
+                "equity": 132.5070535714286,
+                "reason": "daily loss limit",
+                "peak": 134.31466500000002,
+                "day": "2026-11-04",
+                "daily_start": 133.93332500000002,
+                "paused": false,
+                "daily_paused": true
+              },
+              "stocks": {
+                "time": 1794203100.0,
+                "equity": 132.109390571427,
+                "reason": "drawdown limit",
+                "peak": 136.2546407142842,
+                "day": "2026-11-09",
+                "daily_start": 132.49473457142702,
+                "paused": true,
+                "daily_paused": false
+              }
+            },
+            "first_drawdown_blocks": {
+              "crypto": {
+                "time": 1794202200.0,
+                "equity": 132.109390571427,
+                "reason": "drawdown limit",
+                "peak": 136.2546407142842,
+                "day": "2026-11-09",
+                "daily_start": 132.49473457142702,
+                "paused": true,
+                "daily_paused": false
+              },
+              "stocks": {
+                "time": 1794203100.0,
+                "equity": 132.109390571427,
+                "reason": "drawdown limit",
+                "peak": 136.2546407142842,
+                "day": "2026-11-09",
+                "daily_start": 132.49473457142702,
+                "paused": true,
+                "daily_paused": false
+              }
+            }
+          }
+        },
+        "stocks": {
+          "2026-07": {
+            "summary": {
+              "starting_capital": 130.0,
+              "ending_capital": 126.594272,
+              "return_pct": -2.61979,
+              "cash_drawdown_pct": 3.679646,
+              "trades": 25,
+              "skipped": {
+                "slots": 2,
+                "minimum_size": 0,
+                "equity_guard": 57
+              },
+              "unplaceable_partials": 13,
+              "tp1_hits_without_bank": 1,
+              "peak_positions": 8,
+              "peak_by_bot": {
+                "crypto": 3,
+                "stocks": 8
+              },
+              "peak_reserved_margin_pct": 22.489810568577347,
+              "pnl_by_bot": {
+                "crypto": 0.3843999999999982,
+                "stocks": -3.790127599999993
+              },
+              "return_contribution_pct": {
+                "crypto": 0.2956923076923063,
+                "stocks": -2.9154827692307634
+              }
+            },
+            "guard_states": {
+              "crypto": {
+                "peak": 131.40571428571428,
+                "day": "2026-07-01",
+                "daily_start": 130.0,
+                "paused": false,
+                "daily_paused": false
+              },
+              "stocks": {
+                "peak": 131.060448,
+                "day": "2026-07-31",
+                "daily_start": 126.59427240000002,
+                "paused": true,
+                "daily_paused": false
+              }
+            },
+            "first_blocks": {
+              "stocks": {
+                "time": 1784348100.0,
+                "equity": 126.59427240000002,
+                "reason": "drawdown limit",
+                "peak": 131.060448,
+                "day": "2026-07-18",
+                "daily_start": 126.59427240000002,
+                "paused": true,
+                "daily_paused": false
+              }
+            },
+            "first_drawdown_blocks": {
+              "stocks": {
+                "time": 1784348100.0,
+                "equity": 126.59427240000002,
+                "reason": "drawdown limit",
+                "peak": 131.060448,
+                "day": "2026-07-18",
+                "daily_start": 126.59427240000002,
+                "paused": true,
+                "daily_paused": false
+              }
+            }
+          },
+          "2026-08": {
+            "summary": {
+              "starting_capital": 130.0,
+              "ending_capital": 139.951178,
+              "return_pct": 7.654752,
+              "cash_drawdown_pct": 3.574843,
+              "trades": 182,
+              "skipped": {
+                "slots": 6,
+                "minimum_size": 0,
+                "equity_guard": 70
+              },
+              "unplaceable_partials": 78,
+              "tp1_hits_without_bank": 20,
+              "peak_positions": 8,
+              "peak_by_bot": {
+                "stocks": 8,
+                "crypto": 4
+              },
+              "peak_reserved_margin_pct": 23.649204935849905,
+              "pnl_by_bot": {
+                "crypto": 1.3353057142857405,
+                "stocks": 8.615871899999949
+              },
+              "return_contribution_pct": {
+                "crypto": 1.027158241758262,
+                "stocks": 6.62759376923073
+              }
+            },
+            "guard_states": {
+              "stocks": {
+                "peak": 144.55434047142867,
+                "day": "2026-08-31",
+                "daily_start": 139.95117761428577,
+                "paused": true,
+                "daily_paused": false
+              },
+              "crypto": {
+                "peak": 144.72193447142868,
+                "day": "2026-08-31",
+                "daily_start": 139.95117761428577,
+                "paused": true,
+                "daily_paused": false
+              }
+            },
+            "first_blocks": {
+              "crypto": {
+                "time": 1787301000.0,
+                "equity": 142.80155890000012,
+                "reason": "daily loss limit",
+                "peak": 144.55434047142867,
+                "day": "2026-08-21",
+                "daily_start": 144.55434047142867,
+                "paused": false,
+                "daily_paused": true
+              },
+              "stocks": {
+                "time": 1787877000.0,
+                "equity": 139.95117761428577,
+                "reason": "drawdown limit",
+                "peak": 144.55434047142867,
+                "day": "2026-08-28",
+                "daily_start": 139.95117761428577,
+                "paused": true,
+                "daily_paused": false
+              }
+            },
+            "first_drawdown_blocks": {
+              "stocks": {
+                "time": 1787877000.0,
+                "equity": 139.95117761428577,
+                "reason": "drawdown limit",
+                "peak": 144.55434047142867,
+                "day": "2026-08-28",
+                "daily_start": 139.95117761428577,
+                "paused": true,
+                "daily_paused": false
+              },
+              "crypto": {
+                "time": 1787880600.0,
+                "equity": 139.95117761428577,
+                "reason": "drawdown limit",
+                "peak": 144.72193447142868,
+                "day": "2026-08-28",
+                "daily_start": 139.95117761428577,
+                "paused": true,
+                "daily_paused": false
+              }
+            }
+          },
+          "2026-09": {
+            "summary": {
+              "starting_capital": 130.0,
+              "ending_capital": 131.087158,
+              "return_pct": 0.836276,
+              "cash_drawdown_pct": 4.049301,
+              "trades": 112,
+              "skipped": {
+                "slots": 1,
+                "minimum_size": 0,
+                "equity_guard": 256
+              },
+              "unplaceable_partials": 56,
+              "tp1_hits_without_bank": 10,
+              "peak_positions": 10,
+              "peak_by_bot": {
+                "stocks": 8,
+                "crypto": 4
+              },
+              "peak_reserved_margin_pct": 28.586540440963255,
+              "pnl_by_bot": {
+                "crypto": -1.7223500000002194,
+                "stocks": 2.8095082999999987
+              },
+              "return_contribution_pct": {
+                "crypto": -1.3248846153847842,
+                "stocks": 2.1611602307692297
+              }
+            },
+            "guard_states": {
+              "stocks": {
+                "peak": 136.61928454285695,
+                "day": "2026-09-30",
+                "daily_start": 131.08715829999983,
+                "paused": true,
+                "daily_paused": false
+              },
+              "crypto": {
+                "peak": 135.53231954285695,
+                "day": "2026-09-30",
+                "daily_start": 131.08715829999983,
+                "paused": true,
+                "daily_paused": false
+              }
+            },
+            "first_blocks": {
+              "crypto": {
+                "time": 1788251400.0,
+                "equity": 128.5935457142857,
+                "reason": "daily loss limit",
+                "peak": 130.0,
+                "day": "2026-09-01",
+                "daily_start": 130.0,
+                "paused": false,
+                "daily_paused": true
+              },
+              "stocks": {
+                "time": 1789262100.0,
+                "equity": 131.08715829999983,
+                "reason": "drawdown limit",
+                "peak": 136.61928454285695,
+                "day": "2026-09-13",
+                "daily_start": 131.08715829999983,
+                "paused": true,
+                "daily_paused": false
+              }
+            },
+            "first_drawdown_blocks": {
+              "crypto": {
+                "time": 1789200000.0,
+                "equity": 131.08715829999983,
+                "reason": "drawdown limit",
+                "peak": 135.53231954285695,
+                "day": "2026-09-12",
+                "daily_start": 132.46381544285697,
+                "paused": true,
+                "daily_paused": true
+              },
+              "stocks": {
+                "time": 1789262100.0,
+                "equity": 131.08715829999983,
+                "reason": "drawdown limit",
+                "peak": 136.61928454285695,
+                "day": "2026-09-13",
+                "daily_start": 131.08715829999983,
+                "paused": true,
+                "daily_paused": false
+              }
+            }
+          },
+          "2026-10": {
+            "summary": {
+              "starting_capital": 130.0,
+              "ending_capital": 150.812762,
+              "return_pct": 16.009817,
+              "cash_drawdown_pct": 2.170148,
+              "trades": 292,
+              "skipped": {
+                "slots": 9,
+                "minimum_size": 0,
+                "equity_guard": 21
+              },
+              "unplaceable_partials": 140,
+              "tp1_hits_without_bank": 53,
+              "peak_positions": 11,
+              "peak_by_bot": {
+                "stocks": 8,
+                "crypto": 4
+              },
+              "peak_reserved_margin_pct": 31.2613339992714,
+              "pnl_by_bot": {
+                "crypto": 9.751207142857464,
+                "stocks": 11.061554499999973
+              },
+              "return_contribution_pct": {
+                "crypto": 7.500928571428818,
+                "stocks": 8.508888076923055
+              }
+            },
+            "guard_states": {
+              "stocks": {
+                "peak": 151.17412464285758,
+                "day": "2026-10-31",
+                "daily_start": 150.33189021428615,
+                "paused": false,
+                "daily_paused": false
+              },
+              "crypto": {
+                "peak": 151.15485750000045,
+                "day": "2026-10-31",
+                "daily_start": 150.33189021428615,
+                "paused": false,
+                "daily_paused": false
+              }
+            },
+            "first_blocks": {
+              "crypto": {
+                "time": 1790874000.0,
+                "equity": 128.49579000000006,
+                "reason": "daily loss limit",
+                "peak": 130.77762857142858,
+                "day": "2026-10-01",
+                "daily_start": 130.0,
+                "paused": false,
+                "daily_paused": true
+              }
+            },
+            "first_drawdown_blocks": {}
+          },
+          "2026-11": {
+            "summary": {
+              "starting_capital": 130.0,
+              "ending_capital": 131.219705,
+              "return_pct": 0.938235,
+              "cash_drawdown_pct": 4.413014,
+              "trades": 64,
+              "skipped": {
+                "slots": 1,
+                "minimum_size": 0,
+                "equity_guard": 36
+              },
+              "unplaceable_partials": 31,
+              "tp1_hits_without_bank": 13,
+              "peak_positions": 7,
+              "peak_by_bot": {
+                "stocks": 5,
+                "crypto": 4
+              },
+              "peak_reserved_margin_pct": 20.187011507136468,
+              "pnl_by_bot": {
+                "crypto": 4.14334285714137,
+                "stocks": -2.9236380000000146
+              },
+              "return_contribution_pct": {
+                "crypto": 3.187186813185669,
+                "stocks": -2.248952307692319
+              }
+            },
+            "guard_states": {
+              "stocks": {
+                "peak": 136.2546407142842,
+                "day": "2026-11-10",
+                "daily_start": 131.2197048571413,
+                "paused": true,
+                "daily_paused": false
+              },
+              "crypto": {
+                "peak": 136.2546407142842,
+                "day": "2026-11-13",
+                "daily_start": 131.2197048571413,
+                "paused": true,
+                "daily_paused": false
+              }
+            },
+            "first_blocks": {
+              "crypto": {
+                "time": 1793794500.0,
+                "equity": 132.5070535714286,
+                "reason": "daily loss limit",
+                "peak": 134.31466500000002,
+                "day": "2026-11-04",
+                "daily_start": 133.93332500000002,
+                "paused": false,
+                "daily_paused": true
+              },
+              "stocks": {
+                "time": 1794203100.0,
+                "equity": 132.109390571427,
+                "reason": "drawdown limit",
+                "peak": 136.2546407142842,
+                "day": "2026-11-09",
+                "daily_start": 132.49473457142702,
+                "paused": true,
+                "daily_paused": false
+              }
+            },
+            "first_drawdown_blocks": {
+              "crypto": {
+                "time": 1794202200.0,
+                "equity": 132.109390571427,
+                "reason": "drawdown limit",
+                "peak": 136.2546407142842,
+                "day": "2026-11-09",
+                "daily_start": 132.49473457142702,
+                "paused": true,
+                "daily_paused": false
+              },
+              "stocks": {
+                "time": 1794203100.0,
+                "equity": 132.109390571427,
+                "reason": "drawdown limit",
+                "peak": 136.2546407142842,
+                "day": "2026-11-09",
+                "daily_start": 132.49473457142702,
+                "paused": true,
+                "daily_paused": false
+              }
+            }
+          }
+        }
+      },
+      "continuous": {
+        "crypto": {
+          "no_account_guard": {
+            "summary": {
+              "starting_capital": 130.0,
+              "ending_capital": 210.959929,
+              "return_pct": 62.276868,
+              "cash_drawdown_pct": 6.617796,
+              "trades": 1104,
+              "skipped": {
+                "slots": 37,
+                "minimum_size": 0
+              },
+              "unplaceable_partials": 490,
+              "tp1_hits_without_bank": 164,
+              "peak_positions": 11,
+              "peak_by_bot": {
+                "crypto": 4,
+                "stocks": 8
+              },
+              "peak_reserved_margin_pct": 31.95167497653935,
+              "pnl_by_bot": {
+                "crypto": 26.990668571427456,
+                "stocks": 53.969260449999865
+              },
+              "return_contribution_pct": {
+                "crypto": 20.76205274725189,
+                "stocks": 41.51481573076913
+              }
+            },
+            "calendar_months": {
+              "2026-07": {
+                "opening_cash": 130.0,
+                "closing_cash": 129.60908575,
+                "return_pct": -0.3007032692307732,
+                "cash_drawdown_pct": 6.125912505449284,
+                "return_contribution_pct": {
+                  "crypto": 0.2956923076923063,
+                  "stocks": -0.5963955769230868
+                },
+                "entries": 81,
+                "rejected_by_account_guard": 0
+              },
+              "2026-08": {
+                "opening_cash": 129.60908575,
+                "closing_cash": 142.9853112571429,
+                "return_pct": 10.320438131123,
+                "cash_drawdown_pct": 6.61779560070136,
+                "return_contribution_pct": {
+                  "crypto": 0.2716961199944142,
+                  "stocks": 10.048742011128589
+                },
+                "entries": 249,
+                "rejected_by_account_guard": 0
+              },
+              "2026-09": {
+                "opening_cash": 142.9853112571429,
+                "closing_cash": 179.2893660214294,
+                "return_pct": 25.390058912413572,
+                "cash_drawdown_pct": 5.478890999078993,
+                "return_contribution_pct": {
+                  "crypto": 4.281982296262326,
+                  "stocks": 21.108076616151212
+                },
+                "entries": 360,
+                "rejected_by_account_guard": 0
+              },
+              "2026-10": {
+                "opening_cash": 179.28936602142937,
+                "closing_cash": 213.12351359285822,
+                "return_pct": 18.871251721301107,
+                "cash_drawdown_pct": 2.201528439697429,
+                "return_contribution_pct": {
+                  "crypto": 10.416283456095675,
+                  "stocks": 8.454968265205487
+                },
+                "entries": 319,
+                "rejected_by_account_guard": 0
+              },
+              "2026-11": {
+                "opening_cash": 213.12351359285827,
+                "closing_cash": 210.95992902142729,
+                "return_pct": -1.0151787266252543,
+                "cash_drawdown_pct": 5.9717924635199156,
+                "return_contribution_pct": {
+                  "crypto": 0.6832805090436804,
+                  "stocks": -1.6984592356689305
+                },
+                "entries": 95,
+                "rejected_by_account_guard": 0
+              }
+            },
+            "guard_states": {},
+            "first_blocks": {},
+            "first_drawdown_blocks": {}
+          },
+          "realized_cash_guard": {
+            "summary": {
+              "starting_capital": 130.0,
+              "ending_capital": 126.594272,
+              "return_pct": -2.61979,
+              "cash_drawdown_pct": 3.679646,
+              "trades": 25,
+              "skipped": {
+                "slots": 2,
+                "minimum_size": 0,
+                "equity_guard": 1114
+              },
+              "unplaceable_partials": 13,
+              "tp1_hits_without_bank": 1,
+              "peak_positions": 8,
+              "peak_by_bot": {
+                "crypto": 3,
+                "stocks": 8
+              },
+              "peak_reserved_margin_pct": 22.489810568577347,
+              "pnl_by_bot": {
+                "crypto": 0.3843999999999982,
+                "stocks": -3.790127599999993
+              },
+              "return_contribution_pct": {
+                "crypto": 0.2956923076923063,
+                "stocks": -2.9154827692307634
+              }
+            },
+            "calendar_months": {
+              "2026-07": {
+                "opening_cash": 130.0,
+                "closing_cash": 126.59427240000002,
+                "return_pct": -2.6197904615384404,
+                "cash_drawdown_pct": 3.679646287137353,
+                "return_contribution_pct": {
+                  "crypto": 0.2956923076923063,
+                  "stocks": -2.915482769230764
+                },
+                "entries": 25,
+                "rejected_by_account_guard": 57
+              },
+              "2026-08": {
+                "opening_cash": 126.59427240000001,
+                "closing_cash": 126.59427240000001,
+                "return_pct": 0.0,
+                "cash_drawdown_pct": 0.0,
+                "return_contribution_pct": {
+                  "crypto": 0.0,
+                  "stocks": 0.0
+                },
+                "entries": 0,
+                "rejected_by_account_guard": 259
+              },
+              "2026-09": {
+                "opening_cash": 126.59427240000001,
+                "closing_cash": 126.59427240000001,
+                "return_pct": 0.0,
+                "cash_drawdown_pct": 0.0,
+                "return_contribution_pct": {
+                  "crypto": 0.0,
+                  "stocks": 0.0
+                },
+                "entries": 0,
+                "rejected_by_account_guard": 369
+              },
+              "2026-10": {
+                "opening_cash": 126.59427240000001,
+                "closing_cash": 126.59427240000001,
+                "return_pct": 0.0,
+                "cash_drawdown_pct": 0.0,
+                "return_contribution_pct": {
+                  "crypto": 0.0,
+                  "stocks": 0.0
+                },
+                "entries": 0,
+                "rejected_by_account_guard": 328
+              },
+              "2026-11": {
+                "opening_cash": 126.59427240000001,
+                "closing_cash": 126.59427240000001,
+                "return_pct": 0.0,
+                "cash_drawdown_pct": 0.0,
+                "return_contribution_pct": {
+                  "crypto": 0.0,
+                  "stocks": 0.0
+                },
+                "entries": 0,
+                "rejected_by_account_guard": 101
+              }
+            },
+            "guard_states": {
+              "crypto": {
+                "peak": 131.40571428571428,
+                "day": "2026-11-13",
+                "daily_start": 126.59427240000002,
+                "paused": true,
+                "daily_paused": false
+              },
+              "stocks": {
+                "peak": 131.060448,
+                "day": "2026-11-10",
+                "daily_start": 126.59427240000002,
+                "paused": true,
+                "daily_paused": false
+              }
+            },
+            "first_blocks": {
+              "stocks": {
+                "time": 1784348100.0,
+                "equity": 126.59427240000002,
+                "reason": "drawdown limit",
+                "peak": 131.060448,
+                "day": "2026-07-18",
+                "daily_start": 126.59427240000002,
+                "paused": true,
+                "daily_paused": false
+              },
+              "crypto": {
+                "time": 1787213700.0,
+                "equity": 126.59427240000002,
+                "reason": "drawdown limit",
+                "peak": 131.40571428571428,
+                "day": "2026-08-20",
+                "daily_start": 126.59427240000002,
+                "paused": true,
+                "daily_paused": false
+              }
+            },
+            "first_drawdown_blocks": {
+              "stocks": {
+                "time": 1784348100.0,
+                "equity": 126.59427240000002,
+                "reason": "drawdown limit",
+                "peak": 131.060448,
+                "day": "2026-07-18",
+                "daily_start": 126.59427240000002,
+                "paused": true,
+                "daily_paused": false
+              },
+              "crypto": {
+                "time": 1787213700.0,
+                "equity": 126.59427240000002,
+                "reason": "drawdown limit",
+                "peak": 131.40571428571428,
+                "day": "2026-08-20",
+                "daily_start": 126.59427240000002,
+                "paused": true,
+                "daily_paused": false
+              }
+            }
+          }
+        },
+        "stocks": {
+          "no_account_guard": {
+            "summary": {
+              "starting_capital": 130.0,
+              "ending_capital": 210.959929,
+              "return_pct": 62.276868,
+              "cash_drawdown_pct": 6.617796,
+              "trades": 1104,
+              "skipped": {
+                "slots": 37,
+                "minimum_size": 0
+              },
+              "unplaceable_partials": 490,
+              "tp1_hits_without_bank": 164,
+              "peak_positions": 11,
+              "peak_by_bot": {
+                "crypto": 4,
+                "stocks": 8
+              },
+              "peak_reserved_margin_pct": 31.951674976539344,
+              "pnl_by_bot": {
+                "crypto": 26.990668571427456,
+                "stocks": 53.969260449999865
+              },
+              "return_contribution_pct": {
+                "crypto": 20.76205274725189,
+                "stocks": 41.51481573076913
+              }
+            },
+            "calendar_months": {
+              "2026-07": {
+                "opening_cash": 130.0,
+                "closing_cash": 129.60908575,
+                "return_pct": -0.3007032692307732,
+                "cash_drawdown_pct": 6.125912505449284,
+                "return_contribution_pct": {
+                  "crypto": 0.2956923076923063,
+                  "stocks": -0.5963955769230868
+                },
+                "entries": 81,
+                "rejected_by_account_guard": 0
+              },
+              "2026-08": {
+                "opening_cash": 129.60908575,
+                "closing_cash": 142.9853112571429,
+                "return_pct": 10.320438131123,
+                "cash_drawdown_pct": 6.61779560070136,
+                "return_contribution_pct": {
+                  "crypto": 0.2716961199944142,
+                  "stocks": 10.048742011128589
+                },
+                "entries": 249,
+                "rejected_by_account_guard": 0
+              },
+              "2026-09": {
+                "opening_cash": 142.9853112571429,
+                "closing_cash": 179.2893660214294,
+                "return_pct": 25.390058912413572,
+                "cash_drawdown_pct": 5.478890999078993,
+                "return_contribution_pct": {
+                  "crypto": 4.281982296262326,
+                  "stocks": 21.108076616151212
+                },
+                "entries": 360,
+                "rejected_by_account_guard": 0
+              },
+              "2026-10": {
+                "opening_cash": 179.28936602142937,
+                "closing_cash": 213.12351359285827,
+                "return_pct": 18.871251721301153,
+                "cash_drawdown_pct": 2.2015284396974284,
+                "return_contribution_pct": {
+                  "crypto": 10.416283456095675,
+                  "stocks": 8.454968265205487
+                },
+                "entries": 319,
+                "rejected_by_account_guard": 0
+              },
+              "2026-11": {
+                "opening_cash": 213.12351359285827,
+                "closing_cash": 210.95992902142729,
+                "return_pct": -1.0151787266252543,
+                "cash_drawdown_pct": 5.9717924635199156,
+                "return_contribution_pct": {
+                  "crypto": 0.6832805090436804,
+                  "stocks": -1.6984592356689305
+                },
+                "entries": 95,
+                "rejected_by_account_guard": 0
+              }
+            },
+            "guard_states": {},
+            "first_blocks": {},
+            "first_drawdown_blocks": {}
+          },
+          "realized_cash_guard": {
+            "summary": {
+              "starting_capital": 130.0,
+              "ending_capital": 126.594272,
+              "return_pct": -2.61979,
+              "cash_drawdown_pct": 3.679646,
+              "trades": 25,
+              "skipped": {
+                "slots": 2,
+                "minimum_size": 0,
+                "equity_guard": 1114
+              },
+              "unplaceable_partials": 13,
+              "tp1_hits_without_bank": 1,
+              "peak_positions": 8,
+              "peak_by_bot": {
+                "crypto": 3,
+                "stocks": 8
+              },
+              "peak_reserved_margin_pct": 22.489810568577347,
+              "pnl_by_bot": {
+                "crypto": 0.3843999999999982,
+                "stocks": -3.790127599999993
+              },
+              "return_contribution_pct": {
+                "crypto": 0.2956923076923063,
+                "stocks": -2.9154827692307634
+              }
+            },
+            "calendar_months": {
+              "2026-07": {
+                "opening_cash": 130.0,
+                "closing_cash": 126.59427240000002,
+                "return_pct": -2.6197904615384404,
+                "cash_drawdown_pct": 3.679646287137353,
+                "return_contribution_pct": {
+                  "crypto": 0.2956923076923063,
+                  "stocks": -2.915482769230764
+                },
+                "entries": 25,
+                "rejected_by_account_guard": 57
+              },
+              "2026-08": {
+                "opening_cash": 126.59427240000001,
+                "closing_cash": 126.59427240000001,
+                "return_pct": 0.0,
+                "cash_drawdown_pct": 0.0,
+                "return_contribution_pct": {
+                  "crypto": 0.0,
+                  "stocks": 0.0
+                },
+                "entries": 0,
+                "rejected_by_account_guard": 259
+              },
+              "2026-09": {
+                "opening_cash": 126.59427240000001,
+                "closing_cash": 126.59427240000001,
+                "return_pct": 0.0,
+                "cash_drawdown_pct": 0.0,
+                "return_contribution_pct": {
+                  "crypto": 0.0,
+                  "stocks": 0.0
+                },
+                "entries": 0,
+                "rejected_by_account_guard": 369
+              },
+              "2026-10": {
+                "opening_cash": 126.59427240000001,
+                "closing_cash": 126.59427240000001,
+                "return_pct": 0.0,
+                "cash_drawdown_pct": 0.0,
+                "return_contribution_pct": {
+                  "crypto": 0.0,
+                  "stocks": 0.0
+                },
+                "entries": 0,
+                "rejected_by_account_guard": 328
+              },
+              "2026-11": {
+                "opening_cash": 126.59427240000001,
+                "closing_cash": 126.59427240000001,
+                "return_pct": 0.0,
+                "cash_drawdown_pct": 0.0,
+                "return_contribution_pct": {
+                  "crypto": 0.0,
+                  "stocks": 0.0
+                },
+                "entries": 0,
+                "rejected_by_account_guard": 101
+              }
+            },
+            "guard_states": {
+              "crypto": {
+                "peak": 131.40571428571428,
+                "day": "2026-11-13",
+                "daily_start": 126.59427240000002,
+                "paused": true,
+                "daily_paused": false
+              },
+              "stocks": {
+                "peak": 131.060448,
+                "day": "2026-11-10",
+                "daily_start": 126.59427240000002,
+                "paused": true,
+                "daily_paused": false
+              }
+            },
+            "first_blocks": {
+              "stocks": {
+                "time": 1784348100.0,
+                "equity": 126.59427240000002,
+                "reason": "drawdown limit",
+                "peak": 131.060448,
+                "day": "2026-07-18",
+                "daily_start": 126.59427240000002,
+                "paused": true,
+                "daily_paused": false
+              },
+              "crypto": {
+                "time": 1787213700.0,
+                "equity": 126.59427240000002,
+                "reason": "drawdown limit",
+                "peak": 131.40571428571428,
+                "day": "2026-08-20",
+                "daily_start": 126.59427240000002,
+                "paused": true,
+                "daily_paused": false
+              }
+            },
+            "first_drawdown_blocks": {
+              "stocks": {
+                "time": 1784348100.0,
+                "equity": 126.59427240000002,
+                "reason": "drawdown limit",
+                "peak": 131.060448,
+                "day": "2026-07-18",
+                "daily_start": 126.59427240000002,
+                "paused": true,
+                "daily_paused": false
+              },
+              "crypto": {
+                "time": 1787213700.0,
+                "equity": 126.59427240000002,
+                "reason": "drawdown limit",
+                "peak": 131.40571428571428,
+                "day": "2026-08-20",
+                "daily_start": 126.59427240000002,
+                "paused": true,
+                "daily_paused": false
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "guard_matches_tracked_production": true,
+  "equity_guard_function_sha256": "b7ded007f1f66d873ae61107e640dcbb9d9088225f081e8ecbb4b13735e002c8",
+  "limitations": [
+    "Flat hypothetical account starts July 1; no actual customer ledger or inherited positions.",
+    "Guard sees realized cash only at hypothetical entry attempts; real OKX totalEq includes floating PnL.",
+    "Same production equity_guard; independent state per bot, common cash; known initial peak floor $130.",
+    "Continuous guards never reset monthly; an additional monthly-reset comparison is explicitly counterfactual.",
+    "Market prices, signal feed and private execution are not reconstructed; publication/quote failures are absent.",
+    "Previously inspected native data; no independent holdout and no monthly profit forecast.",
+    "15m stop-first paths, delayed recognition and two-writer headroom are proxies for actual execution.",
+    "No deposits/withdrawals,funding,fees,MTM equity or liquidation reconstruction.",
+    "Model signal/stock-paper eligibility continues independently of account entry refusals.",
+    "Daily policy selection is imported from a frozen exploratory report; never selected on later account profits."
+  ],
+  "sources": {
+    "reports\\audit_2026_09_08\\xperp_15m_nov14_merged\\BTCUSDT_15min_current.pkl": "49dea2d9da7944bc1f344722460910108e33f1cd17d5dfd0a91dccd4124dd44c",
+    "reports\\audit_2026_09_08\\xperp_15m_nov14_merged\\ETHUSDT_15min_current.pkl": "654705d6f11986116c8c177e9117d0a8837f2aba662e245f63406b8b136e7eb4",
+    "reports\\audit_2026_09_08\\xperp_15m_nov14_merged\\LINKUSDT_15min_current.pkl": "040ce8728d836ad20ea095c9857601d56c6b4a6734a6ca4be3e215061cbfc811",
+    "reports\\audit_2026_09_08\\xperp_15m_nov14_merged\\XLMUSDT_15min_current.pkl": "37f9271f0df066f7b7cadb82ac83aff1801d1f500c340bfb9993e5a8afa8ba86",
+    "reports\\audit_2026_09_08\\xperp_15m_nov14_merged\\XRPUSDT_15min_current.pkl": "ce39f87ca04a393119ea337cfd9b127f86473381258107e426a5d5d6747b8b51",
+    "reports\\audit_2026_09_08\\xperp_15m_nov14_merged\\AAVEUSDT_15min_current.pkl": "4fec164d0f4bf3116b2b25bf85391581d3bc4af7f9fb1d519606a8ecb499d8d4",
+    "reports\\audit_2026_09_08\\xperp_15m_nov14_merged\\AVAXUSDT_15min_current.pkl": "e3a4d205975ee0e6eca0db0a9ed0205fb824d7c695d8982a28f401516749cf4a",
+    "reports\\audit_2026_09_08\\xperp_15m_nov14_merged\\BILLUSDT_15min_current.pkl": "885eb5fa2b223654aa3c9250a08cfb5cebc8be8fb9bd964c1e1c2714ed4c2c25",
+    "reports\\audit_2026_09_08\\xperp_15m_nov14_merged\\HYPEUSDT_15min_current.pkl": "a89131690b812248f2fab6ade2960cbec05cf6bcf3074839487b907d3d103759",
+    "reports\\audit_2026_09_08\\xperp_15m_nov14_merged\\SOLUSDT_15min_current.pkl": "9be04e74d740c817fc510bb84abaab0fb3abc572984ab1c4a5550b36d510b8a3",
+    "reports\\audit_2026_09_08\\xperp_15m_nov14_merged\\SUIUSDT_15min_current.pkl": "9457f5af0d0dee542a0ebb663ddebc9a5fc72439b8ee52c1048da5eeb3cef38d",
+    "reports\\audit_2026_09_08\\xperp_15m_nov14_merged\\ZECUSDT_15min_current.pkl": "a62e7f7d83ceb149c3fc020f91095b4ac1fd9440e18bc1c6d2c07f4c3dc3705b",
+    "reports\\audit_2026_09_08\\crypto_peer_breadth_nov17.json": "e3884ba0c3205be34d05c7a9e68ec5ca2a2743034362b925ee293130440119dc",
+    "reports\\audit_2026_09_08\\xperp_15m_nov14_merged\\manifest.json": "6ebba73ab8fe00a7a0740feaf3b6fdc867d4773dd36277be53d42f8e20a236b5",
+    "..\\tusa stocks\\reports\\audit_2026_09_08\\stock_close_anchor_nov16_causal_candidates_known_close.pkl": "29d08f1a4f55d3ea59279752206a65ab5c947691c261a5a551367bce9475c16e",
+    "reports\\audit_2026_09_08\\shared_xperp_specs_nov14.json": "7a4a76b813dfe6a5a08c9e858b17d453285dddc99529cdc293885682cf2bee0e",
+    "C:\\Users\\Lenovo\\Desktop\\telegram bot\\account_cash_guard_nov17_audit.py": "d8f32b806b9b1c9792971c023cd7ad8945854199bcd4b30ec496780e6b28ca28",
+    "account_cash_guard_nov17.py": "b824ba21ee3045fd8918d674cc6d26eb064bac824c7b46c458f934e7e7697dda",
+    "lot_aware_tp1_audit.py": "12e343429e39c89e8fb60f16e2277533879ede647437b485a351a9dc744ff27a",
+    "crypto_runner_exit_path_nov16.py": "a09f7916185835032fdd505cc3603c26ed0afef862df9e1f8ce517648501188f",
+    "shared_factor_account_nov14_audit.py": "cd385644515bb374274781ac1768e039a28be2e39e24e396f50933fa302e1f99",
+    "src\\risk_limits.py": "4d708ea46daf614f1745f9b66c710a622b3cc7bba217c9c2463d52b92cfd7988",
+    "src\\okx_trader.py": "3f04038c1cefc81f1e38cfc92f01871698b25e7c534864fe23545450d7c5a3af"
+  }
+}
