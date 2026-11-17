@@ -6,7 +6,8 @@ from src.okx_trader import calc_contracts, calc_partial_close
 
 
 def simulate(rows, specs, *, capital=125.64, margin_fraction=.03, tp1_pct=5, slots=4,
-             bot_slots=None, simultaneous_writers=1, release_delay=0, margin_cap=.9, tie_key=None):
+             bot_slots=None, simultaneous_writers=1, release_delay=0, margin_cap=.9, tie_key=None,
+             entry_guard=None, capture_events=False):
     if not (math.isfinite(capital) and capital > 0 and 0 < margin_fraction <= .1
             and 0 <= tp1_pct < 100 and slots > 0):
         raise ValueError("invalid simulation settings")
@@ -23,12 +24,16 @@ def simulate(rows, specs, *, capital=125.64, margin_fraction=.03, tp1_pct=5, slo
     trades = []
     skipped = dict(slots=0, minimum_size=0)
     sequence = 0
+    cash_events = []
+    guard_rejections = []
 
     def realize(until):
         nonlocal equity, peak, drawdown
         while pending and (until is None or pending[0][0] < until):
-            _, _, pnl, release = heapq.heappop(pending)
+            stamp, _, pnl, release, bot, kind = heapq.heappop(pending)
             equity += pnl
+            if capture_events and kind != 'slot_release':
+                cash_events.append(dict(time=stamp,bot=bot,kind=kind,pnl=pnl,equity=equity))
             if release is not None:
                 del active[release]
             peak = max(peak, equity)
@@ -45,6 +50,13 @@ def simulate(rows, specs, *, capital=125.64, margin_fraction=.03, tp1_pct=5, slo
         bot=row.get('bot','crypto')
         if bot_slots is not None and bot not in bot_slots:
             raise ValueError('unknown bot allocation')
+        if entry_guard is not None:
+            reason = entry_guard(bot=bot,now=now,equity=equity)
+            if reason:
+                skipped['equity_guard'] = skipped.get('equity_guard',0)+1
+                if capture_events:
+                    guard_rejections.append(dict(time=now,bot=bot,reason=reason,equity=equity))
+                continue
         local_full=bot_slots is not None and sum(v['bot']==bot for v in active.values())>=bot_slots[bot]
         if len(active)+simultaneous_writers > slots or symbol in active or local_full:
             skipped["slots"] += 1
@@ -69,12 +81,12 @@ def simulate(rows, specs, *, capital=125.64, margin_fraction=.03, tp1_pct=5, slo
             if not now <= bank_time <= end:
                 raise ValueError("partial exit outside trade lifetime")
             sequence += 1
-            heapq.heappush(pending, (bank_time, sequence, bank_pnl, None))
+            heapq.heappush(pending, (bank_time, sequence, bank_pnl, None, bot, 'tp1'))
         sequence += 1
-        heapq.heappush(pending, (end, sequence, runner_pnl, symbol if release_delay==0 else None))
+        heapq.heappush(pending, (end, sequence, runner_pnl, symbol if release_delay==0 else None, bot, 'runner'))
         if release_delay:
             sequence+=1
-            heapq.heappush(pending,(end+release_delay,sequence,0.,symbol))
+            heapq.heappush(pending,(end+release_delay,sequence,0.,symbol,bot,'slot_release'))
         actual_margin=size*float(spec['ctVal'])*float(row['entry'])/10
         active[symbol]=dict(bot=bot,margin=actual_margin)
         peak_positions=max(peak_positions,len(active))
@@ -86,6 +98,8 @@ def simulate(rows, specs, *, capital=125.64, margin_fraction=.03, tp1_pct=5, slo
             bank_pnl=bank_pnl, runner_pnl=runner_pnl))
         if bot_slots is not None:
             trades[-1]['bot']=bot
+        if capture_events:
+            trades[-1].update(exit_time=end,near_exit_time=float(row['near_exit_time']) if banked else None)
     realize(None)
     result=dict(starting_capital=capital, ending_capital=round(equity, 6),
         return_pct=round(100*(equity/capital-1), 6), cash_drawdown_pct=round(100*drawdown, 6),
@@ -98,4 +112,6 @@ def simulate(rows, specs, *, capital=125.64, margin_fraction=.03, tp1_pct=5, slo
         result.update(peak_positions=peak_positions,peak_by_bot=peak_by_bot,
             peak_reserved_margin_pct=100*peak_margin,pnl_by_bot=cash,
             return_contribution_pct={bot:100*pnl/capital for bot,pnl in cash.items()})
+    if capture_events:
+        result.update(cash_events=cash_events,guard_rejections=guard_rejections)
     return result
