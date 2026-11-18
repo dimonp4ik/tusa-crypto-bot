@@ -1,0 +1,169 @@
+{
+  "status": "EXPLORATORY_MARK_SIGNAL_SHARED_CASH",
+  "objective_verified": false,
+  "live_activation_supported": false,
+  "crypto_path_parity": 2373,
+  "cash_start_utc": "2026-10-01",
+  "cash_start_timestamp": 1790812800.0,
+  "results": {
+    "fixed_price_regressor": {
+      "status": "SHARED_REFERENCE_CASH",
+      "cash": {
+        "crypto": {
+          "summary": {
+            "starting_capital": 130.0,
+            "ending_capital": 151.244088,
+            "return_pct": 16.341606,
+            "cash_drawdown_pct": 3.707676,
+            "trades": 324,
+            "skipped": {
+              "slots": 9,
+              "minimum_size": 0
+            },
+            "unplaceable_partials": 186,
+            "tp1_hits_without_bank": 114,
+            "peak_positions": 7,
+            "peak_by_bot": {
+              "crypto": 4,
+              "stocks": 4
+            },
+            "peak_reserved_margin_pct": 19.76196936808155,
+            "pnl_by_bot": {
+              "crypto": 21.253892857140258,
+              "stocks": -0.009805269703780884
+            },
+            "return_contribution_pct": {
+              "crypto": 16.349148351646352,
+              "stocks": -0.0075425151567545265
+            }
+          },
+          "calendar_months": {
+            "2026-10": {
+              "opening_cash": 130.0,
+              "closing_cash": 149.52340215055705,
+              "return_pct": 15.018001654274649,
+              "cash_drawdown_pct": 2.0747312726654923,
+              "return_contribution_pct": {
+                "crypto": 15.810307692306925,
+                "stocks": -0.7923060380324667
+              },
+              "entries": 216,
+              "rejected_by_account_guard": 0,
+              "stock_closed": 20,
+              "stock_winrate_pct": 35.0
+            },
+            "2026-11": {
+              "opening_cash": 149.5234021505568,
+              "closing_cash": 151.24408758743647,
+              "return_pct": 1.150780019803932,
+              "cash_drawdown_pct": 3.7076758944624935,
+              "return_contribution_pct": {
+                "crypto": 0.4684837604456819,
+                "stocks": 0.682296259358239
+              },
+              "entries": 108,
+              "rejected_by_account_guard": 0,
+              "stock_closed": 32,
+              "stock_winrate_pct": 37.5
+            }
+          }
+        },
+        "stocks": {
+          "summary": {
+            "starting_capital": 130.0,
+            "ending_capital": 151.244088,
+            "return_pct": 16.341606,
+            "cash_drawdown_pct": 3.707676,
+            "trades": 324,
+            "skipped": {
+              "slots": 9,
+              "minimum_size": 0
+            },
+            "unplaceable_partials": 186,
+            "tp1_hits_without_bank": 114,
+            "peak_positions": 7,
+            "peak_by_bot": {
+              "crypto": 4,
+              "stocks": 4
+            },
+            "peak_reserved_margin_pct": 19.76196936808155,
+            "pnl_by_bot": {
+              "crypto": 21.253892857140258,
+              "stocks": -0.009805269703780884
+            },
+            "return_contribution_pct": {
+              "crypto": 16.349148351646352,
+              "stocks": -0.0075425151567545265
+            }
+          },
+          "calendar_months": {
+            "2026-10": {
+              "opening_cash": 130.0,
+              "closing_cash": 149.52340215055705,
+              "return_pct": 15.018001654274649,
+              "cash_drawdown_pct": 2.0747312726654923,
+              "return_contribution_pct": {
+                "crypto": 15.810307692306925,
+                "stocks": -0.7923060380324667
+              },
+              "entries": 216,
+              "rejected_by_account_guard": 0,
+              "stock_closed": 20,
+              "stock_winrate_pct": 35.0
+            },
+            "2026-11": {
+              "opening_cash": 149.5234021505568,
+              "closing_cash": 151.24408758743647,
+              "return_pct": 1.150780019803932,
+              "cash_drawdown_pct": 3.7076758944624935,
+              "return_contribution_pct": {
+                "crypto": 0.4684837604456819,
+                "stocks": 0.682296259358239
+              },
+              "entries": 108,
+              "rejected_by_account_guard": 0,
+              "stock_closed": 32,
+              "stock_winrate_pct": 37.5
+            }
+          }
+        }
+      }
+    }
+  },
+  "limitations": [
+    "One continuous hypothetical $130 account,3% client margin,10x; no monthly resets.",
+    "12 global slots,4crypto/8stocks,90% margin,two-writer headroom,15m release.",
+    "Mark-trigger scenarios differ from current LIVE last-trigger orders; neither is promoted.",
+    "Stock modeled single-target exits; real client partial settings never change.",
+    "Positive last20 R and price readiness is recomputed and required for stock cash entries.",
+    "Closed known references and hypothetical price stresses are not actual market execution prices.",
+    "Current full-equity guard and minute pause recovery, floating PnL,fees,funding,transfers and latency absent.",
+    "Current matched contract specs assumed across history; no historical bid/ask or private fills.",
+    "Previously inspected market eras; July and November partial, no 30% monthly forecast."
+  ],
+  "sources": {
+    "reports\\audit_2026_09_08\\xperp_15m_nov14_merged\\BTCUSDT_15min_current.pkl": "49dea2d9da7944bc1f344722460910108e33f1cd17d5dfd0a91dccd4124dd44c",
+    "reports\\audit_2026_09_08\\xperp_15m_nov14_merged\\ETHUSDT_15min_current.pkl": "654705d6f11986116c8c177e9117d0a8837f2aba662e245f63406b8b136e7eb4",
+    "reports\\audit_2026_09_08\\xperp_15m_nov14_merged\\LINKUSDT_15min_current.pkl": "040ce8728d836ad20ea095c9857601d56c6b4a6734a6ca4be3e215061cbfc811",
+    "reports\\audit_2026_09_08\\xperp_15m_nov14_merged\\XLMUSDT_15min_current.pkl": "37f9271f0df066f7b7cadb82ac83aff1801d1f500c340bfb9993e5a8afa8ba86",
+    "reports\\audit_2026_09_08\\xperp_15m_nov14_merged\\XRPUSDT_15min_current.pkl": "ce39f87ca04a393119ea337cfd9b127f86473381258107e426a5d5d6747b8b51",
+    "reports\\audit_2026_09_08\\xperp_15m_nov14_merged\\AAVEUSDT_15min_current.pkl": "4fec164d0f4bf3116b2b25bf85391581d3bc4af7f9fb1d519606a8ecb499d8d4",
+    "reports\\audit_2026_09_08\\xperp_15m_nov14_merged\\AVAXUSDT_15min_current.pkl": "e3a4d205975ee0e6eca0db0a9ed0205fb824d7c695d8982a28f401516749cf4a",
+    "reports\\audit_2026_09_08\\xperp_15m_nov14_merged\\BILLUSDT_15min_current.pkl": "885eb5fa2b223654aa3c9250a08cfb5cebc8be8fb9bd964c1e1c2714ed4c2c25",
+    "reports\\audit_2026_09_08\\xperp_15m_nov14_merged\\HYPEUSDT_15min_current.pkl": "a89131690b812248f2fab6ade2960cbec05cf6bcf3074839487b907d3d103759",
+    "reports\\audit_2026_09_08\\xperp_15m_nov14_merged\\SOLUSDT_15min_current.pkl": "9be04e74d740c817fc510bb84abaab0fb3abc572984ab1c4a5550b36d510b8a3",
+    "reports\\audit_2026_09_08\\xperp_15m_nov14_merged\\SUIUSDT_15min_current.pkl": "9457f5af0d0dee542a0ebb663ddebc9a5fc72439b8ee52c1048da5eeb3cef38d",
+    "reports\\audit_2026_09_08\\xperp_15m_nov14_merged\\ZECUSDT_15min_current.pkl": "a62e7f7d83ceb149c3fc020f91095b4ac1fd9440e18bc1c6d2c07f4c3dc3705b",
+    "..\\tusa stocks\\reports\\audit_2026_09_08\\stock_mark_conditional_nov19_later.pkl": "1e66e400a0497097bccbcf3cc55ff8badaac06662d4ef5813a4c1e6e074734bd",
+    "reports\\audit_2026_09_08\\crypto_peer_breadth_nov17.json": "e3884ba0c3205be34d05c7a9e68ec5ca2a2743034362b925ee293130440119dc",
+    "reports\\audit_2026_09_08\\xperp_15m_nov14_merged\\manifest.json": "6ebba73ab8fe00a7a0740feaf3b6fdc867d4773dd36277be53d42f8e20a236b5",
+    "reports\\audit_2026_09_08\\shared_xperp_specs_nov14.json": "7a4a76b813dfe6a5a08c9e858b17d453285dddc99529cdc293885682cf2bee0e",
+    "..\\tusa stocks\\reports\\audit_2026_09_08\\stock_mark_matched_nov18\\manifest.json": "fb18a91303dbd139ca5b54cf4b9393a015ed8171b5176b721d6947df5ca6d447",
+    "..\\tusa stocks\\reports\\audit_2026_09_08\\stock_mark_conditional_nov19.json": "b9e36403e76e00a17f2badd944ea530531bb15317a7ea0505b2a20c79f83ecb6",
+    "C:\\Users\\Lenovo\\Desktop\\telegram bot\\stock_mark_shared_nov18_audit.py": "55f508dc9c7d9fbfb5c98ba40bbad52125c0e10bacfa5a518ba2cde8e39e537f",
+    "account_cash_guard_nov17.py": "b824ba21ee3045fd8918d674cc6d26eb064bac824c7b46c458f934e7e7697dda",
+    "account_cash_guard_nov17_audit.py": "d8f32b806b9b1c9792971c023cd7ad8945854199bcd4b30ec496780e6b28ca28",
+    "crypto_runner_exit_path_nov16.py": "ff6a10babb5532f98398592d948f965a951ef00d921759f1828015ee89c34879",
+    "lot_aware_tp1_audit.py": "12e343429e39c89e8fb60f16e2277533879ede647437b485a351a9dc744ff27a"
+  }
+}

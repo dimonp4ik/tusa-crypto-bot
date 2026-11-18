@@ -20,7 +20,12 @@ def main():
     p=argparse.ArgumentParser(description=__doc__)
     p.add_argument('--stock-report',type=Path,default=STOCK/'stock_mark_hypotheses_nov18.json')
     p.add_argument('--output',type=Path,default=ROOT/'stock_mark_shared_nov18.json')
+    p.add_argument('--start-utc',default='2026-07-01',
+        help='Start one continuous account at this UTC timestamp; no monthly resets')
     args=p.parse_args()
+    start=pd.Timestamp(args.start_utc)
+    start_time=(start.tz_localize('UTC') if start.tzinfo is None else start.tz_convert('UTC')).timestamp()
+    if not math.isfinite(start_time):raise ValueError('invalid_cash_start')
     source=ROOT/'crypto_peer_breadth_nov17.json';frozen=json.loads(source.read_text(encoding='utf-8'))
     manifest=ROOT/'xperp_15m_nov14_merged/manifest.json';meta=json.loads(manifest.read_text(encoding='utf-8'))
     candles={};hashes={}
@@ -51,7 +56,8 @@ def main():
         specs[symbol]=item['spec']
     alternatives=json.loads(args.stock_report.read_text(encoding='utf-8'))
     report=dict(status='EXPLORATORY_MARK_SIGNAL_SHARED_CASH',objective_verified=False,
-        live_activation_supported=False,crypto_path_parity=len(records),results={},limitations=[
+        live_activation_supported=False,crypto_path_parity=len(records),cash_start_utc=args.start_utc,
+        cash_start_timestamp=start_time,results={},limitations=[
             'One continuous hypothetical $130 account,3% client margin,10x; no monthly resets.',
             '12 global slots,4crypto/8stocks,90% margin,two-writer headroom,15m release.',
             'Mark-trigger scenarios differ from current LIVE last-trigger orders; neither is promoted.',
@@ -71,13 +77,15 @@ def main():
             sequential_banked=False,near_exit_time=math.nan)
         ready['sequential_runner_r']=ready.net_r
         feed=pd.concat([crypto,ready],ignore_index=True)
-        feed=feed[feed.entry_time.ge(stamp('2026-07-01'))].to_dict('records')
+        feed=feed[feed.entry_time.ge(start_time)].to_dict('records')
         results={}
         for priority in ('crypto','stocks'):
             value=simulate(feed,specs,capital=130.,slots=12,bot_slots=dict(crypto=4,stocks=8),
                 simultaneous_writers=2,release_delay=900,capture_events=True,
                 tie_key=lambda r,p=priority:(r['bot']!=p,r['symbol']))
             months=calendar_months(value)
+            months={label:month for label,month in months.items()
+                if stamp(f'2026-{int(label[-2:])+1:02}-01')>start_time}
             for label,month in months.items():
                 start,end=stamp(label+'-01'),stamp(f'2026-{int(label[-2:])+1:02}-01')
                 closed=[r for r in value['ledger'] if r['bot']=='stocks' and start<=r['exit_time']<end]
