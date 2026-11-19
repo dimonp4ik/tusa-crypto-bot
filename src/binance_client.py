@@ -435,6 +435,7 @@ def get_klines_xperp(symbol, limit=60, include_forming=False, interval="15m"):
             "low":    [float(c[3]) for c in candles],
             "close":  [float(c[4]) for c in candles],
             "volume": [float(c[6]) for c in candles],
+            "volume_contracts": [float(c[5]) for c in candles],
             # 1 = candle is closed, 0 = still forming. Callers that judge on a
             # CLOSE price (close-confirmed stop) must ignore unconfirmed rows:
             # a forming candle's "close" is just the current price, so treating
