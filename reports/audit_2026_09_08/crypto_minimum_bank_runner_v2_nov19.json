@@ -1,0 +1,437 @@
+{
+  "status": "CHECKED_MINIMUM_BANK_RUNNER_SENSITIVITY",
+  "protocol": {
+    "declared_at": "2026-11-19T15:00:40.382358+00:00",
+    "sources": {
+      "C:\\Users\\Lenovo\\Desktop\\telegram bot\\crypto_minimum_bank_runner_nov19_audit.py": "1b14fe037f169fd84af1cafc759e697986fcb6d7f4b80a2f70d47afee377d7a3",
+      "banked_runner_path_nov19.py": "2495d913813cd127a0dd6ea2898c59c7a38c31e4b578bd227df032979fc5afeb",
+      "crypto_native_price_pool_nov19.py": "0a2c5915e185716a9e1fde80d000ef9da2d8b3d4d8701c3dd6ca2c5e62166f3d",
+      "crypto_native_price_features_nov19.py": "c3543e95818b438646cc6d619f308e1581db7e1ad60da57db4b907e9bfc862d7",
+      "crypto_runner_exit_path_nov16.py": "ff6a10babb5532f98398592d948f965a951ef00d921759f1828015ee89c34879",
+      "account_cash_guard_nov17_audit.py": "d8f32b806b9b1c9792971c023cd7ad8945854199bcd4b30ec496780e6b28ca28",
+      "account_cash_guard_nov17.py": "b824ba21ee3045fd8918d674cc6d26eb064bac824c7b46c458f934e7e7697dda",
+      "cash_tp1_policy_nov19.py": "5d20ff72c05708620e72f1d16fa01423fb765547ade8fc232e83a4eb5606c519",
+      "src\\tp1_plan.py": "7a49938a965be142a18eeaf4977cba0251e00d0fdc675226bab3f9cc17a0e31a",
+      "src\\okx_trader.py": "3f04038c1cefc81f1e38cfc92f01871698b25e7c534864fe23545450d7c5a3af",
+      "reports\\audit_2026_09_08\\shared_xperp_specs_nov14.json": "7a4a76b813dfe6a5a08c9e858b17d453285dddc99529cdc293885682cf2bee0e",
+      "reports\\audit_2026_09_08\\crypto_tp1_bank_size_nov19.json": "857f46b5470259064f7604d5bba3e0ddb5ab298e9ead7827470ca67f9ce73c8f",
+      "reports\\audit_2026_09_08\\xperp_15m_nov14_merged\\manifest.json": "6ebba73ab8fe00a7a0740feaf3b6fdc867d4773dd36277be53d42f8e20a236b5",
+      "reports\\audit_2026_09_08\\crypto_native_price_nov19_pool_sources.json": "ef357ddb491b3211c4d9e61bb072d3477daa79643918c075a1e0a5253d329e9e",
+      "reports\\audit_2026_09_08\\crypto_minimum_bank_runner_nov19.json": "e34c83b00bec381d6c88d76569a35bc3eb931dab4805caf0fb04eb1285f269f8",
+      "crypto_minimum_bank_runner_nov19_v1_frozen.py": "167527cafee5c33595fbf57bad521201c4ce51a6dba023247f7a5b0b2322031b"
+    },
+    "policies": [
+      "be_tp1",
+      "half_stop_until_1r",
+      "be_1r",
+      "structure_until_1r"
+    ],
+    "client_policies": {
+      "requested5": {
+        "tp1_pct": 5,
+        "minimum_close": false
+      },
+      "half_minimum": {
+        "tp1_pct": 50,
+        "minimum_close": true
+      }
+    },
+    "entry_cohort": "all frozen native candidate proposals",
+    "scenario": "stocks remain PAPER: no real stock entries; common-account crypto cap4/shared cap12 and90% margin",
+    "capital": 130.0,
+    "client_margin_fraction": 0.03,
+    "leverage": 10,
+    "horizon_bars": 48,
+    "entry_levels": "original known-close references and original fixed0.5R/2R targets",
+    "checked_exit_stress": 0.0005,
+    "controls": [
+      "legacy_unchecked_zero_stress",
+      "be_tp1_zero_stress"
+    ],
+    "policy_comparison": "paired exploratory sensitivity on previously inspected history; no fitted selection or holdout claim",
+    "unknown_paths": "case unscorable if any unknown proposal is admitted by causal publication rails; rejected unknown proposals never affect exits or cash",
+    "implementation_revision": "v2 checks admission of unknown paths rather than invalidating all proposals; all exit policies unchanged",
+    "market_fills_and_price_grid_verified": false,
+    "objective_verified": false,
+    "live_activation_supported": false
+  },
+  "sources": {
+    "C:\\Users\\Lenovo\\Desktop\\telegram bot\\crypto_minimum_bank_runner_nov19_audit.py": "1b14fe037f169fd84af1cafc759e697986fcb6d7f4b80a2f70d47afee377d7a3",
+    "banked_runner_path_nov19.py": "2495d913813cd127a0dd6ea2898c59c7a38c31e4b578bd227df032979fc5afeb",
+    "crypto_native_price_pool_nov19.py": "0a2c5915e185716a9e1fde80d000ef9da2d8b3d4d8701c3dd6ca2c5e62166f3d",
+    "crypto_native_price_features_nov19.py": "c3543e95818b438646cc6d619f308e1581db7e1ad60da57db4b907e9bfc862d7",
+    "crypto_runner_exit_path_nov16.py": "ff6a10babb5532f98398592d948f965a951ef00d921759f1828015ee89c34879",
+    "account_cash_guard_nov17_audit.py": "d8f32b806b9b1c9792971c023cd7ad8945854199bcd4b30ec496780e6b28ca28",
+    "account_cash_guard_nov17.py": "b824ba21ee3045fd8918d674cc6d26eb064bac824c7b46c458f934e7e7697dda",
+    "cash_tp1_policy_nov19.py": "5d20ff72c05708620e72f1d16fa01423fb765547ade8fc232e83a4eb5606c519",
+    "src\\tp1_plan.py": "7a49938a965be142a18eeaf4977cba0251e00d0fdc675226bab3f9cc17a0e31a",
+    "src\\okx_trader.py": "3f04038c1cefc81f1e38cfc92f01871698b25e7c534864fe23545450d7c5a3af",
+    "reports\\audit_2026_09_08\\shared_xperp_specs_nov14.json": "7a4a76b813dfe6a5a08c9e858b17d453285dddc99529cdc293885682cf2bee0e",
+    "reports\\audit_2026_09_08\\crypto_tp1_bank_size_nov19.json": "857f46b5470259064f7604d5bba3e0ddb5ab298e9ead7827470ca67f9ce73c8f",
+    "reports\\audit_2026_09_08\\xperp_15m_nov14_merged\\manifest.json": "6ebba73ab8fe00a7a0740feaf3b6fdc867d4773dd36277be53d42f8e20a236b5",
+    "reports\\audit_2026_09_08\\crypto_native_price_nov19_pool_sources.json": "ef357ddb491b3211c4d9e61bb072d3477daa79643918c075a1e0a5253d329e9e",
+    "reports\\audit_2026_09_08\\crypto_minimum_bank_runner_nov19.json": "e34c83b00bec381d6c88d76569a35bc3eb931dab4805caf0fb04eb1285f269f8",
+    "crypto_minimum_bank_runner_nov19_v1_frozen.py": "167527cafee5c33595fbf57bad521201c4ce51a6dba023247f7a5b0b2322031b",
+    "reports\\audit_2026_09_08\\xperp_15m_nov14_merged\\BTCUSDT_15min_current.pkl": "49dea2d9da7944bc1f344722460910108e33f1cd17d5dfd0a91dccd4124dd44c",
+    "reports\\audit_2026_09_08\\xperp_15m_nov14_merged\\ETHUSDT_15min_current.pkl": "654705d6f11986116c8c177e9117d0a8837f2aba662e245f63406b8b136e7eb4",
+    "reports\\audit_2026_09_08\\xperp_15m_nov14_merged\\LINKUSDT_15min_current.pkl": "040ce8728d836ad20ea095c9857601d56c6b4a6734a6ca4be3e215061cbfc811",
+    "reports\\audit_2026_09_08\\xperp_15m_nov14_merged\\XLMUSDT_15min_current.pkl": "37f9271f0df066f7b7cadb82ac83aff1801d1f500c340bfb9993e5a8afa8ba86",
+    "reports\\audit_2026_09_08\\xperp_15m_nov14_merged\\XRPUSDT_15min_current.pkl": "ce39f87ca04a393119ea337cfd9b127f86473381258107e426a5d5d6747b8b51",
+    "reports\\audit_2026_09_08\\xperp_15m_nov14_merged\\AAVEUSDT_15min_current.pkl": "4fec164d0f4bf3116b2b25bf85391581d3bc4af7f9fb1d519606a8ecb499d8d4",
+    "reports\\audit_2026_09_08\\xperp_15m_nov14_merged\\AVAXUSDT_15min_current.pkl": "e3a4d205975ee0e6eca0db0a9ed0205fb824d7c695d8982a28f401516749cf4a",
+    "reports\\audit_2026_09_08\\xperp_15m_nov14_merged\\BILLUSDT_15min_current.pkl": "885eb5fa2b223654aa3c9250a08cfb5cebc8be8fb9bd964c1e1c2714ed4c2c25",
+    "reports\\audit_2026_09_08\\xperp_15m_nov14_merged\\HYPEUSDT_15min_current.pkl": "a89131690b812248f2fab6ade2960cbec05cf6bcf3074839487b907d3d103759",
+    "reports\\audit_2026_09_08\\xperp_15m_nov14_merged\\SOLUSDT_15min_current.pkl": "9be04e74d740c817fc510bb84abaab0fb3abc572984ab1c4a5550b36d510b8a3",
+    "reports\\audit_2026_09_08\\xperp_15m_nov14_merged\\SUIUSDT_15min_current.pkl": "9457f5af0d0dee542a0ebb663ddebc9a5fc72439b8ee52c1048da5eeb3cef38d",
+    "reports\\audit_2026_09_08\\xperp_15m_nov14_merged\\ZECUSDT_15min_current.pkl": "a62e7f7d83ceb149c3fc020f91095b4ac1fd9440e18bc1c6d2c07f4c3dc3705b"
+  },
+  "results": {
+    "legacy_unchecked_zero_stress": {
+      "status": "RESOLVED_CASH_SENSITIVITY",
+      "diagnostics": {
+        "candidates": 2373,
+        "unknown": 0,
+        "unknown_reasons": {},
+        "admitted_unknown": [],
+        "admitted": 947
+      },
+      "cash": {
+        "requested5": {
+          "summary": {
+            "starting_capital": 130.0,
+            "ending_capital": 163.683053,
+            "return_pct": 25.910041,
+            "cash_drawdown_pct": 6.769514,
+            "trades": 729,
+            "skipped": {
+              "slots": 21,
+              "minimum_size": 0
+            },
+            "unplaceable_partials": 457,
+            "tp1_hits_without_bank": 319,
+            "full_tp1_closes": 0,
+            "peak_positions": 4,
+            "peak_by_bot": {
+              "crypto": 4
+            },
+            "peak_reserved_margin_pct": 11.942857552537415,
+            "pnl_by_bot": {
+              "crypto": 33.68305285714292,
+              "stocks": 0
+            },
+            "return_contribution_pct": {
+              "crypto": 25.91004065934071,
+              "stocks": 0.0
+            }
+          },
+          "calendar_months": {
+            "2026-07": {
+              "opening_cash": 130.0,
+              "closing_cash": 130.54987285714284,
+              "return_pct": 0.42297912087911893,
+              "cash_drawdown_pct": 4.935932884388102,
+              "return_contribution_pct": {
+                "crypto": 0.42297912087912287,
+                "stocks": 0.0
+              },
+              "entries": 103,
+              "rejected_by_account_guard": 0,
+              "closed": 103,
+              "winrate_pct": 31.067961165048544,
+              "bank_pnl": 0.15504142857142852,
+              "runner_pnl": 0.3948314285714332,
+              "tp1_unbanked": 50
+            },
+            "2026-08": {
+              "opening_cash": 130.54987285714287,
+              "closing_cash": 131.31855857142872,
+              "return_pct": 0.5888061761094132,
+              "cash_drawdown_pct": 5.273248241390462,
+              "return_contribution_pct": {
+                "crypto": 0.5888061761093407,
+                "stocks": 0.0
+              },
+              "entries": 158,
+              "rejected_by_account_guard": 0,
+              "closed": 157,
+              "winrate_pct": 26.11464968152866,
+              "bank_pnl": 0.23131428571428564,
+              "runner_pnl": 0.5373714285714632,
+              "tp1_unbanked": 85
+            },
+            "2026-09": {
+              "opening_cash": 131.3185585714286,
+              "closing_cash": 141.35267142857165,
+              "return_pct": 7.641047058619033,
+              "cash_drawdown_pct": 4.4903207758087404,
+              "return_contribution_pct": {
+                "crypto": 7.641047058618862,
+                "stocks": 0.0
+              },
+              "entries": 196,
+              "rejected_by_account_guard": 0,
+              "closed": 195,
+              "winrate_pct": 42.56410256410256,
+              "bank_pnl": 0.5634857142857144,
+              "runner_pnl": 9.461419999999974,
+              "tp1_unbanked": 70
+            },
+            "2026-10": {
+              "opening_cash": 141.35267142857145,
+              "closing_cash": 163.3484171428572,
+              "return_pct": 15.560898490270603,
+              "cash_drawdown_pct": 2.2084830578342487,
+              "return_contribution_pct": {
+                "crypto": 15.560898490270604,
+                "stocks": 0.0
+              },
+              "entries": 196,
+              "rejected_by_account_guard": 0,
+              "closed": 198,
+              "winrate_pct": 43.43434343434343,
+              "bank_pnl": 0.7553014285714286,
+              "runner_pnl": 21.24965142857145,
+              "tp1_unbanked": 81
+            },
+            "2026-11": {
+              "opening_cash": 163.3484171428572,
+              "closing_cash": 163.68305285714277,
+              "return_pct": 0.20486008994682336,
+              "cash_drawdown_pct": 3.7445692410492386,
+              "return_contribution_pct": {
+                "crypto": 0.20486008994692712,
+                "stocks": 0.0
+              },
+              "entries": 76,
+              "rejected_by_account_guard": 0,
+              "closed": 76,
+              "winrate_pct": 32.89473684210526,
+              "bank_pnl": 0.17342857142857154,
+              "runner_pnl": 0.16120714285716697,
+              "tp1_unbanked": 33
+            }
+          }
+        },
+        "half_minimum": {
+          "summary": {
+            "starting_capital": 130.0,
+            "ending_capital": 154.966213,
+            "return_pct": 19.204779,
+            "cash_drawdown_pct": 5.541379,
+            "trades": 729,
+            "skipped": {
+              "slots": 21,
+              "minimum_size": 0
+            },
+            "unplaceable_partials": 0,
+            "tp1_hits_without_bank": 0,
+            "full_tp1_closes": 0,
+            "peak_positions": 4,
+            "peak_by_bot": {
+              "crypto": 4
+            },
+            "peak_reserved_margin_pct": 11.837369187923938,
+            "pnl_by_bot": {
+              "crypto": 24.966212857142896,
+              "stocks": 0
+            },
+            "return_contribution_pct": {
+              "crypto": 19.204779120879152,
+              "stocks": 0.0
+            }
+          },
+          "calendar_months": {
+            "2026-07": {
+              "opening_cash": 130.0,
+              "closing_cash": 129.92698714285712,
+              "return_pct": -0.056163736263759034,
+              "cash_drawdown_pct": 3.7012592802078546,
+              "return_contribution_pct": {
+                "crypto": -0.05616373626373514,
+                "stocks": 0.0
+              },
+              "entries": 103,
+              "rejected_by_account_guard": 0,
+              "closed": 103,
+              "winrate_pct": 66.01941747572816,
+              "bank_pnl": 7.560312857142859,
+              "runner_pnl": -7.633325714285715,
+              "tp1_unbanked": 0
+            },
+            "2026-08": {
+              "opening_cash": 129.92698714285714,
+              "closing_cash": 131.10758785714293,
+              "return_pct": 0.9086647356701061,
+              "cash_drawdown_pct": 4.095604844219148,
+              "return_contribution_pct": {
+                "crypto": 0.9086647356700746,
+                "stocks": 0.0
+              },
+              "entries": 158,
+              "rejected_by_account_guard": 0,
+              "closed": 157,
+              "winrate_pct": 68.15286624203821,
+              "bank_pnl": 11.746395000000001,
+              "runner_pnl": -10.565794285714267,
+              "tp1_unbanked": 0
+            },
+            "2026-09": {
+              "opening_cash": 131.10758785714287,
+              "closing_cash": 136.87986428571435,
+              "return_pct": 4.402702027331218,
+              "cash_drawdown_pct": 4.084443695452428,
+              "return_contribution_pct": {
+                "crypto": 4.402702027331157,
+                "stocks": 0.0
+              },
+              "entries": 196,
+              "rejected_by_account_guard": 0,
+              "closed": 195,
+              "winrate_pct": 67.17948717948718,
+              "bank_pnl": 13.991186428571428,
+              "runner_pnl": -8.375431428571453,
+              "tp1_unbanked": 0
+            },
+            "2026-10": {
+              "opening_cash": 136.8798642857143,
+              "closing_cash": 154.79321499999995,
+              "return_pct": 13.086914432421182,
+              "cash_drawdown_pct": 1.5666419208270925,
+              "return_contribution_pct": {
+                "crypto": 13.08691443242123,
+                "stocks": 0.0
+              },
+              "entries": 196,
+              "rejected_by_account_guard": 0,
+              "closed": 198,
+              "winrate_pct": 75.75757575757575,
+              "bank_pnl": 16.745655000000003,
+              "runner_pnl": 1.3242171428571616,
+              "tp1_unbanked": 0
+            },
+            "2026-11": {
+              "opening_cash": 154.79321500000003,
+              "closing_cash": 154.96621285714272,
+              "return_pct": 0.111760620220136,
+              "cash_drawdown_pct": 3.419586560751827,
+              "return_contribution_pct": {
+                "crypto": 0.11176062022025846,
+                "stocks": 0.0
+              },
+              "entries": 76,
+              "rejected_by_account_guard": 0,
+              "closed": 76,
+              "winrate_pct": 64.47368421052632,
+              "bank_pnl": 6.224733571428578,
+              "runner_pnl": -6.051735714285699,
+              "tp1_unbanked": 0
+            }
+          }
+        }
+      }
+    },
+    "be_tp1_zero_stress": {
+      "status": "UNSCORABLE_UNKNOWN_PATHS",
+      "diagnostics": {
+        "candidates": 2373,
+        "unknown": 2,
+        "unknown_reasons": {
+          "stale_runner_time_exit": 2
+        },
+        "admitted_unknown": [
+          [
+            "BILLUSDT",
+            1790264700,
+            "stale_runner_time_exit"
+          ]
+        ]
+      }
+    },
+    "be_tp1": {
+      "status": "UNSCORABLE_UNKNOWN_PATHS",
+      "diagnostics": {
+        "candidates": 2373,
+        "unknown": 2,
+        "unknown_reasons": {
+          "stale_runner_time_exit": 2
+        },
+        "admitted_unknown": [
+          [
+            "BILLUSDT",
+            1790264700,
+            "stale_runner_time_exit"
+          ]
+        ]
+      }
+    },
+    "half_stop_until_1r": {
+      "status": "UNSCORABLE_UNKNOWN_PATHS",
+      "diagnostics": {
+        "candidates": 2373,
+        "unknown": 2,
+        "unknown_reasons": {
+          "stale_runner_time_exit": 2
+        },
+        "admitted_unknown": [
+          [
+            "BILLUSDT",
+            1790264700,
+            "stale_runner_time_exit"
+          ]
+        ]
+      }
+    },
+    "be_1r": {
+      "status": "UNSCORABLE_UNKNOWN_PATHS",
+      "diagnostics": {
+        "candidates": 2373,
+        "unknown": 3,
+        "unknown_reasons": {
+          "stale_runner_time_exit": 3
+        },
+        "admitted_unknown": [
+          [
+            "AVAXUSDT",
+            1788451200,
+            "stale_runner_time_exit"
+          ],
+          [
+            "BILLUSDT",
+            1790264700,
+            "stale_runner_time_exit"
+          ]
+        ]
+      }
+    },
+    "structure_until_1r": {
+      "status": "UNSCORABLE_UNKNOWN_PATHS",
+      "diagnostics": {
+        "candidates": 2373,
+        "unknown": 2,
+        "unknown_reasons": {
+          "stale_runner_time_exit": 2
+        },
+        "admitted_unknown": [
+          [
+            "BILLUSDT",
+            1790264700,
+            "stale_runner_time_exit"
+          ]
+        ]
+      }
+    }
+  },
+  "objective_verified": false,
+  "live_activation_supported": false,
+  "selected_policy": null,
+  "limitations": [
+    "Already inspected native history; comparison is exploratory, not independent validation.",
+    "Current stocks remain PAPER; crypto-only cash cannot prove shared two-bot monthly target.",
+    "Original unrounded published price references are not private fills or verified current price-grid orders.",
+    "Known candle close amendments and5bp exit stress are scenario proxies; real latency/bid-ask unknown.",
+    "New stops apply only after the observing candle; a crossed amendment exits at its close, not a past stop.",
+    "Trade-volume-zero bars do not bank or trigger; stale terminal references remain unknown.",
+    "Full-equity guard,floating PnL,funding,fees,liquidation and publication/account rejections omitted.",
+    "Client margin3%,10x,contracts rounded; November partial; no guarantee of30% every month."
+  ]
+}

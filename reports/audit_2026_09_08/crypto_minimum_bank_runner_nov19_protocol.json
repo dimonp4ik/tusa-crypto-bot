@@ -1,0 +1,52 @@
+{
+  "declared_at": "2026-11-19T14:57:03.903031+00:00",
+  "sources": {
+    "C:\\Users\\Lenovo\\Desktop\\telegram bot\\crypto_minimum_bank_runner_nov19_audit.py": "167527cafee5c33595fbf57bad521201c4ce51a6dba023247f7a5b0b2322031b",
+    "banked_runner_path_nov19.py": "2495d913813cd127a0dd6ea2898c59c7a38c31e4b578bd227df032979fc5afeb",
+    "crypto_native_price_pool_nov19.py": "0a2c5915e185716a9e1fde80d000ef9da2d8b3d4d8701c3dd6ca2c5e62166f3d",
+    "crypto_native_price_features_nov19.py": "c3543e95818b438646cc6d619f308e1581db7e1ad60da57db4b907e9bfc862d7",
+    "crypto_runner_exit_path_nov16.py": "ff6a10babb5532f98398592d948f965a951ef00d921759f1828015ee89c34879",
+    "account_cash_guard_nov17_audit.py": "d8f32b806b9b1c9792971c023cd7ad8945854199bcd4b30ec496780e6b28ca28",
+    "account_cash_guard_nov17.py": "b824ba21ee3045fd8918d674cc6d26eb064bac824c7b46c458f934e7e7697dda",
+    "cash_tp1_policy_nov19.py": "5d20ff72c05708620e72f1d16fa01423fb765547ade8fc232e83a4eb5606c519",
+    "src\\tp1_plan.py": "7a49938a965be142a18eeaf4977cba0251e00d0fdc675226bab3f9cc17a0e31a",
+    "src\\okx_trader.py": "3f04038c1cefc81f1e38cfc92f01871698b25e7c534864fe23545450d7c5a3af",
+    "reports\\audit_2026_09_08\\shared_xperp_specs_nov14.json": "7a4a76b813dfe6a5a08c9e858b17d453285dddc99529cdc293885682cf2bee0e",
+    "reports\\audit_2026_09_08\\crypto_tp1_bank_size_nov19.json": "857f46b5470259064f7604d5bba3e0ddb5ab298e9ead7827470ca67f9ce73c8f",
+    "reports\\audit_2026_09_08\\xperp_15m_nov14_merged\\manifest.json": "6ebba73ab8fe00a7a0740feaf3b6fdc867d4773dd36277be53d42f8e20a236b5",
+    "reports\\audit_2026_09_08\\crypto_native_price_nov19_pool_sources.json": "ef357ddb491b3211c4d9e61bb072d3477daa79643918c075a1e0a5253d329e9e"
+  },
+  "policies": [
+    "be_tp1",
+    "half_stop_until_1r",
+    "be_1r",
+    "structure_until_1r"
+  ],
+  "client_policies": {
+    "requested5": {
+      "tp1_pct": 5,
+      "minimum_close": false
+    },
+    "half_minimum": {
+      "tp1_pct": 50,
+      "minimum_close": true
+    }
+  },
+  "entry_cohort": "all frozen native candidate proposals",
+  "scenario": "stocks remain PAPER: no real stock entries; common-account crypto cap4/shared cap12 and90% margin",
+  "capital": 130.0,
+  "client_margin_fraction": 0.03,
+  "leverage": 10,
+  "horizon_bars": 48,
+  "entry_levels": "original known-close references and original fixed0.5R/2R targets",
+  "checked_exit_stress": 0.0005,
+  "controls": [
+    "legacy_unchecked_zero_stress",
+    "be_tp1_zero_stress"
+  ],
+  "policy_comparison": "paired exploratory sensitivity on previously inspected history; no fitted selection or holdout claim",
+  "unknown_paths": "case unscorable if any full-horizon candidate path is unknown; no silent outcome deletion",
+  "market_fills_and_price_grid_verified": false,
+  "objective_verified": false,
+  "live_activation_supported": false
+}

@@ -1,0 +1,357 @@
+{
+  "status": "PAIRED_RUNNER_TRANSITIONS_NOT_PORTFOLIO_PERFORMANCE",
+  "protocol": {
+    "declared_at": "2026-11-19T15:02:48.615193+00:00",
+    "sources": {
+      "C:\\Users\\Lenovo\\Desktop\\telegram bot\\runner_protection_pairs_nov19.py": "0311f106170d143a99c8062d906487beaf2f0f40148e0b90774eb48b2cb638e4",
+      "banked_runner_path_nov19.py": "2495d913813cd127a0dd6ea2898c59c7a38c31e4b578bd227df032979fc5afeb",
+      "crypto_minimum_bank_runner_nov19_audit.py": "1b14fe037f169fd84af1cafc759e697986fcb6d7f4b80a2f70d47afee377d7a3",
+      "src\\tp1_plan.py": "7a49938a965be142a18eeaf4977cba0251e00d0fdc675226bab3f9cc17a0e31a",
+      "src\\okx_trader.py": "3f04038c1cefc81f1e38cfc92f01871698b25e7c534864fe23545450d7c5a3af",
+      "reports\\audit_2026_09_08\\xperp_15m_nov14_merged\\manifest.json": "6ebba73ab8fe00a7a0740feaf3b6fdc867d4773dd36277be53d42f8e20a236b5",
+      "reports\\audit_2026_09_08\\crypto_minimum_bank_runner_v2_nov19.json": "b0e071a30431067326862142d917f15ffb804a76dc3713022e271a5695b8f7b2",
+      "reports\\audit_2026_09_08\\shared_xperp_specs_nov14.json": "7a4a76b813dfe6a5a08c9e858b17d453285dddc99529cdc293885682cf2bee0e"
+    },
+    "analysis": "paired path transitions only; common-known intersections are diagnostics, never portfolio returns",
+    "fixed_independent_margin": 3.9,
+    "client_tp1": "50%/minimum lot",
+    "exit_stress": 0.0005,
+    "objective_verified": false,
+    "live_activation_supported": false
+  },
+  "results": {
+    "be_tp1": {
+      "total_proposals": 2373,
+      "unknown_pairs": [
+        {
+          "symbol": "BILLUSDT",
+          "entry_time": 1793340000,
+          "baseline_reason": "stale_runner_time_exit",
+          "alternative_reason": "stale_runner_time_exit"
+        },
+        {
+          "symbol": "BILLUSDT",
+          "entry_time": 1790264700,
+          "baseline_reason": "stale_runner_time_exit",
+          "alternative_reason": "stale_runner_time_exit"
+        }
+      ],
+      "known_pairs": 2371,
+      "better": 0,
+      "worse": 0,
+      "equal": 2371,
+      "recovered_final_targets": 0,
+      "new_runner_losses": 0,
+      "first_target_banked_in_both": 1598,
+      "fixed_size_pnl_delta_sum_known_pairs": 0.0,
+      "transitions": [
+        {
+          "baseline": "AMEND_CROSSED_AT_CLOSE",
+          "alternative": "AMEND_CROSSED_AT_CLOSE",
+          "count": 86
+        },
+        {
+          "baseline": "LOCK",
+          "alternative": "LOCK",
+          "count": 1023
+        },
+        {
+          "baseline": "SL",
+          "alternative": "SL",
+          "count": 765
+        },
+        {
+          "baseline": "TARGET",
+          "alternative": "TARGET",
+          "count": 467
+        },
+        {
+          "baseline": "TIME",
+          "alternative": "TIME",
+          "count": 30
+        }
+      ]
+    },
+    "half_stop_until_1r": {
+      "total_proposals": 2373,
+      "unknown_pairs": [
+        {
+          "symbol": "BILLUSDT",
+          "entry_time": 1793340000,
+          "baseline_reason": "stale_runner_time_exit",
+          "alternative_reason": "stale_runner_time_exit"
+        },
+        {
+          "symbol": "BILLUSDT",
+          "entry_time": 1790264700,
+          "baseline_reason": "stale_runner_time_exit",
+          "alternative_reason": "stale_runner_time_exit"
+        }
+      ],
+      "known_pairs": 2371,
+      "better": 138,
+      "worse": 454,
+      "equal": 1779,
+      "recovered_final_targets": 98,
+      "new_runner_losses": 380,
+      "first_target_banked_in_both": 1598,
+      "fixed_size_pnl_delta_sum_known_pairs": 4.44187714678567,
+      "transitions": [
+        {
+          "baseline": "AMEND_CROSSED_AT_CLOSE",
+          "alternative": "AMEND_CROSSED_AT_CLOSE",
+          "count": 11
+        },
+        {
+          "baseline": "AMEND_CROSSED_AT_CLOSE",
+          "alternative": "LOCK",
+          "count": 7
+        },
+        {
+          "baseline": "AMEND_CROSSED_AT_CLOSE",
+          "alternative": "TARGET",
+          "count": 6
+        },
+        {
+          "baseline": "AMEND_CROSSED_AT_CLOSE",
+          "alternative": "TP1_STOP",
+          "count": 62
+        },
+        {
+          "baseline": "LOCK",
+          "alternative": "AMEND_CROSSED_AT_CLOSE",
+          "count": 3
+        },
+        {
+          "baseline": "LOCK",
+          "alternative": "LOCK",
+          "count": 507
+        },
+        {
+          "baseline": "LOCK",
+          "alternative": "TARGET",
+          "count": 92
+        },
+        {
+          "baseline": "LOCK",
+          "alternative": "TIME",
+          "count": 35
+        },
+        {
+          "baseline": "LOCK",
+          "alternative": "TP1_STOP",
+          "count": 386
+        },
+        {
+          "baseline": "SL",
+          "alternative": "SL",
+          "count": 765
+        },
+        {
+          "baseline": "TARGET",
+          "alternative": "TARGET",
+          "count": 467
+        },
+        {
+          "baseline": "TIME",
+          "alternative": "TIME",
+          "count": 30
+        }
+      ]
+    },
+    "be_1r": {
+      "total_proposals": 2373,
+      "unknown_pairs": [
+        {
+          "symbol": "AVAXUSDT",
+          "entry_time": 1788451200,
+          "baseline_reason": null,
+          "alternative_reason": "stale_runner_time_exit"
+        },
+        {
+          "symbol": "BILLUSDT",
+          "entry_time": 1793340000,
+          "baseline_reason": "stale_runner_time_exit",
+          "alternative_reason": "stale_runner_time_exit"
+        },
+        {
+          "symbol": "BILLUSDT",
+          "entry_time": 1790264700,
+          "baseline_reason": "stale_runner_time_exit",
+          "alternative_reason": "stale_runner_time_exit"
+        }
+      ],
+      "known_pairs": 2370,
+      "better": 196,
+      "worse": 367,
+      "equal": 1807,
+      "recovered_final_targets": 133,
+      "new_runner_losses": 296,
+      "first_target_banked_in_both": 1597,
+      "fixed_size_pnl_delta_sum_known_pairs": -4.731788608571539,
+      "transitions": [
+        {
+          "baseline": "AMEND_CROSSED_AT_CLOSE",
+          "alternative": "AMEND_CROSSED_AT_CLOSE",
+          "count": 4
+        },
+        {
+          "baseline": "AMEND_CROSSED_AT_CLOSE",
+          "alternative": "LOCK",
+          "count": 12
+        },
+        {
+          "baseline": "AMEND_CROSSED_AT_CLOSE",
+          "alternative": "TARGET",
+          "count": 7
+        },
+        {
+          "baseline": "AMEND_CROSSED_AT_CLOSE",
+          "alternative": "TIME",
+          "count": 2
+        },
+        {
+          "baseline": "AMEND_CROSSED_AT_CLOSE",
+          "alternative": "TP1_STOP",
+          "count": 61
+        },
+        {
+          "baseline": "LOCK",
+          "alternative": "AMEND_CROSSED_AT_CLOSE",
+          "count": 6
+        },
+        {
+          "baseline": "LOCK",
+          "alternative": "LOCK",
+          "count": 543
+        },
+        {
+          "baseline": "LOCK",
+          "alternative": "TARGET",
+          "count": 126
+        },
+        {
+          "baseline": "LOCK",
+          "alternative": "TIME",
+          "count": 62
+        },
+        {
+          "baseline": "LOCK",
+          "alternative": "TP1_STOP",
+          "count": 285
+        },
+        {
+          "baseline": "SL",
+          "alternative": "SL",
+          "count": 765
+        },
+        {
+          "baseline": "TARGET",
+          "alternative": "TARGET",
+          "count": 467
+        },
+        {
+          "baseline": "TIME",
+          "alternative": "TIME",
+          "count": 30
+        }
+      ]
+    },
+    "structure_until_1r": {
+      "total_proposals": 2373,
+      "unknown_pairs": [
+        {
+          "symbol": "BILLUSDT",
+          "entry_time": 1793340000,
+          "baseline_reason": "stale_runner_time_exit",
+          "alternative_reason": "stale_runner_time_exit"
+        },
+        {
+          "symbol": "BILLUSDT",
+          "entry_time": 1790264700,
+          "baseline_reason": "stale_runner_time_exit",
+          "alternative_reason": "stale_runner_time_exit"
+        }
+      ],
+      "known_pairs": 2371,
+      "better": 36,
+      "worse": 359,
+      "equal": 1976,
+      "recovered_final_targets": 28,
+      "new_runner_losses": 284,
+      "first_target_banked_in_both": 1598,
+      "fixed_size_pnl_delta_sum_known_pairs": -4.140583247571479,
+      "transitions": [
+        {
+          "baseline": "AMEND_CROSSED_AT_CLOSE",
+          "alternative": "AMEND_CROSSED_AT_CLOSE",
+          "count": 4
+        },
+        {
+          "baseline": "AMEND_CROSSED_AT_CLOSE",
+          "alternative": "LOCK",
+          "count": 5
+        },
+        {
+          "baseline": "AMEND_CROSSED_AT_CLOSE",
+          "alternative": "TARGET",
+          "count": 5
+        },
+        {
+          "baseline": "AMEND_CROSSED_AT_CLOSE",
+          "alternative": "TP1_STOP",
+          "count": 72
+        },
+        {
+          "baseline": "LOCK",
+          "alternative": "AMEND_CROSSED_AT_CLOSE",
+          "count": 2
+        },
+        {
+          "baseline": "LOCK",
+          "alternative": "LOCK",
+          "count": 709
+        },
+        {
+          "baseline": "LOCK",
+          "alternative": "TARGET",
+          "count": 23
+        },
+        {
+          "baseline": "LOCK",
+          "alternative": "TIME",
+          "count": 1
+        },
+        {
+          "baseline": "LOCK",
+          "alternative": "TP1_STOP",
+          "count": 288
+        },
+        {
+          "baseline": "SL",
+          "alternative": "SL",
+          "count": 765
+        },
+        {
+          "baseline": "TARGET",
+          "alternative": "TARGET",
+          "count": 467
+        },
+        {
+          "baseline": "TIME",
+          "alternative": "TIME",
+          "count": 30
+        }
+      ]
+    }
+  },
+  "objective_verified": false,
+  "live_activation_supported": false,
+  "selected_policy": null,
+  "limitations": [
+    "All hypothetical proposals, not a sequence of executable trades; positions overlap.",
+    "Unknown intersections reported explicitly; fixed-size known-pair delta is not account return or expectancy.",
+    "Common account caps, cash compounding, full equity, private fills, bid/ask,funding/fees not reconstructed.",
+    "Previously inspected native data; no independent validation or selection of a live policy."
+  ]
+}
