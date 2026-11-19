@@ -1,0 +1,96 @@
+{
+  "declared_at": "2026-11-19T14:46:38.260327+00:00",
+  "sources": {
+    "C:\\Users\\Lenovo\\Desktop\\telegram bot\\liquidity_trap_joint_nov19_audit.py": "79fc5421ae7dca29170444b017f0e6ca8ad6b4fe4dfac6ec1bf28306ffc3d891",
+    "liquidity_trap_entries_nov19.py": "570548593463176d8bf85951671aa8168e88bb090e469a5ca497037f07121d91",
+    "price_grid_bracket_nov19.py": "eecf5d51d9617cb218bf1625c3bb99f732c7e7fd25d28a17c3f67a4f68f44f97",
+    "phase_entry_scenarios_nov19.py": "21e375770232d2685eeec7827e5a7284ce76e579553448685715c964a08a6101",
+    "phase_scenarios_nov19_audit.py": "c8e2d75e140e07f8815693f80e1eb84887b392bd6e687aa8bba86d610c139a83",
+    "price_bracket_path_nov19.py": "82d3b34231943bb2456983be03f34ba5bbd90d35b67ec50e40a4089ed2651fc3",
+    "cash_tp1_policy_nov19.py": "5d20ff72c05708620e72f1d16fa01423fb765547ade8fc232e83a4eb5606c519",
+    "src\\okx_trader.py": "3f04038c1cefc81f1e38cfc92f01871698b25e7c534864fe23545450d7c5a3af",
+    "src\\tp1_plan.py": "7a49938a965be142a18eeaf4977cba0251e00d0fdc675226bab3f9cc17a0e31a",
+    "reports\\audit_2026_09_08\\xperp_15m_nov14_merged\\manifest.json": "6ebba73ab8fe00a7a0740feaf3b6fdc867d4773dd36277be53d42f8e20a236b5",
+    "..\\tusa stocks\\reports\\audit_2026_09_08\\stock_mark_matched_nov18\\manifest.json": "fb18a91303dbd139ca5b54cf4b9393a015ed8171b5176b721d6947df5ca6d447",
+    "reports\\audit_2026_09_08\\shared_xperp_specs_nov14.json": "7a4a76b813dfe6a5a08c9e858b17d453285dddc99529cdc293885682cf2bee0e",
+    "reports\\audit_2026_09_08\\native_universe_nov19_snapshot.json": "48b5ebdc52e7579b76b8da5ff8450ac41f8baf4df66fbf563bebe88b10eaa78f",
+    "reports\\audit_2026_09_08\\native_expansion_nov19\\selection.json": "49370dd82858a819ce6073efa34b05f6b990822fd724a8910763d36068104d81"
+  },
+  "routes": {
+    "phase_control": [
+      "range_sweep_confirm",
+      "trend_retest_confirm"
+    ],
+    "failed_only": [
+      "failed_break_accept"
+    ],
+    "pullback_only": [
+      "trend_pullback_hold"
+    ],
+    "new_union": [
+      "failed_break_accept",
+      "trend_pullback_hold"
+    ],
+    "all_scenarios": [
+      "failed_break_accept",
+      "range_sweep_confirm",
+      "trend_pullback_hold",
+      "trend_retest_confirm"
+    ]
+  },
+  "universes": [
+    "base",
+    "expanded_current_snapshot"
+  ],
+  "stock_triggers": [
+    "trade",
+    "mark"
+  ],
+  "breakout_lookback": 20,
+  "breakout_volume_minimum": 1.2,
+  "breakout_body_atr": 0.5,
+  "failure_max_bars": 4,
+  "failure_return_atr": 0.25,
+  "failure_body_atr": 0.4,
+  "failure_volume_minimum": 1.0,
+  "acceptance_wait_bars": 2,
+  "acceptance_return_atr": 0.1,
+  "acceptance_volume_minimum": 0.75,
+  "pullback_zone": "last closed1h EMA20",
+  "pullback_zone_tolerance_atr": 0.25,
+  "pullback_max_extension_atr": 1.5,
+  "pullback_requires_closed_counterbody_then_closed_reclaim": true,
+  "macro": "own4h and market4h not strongly opposite final direction",
+  "minimum_active_bars_last16": 12,
+  "minimum_stop": 0.003,
+  "maximum_stop": "clip(1.5ATR,0.008,0.015)",
+  "target1": "clip(1ATR,0.005,0.01)",
+  "target2": "clip(2.5ATR,0.01,0.02),cap at unbroken4h/opposite16h level",
+  "minimum_final_move": 0.008,
+  "minimum_final_reward_risk": 1.5,
+  "price_grid": "same nearest rounding as production; one outward tick if hard stop/TP1 minimum crossed",
+  "entry_exit_stress": 0.0005,
+  "horizon_bars": 32,
+  "client_tp1_policies": {
+    "requested5": {
+      "tp1_pct": 5,
+      "minimum_close": false
+    },
+    "half_minimum": {
+      "tp1_pct": 50,
+      "minimum_close": true
+    }
+  },
+  "selection_months": [
+    "2026-08",
+    "2026-09"
+  ],
+  "later_start": "2026-10-01",
+  "minimum_each_bot_month": 20,
+  "selection_score": "minimum each-bot monthly contribution minus shared monthly cash DD across policies and priorities",
+  "require_each_bot_month_positive": true,
+  "unknown_paths_unscorable": true,
+  "expanded_rule_parameters_frozen_before_expanded_outcomes": true,
+  "objective_verified": false,
+  "live_activation_supported": false
+}
