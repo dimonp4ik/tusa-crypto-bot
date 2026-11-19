@@ -111,14 +111,15 @@ def main():
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--profile',choices=('long_context','intraday_context'),default='intraday_context')
     args=parser.parse_args();intraday=args.profile=='intraday_context'
-    prefix='phase_scenarios_intraday_nov19' if intraday else 'phase_scenarios_long_context_v2_nov19'
+    prefix='phase_scenarios_intraday_v2b_nov19' if intraday else 'phase_scenarios_long_context_v2b_nov19'
     source_paths=(Path(__file__),Path('phase_entry_scenarios_nov19.py'),Path('price_bracket_path_nov19.py'),
         Path('cash_tp1_policy_nov19.py'),Path('src/tp1_plan.py'),Path('account_cash_guard_nov17_audit.py'),
         STOCK_ROOT/'stock_module_cluster_audit.py',CRYPTO_MANIFEST,STOCK_MANIFEST,SPEC_PATH,
-        ROOT/'phase_scenarios_nov19_protocol.json',ROOT/'phase_scenarios_nov19_v1b_protocol.json')
+        ROOT/'phase_scenarios_nov19_protocol.json',ROOT/'phase_scenarios_nov19_v1b_protocol.json',
+        ROOT/'phase_scenarios_intraday_nov19_protocol.json')
     sources={str(p):hashlib.sha256(p.read_bytes()).hexdigest() for p in source_paths}
     protocol=dict(declared_at=datetime.now(timezone.utc).isoformat(),sources=dict(sources),
-        implementation_revision='v2: explicit intraday profile after v1 rarity diagnostics; v1 preserved in research Git history',
+        implementation_revision='v2b: session TIME diagnostic bar is last included candle, not first excluded one; trading rules unchanged from v2',
         profile=args.profile,
         routes=ROUTES,stock_triggers=['trade','mark'],crypto_trigger='trade',
         target1_rule='clip(1ATR/entry,0.005,0.01)' if intraday else 'fixed0.006',

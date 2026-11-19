@@ -33,3 +33,12 @@ def test_time_exit_with_stale_last_trade_is_not_a_free_flat_outcome():
     c=data();c['volume'][31]=0
     out=resolve(c,0,direction='LONG',entry=100,stop=99,tp1=100.6,tp2=101.8)
     assert out==dict(known=False,reason='stale_reference_at_time_exit')
+
+
+def test_session_expiry_reports_last_included_bar_without_reading_expired_bar():
+    c=data();expiry=4*900
+    c['high'][4]=10000
+    out=resolve(c,0,direction='LONG',entry=100,stop=99,tp1=100.6,tp2=101.8,expire_at=expiry,exit_stress=0)
+    assert out['known'] and out['outcome']=='TIME'
+    assert out['exit_time']==expiry
+    assert out['trigger_bar']==3*900

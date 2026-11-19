@@ -51,4 +51,4 @@ def resolve(c,index,*,direction,entry,stop,tp1,tp2,bars=32,expire_at=None,
     bank_fill=tp1*(1-sign*exit_stress)
     return dict(known=True,outcome=code,exit_time=t,exit_reference=fill,
         runner_price_return=sign*(fill/entry-1),bank_price_return=sign*(bank_fill/entry-1),
-        banked=banked,near_exit_time=first,trigger_bar=int(c['time'][j]))
+        banked=banked,near_exit_time=first,trigger_bar=int(c['time'][last_index if code=='TIME' else j]))
