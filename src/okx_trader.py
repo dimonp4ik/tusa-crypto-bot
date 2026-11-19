@@ -680,11 +680,14 @@ def place_spot_buy(creds: dict, inst_id: str, quote_usdc: float) -> tuple:
         return True, ""
 
 
-def get_protection_order_ids(creds: dict, inst_id: str, algo_id: str) -> tuple[str, ...] | None:
+def get_protection_order_ids(creds: dict, inst_id: str, algo_id: str, *,
+                             ord_type: str = 'oco') -> tuple[str, ...] | None:
     """Look up regular orders created by a specific TP/SL or OCO."""
+    if ord_type not in ('oco','conditional'):
+        return None
     ok, rows = _request(creds, "GET", "/api/v5/trade/orders-algo-history",
                         params={"instId": inst_id, "algoId": algo_id,
-                                "ordType": "conditional,oco"})
+                                "ordType": ord_type})
     if not ok or not isinstance(rows, list) or len(rows) != 1:
         return None
     row = rows[0]
@@ -865,11 +868,11 @@ def calc_partial_close(position_sz: float, close_pct: float, spec: dict) -> dict
     }
 
 
-def get_order_book(inst_id: str) -> dict | None:
+def get_order_book(inst_id: str, *, timeout: float = 5) -> dict | None:
     """Uncached executable depth; sizes for X-Perp are in contracts."""
     try:
         response = requests.get(_base_url() + "/api/v5/market/books",
-                                params={"instId": inst_id, "sz": "50"}, timeout=5)
+                                params={"instId": inst_id, "sz": "50"}, timeout=timeout)
         response.raise_for_status()
         body = response.json()
         if body.get("code") != "0" or not body.get("data"):
