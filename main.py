@@ -4073,7 +4073,10 @@ def _fixed_be_counterfactual(setup: dict, candles: dict):
         # The runner is still open. The caller decides whether the persisted
         # horizon has actually ended; resolving TP1 here would discard a later
         # TP2 or breakeven on the next scheduler pass.
-        return "PENDING_TP1", 1, 0, banked
+        from src.live_accounting import marked_r
+        value = marked_r(direction=direction, entry=entry, exit_price=last_close,
+                         sl=stop, tp1=tp1, tp1_fraction=fraction, reached_tp1=True)
+        return "PENDING_TP1", 1, 0, value
     return "EXPIRED", 0, 0, sign * (last_close - entry) / risk
 
 
@@ -4213,14 +4216,22 @@ def _record_candidate_decision_books(
             continue
         try:
             spec = _okx_trade.get_xperp_spec(inst_id)
-            book = _okx_trade.get_order_book(inst_id)
-            book_observed_at = time.time()
-            if not spec or not book:
+            if not spec:
                 continue
-            snap = order_book_snapshot(book, spec["ctVal"])
+            preflight = analysis.get('_publication_book')
+            if preflight:
+                snap, book_observed_at = preflight
+                depth_usd = snap.depth_usd * float(spec['ctVal'])
+            else:
+                book = _okx_trade.get_order_book(inst_id)
+                book_observed_at = time.time()
+                if not book:
+                    continue
+                snap = order_book_snapshot(book, spec['ctVal'])
+                depth_usd = snap.depth_usd
             record_setup_decision_book(
                 setup_id, spread_bps=snap.spread_bps,
-                depth_usd=snap.depth_usd, imbalance=snap.imbalance,
+                depth_usd=depth_usd, imbalance=snap.imbalance,
                 observed_at=book_observed_at)
         except Exception as exc:
             # A missing research snapshot must never affect signal delivery or
@@ -4394,7 +4405,8 @@ def _venue_scan_universe(available: set[str]) -> list[str]:
 def _publish_venue_candidates(
         candidates: list[tuple[dict, int]],
         open_direction_counts: dict[str, int] | None = None,
-        reject_audit: dict[str, int] | None = None) -> int:
+        reject_audit: dict[str, int] | None = None, *,
+        instruments: dict[str, str] | None = None) -> int:
     """Publish a bounded, deterministic slice of one scan's candidates.
 
     Candidates are already stored in setup_log. Overflow rows are marked so
@@ -4448,6 +4460,24 @@ def _publish_venue_candidates(
             if reject_audit is not None:
                 reject_audit["stale_at_publish"] = reject_audit.get("stale_at_publish", 0) + 1
             continue
+        if instruments is not None and entry_bar and not analysis.get('_shadow_only', True):
+            from src.publication_book import publication_book
+            inst_id = instruments.get(_base_of_symbol(analysis['symbol']))
+            wide = False
+            if inst_id:
+                wide, snapshot, observed_at = publication_book(
+                    lambda: _okx_trade.get_order_book(inst_id, timeout=1.0),
+                    clock=time.time,
+                )
+                if snapshot is not None:
+                    analysis['_publication_book'] = (snapshot, observed_at)
+            late = time.time() - float(entry_bar) >= _MAX_VENUE_ENTRY_DELAY_SEC
+            if wide or late:
+                reason = 'stale_at_publish' if late else 'spread_at_publish'
+                mark_setup_blocked(setup_id, reason)
+                if reject_audit is not None:
+                    reject_audit[reason] = reject_audit.get(reason, 0) + 1
+                continue
         if not send_signal(analysis):
             mark_setup_blocked(setup_id, "send_failed")
             if reject_audit is not None:
@@ -4518,7 +4548,8 @@ def _run_venue_strategy_scan(*, early: bool = False) -> None:
                     VENUE_LOSS_PAUSE_STREAK)
         return
 
-    available = set(get_xperp_instruments())
+    instruments = get_xperp_instruments()
+    available = set(instruments)
     symbols = _venue_scan_universe(available)
     if "BTCUSDT" not in symbols:
         _persist_crypto_scan_audit({
@@ -4705,7 +4736,7 @@ def _run_venue_strategy_scan(*, early: bool = False) -> None:
             log.warning("Venue strategy failed for %s: %s", symbol, exc)
     publish_rejects = {}
     published = _publish_venue_candidates(
-        candidates, open_direction_counts, publish_rejects)
+        candidates, open_direction_counts, publish_rejects, instruments=instruments)
     _record_candidate_decision_books(candidates)
     now = time.time()
     symbol_lengths = [len(row.get("close") or []) for key, row in fetched.items()
