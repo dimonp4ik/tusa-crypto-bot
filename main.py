@@ -2436,7 +2436,8 @@ def _at_show_menu(chat_id: int, u: dict):
         risk_line = "Проверка лимитов счёта: сохранённые данные недоступны."
     execution_line = _execution_state_text()
     tp1_pct = float(u.get("tp1_close_pct") or 0)
-    tp1_str = "не закрывать (весь объём под трейлинг)" if tp1_pct <= 0 else f"{tp1_pct:.0f}%"
+    from src.tp1_plan import tp1_setting_label
+    tp1_str = tp1_setting_label(u)
     skip_line = ""
     try:
         last_skip = json.loads(
@@ -2453,6 +2454,7 @@ def _at_show_menu(chat_id: int, u: dict):
               "callback_data": "at_toggle"}],
             [{"text": "⚙️ Изменить размер сделки", "callback_data": "at_resize"}],
             [{"text": f"🎯 % закрытия на TP1: {tp1_pct:.0f}%", "callback_data": "at_tp1pct"}],
+            [{"text": "🎯 TP1: 50% / минимум лот", "callback_data": "at_tp1auto50"}],
             [{"text": "💰 Прибыль и вывод", "callback_data": "at_pnl"}],
             [{"text": "🔑 Заменить API-ключи", "callback_data": "at_rekey"}]]
     _at_reply_kb(chat_id,
@@ -2461,8 +2463,9 @@ def _at_show_menu(chat_id: int, u: dict):
                   f"Исполнение стратегии: {execution_line}\n\n{risk_line}\n\n"
                   f"Баланс (посл. известный): {bal_str}\nПлечо: 10x, изолированная маржа\n"
                   f"{skip_line}\n"
-                  "_Маленький процент TP1 может быть меньше одного контракта. "
-                 "При открытии бот покажет фактически выставленную долю._",
+                  "_Обычный процент может округлиться до нуля. Режим «50% / минимум лот» "
+                  "фиксирует допустимую часть; неделимую позицию — целиком на TP1. "
+                  "Настройка действует на новые сделки._",
                  rows)
 
 
@@ -2963,14 +2966,27 @@ def _at_handle_callback(cb_id: str, chat_id: int, user_id: int, data: str) -> bo
     elif data == "at_rekey":
         _answer_callback(cb_id)
         _at_begin_keys(chat_id)
+    elif data in ("at_tp1auto50", "at_tp1set25", "at_tp1set50", "at_tp1set75"):
+        minimum = data == "at_tp1auto50"
+        pct = 50.0 if minimum else float(data.removeprefix("at_tp1set"))
+        at_set_tp1_close_pct(user_id, pct, minimum_close=minimum)
+        _at_onboarding.pop(chat_id, None)
+        _answer_callback(cb_id, "Настройка TP1 сохранена")
+        detail = ("Половина позиции с учётом минимального объёма биржи. "
+            "Если на допустимые части она не делится, закроется целиком на TP1."
+            if minimum else f"Выбрано {pct:g}% позиции; объём округляется вниз до шага биржи.")
+        _reply(chat_id, "✅ " + detail + "\nТолько для новых сделок. Уже выставленные ордера не меняются.")
+        _at_show_menu(chat_id, dict(u, tp1_close_pct=pct, tp1_minimum_close=int(minimum)))
     elif data == "at_tp1pct":
         _at_onboarding[chat_id] = {"step": "tp1pct_change", "data": {}}
         _answer_callback(cb_id)
-        _reply(chat_id,
+        _at_reply_kb(chat_id,
                "Какой % позиции закрывать на TP1? Напиши число *0-100* "
                "(0 = не закрывать, оставить всё под трейлинг).\n\n"
                "_На небольшой позиции малый процент может быть меньше одного "
-               "контракта; фактическую долю бот покажет при открытии._")
+               "контракта; фактическую долю бот покажет при открытии._",
+               [[{"text": "50% / минимум лот (неделимую — целиком)", "callback_data": "at_tp1auto50"}],
+                [{"text": f"{p}%", "callback_data": f"at_tp1set{p}"} for p in (25,50,75)]])
     elif data == "at_pnl":
         _answer_callback(cb_id)
         _sweep_show_report(chat_id, user_id, u)
