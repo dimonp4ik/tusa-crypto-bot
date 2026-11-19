@@ -1,0 +1,1836 @@
+{
+  "status": "PROSPECTIVE_PUBLIC_QUOTE_AND_TRADE_PATH",
+  "plan_sha256": "8e70e4eaf21e449cfbe2bdd63ba9d8c0d43d9084d6a8ab15b226c8c179199714",
+  "created_at": "2026-11-19T21:33:35.595802+00:00",
+  "book_results": {
+    "wide": 58,
+    "depth slippage exceeds limit": 19,
+    "qualified_5bp": 3,
+    "executable price outside signal bracket": 1
+  },
+  "groups": {
+    "all": {
+      "rows": 81,
+      "known": 79,
+      "unknown": {
+        "receipt_minute_touched_a_level": 2
+      },
+      "outcomes": {
+        "SL_GAP": 45,
+        "TARGET": 21,
+        "SL": 13
+      },
+      "signal_wins": 21,
+      "comparable": 60,
+      "matched_signal_wins": 15,
+      "matched_book_wins": 15,
+      "signal_return_pct_sum": -9.114780007348944,
+      "matched_signal_return_pct_sum": -17.187190375085525,
+      "matched_book_return_pct_sum": -40.27210398554184,
+      "median_entry_cost_bps": 37.25776726784203
+    },
+    "qualified_5bp": {
+      "rows": 3,
+      "known": 3,
+      "unknown": {},
+      "outcomes": {
+        "TARGET": 1,
+        "SL": 2
+      },
+      "signal_wins": 1,
+      "comparable": 3,
+      "matched_signal_wins": 1,
+      "matched_book_wins": 1,
+      "signal_return_pct_sum": 2.400000000000002,
+      "matched_signal_return_pct_sum": 2.400000000000002,
+      "matched_book_return_pct_sum": 2.316637871603977,
+      "median_entry_cost_bps": 5.569996286669543
+    },
+    "wide": {
+      "rows": 58,
+      "known": 57,
+      "unknown": {
+        "receipt_minute_touched_a_level": 1
+      },
+      "outcomes": {
+        "SL_GAP": 33,
+        "TARGET": 14,
+        "SL": 10
+      },
+      "signal_wins": 14,
+      "comparable": 57,
+      "matched_signal_wins": 14,
+      "matched_book_wins": 14,
+      "signal_return_pct_sum": -19.587190375085527,
+      "matched_signal_return_pct_sum": -19.587190375085527,
+      "matched_book_return_pct_sum": -42.58874185714582,
+      "median_entry_cost_bps": 38.49137673807901
+    }
+  },
+  "results": [
+    {
+      "bucket": 1794953700,
+      "symbol": "LITEUSDT",
+      "direction": "SHORT",
+      "receipt": 1794953731.0826154,
+      "book": {
+        "status": "wide",
+        "average": 577.49,
+        "worst": 577.49,
+        "contracts": 0.06,
+        "spread_bps": 73.49642869466186
+      },
+      "path": {
+        "known": true,
+        "outcome": "SL_GAP",
+        "fill_reference": 591.54,
+        "exit_time": 1794963660
+      },
+      "minute_sha256": "b03253050d5aeb9a8c21453f9a2bd690fe85dfe9e207ce045b5f4581047efdfd",
+      "signal_return": -0.016199687344316205,
+      "book_return": -0.024329425617759526,
+      "entry_cost_bps": 79.3664427685492
+    },
+    {
+      "bucket": 1794953700,
+      "symbol": "QCOMUSDT",
+      "direction": "SHORT",
+      "receipt": 1794953732.7391925,
+      "book": {
+        "status": "wide",
+        "average": 167.18999999999997,
+        "worst": 167.19,
+        "contracts": 0.23,
+        "spread_bps": 45.35418034254287
+      },
+      "path": {
+        "known": true,
+        "outcome": "SL_GAP",
+        "fill_reference": 170.25,
+        "exit_time": 1794963660
+      },
+      "minute_sha256": "6088765179560ac6b0a4745a4b324dd1aed2caba4291aa91f9b7f59049d1f077",
+      "signal_return": -0.005195725335065182,
+      "book_return": -0.018302530055625432,
+      "entry_cost_bps": 128.71228670957245
+    },
+    {
+      "bucket": 1794953700,
+      "symbol": "SOFTBANKUSDT",
+      "direction": "LONG",
+      "receipt": 1794953733.7933543,
+      "book": {
+        "status": "wide",
+        "average": 21.18,
+        "worst": 21.18,
+        "contracts": 1.8,
+        "spread_bps": 75.82938388625598
+      },
+      "path": {
+        "known": false,
+        "reason": "receipt_minute_touched_a_level"
+      },
+      "minute_sha256": "29adf2721c4a3dc15376c4b8c70c6240d24a82e8f704c0add3afed521603a73d"
+    },
+    {
+      "bucket": 1794958200,
+      "symbol": "SOFTBANKUSDT",
+      "direction": "SHORT",
+      "receipt": 1794958233.6816719,
+      "book": {
+        "status": "depth slippage exceeds limit",
+        "spread_bps": 95.69377990430661
+      },
+      "path": {
+        "known": true,
+        "outcome": "SL_GAP",
+        "fill_reference": 22.08,
+        "exit_time": 1794958620
+      },
+      "minute_sha256": "f61946669e4194d0080c31f5fe18685c812b6d8ca71d88665204b0aa0ac308dd",
+      "signal_return": -0.005464480874316724
+    },
+    {
+      "bucket": 1794959100,
+      "symbol": "SOFTBANKUSDT",
+      "direction": "SHORT",
+      "receipt": 1794959133.4797015,
+      "book": {
+        "status": "wide",
+        "average": 21.96,
+        "worst": 21.96,
+        "contracts": 1.7,
+        "spread_bps": 108.69565217391235
+      },
+      "path": {
+        "known": true,
+        "outcome": "TARGET",
+        "fill_reference": 21.528,
+        "exit_time": 1794964260
+      },
+      "minute_sha256": "82c7f05881069ae38d3c538200979321dc3724ca5527c421194d85059bdcdc84",
+      "signal_return": 0.025000000000000022,
+      "book_return": 0.019672131147541072,
+      "entry_cost_bps": 54.34782608695565
+    },
+    {
+      "bucket": 1794960000,
+      "symbol": "SKHYUSDT",
+      "direction": "LONG",
+      "receipt": 1794960032.67276,
+      "book": {
+        "status": "depth slippage exceeds limit",
+        "spread_bps": 37.29024238657693
+      },
+      "path": {
+        "known": true,
+        "outcome": "SL_GAP",
+        "fill_reference": 126.72,
+        "exit_time": 1794965100
+      },
+      "minute_sha256": "3e7a8d7b5a293339de9cb47ae4a07db28994256712844964b97989f3d21af2c4",
+      "signal_return": -0.008760951188986232
+    },
+    {
+      "bucket": 1794960000,
+      "symbol": "SOFTBANKUSDT",
+      "direction": "SHORT",
+      "receipt": 1794960033.1313224,
+      "book": {
+        "status": "depth slippage exceeds limit",
+        "spread_bps": 104.19026047565137
+      },
+      "path": {
+        "known": true,
+        "outcome": "TARGET",
+        "fill_reference": 21.645,
+        "exit_time": 1794962700
+      },
+      "minute_sha256": "eeb54236cbd2052cba6d037be5dd08325563437002be11dca77dd607f972e571",
+      "signal_return": 0.025000000000000022
+    },
+    {
+      "bucket": 1794960900,
+      "symbol": "MRNAUSDT",
+      "direction": "SHORT",
+      "receipt": 1794960930.774693,
+      "book": {
+        "status": "depth slippage exceeds limit",
+        "spread_bps": 46.20037627110566
+      },
+      "path": {
+        "known": true,
+        "outcome": "TARGET",
+        "fill_reference": 204.81824999999998,
+        "exit_time": 1795011780
+      },
+      "minute_sha256": "35631365cfc863feb42dc96acafcc83c3572bdf998b8ba46216cf66cbfea60b0",
+      "signal_return": 0.025000000000000022
+    },
+    {
+      "bucket": 1794964500,
+      "symbol": "LITEUSDT",
+      "direction": "SHORT",
+      "receipt": 1794964530.5267503,
+      "book": {
+        "status": "wide",
+        "average": 586.07,
+        "worst": 586.07,
+        "contracts": 0.06,
+        "spread_bps": 81.39821399743337
+      },
+      "path": {
+        "known": true,
+        "outcome": "TARGET",
+        "fill_reference": 576.7515,
+        "exit_time": 1794978120
+      },
+      "minute_sha256": "0d438525a0926c4828c4247f3b7d947c1c85ab30afcdae42e97feb30c9768478",
+      "signal_return": 0.025000000000000022,
+      "book_return": 0.01589997781834951,
+      "entry_cost_bps": 92.47050072691442
+    },
+    {
+      "bucket": 1794968100,
+      "symbol": "BEUSDT",
+      "direction": "LONG",
+      "receipt": 1794968128.626349,
+      "book": {
+        "status": "wide",
+        "average": 179.06999999999996,
+        "worst": 179.07,
+        "contracts": 0.21,
+        "spread_bps": 48.141513658754214
+      },
+      "path": {
+        "known": true,
+        "outcome": "SL_GAP",
+        "fill_reference": 175.85,
+        "exit_time": 1795023240
+      },
+      "minute_sha256": "9ed62f178fb5769fd41eb2d3b888e9c3b4e9c6337ac19e1bbe1127a3fb4a2f11",
+      "signal_return": -0.010689170182841101,
+      "book_return": -0.01798179482883777,
+      "entry_cost_bps": 74.26160337552501
+    },
+    {
+      "bucket": 1794969000,
+      "symbol": "BEUSDT",
+      "direction": "LONG",
+      "receipt": 1794969028.5728328,
+      "book": {
+        "status": "wide",
+        "average": 179.97,
+        "worst": 179.97,
+        "contracts": 0.21,
+        "spread_bps": 57.396004569390726
+      },
+      "path": {
+        "known": true,
+        "outcome": "SL_GAP",
+        "fill_reference": 175.85,
+        "exit_time": 1795023240
+      },
+      "minute_sha256": "ef1ff9b1d9f265fde2b9727b33b5a20b2c0ccbe91e068b210bc7496ecaaa73d1",
+      "signal_return": -0.010689170182841101,
+      "book_return": -0.022892704339612213,
+      "entry_cost_bps": 124.89451476793256
+    },
+    {
+      "bucket": 1794978900,
+      "symbol": "AXTIUSDT",
+      "direction": "LONG",
+      "receipt": 1794978928.4275923,
+      "book": {
+        "status": "depth slippage exceeds limit",
+        "spread_bps": 45.12276045122617
+      },
+      "path": {
+        "known": true,
+        "outcome": "SL_GAP",
+        "fill_reference": 37.16,
+        "exit_time": 1795007040
+      },
+      "minute_sha256": "b0a90cc488680538a26c1ae57c9b73310f6f8ef3cb113e33a824a183017ee42b",
+      "signal_return": -0.008008542445275046
+    },
+    {
+      "bucket": 1794978900,
+      "symbol": "WDCUSDT",
+      "direction": "LONG",
+      "receipt": 1794978933.9718237,
+      "book": {
+        "status": "wide",
+        "average": 289.94,
+        "worst": 289.94,
+        "contracts": 0.13,
+        "spread_bps": 54.64291890022425
+      },
+      "path": {
+        "known": true,
+        "outcome": "SL",
+        "fill_reference": 287.00639,
+        "exit_time": 1795012560
+      },
+      "minute_sha256": "a00a50357c321b6948292dd1490e0317d62771a04e7c9a707bf097aa43ba2e1a",
+      "signal_return": -0.0030000000000000027,
+      "book_return": -0.010117989928950744,
+      "entry_cost_bps": 71.9074582276713
+    },
+    {
+      "bucket": 1794980700,
+      "symbol": "AXTIUSDT",
+      "direction": "SHORT",
+      "receipt": 1794980728.4291382,
+      "book": {
+        "status": "wide",
+        "average": 37.9,
+        "worst": 37.9,
+        "contracts": 1.02,
+        "spread_bps": 70.98724858682874
+      },
+      "path": {
+        "known": true,
+        "outcome": "SL_GAP",
+        "fill_reference": 38.23,
+        "exit_time": 1794992580
+      },
+      "minute_sha256": "8f1fce622b2a00522d55ced5ef69189ff4b06b4ccbc1ed44589d387cb0f2e74b",
+      "signal_return": -0.0047306176084098706,
+      "book_return": -0.008707124010554068,
+      "entry_cost_bps": 39.42181340341633
+    },
+    {
+      "bucket": 1794981600,
+      "symbol": "AXTIUSDT",
+      "direction": "SHORT",
+      "receipt": 1794981628.691741,
+      "book": {
+        "status": "wide",
+        "average": 37.750291262135924,
+        "worst": 37.75,
+        "contracts": 1.03,
+        "spread_bps": 50.191520274733804
+      },
+      "path": {
+        "known": true,
+        "outcome": "SL_GAP",
+        "fill_reference": 38.23,
+        "exit_time": 1794992580
+      },
+      "minute_sha256": "a0252bd9a251b8fa89819b767aee97a621df0d7713b0c375fe19d755229cd19e",
+      "signal_return": -0.0047306176084098706,
+      "book_return": -0.012707418190047948,
+      "entry_cost_bps": 78.76707959634021
+    },
+    {
+      "bucket": 1794983400,
+      "symbol": "AXTIUSDT",
+      "direction": "LONG",
+      "receipt": 1794983428.4819586,
+      "book": {
+        "status": "wide",
+        "average": 38.11,
+        "worst": 38.11,
+        "contracts": 1.02,
+        "spread_bps": 71.09940750493641
+      },
+      "path": {
+        "known": true,
+        "outcome": "SL_GAP",
+        "fill_reference": 37.46,
+        "exit_time": 1795005720
+      },
+      "minute_sha256": "826da0e8d25e240b712c116f20f2df709c22d11954755715133c4381359be9f7",
+      "signal_return": -0.01004228329809731,
+      "book_return": -0.017055890842298527,
+      "entry_cost_bps": 71.35306553911036
+    },
+    {
+      "bucket": 1794983400,
+      "symbol": "BEUSDT",
+      "direction": "SHORT",
+      "receipt": 1794983428.6191332,
+      "book": {
+        "status": "wide",
+        "average": 179.24,
+        "worst": 179.24,
+        "contracts": 0.21,
+        "spread_bps": 61.18249068357496
+      },
+      "path": {
+        "known": true,
+        "outcome": "SL_GAP",
+        "fill_reference": 181.85,
+        "exit_time": 1794989280
+      },
+      "minute_sha256": "e26b5fa02d2e393ca40496bb1773d7584903eed1335a49a4191190c0baa8c772",
+      "signal_return": -0.015071169411107865,
+      "book_return": -0.014561481812095378,
+      "entry_cost_bps": -5.023723137036473
+    },
+    {
+      "bucket": 1794984300,
+      "symbol": "SKHYNIXUSDT",
+      "direction": "LONG",
+      "receipt": 1794984332.579967,
+      "book": {
+        "status": "wide",
+        "average": 861.3,
+        "worst": 861.3,
+        "contracts": 0.045,
+        "spread_bps": 20.920502092049684
+      },
+      "path": {
+        "known": true,
+        "outcome": "SL",
+        "fill_reference": 856.0374999999999,
+        "exit_time": 1795005720
+      },
+      "minute_sha256": "d8f323d00efd9189f520d6969bc28c8f04e97df893bebef2c4b0b945c4f5f460",
+      "signal_return": -0.005763646922183563,
+      "book_return": -0.00610995007546733,
+      "entry_cost_bps": 3.4843205574897063
+    },
+    {
+      "bucket": 1794984300,
+      "symbol": "SOXSUSDT",
+      "direction": "LONG",
+      "receipt": 1794984333.4752364,
+      "book": {
+        "status": "wide",
+        "average": 55.589999999999996,
+        "worst": 55.59,
+        "contracts": 0.7,
+        "spread_bps": 41.46011716989707
+      },
+      "path": {
+        "known": true,
+        "outcome": "SL_GAP",
+        "fill_reference": 55.32,
+        "exit_time": 1794984480
+      },
+      "minute_sha256": "63b1ac97e8af5f09767d0ac24478a3f79a750efad225367437ad11897350ceae",
+      "signal_return": -0.006465517241379337,
+      "book_return": -0.00485698866702633,
+      "entry_cost_bps": -16.16379310344862
+    },
+    {
+      "bucket": 1794985200,
+      "symbol": "SOXSUSDT",
+      "direction": "LONG",
+      "receipt": 1794985233.62189,
+      "book": {
+        "status": "wide",
+        "average": 55.74999999999999,
+        "worst": 55.75,
+        "contracts": 0.6,
+        "spread_bps": 44.943820224719104
+      },
+      "path": {
+        "known": true,
+        "outcome": "SL_GAP",
+        "fill_reference": 55.18,
+        "exit_time": 1794985920
+      },
+      "minute_sha256": "cd8807fb56fc8168c579ceb36aa922ed4bffe625579504a55a5a17d2cda22e89",
+      "signal_return": -0.00897988505747127,
+      "book_return": -0.010224215246636637,
+      "entry_cost_bps": 12.571839080457448
+    },
+    {
+      "bucket": 1794986100,
+      "symbol": "DELLUSDT",
+      "direction": "SHORT",
+      "receipt": 1794986129.632745,
+      "book": {
+        "status": "wide",
+        "average": 333.85,
+        "worst": 333.85,
+        "contracts": 0.11,
+        "spread_bps": 57.34595740867832
+      },
+      "path": {
+        "known": true,
+        "outcome": "SL_GAP",
+        "fill_reference": 336.74,
+        "exit_time": 1794988140
+      },
+      "minute_sha256": "ec4739308d9be840fb3942f9f9b7ae18abf7fe83b1f993fdeed9a5004dbd6d69",
+      "signal_return": -0.004774124246583522,
+      "book_return": -0.00865658229743893,
+      "entry_cost_bps": 38.49137673807901
+    },
+    {
+      "bucket": 1794986100,
+      "symbol": "OKTAUSDT",
+      "direction": "SHORT",
+      "receipt": 1794986132.0338027,
+      "book": {
+        "status": "wide",
+        "average": 174.89,
+        "worst": 174.89,
+        "contracts": 0.22,
+        "spread_bps": 41.08416547789029
+      },
+      "path": {
+        "known": true,
+        "outcome": "SL_GAP",
+        "fill_reference": 202.01,
+        "exit_time": 1795036440
+      },
+      "minute_sha256": "e798c709504b0220ffa44fba08a837ae28053483872eb011775c0758d612dd32",
+      "signal_return": -0.15033312453732695,
+      "book_return": -0.1550689004517125,
+      "entry_cost_bps": 40.99994305563626
+    },
+    {
+      "bucket": 1794986100,
+      "symbol": "SOXSUSDT",
+      "direction": "LONG",
+      "receipt": 1794986133.6805573,
+      "book": {
+        "status": "wide",
+        "average": 55.23,
+        "worst": 55.23,
+        "contracts": 0.7,
+        "spread_bps": 49.00626191124349
+      },
+      "path": {
+        "known": true,
+        "outcome": "SL_GAP",
+        "fill_reference": 54.95,
+        "exit_time": 1794986460
+      },
+      "minute_sha256": "7bfa6090daa7a755cab22d19b2aaf9692c18d69820d5707d697716a209ec3f56",
+      "signal_return": -0.004168176875679497,
+      "book_return": -0.005069708491761582,
+      "entry_cost_bps": 9.061254077564751
+    },
+    {
+      "bucket": 1794987000,
+      "symbol": "OKTAUSDT",
+      "direction": "SHORT",
+      "receipt": 1794987031.8937879,
+      "book": {
+        "status": "wide",
+        "average": 174.97,
+        "worst": 174.97,
+        "contracts": 0.22,
+        "spread_bps": 63.238854863980265
+      },
+      "path": {
+        "known": true,
+        "outcome": "SL_GAP",
+        "fill_reference": 202.01,
+        "exit_time": 1795036440
+      },
+      "minute_sha256": "689cbd5338fb7380229dd216a81f724cb4c7df497cfc6c3e5659455bb815ba03",
+      "signal_return": -0.15033312453732695,
+      "book_return": -0.15454077841915748,
+      "entry_cost_bps": 36.444393827231856
+    },
+    {
+      "bucket": 1794987000,
+      "symbol": "SOXSUSDT",
+      "direction": "LONG",
+      "receipt": 1794987033.5261903,
+      "book": {
+        "status": "wide",
+        "average": 54.919999999999995,
+        "worst": 54.92,
+        "contracts": 0.7,
+        "spread_bps": 49.28356301907514
+      },
+      "path": {
+        "known": true,
+        "outcome": "SL_GAP",
+        "fill_reference": 54.59,
+        "exit_time": 1794987720
+      },
+      "minute_sha256": "039990a925e0a4aaaf428b5c6e1a1faebff000fba466e82c836d8bfae0f87c36",
+      "signal_return": -0.006551410373066391,
+      "book_return": -0.006008739985433165,
+      "entry_cost_bps": -5.459508644223288
+    },
+    {
+      "bucket": 1794987900,
+      "symbol": "SOXSUSDT",
+      "direction": "LONG",
+      "receipt": 1794987933.476333,
+      "book": {
+        "status": "wide",
+        "average": 54.78999999999999,
+        "worst": 54.79,
+        "contracts": 0.7,
+        "spread_bps": 54.904831625182496
+      },
+      "path": {
+        "known": true,
+        "outcome": "SL",
+        "fill_reference": 54.426230000000004,
+        "exit_time": 1794988140
+      },
+      "minute_sha256": "2a3e6f9c7dfe59a0120b188213a4daa6c1082e2d08d0d874ac6b371450ef96a5",
+      "signal_return": -0.0030000000000000027,
+      "book_return": -0.006639350246395059,
+      "entry_cost_bps": 36.63674665689509
+    },
+    {
+      "bucket": 1794988800,
+      "symbol": "LITEUSDT",
+      "direction": "SHORT",
+      "receipt": 1794988830.7216766,
+      "book": {
+        "status": "wide",
+        "average": 585.71,
+        "worst": 585.71,
+        "contracts": 0.06,
+        "spread_bps": 51.42876605020234
+      },
+      "path": {
+        "known": true,
+        "outcome": "TARGET",
+        "fill_reference": 570.0108,
+        "exit_time": 1795012560
+      },
+      "minute_sha256": "6fb6ec94daac72a0d57864ba2d75bc20db1a74a109615c7e3a3087c7b1f57e34",
+      "signal_return": 0.029999999999999916,
+      "book_return": 0.026803708319817043,
+      "entry_cost_bps": 32.84323735620376
+    },
+    {
+      "bucket": 1794988800,
+      "symbol": "SOXSUSDT",
+      "direction": "LONG",
+      "receipt": 1794988833.728541,
+      "book": {
+        "status": "wide",
+        "average": 54.02,
+        "worst": 54.02,
+        "contracts": 0.7,
+        "spread_bps": 27.806098804338806
+      },
+      "path": {
+        "known": true,
+        "outcome": "TARGET",
+        "fill_reference": 55.125600000000006,
+        "exit_time": 1794989460
+      },
+      "minute_sha256": "33e2f74b76eb583d66e3557e81de215cd8d1067fcbeea31ebf789e5ffcb41209",
+      "signal_return": 0.030000000000000027,
+      "book_return": 0.020466493891151405,
+      "entry_cost_bps": 93.4230194319885
+    },
+    {
+      "bucket": 1794989700,
+      "symbol": "LITEUSDT",
+      "direction": "SHORT",
+      "receipt": 1794989730.6792276,
+      "book": {
+        "status": "wide",
+        "average": 579.73,
+        "worst": 579.73,
+        "contracts": 0.06,
+        "spread_bps": 63.44839444611513
+      },
+      "path": {
+        "known": true,
+        "outcome": "TARGET",
+        "fill_reference": 570.0108,
+        "exit_time": 1795012560
+      },
+      "minute_sha256": "aacfd69ae9df785b359a97f32db47a0284828e1411671d70b0ef8d41e434c742",
+      "signal_return": 0.029999999999999916,
+      "book_return": 0.01676504579718141,
+      "entry_cost_bps": 134.6062214961541
+    },
+    {
+      "bucket": 1794990600,
+      "symbol": "BEUSDT",
+      "direction": "SHORT",
+      "receipt": 1794990628.528516,
+      "book": {
+        "status": "wide",
+        "average": 181.09,
+        "worst": 181.09,
+        "contracts": 0.21,
+        "spread_bps": 59.4615426966902
+      },
+      "path": {
+        "known": true,
+        "outcome": "TARGET",
+        "fill_reference": 176.0162,
+        "exit_time": 1795023240
+      },
+      "minute_sha256": "13593f8c1c80a43b9a2e5109b8405ddca3b88181eefb88ced69d7063ed43fd54",
+      "signal_return": 0.030000000000000027,
+      "book_return": 0.028018112540725615,
+      "entry_cost_bps": 20.390168632206105
+    },
+    {
+      "bucket": 1794992400,
+      "symbol": "HOODUSDT",
+      "direction": "SHORT",
+      "receipt": 1794992430.2782016,
+      "book": {
+        "status": "depth slippage exceeds limit",
+        "spread_bps": 69.351072110963
+      },
+      "path": {
+        "known": true,
+        "outcome": "TARGET",
+        "fill_reference": 68.77300000000001,
+        "exit_time": 1795012560
+      },
+      "minute_sha256": "ac2a1f7d337c438e8d74dbabf369a43c3d1252b54555314a2544fa6939fac6b7",
+      "signal_return": 0.029999999999999916
+    },
+    {
+      "bucket": 1794993300,
+      "symbol": "ARMUSDT",
+      "direction": "SHORT",
+      "receipt": 1794993329.2311475,
+      "book": {
+        "status": "depth slippage exceeds limit",
+        "spread_bps": 55.82473140931126
+      },
+      "path": {
+        "known": true,
+        "outcome": "TARGET",
+        "fill_reference": 185.076,
+        "exit_time": 1795012680
+      },
+      "minute_sha256": "f88d49e3bfa2754c4bc578eb51bf2f63db5dfdcf27e5f366b1490d085946d6b6",
+      "signal_return": 0.030000000000000138
+    },
+    {
+      "bucket": 1794993300,
+      "symbol": "CRWVUSDT",
+      "direction": "LONG",
+      "receipt": 1794993330.4826777,
+      "book": {
+        "status": "depth slippage exceeds limit",
+        "spread_bps": 47.28132387706856
+      },
+      "path": {
+        "known": true,
+        "outcome": "SL",
+        "fill_reference": 52.62321428571429,
+        "exit_time": 1794997260
+      },
+      "minute_sha256": "86e82868d3ea6eb5595f16516531f35c952c43733647ad07e775f8db8e6ded05",
+      "signal_return": -0.004856008212664742
+    },
+    {
+      "bucket": 1794993300,
+      "symbol": "HOODUSDT",
+      "direction": "SHORT",
+      "receipt": 1794993331.2338312,
+      "book": {
+        "status": "wide",
+        "average": 70.41,
+        "worst": 70.41,
+        "contracts": 0.5,
+        "spread_bps": 83.44530089809822
+      },
+      "path": {
+        "known": true,
+        "outcome": "TARGET",
+        "fill_reference": 68.77300000000001,
+        "exit_time": 1795012560
+      },
+      "minute_sha256": "297afb2fb6cf93559c0387695f0ce31c3cb0693acbdf440044ef782e8767e35c",
+      "signal_return": 0.029999999999999916,
+      "book_return": 0.023249538417838167,
+      "entry_cost_bps": 69.11142454160913
+    },
+    {
+      "bucket": 1794994200,
+      "symbol": "AAOIUSDT",
+      "direction": "SHORT",
+      "receipt": 1794994227.8766356,
+      "book": {
+        "status": "wide",
+        "average": 40.89,
+        "worst": 40.89,
+        "contracts": 0.95,
+        "spread_bps": 19.545565599804128
+      },
+      "path": {
+        "known": true,
+        "outcome": "SL",
+        "fill_reference": 41.092909999999996,
+        "exit_time": 1794995880
+      },
+      "minute_sha256": "7602ea7b33ae55fa273557d519fa8ed5d6ac7d229cee04a04f8eebed2848fd69",
+      "signal_return": -0.0029999999999998916,
+      "book_return": -0.004962337979946163,
+      "entry_cost_bps": 19.52648279228697
+    },
+    {
+      "bucket": 1794995100,
+      "symbol": "AAOIUSDT",
+      "direction": "SHORT",
+      "receipt": 1794995127.829181,
+      "book": {
+        "status": "wide",
+        "average": 40.781263157894735,
+        "worst": 40.78,
+        "contracts": 0.95,
+        "spread_bps": 17.142157462960768
+      },
+      "path": {
+        "known": true,
+        "outcome": "SL",
+        "fill_reference": 41.12267857142857,
+        "exit_time": 1794995880
+      },
+      "minute_sha256": "d11303f4128ae9b55af2b83c6e044d67bfc2adb97caa6c4a9ac1cac7cea5717b",
+      "signal_return": -0.0037265943721886963,
+      "book_return": -0.008371869508111196,
+      "entry_cost_bps": 46.067083745487956
+    },
+    {
+      "bucket": 1794996000,
+      "symbol": "MRVLUSDT",
+      "direction": "SHORT",
+      "receipt": 1794996031.338205,
+      "book": {
+        "status": "wide",
+        "average": 155.34,
+        "worst": 155.34,
+        "contracts": 0.25,
+        "spread_bps": 35.98509189050265
+      },
+      "path": {
+        "known": true,
+        "outcome": "TARGET",
+        "fill_reference": 150.9417,
+        "exit_time": 1795012260
+      },
+      "minute_sha256": "e112a12a0dcabb3adee2b73c9a7bd6665d107b90e691eb1121bbadca574b2f19",
+      "signal_return": 0.030000000000000138,
+      "book_return": 0.02831402085747392,
+      "entry_cost_bps": 17.35106998264957
+    },
+    {
+      "bucket": 1794996000,
+      "symbol": "NVDAUSDT",
+      "direction": "SHORT",
+      "receipt": 1794996032.1359937,
+      "book": {
+        "status": "qualified_5bp",
+        "average": 161.49,
+        "worst": 161.49,
+        "contracts": 0.24,
+        "spread_bps": 1.8575276307235773
+      },
+      "path": {
+        "known": true,
+        "outcome": "TARGET",
+        "fill_reference": 156.73260000000002,
+        "exit_time": 1795012560
+      },
+      "minute_sha256": "607d90075a505ab1df67fcfad22f3b1f0448d5761eaf6d4464b58c3a990b43c8",
+      "signal_return": 0.029999999999999916,
+      "book_return": 0.029459409251346713,
+      "entry_cost_bps": 5.569996286669543
+    },
+    {
+      "bucket": 1794996000,
+      "symbol": "SOFTBANKUSDT",
+      "direction": "SHORT",
+      "receipt": 1794996033.5781748,
+      "book": {
+        "status": "wide",
+        "average": 21.45,
+        "worst": 21.45,
+        "contracts": 1.8,
+        "spread_bps": 69.68641114982678
+      },
+      "path": {
+        "known": true,
+        "outcome": "TARGET",
+        "fill_reference": 20.8356,
+        "exit_time": 1795019340
+      },
+      "minute_sha256": "ea30bc89ecd64b09b6b30ecba4e562233230f1e0784b8dde4ac62db2926c18d9",
+      "signal_return": 0.030000000000000027,
+      "book_return": 0.0286433566433566,
+      "entry_cost_bps": 13.966480446927498
+    },
+    {
+      "bucket": 1794996900,
+      "symbol": "AAOIUSDT",
+      "direction": "SHORT",
+      "receipt": 1794996927.8762157,
+      "book": {
+        "status": "wide",
+        "average": 40.97,
+        "worst": 40.97,
+        "contracts": 0.95,
+        "spread_bps": 53.554040895812776
+      },
+      "path": {
+        "known": true,
+        "outcome": "SL",
+        "fill_reference": 41.27345,
+        "exit_time": 1795012140
+      },
+      "minute_sha256": "27b38727ea06182e54231196ecddf875f98de94c309e4209862c9488f53d0413",
+      "signal_return": -0.0029999999999998916,
+      "book_return": -0.007406639004149396,
+      "entry_cost_bps": 43.742405832321026
+    },
+    {
+      "bucket": 1794996900,
+      "symbol": "AVGOUSDT",
+      "direction": "SHORT",
+      "receipt": 1794996928.627234,
+      "book": {
+        "status": "wide",
+        "average": 350.68,
+        "worst": 350.68,
+        "contracts": 0.11,
+        "spread_bps": 48.076239243297
+      },
+      "path": {
+        "known": true,
+        "outcome": "SL_GAP",
+        "fill_reference": 353.24,
+        "exit_time": 1795015260
+      },
+      "minute_sha256": "5018d4688732026be4ed0da0fb84d12d1d751343722dc4fe3fe0ecc08ed72a60",
+      "signal_return": -0.004950213371265999,
+      "book_return": -0.007300102657693541,
+      "entry_cost_bps": 23.32859174964397
+    },
+    {
+      "bucket": 1794996900,
+      "symbol": "CRCLUSDT",
+      "direction": "LONG",
+      "receipt": 1794996929.5243278,
+      "book": {
+        "status": "wide",
+        "average": 56.03999999999999,
+        "worst": 56.04,
+        "contracts": 0.6,
+        "spread_bps": 7.140307033202276
+      },
+      "path": {
+        "known": true,
+        "outcome": "SL",
+        "fill_reference": 55.832,
+        "exit_time": 1794997500
+      },
+      "minute_sha256": "e8dcb02a15920efc8368d4a3d46e899d313e85cd8c4f86747ff020c6eb3ee3c3",
+      "signal_return": -0.0030000000000000027,
+      "book_return": -0.0037116345467521628,
+      "entry_cost_bps": 7.142857142856673
+    },
+    {
+      "bucket": 1794996900,
+      "symbol": "MRVLUSDT",
+      "direction": "SHORT",
+      "receipt": 1794996931.3268023,
+      "book": {
+        "status": "wide",
+        "average": 154.86,
+        "worst": 154.86,
+        "contracts": 0.25,
+        "spread_bps": 36.739824035579176
+      },
+      "path": {
+        "known": true,
+        "outcome": "TARGET",
+        "fill_reference": 151.0096,
+        "exit_time": 1795012260
+      },
+      "minute_sha256": "9acb9ca0920891fcde47e248800725ec294c43533a3d90cd7024668727693fda",
+      "signal_return": 0.030000000000000027,
+      "book_return": 0.02486374790133028,
+      "entry_cost_bps": 52.67214799588804
+    },
+    {
+      "bucket": 1794996900,
+      "symbol": "MSTRUSDT",
+      "direction": "LONG",
+      "receipt": 1794996931.623419,
+      "book": {
+        "status": "wide",
+        "average": 98.8871794871795,
+        "worst": 98.9,
+        "contracts": 0.39,
+        "spread_bps": 5.0579131050525685
+      },
+      "path": {
+        "known": true,
+        "outcome": "SL",
+        "fill_reference": 98.54348,
+        "exit_time": 1794997500
+      },
+      "minute_sha256": "b0ac87dad3506fdb04063a4a4ddf0cf167cb3cde30c06b9108fafe5f5acfff59",
+      "signal_return": -0.0030000000000000027,
+      "book_return": -0.003475672872478408,
+      "entry_cost_bps": 4.7733192209120645
+    },
+    {
+      "bucket": 1794997800,
+      "symbol": "CRWVUSDT",
+      "direction": "LONG",
+      "receipt": 1794997829.5765483,
+      "book": {
+        "status": "depth slippage exceeds limit",
+        "spread_bps": 47.7326968973747
+      },
+      "path": {
+        "known": true,
+        "outcome": "SL_GAP",
+        "fill_reference": 52.13,
+        "exit_time": 1795000260
+      },
+      "minute_sha256": "c4d947054996a56e35dccd0d6e900be01f7c37b8a20242e8d50f14a495d0ac15",
+      "signal_return": -0.004772814051164587
+    },
+    {
+      "bucket": 1794998700,
+      "symbol": "AAOIUSDT",
+      "direction": "LONG",
+      "receipt": 1794998727.822047,
+      "book": {
+        "status": "wide",
+        "average": 40.8,
+        "worst": 40.8,
+        "contracts": 0.95,
+        "spread_bps": 24.5398773006121
+      },
+      "path": {
+        "known": true,
+        "outcome": "SL_GAP",
+        "fill_reference": 40.5,
+        "exit_time": 1795000020
+      },
+      "minute_sha256": "5d1956f3f6c9ba72b57f3f77e098a73ec368fc2f867e051bb843fca3f583b18e",
+      "signal_return": -0.007109585682765318,
+      "book_return": -0.007352941176470562,
+      "entry_cost_bps": 2.4515812699177353
+    },
+    {
+      "bucket": 1794998700,
+      "symbol": "BMNRUSDT",
+      "direction": "LONG",
+      "receipt": 1794998729.029259,
+      "book": {
+        "status": "wide",
+        "average": 16.2,
+        "worst": 16.2,
+        "contracts": 2.4,
+        "spread_bps": 37.105751391464885
+      },
+      "path": {
+        "known": true,
+        "outcome": "SL_GAP",
+        "fill_reference": 16.02,
+        "exit_time": 1795006260
+      },
+      "minute_sha256": "673f99b441207589149fd561a05e8bcf4ff11d38e7af5989d1cd29bd15d8f456",
+      "signal_return": -0.0068195908245505255,
+      "book_return": -0.011111111111111072,
+      "entry_cost_bps": 43.39739615623061
+    },
+    {
+      "bucket": 1794998700,
+      "symbol": "HOODUSDT",
+      "direction": "LONG",
+      "receipt": 1794998730.3956578,
+      "book": {
+        "status": "wide",
+        "average": 70.69,
+        "worst": 70.69,
+        "contracts": 0.5,
+        "spread_bps": 51.056587718054104
+      },
+      "path": {
+        "known": true,
+        "outcome": "SL_GAP",
+        "fill_reference": 70.06,
+        "exit_time": 1795003320
+      },
+      "minute_sha256": "5961a107123024d87371501e402a7eba7ffa5d510d86428ecb6d06c006b165eb",
+      "signal_return": -0.003413940256045467,
+      "book_return": -0.008912151648040711,
+      "entry_cost_bps": 55.47652916074064
+    },
+    {
+      "bucket": 1794999600,
+      "symbol": "HOODUSDT",
+      "direction": "LONG",
+      "receipt": 1794999630.428012,
+      "book": {
+        "status": "wide",
+        "average": 70.8,
+        "worst": 70.8,
+        "contracts": 0.5,
+        "spread_bps": 60.91945880852767
+      },
+      "path": {
+        "known": true,
+        "outcome": "SL_GAP",
+        "fill_reference": 70.06,
+        "exit_time": 1795003320
+      },
+      "minute_sha256": "e3360ff819aac357f8cfe001e37c4ec718b50570571151ef09bb66f5497fb7f3",
+      "signal_return": -0.003413940256045467,
+      "book_return": -0.010451977401129908,
+      "entry_cost_bps": 71.12375533428138
+    },
+    {
+      "bucket": 1795002300,
+      "symbol": "ARMUSDT",
+      "direction": "LONG",
+      "receipt": 1795002328.4281209,
+      "book": {
+        "status": "depth slippage exceeds limit",
+        "spread_bps": 44.46091144868488
+      },
+      "path": {
+        "known": true,
+        "outcome": "SL_GAP",
+        "fill_reference": 187.65,
+        "exit_time": 1795005660
+      },
+      "minute_sha256": "8ae5b8f8b209f4510375223ccdfc936aa0816353ecf67154b158c9abba3e4244",
+      "signal_return": -0.004509283819628562
+    },
+    {
+      "bucket": 1795002300,
+      "symbol": "MRVLUSDT",
+      "direction": "LONG",
+      "receipt": 1795002331.2711613,
+      "book": {
+        "status": "wide",
+        "average": 153.99,
+        "worst": 153.99,
+        "contracts": 0.25,
+        "spread_bps": 67.11190747678782
+      },
+      "path": {
+        "known": true,
+        "outcome": "SL_GAP",
+        "fill_reference": 152.64,
+        "exit_time": 1795005120
+      },
+      "minute_sha256": "87df44067c190fd9867d6a6a993fe8a49c4cc01e2342b320674887cae29bb108",
+      "signal_return": -0.0048246185943409126,
+      "book_return": -0.008766803039158555,
+      "entry_cost_bps": 39.770504629026426
+    },
+    {
+      "bucket": 1795003200,
+      "symbol": "AAOIUSDT",
+      "direction": "SHORT",
+      "receipt": 1795003227.8738918,
+      "book": {
+        "status": "depth slippage exceeds limit",
+        "spread_bps": 46.803793570636216
+      },
+      "path": {
+        "known": true,
+        "outcome": "SL_GAP",
+        "fill_reference": 40.8,
+        "exit_time": 1795005060
+      },
+      "minute_sha256": "3da623f7568eb8e890a333dd4bb03fd441f4c593e3cebee48d3363288ae6853f",
+      "signal_return": -0.0036900369003689537
+    },
+    {
+      "bucket": 1795003200,
+      "symbol": "ARMUSDT",
+      "direction": "LONG",
+      "receipt": 1795003228.4752352,
+      "book": {
+        "status": "depth slippage exceeds limit",
+        "spread_bps": 48.17491198814138
+      },
+      "path": {
+        "known": true,
+        "outcome": "SL_GAP",
+        "fill_reference": 187.65,
+        "exit_time": 1795005660
+      },
+      "minute_sha256": "bd835c9ee7513136caf0549988454b22f3f83112d5585e8a79b8a9a5ade60c78",
+      "signal_return": -0.004509283819628562
+    },
+    {
+      "bucket": 1795003200,
+      "symbol": "SOXSUSDT",
+      "direction": "LONG",
+      "receipt": 1795003233.8760583,
+      "book": {
+        "status": "wide",
+        "average": 54.81999999999999,
+        "worst": 54.82,
+        "contracts": 0.7,
+        "spread_bps": 75.0709512038824
+      },
+      "path": {
+        "known": true,
+        "outcome": "TARGET",
+        "fill_reference": 56.077749999999995,
+        "exit_time": 1795005840
+      },
+      "minute_sha256": "66618784b7d118c8c587fad0f4ad8f52fcca2eb07dfaa0bae399be88d75fdfe6",
+      "signal_return": 0.02499999999999991,
+      "book_return": 0.02294326887997089,
+      "entry_cost_bps": 20.106013525862387
+    },
+    {
+      "bucket": 1795009500,
+      "symbol": "SOXSUSDT",
+      "direction": "LONG",
+      "receipt": 1795009533.931396,
+      "book": {
+        "status": "depth slippage exceeds limit",
+        "spread_bps": 56.19505121000676
+      },
+      "path": {
+        "known": true,
+        "outcome": "TARGET",
+        "fill_reference": 56.32375,
+        "exit_time": 1795011660
+      },
+      "minute_sha256": "6367f1f9e5bec237c029c06fea4875756c2fb8fdb265d01b29896e397e5829c6",
+      "signal_return": 0.02499999999999991
+    },
+    {
+      "bucket": 1795010400,
+      "symbol": "MSTRUSDT",
+      "direction": "LONG",
+      "receipt": 1795010431.7265196,
+      "book": {
+        "status": "qualified_5bp",
+        "average": 95.69,
+        "worst": 95.69,
+        "contracts": 0.4,
+        "spread_bps": 3.135615364515405
+      },
+      "path": {
+        "known": true,
+        "outcome": "SL",
+        "fill_reference": 95.45277999999999,
+        "exit_time": 1795011900
+      },
+      "minute_sha256": "4de1610aa0519b19e13f725e395db6165a9c908d2220c5b99e550537174691b7",
+      "signal_return": -0.0030000000000000027,
+      "book_return": -0.002479046922353567,
+      "entry_cost_bps": -5.22247754334626
+    },
+    {
+      "bucket": 1795010400,
+      "symbol": "QCOMUSDT",
+      "direction": "LONG",
+      "receipt": 1795010432.6760993,
+      "book": {
+        "status": "wide",
+        "average": 168.25000000000003,
+        "worst": 168.25,
+        "contracts": 0.23,
+        "spread_bps": 66.78990995288953
+      },
+      "path": {
+        "known": true,
+        "outcome": "SL_GAP",
+        "fill_reference": 162.49,
+        "exit_time": 1795016460
+      },
+      "minute_sha256": "92fb97f2d208d9e711e5b4cc6aead0148eaee5e8b46e6c732441aa0bbd954b76",
+      "signal_return": -0.03389024317735889,
+      "book_return": -0.03423476968796446,
+      "entry_cost_bps": 3.5673940186708997
+    },
+    {
+      "bucket": 1795010400,
+      "symbol": "SOXSUSDT",
+      "direction": "LONG",
+      "receipt": 1795010434.0386167,
+      "book": {
+        "status": "wide",
+        "average": 55.62,
+        "worst": 55.62,
+        "contracts": 0.7,
+        "spread_bps": 68.55493415118084
+      },
+      "path": {
+        "known": true,
+        "outcome": "TARGET",
+        "fill_reference": 56.702999999999996,
+        "exit_time": 1795012260
+      },
+      "minute_sha256": "adc20b957c789170446e6044d53682cd117126eb36aba008173eb1d757b6ca08",
+      "signal_return": 0.02499999999999991,
+      "book_return": 0.01947141316073342,
+      "entry_cost_bps": 54.22993492407713
+    },
+    {
+      "bucket": 1795024800,
+      "symbol": "BEUSDT",
+      "direction": "LONG",
+      "receipt": 1795024828.9238713,
+      "book": {
+        "status": "executable price outside signal bracket",
+        "spread_bps": 64.82982171799054
+      },
+      "path": {
+        "known": true,
+        "outcome": "SL_GAP",
+        "fill_reference": 173.66,
+        "exit_time": 1795045500
+      },
+      "minute_sha256": "c53e26c2779d9fbf7e8581881680c1b0a702a0770e5a09ad550c3399a1f4e9cb",
+      "signal_return": -0.009976626190069005
+    },
+    {
+      "bucket": 1795032000,
+      "symbol": "RKLBUSDT",
+      "direction": "SHORT",
+      "receipt": 1795032032.7239368,
+      "book": {
+        "status": "depth slippage exceeds limit",
+        "spread_bps": 37.085110328203754
+      },
+      "path": {
+        "known": true,
+        "outcome": "TARGET",
+        "fill_reference": 52.8808,
+        "exit_time": 1795035960
+      },
+      "minute_sha256": "1dc0abd58acae06666550f3383552206e1017d2c698cb8072a6884fbb9e6bc72",
+      "signal_return": 0.020000000000000018
+    },
+    {
+      "bucket": 1795032900,
+      "symbol": "AAOIUSDT",
+      "direction": "SHORT",
+      "receipt": 1795032927.934493,
+      "book": {
+        "status": "wide",
+        "average": 40.49,
+        "worst": 40.49,
+        "contracts": 0.96,
+        "spread_bps": 22.203034414702433
+      },
+      "path": {
+        "known": true,
+        "outcome": "SL_GAP",
+        "fill_reference": 40.63,
+        "exit_time": 1795033980
+      },
+      "minute_sha256": "adbad70259aeff85a18dc2f298c00941653dc0f12831e96568f835d44a575714",
+      "signal_return": -0.004946821667078938,
+      "book_return": -0.0034576438626821027,
+      "entry_cost_bps": -14.840465001237924
+    },
+    {
+      "bucket": 1795034700,
+      "symbol": "AAOIUSDT",
+      "direction": "SHORT",
+      "receipt": 1795034727.9311059,
+      "book": {
+        "status": "wide",
+        "average": 40.74,
+        "worst": 40.74,
+        "contracts": 0.95,
+        "spread_bps": 22.066936373665882
+      },
+      "path": {
+        "known": true,
+        "outcome": "TARGET",
+        "fill_reference": 40.082,
+        "exit_time": 1795040700
+      },
+      "minute_sha256": "18f08bb82dcb0d01afc6802d2e5e0ef992922d5278804ff9b6bf9e1bb28ba20f",
+      "signal_return": 0.019999999999999907,
+      "book_return": 0.016151202749140947,
+      "entry_cost_bps": 39.11980440097662
+    },
+    {
+      "bucket": 1795039200,
+      "symbol": "SOFTBANKUSDT",
+      "direction": "SHORT",
+      "receipt": 1795039233.5799377,
+      "book": {
+        "status": "depth slippage exceeds limit",
+        "spread_bps": 112.99435028248513
+      },
+      "path": {
+        "known": false,
+        "reason": "receipt_minute_touched_a_level"
+      },
+      "minute_sha256": "2f25f8d7cf9c520cd19d2c899e1db12585e466ed6eeecdb7931f79f8c3d6bb71"
+    },
+    {
+      "bucket": 1795040100,
+      "symbol": "SOFTBANKUSDT",
+      "direction": "SHORT",
+      "receipt": 1795040133.6220882,
+      "book": {
+        "status": "wide",
+        "average": 21.04,
+        "worst": 21.04,
+        "contracts": 1.8,
+        "spread_bps": 94.60737937559095
+      },
+      "path": {
+        "known": true,
+        "outcome": "SL_GAP",
+        "fill_reference": 21.36,
+        "exit_time": 1795046580
+      },
+      "minute_sha256": "0569423cd573325b560468c0ac7376c6e0d9b0efe2a8c29459bade5900f62ccc",
+      "signal_return": -0.011363636363636243,
+      "book_return": -0.015209125475285079,
+      "entry_cost_bps": 37.878787878788955
+    },
+    {
+      "bucket": 1795046400,
+      "symbol": "AXTIUSDT",
+      "direction": "SHORT",
+      "receipt": 1795046428.5314322,
+      "book": {
+        "status": "wide",
+        "average": 36.01,
+        "worst": 36.01,
+        "contracts": 1.08,
+        "spread_bps": 71.94244604316688
+      },
+      "path": {
+        "known": true,
+        "outcome": "SL_GAP",
+        "fill_reference": 36.39,
+        "exit_time": 1795050120
+      },
+      "minute_sha256": "ceb84a74402115ce684c7e593f84ac8e5395fc386eac1ac111e5775857afdfa4",
+      "signal_return": -0.003308519437551727,
+      "book_return": -0.01055262427103587,
+      "entry_cost_bps": 71.68458781362186
+    },
+    {
+      "bucket": 1795046400,
+      "symbol": "BMNRUSDT",
+      "direction": "SHORT",
+      "receipt": 1795046428.827477,
+      "book": {
+        "status": "depth slippage exceeds limit",
+        "spread_bps": 50.82592121982216
+      },
+      "path": {
+        "known": true,
+        "outcome": "SL_GAP",
+        "fill_reference": 15.88,
+        "exit_time": 1795060680
+      },
+      "minute_sha256": "3f5426e90a83c5428c66fb6ac560baa93823835dc89d55a76a23e1fac85103be",
+      "signal_return": -0.005063291139240533
+    },
+    {
+      "bucket": 1795048200,
+      "symbol": "AAOIUSDT",
+      "direction": "SHORT",
+      "receipt": 1795048227.4247458,
+      "book": {
+        "status": "wide",
+        "average": 41.17,
+        "worst": 41.17,
+        "contracts": 0.94,
+        "spread_bps": 21.83670993570212
+      },
+      "path": {
+        "known": true,
+        "outcome": "SL_GAP",
+        "fill_reference": 41.41,
+        "exit_time": 1795048560
+      },
+      "minute_sha256": "beb3402f3664bd664e771d99238f10505f8a8ee051e63c7c7755ad658ee7229b",
+      "signal_return": -0.004609412906356081,
+      "book_return": -0.005829487490891294,
+      "entry_cost_bps": 12.130033964093956
+    },
+    {
+      "bucket": 1795050000,
+      "symbol": "SOFTBANKUSDT",
+      "direction": "SHORT",
+      "receipt": 1795050033.4267924,
+      "book": {
+        "status": "wide",
+        "average": 21.48,
+        "worst": 21.48,
+        "contracts": 1.8,
+        "spread_bps": 111.11111111111039
+      },
+      "path": {
+        "known": true,
+        "outcome": "SL",
+        "fill_reference": 21.6648,
+        "exit_time": 1795050660
+      },
+      "minute_sha256": "ab36c511b79580a0a075e7cb421bfb168fce2dcf481bdb7e710cc91122a5a296",
+      "signal_return": -0.0029999999999998916,
+      "book_return": -0.008603351955307259,
+      "entry_cost_bps": 55.55555555555647
+    },
+    {
+      "bucket": 1795050900,
+      "symbol": "QCOMUSDT",
+      "direction": "SHORT",
+      "receipt": 1795050932.2258427,
+      "book": {
+        "status": "wide",
+        "average": 161.37,
+        "worst": 161.37,
+        "contracts": 0.24,
+        "spread_bps": 77.77777777777722
+      },
+      "path": {
+        "known": true,
+        "outcome": "SL_GAP",
+        "fill_reference": 163.16,
+        "exit_time": 1795083780
+      },
+      "minute_sha256": "a6415bf4b79e591034de923b0872c21630da4f1791a7832dcf138e2b446e42ff",
+      "signal_return": -0.007782581840642289,
+      "book_return": -0.011092520294974317,
+      "entry_cost_bps": 32.736256948734386
+    },
+    {
+      "bucket": 1795050900,
+      "symbol": "SKHYNIXUSDT",
+      "direction": "SHORT",
+      "receipt": 1795050932.6777725,
+      "book": {
+        "status": "wide",
+        "average": 864.9,
+        "worst": 864.9,
+        "contracts": 0.045,
+        "spread_bps": 12.710150788607345
+      },
+      "path": {
+        "known": true,
+        "outcome": "TARGET",
+        "fill_reference": 846.7875,
+        "exit_time": 1795051620
+      },
+      "minute_sha256": "94311760c61a328e69e15c778ece06ffb144f2aad708f94bfb9957f0c1ede233",
+      "signal_return": 0.025000000000000022,
+      "book_return": 0.02094172736732569,
+      "entry_cost_bps": 41.450777202073354
+    },
+    {
+      "bucket": 1795050900,
+      "symbol": "SOFTBANKUSDT",
+      "direction": "SHORT",
+      "receipt": 1795050933.2853305,
+      "book": {
+        "status": "depth slippage exceeds limit",
+        "spread_bps": 73.39449541284411
+      },
+      "path": {
+        "known": true,
+        "outcome": "SL_GAP",
+        "fill_reference": 21.96,
+        "exit_time": 1795060680
+      },
+      "minute_sha256": "7866780f304130a43b5ced98224a159ba401b74d9c6252ce760312d984f544ff",
+      "signal_return": -0.005494505494505475
+    },
+    {
+      "bucket": 1795051800,
+      "symbol": "QCOMUSDT",
+      "direction": "SHORT",
+      "receipt": 1795051832.131192,
+      "book": {
+        "status": "wide",
+        "average": 160.57,
+        "worst": 160.57,
+        "contracts": 0.24,
+        "spread_bps": 78.16377171216001
+      },
+      "path": {
+        "known": true,
+        "outcome": "SL_GAP",
+        "fill_reference": 163.16,
+        "exit_time": 1795083780
+      },
+      "minute_sha256": "1f4c8f43be41db2f51d69f56c1c67a73f05a7109aa6f865a58ba3b1271318407",
+      "signal_return": -0.007782581840642289,
+      "book_return": -0.016130036744099074,
+      "entry_cost_bps": 82.1494749845586
+    },
+    {
+      "bucket": 1795055400,
+      "symbol": "AXTIUSDT",
+      "direction": "SHORT",
+      "receipt": 1795055428.480183,
+      "book": {
+        "status": "wide",
+        "average": 36.07,
+        "worst": 36.07,
+        "contracts": 1.08,
+        "spread_bps": 66.31666206134346
+      },
+      "path": {
+        "known": true,
+        "outcome": "SL_GAP",
+        "fill_reference": 36.57,
+        "exit_time": 1795068180
+      },
+      "minute_sha256": "29e8f9e0885484fa99a0bfe75279d7084cfb6003b4ff8bd2065a0f7229e98d30",
+      "signal_return": -0.008271298593879095,
+      "book_return": -0.013861935126143532,
+      "entry_cost_bps": 55.141990625862114
+    },
+    {
+      "bucket": 1795055400,
+      "symbol": "MRNAUSDT",
+      "direction": "SHORT",
+      "receipt": 1795055430.8790069,
+      "book": {
+        "status": "depth slippage exceeds limit",
+        "spread_bps": 49.47246201221758
+      },
+      "path": {
+        "known": true,
+        "outcome": "SL_GAP",
+        "fill_reference": 199.06,
+        "exit_time": 1795071840
+      },
+      "minute_sha256": "f377ee26192c68366d27fd33f16c6a0384e5b4698dd6f7cc908aa097f8e6ff48",
+      "signal_return": -0.004491093505576194
+    },
+    {
+      "bucket": 1795059000,
+      "symbol": "MSTRUSDT",
+      "direction": "SHORT",
+      "receipt": 1795059031.2820077,
+      "book": {
+        "status": "qualified_5bp",
+        "average": 91.53571428571429,
+        "worst": 91.52,
+        "contracts": 0.42,
+        "spread_bps": 3.2760032760034004
+      },
+      "path": {
+        "known": true,
+        "outcome": "SL",
+        "fill_reference": 91.88483,
+        "exit_time": 1795059360
+      },
+      "minute_sha256": "802dd05be131536f64084e06e78d103325ecc58dbd1ae3704d8d5df2b56d5dfe",
+      "signal_return": -0.0029999999999998916,
+      "book_return": -0.0038139836129533755,
+      "entry_cost_bps": 8.108908883932564
+    },
+    {
+      "bucket": 1795060800,
+      "symbol": "LITEUSDT",
+      "direction": "SHORT",
+      "receipt": 1795060830.5272722,
+      "book": {
+        "status": "wide",
+        "average": 561.76,
+        "worst": 561.76,
+        "contracts": 0.06,
+        "spread_bps": 33.232923697562704
+      },
+      "path": {
+        "known": true,
+        "outcome": "SL_GAP",
+        "fill_reference": 565.0,
+        "exit_time": 1795069860
+      },
+      "minute_sha256": "36f478f9c99e49a5fa395d75daa0e4a6c8a6725695cb378de07e612bff1eb858",
+      "signal_return": -0.0047659695547017655,
+      "book_return": -0.005767587581885447,
+      "entry_cost_bps": 9.958742353110006
+    },
+    {
+      "bucket": 1795061700,
+      "symbol": "LITEUSDT",
+      "direction": "SHORT",
+      "receipt": 1795061730.4755743,
+      "book": {
+        "status": "wide",
+        "average": 561.27,
+        "worst": 561.27,
+        "contracts": 0.06,
+        "spread_bps": 44.0881051003541
+      },
+      "path": {
+        "known": true,
+        "outcome": "SL_GAP",
+        "fill_reference": 565.0,
+        "exit_time": 1795069860
+      },
+      "minute_sha256": "949951cd0db9636341d52b6cf5f0bf9f99e6bef4b039d90b16a87711047918c9",
+      "signal_return": -0.004444444444444473,
+      "book_return": -0.006645642916956129,
+      "entry_cost_bps": 21.866666666666703
+    },
+    {
+      "bucket": 1795062600,
+      "symbol": "DELLUSDT",
+      "direction": "SHORT",
+      "receipt": 1795062629.4731386,
+      "book": {
+        "status": "depth slippage exceeds limit",
+        "spread_bps": 59.88116845844796
+      },
+      "path": {
+        "known": true,
+        "outcome": "SL_GAP",
+        "fill_reference": 324.23,
+        "exit_time": 1795080060
+      },
+      "minute_sha256": "c91ce6cba40de5cb03a2141a57b91378f75a4e58bb81c49b3b9a831b2bd72f8d",
+      "signal_return": -0.004678978681209589
+    },
+    {
+      "bucket": 1795062600,
+      "symbol": "SKHYUSDT",
+      "direction": "SHORT",
+      "receipt": 1795062632.7708724,
+      "book": {
+        "status": "wide",
+        "average": 126.37999999999998,
+        "worst": 126.38,
+        "contracts": 0.3,
+        "spread_bps": 19.762064740524092
+      },
+      "path": {
+        "known": true,
+        "outcome": "SL_GAP",
+        "fill_reference": 127.84,
+        "exit_time": 1795070040
+      },
+      "minute_sha256": "642836c47fea83377b7e53ac0eb10c2f6dc32741f1f96eef82c1941b8d7e7bd7",
+      "signal_return": -0.008838383838383868,
+      "book_return": -0.01155246083241046,
+      "entry_cost_bps": 26.830808080809952
+    },
+    {
+      "bucket": 1795062600,
+      "symbol": "SOFTBANKUSDT",
+      "direction": "SHORT",
+      "receipt": 1795062633.2229836,
+      "book": {
+        "status": "wide",
+        "average": 22.249999999999996,
+        "worst": 22.25,
+        "contracts": 1.7,
+        "spread_bps": 31.411263181512357
+      },
+      "path": {
+        "known": true,
+        "outcome": "SL_GAP",
+        "fill_reference": 22.32,
+        "exit_time": 1795062720
+      },
+      "minute_sha256": "5753ecef811bfc12985f9212e4432432a24c448f5789cd82632066aa52f9e19e",
+      "signal_return": -0.00540540540540535,
+      "book_return": -0.0031460674157304247,
+      "entry_cost_bps": -22.522522522521182
+    },
+    {
+      "bucket": 1795064400,
+      "symbol": "MSTRUSDT",
+      "direction": "SHORT",
+      "receipt": 1795064431.326118,
+      "book": {
+        "status": "wide",
+        "average": 92.84,
+        "worst": 92.84,
+        "contracts": 0.42,
+        "spread_bps": 5.384159801862612
+      },
+      "path": {
+        "known": true,
+        "outcome": "SL",
+        "fill_reference": 93.42982142857143,
+        "exit_time": 1795071660
+      },
+      "minute_sha256": "ce32806d26c59a11f72abd1e7f2c6b19b09e15aaa054bf425667eab1f39c80bb",
+      "signal_return": -0.005486670561466012,
+      "book_return": -0.006353095956176391,
+      "entry_cost_bps": 8.6095566078348
+    }
+  ],
+  "objective_verified": false,
+  "live_activation_supported": false,
+  "limitations": [
+    "Archived structural observer candidates, not the live production signal journal.",
+    "Same post-receipt stop and target levels, no early-wick guessing. Missing exits are unresolved.",
+    "The first public snapshot at a hypothetical order size does not represent private fills or retries.",
+    "Uncompounded signed price moves, no account PnL, fee, readiness, or overlapping-signal admission claim.",
+    "V1 observer uses legacy base-volume liquidity detection, and capture spans a few days."
+  ]
+}
