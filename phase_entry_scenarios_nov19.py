@@ -13,6 +13,7 @@ MINIMUM_STOP=.003
 MAXIMUM_STOP=.008
 HORIZON=32
 ET=ZoneInfo('America/New_York')
+PROFILES=('long_context','intraday_context')
 
 
 def finite_ema(values,span,window=64):
@@ -55,8 +56,17 @@ class HigherContext:
         for k in range(j-31,j-1):
             if self.h[k]>max(self.h[k-2:k]) and self.h[k]>=max(self.h[k+1:k+3]):highs.append(float(self.h[k]))
             if self.l[k]<min(self.l[k-2:k]) and self.l[k]<=min(self.l[k+1:k+3]):lows.append(float(self.l[k]))
+        # Keep the actual pivot's index: a level closed through after its
+        # formation no longer acts as untouched resistance/support.
+        unbroken_highs=[];unbroken_lows=[]
+        for k in range(j-31,j-1):
+            if self.h[k]>max(self.h[k-2:k]) and self.h[k]>=max(self.h[k+1:k+3]):
+                if max(self.c[k+1:j+1])<=self.h[k]+.1*atr:unbroken_highs.append(float(self.h[k]))
+            if self.l[k]<min(self.l[k-2:k]) and self.l[k]<=min(self.l[k+1:k+3]):
+                if min(self.c[k+1:j+1])>=self.l[k]-.1*atr:unbroken_lows.append(float(self.l[k]))
         result=dict(known_at=self.ends[j],trend=trend,range=efficiency<=.25 and abs(gap)<=1,
-            efficiency=efficiency,gap_atr=gap,pivot_highs=highs,pivot_lows=lows)
+            efficiency=efficiency,gap_atr=gap,pivot_highs=highs,pivot_lows=lows,
+            unbroken_highs=unbroken_highs,unbroken_lows=unbroken_lows)
         self.memo[j]=result;return result
 
 
@@ -67,8 +77,12 @@ def stock_clock(entry_time):
     return now.replace(hour=16,minute=0,second=0,microsecond=0).timestamp()
 
 
-def candidates(signal,trade,symbol,*,references=(),stocks=False,entry_stress=.0005):
+def candidates(signal,trade,symbol,*,references=(),stocks=False,entry_stress=.0005,
+        profile='long_context',diagnostics=None):
     if entry_stress not in (0.,.0005):raise ValueError('unknown_entry_price_scenario')
+    if profile not in PROFILES:raise ValueError('unknown_phase_profile')
+    intraday=profile=='intraday_context';diag=diagnostics if diagnostics is not None else {};diag.clear()
+    def note(name):diag[name]=diag.get(name,0)+1
     h4=HigherContext(signal,16);h1=HigherContext(signal,4)
     refs=[HigherContext(c,16) for c in references]
     t=np.asarray(signal['time'],dtype=np.int64)
@@ -94,10 +108,11 @@ def candidates(signal,trade,symbol,*,references=(),stocks=False,entry_stress=.00
         volume=np.asarray(trade['volume'][i-20:i+1],dtype=float);mean=float(volume[:-1].mean())
         if not np.isfinite(volume).all() or (volume<0).any():raise ValueError('invalid_trade_activity')
         if mean<=0 or volume[-1]<=0 or np.count_nonzero(volume[-16:]>0)<12:
-            pending=None;continue
+            note('trade_activity_rejected');pending=None;continue
         reference=float(trade['close'][i]);a=float(atr[j])
         if min(a,reference,c[j])<=0 or not math.isfinite(a) or not math.isfinite(reference) or abs(reference/c[j]-1)>.001:
-            pending=None;continue
+            note('price_basis_rejected');pending=None;continue
+        note('data_eligible_bars')
         ratio=float(volume[-1]/mean);span=float(h[j]-l[j]);body=float(c[j]-o[j])
         emitted=None
         if pending is not None:
@@ -105,53 +120,72 @@ def candidates(signal,trade,symbol,*,references=(),stocks=False,entry_stress=.00
             invalid=(age>4 or sign*(c[j]-p['level'])<-.25*a
                 or any(r['trend']==-sign for r in market))
             if p['family']=='range_sweep_confirm':
-                invalid=invalid or not four['range'] or (l[j]<p['wick'] if sign>0 else h[j]>p['wick'])
-            else:invalid=invalid or four['trend']!=sign or one['trend']!=sign
-            if invalid:pending=None;continue
+                range_context=one if intraday else four
+                wick_broken=(l[j]<p['wick']-(.15*a if intraday else 0) if sign>0
+                    else h[j]>p['wick']+(.15*a if intraday else 0))
+                invalid=invalid or not range_context['range'] or wick_broken or (intraday and four['trend']==-sign)
+            else:invalid=invalid or one['trend']!=sign or (four['trend']==-sign if intraday else four['trend']!=sign)
+            if invalid:note('pending_invalidated');pending=None;continue
             position=(c[j]-l[j] if sign>0 else h[j]-c[j])/span if span>0 else .5
             if p['stage']=='wait_retest':
                 touched=l[j]<=p['level']+.15*a if sign>0 else h[j]>=p['level']-.15*a
-                if (touched and sign*(c[j]-p['level'])>=.1*a and sign*body>0 and position>=.6):
-                    p.update(stage='confirm',confirmation_close=float(c[j]),wick=float(l[j] if sign>0 else h[j]),retest=j)
-                continue
-            if (sign*(c[j]-p['confirmation_close'])>0 and sign*body>0 and position>=.6 and ratio>=.75):
-                wick=min(p['wick'],l[j]) if sign>0 else max(p['wick'],h[j])
-                emitted=dict(p,wick=float(wick));pending=None
-            elif age>=2 or p.get('retest') is not None:pending=None
+                if (touched and sign*(c[j]-p['level'])>=.1*a and sign*body>0 and position>=.6 and (not intraday or ratio>=.75)):
+                    if intraday:
+                        emitted=dict(p,wick=float(l[j] if sign>0 else h[j]));pending=None
+                    else:p.update(stage='confirm',confirmation_close=float(c[j]),wick=float(l[j] if sign>0 else h[j]),retest=j)
+                if emitted is None:continue
+            if emitted is None:
+                confirmation=(sign*(c[j]-p['level'])>=.1*a if intraday else sign*(c[j]-p['confirmation_close'])>0)
+                if (confirmation and sign*body>0 and position>=.6 and ratio>=.75):
+                    wick=min(p['wick'],l[j]) if sign>0 else max(p['wick'],h[j])
+                    emitted=dict(p,wick=float(wick));pending=None
+                elif age>=2 or p.get('retest') is not None:pending=None
             if emitted is None:continue
         else:
             prior_high=float(max(h[j-20:j]));prior_low=float(min(l[j-20:j]))
-            if four['range'] and one['efficiency']<=.35:
+            if (one['range'] if intraday else four['range'] and one['efficiency']<=.35):
+                note('range_phase_bars')
                 sign=1 if l[j]<prior_low-.1*a and c[j]>prior_low+.1*a and body>0 else (
                     -1 if h[j]>prior_high+.1*a and c[j]<prior_high-.1*a and body<0 else 0)
                 if sign:
                     position=(c[j]-l[j] if sign>0 else h[j]-c[j])/span if span>0 else .5
-                    if ratio>=1.2 and position>=.65 and not any(r['trend']==-sign for r in market):
+                    if ratio>=1.2 and position>=.65 and not any(r['trend']==-sign for r in market) and (not intraday or four['trend']!=-sign):
                         pending=dict(family='range_sweep_confirm',sign=sign,opened=j,stage='confirm',
                             level=prior_low if sign>0 else prior_high,confirmation_close=float(c[j]),
-                            wick=float(l[j] if sign>0 else h[j]),opposite=prior_high if sign>0 else prior_low)
-            elif four['trend'] and one['trend']==four['trend']:
-                sign=four['trend'];level=prior_high if sign>0 else prior_low
+                            wick=float(l[j] if sign>0 else h[j]),opposite=(
+                                float(max(h[j-64:j])) if sign>0 else float(min(l[j-64:j]))) if intraday else (prior_high if sign>0 else prior_low))
+                        note('sweep_awaiting_confirmation')
+            elif (one['trend'] and four['trend']!=-one['trend'] if intraday else four['trend'] and one['trend']==four['trend']):
+                note('trend_phase_bars')
+                sign=one['trend'] if intraday else four['trend'];level=prior_high if sign>0 else prior_low
                 if sign*(c[j]-level)>.1*a and sign*body>=.5*a and ratio>=1.2 and not any(r['trend']==-sign for r in market):
                     pending=dict(family='trend_retest_confirm',sign=sign,opened=j,stage='wait_retest',level=level)
+                    note('breakout_awaiting_retest')
             continue
+        note('confirmed_patterns')
         sign=emitted['sign'];entry=reference*(1+sign*entry_stress)
         stop=emitted['wick']-sign*.15*a
         risk=max(MINIMUM_STOP,sign*(entry-stop)/entry)
-        if risk>MAXIMUM_STOP:continue
+        max_stop=min(.015,max(.008,1.5*a/entry)) if intraday else MAXIMUM_STOP
+        if risk>max_stop:note('stop_distance_rejected');continue
         stop=entry*(1-sign*risk);opposite=emitted.get('opposite')
-        ahead=[v for v in (one['pivot_highs'] if sign>0 else one['pivot_lows']) if sign*(v-entry)>0]
+        level_context=four if intraday else one
+        level_key=('unbroken_highs' if sign>0 else 'unbroken_lows') if intraday else ('pivot_highs' if sign>0 else 'pivot_lows')
+        ahead=[v for v in level_context[level_key] if sign*(v-entry)>0]
         if opposite is not None and sign*(opposite-entry)>0:ahead.append(opposite)
-        target_fraction=TARGET2
+        first_fraction=max(.005,min(.01,a/entry)) if intraday else TARGET1
+        target_fraction=max(.01,min(.02,2.5*a/entry)) if intraday else TARGET2
         if ahead:
             level=min(ahead) if sign>0 else max(ahead)
             target_fraction=min(target_fraction,sign*(level-entry)/entry-.1*a/entry)
-        if target_fraction<MINIMUM_FINAL_MOVE or target_fraction/risk<1.5:continue
+        if target_fraction<(.008 if intraday else MINIMUM_FINAL_MOVE) or target_fraction<=first_fraction or target_fraction/risk<1.5:
+            note('target_space_rejected');continue
         records.append(dict(symbol=symbol,entry_time=entry_time,entry_index=i+1,entry=entry,sl=stop,
-            tp1=entry*(1+sign*TARGET1),tp2=entry*(1+sign*target_fraction),risk_pct=risk,
+            tp1=entry*(1+sign*first_fraction),tp2=entry*(1+sign*target_fraction),risk_pct=risk,
             direction='LONG' if sign>0 else 'SHORT',family=emitted['family'],
             signal_strength=ratio*abs(body)/a,setup_started=int(t[emitted['opened']])+900,
             level=emitted['level'],signal_known_at=entry_time,h4_known_at=four['known_at'],h1_known_at=one['known_at'],
             reference_known_at=[r['known_at'] for r in market],expire_at=expire,
-            target1_fraction=TARGET1,target2_fraction=target_fraction,hold_bars=HORIZON))
+            target1_fraction=first_fraction,target2_fraction=target_fraction,hold_bars=HORIZON))
+        note('signals')
     return records

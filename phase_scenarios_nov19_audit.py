@@ -10,6 +10,7 @@ from functools import lru_cache
 from typing import Callable
 from pathlib import Path
 import pickle
+import argparse
 import pandas as pd
 
 from phase_entry_scenarios_nov19 import candidates,FAMILIES,HORIZON
@@ -107,15 +108,25 @@ def cash(crypto,stock,specs,*,policy,priority,start):
 
 
 def main():
+    parser=argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--profile',choices=('long_context','intraday_context'),default='intraday_context')
+    args=parser.parse_args();intraday=args.profile=='intraday_context'
+    prefix='phase_scenarios_intraday_nov19' if intraday else 'phase_scenarios_long_context_v2_nov19'
     source_paths=(Path(__file__),Path('phase_entry_scenarios_nov19.py'),Path('price_bracket_path_nov19.py'),
         Path('cash_tp1_policy_nov19.py'),Path('src/tp1_plan.py'),Path('account_cash_guard_nov17_audit.py'),
         STOCK_ROOT/'stock_module_cluster_audit.py',CRYPTO_MANIFEST,STOCK_MANIFEST,SPEC_PATH,
-        ROOT/'phase_scenarios_nov19_protocol.json')
+        ROOT/'phase_scenarios_nov19_protocol.json',ROOT/'phase_scenarios_nov19_v1b_protocol.json')
     sources={str(p):hashlib.sha256(p.read_bytes()).hexdigest() for p in source_paths}
     protocol=dict(declared_at=datetime.now(timezone.utc).isoformat(),sources=dict(sources),
-        implementation_revision='v1b: load the exact pure stock portfolio function without unrelated cross-repo imports; no signal parameter change',
+        implementation_revision='v2: explicit intraday profile after v1 rarity diagnostics; v1 preserved in research Git history',
+        profile=args.profile,
         routes=ROUTES,stock_triggers=['trade','mark'],crypto_trigger='trade',
-        target1_fraction=.006,target2_maximum=.018,final_target_minimum=.01,stop_range=[.003,.008],
+        target1_rule='clip(1ATR/entry,0.005,0.01)' if intraday else 'fixed0.006',
+        target2_rule='clip(2.5ATR/entry,0.01,0.02),cap at unbroken4h/opposite16h level' if intraday else 'fixed0.018,cap at1h/all pivots and opposite5h level',
+        final_target_minimum=.008 if intraday else .01,
+        stop_rule='floor0.003,max distance clip(1.5ATR/entry,0.008,0.015)' if intraday else 'range0.003to0.008',
+        scenario_context='1h phase,4h no strong opposition' if intraday else '4h phase and1h alignment',
+        trend_confirmation='closed retest after breakout' if intraday else 'retest then separate close extension',
         minimum_final_reward_risk=1.5,horizon_bars=HORIZON,entry_exit_price_stress=.0005,
         minimum_active_trade_bars_last16=12,setup_volume_ratio=1.2,confirmation_volume_ratio=.75,
         htf_bars=[4,16],htf_ema_spans=[20,50],htf_ema_window=64,
@@ -125,7 +136,7 @@ def main():
         stock_paper_gate='fresh20 completed signals,positive sum actual-R and price,nominal50percent bank',
         client_tp1_policies=TP1_POLICIES,unknown_paths_make_case_unscorable=True,
         objective_verified=False,live_activation_supported=False)
-    declaration=ROOT/'phase_scenarios_nov19_v1b_protocol.json'
+    declaration=ROOT/f'{prefix}_protocol.json'
     if declaration.exists():
         prior=json.loads(declaration.read_text(encoding='utf-8'))
         if prior['sources']!=sources:raise ValueError('phase_declared_sources_changed')
@@ -146,7 +157,7 @@ def main():
         if item['spec']['instId']!=item['instrument']:raise ValueError('phase_stock_contract_changed')
         specs[symbol]=item['spec'];stock[symbol]=pair
     end=min([c['time'][-1]+900 for c in crypto.values()]+[min(m['time'][-1],t['time'][-1])+900 for m,t in stock.values()])
-    cutoff=end-HORIZON*900;rows=dict(crypto=[],stock_trade=[],stock_mark=[])
+    cutoff=end-HORIZON*900;rows=dict(crypto=[],stock_trade=[],stock_mark=[]);diagnostics={}
     def resolve_row(row,path,trade_volume):
         result=resolve(path,row['entry_index'],direction=row['direction'],entry=row['entry'],stop=row['sl'],
             tp1=row['tp1'],tp2=row['tp2'],expire_at=row['expire_at'],require_trade_volume=trade_volume)
@@ -158,12 +169,18 @@ def main():
             sequential_outcome={'TARGET':'TP_RUNNER','TIME':'TP_EXPIRED' if result['banked'] else 'EXPIRED'}.get(result['outcome'],result['outcome']),
             sequential_banked=result['banked'],near_exit_time=result['near_exit_time'] if result['near_exit_time'] is not None else math.nan)
     for symbol,c in sorted(crypto.items()):
-        events=[r for r in candidates(c,c,symbol,references=[crypto['BTCUSDT']]) if r['entry_time']<=cutoff]
+        diag={}
+        events=[r for r in candidates(c,c,symbol,references=[crypto['BTCUSDT']],profile=args.profile,diagnostics=diag)
+            if r['entry_time']<=cutoff]
+        diagnostics['crypto:'+symbol]=diag
         rows['crypto'].extend(resolve_row(r,c,True) for r in events)
         print('phase_candidates','crypto',symbol,len(events),flush=True)
     for symbol,(mark,trade) in sorted(stock.items()):
-        events=[r for r in candidates(mark,trade,symbol,references=[stock['QQQUSDT'][0],stock['SPYUSDT'][0]],stocks=True)
+        diag={}
+        events=[r for r in candidates(mark,trade,symbol,references=[stock['QQQUSDT'][0],stock['SPYUSDT'][0]],stocks=True,
+            profile=args.profile,diagnostics=diag)
             if r['entry_time']<=cutoff]
+        diagnostics['stocks:'+symbol]=diag
         rows['stock_trade'].extend(resolve_row(r,trade,True) for r in events)
         for row in events:
             # Matched sources have identical timestamps, but never rely on an
@@ -174,7 +191,7 @@ def main():
         print('phase_candidates','stocks',symbol,len(events),flush=True)
     frames={key:frame_of(value) for key,value in rows.items()}
     for key,frame in frames.items():
-        path=ROOT/f'phase_scenarios_nov19_{key}.pkl';frame.to_pickle(path)
+        path=ROOT/f'{prefix}_{key}.pkl';frame.to_pickle(path)
         sources[str(path)]=hashlib.sha256(path.read_bytes()).hexdigest()
     start=stamp('2026-08-01');select_end=stamp('2026-10-01');selection={};eligible=[]
     for crypto_route in ROUTES:
@@ -211,7 +228,7 @@ def main():
             later_result=dict(status='RESOLVED_CASH',cash={p:{q:cash(c,s,specs,policy=p,priority=q,start=select_end)
                 for q in ('crypto','stocks')} for p in TP1_POLICIES})
     report=dict(status='PHASE_SCENARIO_JOINT_RESEARCH',objective_verified=False,live_activation_supported=False,
-        protocol=protocol,mature_last_entry=cutoff,signals={k:dict(total=len(f),known=int(f.known.astype(bool).sum()),
+        protocol=protocol,mature_last_entry=cutoff,diagnostics=diagnostics,signals={k:dict(total=len(f),known=int(f.known.astype(bool).sum()),
             families=f.family.value_counts().to_dict()) for k,f in frames.items()},selection=selection,chosen=chosen,
         later=later_result,sources=sources,limitations=[
             'All historical eras inspected before; fixed new hypotheses are not an independent holdout.',
@@ -222,7 +239,7 @@ def main():
             'Weekday NY clock is not an official holiday/early-close calendar; 4h bars include off-hours price references.',
             'No current full-equity guard/minute recovery,floating PnL,funding,fees,latency or liquidation reconstruction.',
             'Current matched specs assumed historically; start coverage/November partial; no margin change or profit promise.'])
-    (ROOT/'phase_scenarios_nov19.json').write_text(json.dumps(report,indent=2,allow_nan=False),encoding='utf-8')
+    (ROOT/f'{prefix}.json').write_text(json.dumps(report,indent=2,allow_nan=False),encoding='utf-8')
     print('phase_signals',report['signals'],'qualified',len(eligible),'chosen',chosen,flush=True)
 
 
