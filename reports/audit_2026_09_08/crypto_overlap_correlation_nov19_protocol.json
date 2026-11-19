@@ -1,0 +1,29 @@
+{
+  "sources": {
+    "C:\\Users\\Lenovo\\Desktop\\telegram bot\\crypto_overlap_correlation_nov19.py": "1619528c7ab05f9189b768161376f8bd8c39490f65d09306e0f8c0f9bdf7bb56",
+    "reports\\audit_2026_09_08\\xperp_15m_nov14_merged\\manifest.json": "6ebba73ab8fe00a7a0740feaf3b6fdc867d4773dd36277be53d42f8e20a236b5",
+    "reports\\audit_2026_09_08\\crypto_native_price_nov19_pool_sources.json": "ef357ddb491b3211c4d9e61bb072d3477daa79643918c075a1e0a5253d329e9e",
+    "reports\\audit_2026_09_08\\shared_xperp_specs_nov14.json": "7a4a76b813dfe6a5a08c9e858b17d453285dddc99529cdc293885682cf2bee0e",
+    "account_cash_guard_nov17_audit.py": "d8f32b806b9b1c9792971c023cd7ad8945854199bcd4b30ec496780e6b28ca28",
+    "account_cash_guard_nov17.py": "b824ba21ee3045fd8918d674cc6d26eb064bac824c7b46c458f934e7e7697dda",
+    "crypto_native_price_pool_nov19.py": "0a2c5915e185716a9e1fde80d000ef9da2d8b3d4d8701c3dd6ca2c5e62166f3d",
+    "crypto_active_entry_runner_nov19_audit.py": "4cdbe85fafe0d16fa07dd24a819e44a4f4f3183d004311310fdaeaa2af537149",
+    "crypto_minimum_bank_runner_nov19_audit.py": "1b14fe037f169fd84af1cafc759e697986fcb6d7f4b80a2f70d47afee377d7a3",
+    "banked_runner_path_nov19.py": "2495d913813cd127a0dd6ea2898c59c7a38c31e4b578bd227df032979fc5afeb",
+    "cash_tp1_policy_nov19.py": "5d20ff72c05708620e72f1d16fa01423fb765547ade8fc232e83a4eb5606c519",
+    "src\\tp1_plan.py": "7a49938a965be142a18eeaf4977cba0251e00d0fdc675226bab3f9cc17a0e31a",
+    "src\\okx_trader.py": "b9167a788982f44c54e2b2a5f1d1ac261fdd7bb6afb50b6635f614685a4239ce"
+  },
+  "declared_at": "2026-11-19T20:50:29.369939+00:00",
+  "policies": [
+    "baseline",
+    "one_direction",
+    "corr_065",
+    "corr_080"
+  ],
+  "correlation": "signed Pearson of 96 closed returns; >=80 paired active; missing cannot qualify as correlation",
+  "selection": "August/September with full horizon purge, each month positive and better than control at both TP1 modes, >=20 each month, lower cash DD and fewer stop pairs",
+  "later": "test one selection winner without refit or reuse of selection-period portfolio state",
+  "cash": "one $130 account, 3% margin and 10x, caps 4 crypto/12 shared and 90%, stock remains PAPER",
+  "limitations": "Known-close quotes and checked 5bp exit proxy, no historical bid/ask or private fills. Previously inspected market history."
+}
