@@ -65,6 +65,33 @@ def test_one_poll_crossing_both_targets_records_and_notifies_both():
         "TP1_PARTIAL", "TP2_HIT"]
 
 
+def test_native_router_defers_exit_until_its_own_market_returns():
+    external = candle(high=103.0, low=98.0, close=102.0)
+    for reason in ("Frozen X-Perp module: example", "Forward X-Perp shadow module: example"):
+        for unavailable in (None, {"time": [], "close": []}):
+            with patch.object(main, "get_klines", return_value=external) as fallback:
+                update, notify, mirror = run_monitor(signal(reason=reason), unavailable)
+            fallback.assert_not_called()
+            update.assert_not_called()
+            notify.assert_not_called()
+            mirror.assert_not_called()
+
+    update, notify, mirror = run_monitor(
+        signal(reason="Forward X-Perp shadow module: example"),
+        candle(high=100.2, low=98.0, close=98.5))
+    for transition in (update, notify, mirror):
+        assert transition.call_args.args[1] == "SL_HIT"
+
+
+def test_legacy_signal_keeps_its_global_fallback():
+    with patch.object(main, "get_klines",
+                      return_value=candle(high=100.2, low=98.0, close=98.5)) as fallback:
+        update, notify, mirror = run_monitor(signal(reason="Legacy setup"), None)
+    fallback.assert_called_once()
+    for transition in (update, notify, mirror):
+        assert transition.call_args.args[1] == "SL_HIT"
+
+
 def test_exchange_backstop_wins_over_tp2_inside_same_candle():
     # Even an optional deep-feed disagreement cannot undo a real exchange
     # backstop fill on the traded X-Perp venue.

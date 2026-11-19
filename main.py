@@ -3557,6 +3557,12 @@ def _deep_feed_breached(symbol: str, sl: float, direction: str,
         return None
 
 
+def _is_native_xperp_signal(row: dict) -> bool:
+    # The crypto journal persists the router's reason on every generated row.
+    return str(row.get("reason") or "").startswith((
+        "Frozen X-Perp module: ", "Forward X-Perp shadow module: "))
+
+
 def _check_open_signals():
     """For each OPEN signal in DB, fetch current price and update status."""
     active_signals = get_open_signals()
@@ -3577,7 +3583,8 @@ def _check_open_signals():
                     620, int(age_hours * bars_per_hour)
                     + TP1_VOLUME_LOOKBACK + 6))
             # Judge TP/SL on the X-Perp (user's actual market) — its wicks are
-            # what the user's position really experiences. Global feed = fallback.
+            # what the user's position really experiences. Legacy global signals
+            # can still use their original feed when X-Perp data is unavailable.
             # include_forming=True: catch SL/TP touches within the current still-
             # forming 15m candle instead of waiting up to ~15min (avg ~7.5min) for
             # it to close — was causing the SL_HIT notification to lag the real
@@ -3587,6 +3594,10 @@ def _check_open_signals():
             df_all = get_klines_xperp(
                 sig["symbol"], limit=candle_lim, include_forming=True,
                 interval=interval)
+            if not (df_all and df_all.get("close")) and _is_native_xperp_signal(sig):
+                log.warning("Native exit data unavailable for %s; retrying on OKX",
+                            sig["symbol"])
+                continue
             if not df_all:
                 if bar_seconds == 300:
                     df_all = get_klines(
