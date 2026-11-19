@@ -3719,11 +3719,16 @@ def _check_open_signals():
             if not df_all.get('close'):
                 continue
             latest_quote = float(df_all['close'][-1])
-            if status == 'TP1_PARTIAL' and use_trail:
-                live_trail_stop, crossed = trailing_observation(df, direction=direction,
+            from src.candle_evidence import bar_has_trade, traded_bars
+            trade_df = traded_bars(df)
+            fresh_quote = bar_has_trade(df_all, len(df_all['close']) - 1)
+            if status == 'TP1_PARTIAL' and use_trail and trade_df.get('close'):
+                live_trail_stop, crossed = trailing_observation(trade_df, direction=direction,
                     entry=entry, atr=atr, multiple=trail_atr_mult, quote=latest_quote)
-                resting_tp2_hit = (max(df.get('high') or [latest_quote]) >= tp2
-                    if direction == 'LONG' else min(df.get('low') or [latest_quote]) <= tp2)
+                if not fresh_quote:
+                    live_trail_stop, crossed = None, False
+                resting_tp2_hit = (max(trade_df['high']) >= tp2
+                    if direction == 'LONG' else min(trade_df['low']) <= tp2)
                 if resting_tp2_hit or crossed:
                     new_status = 'TP2_HIT' if resting_tp2_hit else 'TP1_TRAIL'
                     exit_px = tp2 if resting_tp2_hit else latest_quote
@@ -3732,6 +3737,8 @@ def _check_open_signals():
                         tp1_fraction=tp1_close_frac, reached_tp1=True)
             _conf_flags = df.get("confirmed") or []
             for i in range(0 if status == "TP1_PARTIAL" and use_trail else len(df.get("close", []))):
+                if not bar_has_trade(df, i):
+                    continue
                 opening = float(df["open"][i])
                 high  = float(df["high"][i])
                 low   = float(df["low"][i])
@@ -4027,7 +4034,10 @@ def _fixed_be_counterfactual(setup: dict, candles: dict):
     activation_index = None
     banked = 0.0
 
+    from src.candle_evidence import bar_has_trade
     for i in range(len(candles.get("time") or [])):
+        if not bar_has_trade(candles, i):
+            continue
         o = float(candles["open"][i])
         h = float(candles["high"][i])
         l = float(candles["low"][i])
@@ -4086,13 +4096,17 @@ def _resolve_unsent_venue_setup(setup: dict, candles: dict,
     if not sliced.get("time"):
         return None
     sliced = {key: values[:max_bars] for key, values in sliced.items()}
+    from src.candle_evidence import bar_has_trade
+    trade_indices = [i for i in range(len(sliced['time'])) if bar_has_trade(sliced, i)]
+    if not trade_indices:
+        return None
 
     runner_mode = str(setup.get("strategy_runner_mode") or "").lower()
     if runner_mode == "fixed_be":
         value = _fixed_be_counterfactual(setup, sliced)
     else:
         result = simulate_exit(
-            sliced, range(len(sliced["time"])),
+            sliced, trade_indices,
             direction=setup["direction"],
             entry=float(setup["entry_price"]), sl=float(setup["sl"]),
             tp1=float(setup["tp1"]), tp2=float(setup["tp2"]),
@@ -4113,6 +4127,8 @@ def _resolve_unsent_venue_setup(setup: dict, candles: dict,
     if expire_at:
         terminal = terminal or now >= expire_at
     if not terminal:
+        return None
+    if not bar_has_trade(sliced, len(sliced['time']) - 1):
         return None
     if value[0] == "PENDING_TP1":
         return "TP1", value[1], value[2], value[3]
