@@ -7,7 +7,7 @@ import json
 import math
 from pathlib import Path
 import tarfile
-from datetime import datetime
+from datetime import datetime, timezone
 
 from okx_xperp_l2_capture_nov19 import DAY, END, ROOT_L2, START, cohort
 from src.execution_guard import SpreadLimitError, execution_quote
@@ -60,7 +60,7 @@ class Book:
                     asks=[(p, self.ask[p]) for p in heapq.nsmallest(DEPTH, self.ask)])
 
 
-def sample(events, instrument, points):
+def sample(events, instrument, points, *, day_start=START):
     """Freeze the state strictly before requested times, even on equal ms."""
     requested = iter(sorted(set(points)))
     moment = next(requested, None)
@@ -72,7 +72,7 @@ def sample(events, instrument, points):
         if event['instId'] != instrument:
             raise ValueError('archive instrument mismatch')
         ts = int(event['ts'])
-        if not START * 1000 <= ts < END * 1000:
+        if not day_start * 1000 <= ts < (day_start+86400) * 1000:
             raise ValueError('archive event outside declared day')
         if book.ts is not None and ts < book.ts:
             raise ValueError('nonmonotonic exchange timestamps')
@@ -91,12 +91,13 @@ def sample(events, instrument, points):
     return values, dict(counts, first_ts=first, last_ts=book.ts)
 
 
-def archive(path, instrument, expected_digest, points):
+def archive(path, instrument, expected_digest, points, *, day_start=START):
     with path.open('rb') as stream:
         sha = hashlib.file_digest(stream, 'sha256').hexdigest()
     if sha != expected_digest:
         raise ValueError('L2 archive checksum mismatch')
-    member_name = f'{instrument}-L2orderbook-400lv-{DAY}.data'
+    day = datetime.fromtimestamp(day_start,timezone.utc).date().isoformat()
+    member_name = f'{instrument}-L2orderbook-400lv-{day}.data'
     found = None
     with tarfile.open(path, 'r|gz') as files:
         for member in files:
@@ -105,7 +106,7 @@ def archive(path, instrument, expected_digest, points):
             if found is not None or not member.isfile() or not 0 < member.size <= 8 * 1024**3:
                 raise ValueError('invalid or duplicate exact-instrument member')
             with files.extractfile(member) as stream:
-                found = sample((json.loads(line) for line in stream), instrument, points)
+                found = sample((json.loads(line) for line in stream), instrument, points, day_start=day_start)
     if found is None:
         raise ValueError('exact instrument member not in daily archive')
     return found

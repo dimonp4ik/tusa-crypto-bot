@@ -31,13 +31,14 @@ def cohort():
     return entry_rows, readiness, instruments
 
 
-def validate_file(family, record):
-    name = family + f'-futureschain-L2orderbook-400lv-{DAY}.tar.gz'
+def validate_file(family, record, *, day_start=START):
+    day = datetime.fromtimestamp(day_start,timezone.utc).date().isoformat()
+    name = family + f'-futureschain-L2orderbook-400lv-{day}.tar.gz'
     url = urlsplit(record['url'])
     if (name != record['filename'] or url.scheme != 'https' or url.netloc != 'static.okx.com'
             or url.path != '/cdn/okx/match/orderbook/pro/L2/400lv/daily/'
-                            + DAY.replace('-', '') + '/' + name
-            or url.query or url.fragment or int(record['dateTs']) != 1000 * START):
+                            + day.replace('-', '') + '/' + name
+            or url.query or url.fragment or int(record['dateTs']) != 1000 * day_start):
         raise ValueError('unexpected OKX archive URL or date')
     size = float(record['sizeMB'])
     if not math.isfinite(size) or not 0 < size <= 500:
@@ -45,12 +46,12 @@ def validate_file(family, record):
     return name, math.ceil((1.24 * size + 2) * 1024**2)
 
 
-def catalogue(families):
+def catalogue(families, *, day_start=START):
     files = {}
     for i in range(0, len(families), 5):
         batch = families[i:i+5]
         query = dict(module=4, instType='FUTURES', instFamilyList=','.join(batch),
-                     dateAggrType='daily', begin=1000 * START, end=1000 * START)
+                     dateAggrType='daily', begin=1000 * day_start, end=1000 * day_start)
         response = requests.get(CATALOG, params=query, timeout=12)
         response.raise_for_status()
         body = response.json()
@@ -62,14 +63,14 @@ def catalogue(families):
                 items = group['groupDetails']
                 if family not in batch or family in files or len(items) != 1:
                     raise ValueError('unexpected catalogue group')
-                validate_file(family, items[0])
+                validate_file(family, items[0],day_start=day_start)
                 files[family] = items[0]
         time.sleep(.65)
     return files
 
 
-def download(family, record):
-    name, limit = validate_file(family, record)
+def download(family, record, *, day_start=START):
+    name, limit = validate_file(family, record,day_start=day_start)
     target = ROOT_L2 / name
     digest = hashlib.sha256()
     count = 0
