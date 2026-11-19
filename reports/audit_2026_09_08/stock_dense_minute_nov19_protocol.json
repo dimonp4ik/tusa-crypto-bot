@@ -1,0 +1,34 @@
+{
+  "declared_at": "2026-11-19T15:46:20.571922+00:00",
+  "sources": {
+    "C:\\Users\\Lenovo\\Desktop\\telegram bot\\stock_dense_minute_nov19_audit.py": "f69b9a4dbb5523de7fca9a9c616f818136017744f36aa5a77b82c24a62d20e4b",
+    "stock_dense_minutes_nov19.py": "d9c5414bf43e0a33fb713b37bc8e6711281e8733a675c34fae913f5a9511bcb2",
+    "stock_dense_minute_path_nov19.py": "e6beb5af501445ef267522c7aa7eaa71abf608ca3da8a4d838613584674f9e41",
+    "public_candle_window.py": "53e28c5b60db58cd24023d68656e97b73dde9954740049ae91a9b1ddd651075d",
+    "stock_session_dense_nov19_audit.py": "688d16d62c6c206faa19c78ed34b3ace752b902a11f3051ecdce8dd2a2dbb5b9",
+    "reports\\audit_2026_09_08\\stock_session_dense_nov19_pool_sources.json": "df0576356b84cffec721e209ed39174fcccd36faad3739f88c50a2b2b46ff74f",
+    "reports\\audit_2026_09_08\\stock_session_dense_nov19_model.pkl": "e731cc181341524a8f7a15907f29431908f559533567f8678aa670295d71911d",
+    "reports\\audit_2026_09_08\\stock_session_dense_nov19_protocol.json": "a53b2693deff95e12206932912f7cb92b02b2da28de8408624786fce3006561b",
+    "reports\\audit_2026_09_08\\stock_dense_minutes_nov19\\plan.json": "167104d32f2fa92e5f179d4879a5505a6d722481c81571d13cbd3d245f0509b4"
+  },
+  "profiles": [
+    "amend_next15m_parent_bar",
+    "amend_next1m_bar"
+  ],
+  "thresholds": [
+    0.0,
+    0.0005,
+    0.001,
+    0.002,
+    0.004,
+    0.006
+  ],
+  "scope": "all990 nonnegative frozen-model direction-selected September proposals",
+  "amendment": "new stop participates only from next parent15m boundary or next1m bar",
+  "intraminute_order": "stop-first, gap-aware; same-minute ambiguity counted rather than assigned a winning order",
+  "expiry": "last minute before scheduled session close must have real trades, otherwise unknown",
+  "source": "complete confirmed1m sessions reconciled with frozen15m contract volume and positive-trade OHLC",
+  "score": "same existing six thresholds for sensitivity; no new threshold grid or model fit, no later-period promotion",
+  "objective_verified": false,
+  "live_activation_supported": false
+}
