@@ -1,0 +1,665 @@
+{
+  "status": "EXPLORATORY_NATIVE_PRICE_REGRESSOR",
+  "objective_verified": false,
+  "live_activation_supported": false,
+  "protocol": {
+    "declared_at": "2026-11-18T21:52:56.784855+00:00",
+    "sources": {
+      "C:\\Users\\Lenovo\\Desktop\\telegram bot\\crypto_native_price_nov19_audit.py": "6fa69dd33ba971eda01abb140154e73e8d0f517714988d7c5f700378649b206f",
+      "crypto_native_price_features_nov19.py": "c3543e95818b438646cc6d619f308e1581db7e1ad60da57db4b907e9bfc862d7",
+      "crypto_native_price_pool_nov19.py": "0a2c5915e185716a9e1fde80d000ef9da2d8b3d4d8701c3dd6ca2c5e62166f3d",
+      "account_cash_guard_nov17_audit.py": "d8f32b806b9b1c9792971c023cd7ad8945854199bcd4b30ec496780e6b28ca28",
+      "lot_aware_tp1_audit.py": "12e343429e39c89e8fb60f16e2277533879ede647437b485a351a9dc744ff27a",
+      "shared_factor_account_nov14_audit.py": "cd385644515bb374274781ac1768e039a28be2e39e24e396f50933fa302e1f99",
+      "..\\tusa stocks\\reports\\audit_2026_09_08\\stock_close_anchor_nov16_causal_candidates_known_close.pkl": "29d08f1a4f55d3ea59279752206a65ab5c947691c261a5a551367bce9475c16e",
+      "reports\\audit_2026_09_08\\shared_xperp_specs_nov14.json": "7a4a76b813dfe6a5a08c9e858b17d453285dddc99529cdc293885682cf2bee0e",
+      "reports\\audit_2026_09_08\\crypto_native_price_nov19_pool_sources.json": "ef357ddb491b3211c4d9e61bb072d3477daa79643918c075a1e0a5253d329e9e",
+      "reports\\audit_2026_09_08\\crypto_native_price_nov19_model.pkl": "f23c2844c20144fad37213809dd46aca67ab6477d4647f5e13f82ea0d0072407",
+      "reports\\audit_2026_09_08\\crypto_native_price_nov19_later.pkl": "a5c83d5e88677ab2466ad8d10690d45879c93fa358ab23d79f29e8856b08b51f"
+    },
+    "model": {
+      "max_leaf_nodes": 7,
+      "min_samples_leaf": 100,
+      "max_iter": 150,
+      "learning_rate": 0.05,
+      "l2_regularization": 5.0,
+      "early_stopping": false,
+      "random_state": 20261119
+    },
+    "thresholds": [
+      0.0,
+      0.0005,
+      0.001,
+      0.002,
+      0.004,
+      0.006
+    ],
+    "train_end": 1782864000.0,
+    "select_end": 1788220800.0,
+    "selection": "minimum July/August and both-priority crypto contribution minus additive crypto cash drawdown",
+    "minimum_cash_trades_per_selection_month": 30,
+    "both_months_must_profit": true,
+    "risk_fraction_range": [
+      0.003,
+      0.02
+    ],
+    "later_cash_start": 1788220800.0,
+    "later_refit": false
+  },
+  "pool_rows": 33938,
+  "frozen_candidate_path_parity": 2373,
+  "training": {
+    "rows": 6458,
+    "first_entry": 1778200200.0,
+    "last_entry": 1782819900.0,
+    "last_exit": 1782827100.0,
+    "target": "runner_price_return",
+    "full_horizon_purged": true,
+    "timestamp_balanced": true,
+    "ideal_partial_profit_used_as_label": false
+  },
+  "feature_names": [
+    "atr_fraction",
+    "eff20",
+    "eff96",
+    "dir_z20",
+    "mean20_minus96_atr",
+    "body_atr",
+    "close_location",
+    "favorable_wick_atr",
+    "adverse_wick_atr",
+    "ahead16_atr",
+    "behind16_atr",
+    "ahead96_atr",
+    "behind96_atr",
+    "range4_atr",
+    "range16_atr",
+    "volume_ratio16",
+    "zero_volume_share16",
+    "risk_fraction",
+    "long",
+    "hour_sin",
+    "hour_cos",
+    "weekday_sin",
+    "weekday_cos",
+    "own_return_1",
+    "own_return_2",
+    "own_return_4",
+    "own_return_16",
+    "own_return_64",
+    "BTC_return_4",
+    "BTC_return_16",
+    "BTC_return_64",
+    "ETH_return_4",
+    "ETH_return_16",
+    "ETH_return_64",
+    "BTC_trend_atr",
+    "BTC_eff20",
+    "BTC_z20",
+    "ETH_trend_atr",
+    "ETH_eff20",
+    "ETH_z20",
+    "peer_count",
+    "peer_median4_atr",
+    "peer_median16_atr",
+    "peer_support4",
+    "peer_support16",
+    "relative_to_btc16",
+    "relative_to_eth16",
+    "family_range_reversion",
+    "family_trend_pullback",
+    "family_breakout"
+  ],
+  "selection": {
+    "0.0": {
+      "period_priority_diagnostics": [
+        {
+          "closed": 529,
+          "winrate_pct": 38.752362948960304,
+          "contribution_pct": 8.634604945054967,
+          "additive_crypto_cash_drawdown_pct": 6.2938626373626345,
+          "account_cash_drawdown_pct": 6.716926
+        },
+        {
+          "closed": 529,
+          "winrate_pct": 38.752362948960304,
+          "contribution_pct": 8.634604945054967,
+          "additive_crypto_cash_drawdown_pct": 6.2938626373626345,
+          "account_cash_drawdown_pct": 6.716926
+        },
+        {
+          "closed": 533,
+          "winrate_pct": 39.21200750469043,
+          "contribution_pct": 0.7107648351648155,
+          "additive_crypto_cash_drawdown_pct": 8.354884615384618,
+          "account_cash_drawdown_pct": 5.267542
+        },
+        {
+          "closed": 533,
+          "winrate_pct": 39.21200750469043,
+          "contribution_pct": 0.7107648351648155,
+          "additive_crypto_cash_drawdown_pct": 8.354884615384618,
+          "account_cash_drawdown_pct": 5.267542
+        }
+      ],
+      "qualified": true,
+      "score": -7.644119780219802
+    },
+    "0.0005": {
+      "period_priority_diagnostics": [
+        {
+          "closed": 461,
+          "winrate_pct": 40.3470715835141,
+          "contribution_pct": 8.023121978021985,
+          "additive_crypto_cash_drawdown_pct": 5.308955494505487,
+          "account_cash_drawdown_pct": 6.137199
+        },
+        {
+          "closed": 461,
+          "winrate_pct": 40.3470715835141,
+          "contribution_pct": 8.023121978021985,
+          "additive_crypto_cash_drawdown_pct": 5.308955494505487,
+          "account_cash_drawdown_pct": 6.137199
+        },
+        {
+          "closed": 443,
+          "winrate_pct": 41.760722347629795,
+          "contribution_pct": 5.854780219780231,
+          "additive_crypto_cash_drawdown_pct": 5.569973076923072,
+          "account_cash_drawdown_pct": 5.074015
+        },
+        {
+          "closed": 443,
+          "winrate_pct": 41.760722347629795,
+          "contribution_pct": 5.854780219780231,
+          "additive_crypto_cash_drawdown_pct": 5.569973076923072,
+          "account_cash_drawdown_pct": 5.074015
+        }
+      ],
+      "qualified": true,
+      "score": 0.2848071428571588
+    },
+    "0.001": {
+      "period_priority_diagnostics": [
+        {
+          "closed": 403,
+          "winrate_pct": 40.69478908188586,
+          "contribution_pct": 8.025490109890121,
+          "additive_crypto_cash_drawdown_pct": 4.489611538461545,
+          "account_cash_drawdown_pct": 6.69157
+        },
+        {
+          "closed": 403,
+          "winrate_pct": 40.69478908188586,
+          "contribution_pct": 8.025490109890121,
+          "additive_crypto_cash_drawdown_pct": 4.489611538461545,
+          "account_cash_drawdown_pct": 6.69157
+        },
+        {
+          "closed": 383,
+          "winrate_pct": 42.819843342036556,
+          "contribution_pct": 8.687901098901104,
+          "additive_crypto_cash_drawdown_pct": 3.6509362637362797,
+          "account_cash_drawdown_pct": 4.559865
+        },
+        {
+          "closed": 383,
+          "winrate_pct": 42.819843342036556,
+          "contribution_pct": 8.687901098901104,
+          "additive_crypto_cash_drawdown_pct": 3.6509362637362797,
+          "account_cash_drawdown_pct": 4.559865
+        }
+      ],
+      "qualified": true,
+      "score": 3.5358785714285768
+    },
+    "0.002": {
+      "period_priority_diagnostics": [
+        {
+          "closed": 191,
+          "winrate_pct": 38.21989528795812,
+          "contribution_pct": 7.097601648351617,
+          "additive_crypto_cash_drawdown_pct": 2.1729357142857118,
+          "account_cash_drawdown_pct": 3.585176
+        },
+        {
+          "closed": 191,
+          "winrate_pct": 38.21989528795812,
+          "contribution_pct": 7.097601648351617,
+          "additive_crypto_cash_drawdown_pct": 2.1729357142857118,
+          "account_cash_drawdown_pct": 3.585176
+        },
+        {
+          "closed": 233,
+          "winrate_pct": 43.776824034334766,
+          "contribution_pct": 13.181957142857149,
+          "additive_crypto_cash_drawdown_pct": 2.933385714285713,
+          "account_cash_drawdown_pct": 3.269191
+        },
+        {
+          "closed": 233,
+          "winrate_pct": 43.776824034334766,
+          "contribution_pct": 13.181957142857149,
+          "additive_crypto_cash_drawdown_pct": 2.933385714285713,
+          "account_cash_drawdown_pct": 3.269191
+        }
+      ],
+      "qualified": true,
+      "score": 4.924665934065905
+    },
+    "0.004": {
+      "period_priority_diagnostics": [
+        {
+          "closed": 45,
+          "winrate_pct": 33.333333333333336,
+          "contribution_pct": 1.0490648351648377,
+          "additive_crypto_cash_drawdown_pct": 2.2706692307692284,
+          "account_cash_drawdown_pct": 4.726428
+        },
+        {
+          "closed": 45,
+          "winrate_pct": 33.333333333333336,
+          "contribution_pct": 1.0490648351648377,
+          "additive_crypto_cash_drawdown_pct": 2.2706692307692284,
+          "account_cash_drawdown_pct": 4.726428
+        },
+        {
+          "closed": 77,
+          "winrate_pct": 48.05194805194805,
+          "contribution_pct": 9.810027472527446,
+          "additive_crypto_cash_drawdown_pct": 2.536379120879126,
+          "account_cash_drawdown_pct": 2.670862
+        },
+        {
+          "closed": 77,
+          "winrate_pct": 48.05194805194805,
+          "contribution_pct": 9.810027472527446,
+          "additive_crypto_cash_drawdown_pct": 2.536379120879126,
+          "account_cash_drawdown_pct": 2.670862
+        }
+      ],
+      "qualified": true,
+      "score": -1.2216043956043907
+    },
+    "0.006": {
+      "period_priority_diagnostics": [
+        {
+          "closed": 15,
+          "winrate_pct": 20.0,
+          "contribution_pct": -1.483285714285717,
+          "additive_crypto_cash_drawdown_pct": 1.977901098901099,
+          "account_cash_drawdown_pct": 6.866901
+        },
+        {
+          "closed": 15,
+          "winrate_pct": 20.0,
+          "contribution_pct": -1.483285714285717,
+          "additive_crypto_cash_drawdown_pct": 1.977901098901099,
+          "account_cash_drawdown_pct": 6.866901
+        },
+        {
+          "closed": 21,
+          "winrate_pct": 14.285714285714286,
+          "contribution_pct": -1.8503406593406568,
+          "additive_crypto_cash_drawdown_pct": 2.117582417582417,
+          "account_cash_drawdown_pct": 3.290097
+        },
+        {
+          "closed": 21,
+          "winrate_pct": 14.285714285714286,
+          "contribution_pct": -1.8503406593406568,
+          "additive_crypto_cash_drawdown_pct": 2.117582417582417,
+          "account_cash_drawdown_pct": 3.290097
+        }
+      ],
+      "qualified": false,
+      "score": -3.967923076923074
+    }
+  },
+  "chosen_threshold": 0.002,
+  "later": {
+    "frozen_baseline": {
+      "crypto": {
+        "summary": {
+          "starting_capital": 130.0,
+          "ending_capital": 213.62958,
+          "return_pct": 64.330446,
+          "cash_drawdown_pct": 5.44646,
+          "trades": 881,
+          "skipped": {
+            "slots": 30,
+            "minimum_size": 0
+          },
+          "unplaceable_partials": 414,
+          "tp1_hits_without_bank": 178,
+          "peak_positions": 11,
+          "peak_by_bot": {
+            "stocks": 8,
+            "crypto": 4
+          },
+          "peak_reserved_margin_pct": 32.12283438082925,
+          "pnl_by_bot": {
+            "crypto": 41.694820000000036,
+            "stocks": 41.93475979999993
+          },
+          "return_contribution_pct": {
+            "crypto": 32.07293846153849,
+            "stocks": 32.25750753846148
+          }
+        },
+        "calendar_months": {
+          "2026-09": {
+            "opening_cash": 130.0,
+            "closing_cash": 173.02986330000024,
+            "return_pct": 33.09989484615403,
+            "cash_drawdown_pct": 5.446459654899492,
+            "return_contribution_pct": {
+              "crypto": 9.30775384615383,
+              "stocks": 23.79214100000001
+            },
+            "entries": 401,
+            "rejected_by_account_guard": 0,
+            "crypto_closed": 194,
+            "crypto_winrate_pct": 44.329896907216494,
+            "stocks_closed": 205,
+            "stocks_winrate_pct": 43.90243902439025
+          },
+          "2026-10": {
+            "opening_cash": 173.0298633,
+            "closing_cash": 216.05327094285735,
+            "return_pct": 24.864729603503854,
+            "cash_drawdown_pct": 2.3086699709809246,
+            "return_contribution_pct": {
+              "crypto": 16.375275690839178,
+              "stocks": 8.489453912664546
+            },
+            "entries": 367,
+            "rejected_by_account_guard": 0,
+            "crypto_closed": 198,
+            "crypto_winrate_pct": 44.44444444444444,
+            "stocks_closed": 165,
+            "stocks_winrate_pct": 40.0
+          },
+          "2026-11": {
+            "opening_cash": 216.05327094285713,
+            "closing_cash": 213.62957979999993,
+            "return_pct": -1.1218025685425626,
+            "cash_drawdown_pct": 4.4094184603660445,
+            "return_contribution_pct": {
+              "crypto": 0.5834777930653543,
+              "stocks": -1.7052803616078909
+            },
+            "entries": 113,
+            "rejected_by_account_guard": 0,
+            "crypto_closed": 76,
+            "crypto_winrate_pct": 32.89473684210526,
+            "stocks_closed": 43,
+            "stocks_winrate_pct": 30.232558139534884
+          }
+        }
+      },
+      "stocks": {
+        "summary": {
+          "starting_capital": 130.0,
+          "ending_capital": 213.62958,
+          "return_pct": 64.330446,
+          "cash_drawdown_pct": 5.44646,
+          "trades": 881,
+          "skipped": {
+            "slots": 30,
+            "minimum_size": 0
+          },
+          "unplaceable_partials": 414,
+          "tp1_hits_without_bank": 178,
+          "peak_positions": 11,
+          "peak_by_bot": {
+            "stocks": 8,
+            "crypto": 4
+          },
+          "peak_reserved_margin_pct": 32.12283438082925,
+          "pnl_by_bot": {
+            "crypto": 41.694820000000036,
+            "stocks": 41.93475979999993
+          },
+          "return_contribution_pct": {
+            "crypto": 32.07293846153849,
+            "stocks": 32.25750753846148
+          }
+        },
+        "calendar_months": {
+          "2026-09": {
+            "opening_cash": 130.0,
+            "closing_cash": 173.02986330000024,
+            "return_pct": 33.09989484615403,
+            "cash_drawdown_pct": 5.446459654899492,
+            "return_contribution_pct": {
+              "crypto": 9.30775384615383,
+              "stocks": 23.79214100000001
+            },
+            "entries": 401,
+            "rejected_by_account_guard": 0,
+            "crypto_closed": 194,
+            "crypto_winrate_pct": 44.329896907216494,
+            "stocks_closed": 205,
+            "stocks_winrate_pct": 43.90243902439025
+          },
+          "2026-10": {
+            "opening_cash": 173.0298633,
+            "closing_cash": 216.05327094285735,
+            "return_pct": 24.864729603503854,
+            "cash_drawdown_pct": 2.3086699709809246,
+            "return_contribution_pct": {
+              "crypto": 16.375275690839178,
+              "stocks": 8.489453912664546
+            },
+            "entries": 367,
+            "rejected_by_account_guard": 0,
+            "crypto_closed": 198,
+            "crypto_winrate_pct": 44.44444444444444,
+            "stocks_closed": 165,
+            "stocks_winrate_pct": 40.0
+          },
+          "2026-11": {
+            "opening_cash": 216.05327094285713,
+            "closing_cash": 213.62957979999993,
+            "return_pct": -1.1218025685425626,
+            "cash_drawdown_pct": 4.4094184603660445,
+            "return_contribution_pct": {
+              "crypto": 0.5834777930653543,
+              "stocks": -1.7052803616078909
+            },
+            "entries": 113,
+            "rejected_by_account_guard": 0,
+            "crypto_closed": 76,
+            "crypto_winrate_pct": 32.89473684210526,
+            "stocks_closed": 43,
+            "stocks_winrate_pct": 30.232558139534884
+          }
+        }
+      }
+    },
+    "selected_native_regressor": {
+      "crypto": {
+        "summary": {
+          "starting_capital": 130.0,
+          "ending_capital": 191.384623,
+          "return_pct": 47.218941,
+          "cash_drawdown_pct": 7.177644,
+          "trades": 980,
+          "skipped": {
+            "slots": 32,
+            "minimum_size": 0
+          },
+          "unplaceable_partials": 455,
+          "tp1_hits_without_bank": 197,
+          "peak_positions": 11,
+          "peak_by_bot": {
+            "stocks": 8,
+            "crypto": 4
+          },
+          "peak_reserved_margin_pct": 32.038126025625715,
+          "pnl_by_bot": {
+            "crypto": 20.308224285714267,
+            "stocks": 41.07639884999995
+          },
+          "return_contribution_pct": {
+            "crypto": 15.621710989010976,
+            "stocks": 31.597229884615345
+          }
+        },
+        "calendar_months": {
+          "2026-09": {
+            "opening_cash": 130.0,
+            "closing_cash": 169.76243477857165,
+            "return_pct": 30.58648829120896,
+            "cash_drawdown_pct": 4.732682981760181,
+            "return_contribution_pct": {
+              "crypto": 7.178401098901112,
+              "stocks": 23.40808719230772
+            },
+            "entries": 466,
+            "rejected_by_account_guard": 0,
+            "crypto_closed": 260,
+            "crypto_winrate_pct": 39.61538461538461,
+            "stocks_closed": 206,
+            "stocks_winrate_pct": 43.689320388349515
+          },
+          "2026-10": {
+            "opening_cash": 169.76243477857145,
+            "closing_cash": 177.88680963571437,
+            "return_pct": 4.785731818549799,
+            "cash_drawdown_pct": 4.976629633777542,
+            "return_contribution_pct": {
+              "crypto": -3.1809317237353776,
+              "stocks": 7.966663542285091
+            },
+            "entries": 376,
+            "rejected_by_account_guard": 0,
+            "crypto_closed": 204,
+            "crypto_winrate_pct": 42.15686274509804,
+            "stocks_closed": 165,
+            "stocks_winrate_pct": 40.0
+          },
+          "2026-11": {
+            "opening_cash": 177.88680963571426,
+            "closing_cash": 191.38462313571404,
+            "return_pct": 7.587866423396594,
+            "cash_drawdown_pct": 3.239831898256796,
+            "return_contribution_pct": {
+              "crypto": 9.206039522287384,
+              "stocks": -1.618173098890692
+            },
+            "entries": 138,
+            "rejected_by_account_guard": 0,
+            "crypto_closed": 102,
+            "crypto_winrate_pct": 46.07843137254902,
+            "stocks_closed": 43,
+            "stocks_winrate_pct": 30.232558139534884
+          }
+        }
+      },
+      "stocks": {
+        "summary": {
+          "starting_capital": 130.0,
+          "ending_capital": 190.754349,
+          "return_pct": 46.734114,
+          "cash_drawdown_pct": 7.149223,
+          "trades": 980,
+          "skipped": {
+            "slots": 32,
+            "minimum_size": 0
+          },
+          "unplaceable_partials": 455,
+          "tp1_hits_without_bank": 197,
+          "peak_positions": 11,
+          "peak_by_bot": {
+            "stocks": 8,
+            "crypto": 4
+          },
+          "peak_reserved_margin_pct": 32.00007994496778,
+          "pnl_by_bot": {
+            "crypto": 19.942845714285696,
+            "stocks": 40.81150284999995
+          },
+          "return_contribution_pct": {
+            "crypto": 15.340650549450535,
+            "stocks": 31.39346373076919
+          }
+        },
+        "calendar_months": {
+          "2026-09": {
+            "opening_cash": 130.0,
+            "closing_cash": 169.22833449285727,
+            "return_pct": 30.175641917582507,
+            "cash_drawdown_pct": 4.735631935104916,
+            "return_contribution_pct": {
+              "crypto": 7.12700549450551,
+              "stocks": 23.04863642307695
+            },
+            "entries": 466,
+            "rejected_by_account_guard": 0,
+            "crypto_closed": 259,
+            "crypto_winrate_pct": 39.38223938223938,
+            "stocks_closed": 207,
+            "stocks_winrate_pct": 43.47826086956522
+          },
+          "2026-10": {
+            "opening_cash": 169.2283344928572,
+            "closing_cash": 177.5424082785716,
+            "return_pct": 4.912932465257658,
+            "cash_drawdown_pct": 4.952273235131617,
+            "return_contribution_pct": {
+              "crypto": -3.2000585070547425,
+              "stocks": 8.112990972312298
+            },
+            "entries": 376,
+            "rejected_by_account_guard": 0,
+            "crypto_closed": 204,
+            "crypto_winrate_pct": 42.15686274509804,
+            "stocks_closed": 165,
+            "stocks_winrate_pct": 40.0
+          },
+          "2026-11": {
+            "opening_cash": 177.5424082785714,
+            "closing_cash": 190.75434856428552,
+            "return_pct": 7.441568701143253,
+            "cash_drawdown_pct": 3.2422905731519673,
+            "return_contribution_pct": {
+              "crypto": 9.06439449692687,
+              "stocks": -1.6228257957835597
+            },
+            "entries": 138,
+            "rejected_by_account_guard": 0,
+            "crypto_closed": 102,
+            "crypto_winrate_pct": 46.07843137254902,
+            "stocks_closed": 43,
+            "stocks_winrate_pct": 30.232558139534884
+          }
+        }
+      }
+    }
+  },
+  "sources": {
+    "C:\\Users\\Lenovo\\Desktop\\telegram bot\\crypto_native_price_nov19_audit.py": "6fa69dd33ba971eda01abb140154e73e8d0f517714988d7c5f700378649b206f",
+    "crypto_native_price_features_nov19.py": "c3543e95818b438646cc6d619f308e1581db7e1ad60da57db4b907e9bfc862d7",
+    "crypto_native_price_pool_nov19.py": "0a2c5915e185716a9e1fde80d000ef9da2d8b3d4d8701c3dd6ca2c5e62166f3d",
+    "account_cash_guard_nov17_audit.py": "d8f32b806b9b1c9792971c023cd7ad8945854199bcd4b30ec496780e6b28ca28",
+    "lot_aware_tp1_audit.py": "12e343429e39c89e8fb60f16e2277533879ede647437b485a351a9dc744ff27a",
+    "shared_factor_account_nov14_audit.py": "cd385644515bb374274781ac1768e039a28be2e39e24e396f50933fa302e1f99",
+    "..\\tusa stocks\\reports\\audit_2026_09_08\\stock_close_anchor_nov16_causal_candidates_known_close.pkl": "29d08f1a4f55d3ea59279752206a65ab5c947691c261a5a551367bce9475c16e",
+    "reports\\audit_2026_09_08\\shared_xperp_specs_nov14.json": "7a4a76b813dfe6a5a08c9e858b17d453285dddc99529cdc293885682cf2bee0e",
+    "reports\\audit_2026_09_08\\crypto_native_price_nov19_pool_sources.json": "ef357ddb491b3211c4d9e61bb072d3477daa79643918c075a1e0a5253d329e9e",
+    "reports\\audit_2026_09_08\\crypto_native_price_nov19_model.pkl": "f23c2844c20144fad37213809dd46aca67ab6477d4647f5e13f82ea0d0072407",
+    "reports\\audit_2026_09_08\\crypto_native_price_nov19_later.pkl": "a5c83d5e88677ab2466ad8d10690d45879c93fa358ab23d79f29e8856b08b51f"
+  },
+  "limitations": [
+    "All historical eras have been inspected previously; chronological split is no new untouched holdout.",
+    "Current matched native contracts and current specifications; survivorship and historical data vintages remain.",
+    "Known prior close is not an executable bid/ask; 15m last-price stop-first/next-bar BE paths are public proxies.",
+    "Runner price label has no ideal TP1 bank; shared cash applies actual current lot rounding for requested 5%.",
+    "Selection uses two separate flat $130 months only; later September onward account is continuous without monthly resets.",
+    "Stock feed is a frozen reference baseline with its existing last20 R PAPER gate, not current client execution.",
+    "No full floating-equity guard or minute pause recovery,fees,funding,transfers,publication latency or private fills.",
+    "May listing coverage and November end are partial; no monthly profit promise or automatic margin change."
+  ]
+}

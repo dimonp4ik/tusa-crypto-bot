@@ -1,0 +1,36 @@
+{
+  "declared_at": "2026-11-18T22:00:10.613181+00:00",
+  "sources": {
+    "C:\\Users\\Lenovo\\Desktop\\telegram bot\\crypto_native_price_calibration_nov19_audit.py": "277bc9b7f79331b057161ec6ae5f640029aaeb819d850c3f46bc5f1238c080af",
+    "crypto_native_price_calibration_nov19.py": "7fc8d032c4a4d5abcd74ab7b0125db94ee58abed6087d13d32e3375c81b2e6e5",
+    "crypto_native_long_phase_nov19.py": "824a62dcbea5420c7a9efa56b9fd3c6d777533b7597e3ca8678736d4ce8ac947",
+    "crypto_native_price_nov19_audit.py": "6fa69dd33ba971eda01abb140154e73e8d0f517714988d7c5f700378649b206f",
+    "reports\\audit_2026_09_08\\crypto_native_price_nov19.json": "6b74f6c8c8f9a773fc744ed0d4cad8dff3b5eec507da26eda018d4fc38ab87fb",
+    "reports\\audit_2026_09_08\\crypto_native_price_nov19_model.pkl": "f23c2844c20144fad37213809dd46aca67ab6477d4647f5e13f82ea0d0072407",
+    "reports\\audit_2026_09_08\\crypto_native_price_nov19_pool_sources.json": "ef357ddb491b3211c4d9e61bb072d3477daa79643918c075a1e0a5253d329e9e",
+    "reports\\audit_2026_09_08\\xperp_15m_nov14_merged\\manifest.json": "6ebba73ab8fe00a7a0740feaf3b6fdc867d4773dd36277be53d42f8e20a236b5",
+    "..\\tusa stocks\\reports\\audit_2026_09_08\\stock_close_anchor_nov16_causal_candidates_known_close.pkl": "29d08f1a4f55d3ea59279752206a65ab5c947691c261a5a551367bce9475c16e",
+    "reports\\audit_2026_09_08\\shared_xperp_specs_nov14.json": "7a4a76b813dfe6a5a08c9e858b17d453285dddc99529cdc293885682cf2bee0e"
+  },
+  "history_days": 30,
+  "shrink_timestamps": 100.0,
+  "correction_weight": 0.5,
+  "calibration_start": 1782864000.0,
+  "thresholds": [
+    0.0,
+    0.0005,
+    0.001,
+    0.002,
+    0.004,
+    0.006
+  ],
+  "selection_end": 1788220800.0,
+  "minimum_distinct_history_times": {
+    "phase": 50,
+    "family": 100,
+    "global_fallback": 200
+  },
+  "no_training_period_labels_for_calibration": true,
+  "daily_midnight_full_horizon_purge": true,
+  "hypothesis_origin": "daily residual correction after observing base model phase-dependent later errors"
+}

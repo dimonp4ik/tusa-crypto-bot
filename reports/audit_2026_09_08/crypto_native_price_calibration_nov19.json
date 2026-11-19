@@ -1,0 +1,927 @@
+{
+  "status": "PREQUENTIAL_PRICE_CALIBRATION_RESEARCH_ONLY",
+  "objective_verified": false,
+  "live_activation_supported": false,
+  "protocol": {
+    "declared_at": "2026-11-18T22:00:10.613181+00:00",
+    "sources": {
+      "C:\\Users\\Lenovo\\Desktop\\telegram bot\\crypto_native_price_calibration_nov19_audit.py": "277bc9b7f79331b057161ec6ae5f640029aaeb819d850c3f46bc5f1238c080af",
+      "crypto_native_price_calibration_nov19.py": "7fc8d032c4a4d5abcd74ab7b0125db94ee58abed6087d13d32e3375c81b2e6e5",
+      "crypto_native_long_phase_nov19.py": "824a62dcbea5420c7a9efa56b9fd3c6d777533b7597e3ca8678736d4ce8ac947",
+      "crypto_native_price_nov19_audit.py": "6fa69dd33ba971eda01abb140154e73e8d0f517714988d7c5f700378649b206f",
+      "reports\\audit_2026_09_08\\crypto_native_price_nov19.json": "6b74f6c8c8f9a773fc744ed0d4cad8dff3b5eec507da26eda018d4fc38ab87fb",
+      "reports\\audit_2026_09_08\\crypto_native_price_nov19_model.pkl": "f23c2844c20144fad37213809dd46aca67ab6477d4647f5e13f82ea0d0072407",
+      "reports\\audit_2026_09_08\\crypto_native_price_nov19_pool_sources.json": "ef357ddb491b3211c4d9e61bb072d3477daa79643918c075a1e0a5253d329e9e",
+      "reports\\audit_2026_09_08\\xperp_15m_nov14_merged\\manifest.json": "6ebba73ab8fe00a7a0740feaf3b6fdc867d4773dd36277be53d42f8e20a236b5",
+      "..\\tusa stocks\\reports\\audit_2026_09_08\\stock_close_anchor_nov16_causal_candidates_known_close.pkl": "29d08f1a4f55d3ea59279752206a65ab5c947691c261a5a551367bce9475c16e",
+      "reports\\audit_2026_09_08\\shared_xperp_specs_nov14.json": "7a4a76b813dfe6a5a08c9e858b17d453285dddc99529cdc293885682cf2bee0e"
+    },
+    "history_days": 30,
+    "shrink_timestamps": 100.0,
+    "correction_weight": 0.5,
+    "calibration_start": 1782864000.0,
+    "thresholds": [
+      0.0,
+      0.0005,
+      0.001,
+      0.002,
+      0.004,
+      0.006
+    ],
+    "selection_end": 1788220800.0,
+    "minimum_distinct_history_times": {
+      "phase": 50,
+      "family": 100,
+      "global_fallback": 200
+    },
+    "no_training_period_labels_for_calibration": true,
+    "daily_midnight_full_horizon_purge": true,
+    "hypothesis_origin": "daily residual correction after observing base model phase-dependent later errors"
+  },
+  "selection": {
+    "0.0": {
+      "period_priority_diagnostics": [
+        {
+          "closed": 543,
+          "winrate_pct": 41.06813996316759,
+          "contribution_pct": 10.884697252747246,
+          "additive_crypto_cash_drawdown_pct": 6.520639560439555,
+          "account_cash_drawdown_pct": 6.222809
+        },
+        {
+          "closed": 543,
+          "winrate_pct": 41.06813996316759,
+          "contribution_pct": 10.884697252747246,
+          "additive_crypto_cash_drawdown_pct": 6.520639560439555,
+          "account_cash_drawdown_pct": 6.222809
+        },
+        {
+          "closed": 525,
+          "winrate_pct": 38.666666666666664,
+          "contribution_pct": 0.1759483516483422,
+          "additive_crypto_cash_drawdown_pct": 7.861291208791215,
+          "account_cash_drawdown_pct": 5.335548
+        },
+        {
+          "closed": 525,
+          "winrate_pct": 38.666666666666664,
+          "contribution_pct": 0.1759483516483422,
+          "additive_crypto_cash_drawdown_pct": 7.861291208791215,
+          "account_cash_drawdown_pct": 5.335548
+        }
+      ],
+      "qualified": true,
+      "score": -7.685342857142873
+    },
+    "0.0005": {
+      "period_priority_diagnostics": [
+        {
+          "closed": 469,
+          "winrate_pct": 41.36460554371002,
+          "contribution_pct": 13.169618131868127,
+          "additive_crypto_cash_drawdown_pct": 5.628309340659336,
+          "account_cash_drawdown_pct": 5.446991
+        },
+        {
+          "closed": 469,
+          "winrate_pct": 41.36460554371002,
+          "contribution_pct": 13.169618131868127,
+          "additive_crypto_cash_drawdown_pct": 5.628309340659336,
+          "account_cash_drawdown_pct": 5.446991
+        },
+        {
+          "closed": 488,
+          "winrate_pct": 39.75409836065574,
+          "contribution_pct": 8.320819780219773,
+          "additive_crypto_cash_drawdown_pct": 4.228818131868145,
+          "account_cash_drawdown_pct": 4.162541
+        },
+        {
+          "closed": 488,
+          "winrate_pct": 39.75409836065574,
+          "contribution_pct": 8.320819780219773,
+          "additive_crypto_cash_drawdown_pct": 4.228818131868145,
+          "account_cash_drawdown_pct": 4.162541
+        }
+      ],
+      "qualified": true,
+      "score": 4.092001648351628
+    },
+    "0.001": {
+      "period_priority_diagnostics": [
+        {
+          "closed": 402,
+          "winrate_pct": 39.30348258706468,
+          "contribution_pct": 3.441106593406594,
+          "additive_crypto_cash_drawdown_pct": 3.6624346153846146,
+          "account_cash_drawdown_pct": 7.546604
+        },
+        {
+          "closed": 402,
+          "winrate_pct": 39.30348258706468,
+          "contribution_pct": 3.441106593406594,
+          "additive_crypto_cash_drawdown_pct": 3.6624346153846146,
+          "account_cash_drawdown_pct": 7.546604
+        },
+        {
+          "closed": 389,
+          "winrate_pct": 43.18766066838046,
+          "contribution_pct": 8.029812637362637,
+          "additive_crypto_cash_drawdown_pct": 4.775163736263754,
+          "account_cash_drawdown_pct": 4.938993
+        },
+        {
+          "closed": 389,
+          "winrate_pct": 43.18766066838046,
+          "contribution_pct": 8.029812637362637,
+          "additive_crypto_cash_drawdown_pct": 4.775163736263754,
+          "account_cash_drawdown_pct": 4.938993
+        }
+      ],
+      "qualified": true,
+      "score": -0.22132802197802048
+    },
+    "0.002": {
+      "period_priority_diagnostics": [
+        {
+          "closed": 214,
+          "winrate_pct": 37.850467289719624,
+          "contribution_pct": 4.2796351648351285,
+          "additive_crypto_cash_drawdown_pct": 3.1636648351648358,
+          "account_cash_drawdown_pct": 4.832743
+        },
+        {
+          "closed": 214,
+          "winrate_pct": 37.850467289719624,
+          "contribution_pct": 4.2796351648351285,
+          "additive_crypto_cash_drawdown_pct": 3.1636648351648358,
+          "account_cash_drawdown_pct": 4.832743
+        },
+        {
+          "closed": 241,
+          "winrate_pct": 39.83402489626556,
+          "contribution_pct": 7.378343956043957,
+          "additive_crypto_cash_drawdown_pct": 4.096220879120882,
+          "account_cash_drawdown_pct": 4.005678
+        },
+        {
+          "closed": 241,
+          "winrate_pct": 39.83402489626556,
+          "contribution_pct": 7.378343956043957,
+          "additive_crypto_cash_drawdown_pct": 4.096220879120882,
+          "account_cash_drawdown_pct": 4.005678
+        }
+      ],
+      "qualified": true,
+      "score": 1.1159703296702927
+    },
+    "0.004": {
+      "period_priority_diagnostics": [
+        {
+          "closed": 49,
+          "winrate_pct": 36.734693877551024,
+          "contribution_pct": 2.80915604395604,
+          "additive_crypto_cash_drawdown_pct": 2.2566912087912057,
+          "account_cash_drawdown_pct": 4.835225
+        },
+        {
+          "closed": 49,
+          "winrate_pct": 36.734693877551024,
+          "contribution_pct": 2.80915604395604,
+          "additive_crypto_cash_drawdown_pct": 2.2566912087912057,
+          "account_cash_drawdown_pct": 4.835225
+        },
+        {
+          "closed": 81,
+          "winrate_pct": 48.148148148148145,
+          "contribution_pct": 7.419824175824148,
+          "additive_crypto_cash_drawdown_pct": 3.3741813186813236,
+          "account_cash_drawdown_pct": 2.676206
+        },
+        {
+          "closed": 81,
+          "winrate_pct": 48.148148148148145,
+          "contribution_pct": 7.419824175824148,
+          "additive_crypto_cash_drawdown_pct": 3.3741813186813236,
+          "account_cash_drawdown_pct": 2.676206
+        }
+      ],
+      "qualified": true,
+      "score": 0.5524648351648342
+    },
+    "0.006": {
+      "period_priority_diagnostics": [
+        {
+          "closed": 16,
+          "winrate_pct": 18.75,
+          "contribution_pct": -1.739219780219783,
+          "additive_crypto_cash_drawdown_pct": 2.229142857142857,
+          "account_cash_drawdown_pct": 7.093545
+        },
+        {
+          "closed": 16,
+          "winrate_pct": 18.75,
+          "contribution_pct": -1.739219780219783,
+          "additive_crypto_cash_drawdown_pct": 2.229142857142857,
+          "account_cash_drawdown_pct": 7.093545
+        },
+        {
+          "closed": 23,
+          "winrate_pct": 26.08695652173913,
+          "contribution_pct": -1.305906593406596,
+          "additive_crypto_cash_drawdown_pct": 2.021054945054944,
+          "account_cash_drawdown_pct": 3.247064
+        },
+        {
+          "closed": 23,
+          "winrate_pct": 26.08695652173913,
+          "contribution_pct": -1.305906593406596,
+          "additive_crypto_cash_drawdown_pct": 2.021054945054944,
+          "account_cash_drawdown_pct": 3.247064
+        }
+      ],
+      "qualified": false,
+      "score": -3.96836263736264
+    }
+  },
+  "chosen_threshold": 0.0005,
+  "base_selection_score": 4.924665934065905,
+  "calibrated_selection_score": 4.092001648351628,
+  "improves_selection": false,
+  "daily_calibration": [
+    {
+      "day": 1782864000,
+      "history_rows": 0,
+      "history_timestamps": 0,
+      "last_history_exit": null,
+      "last_history_full_horizon": null,
+      "groups_used": {}
+    },
+    {
+      "day": 1782950400,
+      "history_rows": 101,
+      "history_timestamps": 26,
+      "last_history_exit": 1782914400.0,
+      "last_history_full_horizon": 1782949500.0,
+      "groups_used": {}
+    },
+    {
+      "day": 1783036800,
+      "history_rows": 327,
+      "history_timestamps": 87,
+      "last_history_exit": 1783002600.0,
+      "last_history_full_horizon": 1783035900.0,
+      "groups_used": {}
+    },
+    {
+      "day": 1783123200,
+      "history_rows": 505,
+      "history_timestamps": 149,
+      "last_history_exit": 1783106100.0,
+      "last_history_full_horizon": 1783120500.0,
+      "groups_used": {}
+    },
+    {
+      "day": 1783209600,
+      "history_rows": 636,
+      "history_timestamps": 201,
+      "last_history_exit": 1783185300.0,
+      "last_history_full_horizon": 1783208700.0,
+      "groups_used": {
+        "global": 187,
+        "phase": 15
+      }
+    },
+    {
+      "day": 1783296000,
+      "history_rows": 837,
+      "history_timestamps": 273,
+      "last_history_exit": 1783287900.0,
+      "last_history_full_horizon": 1783294200.0,
+      "groups_used": {
+        "global": 147,
+        "phase": 69
+      }
+    },
+    {
+      "day": 1783382400,
+      "history_rows": 1053,
+      "history_timestamps": 350,
+      "last_history_exit": 1783340100.0,
+      "last_history_full_horizon": 1783379700.0,
+      "groups_used": {
+        "global": 147,
+        "phase": 22,
+        "family": 15
+      }
+    },
+    {
+      "day": 1783468800,
+      "history_rows": 1264,
+      "history_timestamps": 415,
+      "last_history_exit": 1783432800.0,
+      "last_history_full_horizon": 1783467000.0,
+      "groups_used": {
+        "phase": 28,
+        "global": 116,
+        "family": 45
+      }
+    },
+    {
+      "day": 1783555200,
+      "history_rows": 1420,
+      "history_timestamps": 470,
+      "last_history_exit": 1783527300.0,
+      "last_history_full_horizon": 1783554300.0,
+      "groups_used": {
+        "global": 40,
+        "family": 159
+      }
+    },
+    {
+      "day": 1783641600,
+      "history_rows": 1649,
+      "history_timestamps": 535,
+      "last_history_exit": 1783628100.0,
+      "last_history_full_horizon": 1783640700.0,
+      "groups_used": {
+        "phase": 148,
+        "family": 66
+      }
+    },
+    {
+      "day": 1783728000,
+      "history_rows": 1852,
+      "history_timestamps": 605,
+      "last_history_exit": 1783693800.0,
+      "last_history_full_horizon": 1783723500.0,
+      "groups_used": {
+        "family": 24,
+        "phase": 161
+      }
+    },
+    {
+      "day": 1783814400,
+      "history_rows": 2033,
+      "history_timestamps": 678,
+      "last_history_exit": 1783784700.0,
+      "last_history_full_horizon": 1783813500.0,
+      "groups_used": {
+        "family": 77,
+        "phase": 122
+      }
+    },
+    {
+      "day": 1783900800,
+      "history_rows": 2226,
+      "history_timestamps": 748,
+      "last_history_exit": 1783868400.0,
+      "last_history_full_horizon": 1783899900.0,
+      "groups_used": {
+        "family": 188,
+        "phase": 12
+      }
+    },
+    {
+      "day": 1783987200,
+      "history_rows": 2444,
+      "history_timestamps": 823,
+      "last_history_exit": 1783955700.0,
+      "last_history_full_horizon": 1783986300.0,
+      "groups_used": {
+        "family": 241
+      }
+    },
+    {
+      "day": 1784073600,
+      "history_rows": 2684,
+      "history_timestamps": 893,
+      "last_history_exit": 1784033100.0,
+      "last_history_full_horizon": 1784072700.0,
+      "groups_used": {
+        "family": 18,
+        "phase": 213
+      }
+    },
+    {
+      "day": 1784160000,
+      "history_rows": 2922,
+      "history_timestamps": 961,
+      "last_history_exit": 1784129400.0,
+      "last_history_full_horizon": 1784159100.0,
+      "groups_used": {
+        "family": 90,
+        "phase": 134
+      }
+    },
+    {
+      "day": 1784246400,
+      "history_rows": 3097,
+      "history_timestamps": 1026,
+      "last_history_exit": 1784208600.0,
+      "last_history_full_horizon": 1784237400.0,
+      "groups_used": {
+        "family": 77,
+        "phase": 106
+      }
+    },
+    {
+      "day": 1784332800,
+      "history_rows": 3304,
+      "history_timestamps": 1094,
+      "last_history_exit": 1784297700.0,
+      "last_history_full_horizon": 1784331900.0,
+      "groups_used": {
+        "family": 76,
+        "phase": 75
+      }
+    },
+    {
+      "day": 1784419200,
+      "history_rows": 3485,
+      "history_timestamps": 1154,
+      "last_history_exit": 1784385000.0,
+      "last_history_full_horizon": 1784418300.0,
+      "groups_used": {
+        "phase": 121,
+        "family": 9
+      }
+    },
+    {
+      "day": 1784505600,
+      "history_rows": 3625,
+      "history_timestamps": 1217,
+      "last_history_exit": 1784472300.0,
+      "last_history_full_horizon": 1784504700.0,
+      "groups_used": {
+        "phase": 207,
+        "family": 8
+      }
+    },
+    {
+      "day": 1784592000,
+      "history_rows": 3806,
+      "history_timestamps": 1278,
+      "last_history_exit": 1784560500.0,
+      "last_history_full_horizon": 1784591100.0,
+      "groups_used": {
+        "phase": 204
+      }
+    },
+    {
+      "day": 1784678400,
+      "history_rows": 3997,
+      "history_timestamps": 1346,
+      "last_history_exit": 1784648700.0,
+      "last_history_full_horizon": 1784677500.0,
+      "groups_used": {
+        "phase": 202,
+        "family": 17
+      }
+    },
+    {
+      "day": 1784764800,
+      "history_rows": 4233,
+      "history_timestamps": 1425,
+      "last_history_exit": 1784736900.0,
+      "last_history_full_horizon": 1784763900.0,
+      "groups_used": {
+        "phase": 196,
+        "family": 12
+      }
+    },
+    {
+      "day": 1784851200,
+      "history_rows": 4424,
+      "history_timestamps": 1499,
+      "last_history_exit": 1784816100.0,
+      "last_history_full_horizon": 1784850300.0,
+      "groups_used": {
+        "family": 127,
+        "phase": 73
+      }
+    },
+    {
+      "day": 1784937600,
+      "history_rows": 4655,
+      "history_timestamps": 1569,
+      "last_history_exit": 1784900700.0,
+      "last_history_full_horizon": 1784936700.0,
+      "groups_used": {
+        "phase": 99,
+        "family": 58
+      }
+    },
+    {
+      "day": 1785024000,
+      "history_rows": 4810,
+      "history_timestamps": 1633,
+      "last_history_exit": 1784993400.0,
+      "last_history_full_horizon": 1785023100.0,
+      "groups_used": {
+        "phase": 192,
+        "family": 6
+      }
+    },
+    {
+      "day": 1785110400,
+      "history_rows": 4970,
+      "history_timestamps": 1702,
+      "last_history_exit": 1785085200.0,
+      "last_history_full_horizon": 1785108600.0,
+      "groups_used": {
+        "phase": 231
+      }
+    },
+    {
+      "day": 1785196800,
+      "history_rows": 5171,
+      "history_timestamps": 1770,
+      "last_history_exit": 1785159900.0,
+      "last_history_full_horizon": 1785195900.0,
+      "groups_used": {
+        "phase": 192,
+        "family": 13
+      }
+    },
+    {
+      "day": 1785283200,
+      "history_rows": 5405,
+      "history_timestamps": 1827,
+      "last_history_exit": 1785248100.0,
+      "last_history_full_horizon": 1785282300.0,
+      "groups_used": {
+        "phase": 212,
+        "family": 8
+      }
+    },
+    {
+      "day": 1785369600,
+      "history_rows": 5636,
+      "history_timestamps": 1896,
+      "last_history_exit": 1785348000.0,
+      "last_history_full_horizon": 1785368700.0,
+      "groups_used": {
+        "phase": 179,
+        "family": 9
+      }
+    },
+    {
+      "day": 1785456000,
+      "history_rows": 5857,
+      "history_timestamps": 1971,
+      "last_history_exit": 1785428100.0,
+      "last_history_full_horizon": 1785455100.0,
+      "groups_used": {
+        "phase": 229,
+        "family": 5
+      }
+    },
+    {
+      "day": 1785542400,
+      "history_rows": 5873,
+      "history_timestamps": 1990,
+      "last_history_exit": 1785510000.0,
+      "last_history_full_horizon": 1785541500.0,
+      "groups_used": {
+        "phase": 195,
+        "family": 9
+      }
+    },
+    {
+      "day": 1785628800,
+      "history_rows": 5841,
+      "history_timestamps": 1999,
+      "last_history_exit": 1785606300.0,
+      "last_history_full_horizon": 1785627000.0,
+      "groups_used": {
+        "phase": 209
+      }
+    },
+    {
+      "day": 1785715200,
+      "history_rows": 5924,
+      "history_timestamps": 2023,
+      "last_history_exit": 1785691800.0,
+      "last_history_full_horizon": 1785714300.0,
+      "groups_used": {
+        "phase": 250,
+        "family": 2
+      }
+    },
+    {
+      "day": 1785801600,
+      "history_rows": 5963,
+      "history_timestamps": 2027,
+      "last_history_exit": 1785765600.0,
+      "last_history_full_horizon": 1785800700.0,
+      "groups_used": {
+        "phase": 205
+      }
+    },
+    {
+      "day": 1785888000,
+      "history_rows": 6005,
+      "history_timestamps": 2030,
+      "last_history_exit": 1785859200.0,
+      "last_history_full_horizon": 1785887100.0,
+      "groups_used": {
+        "phase": 223
+      }
+    },
+    {
+      "day": 1785974400,
+      "history_rows": 5967,
+      "history_timestamps": 2034,
+      "last_history_exit": 1785947400.0,
+      "last_history_full_horizon": 1785972600.0,
+      "groups_used": {
+        "phase": 239
+      }
+    },
+    {
+      "day": 1786060800,
+      "history_rows": 6048,
+      "history_timestamps": 2050,
+      "last_history_exit": 1786032000.0,
+      "last_history_full_horizon": 1786059900.0,
+      "groups_used": {
+        "phase": 218
+      }
+    },
+    {
+      "day": 1786147200,
+      "history_rows": 6083,
+      "history_timestamps": 2076,
+      "last_history_exit": 1786118400.0,
+      "last_history_full_horizon": 1786146300.0,
+      "groups_used": {
+        "phase": 138
+      }
+    },
+    {
+      "day": 1786233600,
+      "history_rows": 6045,
+      "history_timestamps": 2078,
+      "last_history_exit": 1786204800.0,
+      "last_history_full_horizon": 1786232700.0,
+      "groups_used": {
+        "phase": 206
+      }
+    },
+    {
+      "day": 1786320000,
+      "history_rows": 5991,
+      "history_timestamps": 2083,
+      "last_history_exit": 1786292100.0,
+      "last_history_full_horizon": 1786319100.0,
+      "groups_used": {
+        "phase": 167,
+        "family": 2
+      }
+    },
+    {
+      "day": 1786406400,
+      "history_rows": 6008,
+      "history_timestamps": 2083,
+      "last_history_exit": 1786376700.0,
+      "last_history_full_horizon": 1786405500.0,
+      "groups_used": {
+        "phase": 218,
+        "family": 8
+      }
+    },
+    {
+      "day": 1786492800,
+      "history_rows": 5999,
+      "history_timestamps": 2082,
+      "last_history_exit": 1786473000.0,
+      "last_history_full_horizon": 1786491900.0,
+      "groups_used": {
+        "phase": 182,
+        "family": 40
+      }
+    },
+    {
+      "day": 1786579200,
+      "history_rows": 6043,
+      "history_timestamps": 2099,
+      "last_history_exit": 1786540500.0,
+      "last_history_full_horizon": 1786578300.0,
+      "groups_used": {
+        "phase": 225
+      }
+    },
+    {
+      "day": 1786665600,
+      "history_rows": 6033,
+      "history_timestamps": 2112,
+      "last_history_exit": 1786634100.0,
+      "last_history_full_horizon": 1786664700.0,
+      "groups_used": {
+        "phase": 219
+      }
+    },
+    {
+      "day": 1786752000,
+      "history_rows": 6001,
+      "history_timestamps": 2111,
+      "last_history_exit": 1786722300.0,
+      "last_history_full_horizon": 1786748400.0,
+      "groups_used": {
+        "phase": 169
+      }
+    },
+    {
+      "day": 1786838400,
+      "history_rows": 5990,
+      "history_timestamps": 2120,
+      "last_history_exit": 1786818600.0,
+      "last_history_full_horizon": 1786837500.0,
+      "groups_used": {
+        "phase": 153
+      }
+    },
+    {
+      "day": 1786924800,
+      "history_rows": 5950,
+      "history_timestamps": 2128,
+      "last_history_exit": 1786896000.0,
+      "last_history_full_horizon": 1786923900.0,
+      "groups_used": {
+        "phase": 195
+      }
+    },
+    {
+      "day": 1787011200,
+      "history_rows": 5999,
+      "history_timestamps": 2136,
+      "last_history_exit": 1786982400.0,
+      "last_history_full_horizon": 1787008500.0,
+      "groups_used": {
+        "phase": 179
+      }
+    },
+    {
+      "day": 1787097600,
+      "history_rows": 6062,
+      "history_timestamps": 2151,
+      "last_history_exit": 1787087700.0,
+      "last_history_full_horizon": 1787096700.0,
+      "groups_used": {
+        "phase": 210
+      }
+    },
+    {
+      "day": 1787184000,
+      "history_rows": 6013,
+      "history_timestamps": 2153,
+      "last_history_exit": 1787151600.0,
+      "last_history_full_horizon": 1787183100.0,
+      "groups_used": {
+        "phase": 225
+      }
+    },
+    {
+      "day": 1787270400,
+      "history_rows": 6045,
+      "history_timestamps": 2136,
+      "last_history_exit": 1787238900.0,
+      "last_history_full_horizon": 1787269500.0,
+      "groups_used": {
+        "phase": 182
+      }
+    },
+    {
+      "day": 1787356800,
+      "history_rows": 6019,
+      "history_timestamps": 2129,
+      "last_history_exit": 1787304600.0,
+      "last_history_full_horizon": 1787346000.0,
+      "groups_used": {
+        "family": 2,
+        "phase": 104
+      }
+    },
+    {
+      "day": 1787443200,
+      "history_rows": 5932,
+      "history_timestamps": 2104,
+      "last_history_exit": 1787436900.0,
+      "last_history_full_horizon": 1787437800.0,
+      "groups_used": {
+        "phase": 169
+      }
+    },
+    {
+      "day": 1787529600,
+      "history_rows": 5910,
+      "history_timestamps": 2098,
+      "last_history_exit": 1787496300.0,
+      "last_history_full_horizon": 1787528700.0,
+      "groups_used": {
+        "phase": 147
+      }
+    },
+    {
+      "day": 1787616000,
+      "history_rows": 5915,
+      "history_timestamps": 2077,
+      "last_history_exit": 1787580000.0,
+      "last_history_full_horizon": 1787615100.0,
+      "groups_used": {
+        "phase": 166,
+        "family": 2
+      }
+    },
+    {
+      "day": 1787702400,
+      "history_rows": 5859,
+      "history_timestamps": 2060,
+      "last_history_exit": 1787686200.0,
+      "last_history_full_horizon": 1787701500.0,
+      "groups_used": {
+        "phase": 249
+      }
+    },
+    {
+      "day": 1787788800,
+      "history_rows": 5830,
+      "history_timestamps": 2051,
+      "last_history_exit": 1787757300.0,
+      "last_history_full_horizon": 1787787900.0,
+      "groups_used": {
+        "phase": 201
+      }
+    },
+    {
+      "day": 1787875200,
+      "history_rows": 5856,
+      "history_timestamps": 2062,
+      "last_history_exit": 1787854500.0,
+      "last_history_full_horizon": 1787874300.0,
+      "groups_used": {
+        "phase": 209,
+        "family": 2
+      }
+    },
+    {
+      "day": 1787961600,
+      "history_rows": 5880,
+      "history_timestamps": 2059,
+      "last_history_exit": 1787927400.0,
+      "last_history_full_horizon": 1787960700.0,
+      "groups_used": {
+        "phase": 154
+      }
+    },
+    {
+      "day": 1788048000,
+      "history_rows": 5837,
+      "history_timestamps": 2042,
+      "last_history_exit": 1788018300.0,
+      "last_history_full_horizon": 1788047100.0,
+      "groups_used": {
+        "phase": 246
+      }
+    },
+    {
+      "day": 1788134400,
+      "history_rows": 5758,
+      "history_timestamps": 2034,
+      "last_history_exit": 1788102900.0,
+      "last_history_full_horizon": 1788131700.0,
+      "groups_used": {
+        "phase": 229
+      }
+    }
+  ],
+  "later": null,
+  "sources": {
+    "C:\\Users\\Lenovo\\Desktop\\telegram bot\\crypto_native_price_calibration_nov19_audit.py": "277bc9b7f79331b057161ec6ae5f640029aaeb819d850c3f46bc5f1238c080af",
+    "crypto_native_price_calibration_nov19.py": "7fc8d032c4a4d5abcd74ab7b0125db94ee58abed6087d13d32e3375c81b2e6e5",
+    "crypto_native_long_phase_nov19.py": "824a62dcbea5420c7a9efa56b9fd3c6d777533b7597e3ca8678736d4ce8ac947",
+    "crypto_native_price_nov19_audit.py": "6fa69dd33ba971eda01abb140154e73e8d0f517714988d7c5f700378649b206f",
+    "reports\\audit_2026_09_08\\crypto_native_price_nov19.json": "6b74f6c8c8f9a773fc744ed0d4cad8dff3b5eec507da26eda018d4fc38ab87fb",
+    "reports\\audit_2026_09_08\\crypto_native_price_nov19_model.pkl": "f23c2844c20144fad37213809dd46aca67ab6477d4647f5e13f82ea0d0072407",
+    "reports\\audit_2026_09_08\\crypto_native_price_nov19_pool_sources.json": "ef357ddb491b3211c4d9e61bb072d3477daa79643918c075a1e0a5253d329e9e",
+    "reports\\audit_2026_09_08\\xperp_15m_nov14_merged\\manifest.json": "6ebba73ab8fe00a7a0740feaf3b6fdc867d4773dd36277be53d42f8e20a236b5",
+    "..\\tusa stocks\\reports\\audit_2026_09_08\\stock_close_anchor_nov16_causal_candidates_known_close.pkl": "29d08f1a4f55d3ea59279752206a65ab5c947691c261a5a551367bce9475c16e",
+    "reports\\audit_2026_09_08\\shared_xperp_specs_nov14.json": "7a4a76b813dfe6a5a08c9e858b17d453285dddc99529cdc293885682cf2bee0e"
+  },
+  "limitations": [
+    "All historical eras have been inspected previously; chronological split is no new untouched holdout.",
+    "Current matched native contracts and current specifications; survivorship and historical data vintages remain.",
+    "Known prior close is not an executable bid/ask; 15m last-price stop-first/next-bar BE paths are public proxies.",
+    "Runner price label has no ideal TP1 bank; shared cash applies actual current lot rounding for requested 5%.",
+    "Selection uses two separate flat $130 months only; later September onward account is continuous without monthly resets.",
+    "Stock feed is a frozen reference baseline with its existing last20 R PAPER gate, not current client execution.",
+    "No full floating-equity guard or minute pause recovery,fees,funding,transfers,publication latency or private fills.",
+    "May listing coverage and November end are partial; no monthly profit promise or automatic margin change.",
+    "Correction chosen after inspecting base-model later errors; no pristine holdout is claimed.",
+    "Every midnight uses only prior 30-day raw candidates with full horizon and exit strictly before midnight.",
+    "Calibration excludes May/June fit labels, uses timestamp weights and minimum distinct times, not independence claims.",
+    "Hypothetical outcomes remain available when no private trade opened; account risk rejection is not a model loss label.",
+    "Cash threshold chosen only from July/August; later outcomes may update the fixed daily rule, never threshold."
+  ]
+}

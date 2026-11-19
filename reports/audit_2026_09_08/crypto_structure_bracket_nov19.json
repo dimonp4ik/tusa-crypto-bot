@@ -1,0 +1,1859 @@
+{
+  "status": "STRUCTURAL_STOP_PAIRED_REFERENCE_RESEARCH",
+  "objective_verified": false,
+  "live_activation_supported": false,
+  "protocol": {
+    "declared_at": "2026-11-19T13:37:20.117288+00:00",
+    "sources": {
+      "C:\\Users\\Lenovo\\Desktop\\telegram bot\\crypto_structure_bracket_nov19_audit.py": "5832eee147efebc6d3b8976d27e48c2506e8139b684c028236b11c063013fbc1",
+      "crypto_structure_bracket_nov19.py": "8ee2f8736099c7d54d66e6f12d1a0c56d88e10fe75601ab1cd61c1613d18b459",
+      "crypto_native_weekly_nov19_audit.py": "c977cfd4d9cbe2bf4e5ea0204de756201b61f149be8467b4a956a238eca7d4b3",
+      "cash_tp1_policy_nov19.py": "5d20ff72c05708620e72f1d16fa01423fb765547ade8fc232e83a4eb5606c519",
+      "account_cash_guard_nov17_audit.py": "d8f32b806b9b1c9792971c023cd7ad8945854199bcd4b30ec496780e6b28ca28",
+      "reports\\audit_2026_09_08\\crypto_native_price_nov19_pool_sources.json": "ef357ddb491b3211c4d9e61bb072d3477daa79643918c075a1e0a5253d329e9e",
+      "reports\\audit_2026_09_08\\xperp_15m_nov14_merged\\manifest.json": "6ebba73ab8fe00a7a0740feaf3b6fdc867d4773dd36277be53d42f8e20a236b5",
+      "..\\tusa stocks\\reports\\audit_2026_09_08\\stock_close_anchor_nov16_causal_candidates_known_close.pkl": "29d08f1a4f55d3ea59279752206a65ab5c947691c261a5a551367bce9475c16e",
+      "reports\\audit_2026_09_08\\shared_xperp_specs_nov14.json": "7a4a76b813dfe6a5a08c9e858b17d453285dddc99529cdc293885682cf2bee0e",
+      "reports\\audit_2026_09_08\\crypto_structure_bracket_nov19_protocol.json": "78d7747f98bed44f5fdc78691891d7a1c46c8875fba5551878255ff0ee4e0122"
+    },
+    "policies": [
+      "control",
+      "swing4_widen",
+      "swing8_widen",
+      "confirmed_pivot_widen"
+    ],
+    "implementation_revision": "v2: exact original stop-subtraction risk for target arithmetic; first run failed parity before cash selection",
+    "fixed_original_entry_and_tp_prices": true,
+    "stop_only_widens": true,
+    "stop_maximum_fraction": 0.02,
+    "buffer_atr": 0.25,
+    "pivot_left_right": [
+      2,
+      2
+    ],
+    "pivot_history_bars": 96,
+    "selection_end": 1788220800.0,
+    "selection": "worst July/August crypto contribution minus additive DD across both TP1 policies and priorities",
+    "minimum_cash_trades_per_selection_case": 30,
+    "no_later_retuning": true,
+    "compare_matched_original_stops": true,
+    "objective_verified": false,
+    "live_activation_supported": false
+  },
+  "control_path_parity": 2373,
+  "geometry": {
+    "control": {
+      "retained": 2373,
+      "rejected": 0,
+      "widened": 0
+    },
+    "swing4_widen": {
+      "retained": 1748,
+      "rejected": 625,
+      "widened": 514
+    },
+    "swing8_widen": {
+      "retained": 1390,
+      "rejected": 983,
+      "widened": 319
+    },
+    "confirmed_pivot_widen": {
+      "retained": 765,
+      "rejected": 1608,
+      "widened": 279
+    }
+  },
+  "paired_outcomes_descriptive": {
+    "control": {
+      "SL -> SL": 765,
+      "LOCK -> LOCK": 1109,
+      "TP_RUNNER -> TP_RUNNER": 467,
+      "EXPIRED -> EXPIRED": 9,
+      "TP_EXPIRED -> TP_EXPIRED": 23
+    },
+    "swing4_widen": {
+      "SL -> SL": 514,
+      "LOCK -> LOCK": 826,
+      "TP_RUNNER -> TP_RUNNER": 356,
+      "SL -> LOCK": 19,
+      "SL -> TP_EXPIRED": 3,
+      "EXPIRED -> EXPIRED": 6,
+      "SL -> TP_RUNNER": 5,
+      "TP_EXPIRED -> TP_EXPIRED": 17,
+      "SL -> EXPIRED": 2
+    },
+    "swing8_widen": {
+      "SL -> SL": 405,
+      "LOCK -> LOCK": 664,
+      "TP_RUNNER -> TP_RUNNER": 288,
+      "SL -> LOCK": 13,
+      "SL -> TP_EXPIRED": 1,
+      "SL -> TP_RUNNER": 4,
+      "EXPIRED -> EXPIRED": 3,
+      "TP_EXPIRED -> TP_EXPIRED": 11,
+      "SL -> EXPIRED": 1
+    },
+    "confirmed_pivot_widen": {
+      "LOCK -> LOCK": 377,
+      "SL -> SL": 198,
+      "TP_RUNNER -> TP_RUNNER": 171,
+      "SL -> LOCK": 9,
+      "SL -> TP_EXPIRED": 1,
+      "SL -> TP_RUNNER": 2,
+      "EXPIRED -> EXPIRED": 1,
+      "TP_EXPIRED -> TP_EXPIRED": 5,
+      "SL -> EXPIRED": 1
+    }
+  },
+  "selection": {
+    "control": {
+      "parts": [
+        {
+          "start": 1782864000.0,
+          "tp1": "requested5",
+          "priority": "crypto",
+          "closed": 101,
+          "winrate_pct": 30.693069306930692,
+          "contribution_pct": 0.35913296703297054,
+          "additive_crypto_cash_drawdown_pct": 5.015510989011002,
+          "account_cash_drawdown_pct": 6.92437
+        },
+        {
+          "start": 1782864000.0,
+          "tp1": "requested5",
+          "priority": "stocks",
+          "closed": 101,
+          "winrate_pct": 30.693069306930692,
+          "contribution_pct": 0.35913296703297054,
+          "additive_crypto_cash_drawdown_pct": 5.015510989011002,
+          "account_cash_drawdown_pct": 6.92437
+        },
+        {
+          "start": 1782864000.0,
+          "tp1": "half_minimum",
+          "priority": "crypto",
+          "closed": 101,
+          "winrate_pct": 65.34653465346534,
+          "contribution_pct": -0.08086703296703276,
+          "additive_crypto_cash_drawdown_pct": 3.641390109890122,
+          "account_cash_drawdown_pct": 6.955204
+        },
+        {
+          "start": 1782864000.0,
+          "tp1": "half_minimum",
+          "priority": "stocks",
+          "closed": 101,
+          "winrate_pct": 65.34653465346534,
+          "contribution_pct": -0.08086703296703276,
+          "additive_crypto_cash_drawdown_pct": 3.641390109890122,
+          "account_cash_drawdown_pct": 6.955204
+        },
+        {
+          "start": 1785542400.0,
+          "tp1": "requested5",
+          "priority": "crypto",
+          "closed": 156,
+          "winrate_pct": 32.05128205128205,
+          "contribution_pct": 0.5942439560439845,
+          "additive_crypto_cash_drawdown_pct": 6.0296263736263676,
+          "account_cash_drawdown_pct": 6.634479
+        },
+        {
+          "start": 1785542400.0,
+          "tp1": "requested5",
+          "priority": "stocks",
+          "closed": 156,
+          "winrate_pct": 32.05128205128205,
+          "contribution_pct": 0.5942439560439845,
+          "additive_crypto_cash_drawdown_pct": 6.0296263736263676,
+          "account_cash_drawdown_pct": 6.634479
+        },
+        {
+          "start": 1785542400.0,
+          "tp1": "half_minimum",
+          "priority": "crypto",
+          "closed": 156,
+          "winrate_pct": 67.3076923076923,
+          "contribution_pct": 0.7738445054945221,
+          "additive_crypto_cash_drawdown_pct": 4.7970758241758205,
+          "account_cash_drawdown_pct": 6.059908
+        },
+        {
+          "start": 1785542400.0,
+          "tp1": "half_minimum",
+          "priority": "stocks",
+          "closed": 156,
+          "winrate_pct": 67.3076923076923,
+          "contribution_pct": 0.7738445054945221,
+          "additive_crypto_cash_drawdown_pct": 4.7970758241758205,
+          "account_cash_drawdown_pct": 6.059908
+        }
+      ],
+      "matched_original": [
+        {
+          "start": 1782864000.0,
+          "tp1": "requested5",
+          "priority": "crypto",
+          "closed": 101,
+          "winrate_pct": 30.693069306930692,
+          "contribution_pct": 0.35913296703297054,
+          "additive_crypto_cash_drawdown_pct": 5.015510989011002,
+          "account_cash_drawdown_pct": 6.92437
+        },
+        {
+          "start": 1782864000.0,
+          "tp1": "requested5",
+          "priority": "stocks",
+          "closed": 101,
+          "winrate_pct": 30.693069306930692,
+          "contribution_pct": 0.35913296703297054,
+          "additive_crypto_cash_drawdown_pct": 5.015510989011002,
+          "account_cash_drawdown_pct": 6.92437
+        },
+        {
+          "start": 1782864000.0,
+          "tp1": "half_minimum",
+          "priority": "crypto",
+          "closed": 101,
+          "winrate_pct": 65.34653465346534,
+          "contribution_pct": -0.08086703296703276,
+          "additive_crypto_cash_drawdown_pct": 3.641390109890122,
+          "account_cash_drawdown_pct": 6.955204
+        },
+        {
+          "start": 1782864000.0,
+          "tp1": "half_minimum",
+          "priority": "stocks",
+          "closed": 101,
+          "winrate_pct": 65.34653465346534,
+          "contribution_pct": -0.08086703296703276,
+          "additive_crypto_cash_drawdown_pct": 3.641390109890122,
+          "account_cash_drawdown_pct": 6.955204
+        },
+        {
+          "start": 1785542400.0,
+          "tp1": "requested5",
+          "priority": "crypto",
+          "closed": 156,
+          "winrate_pct": 32.05128205128205,
+          "contribution_pct": 0.5942439560439845,
+          "additive_crypto_cash_drawdown_pct": 6.0296263736263676,
+          "account_cash_drawdown_pct": 6.634479
+        },
+        {
+          "start": 1785542400.0,
+          "tp1": "requested5",
+          "priority": "stocks",
+          "closed": 156,
+          "winrate_pct": 32.05128205128205,
+          "contribution_pct": 0.5942439560439845,
+          "additive_crypto_cash_drawdown_pct": 6.0296263736263676,
+          "account_cash_drawdown_pct": 6.634479
+        },
+        {
+          "start": 1785542400.0,
+          "tp1": "half_minimum",
+          "priority": "crypto",
+          "closed": 156,
+          "winrate_pct": 67.3076923076923,
+          "contribution_pct": 0.7738445054945221,
+          "additive_crypto_cash_drawdown_pct": 4.7970758241758205,
+          "account_cash_drawdown_pct": 6.059908
+        },
+        {
+          "start": 1785542400.0,
+          "tp1": "half_minimum",
+          "priority": "stocks",
+          "closed": 156,
+          "winrate_pct": 67.3076923076923,
+          "contribution_pct": 0.7738445054945221,
+          "additive_crypto_cash_drawdown_pct": 4.7970758241758205,
+          "account_cash_drawdown_pct": 6.059908
+        }
+      ],
+      "qualified": false,
+      "score": -5.4353824175823835
+    },
+    "swing4_widen": {
+      "parts": [
+        {
+          "start": 1782864000.0,
+          "tp1": "requested5",
+          "priority": "crypto",
+          "closed": 90,
+          "winrate_pct": 28.88888888888889,
+          "contribution_pct": -0.13506346153844537,
+          "additive_crypto_cash_drawdown_pct": 4.312321428571433,
+          "account_cash_drawdown_pct": 8.539942
+        },
+        {
+          "start": 1782864000.0,
+          "tp1": "requested5",
+          "priority": "stocks",
+          "closed": 90,
+          "winrate_pct": 28.88888888888889,
+          "contribution_pct": -0.13506346153844537,
+          "additive_crypto_cash_drawdown_pct": 4.312321428571433,
+          "account_cash_drawdown_pct": 8.539942
+        },
+        {
+          "start": 1782864000.0,
+          "tp1": "half_minimum",
+          "priority": "crypto",
+          "closed": 90,
+          "winrate_pct": 70.0,
+          "contribution_pct": 0.2534461538461662,
+          "additive_crypto_cash_drawdown_pct": 2.7572239010988953,
+          "account_cash_drawdown_pct": 8.042221
+        },
+        {
+          "start": 1782864000.0,
+          "tp1": "half_minimum",
+          "priority": "stocks",
+          "closed": 90,
+          "winrate_pct": 70.0,
+          "contribution_pct": 0.2534461538461662,
+          "additive_crypto_cash_drawdown_pct": 2.7572239010988953,
+          "account_cash_drawdown_pct": 8.042221
+        },
+        {
+          "start": 1785542400.0,
+          "tp1": "requested5",
+          "priority": "crypto",
+          "closed": 132,
+          "winrate_pct": 35.60606060606061,
+          "contribution_pct": 2.4945131868131982,
+          "additive_crypto_cash_drawdown_pct": 6.885554945054949,
+          "account_cash_drawdown_pct": 7.50849
+        },
+        {
+          "start": 1785542400.0,
+          "tp1": "requested5",
+          "priority": "stocks",
+          "closed": 132,
+          "winrate_pct": 35.60606060606061,
+          "contribution_pct": 2.4945131868131982,
+          "additive_crypto_cash_drawdown_pct": 6.885554945054949,
+          "account_cash_drawdown_pct": 7.50849
+        },
+        {
+          "start": 1785542400.0,
+          "tp1": "half_minimum",
+          "priority": "crypto",
+          "closed": 132,
+          "winrate_pct": 68.93939393939394,
+          "contribution_pct": 2.0455401098901134,
+          "additive_crypto_cash_drawdown_pct": 5.647518681318689,
+          "account_cash_drawdown_pct": 6.64383
+        },
+        {
+          "start": 1785542400.0,
+          "tp1": "half_minimum",
+          "priority": "stocks",
+          "closed": 132,
+          "winrate_pct": 68.93939393939394,
+          "contribution_pct": 2.0455401098901134,
+          "additive_crypto_cash_drawdown_pct": 5.647518681318689,
+          "account_cash_drawdown_pct": 6.64383
+        }
+      ],
+      "matched_original": [
+        {
+          "start": 1782864000.0,
+          "tp1": "requested5",
+          "priority": "crypto",
+          "closed": 90,
+          "winrate_pct": 28.88888888888889,
+          "contribution_pct": 0.3700230769230838,
+          "additive_crypto_cash_drawdown_pct": 3.755313186813183,
+          "account_cash_drawdown_pct": 8.350089
+        },
+        {
+          "start": 1782864000.0,
+          "tp1": "requested5",
+          "priority": "stocks",
+          "closed": 90,
+          "winrate_pct": 28.88888888888889,
+          "contribution_pct": 0.3700230769230838,
+          "additive_crypto_cash_drawdown_pct": 3.755313186813183,
+          "account_cash_drawdown_pct": 8.350089
+        },
+        {
+          "start": 1782864000.0,
+          "tp1": "half_minimum",
+          "priority": "crypto",
+          "closed": 90,
+          "winrate_pct": 68.88888888888889,
+          "contribution_pct": 0.6393472527472557,
+          "additive_crypto_cash_drawdown_pct": 2.3445659340659306,
+          "account_cash_drawdown_pct": 7.944174
+        },
+        {
+          "start": 1782864000.0,
+          "tp1": "half_minimum",
+          "priority": "stocks",
+          "closed": 90,
+          "winrate_pct": 68.88888888888889,
+          "contribution_pct": 0.6393472527472557,
+          "additive_crypto_cash_drawdown_pct": 2.3445659340659306,
+          "account_cash_drawdown_pct": 7.944174
+        },
+        {
+          "start": 1785542400.0,
+          "tp1": "requested5",
+          "priority": "crypto",
+          "closed": 133,
+          "winrate_pct": 33.83458646616541,
+          "contribution_pct": 2.103101098901121,
+          "additive_crypto_cash_drawdown_pct": 6.41972527472527,
+          "account_cash_drawdown_pct": 7.211571
+        },
+        {
+          "start": 1785542400.0,
+          "tp1": "requested5",
+          "priority": "stocks",
+          "closed": 133,
+          "winrate_pct": 33.83458646616541,
+          "contribution_pct": 2.103101098901121,
+          "additive_crypto_cash_drawdown_pct": 6.41972527472527,
+          "account_cash_drawdown_pct": 7.211571
+        },
+        {
+          "start": 1785542400.0,
+          "tp1": "half_minimum",
+          "priority": "crypto",
+          "closed": 133,
+          "winrate_pct": 67.66917293233082,
+          "contribution_pct": 1.9327928571428714,
+          "additive_crypto_cash_drawdown_pct": 5.179689010989008,
+          "account_cash_drawdown_pct": 6.340605
+        },
+        {
+          "start": 1785542400.0,
+          "tp1": "half_minimum",
+          "priority": "stocks",
+          "closed": 133,
+          "winrate_pct": 67.66917293233082,
+          "contribution_pct": 1.9327928571428714,
+          "additive_crypto_cash_drawdown_pct": 5.179689010989008,
+          "account_cash_drawdown_pct": 6.340605
+        }
+      ],
+      "qualified": false,
+      "score": -4.447384890109879
+    },
+    "swing8_widen": {
+      "parts": [
+        {
+          "start": 1782864000.0,
+          "tp1": "requested5",
+          "priority": "crypto",
+          "closed": 72,
+          "winrate_pct": 25.0,
+          "contribution_pct": -2.0043804945054933,
+          "additive_crypto_cash_drawdown_pct": 5.379417582417589,
+          "account_cash_drawdown_pct": 8.331604
+        },
+        {
+          "start": 1782864000.0,
+          "tp1": "requested5",
+          "priority": "stocks",
+          "closed": 72,
+          "winrate_pct": 25.0,
+          "contribution_pct": -2.0043804945054933,
+          "additive_crypto_cash_drawdown_pct": 5.379417582417589,
+          "account_cash_drawdown_pct": 8.331604
+        },
+        {
+          "start": 1782864000.0,
+          "tp1": "half_minimum",
+          "priority": "crypto",
+          "closed": 72,
+          "winrate_pct": 65.27777777777777,
+          "contribution_pct": -1.8398489010989019,
+          "additive_crypto_cash_drawdown_pct": 4.306358516483523,
+          "account_cash_drawdown_pct": 7.919109
+        },
+        {
+          "start": 1782864000.0,
+          "tp1": "half_minimum",
+          "priority": "stocks",
+          "closed": 72,
+          "winrate_pct": 65.27777777777777,
+          "contribution_pct": -1.8398489010989019,
+          "additive_crypto_cash_drawdown_pct": 4.306358516483523,
+          "account_cash_drawdown_pct": 7.919109
+        },
+        {
+          "start": 1785542400.0,
+          "tp1": "requested5",
+          "priority": "crypto",
+          "closed": 108,
+          "winrate_pct": 38.888888888888886,
+          "contribution_pct": 3.0330590659340926,
+          "additive_crypto_cash_drawdown_pct": 4.157521153846154,
+          "account_cash_drawdown_pct": 5.760539
+        },
+        {
+          "start": 1785542400.0,
+          "tp1": "requested5",
+          "priority": "stocks",
+          "closed": 108,
+          "winrate_pct": 38.888888888888886,
+          "contribution_pct": 3.0330590659340926,
+          "additive_crypto_cash_drawdown_pct": 4.157521153846154,
+          "account_cash_drawdown_pct": 5.760539
+        },
+        {
+          "start": 1785542400.0,
+          "tp1": "half_minimum",
+          "priority": "crypto",
+          "closed": 108,
+          "winrate_pct": 71.29629629629629,
+          "contribution_pct": 2.4608964285714436,
+          "additive_crypto_cash_drawdown_pct": 3.792696978021979,
+          "account_cash_drawdown_pct": 5.53835
+        },
+        {
+          "start": 1785542400.0,
+          "tp1": "half_minimum",
+          "priority": "stocks",
+          "closed": 108,
+          "winrate_pct": 71.29629629629629,
+          "contribution_pct": 2.4608964285714436,
+          "additive_crypto_cash_drawdown_pct": 3.792696978021979,
+          "account_cash_drawdown_pct": 5.53835
+        }
+      ],
+      "matched_original": [
+        {
+          "start": 1782864000.0,
+          "tp1": "requested5",
+          "priority": "crypto",
+          "closed": 72,
+          "winrate_pct": 25.0,
+          "contribution_pct": -1.1332362637362579,
+          "additive_crypto_cash_drawdown_pct": 4.496857142857147,
+          "account_cash_drawdown_pct": 7.788854
+        },
+        {
+          "start": 1782864000.0,
+          "tp1": "requested5",
+          "priority": "stocks",
+          "closed": 72,
+          "winrate_pct": 25.0,
+          "contribution_pct": -1.1332362637362579,
+          "additive_crypto_cash_drawdown_pct": 4.496857142857147,
+          "account_cash_drawdown_pct": 7.788854
+        },
+        {
+          "start": 1782864000.0,
+          "tp1": "half_minimum",
+          "priority": "crypto",
+          "closed": 72,
+          "winrate_pct": 63.888888888888886,
+          "contribution_pct": -0.9680989010988966,
+          "additive_crypto_cash_drawdown_pct": 3.349302197802201,
+          "account_cash_drawdown_pct": 7.350079
+        },
+        {
+          "start": 1782864000.0,
+          "tp1": "half_minimum",
+          "priority": "stocks",
+          "closed": 72,
+          "winrate_pct": 63.888888888888886,
+          "contribution_pct": -0.9680989010988966,
+          "additive_crypto_cash_drawdown_pct": 3.349302197802201,
+          "account_cash_drawdown_pct": 7.350079
+        },
+        {
+          "start": 1785542400.0,
+          "tp1": "requested5",
+          "priority": "crypto",
+          "closed": 109,
+          "winrate_pct": 35.77981651376147,
+          "contribution_pct": 2.5200934065934404,
+          "additive_crypto_cash_drawdown_pct": 3.7646131868131802,
+          "account_cash_drawdown_pct": 5.478271
+        },
+        {
+          "start": 1785542400.0,
+          "tp1": "requested5",
+          "priority": "stocks",
+          "closed": 109,
+          "winrate_pct": 35.77981651376147,
+          "contribution_pct": 2.5200934065934404,
+          "additive_crypto_cash_drawdown_pct": 3.7646131868131802,
+          "account_cash_drawdown_pct": 5.478271
+        },
+        {
+          "start": 1785542400.0,
+          "tp1": "half_minimum",
+          "priority": "crypto",
+          "closed": 109,
+          "winrate_pct": 69.72477064220183,
+          "contribution_pct": 2.20583296703299,
+          "additive_crypto_cash_drawdown_pct": 3.5637219780219738,
+          "account_cash_drawdown_pct": 5.499396
+        },
+        {
+          "start": 1785542400.0,
+          "tp1": "half_minimum",
+          "priority": "stocks",
+          "closed": 109,
+          "winrate_pct": 69.72477064220183,
+          "contribution_pct": 2.20583296703299,
+          "additive_crypto_cash_drawdown_pct": 3.5637219780219738,
+          "account_cash_drawdown_pct": 5.499396
+        }
+      ],
+      "qualified": false,
+      "score": -7.383798076923082
+    },
+    "confirmed_pivot_widen": {
+      "parts": [
+        {
+          "start": 1782864000.0,
+          "tp1": "requested5",
+          "priority": "crypto",
+          "closed": 54,
+          "winrate_pct": 31.48148148148148,
+          "contribution_pct": 1.3360370879120942,
+          "additive_crypto_cash_drawdown_pct": 1.6313228021978001,
+          "account_cash_drawdown_pct": 7.310343
+        },
+        {
+          "start": 1782864000.0,
+          "tp1": "requested5",
+          "priority": "stocks",
+          "closed": 54,
+          "winrate_pct": 31.48148148148148,
+          "contribution_pct": 1.3360370879120942,
+          "additive_crypto_cash_drawdown_pct": 1.6313228021978001,
+          "account_cash_drawdown_pct": 7.310343
+        },
+        {
+          "start": 1782864000.0,
+          "tp1": "half_minimum",
+          "priority": "crypto",
+          "closed": 54,
+          "winrate_pct": 70.37037037037037,
+          "contribution_pct": 0.31478983516484044,
+          "additive_crypto_cash_drawdown_pct": 1.3022156593406558,
+          "account_cash_drawdown_pct": 6.887712
+        },
+        {
+          "start": 1782864000.0,
+          "tp1": "half_minimum",
+          "priority": "stocks",
+          "closed": 54,
+          "winrate_pct": 70.37037037037037,
+          "contribution_pct": 0.31478983516484044,
+          "additive_crypto_cash_drawdown_pct": 1.3022156593406558,
+          "account_cash_drawdown_pct": 6.887712
+        },
+        {
+          "start": 1785542400.0,
+          "tp1": "requested5",
+          "priority": "crypto",
+          "closed": 74,
+          "winrate_pct": 48.648648648648646,
+          "contribution_pct": 5.421719505494519,
+          "additive_crypto_cash_drawdown_pct": 2.9181035714285746,
+          "account_cash_drawdown_pct": 4.346148
+        },
+        {
+          "start": 1785542400.0,
+          "tp1": "requested5",
+          "priority": "stocks",
+          "closed": 74,
+          "winrate_pct": 48.648648648648646,
+          "contribution_pct": 5.421719505494519,
+          "additive_crypto_cash_drawdown_pct": 2.9181035714285746,
+          "account_cash_drawdown_pct": 4.346148
+        },
+        {
+          "start": 1785542400.0,
+          "tp1": "half_minimum",
+          "priority": "crypto",
+          "closed": 74,
+          "winrate_pct": 72.97297297297297,
+          "contribution_pct": 3.8871112637362693,
+          "additive_crypto_cash_drawdown_pct": 2.2730486263736296,
+          "account_cash_drawdown_pct": 4.245514
+        },
+        {
+          "start": 1785542400.0,
+          "tp1": "half_minimum",
+          "priority": "stocks",
+          "closed": 74,
+          "winrate_pct": 72.97297297297297,
+          "contribution_pct": 3.8871112637362693,
+          "additive_crypto_cash_drawdown_pct": 2.2730486263736296,
+          "account_cash_drawdown_pct": 4.245514
+        }
+      ],
+      "matched_original": [
+        {
+          "start": 1782864000.0,
+          "tp1": "requested5",
+          "priority": "crypto",
+          "closed": 54,
+          "winrate_pct": 31.48148148148148,
+          "contribution_pct": 2.342851648351651,
+          "additive_crypto_cash_drawdown_pct": 1.332967032967033,
+          "account_cash_drawdown_pct": 7.045221
+        },
+        {
+          "start": 1782864000.0,
+          "tp1": "requested5",
+          "priority": "stocks",
+          "closed": 54,
+          "winrate_pct": 31.48148148148148,
+          "contribution_pct": 2.342851648351651,
+          "additive_crypto_cash_drawdown_pct": 1.332967032967033,
+          "account_cash_drawdown_pct": 7.045221
+        },
+        {
+          "start": 1782864000.0,
+          "tp1": "half_minimum",
+          "priority": "crypto",
+          "closed": 54,
+          "winrate_pct": 68.51851851851852,
+          "contribution_pct": 1.2376483516483532,
+          "additive_crypto_cash_drawdown_pct": 1.0621318681318668,
+          "account_cash_drawdown_pct": 6.607808
+        },
+        {
+          "start": 1782864000.0,
+          "tp1": "half_minimum",
+          "priority": "stocks",
+          "closed": 54,
+          "winrate_pct": 68.51851851851852,
+          "contribution_pct": 1.2376483516483532,
+          "additive_crypto_cash_drawdown_pct": 1.0621318681318668,
+          "account_cash_drawdown_pct": 6.607808
+        },
+        {
+          "start": 1785542400.0,
+          "tp1": "requested5",
+          "priority": "crypto",
+          "closed": 74,
+          "winrate_pct": 45.945945945945944,
+          "contribution_pct": 5.086830769230794,
+          "additive_crypto_cash_drawdown_pct": 2.5048406593406582,
+          "account_cash_drawdown_pct": 3.99777
+        },
+        {
+          "start": 1785542400.0,
+          "tp1": "requested5",
+          "priority": "stocks",
+          "closed": 74,
+          "winrate_pct": 45.945945945945944,
+          "contribution_pct": 5.086830769230794,
+          "additive_crypto_cash_drawdown_pct": 2.5048406593406582,
+          "account_cash_drawdown_pct": 3.99777
+        },
+        {
+          "start": 1785542400.0,
+          "tp1": "half_minimum",
+          "priority": "crypto",
+          "closed": 74,
+          "winrate_pct": 70.27027027027027,
+          "contribution_pct": 3.5118258241758395,
+          "additive_crypto_cash_drawdown_pct": 1.8880472527472478,
+          "account_cash_drawdown_pct": 4.000147
+        },
+        {
+          "start": 1785542400.0,
+          "tp1": "half_minimum",
+          "priority": "stocks",
+          "closed": 74,
+          "winrate_pct": 70.27027027027027,
+          "contribution_pct": 3.5118258241758395,
+          "additive_crypto_cash_drawdown_pct": 1.8880472527472478,
+          "account_cash_drawdown_pct": 4.000147
+        }
+      ],
+      "qualified": true,
+      "score": -0.9874258241758154
+    }
+  },
+  "chosen_policy": "confirmed_pivot_widen",
+  "later": {
+    "control": {
+      "requested5": {
+        "crypto": {
+          "summary": {
+            "starting_capital": 130.0,
+            "ending_capital": 213.62958,
+            "return_pct": 64.330446,
+            "cash_drawdown_pct": 5.44646,
+            "trades": 881,
+            "skipped": {
+              "slots": 30,
+              "minimum_size": 0
+            },
+            "unplaceable_partials": 414,
+            "tp1_hits_without_bank": 178,
+            "full_tp1_closes": 0,
+            "peak_positions": 11,
+            "peak_by_bot": {
+              "stocks": 8,
+              "crypto": 4
+            },
+            "peak_reserved_margin_pct": 32.12283438082925,
+            "pnl_by_bot": {
+              "crypto": 41.694820000000036,
+              "stocks": 41.93475979999993
+            },
+            "return_contribution_pct": {
+              "crypto": 32.07293846153849,
+              "stocks": 32.25750753846148
+            }
+          },
+          "calendar_months": {
+            "2026-09": {
+              "opening_cash": 130.0,
+              "closing_cash": 173.02986330000024,
+              "return_pct": 33.09989484615403,
+              "cash_drawdown_pct": 5.446459654899492,
+              "return_contribution_pct": {
+                "crypto": 9.30775384615383,
+                "stocks": 23.79214100000001
+              },
+              "entries": 401,
+              "rejected_by_account_guard": 0,
+              "crypto_closed": 194,
+              "crypto_winrate_pct": 44.329896907216494,
+              "crypto_tp1_hits_without_bank": 67,
+              "stocks_closed": 205,
+              "stocks_winrate_pct": 43.90243902439025,
+              "stocks_tp1_hits_without_bank": 0
+            },
+            "2026-10": {
+              "opening_cash": 173.0298633,
+              "closing_cash": 216.05327094285735,
+              "return_pct": 24.864729603503854,
+              "cash_drawdown_pct": 2.3086699709809246,
+              "return_contribution_pct": {
+                "crypto": 16.375275690839178,
+                "stocks": 8.489453912664546
+              },
+              "entries": 367,
+              "rejected_by_account_guard": 0,
+              "crypto_closed": 198,
+              "crypto_winrate_pct": 44.44444444444444,
+              "crypto_tp1_hits_without_bank": 78,
+              "stocks_closed": 165,
+              "stocks_winrate_pct": 40.0,
+              "stocks_tp1_hits_without_bank": 0
+            },
+            "2026-11": {
+              "opening_cash": 216.05327094285713,
+              "closing_cash": 213.62957979999993,
+              "return_pct": -1.1218025685425626,
+              "cash_drawdown_pct": 4.4094184603660445,
+              "return_contribution_pct": {
+                "crypto": 0.5834777930653543,
+                "stocks": -1.7052803616078909
+              },
+              "entries": 113,
+              "rejected_by_account_guard": 0,
+              "crypto_closed": 76,
+              "crypto_winrate_pct": 32.89473684210526,
+              "crypto_tp1_hits_without_bank": 33,
+              "stocks_closed": 43,
+              "stocks_winrate_pct": 30.232558139534884,
+              "stocks_tp1_hits_without_bank": 0
+            }
+          }
+        },
+        "stocks": {
+          "summary": {
+            "starting_capital": 130.0,
+            "ending_capital": 213.62958,
+            "return_pct": 64.330446,
+            "cash_drawdown_pct": 5.44646,
+            "trades": 881,
+            "skipped": {
+              "slots": 30,
+              "minimum_size": 0
+            },
+            "unplaceable_partials": 414,
+            "tp1_hits_without_bank": 178,
+            "full_tp1_closes": 0,
+            "peak_positions": 11,
+            "peak_by_bot": {
+              "stocks": 8,
+              "crypto": 4
+            },
+            "peak_reserved_margin_pct": 32.12283438082925,
+            "pnl_by_bot": {
+              "crypto": 41.694820000000036,
+              "stocks": 41.93475979999993
+            },
+            "return_contribution_pct": {
+              "crypto": 32.07293846153849,
+              "stocks": 32.25750753846148
+            }
+          },
+          "calendar_months": {
+            "2026-09": {
+              "opening_cash": 130.0,
+              "closing_cash": 173.02986330000024,
+              "return_pct": 33.09989484615403,
+              "cash_drawdown_pct": 5.446459654899492,
+              "return_contribution_pct": {
+                "crypto": 9.30775384615383,
+                "stocks": 23.79214100000001
+              },
+              "entries": 401,
+              "rejected_by_account_guard": 0,
+              "crypto_closed": 194,
+              "crypto_winrate_pct": 44.329896907216494,
+              "crypto_tp1_hits_without_bank": 67,
+              "stocks_closed": 205,
+              "stocks_winrate_pct": 43.90243902439025,
+              "stocks_tp1_hits_without_bank": 0
+            },
+            "2026-10": {
+              "opening_cash": 173.0298633,
+              "closing_cash": 216.05327094285735,
+              "return_pct": 24.864729603503854,
+              "cash_drawdown_pct": 2.3086699709809246,
+              "return_contribution_pct": {
+                "crypto": 16.375275690839178,
+                "stocks": 8.489453912664546
+              },
+              "entries": 367,
+              "rejected_by_account_guard": 0,
+              "crypto_closed": 198,
+              "crypto_winrate_pct": 44.44444444444444,
+              "crypto_tp1_hits_without_bank": 78,
+              "stocks_closed": 165,
+              "stocks_winrate_pct": 40.0,
+              "stocks_tp1_hits_without_bank": 0
+            },
+            "2026-11": {
+              "opening_cash": 216.05327094285713,
+              "closing_cash": 213.62957979999993,
+              "return_pct": -1.1218025685425626,
+              "cash_drawdown_pct": 4.4094184603660445,
+              "return_contribution_pct": {
+                "crypto": 0.5834777930653543,
+                "stocks": -1.7052803616078909
+              },
+              "entries": 113,
+              "rejected_by_account_guard": 0,
+              "crypto_closed": 76,
+              "crypto_winrate_pct": 32.89473684210526,
+              "crypto_tp1_hits_without_bank": 33,
+              "stocks_closed": 43,
+              "stocks_winrate_pct": 30.232558139534884,
+              "stocks_tp1_hits_without_bank": 0
+            }
+          }
+        }
+      },
+      "half_minimum": {
+        "crypto": {
+          "summary": {
+            "starting_capital": 130.0,
+            "ending_capital": 203.100892,
+            "return_pct": 56.231455,
+            "cash_drawdown_pct": 5.013241,
+            "trades": 881,
+            "skipped": {
+              "slots": 30,
+              "minimum_size": 0
+            },
+            "unplaceable_partials": 0,
+            "tp1_hits_without_bank": 0,
+            "full_tp1_closes": 0,
+            "peak_positions": 11,
+            "peak_by_bot": {
+              "stocks": 8,
+              "crypto": 4
+            },
+            "peak_reserved_margin_pct": 31.86282764567227,
+            "pnl_by_bot": {
+              "crypto": 31.782555000000038,
+              "stocks": 41.31833669999993
+            },
+            "return_contribution_pct": {
+              "crypto": 24.44811923076926,
+              "stocks": 31.783335923076873
+            }
+          },
+          "calendar_months": {
+            "2026-09": {
+              "opening_cash": 130.0,
+              "closing_cash": 168.21016327142854,
+              "return_pct": 29.392433285714258,
+              "cash_drawdown_pct": 5.013241170885408,
+              "return_contribution_pct": {
+                "crypto": 6.025710439560421,
+                "stocks": 23.366722846153856
+              },
+              "entries": 401,
+              "rejected_by_account_guard": 0,
+              "crypto_closed": 194,
+              "crypto_winrate_pct": 67.52577319587628,
+              "crypto_tp1_hits_without_bank": 0,
+              "stocks_closed": 205,
+              "stocks_winrate_pct": 43.90243902439025,
+              "stocks_tp1_hits_without_bank": 0
+            },
+            "2026-10": {
+              "opening_cash": 168.21016327142854,
+              "closing_cash": 206.40969384285717,
+              "return_pct": 22.70940698737021,
+              "cash_drawdown_pct": 2.262038683989017,
+              "return_contribution_pct": {
+                "crypto": 14.161390791227351,
+                "stocks": 8.548016196142802
+              },
+              "entries": 367,
+              "rejected_by_account_guard": 0,
+              "crypto_closed": 198,
+              "crypto_winrate_pct": 75.75757575757575,
+              "crypto_tp1_hits_without_bank": 0,
+              "stocks_closed": 165,
+              "stocks_winrate_pct": 40.0,
+              "stocks_tp1_hits_without_bank": 0
+            },
+            "2026-11": {
+              "opening_cash": 206.4096938428571,
+              "closing_cash": 203.10089169999995,
+              "return_pct": -1.6030265251864573,
+              "cash_drawdown_pct": 4.980087126800955,
+              "return_contribution_pct": {
+                "crypto": 0.06212540445920809,
+                "stocks": -1.665151929645658
+              },
+              "entries": 113,
+              "rejected_by_account_guard": 0,
+              "crypto_closed": 76,
+              "crypto_winrate_pct": 64.47368421052632,
+              "crypto_tp1_hits_without_bank": 0,
+              "stocks_closed": 43,
+              "stocks_winrate_pct": 30.232558139534884,
+              "stocks_tp1_hits_without_bank": 0
+            }
+          }
+        },
+        "stocks": {
+          "summary": {
+            "starting_capital": 130.0,
+            "ending_capital": 203.100892,
+            "return_pct": 56.231455,
+            "cash_drawdown_pct": 5.013241,
+            "trades": 881,
+            "skipped": {
+              "slots": 30,
+              "minimum_size": 0
+            },
+            "unplaceable_partials": 0,
+            "tp1_hits_without_bank": 0,
+            "full_tp1_closes": 0,
+            "peak_positions": 11,
+            "peak_by_bot": {
+              "stocks": 8,
+              "crypto": 4
+            },
+            "peak_reserved_margin_pct": 31.86282764567227,
+            "pnl_by_bot": {
+              "crypto": 31.782555000000038,
+              "stocks": 41.31833669999993
+            },
+            "return_contribution_pct": {
+              "crypto": 24.44811923076926,
+              "stocks": 31.783335923076873
+            }
+          },
+          "calendar_months": {
+            "2026-09": {
+              "opening_cash": 130.0,
+              "closing_cash": 168.21016327142854,
+              "return_pct": 29.392433285714258,
+              "cash_drawdown_pct": 5.013241170885408,
+              "return_contribution_pct": {
+                "crypto": 6.025710439560421,
+                "stocks": 23.366722846153856
+              },
+              "entries": 401,
+              "rejected_by_account_guard": 0,
+              "crypto_closed": 194,
+              "crypto_winrate_pct": 67.52577319587628,
+              "crypto_tp1_hits_without_bank": 0,
+              "stocks_closed": 205,
+              "stocks_winrate_pct": 43.90243902439025,
+              "stocks_tp1_hits_without_bank": 0
+            },
+            "2026-10": {
+              "opening_cash": 168.21016327142854,
+              "closing_cash": 206.40969384285717,
+              "return_pct": 22.70940698737021,
+              "cash_drawdown_pct": 2.262038683989017,
+              "return_contribution_pct": {
+                "crypto": 14.161390791227351,
+                "stocks": 8.548016196142802
+              },
+              "entries": 367,
+              "rejected_by_account_guard": 0,
+              "crypto_closed": 198,
+              "crypto_winrate_pct": 75.75757575757575,
+              "crypto_tp1_hits_without_bank": 0,
+              "stocks_closed": 165,
+              "stocks_winrate_pct": 40.0,
+              "stocks_tp1_hits_without_bank": 0
+            },
+            "2026-11": {
+              "opening_cash": 206.4096938428571,
+              "closing_cash": 203.10089169999995,
+              "return_pct": -1.6030265251864573,
+              "cash_drawdown_pct": 4.980087126800955,
+              "return_contribution_pct": {
+                "crypto": 0.06212540445920809,
+                "stocks": -1.665151929645658
+              },
+              "entries": 113,
+              "rejected_by_account_guard": 0,
+              "crypto_closed": 76,
+              "crypto_winrate_pct": 64.47368421052632,
+              "crypto_tp1_hits_without_bank": 0,
+              "stocks_closed": 43,
+              "stocks_winrate_pct": 30.232558139534884,
+              "stocks_tp1_hits_without_bank": 0
+            }
+          }
+        }
+      }
+    },
+    "selected": {
+      "requested5": {
+        "crypto": {
+          "summary": {
+            "starting_capital": 130.0,
+            "ending_capital": 182.795789,
+            "return_pct": 40.612146,
+            "cash_drawdown_pct": 4.969417,
+            "trades": 642,
+            "skipped": {
+              "slots": 20,
+              "minimum_size": 0
+            },
+            "unplaceable_partials": 294,
+            "tp1_hits_without_bank": 100,
+            "full_tp1_closes": 0,
+            "peak_positions": 11,
+            "peak_by_bot": {
+              "stocks": 8,
+              "crypto": 4
+            },
+            "peak_reserved_margin_pct": 31.868248176047704,
+            "pnl_by_bot": {
+              "crypto": 12.93934499999997,
+              "stocks": 39.85644419999995
+            },
+            "return_contribution_pct": {
+              "crypto": 9.953342307692283,
+              "stocks": 30.658803230769195
+            }
+          },
+          "calendar_months": {
+            "2026-09": {
+              "opening_cash": 130.0,
+              "closing_cash": 158.81512591428583,
+              "return_pct": 22.16548147252757,
+              "cash_drawdown_pct": 3.896147965364715,
+              "return_contribution_pct": {
+                "crypto": -0.32998406593408297,
+                "stocks": 22.495465538461556
+              },
+              "entries": 293,
+              "rejected_by_account_guard": 0,
+              "crypto_closed": 86,
+              "crypto_winrate_pct": 38.372093023255815,
+              "crypto_tp1_hits_without_bank": 36,
+              "stocks_closed": 206,
+              "stocks_winrate_pct": 43.689320388349515,
+              "stocks_tp1_hits_without_bank": 0
+            },
+            "2026-10": {
+              "opening_cash": 158.81512591428572,
+              "closing_cash": 188.56517948571445,
+              "return_pct": 18.73250636559969,
+              "cash_drawdown_pct": 3.1964677106616755,
+              "return_contribution_pct": {
+                "crypto": 10.182366747709107,
+                "stocks": 8.55013961789046
+              },
+              "entries": 262,
+              "rejected_by_account_guard": 0,
+              "crypto_closed": 92,
+              "crypto_winrate_pct": 50.0,
+              "crypto_tp1_hits_without_bank": 43,
+              "stocks_closed": 165,
+              "stocks_winrate_pct": 40.0,
+              "stocks_tp1_hits_without_bank": 0
+            },
+            "2026-11": {
+              "opening_cash": 188.56517948571422,
+              "closing_cash": 182.7957891999999,
+              "return_pct": -3.059626544757399,
+              "cash_drawdown_pct": 4.969416837091401,
+              "return_contribution_pct": {
+                "crypto": -1.4863901667097776,
+                "stocks": -1.5732363780476095
+              },
+              "entries": 87,
+              "rejected_by_account_guard": 0,
+              "crypto_closed": 50,
+              "crypto_winrate_pct": 36.0,
+              "crypto_tp1_hits_without_bank": 21,
+              "stocks_closed": 43,
+              "stocks_winrate_pct": 30.232558139534884,
+              "stocks_tp1_hits_without_bank": 0
+            }
+          }
+        },
+        "stocks": {
+          "summary": {
+            "starting_capital": 130.0,
+            "ending_capital": 182.795789,
+            "return_pct": 40.612146,
+            "cash_drawdown_pct": 4.969417,
+            "trades": 642,
+            "skipped": {
+              "slots": 20,
+              "minimum_size": 0
+            },
+            "unplaceable_partials": 294,
+            "tp1_hits_without_bank": 100,
+            "full_tp1_closes": 0,
+            "peak_positions": 11,
+            "peak_by_bot": {
+              "stocks": 8,
+              "crypto": 4
+            },
+            "peak_reserved_margin_pct": 31.868248176047704,
+            "pnl_by_bot": {
+              "crypto": 12.93934499999997,
+              "stocks": 39.85644419999995
+            },
+            "return_contribution_pct": {
+              "crypto": 9.953342307692283,
+              "stocks": 30.658803230769195
+            }
+          },
+          "calendar_months": {
+            "2026-09": {
+              "opening_cash": 130.0,
+              "closing_cash": 158.81512591428583,
+              "return_pct": 22.16548147252757,
+              "cash_drawdown_pct": 3.896147965364715,
+              "return_contribution_pct": {
+                "crypto": -0.32998406593408297,
+                "stocks": 22.495465538461556
+              },
+              "entries": 293,
+              "rejected_by_account_guard": 0,
+              "crypto_closed": 86,
+              "crypto_winrate_pct": 38.372093023255815,
+              "crypto_tp1_hits_without_bank": 36,
+              "stocks_closed": 206,
+              "stocks_winrate_pct": 43.689320388349515,
+              "stocks_tp1_hits_without_bank": 0
+            },
+            "2026-10": {
+              "opening_cash": 158.81512591428572,
+              "closing_cash": 188.56517948571445,
+              "return_pct": 18.73250636559969,
+              "cash_drawdown_pct": 3.1964677106616755,
+              "return_contribution_pct": {
+                "crypto": 10.182366747709107,
+                "stocks": 8.55013961789046
+              },
+              "entries": 262,
+              "rejected_by_account_guard": 0,
+              "crypto_closed": 92,
+              "crypto_winrate_pct": 50.0,
+              "crypto_tp1_hits_without_bank": 43,
+              "stocks_closed": 165,
+              "stocks_winrate_pct": 40.0,
+              "stocks_tp1_hits_without_bank": 0
+            },
+            "2026-11": {
+              "opening_cash": 188.56517948571422,
+              "closing_cash": 182.7957891999999,
+              "return_pct": -3.059626544757399,
+              "cash_drawdown_pct": 4.969416837091401,
+              "return_contribution_pct": {
+                "crypto": -1.4863901667097776,
+                "stocks": -1.5732363780476095
+              },
+              "entries": 87,
+              "rejected_by_account_guard": 0,
+              "crypto_closed": 50,
+              "crypto_winrate_pct": 36.0,
+              "crypto_tp1_hits_without_bank": 21,
+              "stocks_closed": 43,
+              "stocks_winrate_pct": 30.232558139534884,
+              "stocks_tp1_hits_without_bank": 0
+            }
+          }
+        }
+      },
+      "half_minimum": {
+        "crypto": {
+          "summary": {
+            "starting_capital": 130.0,
+            "ending_capital": 182.536688,
+            "return_pct": 40.412837,
+            "cash_drawdown_pct": 4.850473,
+            "trades": 642,
+            "skipped": {
+              "slots": 20,
+              "minimum_size": 0
+            },
+            "unplaceable_partials": 0,
+            "tp1_hits_without_bank": 0,
+            "full_tp1_closes": 0,
+            "peak_positions": 11,
+            "peak_by_bot": {
+              "stocks": 8,
+              "crypto": 4
+            },
+            "peak_reserved_margin_pct": 31.681321939747363,
+            "pnl_by_bot": {
+              "crypto": 12.847744999999982,
+              "stocks": 39.68894269999995
+            },
+            "return_contribution_pct": {
+              "crypto": 9.882880769230756,
+              "stocks": 30.529955923076884
+            }
+          },
+          "calendar_months": {
+            "2026-09": {
+              "opening_cash": 130.0,
+              "closing_cash": 159.26104648571436,
+              "return_pct": 22.508497296703347,
+              "cash_drawdown_pct": 3.612180809449497,
+              "return_contribution_pct": {
+                "crypto": 0.007591758241747784,
+                "stocks": 22.500905538461552
+              },
+              "entries": 293,
+              "rejected_by_account_guard": 0,
+              "crypto_closed": 86,
+              "crypto_winrate_pct": 69.76744186046511,
+              "crypto_tp1_hits_without_bank": 0,
+              "stocks_closed": 206,
+              "stocks_winrate_pct": 43.689320388349515,
+              "stocks_tp1_hits_without_bank": 0
+            },
+            "2026-10": {
+              "opening_cash": 159.26104648571427,
+              "closing_cash": 187.21361020000006,
+              "return_pct": 17.551412810032694,
+              "cash_drawdown_pct": 2.6045140048653517,
+              "return_contribution_pct": {
+                "crypto": 9.107290222149063,
+                "stocks": 8.444122587883577
+              },
+              "entries": 262,
+              "rejected_by_account_guard": 0,
+              "crypto_closed": 92,
+              "crypto_winrate_pct": 83.69565217391305,
+              "crypto_tp1_hits_without_bank": 0,
+              "stocks_closed": 165,
+              "stocks_winrate_pct": 40.0,
+              "stocks_tp1_hits_without_bank": 0
+            },
+            "2026-11": {
+              "opening_cash": 187.21361019999998,
+              "closing_cash": 182.53668769999987,
+              "return_pct": -2.4981744089031532,
+              "cash_drawdown_pct": 4.8504730176312165,
+              "return_contribution_pct": {
+                "crypto": -0.8901542992625934,
+                "stocks": -1.6080201096405249
+              },
+              "entries": 87,
+              "rejected_by_account_guard": 0,
+              "crypto_closed": 50,
+              "crypto_winrate_pct": 66.0,
+              "crypto_tp1_hits_without_bank": 0,
+              "stocks_closed": 43,
+              "stocks_winrate_pct": 30.232558139534884,
+              "stocks_tp1_hits_without_bank": 0
+            }
+          }
+        },
+        "stocks": {
+          "summary": {
+            "starting_capital": 130.0,
+            "ending_capital": 182.536688,
+            "return_pct": 40.412837,
+            "cash_drawdown_pct": 4.850473,
+            "trades": 642,
+            "skipped": {
+              "slots": 20,
+              "minimum_size": 0
+            },
+            "unplaceable_partials": 0,
+            "tp1_hits_without_bank": 0,
+            "full_tp1_closes": 0,
+            "peak_positions": 11,
+            "peak_by_bot": {
+              "stocks": 8,
+              "crypto": 4
+            },
+            "peak_reserved_margin_pct": 31.681321939747363,
+            "pnl_by_bot": {
+              "crypto": 12.847744999999982,
+              "stocks": 39.68894269999995
+            },
+            "return_contribution_pct": {
+              "crypto": 9.882880769230756,
+              "stocks": 30.529955923076884
+            }
+          },
+          "calendar_months": {
+            "2026-09": {
+              "opening_cash": 130.0,
+              "closing_cash": 159.26104648571436,
+              "return_pct": 22.508497296703347,
+              "cash_drawdown_pct": 3.612180809449497,
+              "return_contribution_pct": {
+                "crypto": 0.007591758241747784,
+                "stocks": 22.500905538461552
+              },
+              "entries": 293,
+              "rejected_by_account_guard": 0,
+              "crypto_closed": 86,
+              "crypto_winrate_pct": 69.76744186046511,
+              "crypto_tp1_hits_without_bank": 0,
+              "stocks_closed": 206,
+              "stocks_winrate_pct": 43.689320388349515,
+              "stocks_tp1_hits_without_bank": 0
+            },
+            "2026-10": {
+              "opening_cash": 159.26104648571427,
+              "closing_cash": 187.21361020000006,
+              "return_pct": 17.551412810032694,
+              "cash_drawdown_pct": 2.6045140048653517,
+              "return_contribution_pct": {
+                "crypto": 9.107290222149063,
+                "stocks": 8.444122587883577
+              },
+              "entries": 262,
+              "rejected_by_account_guard": 0,
+              "crypto_closed": 92,
+              "crypto_winrate_pct": 83.69565217391305,
+              "crypto_tp1_hits_without_bank": 0,
+              "stocks_closed": 165,
+              "stocks_winrate_pct": 40.0,
+              "stocks_tp1_hits_without_bank": 0
+            },
+            "2026-11": {
+              "opening_cash": 187.21361019999998,
+              "closing_cash": 182.53668769999987,
+              "return_pct": -2.4981744089031532,
+              "cash_drawdown_pct": 4.8504730176312165,
+              "return_contribution_pct": {
+                "crypto": -0.8901542992625934,
+                "stocks": -1.6080201096405249
+              },
+              "entries": 87,
+              "rejected_by_account_guard": 0,
+              "crypto_closed": 50,
+              "crypto_winrate_pct": 66.0,
+              "crypto_tp1_hits_without_bank": 0,
+              "stocks_closed": 43,
+              "stocks_winrate_pct": 30.232558139534884,
+              "stocks_tp1_hits_without_bank": 0
+            }
+          }
+        }
+      }
+    },
+    "matched_original": {
+      "requested5": {
+        "crypto": {
+          "summary": {
+            "starting_capital": 130.0,
+            "ending_capital": 185.481337,
+            "return_pct": 42.677951,
+            "cash_drawdown_pct": 4.532498,
+            "trades": 639,
+            "skipped": {
+              "slots": 20,
+              "minimum_size": 0
+            },
+            "unplaceable_partials": 293,
+            "tp1_hits_without_bank": 95,
+            "full_tp1_closes": 0,
+            "peak_positions": 11,
+            "peak_by_bot": {
+              "stocks": 8,
+              "crypto": 4
+            },
+            "peak_reserved_margin_pct": 31.70666639873452,
+            "pnl_by_bot": {
+              "crypto": 15.79075571428565,
+              "stocks": 39.69058119999995
+            },
+            "return_contribution_pct": {
+              "crypto": 12.146735164835114,
+              "stocks": 30.531216307692265
+            }
+          },
+          "calendar_months": {
+            "2026-09": {
+              "opening_cash": 130.0,
+              "closing_cash": 159.67516562857153,
+              "return_pct": 22.827050483516565,
+              "cash_drawdown_pct": 4.1373892898616855,
+              "return_contribution_pct": {
+                "crypto": 0.35821648351645763,
+                "stocks": 22.468834000000022
+              },
+              "entries": 290,
+              "rejected_by_account_guard": 0,
+              "crypto_closed": 83,
+              "crypto_winrate_pct": 39.75903614457831,
+              "crypto_tp1_hits_without_bank": 32,
+              "stocks_closed": 206,
+              "stocks_winrate_pct": 43.689320388349515,
+              "stocks_tp1_hits_without_bank": 0
+            },
+            "2026-10": {
+              "opening_cash": 159.6751656285714,
+              "closing_cash": 190.0728759857143,
+              "return_pct": 19.03721861660852,
+              "cash_drawdown_pct": 3.3803953553846195,
+              "return_contribution_pct": {
+                "crypto": 10.469037430672119,
+                "stocks": 8.568181185936352
+              },
+              "entries": 262,
+              "rejected_by_account_guard": 0,
+              "crypto_closed": 92,
+              "crypto_winrate_pct": 50.0,
+              "crypto_tp1_hits_without_bank": 42,
+              "stocks_closed": 165,
+              "stocks_winrate_pct": 40.0,
+              "stocks_tp1_hits_without_bank": 0
+            },
+            "2026-11": {
+              "opening_cash": 190.0728759857142,
+              "closing_cash": 185.48133691428558,
+              "return_pct": -2.415672961024551,
+              "cash_drawdown_pct": 4.5324981280159395,
+              "return_contribution_pct": {
+                "crypto": -0.7320237378494542,
+                "stocks": -1.6836492231750886
+              },
+              "entries": 87,
+              "rejected_by_account_guard": 0,
+              "crypto_closed": 50,
+              "crypto_winrate_pct": 36.0,
+              "crypto_tp1_hits_without_bank": 21,
+              "stocks_closed": 43,
+              "stocks_winrate_pct": 30.232558139534884,
+              "stocks_tp1_hits_without_bank": 0
+            }
+          }
+        },
+        "stocks": {
+          "summary": {
+            "starting_capital": 130.0,
+            "ending_capital": 185.481337,
+            "return_pct": 42.677951,
+            "cash_drawdown_pct": 4.532498,
+            "trades": 639,
+            "skipped": {
+              "slots": 20,
+              "minimum_size": 0
+            },
+            "unplaceable_partials": 293,
+            "tp1_hits_without_bank": 95,
+            "full_tp1_closes": 0,
+            "peak_positions": 11,
+            "peak_by_bot": {
+              "stocks": 8,
+              "crypto": 4
+            },
+            "peak_reserved_margin_pct": 31.70666639873452,
+            "pnl_by_bot": {
+              "crypto": 15.79075571428565,
+              "stocks": 39.69058119999995
+            },
+            "return_contribution_pct": {
+              "crypto": 12.146735164835114,
+              "stocks": 30.531216307692265
+            }
+          },
+          "calendar_months": {
+            "2026-09": {
+              "opening_cash": 130.0,
+              "closing_cash": 159.67516562857153,
+              "return_pct": 22.827050483516565,
+              "cash_drawdown_pct": 4.1373892898616855,
+              "return_contribution_pct": {
+                "crypto": 0.35821648351645763,
+                "stocks": 22.468834000000022
+              },
+              "entries": 290,
+              "rejected_by_account_guard": 0,
+              "crypto_closed": 83,
+              "crypto_winrate_pct": 39.75903614457831,
+              "crypto_tp1_hits_without_bank": 32,
+              "stocks_closed": 206,
+              "stocks_winrate_pct": 43.689320388349515,
+              "stocks_tp1_hits_without_bank": 0
+            },
+            "2026-10": {
+              "opening_cash": 159.6751656285714,
+              "closing_cash": 190.0728759857143,
+              "return_pct": 19.03721861660852,
+              "cash_drawdown_pct": 3.3803953553846195,
+              "return_contribution_pct": {
+                "crypto": 10.469037430672119,
+                "stocks": 8.568181185936352
+              },
+              "entries": 262,
+              "rejected_by_account_guard": 0,
+              "crypto_closed": 92,
+              "crypto_winrate_pct": 50.0,
+              "crypto_tp1_hits_without_bank": 42,
+              "stocks_closed": 165,
+              "stocks_winrate_pct": 40.0,
+              "stocks_tp1_hits_without_bank": 0
+            },
+            "2026-11": {
+              "opening_cash": 190.0728759857142,
+              "closing_cash": 185.48133691428558,
+              "return_pct": -2.415672961024551,
+              "cash_drawdown_pct": 4.5324981280159395,
+              "return_contribution_pct": {
+                "crypto": -0.7320237378494542,
+                "stocks": -1.6836492231750886
+              },
+              "entries": 87,
+              "rejected_by_account_guard": 0,
+              "crypto_closed": 50,
+              "crypto_winrate_pct": 36.0,
+              "crypto_tp1_hits_without_bank": 21,
+              "stocks_closed": 43,
+              "stocks_winrate_pct": 30.232558139534884,
+              "stocks_tp1_hits_without_bank": 0
+            }
+          }
+        }
+      },
+      "half_minimum": {
+        "crypto": {
+          "summary": {
+            "starting_capital": 130.0,
+            "ending_capital": 184.861435,
+            "return_pct": 42.201104,
+            "cash_drawdown_pct": 4.365561,
+            "trades": 639,
+            "skipped": {
+              "slots": 20,
+              "minimum_size": 0
+            },
+            "unplaceable_partials": 0,
+            "tp1_hits_without_bank": 0,
+            "full_tp1_closes": 0,
+            "peak_positions": 11,
+            "peak_by_bot": {
+              "stocks": 8,
+              "crypto": 4
+            },
+            "peak_reserved_margin_pct": 31.633865427481616,
+            "pnl_by_bot": {
+              "crypto": 15.102227142857089,
+              "stocks": 39.75920769999995
+            },
+            "return_contribution_pct": {
+              "crypto": 11.61709780219776,
+              "stocks": 30.584005923076884
+            }
+          },
+          "calendar_months": {
+            "2026-09": {
+              "opening_cash": 130.0,
+              "closing_cash": 159.5468860571429,
+              "return_pct": 22.728373890109932,
+              "cash_drawdown_pct": 3.9149363210143813,
+              "return_contribution_pct": {
+                "crypto": 0.19524835164833196,
+                "stocks": 22.53312553846156
+              },
+              "entries": 290,
+              "rejected_by_account_guard": 0,
+              "crypto_closed": 83,
+              "crypto_winrate_pct": 67.46987951807229,
+              "crypto_tp1_hits_without_bank": 0,
+              "stocks_closed": 206,
+              "stocks_winrate_pct": 43.689320388349515,
+              "stocks_tp1_hits_without_bank": 0
+            },
+            "2026-10": {
+              "opening_cash": 159.54688605714284,
+              "closing_cash": 188.2934960571429,
+              "return_pct": 18.017656571313,
+              "cash_drawdown_pct": 2.7824699165195472,
+              "return_contribution_pct": {
+                "crypto": 9.482215776108339,
+                "stocks": 8.535440795204595
+              },
+              "entries": 262,
+              "rejected_by_account_guard": 0,
+              "crypto_closed": 92,
+              "crypto_winrate_pct": 82.6086956521739,
+              "crypto_tp1_hits_without_bank": 0,
+              "stocks_closed": 165,
+              "stocks_winrate_pct": 40.0,
+              "stocks_tp1_hits_without_bank": 0
+            },
+            "2026-11": {
+              "opening_cash": 188.2934960571428,
+              "closing_cash": 184.861434842857,
+              "return_pct": -1.8227189393967391,
+              "cash_drawdown_pct": 4.365560668004497,
+              "return_contribution_pct": {
+                "crypto": -0.14879734040346157,
+                "stocks": -1.673921598993254
+              },
+              "entries": 87,
+              "rejected_by_account_guard": 0,
+              "crypto_closed": 50,
+              "crypto_winrate_pct": 66.0,
+              "crypto_tp1_hits_without_bank": 0,
+              "stocks_closed": 43,
+              "stocks_winrate_pct": 30.232558139534884,
+              "stocks_tp1_hits_without_bank": 0
+            }
+          }
+        },
+        "stocks": {
+          "summary": {
+            "starting_capital": 130.0,
+            "ending_capital": 184.861435,
+            "return_pct": 42.201104,
+            "cash_drawdown_pct": 4.365561,
+            "trades": 639,
+            "skipped": {
+              "slots": 20,
+              "minimum_size": 0
+            },
+            "unplaceable_partials": 0,
+            "tp1_hits_without_bank": 0,
+            "full_tp1_closes": 0,
+            "peak_positions": 11,
+            "peak_by_bot": {
+              "stocks": 8,
+              "crypto": 4
+            },
+            "peak_reserved_margin_pct": 31.633865427481616,
+            "pnl_by_bot": {
+              "crypto": 15.102227142857089,
+              "stocks": 39.75920769999995
+            },
+            "return_contribution_pct": {
+              "crypto": 11.61709780219776,
+              "stocks": 30.584005923076884
+            }
+          },
+          "calendar_months": {
+            "2026-09": {
+              "opening_cash": 130.0,
+              "closing_cash": 159.5468860571429,
+              "return_pct": 22.728373890109932,
+              "cash_drawdown_pct": 3.9149363210143813,
+              "return_contribution_pct": {
+                "crypto": 0.19524835164833196,
+                "stocks": 22.53312553846156
+              },
+              "entries": 290,
+              "rejected_by_account_guard": 0,
+              "crypto_closed": 83,
+              "crypto_winrate_pct": 67.46987951807229,
+              "crypto_tp1_hits_without_bank": 0,
+              "stocks_closed": 206,
+              "stocks_winrate_pct": 43.689320388349515,
+              "stocks_tp1_hits_without_bank": 0
+            },
+            "2026-10": {
+              "opening_cash": 159.54688605714284,
+              "closing_cash": 188.2934960571429,
+              "return_pct": 18.017656571313,
+              "cash_drawdown_pct": 2.7824699165195472,
+              "return_contribution_pct": {
+                "crypto": 9.482215776108339,
+                "stocks": 8.535440795204595
+              },
+              "entries": 262,
+              "rejected_by_account_guard": 0,
+              "crypto_closed": 92,
+              "crypto_winrate_pct": 82.6086956521739,
+              "crypto_tp1_hits_without_bank": 0,
+              "stocks_closed": 165,
+              "stocks_winrate_pct": 40.0,
+              "stocks_tp1_hits_without_bank": 0
+            },
+            "2026-11": {
+              "opening_cash": 188.2934960571428,
+              "closing_cash": 184.861434842857,
+              "return_pct": -1.8227189393967391,
+              "cash_drawdown_pct": 4.365560668004497,
+              "return_contribution_pct": {
+                "crypto": -0.14879734040346157,
+                "stocks": -1.673921598993254
+              },
+              "entries": 87,
+              "rejected_by_account_guard": 0,
+              "crypto_closed": 50,
+              "crypto_winrate_pct": 66.0,
+              "crypto_tp1_hits_without_bank": 0,
+              "stocks_closed": 43,
+              "stocks_winrate_pct": 30.232558139534884,
+              "stocks_tp1_hits_without_bank": 0
+            }
+          }
+        }
+      }
+    }
+  },
+  "sources": {
+    "C:\\Users\\Lenovo\\Desktop\\telegram bot\\crypto_structure_bracket_nov19_audit.py": "5832eee147efebc6d3b8976d27e48c2506e8139b684c028236b11c063013fbc1",
+    "crypto_structure_bracket_nov19.py": "8ee2f8736099c7d54d66e6f12d1a0c56d88e10fe75601ab1cd61c1613d18b459",
+    "crypto_native_weekly_nov19_audit.py": "c977cfd4d9cbe2bf4e5ea0204de756201b61f149be8467b4a956a238eca7d4b3",
+    "cash_tp1_policy_nov19.py": "5d20ff72c05708620e72f1d16fa01423fb765547ade8fc232e83a4eb5606c519",
+    "account_cash_guard_nov17_audit.py": "d8f32b806b9b1c9792971c023cd7ad8945854199bcd4b30ec496780e6b28ca28",
+    "reports\\audit_2026_09_08\\crypto_native_price_nov19_pool_sources.json": "ef357ddb491b3211c4d9e61bb072d3477daa79643918c075a1e0a5253d329e9e",
+    "reports\\audit_2026_09_08\\xperp_15m_nov14_merged\\manifest.json": "6ebba73ab8fe00a7a0740feaf3b6fdc867d4773dd36277be53d42f8e20a236b5",
+    "..\\tusa stocks\\reports\\audit_2026_09_08\\stock_close_anchor_nov16_causal_candidates_known_close.pkl": "29d08f1a4f55d3ea59279752206a65ab5c947691c261a5a551367bce9475c16e",
+    "reports\\audit_2026_09_08\\shared_xperp_specs_nov14.json": "7a4a76b813dfe6a5a08c9e858b17d453285dddc99529cdc293885682cf2bee0e",
+    "reports\\audit_2026_09_08\\crypto_structure_bracket_nov19_protocol.json": "78d7747f98bed44f5fdc78691891d7a1c46c8875fba5551878255ff0ee4e0122"
+  },
+  "limitations": [
+    "All market eras inspected previously; structural hypotheses are exploratory, no new untouched holdout.",
+    "Entries and TP prices frozen; only initial stop changes or entry-known geometry rejection.",
+    "risk_pct/R retain the original normalization unit; actual_stop_fraction records actual changed stop distance.",
+    "Matched original-stop controls distinguish entry exclusion from a stop-placement benefit.",
+    "Later openings precede their ranges; stop-first ambiguous bars, BE active from following bar.",
+    "Fifteen-minute public last-price references, not executable quotes or private fills; zero-volume bars remain public proxies.",
+    "Both client TP1 modes and priorities; continuous later shared account with current lot specs assumed historically.",
+    "No full-equity guard or minute recovery,floating PnL,funding,fees,latency or liquidation reconstruction.",
+    "Stock is an old frozen reference feed, not current PAPER/live-account behavior; November partial.",
+    "No margin change, live activation or promise of30% each month."
+  ]
+}

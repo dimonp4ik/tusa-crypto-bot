@@ -1,0 +1,14 @@
+# Preserve the new frozen research source and JSON bytes on Windows checkouts.
+crypto_native_*nov19*.py text eol=lf
+crypto_structure_bracket_nov19*.py text eol=lf
+crypto_tp1_bank_size_nov19_audit.py text eol=lf
+cash_tp1_policy_nov19.py text eol=lf
+account_cash_guard_nov17_audit.py -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+crypto_runner_exit_path_nov16.py -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+tests/test_crypto_native_*nov19*.py text eol=lf
+tests/test_crypto_structure_bracket_nov19.py text eol=lf
+tests/test_cash_tp1_policy_nov19.py text eol=lf
+src/tp1_plan.py text eol=lf
+reports/audit_2026_09_08/crypto_native_*nov19*.json -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+reports/audit_2026_09_08/crypto_structure_bracket_nov19*.json -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+reports/audit_2026_09_08/crypto_tp1_bank_size_nov19.json -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol

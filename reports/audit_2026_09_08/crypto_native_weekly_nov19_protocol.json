@@ -1,0 +1,53 @@
+{
+  "declared_at": "2026-11-19T13:29:00.649079+00:00",
+  "sources": {
+    "C:\\Users\\Lenovo\\Desktop\\telegram bot\\crypto_native_weekly_nov19_audit.py": "c977cfd4d9cbe2bf4e5ea0204de756201b61f149be8467b4a956a238eca7d4b3",
+    "crypto_native_weekly_nov19.py": "4d939378084c9cf79b5628e590c3261a53ef94e5f379976686550de636b23b7e",
+    "cash_tp1_policy_nov19.py": "5d20ff72c05708620e72f1d16fa01423fb765547ade8fc232e83a4eb5606c519",
+    "crypto_native_price_nov19_audit.py": "6fa69dd33ba971eda01abb140154e73e8d0f517714988d7c5f700378649b206f",
+    "src\\tp1_plan.py": "7a49938a965be142a18eeaf4977cba0251e00d0fdc675226bab3f9cc17a0e31a",
+    "src\\okx_trader.py": "3f04038c1cefc81f1e38cfc92f01871698b25e7c534864fe23545450d7c5a3af",
+    "reports\\audit_2026_09_08\\crypto_native_price_nov19_pool_sources.json": "ef357ddb491b3211c4d9e61bb072d3477daa79643918c075a1e0a5253d329e9e",
+    "reports\\audit_2026_09_08\\crypto_native_price_nov19_model.pkl": "f23c2844c20144fad37213809dd46aca67ab6477d4647f5e13f82ea0d0072407",
+    "..\\tusa stocks\\reports\\audit_2026_09_08\\stock_close_anchor_nov16_causal_candidates_known_close.pkl": "29d08f1a4f55d3ea59279752206a65ab5c947691c261a5a551367bce9475c16e",
+    "reports\\audit_2026_09_08\\shared_xperp_specs_nov14.json": "7a4a76b813dfe6a5a08c9e858b17d453285dddc99529cdc293885682cf2bee0e"
+  },
+  "model": {
+    "max_leaf_nodes": 7,
+    "min_samples_leaf": 100,
+    "max_iter": 150,
+    "learning_rate": 0.05,
+    "l2_regularization": 5.0,
+    "early_stopping": false,
+    "random_state": 20261119
+  },
+  "weekly_window_days": 90,
+  "minimum_training_rows": 2000,
+  "weekly_first_fit": 1782864000.0,
+  "subsequent_fits": "Monday 00:00 UTC",
+  "thresholds": [
+    0.0,
+    0.0005,
+    0.001,
+    0.002,
+    0.004,
+    0.006
+  ],
+  "tp1_policies": {
+    "requested5": {
+      "tp1_pct": 5.0,
+      "minimum_close": false
+    },
+    "half_minimum": {
+      "tp1_pct": 50.0,
+      "minimum_close": true
+    }
+  },
+  "selection_end": 1788220800.0,
+  "selection": "minimum crypto contribution minus additive crypto cash DD across July/August, both client TP1 policies and tie priorities",
+  "required_minimum_cash_trades": 30,
+  "require_all_selection_cases_profitable": true,
+  "later_threshold_retuning": false,
+  "objective_verified": false,
+  "live_activation_supported": false
+}

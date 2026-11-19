@@ -1,0 +1,41 @@
+{
+  "declared_at": "2026-11-18T21:52:56.784855+00:00",
+  "sources": {
+    "C:\\Users\\Lenovo\\Desktop\\telegram bot\\crypto_native_price_nov19_audit.py": "6fa69dd33ba971eda01abb140154e73e8d0f517714988d7c5f700378649b206f",
+    "crypto_native_price_features_nov19.py": "c3543e95818b438646cc6d619f308e1581db7e1ad60da57db4b907e9bfc862d7",
+    "crypto_native_price_pool_nov19.py": "0a2c5915e185716a9e1fde80d000ef9da2d8b3d4d8701c3dd6ca2c5e62166f3d",
+    "account_cash_guard_nov17_audit.py": "d8f32b806b9b1c9792971c023cd7ad8945854199bcd4b30ec496780e6b28ca28",
+    "lot_aware_tp1_audit.py": "12e343429e39c89e8fb60f16e2277533879ede647437b485a351a9dc744ff27a",
+    "shared_factor_account_nov14_audit.py": "cd385644515bb374274781ac1768e039a28be2e39e24e396f50933fa302e1f99",
+    "..\\tusa stocks\\reports\\audit_2026_09_08\\stock_close_anchor_nov16_causal_candidates_known_close.pkl": "29d08f1a4f55d3ea59279752206a65ab5c947691c261a5a551367bce9475c16e",
+    "reports\\audit_2026_09_08\\shared_xperp_specs_nov14.json": "7a4a76b813dfe6a5a08c9e858b17d453285dddc99529cdc293885682cf2bee0e"
+  },
+  "model": {
+    "max_leaf_nodes": 7,
+    "min_samples_leaf": 100,
+    "max_iter": 150,
+    "learning_rate": 0.05,
+    "l2_regularization": 5.0,
+    "early_stopping": false,
+    "random_state": 20261119
+  },
+  "thresholds": [
+    0.0,
+    0.0005,
+    0.001,
+    0.002,
+    0.004,
+    0.006
+  ],
+  "train_end": 1782864000.0,
+  "select_end": 1788220800.0,
+  "selection": "minimum July/August and both-priority crypto contribution minus additive crypto cash drawdown",
+  "minimum_cash_trades_per_selection_month": 30,
+  "both_months_must_profit": true,
+  "risk_fraction_range": [
+    0.003,
+    0.02
+  ],
+  "later_cash_start": 1788220800.0,
+  "later_refit": false
+}
