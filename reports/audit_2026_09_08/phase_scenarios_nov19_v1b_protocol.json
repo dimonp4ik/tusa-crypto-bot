@@ -1,0 +1,71 @@
+{
+  "declared_at": "2026-11-19T14:00:31.621147+00:00",
+  "sources": {
+    "C:\\Users\\Lenovo\\Desktop\\telegram bot\\phase_scenarios_nov19_audit.py": "a5be690e2deccb2fab94c74343f4ef8f1c0c2275a81c70d2d5e5a42cac974ac3",
+    "phase_entry_scenarios_nov19.py": "6787ae1b15e123dd4f23e6b5a9cc007a2dea5712a8cb5b67d1b3ce69aa8ab39b",
+    "price_bracket_path_nov19.py": "a41d8c9db01fe865fe524d8f58ac558d0999e34ba478b2586fa6c3ee1270c47c",
+    "cash_tp1_policy_nov19.py": "5d20ff72c05708620e72f1d16fa01423fb765547ade8fc232e83a4eb5606c519",
+    "src\\tp1_plan.py": "7a49938a965be142a18eeaf4977cba0251e00d0fdc675226bab3f9cc17a0e31a",
+    "account_cash_guard_nov17_audit.py": "d8f32b806b9b1c9792971c023cd7ad8945854199bcd4b30ec496780e6b28ca28",
+    "..\\tusa stocks\\stock_module_cluster_audit.py": "213a4d59bc9e85847e8a099394b1c3c3463c7d513e9883c6187affaa6d9ddf23",
+    "reports\\audit_2026_09_08\\xperp_15m_nov14_merged\\manifest.json": "6ebba73ab8fe00a7a0740feaf3b6fdc867d4773dd36277be53d42f8e20a236b5",
+    "..\\tusa stocks\\reports\\audit_2026_09_08\\stock_mark_matched_nov18\\manifest.json": "fb18a91303dbd139ca5b54cf4b9393a015ed8171b5176b721d6947df5ca6d447",
+    "reports\\audit_2026_09_08\\shared_xperp_specs_nov14.json": "7a4a76b813dfe6a5a08c9e858b17d453285dddc99529cdc293885682cf2bee0e",
+    "reports\\audit_2026_09_08\\phase_scenarios_nov19_protocol.json": "c24de22d4e41a68a70e57efffd8b2fcdb0cc1d5fbe15ea24023a44630a1785e0"
+  },
+  "implementation_revision": "v1b: load the exact pure stock portfolio function without unrelated cross-repo imports; no signal parameter change",
+  "routes": [
+    "range_only",
+    "trend_only",
+    "phase_union"
+  ],
+  "stock_triggers": [
+    "trade",
+    "mark"
+  ],
+  "crypto_trigger": "trade",
+  "target1_fraction": 0.006,
+  "target2_maximum": 0.018,
+  "final_target_minimum": 0.01,
+  "stop_range": [
+    0.003,
+    0.008
+  ],
+  "minimum_final_reward_risk": 1.5,
+  "horizon_bars": 32,
+  "entry_exit_price_stress": 0.0005,
+  "minimum_active_trade_bars_last16": 12,
+  "setup_volume_ratio": 1.2,
+  "confirmation_volume_ratio": 0.75,
+  "htf_bars": [
+    4,
+    16
+  ],
+  "htf_ema_spans": [
+    20,
+    50
+  ],
+  "htf_ema_window": 64,
+  "stock_clock": "NY weekday10:00-15:30 entries,16:00 time exit; no holiday/early-close calendar",
+  "selection_months": [
+    "2026-08",
+    "2026-09"
+  ],
+  "later_start": "2026-10-01",
+  "minimum_cash_closed_each_bot_month": 20,
+  "both_bots_must_profit_each_selection_month": true,
+  "stock_paper_gate": "fresh20 completed signals,positive sum actual-R and price,nominal50percent bank",
+  "client_tp1_policies": {
+    "requested5": {
+      "tp1_pct": 5,
+      "minimum_close": false
+    },
+    "half_minimum": {
+      "tp1_pct": 50,
+      "minimum_close": true
+    }
+  },
+  "unknown_paths_make_case_unscorable": true,
+  "objective_verified": false,
+  "live_activation_supported": false
+}
