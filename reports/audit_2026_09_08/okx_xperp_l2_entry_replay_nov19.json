@@ -1,0 +1,1950 @@
+{
+  "status": "OFFICIAL_PUBLIC_L2_PILOT",
+  "day": "2026-11-13",
+  "manifest_sha256": "de2e71d46c02862165d39aaac85bfdbd64233b80638cfb8d270a3d8196f77ce6",
+  "proposals_requested": 22,
+  "first_checks_ms": [
+    10000,
+    70000
+  ],
+  "retries_ms": [
+    0,
+    200,
+    800
+  ],
+  "proposals_missing": {
+    "crypto": 0,
+    "stocks": 0
+  },
+  "totals": {
+    "crypto": {
+      "10000": {
+        "proposals": 17,
+        "wide": 5,
+        "rescued_by_retry": 0,
+        "eligible": 12
+      },
+      "70000": {
+        "proposals": 17,
+        "wide": 6,
+        "rescued_by_retry": 0,
+        "eligible": 11
+      }
+    },
+    "stocks": {
+      "10000": {
+        "proposals": 5,
+        "wide": 3,
+        "rescued_by_retry": 0,
+        "stale order book": 2
+      },
+      "70000": {
+        "proposals": 5,
+        "wide": 4,
+        "rescued_by_retry": 0,
+        "stale order book": 1
+      }
+    }
+  },
+  "instruments": {
+    "AAVEUSDT": {
+      "events": {
+        "snapshot": 96,
+        "update": 1383628,
+        "first_ts": 1794528000008,
+        "last_ts": 1794614399426
+      },
+      "census": {
+        "10000": {
+          "postmarket": {
+            "windows": 16,
+            "wide": 28,
+            "eligible": 3,
+            "depth slippage exceeds limit": 1
+          },
+          "other": {
+            "windows": 32,
+            "wide": 60,
+            "eligible": 4
+          },
+          "premarket": {
+            "windows": 22,
+            "wide": 42,
+            "eligible": 1,
+            "depth slippage exceeds limit": 1
+          },
+          "regular": {
+            "windows": 26,
+            "wide": 48,
+            "eligible": 1,
+            "depth slippage exceeds limit": 1,
+            "stale order book": 2
+          }
+        },
+        "70000": {
+          "postmarket": {
+            "windows": 16,
+            "wide": 28,
+            "eligible": 2,
+            "stale order book": 2
+          },
+          "other": {
+            "windows": 32,
+            "wide": 60,
+            "eligible": 3,
+            "depth slippage exceeds limit": 1
+          },
+          "premarket": {
+            "windows": 22,
+            "wide": 38,
+            "depth slippage exceeds limit": 3,
+            "eligible": 3
+          },
+          "regular": {
+            "windows": 26,
+            "wide": 46,
+            "depth slippage exceeds limit": 4,
+            "eligible": 2
+          }
+        }
+      },
+      "proposals": [
+        {
+          "bot": "crypto",
+          "symbol": "AAVEUSDT",
+          "direction": "LONG",
+          "epoch": 1794539700,
+          "entry": 112.2,
+          "stop": 110.95714285714286,
+          "target": 114.6857142857143,
+          "variants": {
+            "10000": [
+              {
+                "offset_ms": 10000,
+                "status": "wide",
+                "spread_bps": 12.459950160199407
+              },
+              {
+                "offset_ms": 10200,
+                "status": "wide",
+                "spread_bps": 12.459950160199407
+              },
+              {
+                "offset_ms": 10800,
+                "status": "wide",
+                "spread_bps": 11.56943888221507
+              }
+            ],
+            "70000": [
+              {
+                "offset_ms": 70000,
+                "status": "wide",
+                "spread_bps": 10.712372790573518
+              },
+              {
+                "offset_ms": 70200,
+                "status": "wide",
+                "spread_bps": 12.498884028211817
+              },
+              {
+                "offset_ms": 70800,
+                "status": "wide",
+                "spread_bps": 10.716199321307782
+              }
+            ]
+          },
+          "stock_reference_ready": null
+        }
+      ]
+    },
+    "AVAXUSDT": {
+      "events": {
+        "snapshot": 96,
+        "update": 1117616,
+        "first_ts": 1794528000004,
+        "last_ts": 1794614399992
+      },
+      "census": {
+        "10000": {
+          "postmarket": {
+            "windows": 16,
+            "eligible": 17,
+            "wide": 14,
+            "depth slippage exceeds limit": 1
+          },
+          "other": {
+            "windows": 32,
+            "wide": 50,
+            "eligible": 14
+          },
+          "premarket": {
+            "windows": 22,
+            "wide": 28,
+            "eligible": 16
+          },
+          "regular": {
+            "windows": 26,
+            "depth slippage exceeds limit": 1,
+            "eligible": 25,
+            "wide": 26
+          }
+        },
+        "70000": {
+          "postmarket": {
+            "windows": 16,
+            "eligible": 20,
+            "wide": 12
+          },
+          "other": {
+            "windows": 32,
+            "wide": 48,
+            "eligible": 16
+          },
+          "premarket": {
+            "windows": 22,
+            "wide": 24,
+            "eligible": 20
+          },
+          "regular": {
+            "windows": 26,
+            "eligible": 23,
+            "wide": 28,
+            "depth slippage exceeds limit": 1
+          }
+        }
+      },
+      "proposals": [
+        {
+          "bot": "crypto",
+          "symbol": "AVAXUSDT",
+          "direction": "LONG",
+          "epoch": 1794536100,
+          "entry": 8.275,
+          "stop": 8.190857142857142,
+          "target": 8.443285714285716,
+          "variants": {
+            "10000": [
+              {
+                "offset_ms": 10000,
+                "status": "wide",
+                "spread_bps": 16.920473773267005
+              },
+              {
+                "offset_ms": 10200,
+                "status": "wide",
+                "spread_bps": 16.920473773267005
+              },
+              {
+                "offset_ms": 10800,
+                "status": "wide",
+                "spread_bps": 10.874161783362943
+              }
+            ],
+            "70000": [
+              {
+                "offset_ms": 70000,
+                "status": "wide",
+                "spread_bps": 10.880735054101846
+              },
+              {
+                "offset_ms": 70200,
+                "status": "wide",
+                "spread_bps": 8.461770927772346
+              },
+              {
+                "offset_ms": 70800,
+                "status": "wide",
+                "spread_bps": 8.461770927772346
+              }
+            ]
+          },
+          "stock_reference_ready": null
+        },
+        {
+          "bot": "crypto",
+          "symbol": "AVAXUSDT",
+          "direction": "LONG",
+          "epoch": 1794564900,
+          "entry": 8.362,
+          "stop": 8.266571428571428,
+          "target": 8.552857142857144,
+          "variants": {
+            "10000": [
+              {
+                "offset_ms": 10000,
+                "status": "eligible",
+                "average": 8.366,
+                "worst": 8.366,
+                "contracts": 0.4,
+                "spread_bps": 4.782400765183596,
+                "slippage_bps": 0.0,
+                "last_event_ms": 1794564909733
+              }
+            ],
+            "70000": [
+              {
+                "offset_ms": 70000,
+                "status": "wide",
+                "spread_bps": 5.970505701833878
+              },
+              {
+                "offset_ms": 70200,
+                "status": "wide",
+                "spread_bps": 5.970505701833878
+              },
+              {
+                "offset_ms": 70800,
+                "status": "wide",
+                "spread_bps": 5.970505701833878
+              }
+            ]
+          },
+          "stock_reference_ready": null
+        },
+        {
+          "bot": "crypto",
+          "symbol": "AVAXUSDT",
+          "direction": "LONG",
+          "epoch": 1794609900,
+          "entry": 8.197,
+          "stop": 8.107571428571427,
+          "target": 8.375857142857143,
+          "variants": {
+            "10000": [
+              {
+                "offset_ms": 10000,
+                "status": "wide",
+                "spread_bps": 6.099420555046057
+              },
+              {
+                "offset_ms": 10200,
+                "status": "wide",
+                "spread_bps": 6.099420555046057
+              },
+              {
+                "offset_ms": 10800,
+                "status": "wide",
+                "spread_bps": 6.099420555046057
+              }
+            ],
+            "70000": [
+              {
+                "offset_ms": 70000,
+                "status": "wide",
+                "spread_bps": 6.0979328007814875
+              },
+              {
+                "offset_ms": 70200,
+                "status": "wide",
+                "spread_bps": 6.0979328007814875
+              },
+              {
+                "offset_ms": 70800,
+                "status": "wide",
+                "spread_bps": 6.0979328007814875
+              }
+            ]
+          },
+          "stock_reference_ready": null
+        }
+      ]
+    },
+    "AXTIUSDT": {
+      "events": {
+        "snapshot": 96,
+        "update": 705257,
+        "first_ts": 1794528000004,
+        "last_ts": 1794614397752
+      },
+      "census": {
+        "10000": {
+          "postmarket": {
+            "windows": 16,
+            "wide": 26,
+            "stale order book": 6
+          },
+          "other": {
+            "windows": 32,
+            "wide": 64
+          },
+          "premarket": {
+            "windows": 22,
+            "wide": 44
+          },
+          "regular": {
+            "windows": 26,
+            "wide": 52
+          }
+        },
+        "70000": {
+          "postmarket": {
+            "windows": 16,
+            "wide": 28,
+            "stale order book": 4
+          },
+          "other": {
+            "windows": 32,
+            "wide": 62,
+            "stale order book": 2
+          },
+          "premarket": {
+            "windows": 22,
+            "wide": 42,
+            "stale order book": 2
+          },
+          "regular": {
+            "windows": 26,
+            "wide": 52
+          }
+        }
+      },
+      "proposals": [
+        {
+          "bot": "stocks",
+          "symbol": "AXTIUSDT",
+          "direction": "SHORT",
+          "epoch": 1794566700,
+          "entry": 43.7,
+          "stop": 44.137,
+          "target": 42.389,
+          "variants": {
+            "10000": [
+              {
+                "offset_ms": 10000,
+                "status": "wide",
+                "spread_bps": 43.612992080798286
+              },
+              {
+                "offset_ms": 10200,
+                "status": "wide",
+                "spread_bps": 43.612992080798286
+              },
+              {
+                "offset_ms": 10800,
+                "status": "wide",
+                "spread_bps": 43.612992080798286
+              }
+            ],
+            "70000": [
+              {
+                "offset_ms": 70000,
+                "status": "wide",
+                "spread_bps": 43.58297969950631
+              },
+              {
+                "offset_ms": 70200,
+                "status": "wide",
+                "spread_bps": 43.58297969950631
+              },
+              {
+                "offset_ms": 70800,
+                "status": "wide",
+                "spread_bps": 43.58297969950631
+              }
+            ]
+          },
+          "stock_reference_ready": false
+        }
+      ]
+    },
+    "BTCUSDT": {
+      "events": {
+        "snapshot": 96,
+        "update": 2914977,
+        "first_ts": 1794528000004,
+        "last_ts": 1794614399952
+      },
+      "census": {
+        "10000": {
+          "postmarket": {
+            "windows": 16,
+            "eligible": 32
+          },
+          "other": {
+            "windows": 32,
+            "eligible": 64
+          },
+          "premarket": {
+            "windows": 22,
+            "eligible": 44
+          },
+          "regular": {
+            "windows": 26,
+            "eligible": 52
+          }
+        },
+        "70000": {
+          "postmarket": {
+            "windows": 16,
+            "eligible": 32
+          },
+          "other": {
+            "windows": 32,
+            "eligible": 64
+          },
+          "premarket": {
+            "windows": 22,
+            "eligible": 44
+          },
+          "regular": {
+            "windows": 26,
+            "eligible": 52
+          }
+        }
+      },
+      "proposals": [
+        {
+          "bot": "crypto",
+          "symbol": "BTCUSDT",
+          "direction": "SHORT",
+          "epoch": 1794549600,
+          "entry": 68067.0,
+          "stop": 69093.0142857143,
+          "target": 66014.97142857141,
+          "variants": {
+            "10000": [
+              {
+                "offset_ms": 10000,
+                "status": "eligible",
+                "average": 68034.4,
+                "worst": 68034.4,
+                "contracts": 5.0,
+                "spread_bps": 0.014698435866802887,
+                "slippage_bps": -0.0,
+                "last_event_ms": 1794549609985
+              }
+            ],
+            "70000": [
+              {
+                "offset_ms": 70000,
+                "status": "eligible",
+                "average": 68021.2,
+                "worst": 68021.2,
+                "contracts": 5.0,
+                "spread_bps": 0.014701288201234286,
+                "slippage_bps": -0.0,
+                "last_event_ms": 1794549669985
+              }
+            ]
+          },
+          "stock_reference_ready": null
+        }
+      ]
+    },
+    "CRCLUSDT": {
+      "events": {
+        "snapshot": 96,
+        "update": 836539,
+        "first_ts": 1794528000004,
+        "last_ts": 1794614399452
+      },
+      "census": {
+        "10000": {
+          "postmarket": {
+            "windows": 16,
+            "eligible": 12,
+            "wide": 20
+          },
+          "other": {
+            "windows": 32,
+            "wide": 24,
+            "eligible": 40
+          },
+          "premarket": {
+            "windows": 22,
+            "wide": 20,
+            "stale order book": 2,
+            "eligible": 22
+          },
+          "regular": {
+            "windows": 26,
+            "wide": 28,
+            "eligible": 24
+          }
+        },
+        "70000": {
+          "postmarket": {
+            "windows": 16,
+            "wide": 16,
+            "eligible": 14,
+            "stale order book": 2
+          },
+          "other": {
+            "windows": 32,
+            "eligible": 34,
+            "wide": 30
+          },
+          "premarket": {
+            "windows": 22,
+            "wide": 26,
+            "eligible": 18
+          },
+          "regular": {
+            "windows": 26,
+            "wide": 20,
+            "eligible": 32
+          }
+        }
+      },
+      "proposals": [
+        {
+          "bot": "stocks",
+          "symbol": "CRCLUSDT",
+          "direction": "SHORT",
+          "epoch": 1794563100,
+          "entry": 62.86,
+          "stop": 63.4886,
+          "target": 61.602799999999995,
+          "variants": {
+            "10000": [
+              {
+                "offset_ms": 10000,
+                "status": "wide",
+                "spread_bps": 7.957348611442215
+              },
+              {
+                "offset_ms": 10200,
+                "status": "wide",
+                "spread_bps": 7.957348611442215
+              },
+              {
+                "offset_ms": 10800,
+                "status": "wide",
+                "spread_bps": 7.957348611442215
+              }
+            ],
+            "70000": [
+              {
+                "offset_ms": 70000,
+                "status": "wide",
+                "spread_bps": 6.3684126731410835
+              },
+              {
+                "offset_ms": 70200,
+                "status": "wide",
+                "spread_bps": 6.3684126731410835
+              },
+              {
+                "offset_ms": 70800,
+                "status": "wide",
+                "spread_bps": 6.3684126731410835
+              }
+            ]
+          },
+          "stock_reference_ready": false
+        }
+      ]
+    },
+    "ETHUSDT": {
+      "events": {
+        "snapshot": 96,
+        "update": 3105693,
+        "first_ts": 1794528000004,
+        "last_ts": 1794614399972
+      },
+      "census": {
+        "10000": {
+          "postmarket": {
+            "windows": 16,
+            "eligible": 32
+          },
+          "other": {
+            "windows": 32,
+            "eligible": 64
+          },
+          "premarket": {
+            "windows": 22,
+            "eligible": 44
+          },
+          "regular": {
+            "windows": 26,
+            "eligible": 52
+          }
+        },
+        "70000": {
+          "postmarket": {
+            "windows": 16,
+            "eligible": 32
+          },
+          "other": {
+            "windows": 32,
+            "eligible": 64
+          },
+          "premarket": {
+            "windows": 22,
+            "eligible": 44
+          },
+          "regular": {
+            "windows": 26,
+            "eligible": 52
+          }
+        }
+      },
+      "proposals": [
+        {
+          "bot": "crypto",
+          "symbol": "ETHUSDT",
+          "direction": "SHORT",
+          "epoch": 1794549600,
+          "entry": 1908.54,
+          "stop": 1945.7485714285713,
+          "target": 1834.1228571428574,
+          "variants": {
+            "10000": [
+              {
+                "offset_ms": 10000,
+                "status": "eligible",
+                "average": 1906.92,
+                "worst": 1906.92,
+                "contracts": 20.0,
+                "spread_bps": 0.05244044731696791,
+                "slippage_bps": -0.0,
+                "last_event_ms": 1794549609985
+              }
+            ],
+            "70000": [
+              {
+                "offset_ms": 70000,
+                "status": "eligible",
+                "average": 1907.3089999999997,
+                "worst": 1907.19,
+                "contracts": 20.0,
+                "spread_bps": 0.05242835010598867,
+                "slippage_bps": 0.8912842882302652,
+                "last_event_ms": 1794549669995
+              }
+            ]
+          },
+          "stock_reference_ready": null
+        }
+      ]
+    },
+    "HOODUSDT": {
+      "events": {
+        "snapshot": 96,
+        "update": 531876,
+        "first_ts": 1794528000008,
+        "last_ts": 1794614399776
+      },
+      "census": {
+        "10000": {
+          "postmarket": {
+            "windows": 16,
+            "wide": 28,
+            "stale order book": 4
+          },
+          "other": {
+            "windows": 32,
+            "wide": 58,
+            "stale order book": 6
+          },
+          "premarket": {
+            "windows": 22,
+            "wide": 42,
+            "stale order book": 2
+          },
+          "regular": {
+            "windows": 26,
+            "wide": 52
+          }
+        },
+        "70000": {
+          "postmarket": {
+            "windows": 16,
+            "wide": 28,
+            "stale order book": 4
+          },
+          "other": {
+            "windows": 32,
+            "wide": 56,
+            "stale order book": 8
+          },
+          "premarket": {
+            "windows": 22,
+            "wide": 44
+          },
+          "regular": {
+            "windows": 26,
+            "wide": 52
+          }
+        }
+      },
+      "proposals": [
+        {
+          "bot": "stocks",
+          "symbol": "HOODUSDT",
+          "direction": "SHORT",
+          "epoch": 1794563100,
+          "entry": 80.1,
+          "stop": 80.901,
+          "target": 78.49799999999999,
+          "variants": {
+            "10000": [
+              {
+                "offset_ms": 10000,
+                "status": "wide",
+                "spread_bps": 58.72430811519946
+              },
+              {
+                "offset_ms": 10200,
+                "status": "wide",
+                "spread_bps": 58.72430811519946
+              },
+              {
+                "offset_ms": 10800,
+                "status": "stale order book"
+              }
+            ],
+            "70000": [
+              {
+                "offset_ms": 70000,
+                "status": "wide",
+                "spread_bps": 33.693142821488244
+              },
+              {
+                "offset_ms": 70200,
+                "status": "wide",
+                "spread_bps": 33.693142821488244
+              },
+              {
+                "offset_ms": 70800,
+                "status": "wide",
+                "spread_bps": 33.693142821488244
+              }
+            ]
+          },
+          "stock_reference_ready": false
+        }
+      ]
+    },
+    "HYPEUSDT": {
+      "events": {
+        "snapshot": 96,
+        "update": 1195530,
+        "first_ts": 1794528000004,
+        "last_ts": 1794614399902
+      },
+      "census": {
+        "10000": {
+          "postmarket": {
+            "windows": 16,
+            "eligible": 30,
+            "wide": 2
+          },
+          "other": {
+            "windows": 32,
+            "eligible": 62,
+            "wide": 2
+          },
+          "premarket": {
+            "windows": 22,
+            "eligible": 44
+          },
+          "regular": {
+            "windows": 26,
+            "eligible": 52
+          }
+        },
+        "70000": {
+          "postmarket": {
+            "windows": 16,
+            "eligible": 32
+          },
+          "other": {
+            "windows": 32,
+            "eligible": 64
+          },
+          "premarket": {
+            "windows": 22,
+            "eligible": 42,
+            "wide": 2
+          },
+          "regular": {
+            "windows": 26,
+            "eligible": 48,
+            "wide": 4
+          }
+        }
+      },
+      "proposals": [
+        {
+          "bot": "crypto",
+          "symbol": "HYPEUSDT",
+          "direction": "LONG",
+          "epoch": 1794531600,
+          "entry": 73.074,
+          "stop": 72.31142857142856,
+          "target": 74.59914285714287,
+          "variants": {
+            "10000": [
+              {
+                "offset_ms": 10000,
+                "status": "eligible",
+                "average": 73.044,
+                "worst": 73.044,
+                "contracts": 5.0,
+                "spread_bps": 3.6970854642924564,
+                "slippage_bps": 0.0,
+                "last_event_ms": 1794531609928
+              }
+            ],
+            "70000": [
+              {
+                "offset_ms": 70000,
+                "status": "eligible",
+                "average": 72.9834,
+                "worst": 72.984,
+                "contracts": 5.0,
+                "spread_bps": 4.65970451991421,
+                "slippage_bps": 0.13701820971823153,
+                "last_event_ms": 1794531669928
+              }
+            ]
+          },
+          "stock_reference_ready": null
+        },
+        {
+          "bot": "crypto",
+          "symbol": "HYPEUSDT",
+          "direction": "LONG",
+          "epoch": 1794542400,
+          "entry": 70.8,
+          "stop": 69.61671428571428,
+          "target": 73.16657142857143,
+          "variants": {
+            "10000": [
+              {
+                "offset_ms": 10000,
+                "status": "eligible",
+                "average": 70.8496,
+                "worst": 70.85,
+                "contracts": 5.0,
+                "spread_bps": 2.8233434032575766,
+                "slippage_bps": 0.2822944896108126,
+                "last_event_ms": 1794542409925
+              }
+            ],
+            "70000": [
+              {
+                "offset_ms": 70000,
+                "status": "eligible",
+                "average": 70.616,
+                "worst": 70.616,
+                "contracts": 5.0,
+                "spread_bps": 3.682563063891937,
+                "slippage_bps": 0.0,
+                "last_event_ms": 1794542469885
+              }
+            ]
+          },
+          "stock_reference_ready": null
+        },
+        {
+          "bot": "crypto",
+          "symbol": "HYPEUSDT",
+          "direction": "LONG",
+          "epoch": 1794572100,
+          "entry": 73.85,
+          "stop": 73.05514285714285,
+          "target": 75.43971428571427,
+          "variants": {
+            "10000": [
+              {
+                "offset_ms": 10000,
+                "status": "eligible",
+                "average": 73.877,
+                "worst": 73.877,
+                "contracts": 5.0,
+                "spread_bps": 3.1137675910941014,
+                "slippage_bps": 0.0,
+                "last_event_ms": 1794572109921
+              }
+            ],
+            "70000": [
+              {
+                "offset_ms": 70000,
+                "status": "eligible",
+                "average": 73.813,
+                "worst": 73.813,
+                "contracts": 5.0,
+                "spread_bps": 1.7613624816249556,
+                "slippage_bps": 0.0,
+                "last_event_ms": 1794572168381
+              }
+            ]
+          },
+          "stock_reference_ready": null
+        },
+        {
+          "bot": "crypto",
+          "symbol": "HYPEUSDT",
+          "direction": "LONG",
+          "epoch": 1794606300,
+          "entry": 72.144,
+          "stop": 71.41900000000001,
+          "target": 73.594,
+          "variants": {
+            "10000": [
+              {
+                "offset_ms": 10000,
+                "status": "eligible",
+                "average": 72.257,
+                "worst": 72.257,
+                "contracts": 5.0,
+                "spread_bps": 4.84499477432856,
+                "slippage_bps": 0.0,
+                "last_event_ms": 1794606309999
+              }
+            ],
+            "70000": [
+              {
+                "offset_ms": 70000,
+                "status": "eligible",
+                "average": 72.25919999999999,
+                "worst": 72.261,
+                "contracts": 5.0,
+                "spread_bps": 3.5988649733540377,
+                "slippage_bps": 0.4151789421236174,
+                "last_event_ms": 1794606369989
+              }
+            ]
+          },
+          "stock_reference_ready": null
+        }
+      ]
+    },
+    "INTCUSDT": {
+      "events": {
+        "snapshot": 96,
+        "update": 1213248,
+        "first_ts": 1794528000004,
+        "last_ts": 1794614399542
+      },
+      "census": {
+        "10000": {
+          "postmarket": {
+            "windows": 16,
+            "eligible": 10,
+            "wide": 20,
+            "stale order book": 2
+          },
+          "other": {
+            "windows": 32,
+            "eligible": 62,
+            "wide": 2
+          },
+          "premarket": {
+            "windows": 22,
+            "eligible": 34,
+            "stale order book": 2,
+            "wide": 8
+          },
+          "regular": {
+            "windows": 26,
+            "wide": 38,
+            "eligible": 14
+          }
+        },
+        "70000": {
+          "postmarket": {
+            "windows": 16,
+            "eligible": 12,
+            "wide": 18,
+            "stale order book": 2
+          },
+          "other": {
+            "windows": 32,
+            "eligible": 64
+          },
+          "premarket": {
+            "windows": 22,
+            "eligible": 40,
+            "wide": 4
+          },
+          "regular": {
+            "windows": 26,
+            "wide": 36,
+            "eligible": 16
+          }
+        }
+      },
+      "proposals": []
+    },
+    "LINKUSDT": {
+      "events": {
+        "snapshot": 96,
+        "update": 1491641,
+        "first_ts": 1794528000003,
+        "last_ts": 1794614399762
+      },
+      "census": {
+        "10000": {
+          "postmarket": {
+            "windows": 16,
+            "eligible": 32
+          },
+          "other": {
+            "windows": 32,
+            "eligible": 64
+          },
+          "premarket": {
+            "windows": 22,
+            "eligible": 42,
+            "wide": 2
+          },
+          "regular": {
+            "windows": 26,
+            "eligible": 52
+          }
+        },
+        "70000": {
+          "postmarket": {
+            "windows": 16,
+            "eligible": 32
+          },
+          "other": {
+            "windows": 32,
+            "eligible": 64
+          },
+          "premarket": {
+            "windows": 22,
+            "eligible": 44
+          },
+          "regular": {
+            "windows": 26,
+            "eligible": 52
+          }
+        }
+      },
+      "proposals": [
+        {
+          "bot": "crypto",
+          "symbol": "LINKUSDT",
+          "direction": "SHORT",
+          "epoch": 1794555000,
+          "entry": 9.914,
+          "stop": 10.063428571428572,
+          "target": 9.615142857142855,
+          "variants": {
+            "10000": [
+              {
+                "offset_ms": 10000,
+                "status": "eligible",
+                "average": 9.92,
+                "worst": 9.92,
+                "contracts": 3.0,
+                "spread_bps": 2.015925813930721,
+                "slippage_bps": -0.0,
+                "last_event_ms": 1794555009952
+              }
+            ],
+            "70000": [
+              {
+                "offset_ms": 70000,
+                "status": "eligible",
+                "average": 9.919,
+                "worst": 9.919,
+                "contracts": 3.0,
+                "spread_bps": 2.016129032256947,
+                "slippage_bps": -0.0,
+                "last_event_ms": 1794555069992
+              }
+            ]
+          },
+          "stock_reference_ready": null
+        },
+        {
+          "bot": "crypto",
+          "symbol": "LINKUSDT",
+          "direction": "LONG",
+          "epoch": 1794606300,
+          "entry": 9.83,
+          "stop": 9.730857142857143,
+          "target": 10.028285714285714,
+          "variants": {
+            "10000": [
+              {
+                "offset_ms": 10000,
+                "status": "eligible",
+                "average": 9.842,
+                "worst": 9.842,
+                "contracts": 3.0,
+                "spread_bps": 3.0486255779687146,
+                "slippage_bps": 0.0,
+                "last_event_ms": 1794606309992
+              }
+            ],
+            "70000": [
+              {
+                "offset_ms": 70000,
+                "status": "eligible",
+                "average": 9.833,
+                "worst": 9.833,
+                "contracts": 3.0,
+                "spread_bps": 2.0341741253058054,
+                "slippage_bps": 0.0,
+                "last_event_ms": 1794606369992
+              }
+            ]
+          },
+          "stock_reference_ready": null
+        }
+      ]
+    },
+    "NVDAUSDT": {
+      "events": {
+        "snapshot": 96,
+        "update": 1300096,
+        "first_ts": 1794528000004,
+        "last_ts": 1794614399772
+      },
+      "census": {
+        "10000": {
+          "postmarket": {
+            "windows": 16,
+            "eligible": 32
+          },
+          "other": {
+            "windows": 32,
+            "eligible": 60,
+            "wide": 4
+          },
+          "premarket": {
+            "windows": 22,
+            "wide": 20,
+            "eligible": 24
+          },
+          "regular": {
+            "windows": 26,
+            "wide": 12,
+            "eligible": 40
+          }
+        },
+        "70000": {
+          "postmarket": {
+            "windows": 16,
+            "eligible": 32
+          },
+          "other": {
+            "windows": 32,
+            "eligible": 60,
+            "wide": 4
+          },
+          "premarket": {
+            "windows": 22,
+            "wide": 22,
+            "eligible": 22
+          },
+          "regular": {
+            "windows": 26,
+            "wide": 4,
+            "eligible": 48
+          }
+        }
+      },
+      "proposals": []
+    },
+    "SOFTBANKUSDT": {
+      "events": {
+        "snapshot": 96,
+        "update": 104312,
+        "first_ts": 1794528000003,
+        "last_ts": 1794614398102
+      },
+      "census": {
+        "10000": {
+          "postmarket": {
+            "windows": 16,
+            "wide": 18,
+            "stale order book": 14
+          },
+          "other": {
+            "windows": 32,
+            "wide": 46,
+            "stale order book": 18
+          },
+          "premarket": {
+            "windows": 22,
+            "stale order book": 24,
+            "wide": 20
+          },
+          "regular": {
+            "windows": 26,
+            "wide": 32,
+            "stale order book": 20
+          }
+        },
+        "70000": {
+          "postmarket": {
+            "windows": 16,
+            "wide": 20,
+            "stale order book": 12
+          },
+          "other": {
+            "windows": 32,
+            "wide": 38,
+            "stale order book": 26
+          },
+          "premarket": {
+            "windows": 22,
+            "stale order book": 24,
+            "wide": 20
+          },
+          "regular": {
+            "windows": 26,
+            "wide": 32,
+            "eligible": 1,
+            "depth slippage exceeds limit": 1,
+            "stale order book": 18
+          }
+        }
+      },
+      "proposals": [
+        {
+          "bot": "stocks",
+          "symbol": "SOFTBANKUSDT",
+          "direction": "SHORT",
+          "epoch": 1794555900,
+          "entry": 22.32,
+          "stop": 22.5432,
+          "target": 21.6504,
+          "variants": {
+            "10000": [
+              {
+                "offset_ms": 10000,
+                "status": "stale order book"
+              }
+            ],
+            "70000": [
+              {
+                "offset_ms": 70000,
+                "status": "stale order book"
+              }
+            ]
+          },
+          "stock_reference_ready": false
+        }
+      ]
+    },
+    "SOLUSDT": {
+      "events": {
+        "snapshot": 96,
+        "update": 1808697,
+        "first_ts": 1794528000003,
+        "last_ts": 1794614399982
+      },
+      "census": {
+        "10000": {
+          "postmarket": {
+            "windows": 16,
+            "eligible": 32
+          },
+          "other": {
+            "windows": 32,
+            "eligible": 64
+          },
+          "premarket": {
+            "windows": 22,
+            "eligible": 44
+          },
+          "regular": {
+            "windows": 26,
+            "eligible": 52
+          }
+        },
+        "70000": {
+          "postmarket": {
+            "windows": 16,
+            "eligible": 32
+          },
+          "other": {
+            "windows": 32,
+            "eligible": 64
+          },
+          "premarket": {
+            "windows": 22,
+            "eligible": 44
+          },
+          "regular": {
+            "windows": 26,
+            "eligible": 52
+          }
+        }
+      },
+      "proposals": [
+        {
+          "bot": "crypto",
+          "symbol": "SOLUSDT",
+          "direction": "SHORT",
+          "epoch": 1794560400,
+          "entry": 79.61,
+          "stop": 80.68285714285715,
+          "target": 77.46428571428571,
+          "variants": {
+            "10000": [
+              {
+                "offset_ms": 10000,
+                "status": "eligible",
+                "average": 79.6,
+                "worst": 79.6,
+                "contracts": 48.0,
+                "spread_bps": 1.2562024998436174,
+                "slippage_bps": -0.0,
+                "last_event_ms": 1794560409982
+              }
+            ],
+            "70000": [
+              {
+                "offset_ms": 70000,
+                "status": "eligible",
+                "average": 79.68,
+                "worst": 79.68,
+                "contracts": 48.0,
+                "spread_bps": 1.2549413314916114,
+                "slippage_bps": -0.0,
+                "last_event_ms": 1794560469903
+              }
+            ]
+          },
+          "stock_reference_ready": null
+        }
+      ]
+    },
+    "SOXLUSDT": {
+      "events": {
+        "snapshot": 96,
+        "update": 2075318,
+        "first_ts": 1794528000004,
+        "last_ts": 1794614399322
+      },
+      "census": {
+        "10000": {
+          "postmarket": {
+            "windows": 16,
+            "eligible": 14,
+            "wide": 18
+          },
+          "other": {
+            "windows": 32,
+            "wide": 22,
+            "eligible": 42
+          },
+          "premarket": {
+            "windows": 22,
+            "wide": 10,
+            "eligible": 34
+          },
+          "regular": {
+            "windows": 26,
+            "wide": 32,
+            "eligible": 19,
+            "depth slippage exceeds limit": 1
+          }
+        },
+        "70000": {
+          "postmarket": {
+            "windows": 16,
+            "eligible": 12,
+            "wide": 20
+          },
+          "other": {
+            "windows": 32,
+            "wide": 18,
+            "eligible": 46
+          },
+          "premarket": {
+            "windows": 22,
+            "wide": 14,
+            "eligible": 30
+          },
+          "regular": {
+            "windows": 26,
+            "wide": 44,
+            "eligible": 8
+          }
+        }
+      },
+      "proposals": []
+    },
+    "SOXSUSDT": {
+      "events": {
+        "snapshot": 96,
+        "update": 1475942,
+        "first_ts": 1794528000003,
+        "last_ts": 1794614395332
+      },
+      "census": {
+        "10000": {
+          "postmarket": {
+            "windows": 16,
+            "wide": 32
+          },
+          "other": {
+            "windows": 32,
+            "wide": 64
+          },
+          "premarket": {
+            "windows": 22,
+            "wide": 44
+          },
+          "regular": {
+            "windows": 26,
+            "wide": 52
+          }
+        },
+        "70000": {
+          "postmarket": {
+            "windows": 16,
+            "wide": 32
+          },
+          "other": {
+            "windows": 32,
+            "wide": 64
+          },
+          "premarket": {
+            "windows": 22,
+            "wide": 44
+          },
+          "regular": {
+            "windows": 26,
+            "wide": 52
+          }
+        }
+      },
+      "proposals": [
+        {
+          "bot": "stocks",
+          "symbol": "SOXSUSDT",
+          "direction": "SHORT",
+          "epoch": 1794555900,
+          "entry": 46.68,
+          "stop": 47.1468,
+          "target": 45.279599999999995,
+          "variants": {
+            "10000": [
+              {
+                "offset_ms": 10000,
+                "status": "wide",
+                "spread_bps": 27.80451288632287
+              },
+              {
+                "offset_ms": 10200,
+                "status": "wide",
+                "spread_bps": 27.80451288632287
+              },
+              {
+                "offset_ms": 10800,
+                "status": "wide",
+                "spread_bps": 27.80451288632287
+              }
+            ],
+            "70000": [
+              {
+                "offset_ms": 70000,
+                "status": "wide",
+                "spread_bps": 27.82832066788024
+              },
+              {
+                "offset_ms": 70200,
+                "status": "wide",
+                "spread_bps": 27.82832066788024
+              },
+              {
+                "offset_ms": 70800,
+                "status": "wide",
+                "spread_bps": 27.82832066788024
+              }
+            ]
+          },
+          "stock_reference_ready": false
+        }
+      ]
+    },
+    "SPCXUSDT": {
+      "events": {
+        "snapshot": 96,
+        "update": 738577,
+        "first_ts": 1794528000004,
+        "last_ts": 1794614397302
+      },
+      "census": {
+        "10000": {
+          "postmarket": {
+            "windows": 16,
+            "eligible": 26,
+            "wide": 6
+          },
+          "other": {
+            "windows": 32,
+            "eligible": 64
+          },
+          "premarket": {
+            "windows": 22,
+            "eligible": 40,
+            "wide": 4
+          },
+          "regular": {
+            "windows": 26,
+            "eligible": 47,
+            "depth slippage exceeds limit": 1,
+            "wide": 4
+          }
+        },
+        "70000": {
+          "postmarket": {
+            "windows": 16,
+            "eligible": 28,
+            "wide": 4
+          },
+          "other": {
+            "windows": 32,
+            "eligible": 64
+          },
+          "premarket": {
+            "windows": 22,
+            "eligible": 40,
+            "wide": 4
+          },
+          "regular": {
+            "windows": 26,
+            "eligible": 52
+          }
+        }
+      },
+      "proposals": []
+    },
+    "XLMUSDT": {
+      "events": {
+        "snapshot": 96,
+        "update": 1094663,
+        "first_ts": 1794528000003,
+        "last_ts": 1794614399892
+      },
+      "census": {
+        "10000": {
+          "postmarket": {
+            "windows": 16,
+            "wide": 22,
+            "depth slippage exceeds limit": 2,
+            "eligible": 8
+          },
+          "other": {
+            "windows": 32,
+            "wide": 60,
+            "depth slippage exceeds limit": 4
+          },
+          "premarket": {
+            "windows": 22,
+            "wide": 44
+          },
+          "regular": {
+            "windows": 26,
+            "wide": 38,
+            "depth slippage exceeds limit": 5,
+            "eligible": 9
+          }
+        },
+        "70000": {
+          "postmarket": {
+            "windows": 16,
+            "wide": 28,
+            "depth slippage exceeds limit": 2,
+            "eligible": 2
+          },
+          "other": {
+            "windows": 32,
+            "wide": 58,
+            "depth slippage exceeds limit": 5,
+            "eligible": 1
+          },
+          "premarket": {
+            "windows": 22,
+            "eligible": 2,
+            "depth slippage exceeds limit": 2,
+            "wide": 40
+          },
+          "regular": {
+            "windows": 26,
+            "wide": 40,
+            "depth slippage exceeds limit": 3,
+            "eligible": 9
+          }
+        }
+      },
+      "proposals": [
+        {
+          "bot": "crypto",
+          "symbol": "XLMUSDT",
+          "direction": "LONG",
+          "epoch": 1794537000,
+          "entry": 0.14613,
+          "stop": 0.14445000000000002,
+          "target": 0.14948999999999998,
+          "variants": {
+            "10000": [
+              {
+                "offset_ms": 10000,
+                "status": "wide",
+                "spread_bps": 17.119183757318464
+              },
+              {
+                "offset_ms": 10200,
+                "status": "wide",
+                "spread_bps": 17.119183757318464
+              },
+              {
+                "offset_ms": 10800,
+                "status": "wide",
+                "spread_bps": 17.119183757318464
+              }
+            ],
+            "70000": [
+              {
+                "offset_ms": 70000,
+                "status": "wide",
+                "spread_bps": 15.75288517516578
+              },
+              {
+                "offset_ms": 70200,
+                "status": "wide",
+                "spread_bps": 15.75288517516578
+              },
+              {
+                "offset_ms": 70800,
+                "status": "wide",
+                "spread_bps": 16.438356164382892
+              }
+            ]
+          },
+          "stock_reference_ready": null
+        },
+        {
+          "bot": "crypto",
+          "symbol": "XLMUSDT",
+          "direction": "LONG",
+          "epoch": 1794559500,
+          "entry": 0.14588,
+          "stop": 0.14419142857142858,
+          "target": 0.14925714285714287,
+          "variants": {
+            "10000": [
+              {
+                "offset_ms": 10000,
+                "status": "wide",
+                "spread_bps": 10.27995750950973
+              },
+              {
+                "offset_ms": 10200,
+                "status": "wide",
+                "spread_bps": 10.27995750950973
+              },
+              {
+                "offset_ms": 10800,
+                "status": "wide",
+                "spread_bps": 10.27995750950973
+              }
+            ],
+            "70000": [
+              {
+                "offset_ms": 70000,
+                "status": "wide",
+                "spread_bps": 7.530378230361046
+              },
+              {
+                "offset_ms": 70200,
+                "status": "wide",
+                "spread_bps": 7.530378230361046
+              },
+              {
+                "offset_ms": 70800,
+                "status": "wide",
+                "spread_bps": 7.530378230361046
+              }
+            ]
+          },
+          "stock_reference_ready": null
+        }
+      ]
+    },
+    "XRPUSDT": {
+      "events": {
+        "snapshot": 96,
+        "update": 1675248,
+        "first_ts": 1794528000008,
+        "last_ts": 1794614399576
+      },
+      "census": {
+        "10000": {
+          "postmarket": {
+            "windows": 16,
+            "eligible": 32
+          },
+          "other": {
+            "windows": 32,
+            "eligible": 64
+          },
+          "premarket": {
+            "windows": 22,
+            "eligible": 44
+          },
+          "regular": {
+            "windows": 26,
+            "eligible": 52
+          }
+        },
+        "70000": {
+          "postmarket": {
+            "windows": 16,
+            "eligible": 32
+          },
+          "other": {
+            "windows": 32,
+            "eligible": 64
+          },
+          "premarket": {
+            "windows": 22,
+            "eligible": 44
+          },
+          "regular": {
+            "windows": 26,
+            "eligible": 52
+          }
+        }
+      },
+      "proposals": [
+        {
+          "bot": "crypto",
+          "symbol": "XRPUSDT",
+          "direction": "LONG",
+          "epoch": 1794555000,
+          "entry": 1.03,
+          "stop": 1.015957142857143,
+          "target": 1.058085714285714,
+          "variants": {
+            "10000": [
+              {
+                "offset_ms": 10000,
+                "status": "eligible",
+                "average": 1.0303,
+                "worst": 1.0303,
+                "contracts": 37.0,
+                "spread_bps": 0.970638194612851,
+                "slippage_bps": 0.0,
+                "last_event_ms": 1794555009941
+              }
+            ],
+            "70000": [
+              {
+                "offset_ms": 70000,
+                "status": "eligible",
+                "average": 1.0291,
+                "worst": 1.0291,
+                "contracts": 37.0,
+                "spread_bps": 0.9717700791991546,
+                "slippage_bps": 0.0,
+                "last_event_ms": 1794555069991
+              }
+            ]
+          },
+          "stock_reference_ready": null
+        }
+      ]
+    },
+    "ZECUSDT": {
+      "events": {
+        "snapshot": 96,
+        "update": 3057348,
+        "first_ts": 1794528000003,
+        "last_ts": 1794614399972
+      },
+      "census": {
+        "10000": {
+          "postmarket": {
+            "windows": 16,
+            "eligible": 32
+          },
+          "other": {
+            "windows": 32,
+            "eligible": 64
+          },
+          "premarket": {
+            "windows": 22,
+            "eligible": 42,
+            "wide": 2
+          },
+          "regular": {
+            "windows": 26,
+            "wide": 6,
+            "eligible": 46
+          }
+        },
+        "70000": {
+          "postmarket": {
+            "windows": 16,
+            "eligible": 32
+          },
+          "other": {
+            "windows": 32,
+            "eligible": 62,
+            "wide": 2
+          },
+          "premarket": {
+            "windows": 22,
+            "eligible": 42,
+            "wide": 2
+          },
+          "regular": {
+            "windows": 26,
+            "eligible": 52
+          }
+        }
+      },
+      "proposals": [
+        {
+          "bot": "crypto",
+          "symbol": "ZECUSDT",
+          "direction": "SHORT",
+          "epoch": 1794569400,
+          "entry": 955.53,
+          "stop": 972.3357142857143,
+          "target": 921.9185714285713,
+          "variants": {
+            "10000": [
+              {
+                "offset_ms": 10000,
+                "status": "eligible",
+                "average": 956.12,
+                "worst": 956.12,
+                "contracts": 4.0,
+                "spread_bps": 1.2549938296137184,
+                "slippage_bps": -0.0,
+                "last_event_ms": 1794569409836
+              }
+            ],
+            "70000": [
+              {
+                "offset_ms": 70000,
+                "status": "eligible",
+                "average": 954.86,
+                "worst": 954.86,
+                "contracts": 4.0,
+                "spread_bps": 1.9896225476586948,
+                "slippage_bps": -0.0,
+                "last_event_ms": 1794569469996
+              }
+            ]
+          },
+          "stock_reference_ready": null
+        }
+      ]
+    }
+  },
+  "objective_verified": false,
+  "live_activation_supported": false,
+  "limitations": [
+    "Exact X-Perp files and exchange event timestamps. No private receipt/fill or network latency reconstruction.",
+    "Archives omit sequence IDs and checksums, so undisclosed gaps between updates cannot be ruled out.",
+    "Fixed past proposals, one UTC day. No publication-spread filter, account state, or exit/PnL replay.",
+    "Three illustrative checks at fixed times. The 70-second timing is a stock scan proxy, not recovered timestamps."
+  ]
+}
