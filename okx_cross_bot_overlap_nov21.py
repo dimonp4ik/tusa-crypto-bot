@@ -179,7 +179,7 @@ def overlap_view(closed):
                 profitable_closes=Counter(t["bot"] for t in closed if t["bank_pnl"] + t["runner_pnl"] > 0))
 
 
-def score_joint():
+def joint_inputs():
     files = [DATA / name for name in ("crypto_plan.json", "crypto_capture.json", "crypto_books.json")]
     files += [STOCK_DATA / name for name in ("plan.json", "capture.json", "trade_repair.json")]
     plans = [json.loads(path.read_bytes()) for path in files]
@@ -238,6 +238,14 @@ def score_joint():
             return tape[index].price * (1 - sign * penalty / 10_000)
         return price
 
+    return (crypto_rows, stock_rows, specs, ticks, books, hashes, entry_checks, tape_checks, exit_proxy,
+            unknown_quotes)
+
+
+def score_joint():
+    (crypto_rows, stock_rows, specs, ticks, books, hashes, entry_checks, tape_checks, exit_proxy,
+     unknown_quotes) = joint_inputs()
+    rows = crypto_rows + stock_rows
     published = list(crypto_cadence(crypto_rows))
     scenarios = {
         "crypto_only": published,
