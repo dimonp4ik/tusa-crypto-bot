@@ -30,13 +30,16 @@ def local_trade_days(start,end):
             for day in (first+timedelta(days=i) for i in range((last-first).days+1))}
 
 
-def freeze():
+def freeze(*, start=START, entry_end=None):
     crypto,ready,stock,specs,end=records()
+    if entry_end is not None:
+        end = min(end, entry_end + max(HOLD.values()))
+    entry_end = entry_end if entry_end is not None else end
     ready_keys={(r['symbol'],r['entry_time']) for r in ready}
     proposals=[]
     for r in crypto+stock:
         at=int(r['entry_time'])
-        if not START<=at<end:
+        if not start<=at<entry_end:
             continue
         bot=r['bot']; e=r['entry']; side=r['direction']; sign=1 if side=='LONG' else -1
         stop=r['sl'] if bot=='crypto' else e*(1-sign*r['risk_pct'])
@@ -48,7 +51,7 @@ def freeze():
     proposals.sort(key=lambda r:(r['epoch'],r['bot'],r['symbol']))
     if len(proposals)!=len({(r['bot'],r['symbol'],r['epoch']) for r in proposals}):
         raise ValueError('duplicate frozen proposal')
-    return dict(start=START,coverage_end=int(end),specs={s:specs[s] for s in sorted({r['symbol'] for r in proposals})},
+    return dict(start=start,coverage_end=int(end),specs={s:specs[s] for s in sorted({r['symbol'] for r in proposals})},
         rows=proposals,parameters=dict(capital=130.,margin=.03,leverage=10,crypto_offset_ms=10_000,
             stock_offset_ms=70_000,exit_lags_ms=[200,1000],be_seconds=[60,900],
             retry_offsets_ms=[0,200,800],account_cap=12,bot_caps={'crypto':4,'stocks':8},

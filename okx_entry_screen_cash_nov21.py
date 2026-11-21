@@ -9,6 +9,16 @@ from okx_xperp_cash_tick_nov19 import simulate
 from okx_xperp_multiday_replay_nov20 import FOLDER, ROOT, cached_entries, exit_books, file_hash, utc_day
 
 
+POLICIES = {
+    "baseline": {},
+    "book_imbalance_minus_30pct": {"imbalance": -.30},
+    "book_imbalance_nonnegative": {"imbalance": 0.},
+    "quote_reward_risk_1_8": {"reward_risk": 1.8},
+    "one_same_side_per_rolling_hour": {"same_side_per_hour": 1},
+    "two_same_side_per_rolling_hour": {"same_side_per_hour": 2},
+}
+
+
 def entry_features(row, book):
     mid = (book["bids"][0][0] + book["asks"][0][0]) / 2
     bids = math.fsum(qty for price, qty in book["bids"] if price >= mid * .999)
@@ -79,14 +89,6 @@ def main():
         cache.write_bytes(pickle.dumps((digest, books), protocol=5))
     features = {(r["symbol"], r["entry_ms"]): entry_features(r, books[r["symbol"]][r["entry_ms"]])
                 for r in rows if r["bot"] == "crypto" and r["entry_status"] == "eligible"}
-    policies = {
-        "baseline": {},
-        "book_imbalance_minus_30pct": {"imbalance": -.30},
-        "book_imbalance_nonnegative": {"imbalance": 0.},
-        "quote_reward_risk_1_8": {"reward_risk": 1.8},
-        "one_same_side_per_rolling_hour": {"same_side_per_hour": 1},
-        "two_same_side_per_rolling_hour": {"same_side_per_hour": 2},
-    }
     cohorts = {
         "all": rows,
         "omit_13_nov": [r for r in rows if utc_day(r["entry_ms"] / 1000) != "2026-11-13"],
@@ -94,7 +96,7 @@ def main():
     results = {}
     for cohort, proposals in cohorts.items():
         results[cohort] = {}
-        for name, policy in policies.items():
+        for name, policy in POLICIES.items():
             selected = screened_rows(proposals, features, **policy)
             result = simulate(selected, specs, ticks, books, clock=60, lag=200, setting="requested5")
             if name == "baseline":
