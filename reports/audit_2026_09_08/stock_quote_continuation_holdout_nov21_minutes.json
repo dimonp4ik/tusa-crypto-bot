@@ -1,0 +1,656 @@
+{
+  "plan_sha256": "571bb4cff678ea222d6600959ebeffed37ad42745d29584fd6a9762118aa6482",
+  "minute_sources": {
+    "AMZN-USD_UM_XPERP-310613": [
+      "a488907460cc49f19263ca6430b68057405b749371a23316ac525cab172cf6a4"
+    ],
+    "CRCL-USD_UM_XPERP-310704": [
+      "9d95a833b6b562cd68208016380e350920fa4e3664b61d34543b38a26d2aa133"
+    ],
+    "GOOGL-USD_UM_XPERP-310613": [
+      "01d5340113bf400a11bed4455110615ab7f679e325c3af2d524ae705313c3e5d",
+      "656580d4508eaca8cbd7b9bc90af775158b6158b9b68353f74eff1cfcebec180"
+    ],
+    "INTC-USD_UM_XPERP-310627": [
+      "6dd4f02ecfb13f5f8150e45c9bd9100f6120a7d0ace2b28b7868c3e43aab2b8e",
+      "b88dbcfd43ff1fa8f1bdee41515888b11bf8f34bc10746d6f90502c9f3065c71"
+    ],
+    "MSFT-USD_UM_XPERP-310613": [
+      "ca93eef76459bde9294220eb642cb1bb244ec3c2bfe4814c022927acff75ed92"
+    ],
+    "MSTR-USD_UM_XPERP-310704": [
+      "2377f27140dcf4c416e0fcbed50760b38bef04c933cd5fb2e392d3640bb935ab"
+    ],
+    "NVDA-USD_UM_XPERP-310613": [
+      "3516a427a7c1839593da0c29a5e605b972a058cafccc82b6246a1d192370ce65",
+      "77323f917f0f52d70942ef201181c26ab561d0b0aa4c9dfc3b98d0ce63e8e450"
+    ],
+    "SPCX-USD_UM_XPERP-310613": [
+      "d1f6d50d5fe6d53b3b1d6cb73189a9625c0cd66987ab47b5bce18230a03376ad",
+      "39be9f26601bad5a0c4cb5d7d47f20183ffc8036ed02fc60895a1ce13d9a74d6"
+    ],
+    "TSLA-USD_UM_XPERP-310613": [
+      "572d258f6c886848b1c0d8a48d664d528772478ba27bf36ad7be628f8daf4bdb"
+    ]
+  },
+  "aggregates": {
+    "unseen_contract_observer": {
+      "native|all": {
+        "qualified": 1,
+        "scored": 1,
+        "wins": 0,
+        "mean_price_pct": -0.36832412523022384,
+        "exits": {
+          "SL": 1
+        }
+      },
+      "native|regular": {
+        "qualified": 0,
+        "scored": 0,
+        "wins": 0,
+        "mean_price_pct": null,
+        "exits": {}
+      },
+      "reversal_z1_25|all": {
+        "qualified": 1,
+        "scored": 1,
+        "wins": 0,
+        "mean_price_pct": -0.36832412523022384,
+        "exits": {
+          "SL": 1
+        }
+      },
+      "reversal_z1_25|regular": {
+        "qualified": 0,
+        "scored": 0,
+        "wins": 0,
+        "mean_price_pct": null,
+        "exits": {}
+      },
+      "aligned_continuation|all": {
+        "qualified": 35,
+        "scored": 33,
+        "wins": 6,
+        "mean_price_pct": -0.4895789228660812,
+        "exits": {
+          "SL": 22,
+          "SL_GAP": 5,
+          "TARGET": 6,
+          "missing_terminal_trade": 2
+        }
+      },
+      "aligned_continuation|regular": {
+        "qualified": 10,
+        "scored": 8,
+        "wins": 4,
+        "mean_price_pct": 0.3668535994372321,
+        "exits": {
+          "TARGET": 4,
+          "missing_terminal_trade": 2,
+          "SL_GAP": 1,
+          "SL": 3
+        }
+      }
+    }
+  },
+  "results": [
+    {
+      "cohort": "unseen_contract_observer",
+      "route": "aligned_continuation",
+      "symbol": "AMZNUSDT",
+      "phase": "premarket",
+      "direction": "SHORT",
+      "entry_ms": 1795178728023,
+      "path": {
+        "known": true,
+        "outcome": "SL",
+        "fill_reference": 253.24,
+        "exit_time": 1795183860
+      },
+      "price_return": -0.008402022856687896
+    },
+    {
+      "cohort": "unseen_contract_observer",
+      "route": "aligned_continuation",
+      "symbol": "CRCLUSDT",
+      "phase": "premarket",
+      "direction": "SHORT",
+      "entry_ms": 1795173329275,
+      "path": {
+        "known": true,
+        "outcome": "SL_GAP",
+        "fill_reference": 51.62,
+        "exit_time": 1795185060
+      },
+      "price_return": -0.01394617953250843
+    },
+    {
+      "cohort": "unseen_contract_observer",
+      "route": "aligned_continuation",
+      "symbol": "GOOGLUSDT",
+      "phase": "premarket",
+      "direction": "SHORT",
+      "entry_ms": 1795178729972,
+      "path": {
+        "known": true,
+        "outcome": "SL",
+        "fill_reference": 272.98,
+        "exit_time": 1795184760
+      },
+      "price_return": -0.007083302589832474
+    },
+    {
+      "cohort": "unseen_contract_observer",
+      "route": "aligned_continuation",
+      "symbol": "GOOGLUSDT",
+      "phase": "regular",
+      "direction": "SHORT",
+      "entry_ms": 1795199430074,
+      "path": {
+        "known": true,
+        "outcome": "TARGET",
+        "fill_reference": 267.38,
+        "exit_time": 1795206660
+      },
+      "price_return": 0.019580522147257362
+    },
+    {
+      "cohort": "unseen_contract_observer",
+      "route": "aligned_continuation",
+      "symbol": "GOOGLUSDT",
+      "phase": "regular",
+      "direction": "SHORT",
+      "entry_ms": 1795203029875,
+      "path": {
+        "known": true,
+        "outcome": "TARGET",
+        "fill_reference": 265.11,
+        "exit_time": 1795208160
+      },
+      "price_return": 0.018656302054414042
+    },
+    {
+      "cohort": "unseen_contract_observer",
+      "route": "aligned_continuation",
+      "symbol": "GOOGLUSDT",
+      "phase": "regular",
+      "direction": "SHORT",
+      "entry_ms": 1795205729873,
+      "path": {
+        "known": false,
+        "reason": "missing_terminal_trade"
+      },
+      "price_return": null
+    },
+    {
+      "cohort": "unseen_contract_observer",
+      "route": "aligned_continuation",
+      "symbol": "GOOGLUSDT",
+      "phase": "regular",
+      "direction": "SHORT",
+      "entry_ms": 1795206629973,
+      "path": {
+        "known": true,
+        "outcome": "SL_GAP",
+        "fill_reference": 271.06,
+        "exit_time": 1795217640
+      },
+      "price_return": -0.014446107784431117
+    },
+    {
+      "cohort": "unseen_contract_observer",
+      "route": "aligned_continuation",
+      "symbol": "GOOGLUSDT",
+      "phase": "regular",
+      "direction": "SHORT",
+      "entry_ms": 1795207530022,
+      "path": {
+        "known": true,
+        "outcome": "SL",
+        "fill_reference": 270.06,
+        "exit_time": 1795211040
+      },
+      "price_return": -0.01244657719127229
+    },
+    {
+      "cohort": "unseen_contract_observer",
+      "route": "aligned_continuation",
+      "symbol": "GOOGLUSDT",
+      "phase": "postmarket",
+      "direction": "LONG",
+      "entry_ms": 1795217429825,
+      "path": {
+        "known": true,
+        "outcome": "SL",
+        "fill_reference": 269.19,
+        "exit_time": 1795231260
+      },
+      "price_return": -0.006822943432027495
+    },
+    {
+      "cohort": "unseen_contract_observer",
+      "route": "aligned_continuation",
+      "symbol": "GOOGLUSDT",
+      "phase": "other",
+      "direction": "SHORT",
+      "entry_ms": 1795232729878,
+      "path": {
+        "known": true,
+        "outcome": "SL_GAP",
+        "fill_reference": 269.96,
+        "exit_time": 1795259520
+      },
+      "price_return": -0.012451245124512456
+    },
+    {
+      "cohort": "unseen_contract_observer",
+      "route": "aligned_continuation",
+      "symbol": "INTCUSDT",
+      "phase": "premarket",
+      "direction": "SHORT",
+      "entry_ms": 1795168830279,
+      "path": {
+        "known": true,
+        "outcome": "SL_GAP",
+        "fill_reference": 53.4,
+        "exit_time": 1795170900
+      },
+      "price_return": -0.012322274881516604
+    },
+    {
+      "cohort": "unseen_contract_observer",
+      "route": "aligned_continuation",
+      "symbol": "INTCUSDT",
+      "phase": "premarket",
+      "direction": "SHORT",
+      "entry_ms": 1795173330326,
+      "path": {
+        "known": true,
+        "outcome": "SL",
+        "fill_reference": 53.49,
+        "exit_time": 1795182660
+      },
+      "price_return": -0.011617539783319364
+    },
+    {
+      "cohort": "unseen_contract_observer",
+      "route": "aligned_continuation",
+      "symbol": "INTCUSDT",
+      "phase": "other",
+      "direction": "SHORT",
+      "entry_ms": 1795235430329,
+      "path": {
+        "known": true,
+        "outcome": "SL",
+        "fill_reference": 52.11,
+        "exit_time": 1795243380
+      },
+      "price_return": -0.01618564742589701
+    },
+    {
+      "cohort": "unseen_contract_observer",
+      "route": "aligned_continuation",
+      "symbol": "INTCUSDT",
+      "phase": "other",
+      "direction": "SHORT",
+      "entry_ms": 1795236330279,
+      "path": {
+        "known": true,
+        "outcome": "SL",
+        "fill_reference": 51.67,
+        "exit_time": 1795238760
+      },
+      "price_return": -0.009179687500000089
+    },
+    {
+      "cohort": "unseen_contract_observer",
+      "route": "aligned_continuation",
+      "symbol": "MSFTUSDT",
+      "phase": "premarket",
+      "direction": "SHORT",
+      "entry_ms": 1795178731195,
+      "path": {
+        "known": true,
+        "outcome": "SL",
+        "fill_reference": 490.37,
+        "exit_time": 1795184760
+      },
+      "price_return": -0.004856557377049153
+    },
+    {
+      "cohort": "unseen_contract_observer",
+      "route": "aligned_continuation",
+      "symbol": "MSFTUSDT",
+      "phase": "premarket",
+      "direction": "SHORT",
+      "entry_ms": 1795179631279,
+      "path": {
+        "known": true,
+        "outcome": "SL",
+        "fill_reference": 489.75,
+        "exit_time": 1795184760
+      },
+      "price_return": -0.004780271634319488
+    },
+    {
+      "cohort": "unseen_contract_observer",
+      "route": "aligned_continuation",
+      "symbol": "MSFTUSDT",
+      "phase": "regular",
+      "direction": "SHORT",
+      "entry_ms": 1795192231169,
+      "path": {
+        "known": true,
+        "outcome": "TARGET",
+        "fill_reference": 481.84,
+        "exit_time": 1795208160
+      },
+      "price_return": 0.018995459820428717
+    },
+    {
+      "cohort": "unseen_contract_observer",
+      "route": "aligned_continuation",
+      "symbol": "MSFTUSDT",
+      "phase": "regular",
+      "direction": "SHORT",
+      "entry_ms": 1795193131182,
+      "path": {
+        "known": false,
+        "reason": "missing_terminal_trade"
+      },
+      "price_return": null
+    },
+    {
+      "cohort": "unseen_contract_observer",
+      "route": "aligned_continuation",
+      "symbol": "MSFTUSDT",
+      "phase": "regular",
+      "direction": "SHORT",
+      "entry_ms": 1795206631170,
+      "path": {
+        "known": true,
+        "outcome": "SL",
+        "fill_reference": 487.49,
+        "exit_time": 1795215960
+      },
+      "price_return": -0.007856271578903895
+    },
+    {
+      "cohort": "unseen_contract_observer",
+      "route": "aligned_continuation",
+      "symbol": "MSTRUSDT",
+      "phase": "premarket",
+      "direction": "SHORT",
+      "entry_ms": 1795173331374,
+      "path": {
+        "known": true,
+        "outcome": "TARGET",
+        "fill_reference": 83.3,
+        "exit_time": 1795176480
+      },
+      "price_return": 0.019538606403013192
+    },
+    {
+      "cohort": "unseen_contract_observer",
+      "route": "aligned_continuation",
+      "symbol": "NVDAUSDT",
+      "phase": "premarket",
+      "direction": "SHORT",
+      "entry_ms": 1795167931878,
+      "path": {
+        "known": true,
+        "outcome": "SL",
+        "fill_reference": 144.07,
+        "exit_time": 1795184760
+      },
+      "price_return": -0.012225110658329097
+    },
+    {
+      "cohort": "unseen_contract_observer",
+      "route": "aligned_continuation",
+      "symbol": "NVDAUSDT",
+      "phase": "premarket",
+      "direction": "SHORT",
+      "entry_ms": 1795168831778,
+      "path": {
+        "known": true,
+        "outcome": "SL",
+        "fill_reference": 143.22,
+        "exit_time": 1795170840
+      },
+      "price_return": -0.008236536430834107
+    },
+    {
+      "cohort": "unseen_contract_observer",
+      "route": "aligned_continuation",
+      "symbol": "NVDAUSDT",
+      "phase": "premarket",
+      "direction": "SHORT",
+      "entry_ms": 1795173331824,
+      "path": {
+        "known": true,
+        "outcome": "SL",
+        "fill_reference": 143.78,
+        "exit_time": 1795184760
+      },
+      "price_return": -0.007638937556941672
+    },
+    {
+      "cohort": "unseen_contract_observer",
+      "route": "aligned_continuation",
+      "symbol": "NVDAUSDT",
+      "phase": "premarket",
+      "direction": "SHORT",
+      "entry_ms": 1795178731782,
+      "path": {
+        "known": true,
+        "outcome": "SL",
+        "fill_reference": 142.9,
+        "exit_time": 1795183440
+      },
+      "price_return": -0.008610954263128079
+    },
+    {
+      "cohort": "unseen_contract_observer",
+      "route": "aligned_continuation",
+      "symbol": "NVDAUSDT",
+      "phase": "premarket",
+      "direction": "SHORT",
+      "entry_ms": 1795179631834,
+      "path": {
+        "known": true,
+        "outcome": "SL",
+        "fill_reference": 142.61,
+        "exit_time": 1795183260
+      },
+      "price_return": -0.009771295050626794
+    },
+    {
+      "cohort": "unseen_contract_observer",
+      "route": "native",
+      "symbol": "NVDAUSDT",
+      "phase": "postmarket",
+      "direction": "SHORT",
+      "entry_ms": 1795221931679,
+      "path": {
+        "known": true,
+        "outcome": "SL",
+        "fill_reference": 130.8,
+        "exit_time": 1795269600
+      },
+      "price_return": -0.0036832412523022384
+    },
+    {
+      "cohort": "unseen_contract_observer",
+      "route": "reversal_z1_25",
+      "symbol": "NVDAUSDT",
+      "phase": "postmarket",
+      "direction": "SHORT",
+      "entry_ms": 1795221931679,
+      "path": {
+        "known": true,
+        "outcome": "SL",
+        "fill_reference": 130.8,
+        "exit_time": 1795269600
+      },
+      "price_return": -0.0036832412523022384
+    },
+    {
+      "cohort": "unseen_contract_observer",
+      "route": "aligned_continuation",
+      "symbol": "NVDAUSDT",
+      "phase": "postmarket",
+      "direction": "LONG",
+      "entry_ms": 1795221931679,
+      "path": {
+        "known": true,
+        "outcome": "SL",
+        "fill_reference": 128.98,
+        "exit_time": 1795231920
+      },
+      "price_return": -0.010510164940544686
+    },
+    {
+      "cohort": "unseen_contract_observer",
+      "route": "aligned_continuation",
+      "symbol": "NVDAUSDT",
+      "phase": "other",
+      "direction": "SHORT",
+      "entry_ms": 1795231831675,
+      "path": {
+        "known": true,
+        "outcome": "SL",
+        "fill_reference": 130.73,
+        "exit_time": 1795269600
+      },
+      "price_return": -0.008874826362092803
+    },
+    {
+      "cohort": "unseen_contract_observer",
+      "route": "aligned_continuation",
+      "symbol": "NVDAUSDT",
+      "phase": "other",
+      "direction": "SHORT",
+      "entry_ms": 1795232731676,
+      "path": {
+        "known": true,
+        "outcome": "SL",
+        "fill_reference": 130.48,
+        "exit_time": 1795269120
+      },
+      "price_return": -0.020970266040688523
+    },
+    {
+      "cohort": "unseen_contract_observer",
+      "route": "aligned_continuation",
+      "symbol": "NVDAUSDT",
+      "phase": "other",
+      "direction": "SHORT",
+      "entry_ms": 1795235431828,
+      "path": {
+        "known": true,
+        "outcome": "SL",
+        "fill_reference": 129.24,
+        "exit_time": 1795243320
+      },
+      "price_return": -0.012297329051460748
+    },
+    {
+      "cohort": "unseen_contract_observer",
+      "route": "aligned_continuation",
+      "symbol": "SPCXUSDT",
+      "phase": "premarket",
+      "direction": "SHORT",
+      "entry_ms": 1795173333777,
+      "path": {
+        "known": true,
+        "outcome": "TARGET",
+        "fill_reference": 130.06,
+        "exit_time": 1795178280
+      },
+      "price_return": 0.017781157389805013
+    },
+    {
+      "cohort": "unseen_contract_observer",
+      "route": "aligned_continuation",
+      "symbol": "SPCXUSDT",
+      "phase": "regular",
+      "direction": "LONG",
+      "entry_ms": 1795185033723,
+      "path": {
+        "known": true,
+        "outcome": "SL",
+        "fill_reference": 129.74,
+        "exit_time": 1795185300
+      },
+      "price_return": -0.01278344239841711
+    },
+    {
+      "cohort": "unseen_contract_observer",
+      "route": "aligned_continuation",
+      "symbol": "SPCXUSDT",
+      "phase": "postmarket",
+      "direction": "LONG",
+      "entry_ms": 1795217433577,
+      "path": {
+        "known": true,
+        "outcome": "SL_GAP",
+        "fill_reference": 129.29,
+        "exit_time": 1795227000
+      },
+      "price_return": -0.005458988356380368
+    },
+    {
+      "cohort": "unseen_contract_observer",
+      "route": "aligned_continuation",
+      "symbol": "TSLAUSDT",
+      "phase": "premarket",
+      "direction": "SHORT",
+      "entry_ms": 1795173333929,
+      "path": {
+        "known": true,
+        "outcome": "SL",
+        "fill_reference": 370.17,
+        "exit_time": 1795184880
+      },
+      "price_return": -0.0065805574439159464
+    },
+    {
+      "cohort": "unseen_contract_observer",
+      "route": "aligned_continuation",
+      "symbol": "TSLAUSDT",
+      "phase": "premarket",
+      "direction": "SHORT",
+      "entry_ms": 1795182333828,
+      "path": {
+        "known": true,
+        "outcome": "SL",
+        "fill_reference": 367.0,
+        "exit_time": 1795183860
+      },
+      "price_return": -0.00940645800099027
+    },
+    {
+      "cohort": "unseen_contract_observer",
+      "route": "aligned_continuation",
+      "symbol": "TSLAUSDT",
+      "phase": "regular",
+      "direction": "SHORT",
+      "entry_ms": 1795192233834,
+      "path": {
+        "known": true,
+        "outcome": "TARGET",
+        "fill_reference": 350.71,
+        "exit_time": 1795199520
+      },
+      "price_return": 0.01964840288590286
+    }
+  ],
+  "live_activation_supported": false,
+  "limitations": [
+    "Entry on observed top-five book at 3% margin and 10x.",
+    "Each setup is independent. Exit price is a one-minute trade-based reference.",
+    "Ambiguous entry minute and simultaneous stop/target touches stay unknown.",
+    "Average refers to the underlying price move. Shared account drawdown requires the L2 exit replay."
+  ]
+}

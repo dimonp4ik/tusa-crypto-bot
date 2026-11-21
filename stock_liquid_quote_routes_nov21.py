@@ -88,15 +88,16 @@ def geometry(setup, frame):
                 target=e * (1 + sign * setup["target_r"] * .01))
 
 
-def freeze():
+def freeze(*, archives=ARCHIVES, first_bucket=0, mature_at=MATURE_AT):
     native = native_module()
     cases, counts, hashes = {}, {}, {}
-    for cohort, (folder, profile) in ARCHIVES.items():
+    for cohort, (folder, profile) in archives.items():
         cases[cohort] = []
         hashes[cohort] = {}
         counts[cohort] = {route: Counter() for route in ROUTES}
         for path in sorted(folder.glob("bucket_*.json")):
-            if int(path.stem.removeprefix("bucket_")) + HOLD_SECONDS > MATURE_AT:
+            at = int(path.stem.removeprefix("bucket_"))
+            if at < first_bucket or at + HOLD_SECONDS > mature_at:
                 continue
             raw = path.read_bytes()
             scan = json.loads(raw)
@@ -150,16 +151,16 @@ def freeze():
                         book=dict(ts=round(book["exchange_at"] * 1000), bids=book["bids"], asks=book["asks"]),
                     ))
     return dict(cases=cases, counts=counts, archive_sha256=hashes, native_sha256=file_hash(NATIVE_PATH),
-                mature_at=MATURE_AT)
+                mature_at=mature_at)
 
 
 def write_json(path, payload):
     path.write_text(json.dumps(payload, indent=2, allow_nan=False) + "\n", encoding="utf-8", newline="\n")
 
 
-def load_plan():
-    DATA.mkdir(parents=True, exist_ok=True)
-    path = DATA / "plan.json"
+def load_plan(data=DATA):
+    data.mkdir(parents=True, exist_ok=True)
+    path = data / "plan.json"
     if path.exists():
         return json.loads(path.read_bytes())
     plan = freeze()
@@ -167,8 +168,8 @@ def load_plan():
     return plan
 
 
-def capture():
-    plan = load_plan()
+def capture(*, data=DATA):
+    plan = load_plan(data)
     rows = [r for cases in plan["cases"].values() for r in cases]
     print("proposals", plan["counts"], flush=True)
     print("qualified markets", dict(Counter((r["symbol"], r["route"]) for r in rows)), flush=True)
@@ -190,11 +191,11 @@ def capture():
         finish = max(r["epoch"] + HOLD_SECONDS for r in subset)
         frame = defaultdict(list)
         for at in range(begin, finish, 86400):
-            data, _ = fetch_window(specs[symbol]["instId"], at, min(at + 86400, finish), 900, DATA / "candles")
-            for field, values in data.items():
+            source, _ = fetch_window(specs[symbol]["instId"], at, min(at + 86400, finish), 900, data / "candles")
+            for field, values in source.items():
                 frame[field].extend(values)
         frame["volume_contracts"] = frame["volume"]
-        path = DATA / f"{symbol}_reference.pkl"
+        path = data / f"{symbol}_reference.pkl"
         path.write_bytes(pickle.dumps(dict(frame), protocol=5))
         return symbol, dict(path=str(path), sha256=file_hash(path))
 
@@ -203,13 +204,13 @@ def capture():
         grouped[row["symbol"]].append(row)
     with ThreadPoolExecutor(max_workers=3) as pool:
         references.update(pool.map(lambda item: candles(*item), sorted(grouped.items())))
-    write_json(DATA / "capture.json", dict(plan_sha256=file_hash(DATA / "plan.json"),
+    write_json(data / "capture.json", dict(plan_sha256=file_hash(data / "plan.json"),
                                            trades=trades, reference=references, specs=specs, books={}))
     print("captured", len(trades), "instruments", sum(len(v["days"]) for v in trades.values()), "files", flush=True)
 
 
-def score_minutes():
-    plan = load_plan()
+def score_minutes(*, data=DATA, stem="stock_liquid_quote_routes_nov21"):
+    plan = load_plan(data)
     grouped = defaultdict(list)
     for cohort, rows in plan["cases"].items():
         for row in rows:
@@ -222,9 +223,9 @@ def score_minutes():
         frame = defaultdict(list)
         hashes = []
         for begin in range(start, finish, 86400):
-            data, digest = fetch_window(instrument, begin, min(begin + 86400, finish), 60, DATA / "minutes")
+            source, digest = fetch_window(instrument, begin, min(begin + 86400, finish), 60, data / "minutes")
             hashes.append(digest)
-            for field, values in data.items():
+            for field, values in source.items():
                 frame[field].extend(values)
         output = []
         for cohort, row in candidates:
@@ -263,8 +264,8 @@ def score_minutes():
                     mean_price_pct=100 * math.fsum(values) / len(values) if values else None,
                     exits=Counter(r["path"].get("outcome", r["path"].get("reason")) for r in subset),
                 )
-    write_json(ROOT / "stock_liquid_quote_routes_nov21_minutes.json",
-               dict(plan_sha256=file_hash(DATA / "plan.json"), minute_sources=sources, aggregates=aggregates,
+    write_json(ROOT / f"{stem}_minutes.json",
+               dict(plan_sha256=file_hash(data / "plan.json"), minute_sources=sources, aggregates=aggregates,
                     results=results, live_activation_supported=False,
                     limitations=["Entry on observed top-five book at 3% margin and 10x.",
                                  "Each setup is independent. Exit price is a one-minute trade-based reference.",
@@ -273,16 +274,16 @@ def score_minutes():
     print(json.dumps(aggregates, indent=2))
 
 
-def repair_trades():
-    plan = load_plan()
-    capture_path = DATA / "capture.json"
+def repair_trades(*, data=DATA):
+    plan = load_plan(data)
+    capture_path = data / "capture.json"
     captured = json.loads(capture_path.read_bytes())
-    if captured["plan_sha256"] != file_hash(DATA / "plan.json"):
+    if captured["plan_sha256"] != file_hash(data / "plan.json"):
         raise ValueError("trade repair plan changed")
     rows = [r for cohort in plan["cases"].values() for r in cohort]
     evidence = repair_recent_days(captured["trades"], rows, hold_seconds=HOLD_SECONDS,
-                                  folder=DATA / "repaired_prints")
-    write_json(DATA / "trade_repair.json", dict(capture_sha256=file_hash(capture_path), intervals=evidence))
+                                  folder=data / "repaired_prints")
+    write_json(data / "trade_repair.json", dict(capture_sha256=file_hash(capture_path), intervals=evidence))
 
 
 def limit_bursts(proposals, *, max_same_side):
@@ -302,11 +303,11 @@ def limit_bursts(proposals, *, max_same_side):
             yield row
 
 
-def score(*, stress=False):
-    plan = load_plan()
-    capture_path = DATA / "capture.json"
+def score(*, stress=False, data=DATA, stem="stock_liquid_quote_routes_nov21", extra_variants=None):
+    plan = load_plan(data)
+    capture_path = data / "capture.json"
     captured = json.loads(capture_path.read_bytes())
-    if captured["plan_sha256"] != file_hash(DATA / "plan.json"):
+    if captured["plan_sha256"] != file_hash(data / "plan.json"):
         raise ValueError("frozen proposals changed")
     rows = [r for cases in plan["cases"].values() for r in cases]
     specs = captured["specs"]
@@ -314,7 +315,7 @@ def score(*, stress=False):
     books = defaultdict(dict)
     for row in rows:
         books[row["symbol"]][row["entry_ms"]] = row["book"]
-    repair_path = DATA / "trade_repair.json"
+    repair_path = data / "trade_repair.json"
     repair = json.loads(repair_path.read_bytes()) if repair_path.exists() else None
     if repair:
         if repair["capture_sha256"] != file_hash(capture_path):
@@ -352,6 +353,8 @@ def score(*, stress=False):
             if route == "aligned_continuation":
                 subsets.update(stock_cadence=list(limit_bursts(proposals, max_same_side=2)),
                                one_per_side_hour=list(limit_bursts(proposals, max_same_side=1)))
+                if extra_variants:
+                    subsets.update({name: list(apply(proposals)) for name, apply in extra_variants.items()})
             for label, subset in subsets.items():
                 unknown = [(r["symbol"], r["entry_ms"], r["path"][60].get("reason"))
                            for r in subset if r["entry_status"] == "eligible" and not r["path"][60]["known"]]
@@ -384,7 +387,7 @@ def score(*, stress=False):
                 if result.get("status") == "SCORED_PUBLIC_L2_SIMULATION":
                     result["status"] = "SCORED_PUBLIC_TRADE_EXIT_STRESS"
     suffix = "_exit_stress" if stress else ""
-    write_json(ROOT / f"stock_liquid_quote_routes_nov21{suffix}.json", report)
+    write_json(ROOT / f"{stem}{suffix}.json", report)
     print(json.dumps({cohort: {key: {k: v for k, v in case.items() if k != "closed"}
                               for key, case in cases.items()} for cohort, cases in results.items()}, indent=2))
 
