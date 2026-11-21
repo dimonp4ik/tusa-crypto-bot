@@ -1,0 +1,539 @@
+{
+  "source_sha256": "dbdd34a2f33eb219f409912de1fbba156fd6cf7c48cc30aa271da49d8571710e",
+  "scope": {
+    "start": 1794182400,
+    "end": 1794689100,
+    "proposals": 63
+  },
+  "baseline_parity": true,
+  "results": {
+    "all": {
+      "baseline": {
+        "status": "SCORED_PUBLIC_L2_SIMULATION",
+        "trades": 24,
+        "skipped": {
+          "crypto:wide": 14,
+          "stocks:wide": 21,
+          "stocks:stale order book": 3,
+          "stocks:paper_guard": 1
+        },
+        "return_pct": -2.2007307692307743,
+        "drawdown_pct": 2.444807692307686,
+        "contribution_pct": {
+          "crypto": -2.200730769230761,
+          "stocks": 0.0
+        },
+        "peak_reservations": 4,
+        "peak_margin_pct": 11.56279155866751,
+        "cash_pnl_by_entry_day": {
+          "2026-11-09": -0.7841999999999887,
+          "2026-11-10": -0.020700000000001495,
+          "2026-11-11": 0.6482000000000017,
+          "2026-11-12": 0.394049999999997,
+          "2026-11-13": -3.0910999999999937,
+          "2026-11-14": -0.00720000000000387
+        },
+        "exit_counts": {
+          "SL": 10,
+          "BE": 11,
+          "TARGET": 3
+        }
+      },
+      "book_imbalance_minus_30pct": {
+        "status": "SCORED_PUBLIC_L2_SIMULATION",
+        "trades": 20,
+        "skipped": {
+          "crypto:wide": 14,
+          "stocks:wide": 21,
+          "stocks:stale order book": 3,
+          "crypto:adverse_book": 4,
+          "stocks:paper_guard": 1
+        },
+        "return_pct": -1.4514230769230196,
+        "drawdown_pct": 1.9411030410895522,
+        "contribution_pct": {
+          "crypto": -1.4514230769230585,
+          "stocks": 0.0
+        },
+        "peak_reservations": 3,
+        "peak_margin_pct": 8.515553129602369,
+        "cash_pnl_by_entry_day": {
+          "2026-11-09": -0.7841999999999887,
+          "2026-11-10": -0.01769999999999783,
+          "2026-11-11": 0.6482000000000017,
+          "2026-11-12": 0.8187499999999984,
+          "2026-11-13": -2.5726999999999878,
+          "2026-11-14": 0.020799999999998375
+        },
+        "exit_counts": {
+          "SL": 8,
+          "BE": 9,
+          "TARGET": 3
+        }
+      },
+      "book_imbalance_nonnegative": {
+        "status": "SCORED_PUBLIC_L2_SIMULATION",
+        "trades": 12,
+        "skipped": {
+          "crypto:wide": 14,
+          "stocks:wide": 21,
+          "stocks:stale order book": 3,
+          "crypto:adverse_book": 12,
+          "stocks:paper_guard": 1
+        },
+        "return_pct": -2.4696153846153646,
+        "drawdown_pct": 2.4696153846153597,
+        "contribution_pct": {
+          "crypto": -2.4696153846153734,
+          "stocks": 0.0
+        },
+        "peak_reservations": 2,
+        "peak_margin_pct": 5.909800499929254,
+        "cash_pnl_by_entry_day": {
+          "2026-11-09": -0.7841999999999887,
+          "2026-11-11": -0.008800000000001943,
+          "2026-11-13": -2.417499999999995
+        },
+        "exit_counts": {
+          "SL": 6,
+          "BE": 6
+        }
+      },
+      "quote_reward_risk_1_8": {
+        "status": "SCORED_PUBLIC_L2_SIMULATION",
+        "trades": 21,
+        "skipped": {
+          "crypto:wide": 14,
+          "stocks:wide": 21,
+          "stocks:stale order book": 3,
+          "crypto:low_quote_reward_risk": 3,
+          "stocks:paper_guard": 1
+        },
+        "return_pct": -1.545576923076919,
+        "drawdown_pct": 2.33901701574246,
+        "contribution_pct": {
+          "crypto": -1.5455769230769127,
+          "stocks": 0.0
+        },
+        "peak_reservations": 4,
+        "peak_margin_pct": 11.524562246869992,
+        "cash_pnl_by_entry_day": {
+          "2026-11-09": -0.7841999999999887,
+          "2026-11-10": -0.020700000000001495,
+          "2026-11-11": 0.6482000000000017,
+          "2026-11-12": 0.8187499999999984,
+          "2026-11-13": -2.6640999999999924,
+          "2026-11-14": -0.00720000000000387
+        },
+        "exit_counts": {
+          "SL": 8,
+          "BE": 10,
+          "TARGET": 3
+        }
+      },
+      "one_same_side_per_rolling_hour": {
+        "status": "SCORED_PUBLIC_L2_SIMULATION",
+        "trades": 18,
+        "skipped": {
+          "crypto:wide": 14,
+          "stocks:wide": 21,
+          "stocks:stale order book": 3,
+          "crypto:same_side_hour": 6,
+          "stocks:paper_guard": 1
+        },
+        "return_pct": -1.0138076923076667,
+        "drawdown_pct": 1.7449753306753417,
+        "contribution_pct": {
+          "crypto": -1.0138076923076815,
+          "stocks": 0.0
+        },
+        "peak_reservations": 4,
+        "peak_margin_pct": 11.48709751736854,
+        "cash_pnl_by_entry_day": {
+          "2026-11-09": -0.45119999999999205,
+          "2026-11-10": -0.01769999999999783,
+          "2026-11-11": 0.656100000000001,
+          "2026-11-12": 0.8187499999999984,
+          "2026-11-13": -2.3170999999999955,
+          "2026-11-14": -0.006799999999999695
+        },
+        "exit_counts": {
+          "SL": 7,
+          "BE": 8,
+          "TARGET": 3
+        }
+      },
+      "two_same_side_per_rolling_hour": {
+        "status": "SCORED_PUBLIC_L2_SIMULATION",
+        "trades": 24,
+        "skipped": {
+          "crypto:wide": 14,
+          "stocks:wide": 21,
+          "stocks:stale order book": 3,
+          "stocks:paper_guard": 1
+        },
+        "return_pct": -2.2007307692307743,
+        "drawdown_pct": 2.444807692307686,
+        "contribution_pct": {
+          "crypto": -2.200730769230761,
+          "stocks": 0.0
+        },
+        "peak_reservations": 4,
+        "peak_margin_pct": 11.56279155866751,
+        "cash_pnl_by_entry_day": {
+          "2026-11-09": -0.7841999999999887,
+          "2026-11-10": -0.020700000000001495,
+          "2026-11-11": 0.6482000000000017,
+          "2026-11-12": 0.394049999999997,
+          "2026-11-13": -3.0910999999999937,
+          "2026-11-14": -0.00720000000000387
+        },
+        "exit_counts": {
+          "SL": 10,
+          "BE": 11,
+          "TARGET": 3
+        }
+      }
+    },
+    "omit_13_nov": {
+      "baseline": {
+        "status": "SCORED_PUBLIC_L2_SIMULATION",
+        "trades": 12,
+        "skipped": {
+          "crypto:wide": 9,
+          "stocks:wide": 17,
+          "stocks:stale order book": 2,
+          "stocks:paper_guard": 1
+        },
+        "return_pct": 0.17734615384614738,
+        "drawdown_pct": 0.6198461538461576,
+        "contribution_pct": {
+          "crypto": 0.17734615384616062,
+          "stocks": 0.0
+        },
+        "peak_reservations": 2,
+        "peak_margin_pct": 5.703178881239899,
+        "cash_pnl_by_entry_day": {
+          "2026-11-09": -0.7841999999999887,
+          "2026-11-10": -0.020700000000001495,
+          "2026-11-11": 0.6482000000000017,
+          "2026-11-12": 0.394049999999997,
+          "2026-11-14": -0.006799999999999695
+        },
+        "exit_counts": {
+          "SL": 3,
+          "BE": 7,
+          "TARGET": 2
+        }
+      },
+      "book_imbalance_minus_30pct": {
+        "status": "SCORED_PUBLIC_L2_SIMULATION",
+        "trades": 9,
+        "skipped": {
+          "crypto:wide": 9,
+          "stocks:wide": 17,
+          "stocks:stale order book": 2,
+          "crypto:adverse_book": 3,
+          "stocks:paper_guard": 1
+        },
+        "return_pct": 0.5278846153846217,
+        "drawdown_pct": 0.6175384615384544,
+        "contribution_pct": {
+          "crypto": 0.5278846153846277,
+          "stocks": 0.0
+        },
+        "peak_reservations": 2,
+        "peak_margin_pct": 5.38143076923077,
+        "cash_pnl_by_entry_day": {
+          "2026-11-09": -0.7841999999999887,
+          "2026-11-10": -0.01769999999999783,
+          "2026-11-11": 0.6482000000000017,
+          "2026-11-12": 0.8187499999999984,
+          "2026-11-14": 0.02120000000000255
+        },
+        "exit_counts": {
+          "SL": 2,
+          "BE": 5,
+          "TARGET": 2
+        }
+      },
+      "book_imbalance_nonnegative": {
+        "status": "SCORED_PUBLIC_L2_SIMULATION",
+        "trades": 4,
+        "skipped": {
+          "crypto:wide": 9,
+          "stocks:wide": 17,
+          "stocks:stale order book": 2,
+          "crypto:adverse_book": 8,
+          "stocks:paper_guard": 1
+        },
+        "return_pct": -0.6099999999999994,
+        "drawdown_pct": 0.6100000000000049,
+        "contribution_pct": {
+          "crypto": -0.6099999999999928,
+          "stocks": 0.0
+        },
+        "peak_reservations": 2,
+        "peak_margin_pct": 5.38143076923077,
+        "cash_pnl_by_entry_day": {
+          "2026-11-09": -0.7841999999999887,
+          "2026-11-11": -0.008800000000001943
+        },
+        "exit_counts": {
+          "SL": 2,
+          "BE": 2
+        }
+      },
+      "quote_reward_risk_1_8": {
+        "status": "SCORED_PUBLIC_L2_SIMULATION",
+        "trades": 11,
+        "skipped": {
+          "crypto:wide": 9,
+          "stocks:wide": 17,
+          "stocks:stale order book": 2,
+          "crypto:low_quote_reward_risk": 1,
+          "stocks:paper_guard": 1
+        },
+        "return_pct": 0.5040384615384585,
+        "drawdown_pct": 0.6198461538461576,
+        "contribution_pct": {
+          "crypto": 0.5040384615384693,
+          "stocks": 0.0
+        },
+        "peak_reservations": 2,
+        "peak_margin_pct": 5.38143076923077,
+        "cash_pnl_by_entry_day": {
+          "2026-11-09": -0.7841999999999887,
+          "2026-11-10": -0.020700000000001495,
+          "2026-11-11": 0.6482000000000017,
+          "2026-11-12": 0.8187499999999984,
+          "2026-11-14": -0.006799999999999695
+        },
+        "exit_counts": {
+          "SL": 2,
+          "BE": 7,
+          "TARGET": 2
+        }
+      },
+      "one_same_side_per_rolling_hour": {
+        "status": "SCORED_PUBLIC_L2_SIMULATION",
+        "trades": 8,
+        "skipped": {
+          "crypto:wide": 9,
+          "stocks:wide": 17,
+          "stocks:stale order book": 2,
+          "crypto:same_side_hour": 4,
+          "stocks:paper_guard": 1
+        },
+        "return_pct": 0.7685769230769246,
+        "drawdown_pct": 0.36138461538460936,
+        "contribution_pct": {
+          "crypto": 0.7685769230769308,
+          "stocks": 0.0
+        },
+        "peak_reservations": 2,
+        "peak_margin_pct": 5.146222890524652,
+        "cash_pnl_by_entry_day": {
+          "2026-11-09": -0.45119999999999205,
+          "2026-11-10": -0.01769999999999783,
+          "2026-11-11": 0.656100000000001,
+          "2026-11-12": 0.8187499999999984,
+          "2026-11-14": -0.006799999999999695
+        },
+        "exit_counts": {
+          "SL": 1,
+          "BE": 5,
+          "TARGET": 2
+        }
+      },
+      "two_same_side_per_rolling_hour": {
+        "status": "SCORED_PUBLIC_L2_SIMULATION",
+        "trades": 12,
+        "skipped": {
+          "crypto:wide": 9,
+          "stocks:wide": 17,
+          "stocks:stale order book": 2,
+          "stocks:paper_guard": 1
+        },
+        "return_pct": 0.17734615384614738,
+        "drawdown_pct": 0.6198461538461576,
+        "contribution_pct": {
+          "crypto": 0.17734615384616062,
+          "stocks": 0.0
+        },
+        "peak_reservations": 2,
+        "peak_margin_pct": 5.703178881239899,
+        "cash_pnl_by_entry_day": {
+          "2026-11-09": -0.7841999999999887,
+          "2026-11-10": -0.020700000000001495,
+          "2026-11-11": 0.6482000000000017,
+          "2026-11-12": 0.394049999999997,
+          "2026-11-14": -0.006799999999999695
+        },
+        "exit_counts": {
+          "SL": 3,
+          "BE": 7,
+          "TARGET": 2
+        }
+      }
+    }
+  },
+  "stock_entry_gate_counts": {
+    "wide": 21,
+    "stale order book": 3,
+    "eligible": 1
+  },
+  "features": [
+    {
+      "symbol": "SUIUSDT",
+      "entry_ms": 1794202210000,
+      "aligned_imbalance_10bps": 0.7859223558074254,
+      "quote_reward_risk": 2.0320121951219834
+    },
+    {
+      "symbol": "LINKUSDT",
+      "entry_ms": 1794204910000,
+      "aligned_imbalance_10bps": 0.6817381092190252,
+      "quote_reward_risk": 2.2058823529411664
+    },
+    {
+      "symbol": "HYPEUSDT",
+      "entry_ms": 1794342610000,
+      "aligned_imbalance_10bps": -0.1901065174219173,
+      "quote_reward_risk": 1.8579856115108009
+    },
+    {
+      "symbol": "LINKUSDT",
+      "entry_ms": 1794342610000,
+      "aligned_imbalance_10bps": -0.4095409540954095,
+      "quote_reward_risk": 1.8613861386138557
+    },
+    {
+      "symbol": "ZECUSDT",
+      "entry_ms": 1794359710000,
+      "aligned_imbalance_10bps": 0.6645291933850827,
+      "quote_reward_risk": 2.35515247108303
+    },
+    {
+      "symbol": "LINKUSDT",
+      "entry_ms": 1794434410000,
+      "aligned_imbalance_10bps": -0.2616407982261641,
+      "quote_reward_risk": 2.086419753086423
+    },
+    {
+      "symbol": "HYPEUSDT",
+      "entry_ms": 1794437110000,
+      "aligned_imbalance_10bps": 0.2924683892248488,
+      "quote_reward_risk": 1.8777387350144719
+    },
+    {
+      "symbol": "BTCUSDT",
+      "entry_ms": 1794494710000,
+      "aligned_imbalance_10bps": -0.23530665666220446,
+      "quote_reward_risk": 2.3936765528818746
+    },
+    {
+      "symbol": "SUIUSDT",
+      "entry_ms": 1794514510000,
+      "aligned_imbalance_10bps": -0.24914201311959686,
+      "quote_reward_risk": 2.1048252911813927
+    },
+    {
+      "symbol": "HYPEUSDT",
+      "entry_ms": 1794515410000,
+      "aligned_imbalance_10bps": -0.646626114018956,
+      "quote_reward_risk": 1.7911059098887754
+    },
+    {
+      "symbol": "HYPEUSDT",
+      "entry_ms": 1794531610000,
+      "aligned_imbalance_10bps": -0.0007612281146917026,
+      "quote_reward_risk": 2.122854914196572
+    },
+    {
+      "symbol": "HYPEUSDT",
+      "entry_ms": 1794542410000,
+      "aligned_imbalance_10bps": 0.18758434547908232,
+      "quote_reward_risk": 1.879307547913147
+    },
+    {
+      "symbol": "BTCUSDT",
+      "entry_ms": 1794549610000,
+      "aligned_imbalance_10bps": 0.3457527461008537,
+      "quote_reward_risk": 1.9076150763126845
+    },
+    {
+      "symbol": "ETHUSDT",
+      "entry_ms": 1794549610000,
+      "aligned_imbalance_10bps": 0.18314048387681817,
+      "quote_reward_risk": 1.8748344370861003
+    },
+    {
+      "symbol": "LINKUSDT",
+      "entry_ms": 1794555010000,
+      "aligned_imbalance_10bps": 0.8191528545119705,
+      "quote_reward_risk": 2.125498007968132
+    },
+    {
+      "symbol": "XRPUSDT",
+      "entry_ms": 1794555010000,
+      "aligned_imbalance_10bps": -0.07143818738403367,
+      "quote_reward_risk": 1.9372509960159425
+    },
+    {
+      "symbol": "SOLUSDT",
+      "entry_ms": 1794560410000,
+      "aligned_imbalance_10bps": -0.44244606526855224,
+      "quote_reward_risk": 1.9722955145118595
+    },
+    {
+      "symbol": "AVAXUSDT",
+      "entry_ms": 1794564910000,
+      "aligned_imbalance_10bps": -0.14340588988476308,
+      "quote_reward_risk": 1.8793103448275998
+    },
+    {
+      "symbol": "ZECUSDT",
+      "entry_ms": 1794569410000,
+      "aligned_imbalance_10bps": 0.02638888888888889,
+      "quote_reward_risk": 2.1091533785569614
+    },
+    {
+      "symbol": "HYPEUSDT",
+      "entry_ms": 1794572110000,
+      "aligned_imbalance_10bps": 0.3633692458374143,
+      "quote_reward_risk": 1.9014427255344997
+    },
+    {
+      "symbol": "HYPEUSDT",
+      "entry_ms": 1794606310000,
+      "aligned_imbalance_10bps": 0.3037383177570093,
+      "quote_reward_risk": 1.595465393794748
+    },
+    {
+      "symbol": "LINKUSDT",
+      "entry_ms": 1794606310000,
+      "aligned_imbalance_10bps": 0.15036045314109167,
+      "quote_reward_risk": 1.6760925449871344
+    },
+    {
+      "symbol": "XRPUSDT",
+      "entry_ms": 1794623410000,
+      "aligned_imbalance_10bps": -0.02628792962051741,
+      "quote_reward_risk": 2.177966101694928
+    },
+    {
+      "symbol": "AVAXUSDT",
+      "entry_ms": 1794641410000,
+      "aligned_imbalance_10bps": -0.49584026622296173,
+      "quote_reward_risk": 1.856361149110786
+    }
+  ],
+  "live_activation_supported": false,
+  "limitations": [
+    "Six observed days with partial final coverage, exploratory only.",
+    "Per-direction rate limits count eligible proposals before the common cash admission checks.",
+    "Imbalance is a single visible top-50-level quote within 10 bps of midpoint, not matched trade flow.",
+    "The same paper readiness and 3% collateral, 10x, fees and equity-guard limitations as the cash control apply."
+  ]
+}
