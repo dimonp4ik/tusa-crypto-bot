@@ -20,12 +20,12 @@ DAY1 = datetime.fromtimestamp(END + 57600 - 1, TRADE_TZ).replace(hour=0, minute=
 TRADE_DAYS = {int(day.timestamp()*1000): day.date().isoformat() for day in (DAY0, DAY1)}
 
 
-def get_catalogue(families):
+def get_catalogue(families, *, trade_days=TRADE_DAYS):
     result = {}
     for i in range(0, len(families), 5):
         batch = families[i:i+5]
         query = dict(module=1,instType='FUTURES',instFamilyList=','.join(batch),
-                     dateAggrType='daily',begin=min(TRADE_DAYS),end=max(TRADE_DAYS))
+                     dateAggrType='daily',begin=min(trade_days),end=max(trade_days))
         response = requests.get(CATALOG,params=query,timeout=12)
         response.raise_for_status()
         body = response.json()
@@ -41,13 +41,13 @@ def get_catalogue(families):
     return result
 
 
-def fetch_family(job):
+def fetch_family(job, *, trade_days=TRADE_DAYS):
     symbol, instrument, files = job
     family = instrument.rsplit('-',1)[0]
     found = {}
     for item in files:
         stamp = int(item['dateTs'])
-        day = TRADE_DAYS.get(stamp)
+        day = trade_days.get(stamp)
         if day is None or day in found:
             raise ValueError('unexpected date in trade catalogue')
         name = family + f'-futureschain-trades-{day}.zip'
@@ -79,7 +79,7 @@ def fetch_family(job):
             temp.replace(path)
         found[day] = dict(path=str(path),sha256=hashlib.sha256(raw).hexdigest(),
                           utc_start_ms=stamp,bytes=len(raw),catalogue=item)
-    return symbol,dict(instrument=instrument,days=found,complete=set(found)==set(TRADE_DAYS.values()))
+    return symbol,dict(instrument=instrument,days=found,complete=set(found)==set(trade_days.values()))
 
 
 def main():

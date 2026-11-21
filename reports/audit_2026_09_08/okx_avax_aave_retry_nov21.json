@@ -1,0 +1,1477 @@
+{
+  "status": "FIXED_SPREAD_RETRY_RESEARCH",
+  "inputs": {
+    "reports\\audit_2026_09_08\\okx_xperp_l2_nov19\\nov9_14\\plan.json": "9455bbc8d1ae2ed6b2fa9edffbb266b3ad216264c34bcb364c2e9047af23c640",
+    "reports\\audit_2026_09_08\\okx_xperp_l2_nov19\\nov9_14\\capture.json": "ad08428039eeaf646b5dd640a421e4c4b82277cd9409a88675518b323a3cedcd",
+    "reports\\audit_2026_09_08\\paired_contract_volume_nov19\\manifest.json": "4dae23c5860318f9faf3f48f1a44c05f068e7b13bd999f06225e627f9c348c05",
+    "reports\\audit_2026_09_08\\native_universe_nov19_snapshot.json": "48b5ebdc52e7579b76b8da5ff8450ac41f8baf4df66fbf563bebe88b10eaa78f"
+  },
+  "offsets_ms": {
+    "current": [
+      10000,
+      10200,
+      10800
+    ],
+    "within_deadline": [
+      10000,
+      30000,
+      60000,
+      120000
+    ]
+  },
+  "counts": {
+    "AAVEUSDT": {
+      "current": {
+        "wide": 7
+      },
+      "within_deadline": {
+        "wide": 5,
+        "depth slippage exceeds limit": 1,
+        "eligible": 1
+      }
+    },
+    "AVAXUSDT": {
+      "current": {
+        "wide": 5,
+        "eligible": 2
+      },
+      "within_deadline": {
+        "wide": 2,
+        "eligible": 5
+      }
+    }
+  },
+  "rescues": {
+    "AVAXUSDT:rescued": 3,
+    "AVAXUSDT:rescued_with_bracket_room": 3,
+    "AAVEUSDT:rescued": 1,
+    "AAVEUSDT:rescued_with_bracket_room": 0
+  },
+  "proposals": [
+    {
+      "current": {
+        "epoch": 1794192300,
+        "entry": 130.48,
+        "stop": 128.3057142857143,
+        "target": 134.8285714285714,
+        "bot": "crypto",
+        "direction": "LONG",
+        "symbol": "AAVEUSDT",
+        "paper_reference_ready": false,
+        "entry_ms": 1794192310800,
+        "entry_status": "wide",
+        "attempts": [
+          {
+            "ms": 1794192310000,
+            "status": "wide",
+            "spread_bps": 8.43138006361964
+          },
+          {
+            "ms": 1794192310200,
+            "status": "wide",
+            "spread_bps": 8.43138006361964
+          },
+          {
+            "ms": 1794192310800,
+            "status": "wide",
+            "spread_bps": 8.43138006361964
+          }
+        ],
+        "paper_path": {
+          "known": true,
+          "code": "SL",
+          "end_ms": 1794207682577,
+          "trigger_price": 128.26,
+          "bank": null,
+          "be_level": 130.48
+        }
+      },
+      "within_deadline": {
+        "epoch": 1794192300,
+        "entry": 130.48,
+        "stop": 128.3057142857143,
+        "target": 134.8285714285714,
+        "bot": "crypto",
+        "direction": "LONG",
+        "symbol": "AAVEUSDT",
+        "paper_reference_ready": false,
+        "entry_ms": 1794192420000,
+        "entry_status": "wide",
+        "attempts": [
+          {
+            "ms": 1794192310000,
+            "status": "wide",
+            "spread_bps": 8.43138006361964
+          },
+          {
+            "ms": 1794192330000,
+            "status": "wide",
+            "spread_bps": 11.487650775416864
+          },
+          {
+            "ms": 1794192360000,
+            "status": "wide",
+            "spread_bps": 8.43138006361964
+          },
+          {
+            "ms": 1794192420000,
+            "status": "wide",
+            "spread_bps": 5.381096975054247
+          }
+        ],
+        "paper_path": {
+          "known": true,
+          "code": "SL",
+          "end_ms": 1794207682577,
+          "trigger_price": 128.26,
+          "bank": null,
+          "be_level": 130.48
+        }
+      }
+    },
+    {
+      "current": {
+        "epoch": 1794285900,
+        "entry": 126.15,
+        "stop": 127.59714285714286,
+        "target": 123.2557142857143,
+        "bot": "crypto",
+        "direction": "SHORT",
+        "symbol": "AAVEUSDT",
+        "paper_reference_ready": false,
+        "entry_ms": 1794285910800,
+        "entry_status": "wide",
+        "attempts": [
+          {
+            "ms": 1794285910000,
+            "status": "wide",
+            "spread_bps": 9.504197687311132
+          },
+          {
+            "ms": 1794285910200,
+            "status": "wide",
+            "spread_bps": 9.50796291894385
+          },
+          {
+            "ms": 1794285910800,
+            "status": "wide",
+            "spread_bps": 8.715287406409653
+          }
+        ],
+        "paper_path": {
+          "known": true,
+          "code": "BE",
+          "end_ms": 1794292422574,
+          "trigger_price": 126.18,
+          "bank": {
+            "ms": 1794291222628,
+            "price": 125.39
+          },
+          "be_level": 126.15
+        }
+      },
+      "within_deadline": {
+        "epoch": 1794285900,
+        "entry": 126.15,
+        "stop": 127.59714285714286,
+        "target": 123.2557142857143,
+        "bot": "crypto",
+        "direction": "SHORT",
+        "symbol": "AAVEUSDT",
+        "paper_reference_ready": false,
+        "entry_ms": 1794286020000,
+        "entry_status": "wide",
+        "attempts": [
+          {
+            "ms": 1794285910000,
+            "status": "wide",
+            "spread_bps": 9.504197687311132
+          },
+          {
+            "ms": 1794285930000,
+            "status": "wide",
+            "spread_bps": 9.507209633972789
+          },
+          {
+            "ms": 1794285960000,
+            "status": "wide",
+            "spread_bps": 8.722197993894417
+          },
+          {
+            "ms": 1794286020000,
+            "status": "wide",
+            "spread_bps": 11.901455944777696
+          }
+        ],
+        "paper_path": {
+          "known": true,
+          "code": "BE",
+          "end_ms": 1794292422574,
+          "trigger_price": 126.18,
+          "bank": {
+            "ms": 1794291222628,
+            "price": 125.39
+          },
+          "be_level": 126.15
+        }
+      }
+    },
+    {
+      "current": {
+        "epoch": 1794346200,
+        "entry": 123.31,
+        "stop": 124.63857142857142,
+        "target": 120.65285714285716,
+        "bot": "crypto",
+        "direction": "SHORT",
+        "symbol": "AAVEUSDT",
+        "paper_reference_ready": false,
+        "entry_ms": 1794346210800,
+        "entry_status": "wide",
+        "attempts": [
+          {
+            "ms": 1794346210000,
+            "status": "wide",
+            "spread_bps": 5.677900798961202
+          },
+          {
+            "ms": 1794346210200,
+            "status": "wide",
+            "spread_bps": 5.677900798961202
+          },
+          {
+            "ms": 1794346210800,
+            "status": "wide",
+            "spread_bps": 5.677900798961202
+          }
+        ],
+        "paper_path": {
+          "known": true,
+          "code": "SL",
+          "end_ms": 1794348529456,
+          "trigger_price": 124.71,
+          "bank": null,
+          "be_level": 123.31
+        }
+      },
+      "within_deadline": {
+        "epoch": 1794346200,
+        "entry": 123.31,
+        "stop": 124.63857142857142,
+        "target": 120.65285714285716,
+        "bot": "crypto",
+        "direction": "SHORT",
+        "symbol": "AAVEUSDT",
+        "paper_reference_ready": false,
+        "entry_ms": 1794346320000,
+        "entry_status": "wide",
+        "attempts": [
+          {
+            "ms": 1794346210000,
+            "status": "wide",
+            "spread_bps": 5.677900798961202
+          },
+          {
+            "ms": 1794346230000,
+            "status": "wide",
+            "spread_bps": 8.112932013630418
+          },
+          {
+            "ms": 1794346260000,
+            "status": "wide",
+            "spread_bps": 9.737098344692496
+          },
+          {
+            "ms": 1794346320000,
+            "status": "wide",
+            "spread_bps": 5.676979846722143
+          }
+        ],
+        "paper_path": {
+          "known": true,
+          "code": "SL",
+          "end_ms": 1794348529456,
+          "trigger_price": 124.71,
+          "bank": null,
+          "be_level": 123.31
+        }
+      }
+    },
+    {
+      "current": {
+        "epoch": 1794384900,
+        "entry": 8.64,
+        "stop": 8.543571428571429,
+        "target": 8.832857142857144,
+        "bot": "crypto",
+        "direction": "LONG",
+        "symbol": "AVAXUSDT",
+        "paper_reference_ready": false,
+        "entry_ms": 1794384910800,
+        "entry_status": "wide",
+        "attempts": [
+          {
+            "ms": 1794384910000,
+            "status": "wide",
+            "spread_bps": 8.099508244143998
+          },
+          {
+            "ms": 1794384910200,
+            "status": "wide",
+            "spread_bps": 8.099508244143998
+          },
+          {
+            "ms": 1794384910800,
+            "status": "wide",
+            "spread_bps": 6.942837306179388
+          }
+        ],
+        "paper_path": {
+          "known": true,
+          "code": "BE",
+          "end_ms": 1794394991897,
+          "trigger_price": 8.638,
+          "bank": {
+            "ms": 1794393004181,
+            "price": 8.69
+          },
+          "be_level": 8.64
+        }
+      },
+      "within_deadline": {
+        "epoch": 1794384900,
+        "entry": 8.64,
+        "stop": 8.543571428571429,
+        "target": 8.832857142857144,
+        "bot": "crypto",
+        "direction": "LONG",
+        "symbol": "AVAXUSDT",
+        "paper_reference_ready": false,
+        "entry_ms": 1794385020000,
+        "entry_status": "wide",
+        "attempts": [
+          {
+            "ms": 1794384910000,
+            "status": "wide",
+            "spread_bps": 8.099508244143998
+          },
+          {
+            "ms": 1794384930000,
+            "status": "wide",
+            "spread_bps": 6.93641618497136
+          },
+          {
+            "ms": 1794384960000,
+            "status": "wide",
+            "spread_bps": 8.09669770400749
+          },
+          {
+            "ms": 1794385020000,
+            "status": "wide",
+            "spread_bps": 8.115471566865311
+          }
+        ],
+        "paper_path": {
+          "known": true,
+          "code": "BE",
+          "end_ms": 1794394991897,
+          "trigger_price": 8.638,
+          "bank": {
+            "ms": 1794393004181,
+            "price": 8.69
+          },
+          "be_level": 8.64
+        }
+      }
+    },
+    {
+      "current": {
+        "epoch": 1794433500,
+        "entry": 122.17,
+        "stop": 123.44142857142857,
+        "target": 119.62714285714286,
+        "bot": "crypto",
+        "direction": "SHORT",
+        "symbol": "AAVEUSDT",
+        "paper_reference_ready": false,
+        "entry_ms": 1794433510800,
+        "entry_status": "wide",
+        "attempts": [
+          {
+            "ms": 1794433510000,
+            "status": "wide",
+            "spread_bps": 9.001268360541665
+          },
+          {
+            "ms": 1794433510200,
+            "status": "wide",
+            "spread_bps": 9.001268360541665
+          },
+          {
+            "ms": 1794433510800,
+            "status": "wide",
+            "spread_bps": 9.001268360541665
+          }
+        ],
+        "paper_path": {
+          "known": true,
+          "code": "TARGET",
+          "end_ms": 1794438513238,
+          "trigger_price": 119.63,
+          "bank": {
+            "ms": 1794436303547,
+            "price": 121.52
+          },
+          "be_level": 122.17,
+          "simultaneous_targets": false
+        }
+      },
+      "within_deadline": {
+        "epoch": 1794433500,
+        "entry": 122.17,
+        "stop": 123.44142857142857,
+        "target": 119.62714285714286,
+        "bot": "crypto",
+        "direction": "SHORT",
+        "symbol": "AAVEUSDT",
+        "paper_reference_ready": false,
+        "entry_ms": 1794433620000,
+        "entry_status": "wide",
+        "attempts": [
+          {
+            "ms": 1794433510000,
+            "status": "wide",
+            "spread_bps": 9.001268360541665
+          },
+          {
+            "ms": 1794433530000,
+            "status": "wide",
+            "spread_bps": 7.365276811652621
+          },
+          {
+            "ms": 1794433560000,
+            "status": "wide",
+            "spread_bps": 8.181966944853079
+          },
+          {
+            "ms": 1794433620000,
+            "status": "wide",
+            "spread_bps": 7.3731208782209
+          }
+        ],
+        "paper_path": {
+          "known": true,
+          "code": "TARGET",
+          "end_ms": 1794438513238,
+          "trigger_price": 119.63,
+          "bank": {
+            "ms": 1794436303547,
+            "price": 121.52
+          },
+          "be_level": 122.17,
+          "simultaneous_targets": false
+        }
+      }
+    },
+    {
+      "current": {
+        "epoch": 1794438900,
+        "entry": 8.406,
+        "stop": 8.49957142857143,
+        "target": 8.218857142857141,
+        "bot": "crypto",
+        "direction": "SHORT",
+        "symbol": "AVAXUSDT",
+        "paper_reference_ready": false,
+        "entry_ms": 1794438910800,
+        "entry_status": "wide",
+        "attempts": [
+          {
+            "ms": 1794438910000,
+            "status": "wide",
+            "spread_bps": 13.083556348499567
+          },
+          {
+            "ms": 1794438910200,
+            "status": "wide",
+            "spread_bps": 9.515879624121707
+          },
+          {
+            "ms": 1794438910800,
+            "status": "wide",
+            "spread_bps": 14.275517487509463
+          }
+        ],
+        "paper_path": {
+          "known": true,
+          "code": "SL",
+          "end_ms": 1794441085189,
+          "trigger_price": 8.5,
+          "bank": null,
+          "be_level": 8.406
+        }
+      },
+      "within_deadline": {
+        "epoch": 1794438900,
+        "entry": 8.406,
+        "stop": 8.49957142857143,
+        "target": 8.218857142857141,
+        "bot": "crypto",
+        "direction": "SHORT",
+        "symbol": "AVAXUSDT",
+        "paper_reference_ready": false,
+        "entry_ms": 1794438960000,
+        "entry_status": "eligible",
+        "attempts": [
+          {
+            "ms": 1794438910000,
+            "status": "wide",
+            "spread_bps": 13.083556348499567
+          },
+          {
+            "ms": 1794438930000,
+            "status": "wide",
+            "spread_bps": 9.523809523808474
+          },
+          {
+            "ms": 1794438960000,
+            "status": "eligible",
+            "average": 8.402,
+            "worst": 8.402,
+            "contracts": 0.4,
+            "spread_bps": 4.75963826749326,
+            "slippage_bps": -0.0,
+            "last_event_ms": 1794438959898
+          }
+        ],
+        "reference_entry": 8.402,
+        "available_reward_to_risk": 1.8770131771595522,
+        "already_past_tp1": false,
+        "rescue_with_bracket_room": true,
+        "paper_path": {
+          "known": true,
+          "code": "SL",
+          "end_ms": 1794441085189,
+          "trigger_price": 8.5,
+          "bank": null,
+          "be_level": 8.406
+        },
+        "path": {
+          "60": {
+            "known": true,
+            "code": "SL",
+            "end_ms": 1794441085189,
+            "trigger_price": 8.5,
+            "bank": null,
+            "be_level": 8.402
+          },
+          "900": {
+            "known": true,
+            "code": "SL",
+            "end_ms": 1794441085189,
+            "trigger_price": 8.5,
+            "bank": null,
+            "be_level": 8.402
+          }
+        }
+      }
+    },
+    {
+      "current": {
+        "epoch": 1794476700,
+        "entry": 8.66,
+        "stop": 8.572571428571429,
+        "target": 8.834857142857143,
+        "bot": "crypto",
+        "direction": "LONG",
+        "symbol": "AVAXUSDT",
+        "paper_reference_ready": false,
+        "entry_ms": 1794476710800,
+        "entry_status": "wide",
+        "attempts": [
+          {
+            "ms": 1794476710000,
+            "status": "wide",
+            "spread_bps": 6.930807439066913
+          },
+          {
+            "ms": 1794476710200,
+            "status": "wide",
+            "spread_bps": 6.930807439066913
+          },
+          {
+            "ms": 1794476710800,
+            "status": "wide",
+            "spread_bps": 6.930807439066913
+          }
+        ],
+        "paper_path": {
+          "known": true,
+          "code": "SL",
+          "end_ms": 1794479473600,
+          "trigger_price": 8.571,
+          "bank": null,
+          "be_level": 8.66
+        }
+      },
+      "within_deadline": {
+        "epoch": 1794476700,
+        "entry": 8.66,
+        "stop": 8.572571428571429,
+        "target": 8.834857142857143,
+        "bot": "crypto",
+        "direction": "LONG",
+        "symbol": "AVAXUSDT",
+        "paper_reference_ready": false,
+        "entry_ms": 1794476730000,
+        "entry_status": "eligible",
+        "attempts": [
+          {
+            "ms": 1794476710000,
+            "status": "wide",
+            "spread_bps": 6.930807439066913
+          },
+          {
+            "ms": 1794476730000,
+            "status": "eligible",
+            "average": 8.6545,
+            "worst": 8.655,
+            "contracts": 0.4,
+            "spread_bps": 1.1557353366093293,
+            "slippage_bps": 2.311337108515943,
+            "last_event_ms": 1794476729449
+          }
+        ],
+        "reference_entry": 8.6545,
+        "available_reward_to_risk": 2.1819757365684884,
+        "already_past_tp1": false,
+        "rescue_with_bracket_room": true,
+        "paper_path": {
+          "known": true,
+          "code": "SL",
+          "end_ms": 1794479473600,
+          "trigger_price": 8.571,
+          "bank": null,
+          "be_level": 8.66
+        },
+        "path": {
+          "60": {
+            "known": true,
+            "code": "SL",
+            "end_ms": 1794479473600,
+            "trigger_price": 8.571,
+            "bank": null,
+            "be_level": 8.654
+          },
+          "900": {
+            "known": true,
+            "code": "SL",
+            "end_ms": 1794479473600,
+            "trigger_price": 8.571,
+            "bank": null,
+            "be_level": 8.654
+          }
+        }
+      }
+    },
+    {
+      "current": {
+        "epoch": 1794536100,
+        "entry": 8.275,
+        "stop": 8.190857142857142,
+        "target": 8.443285714285716,
+        "bot": "crypto",
+        "direction": "LONG",
+        "symbol": "AVAXUSDT",
+        "paper_reference_ready": false,
+        "entry_ms": 1794536110800,
+        "entry_status": "wide",
+        "attempts": [
+          {
+            "ms": 1794536110000,
+            "status": "wide",
+            "spread_bps": 16.920473773267005
+          },
+          {
+            "ms": 1794536110200,
+            "status": "wide",
+            "spread_bps": 16.920473773267005
+          },
+          {
+            "ms": 1794536110800,
+            "status": "wide",
+            "spread_bps": 10.874161783362943
+          }
+        ],
+        "paper_path": {
+          "known": true,
+          "code": "BE",
+          "end_ms": 1794537011243,
+          "trigger_price": 8.275,
+          "bank": {
+            "ms": 1794536569287,
+            "price": 8.317
+          },
+          "be_level": 8.275
+        }
+      },
+      "within_deadline": {
+        "epoch": 1794536100,
+        "entry": 8.275,
+        "stop": 8.190857142857142,
+        "target": 8.443285714285716,
+        "bot": "crypto",
+        "direction": "LONG",
+        "symbol": "AVAXUSDT",
+        "paper_reference_ready": false,
+        "entry_ms": 1794536220000,
+        "entry_status": "wide",
+        "attempts": [
+          {
+            "ms": 1794536110000,
+            "status": "wide",
+            "spread_bps": 16.920473773267005
+          },
+          {
+            "ms": 1794536130000,
+            "status": "wide",
+            "spread_bps": 9.657170449059507
+          },
+          {
+            "ms": 1794536160000,
+            "status": "wide",
+            "spread_bps": 6.043391551337409
+          },
+          {
+            "ms": 1794536220000,
+            "status": "wide",
+            "spread_bps": 13.292248202526745
+          }
+        ],
+        "paper_path": {
+          "known": true,
+          "code": "BE",
+          "end_ms": 1794537011243,
+          "trigger_price": 8.275,
+          "bank": {
+            "ms": 1794536569287,
+            "price": 8.317
+          },
+          "be_level": 8.275
+        }
+      }
+    },
+    {
+      "current": {
+        "epoch": 1794539700,
+        "entry": 112.2,
+        "stop": 110.95714285714286,
+        "target": 114.6857142857143,
+        "bot": "crypto",
+        "direction": "LONG",
+        "symbol": "AAVEUSDT",
+        "paper_reference_ready": false,
+        "entry_ms": 1794539710800,
+        "entry_status": "wide",
+        "attempts": [
+          {
+            "ms": 1794539710000,
+            "status": "wide",
+            "spread_bps": 12.459950160199407
+          },
+          {
+            "ms": 1794539710200,
+            "status": "wide",
+            "spread_bps": 12.459950160199407
+          },
+          {
+            "ms": 1794539710800,
+            "status": "wide",
+            "spread_bps": 11.56943888221507
+          }
+        ],
+        "paper_path": {
+          "known": true,
+          "code": "SL",
+          "end_ms": 1794540127316,
+          "trigger_price": 110.96,
+          "bank": null,
+          "be_level": 112.2
+        }
+      },
+      "within_deadline": {
+        "epoch": 1794539700,
+        "entry": 112.2,
+        "stop": 110.95714285714286,
+        "target": 114.6857142857143,
+        "bot": "crypto",
+        "direction": "LONG",
+        "symbol": "AAVEUSDT",
+        "paper_reference_ready": false,
+        "entry_ms": 1794539820000,
+        "entry_status": "wide",
+        "attempts": [
+          {
+            "ms": 1794539710000,
+            "status": "wide",
+            "spread_bps": 12.459950160199407
+          },
+          {
+            "ms": 1794539730000,
+            "status": "wide",
+            "spread_bps": 7.1275837491089
+          },
+          {
+            "ms": 1794539760000,
+            "status": "wide",
+            "spread_bps": 9.823621344049961
+          },
+          {
+            "ms": 1794539820000,
+            "status": "wide",
+            "spread_bps": 10.7047279214978
+          }
+        ],
+        "paper_path": {
+          "known": true,
+          "code": "SL",
+          "end_ms": 1794540127316,
+          "trigger_price": 110.96,
+          "bank": null,
+          "be_level": 112.2
+        }
+      }
+    },
+    {
+      "current": {
+        "epoch": 1794564900,
+        "entry": 8.362,
+        "stop": 8.266571428571428,
+        "target": 8.552857142857144,
+        "bot": "crypto",
+        "direction": "LONG",
+        "symbol": "AVAXUSDT",
+        "paper_reference_ready": false,
+        "entry_ms": 1794564910000,
+        "entry_status": "eligible",
+        "attempts": [
+          {
+            "ms": 1794564910000,
+            "status": "eligible",
+            "average": 8.366,
+            "worst": 8.366,
+            "contracts": 0.4,
+            "spread_bps": 4.782400765183596,
+            "slippage_bps": 0.0,
+            "last_event_ms": 1794564909733
+          }
+        ],
+        "reference_entry": 8.366,
+        "available_reward_to_risk": 1.8793103448275998,
+        "already_past_tp1": false,
+        "paper_path": {
+          "known": true,
+          "code": "TARGET",
+          "end_ms": 1794576746796,
+          "trigger_price": 8.553,
+          "bank": {
+            "ms": 1794565141344,
+            "price": 8.413
+          },
+          "be_level": 8.362,
+          "simultaneous_targets": false
+        },
+        "path": {
+          "60": {
+            "known": true,
+            "code": "TARGET",
+            "end_ms": 1794576746796,
+            "trigger_price": 8.553,
+            "bank": {
+              "ms": 1794565141344,
+              "price": 8.413
+            },
+            "be_level": 8.366,
+            "simultaneous_targets": false
+          },
+          "900": {
+            "known": true,
+            "code": "TARGET",
+            "end_ms": 1794576746796,
+            "trigger_price": 8.553,
+            "bank": {
+              "ms": 1794565141344,
+              "price": 8.413
+            },
+            "be_level": 8.366,
+            "simultaneous_targets": false
+          }
+        }
+      },
+      "within_deadline": {
+        "epoch": 1794564900,
+        "entry": 8.362,
+        "stop": 8.266571428571428,
+        "target": 8.552857142857144,
+        "bot": "crypto",
+        "direction": "LONG",
+        "symbol": "AVAXUSDT",
+        "paper_reference_ready": false,
+        "entry_ms": 1794564910000,
+        "entry_status": "eligible",
+        "attempts": [
+          {
+            "ms": 1794564910000,
+            "status": "eligible",
+            "average": 8.366,
+            "worst": 8.366,
+            "contracts": 0.4,
+            "spread_bps": 4.782400765183596,
+            "slippage_bps": 0.0,
+            "last_event_ms": 1794564909733
+          }
+        ],
+        "reference_entry": 8.366,
+        "available_reward_to_risk": 1.8793103448275998,
+        "already_past_tp1": false,
+        "paper_path": {
+          "known": true,
+          "code": "TARGET",
+          "end_ms": 1794576746796,
+          "trigger_price": 8.553,
+          "bank": {
+            "ms": 1794565141344,
+            "price": 8.413
+          },
+          "be_level": 8.362,
+          "simultaneous_targets": false
+        },
+        "path": {
+          "60": {
+            "known": true,
+            "code": "TARGET",
+            "end_ms": 1794576746796,
+            "trigger_price": 8.553,
+            "bank": {
+              "ms": 1794565141344,
+              "price": 8.413
+            },
+            "be_level": 8.366,
+            "simultaneous_targets": false
+          },
+          "900": {
+            "known": true,
+            "code": "TARGET",
+            "end_ms": 1794576746796,
+            "trigger_price": 8.553,
+            "bank": {
+              "ms": 1794565141344,
+              "price": 8.413
+            },
+            "be_level": 8.366,
+            "simultaneous_targets": false
+          }
+        }
+      }
+    },
+    {
+      "current": {
+        "epoch": 1794609900,
+        "entry": 8.197,
+        "stop": 8.107571428571427,
+        "target": 8.375857142857143,
+        "bot": "crypto",
+        "direction": "LONG",
+        "symbol": "AVAXUSDT",
+        "paper_reference_ready": false,
+        "entry_ms": 1794609910800,
+        "entry_status": "wide",
+        "attempts": [
+          {
+            "ms": 1794609910000,
+            "status": "wide",
+            "spread_bps": 6.099420555046057
+          },
+          {
+            "ms": 1794609910200,
+            "status": "wide",
+            "spread_bps": 6.099420555046057
+          },
+          {
+            "ms": 1794609910800,
+            "status": "wide",
+            "spread_bps": 6.099420555046057
+          }
+        ],
+        "paper_path": {
+          "known": true,
+          "code": "BE",
+          "end_ms": 1794618178854,
+          "trigger_price": 8.197,
+          "bank": {
+            "ms": 1794614496238,
+            "price": 8.243
+          },
+          "be_level": 8.197
+        }
+      },
+      "within_deadline": {
+        "epoch": 1794609900,
+        "entry": 8.197,
+        "stop": 8.107571428571427,
+        "target": 8.375857142857143,
+        "bot": "crypto",
+        "direction": "LONG",
+        "symbol": "AVAXUSDT",
+        "paper_reference_ready": false,
+        "entry_ms": 1794609930000,
+        "entry_status": "eligible",
+        "attempts": [
+          {
+            "ms": 1794609910000,
+            "status": "wide",
+            "spread_bps": 6.099420555046057
+          },
+          {
+            "ms": 1794609930000,
+            "status": "eligible",
+            "average": 8.203,
+            "worst": 8.203,
+            "contracts": 0.4,
+            "spread_bps": 1.2191405059426343,
+            "slippage_bps": 0.0,
+            "last_event_ms": 1794609929812
+          }
+        ],
+        "reference_entry": 8.203,
+        "available_reward_to_risk": 1.8113772455089763,
+        "already_past_tp1": false,
+        "rescue_with_bracket_room": true,
+        "paper_path": {
+          "known": true,
+          "code": "BE",
+          "end_ms": 1794618178854,
+          "trigger_price": 8.197,
+          "bank": {
+            "ms": 1794614496238,
+            "price": 8.243
+          },
+          "be_level": 8.197
+        },
+        "path": {
+          "60": {
+            "known": true,
+            "code": "BE",
+            "end_ms": 1794618178508,
+            "trigger_price": 8.199,
+            "bank": {
+              "ms": 1794614496238,
+              "price": 8.243
+            },
+            "be_level": 8.203
+          },
+          "900": {
+            "known": true,
+            "code": "BE",
+            "end_ms": 1794618178508,
+            "trigger_price": 8.199,
+            "bank": {
+              "ms": 1794614496238,
+              "price": 8.243
+            },
+            "be_level": 8.203
+          }
+        }
+      }
+    },
+    {
+      "current": {
+        "epoch": 1794622500,
+        "entry": 110.09,
+        "stop": 108.97857142857143,
+        "target": 112.31285714285715,
+        "bot": "crypto",
+        "direction": "LONG",
+        "symbol": "AAVEUSDT",
+        "paper_reference_ready": false,
+        "entry_ms": 1794622510800,
+        "entry_status": "wide",
+        "attempts": [
+          {
+            "ms": 1794622510000,
+            "status": "wide",
+            "spread_bps": 9.084302325580879
+          },
+          {
+            "ms": 1794622510200,
+            "status": "wide",
+            "spread_bps": 9.084302325580879
+          },
+          {
+            "ms": 1794622510800,
+            "status": "wide",
+            "spread_bps": 7.26678172404381
+          }
+        ],
+        "paper_path": {
+          "known": true,
+          "code": "SL",
+          "end_ms": 1794622900554,
+          "trigger_price": 108.98,
+          "bank": null,
+          "be_level": 110.09
+        }
+      },
+      "within_deadline": {
+        "epoch": 1794622500,
+        "entry": 110.09,
+        "stop": 108.97857142857143,
+        "target": 112.31285714285715,
+        "bot": "crypto",
+        "direction": "LONG",
+        "symbol": "AAVEUSDT",
+        "paper_reference_ready": false,
+        "entry_ms": 1794622620000,
+        "entry_status": "depth slippage exceeds limit",
+        "attempts": [
+          {
+            "ms": 1794622510000,
+            "status": "wide",
+            "spread_bps": 9.084302325580879
+          },
+          {
+            "ms": 1794622530000,
+            "status": "wide",
+            "spread_bps": 7.26678172404381
+          },
+          {
+            "ms": 1794622560000,
+            "status": "wide",
+            "spread_bps": 7.264802034144415
+          },
+          {
+            "ms": 1794622620000,
+            "status": "depth slippage exceeds limit"
+          }
+        ],
+        "paper_path": {
+          "known": true,
+          "code": "SL",
+          "end_ms": 1794622900554,
+          "trigger_price": 108.98,
+          "bank": null,
+          "be_level": 110.09
+        }
+      }
+    },
+    {
+      "current": {
+        "epoch": 1794641400,
+        "entry": 107.75,
+        "stop": 106.27857142857142,
+        "target": 110.69285714285715,
+        "bot": "crypto",
+        "direction": "LONG",
+        "symbol": "AAVEUSDT",
+        "paper_reference_ready": false,
+        "entry_ms": 1794641410800,
+        "entry_status": "wide",
+        "attempts": [
+          {
+            "ms": 1794641410000,
+            "status": "wide",
+            "spread_bps": 10.208343000324758
+          },
+          {
+            "ms": 1794641410200,
+            "status": "wide",
+            "spread_bps": 10.208343000324758
+          },
+          {
+            "ms": 1794641410800,
+            "status": "wide",
+            "spread_bps": 10.208343000324758
+          }
+        ],
+        "paper_path": {
+          "known": true,
+          "code": "SL",
+          "end_ms": 1794661244987,
+          "trigger_price": 106.27,
+          "bank": null,
+          "be_level": 107.75
+        }
+      },
+      "within_deadline": {
+        "epoch": 1794641400,
+        "entry": 107.75,
+        "stop": 106.27857142857142,
+        "target": 110.69285714285715,
+        "bot": "crypto",
+        "direction": "LONG",
+        "symbol": "AAVEUSDT",
+        "paper_reference_ready": false,
+        "entry_ms": 1794641520000,
+        "entry_status": "eligible",
+        "attempts": [
+          {
+            "ms": 1794641410000,
+            "status": "wide",
+            "spread_bps": 10.208343000324758
+          },
+          {
+            "ms": 1794641430000,
+            "status": "wide",
+            "spread_bps": 8.351505590869337
+          },
+          {
+            "ms": 1794641460000,
+            "status": "wide",
+            "spread_bps": 6.49079697714249
+          },
+          {
+            "ms": 1794641520000,
+            "status": "eligible",
+            "average": 108.05861111111112,
+            "worst": 108.06,
+            "contracts": 3.6,
+            "spread_bps": 0.9258830609698733,
+            "slippage_bps": 4.629200999906047,
+            "last_event_ms": 1794641519687
+          }
+        ],
+        "reference_entry": 108.05861111111112,
+        "available_reward_to_risk": 1.4779470729751383,
+        "already_past_tp1": false,
+        "rescue_with_bracket_room": false,
+        "paper_path": {
+          "known": true,
+          "code": "SL",
+          "end_ms": 1794661244987,
+          "trigger_price": 106.27,
+          "bank": null,
+          "be_level": 107.75
+        },
+        "path": {
+          "60": {
+            "known": true,
+            "code": "SL",
+            "end_ms": 1794661244987,
+            "trigger_price": 106.27,
+            "bank": null,
+            "be_level": 108.06
+          },
+          "900": {
+            "known": true,
+            "code": "SL",
+            "end_ms": 1794661244987,
+            "trigger_price": 106.27,
+            "bank": null,
+            "be_level": 108.06
+          }
+        }
+      }
+    },
+    {
+      "current": {
+        "epoch": 1794641400,
+        "entry": 7.99,
+        "stop": 7.890571428571429,
+        "target": 8.188857142857144,
+        "bot": "crypto",
+        "direction": "LONG",
+        "symbol": "AVAXUSDT",
+        "paper_reference_ready": false,
+        "entry_ms": 1794641410000,
+        "entry_status": "eligible",
+        "attempts": [
+          {
+            "ms": 1794641410000,
+            "status": "eligible",
+            "average": 7.995000000000001,
+            "worst": 7.995,
+            "contracts": 0.4,
+            "spread_bps": 3.753049352599129,
+            "slippage_bps": 0.0,
+            "last_event_ms": 1794641409979
+          }
+        ],
+        "reference_entry": 7.995000000000001,
+        "available_reward_to_risk": 1.8563611491108103,
+        "already_past_tp1": false,
+        "paper_path": {
+          "known": true,
+          "code": "BE",
+          "end_ms": 1794652460810,
+          "trigger_price": 7.988,
+          "bank": {
+            "ms": 1794644272397,
+            "price": 8.044
+          },
+          "be_level": 7.99
+        },
+        "path": {
+          "60": {
+            "known": true,
+            "code": "BE",
+            "end_ms": 1794646437490,
+            "trigger_price": 7.995,
+            "bank": {
+              "ms": 1794644272397,
+              "price": 8.044
+            },
+            "be_level": 7.995
+          },
+          "900": {
+            "known": true,
+            "code": "BE",
+            "end_ms": 1794646437490,
+            "trigger_price": 7.995,
+            "bank": {
+              "ms": 1794644272397,
+              "price": 8.044
+            },
+            "be_level": 7.995
+          }
+        }
+      },
+      "within_deadline": {
+        "epoch": 1794641400,
+        "entry": 7.99,
+        "stop": 7.890571428571429,
+        "target": 8.188857142857144,
+        "bot": "crypto",
+        "direction": "LONG",
+        "symbol": "AVAXUSDT",
+        "paper_reference_ready": false,
+        "entry_ms": 1794641410000,
+        "entry_status": "eligible",
+        "attempts": [
+          {
+            "ms": 1794641410000,
+            "status": "eligible",
+            "average": 7.995000000000001,
+            "worst": 7.995,
+            "contracts": 0.4,
+            "spread_bps": 3.753049352599129,
+            "slippage_bps": 0.0,
+            "last_event_ms": 1794641409979
+          }
+        ],
+        "reference_entry": 7.995000000000001,
+        "available_reward_to_risk": 1.8563611491108103,
+        "already_past_tp1": false,
+        "paper_path": {
+          "known": true,
+          "code": "BE",
+          "end_ms": 1794652460810,
+          "trigger_price": 7.988,
+          "bank": {
+            "ms": 1794644272397,
+            "price": 8.044
+          },
+          "be_level": 7.99
+        },
+        "path": {
+          "60": {
+            "known": true,
+            "code": "BE",
+            "end_ms": 1794646437490,
+            "trigger_price": 7.995,
+            "bank": {
+              "ms": 1794644272397,
+              "price": 8.044
+            },
+            "be_level": 7.995
+          },
+          "900": {
+            "known": true,
+            "code": "BE",
+            "end_ms": 1794646437490,
+            "trigger_price": 7.995,
+            "bank": {
+              "ms": 1794644272397,
+              "price": 8.044
+            },
+            "be_level": 7.995
+          }
+        }
+      }
+    }
+  ],
+  "archive_checks": {
+    "1794182400:AAVEUSDT": {
+      "snapshot": 96,
+      "update": 1673737,
+      "first_ts": 1794182400009,
+      "last_ts": 1794268799989
+    },
+    "1794268800:AAVEUSDT": {
+      "snapshot": 96,
+      "update": 1918828,
+      "first_ts": 1794268800009,
+      "last_ts": 1794355199999
+    },
+    "1794355200:AAVEUSDT": {
+      "snapshot": 96,
+      "update": 1617867,
+      "first_ts": 1794355200009,
+      "last_ts": 1794441599857
+    },
+    "1794355200:AVAXUSDT": {
+      "snapshot": 96,
+      "update": 761905,
+      "first_ts": 1794355200003,
+      "last_ts": 1794441599848
+    },
+    "1794441600:AVAXUSDT": {
+      "snapshot": 96,
+      "update": 795157,
+      "first_ts": 1794441600008,
+      "last_ts": 1794527999194
+    },
+    "1794528000:AAVEUSDT": {
+      "snapshot": 96,
+      "update": 1383628,
+      "first_ts": 1794528000008,
+      "last_ts": 1794614399426
+    },
+    "1794528000:AVAXUSDT": {
+      "snapshot": 96,
+      "update": 1117616,
+      "first_ts": 1794528000004,
+      "last_ts": 1794614399992
+    },
+    "1794614400:AAVEUSDT": {
+      "snapshot": 96,
+      "update": 1721107,
+      "first_ts": 1794614400006,
+      "last_ts": 1794700799971
+    },
+    "1794614400:AVAXUSDT": {
+      "snapshot": 96,
+      "update": 1323660,
+      "first_ts": 1794614400002,
+      "last_ts": 1794700799913
+    }
+  },
+  "tape_checks": {
+    "AAVEUSDT": {
+      "tape_trades": 50561,
+      "reconciled_bars": 309,
+      "mismatches": {}
+    },
+    "AVAXUSDT": {
+      "tape_trades": 43693,
+      "reconciled_bars": 301,
+      "mismatches": {}
+    }
+  },
+  "objective_verified": false,
+  "live_activation_supported": false,
+  "limitations": [
+    "Different fixed times with the same spread/depth gates. No reduced guard threshold.",
+    "Retrospective on the fixed 9\u201314 November proposal cohort, no fresh holdout or private account eligibility.",
+    "A rescued quote needs room for at least 1.5R and must precede TP1. Trade tape reports triggers, no new cash execution estimate."
+  ]
+}
