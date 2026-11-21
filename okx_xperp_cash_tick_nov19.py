@@ -140,7 +140,9 @@ def close_quote(book, stamp, side, contracts):
     return execution_quote(book,opposite,contracts,stamp,max_spread=1.,max_slippage=1.).average
 
 
-def simulate(rows, specs, ticks, books, *, clock, lag, setting, exit_price=None):
+def simulate(rows, specs, ticks, books, *, clock, lag, setting, exit_price=None, max_positions=12):
+    if not isinstance(max_positions, int) or not 1 <= max_positions <= 12:
+        raise ValueError('invalid shared position cap')
     cash=peak=CAPITAL
     drawdown=0.
     max_used=0
@@ -172,7 +174,7 @@ def simulate(rows, specs, ticks, books, *, clock, lag, setting, exit_price=None)
         if bot=='stocks' and not row['stock_reference_ready']:
             skipped['stocks:paper_guard']+=1
             continue
-        if symbol in active or len(active)>=12 or sum(r[0]==bot for r in active.values())>=CAPS[bot]:
+        if symbol in active or len(active)>=max_positions or sum(r[0]==bot for r in active.values())>=CAPS[bot]:
             skipped[bot+':position_cap']+=1
             continue
         reserved=math.fsum(r[1] for r in active.values())
@@ -227,7 +229,7 @@ def simulate(rows, specs, ticks, books, *, clock, lag, setting, exit_price=None)
         max_used=max(max_used,len(active))
         max_reserved=max(max_reserved,(reserved+margin)/cash)
     drain(None)
-    if active or abs(cash-CAPITAL-math.fsum(contribution.values()))>1e-9 or max_used>12 or max_reserved>.9:
+    if active or abs(cash-CAPITAL-math.fsum(contribution.values()))>1e-9 or max_used>max_positions or max_reserved>.9:
         raise ValueError('shared account ledger did not reconcile')
     return dict(status='SCORED_PUBLIC_L2_SIMULATION',trades=len(closed),skipped=skipped,
                 return_pct=100*(cash/CAPITAL-1),drawdown_pct=100*drawdown,
