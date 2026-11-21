@@ -82,16 +82,23 @@ def reconcile(tape, frame, *, start, end):
     return discrepancies
 
 
-def resolve_ticks(tape, times, *, signal, entered_at, entry_px, tick_size, amend_seconds):
+def resolve_ticks(tape, times, *, signal, entered_at, entry_px, tick_size, amend_seconds,
+                  runner_policy="be_tp1"):
     """Model exchange-side triggers, leaving order matching to the L2 replay."""
     if amend_seconds not in (60,900):
         raise ValueError('unknown stop amendment clock')
+    if runner_policy not in ("be_tp1", "be_1r", "half_stop_then_1r"):
+        raise ValueError('unknown runner protection policy')
     sign = 1 if signal['direction']=='LONG' else -1
     stock = signal['bot']=='stocks'
     original_stop = round_to_tick(signal['stop'],tick_size)
     limit = round_to_tick(signal['target'],tick_size)
     tp1 = round_to_tick(signal['entry']+.5*(signal['entry']-signal['stop']),tick_size)
+    one_r = round_to_tick(2*signal['entry']-signal['stop'],tick_size)
     breakeven = round_to_tick(entry_px,tick_size)
+    half_risk_stop = round_to_tick(entry_px-.5*(signal['entry']-signal['stop']),tick_size)
+    if sign*(half_risk_stop-original_stop)<0:
+        half_risk_stop=original_stop
     expiry = int(signal['epoch']*1000)+(64 if stock else 48)*900_000
     if not sign*original_stop < sign*entry_px < sign*limit or not entered_at < expiry:
         return dict(known=False,reason='invalid_entry_relative_to_bracket')
@@ -101,12 +108,16 @@ def resolve_ticks(tape, times, *, signal, entered_at, entry_px, tick_size, amend
     expires_tick = bisect_right(times, expiry-1)
     bank = None
     activation = math.inf
+    half_activation = math.inf
+    period = amend_seconds*1000
     for index in range(opened_tick,expires_tick):
         event = tape[index]
         active = event.ms>=activation
-        stop = breakeven if active else original_stop
+        half_active = event.ms>=half_activation
+        stop = breakeven if active else half_risk_stop if half_active else original_stop
         if sign*(event.price-stop)<=0:
-            return dict(known=True,code='BE' if active else 'SL_AFTER_TP1' if bank else 'SL',
+            code = 'BE' if active else 'TP1_HALF_STOP' if half_active else 'SL_AFTER_TP1' if bank else 'SL'
+            return dict(known=True,code=code,
                         end_ms=event.ms,trigger_price=event.price,bank=bank,be_level=breakeven)
         if sign*(event.price-limit)>=0:
             # A first print across both levels creates concurrent triggers.
@@ -116,6 +127,10 @@ def resolve_ticks(tape, times, *, signal, entered_at, entry_px, tick_size, amend
                         simultaneous_targets=(not stock and bank is None))
         if not stock and bank is None and sign*(event.price-tp1)>=0:
             bank = dict(ms=event.ms,price=event.price)
-            period = amend_seconds*1000
+            if runner_policy == "be_tp1":
+                activation = (event.ms//period+1)*period
+            elif runner_policy == "half_stop_then_1r":
+                half_activation = (event.ms//period+1)*period
+        if not stock and runner_policy != "be_tp1" and activation == math.inf and sign*(event.price-one_r)>=0:
             activation = (event.ms//period+1)*period
     return dict(known=True,code='TIME',end_ms=expiry,trigger_price=None,bank=bank,be_level=breakeven)

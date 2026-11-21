@@ -140,7 +140,8 @@ def close_quote(book, stamp, side, contracts):
     return execution_quote(book,opposite,contracts,stamp,max_spread=1.,max_slippage=1.).average
 
 
-def simulate(rows, specs, ticks, books, *, clock, lag, setting, exit_price=None, max_positions=12):
+def simulate(rows, specs, ticks, books, *, clock, lag, setting, exit_price=None, max_positions=12,
+             unbankable_runner=None):
     if not isinstance(max_positions, int) or not 1 <= max_positions <= 12:
         raise ValueError('invalid shared position cap')
     cash=peak=CAPITAL
@@ -198,8 +199,14 @@ def simulate(rows, specs, ticks, books, *, clock, lag, setting, exit_price=None,
             if bot=='crypto' and (1 if side=='LONG' else -1)*(entry.average-tp1)>=0:
                 raise ValueError('compounded entry is already beyond TP1')
             partial,minimum=TP1_SETTINGS[setting]
-            bank_size=(plan_tp1_close(entry.contracts,partial,spec,ensure_minimum=minimum)['size']
-                       if path['bank'] else 0.)
+            planned_bank=0.
+            if path['bank'] or unbankable_runner is not None and bot=='crypto':
+                planned_bank=plan_tp1_close(entry.contracts,partial,spec,ensure_minimum=minimum)['size']
+            if unbankable_runner is not None and bot=='crypto' and not planned_bank:
+                path=row['runner_paths'][unbankable_runner][clock]
+                if not path['known']:
+                    raise ValueError(path['reason'])
+            bank_size=planned_bank if path['bank'] else 0.
             remainder=max(0.,entry.contracts-bank_size)
             bank_at=(path['bank']['ms']+lag) if bank_size else None
             def quote_exit(stamp, size):

@@ -94,7 +94,7 @@ def cached_entries(plan,capture,inputs):
     return result
 
 
-def resolve_all(rows,trades,reference,ticks,*,trade_loader=load_trade_tape):
+def resolve_all(rows,trades,reference,ticks,*,trade_loader=load_trade_tape,path_resolver=resolve_ticks):
     by_symbol=defaultdict(list)
     for row in rows:
         by_symbol[row['symbol']].append(row)
@@ -123,7 +123,7 @@ def resolve_all(rows,trades,reference,ticks,*,trade_loader=load_trade_tape):
         evidence[symbol]=dict(tape_trades=len(tape),reconciled_bars=len(relevant),mismatches=errors)
 
         def checked(row,at,px,clock):
-            result=resolve_ticks(tape,times,signal=row,entered_at=at,entry_px=px,tick_size=ticks[symbol],
+            result=path_resolver(tape,times,signal=row,entered_at=at,entry_px=px,tick_size=ticks[symbol],
                                  amend_seconds=clock)
             if result['known']:
                 first=at//900_000*900
