@@ -2664,22 +2664,17 @@ def _at_show_final_confirm(chat_id: int, mode_str: str, tp1_pct: float):
                    {"text": "❌ Отмена", "callback_data": "at_cancel"}]])
 
 
-def _sweep_pending(u: dict) -> tuple:
-    """(unswept realised PnL, offer amount) for one autotrade user, or (0, 0).
-
-    PnL comes from OKX, not from our own exit prices. The engine books the
-    candle close while the exchange books the fill, and those differ — see
-    okx_trader.get_last_fill_px. Real money must not move on our number.
-    """
+def _sweep_pending(u: dict, *, state: dict | None = None) -> tuple[float | None, float]:
+    """Return signed exchange PnL and the permissible offer amount."""
     from src.autotrader import _creds_of
     creds = _creds_of(u)
     if not creds:
-        return 0.0, 0.0
-    st = sweep_state(u["user_id"])
+        return None, 0.
+    st = state if state is not None else sweep_state(u["user_id"])
     ok, pnl = _okx.get_realized_pnl_since(creds, float(st["watermark_ts"]))
-    if not ok or pnl is None or pnl <= 0:
-        return 0.0, 0.0
-    return float(pnl), round(float(pnl) * PROFIT_SWEEP_PCT / 100.0, 2)
+    if not ok or pnl is None or not math.isfinite(pnl):
+        return None, 0.
+    return pnl, round(max(0., pnl) * PROFIT_SWEEP_PCT / 100., 2)
 
 
 def _sweep_coin_facts(limit: int = 4) -> list:
@@ -2766,8 +2761,8 @@ def _check_profit_sweeps() -> None:
             gap_h = (time.time() - float(st.get("last_offer_ts") or 0)) / 3600.0
             if gap_h < PROFIT_SWEEP_MIN_GAP_H:
                 continue
-            pnl, amount = _sweep_pending(u)
-            if pnl < PROFIT_SWEEP_THRESHOLD_USD:
+            pnl, amount = _sweep_pending(u, state=st)
+            if pnl is None or pnl < PROFIT_SWEEP_THRESHOLD_USD:
                 continue
             if amount < PROFIT_SWEEP_MIN_ORDER_USD:
                 continue
@@ -2832,22 +2827,26 @@ def _sweep_show_report(chat_id: int, user_id: int, u: dict) -> None:
     L = ["*Прибыль и вывод с плеча*", ""]
 
     bal = u.get("last_balance")
+    balance_label = "Последний известный баланс"
     if creds:
         ok_b, live_bal = _okx.get_balance(creds)
         if ok_b:
             bal = live_bal
-    L.append("Баланс: *$" + (format(bal, ".2f") if bal is not None else "—") + "*")
+            balance_label = "Баланс OKX"
+    balance_text = f"${bal:.2f}" if bal is not None else "—"
+    L.append(f"{balance_label} — *{balance_text}*")
 
     since = float(st.get("watermark_ts") or 0)
     since_txt = datetime.fromtimestamp(since, _riga_tz()).strftime("%d.%m %H:%M")
-    pnl, amount = _sweep_pending(u)
-    L.append("Прибыль с " + since_txt + ": *$" + format(pnl, "+.2f") + "*")
-    L.append("Уже выведено всего: $" + format(float(st.get("total_swept") or 0), ".2f"))
+    pnl, amount = _sweep_pending(u, state=st)
+    total = "не подтверждён OKX" if pnl is None else f"${pnl:+.2f}"
+    L.append(f"Закрытый результат по фьючерсам счёта с {since_txt} — *{total}*")
+    L.append("Учтено в прошлых операциях: $" + format(float(st.get("total_swept") or 0), ".2f"))
     L.append("")
 
-    if pnl <= 0:
-        L.append("_Пока выводить нечего. Считается только закрытая прибыль, "
-                 "открытые позиции не в счёт._")
+    if pnl is None or pnl <= 0:
+        L.append("_OKX не подтвердил полноту истории за этот период._" if pnl is None
+                 else "_За этот период закрытой прибыли для вывода нет._")
         _at_reply_kb(chat_id, chr(10).join(L),
                      [[{"text": "« Назад", "callback_data": "at_menu"}]])
         return
@@ -2897,12 +2896,18 @@ def _sweep_handle_callback(cb_id: str, chat_id: int, user_id: int, data: str) ->
     """
     if not data.startswith("sw_"):
         return False
+    if chat_id != user_id:
+        _answer_callback(cb_id, "Открой это меню в личном чате с ботом.")
+        return True
     u = at_get(user_id)
     if not u or not u.get("allowed"):
         _answer_callback(cb_id, "Нет доступа.")
         return True
 
     pnl, amount = _sweep_pending(u)
+    if pnl is None:
+        _answer_callback(cb_id, "OKX не подтвердил результат за этот период.")
+        return True
     if amount < PROFIT_SWEEP_MIN_ORDER_USD:
         _answer_callback(cb_id, "Прибыль уже учтена.")
         return True
@@ -3028,6 +3033,9 @@ def _at_handle_callback(cb_id: str, chat_id: int, user_id: int, data: str) -> bo
                [[{"text": "50% / минимум лот (неделимую — целиком)", "callback_data": "at_tp1auto50"}],
                 [{"text": f"{p}%", "callback_data": f"at_tp1set{p}"} for p in (25,50,75)]])
     elif data == "at_pnl":
+        if chat_id != user_id:
+            _answer_callback(cb_id, "Результат доступен в личном чате с ботом.")
+            return True
         _answer_callback(cb_id)
         _sweep_show_report(chat_id, user_id, u)
     elif data == "at_menu":
