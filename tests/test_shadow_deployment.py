@@ -59,6 +59,15 @@ class ShadowDeploymentTests(unittest.TestCase):
         self.assertIn('"already_open": 1', body)
         self.assertIn('"hour_cap": 2', body)
 
+    def test_scan_pause_explains_next_utc_day_without_promising_a_trade(self):
+        current = datetime(2026, 11, 21, 21, tzinfo=timezone.utc).timestamp()
+        audit = main.json.dumps(dict(ts=current, result="daily_loss_pause", loss_pause_streak=3))
+        with patch.object(main, "get_bot_state", return_value=audit):
+            with patch.object(main.time, "time", return_value=current + 60):
+                self.assertIn("22.11 00:00 UTC", main._crypto_scan_status_text())
+            with patch.object(main.time, "time", return_value=current + 3 * 3600):
+                self.assertIn("следующем скане", main._crypto_scan_status_text())
+
     def test_stale_scheduler_cycle_keeps_last_real_decision_visible(self):
         now = main.time.time()
         current = {

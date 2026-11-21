@@ -38,3 +38,29 @@ def test_unconfirmed_amount_cannot_spend_or_advance_the_watermark():
         commit.assert_not_called()
         buy.assert_not_called()
         assert "не подтвердил" in callback.call_args.args[1]
+
+
+def test_manual_ticker_requires_private_chat_and_uses_only_current_confirmed_amount():
+    user = {"allowed": True, "user_id": 15}
+    with (patch.object(main, "TELEGRAM_TOKEN", "fixture-telegram-token"),
+          patch.object(main, "DEPLOYMENT_MODE", "live"),
+          patch.object(main, "upsert_user"),
+          patch.object(main, "_is_admin", return_value=False),
+          patch.object(main, "_is_super_admin", return_value=False),
+          patch.object(main, "at_get", return_value=user),
+          patch.object(main, "_sweep_pending", return_value=(20., 8.)) as balance,
+          patch.object(main, "_sweep_execute_buy") as buy,
+          patch.object(main, "_reply"),
+          patch.dict(main._sweep_pending_manual, {15: 12.}, clear=True)):
+        client = main.app.test_client()
+        headers = {"X-Telegram-Bot-Api-Secret-Token": main._telegram_webhook_secret()}
+        group = {"message": {"chat": {"id": -15}, "from": {"id": 15}, "text": "BTC"}}
+        direct = {"message": {"chat": {"id": 15}, "from": {"id": 15}, "text": "BTC"}}
+        assert client.post("/webhook", json=group, headers=headers).status_code == 200
+        assert main._sweep_pending_manual[15] == 12.
+        balance.assert_not_called()
+        buy.assert_not_called()
+        assert client.post("/webhook", json=direct, headers=headers).status_code == 200
+        buy.assert_called_once_with(15, 15, user, "BTC", 8.)
+        assert client.post("/webhook", json=direct, headers=headers).status_code == 200
+        assert buy.call_count == 1

@@ -807,6 +807,14 @@ def _crypto_scan_status_text() -> str:
             str(row.get("result")), str(row.get("result") or "неизвестно"))
         if row.get("result") == "daily_loss_pause" and row.get("loss_pause_streak"):
             result += f" · порог {int(row['loss_pause_streak'])} стопа подряд"
+            observed = float(row.get("ts") or 0)
+            if observed > 0:
+                reset = (int(observed) // 86400 + 1) * 86400
+                if time.time() < reset:
+                    reset_text = datetime.fromtimestamp(reset, timezone.utc).strftime("%d.%m %H:%M UTC")
+                    result += f" · пересчёт серии с {reset_text}"
+                else:
+                    result += " · начался новый день UTC, серия проверится на следующем скане"
         strategy = row.get("strategy") or {}
         timing = ""
         if row.get("entry_bar") and row.get("scan_started_at"):
@@ -3239,19 +3247,24 @@ def webhook():
     # gates it, so the DM requirement protected nothing.
     # Manual ticker for a profit sweep. Checked before the admin block prompt so
     # a user who is also an admin does not have his coin swallowed by that flow.
-    if user_id in _sweep_pending_manual:
-        amount = _sweep_pending_manual.pop(user_id)
+    approved_amount = _sweep_pending_manual.pop(user_id, None) if is_dm and chat_id == user_id else None
+    if approved_amount is not None:
         base = (text_raw or "").strip().upper()
         for q in ("USDC", "USDT"):
             if base.endswith(q):
                 base = base[:-len(q)]
         base = base.replace("-", "").replace("/", "").replace("_", "")
         u = at_get(user_id)
-        if not base or not u:
+        if not base or not u or not u.get("allowed"):
             _reply(chat_id, "Не понял тикер. Нажми кнопку в предложении ещё раз.")
-            return
+            return "ok", 200
+        pnl, available = _sweep_pending(u)
+        amount = min(approved_amount, available)
+        if pnl is None or amount < PROFIT_SWEEP_MIN_ORDER_USD:
+            _reply(chat_id, "Доступная сумма изменилась. Открой «Прибыль и вывод», чтобы проверить её.")
+            return "ok", 200
         _sweep_execute_buy(chat_id, user_id, u, base, amount)
-        return
+        return "ok", 200
 
     if _is_admin(user_id) and chat_id in _pending_block_chat:
         days = _pending_block_chat.pop(chat_id)
