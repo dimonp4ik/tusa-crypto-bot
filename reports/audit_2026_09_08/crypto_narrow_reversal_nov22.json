@@ -1,0 +1,740 @@
+{
+  "source_hashes": {
+    "shared_xperp_specs_nov14.json": "7a4a76b813dfe6a5a08c9e858b17d453285dddc99529cdc293885682cf2bee0e",
+    "crypto_risk_range_long_history_nov22.json": "06bc026520341103d80640055764f5fbe5b15c07fae75d03f198d406bbeaf771",
+    "okx_crypto_risk_range_nov22.json": "c2f11129ac7f0fa0d3a64beeca7da72973893d4ebed91a40e479a4b838f6982b",
+    "manifest.json": "6ebba73ab8fe00a7a0740feaf3b6fdc867d4773dd36277be53d42f8e20a236b5",
+    "crypto_xperp_raw_router_audit_2_0_nov14_merged_raw_families.csv": "fd9800fcd1822ace6e1b2fd1cc9d31f7f6924e0572cccc759c07ac536d8b893a"
+  },
+  "candle_pool_sha256": "614be11774df2976034db3185ac29af19c4fc69da47642f28515dedc918f8d31",
+  "cutoff_exclusive": 1793491200,
+  "cases": {
+    "control": {
+      "status": "SCORED_CANDLE_PROXY",
+      "clients": {
+        "requested5": {
+          "summary": {
+            "starting_capital": 130.0,
+            "ending_capital": 143.353947,
+            "return_pct": 10.272267,
+            "cash_drawdown_pct": 9.903751,
+            "trades": 637,
+            "skipped": {
+              "slots": 17,
+              "minimum_size": 0
+            },
+            "unplaceable_partials": 425,
+            "tp1_hits_without_bank": 298,
+            "full_tp1_closes": 0,
+            "peak_positions": 4,
+            "peak_by_bot": {
+              "crypto": 4
+            },
+            "peak_reserved_margin_pct": 11.846062686868127,
+            "pnl_by_bot": {
+              "crypto": 13.353947018572669,
+              "stocks": 0
+            },
+            "return_contribution_pct": {
+              "crypto": 10.272266937363591,
+              "stocks": 0.0
+            }
+          },
+          "calendar_months": {
+            "2026-07": {
+              "opening_cash": 130.0,
+              "closing_cash": 129.01732683857156,
+              "return_pct": -0.7559024318680274,
+              "cash_drawdown_pct": 5.663674698328672,
+              "return_contribution_pct": {
+                "crypto": -0.755902431867982,
+                "stocks": 0.0
+              },
+              "entries": 102,
+              "rejected_by_account_guard": 0,
+              "closed": 102,
+              "winrate_pct": 19.607843137254903,
+              "bank_pnl": 0.13619079714285814,
+              "runner_pnl": -1.118863958571236,
+              "tp1_unbanked": 50
+            },
+            "2026-08": {
+              "opening_cash": 129.01732683857162,
+              "closing_cash": 127.05974791500054,
+              "return_pct": -1.5172992430857235,
+              "cash_drawdown_pct": 6.0543877594390745,
+              "return_contribution_pct": {
+                "crypto": -1.517299243085745,
+                "stocks": 0.0
+              },
+              "entries": 158,
+              "rejected_by_account_guard": 0,
+              "closed": 157,
+              "winrate_pct": 17.197452229299362,
+              "bank_pnl": 0.1669256357142879,
+              "runner_pnl": -2.124504559285397,
+              "tp1_unbanked": 88
+            },
+            "2026-09": {
+              "opening_cash": 127.05974791500051,
+              "closing_cash": 132.62668083571515,
+              "return_pct": 4.3813505158524,
+              "cash_drawdown_pct": 4.661159807418145,
+              "return_contribution_pct": {
+                "crypto": 4.381350515852404,
+                "stocks": 0.0
+              },
+              "entries": 190,
+              "rejected_by_account_guard": 0,
+              "closed": 189,
+              "winrate_pct": 22.75132275132275,
+              "bank_pnl": 0.4122255892857187,
+              "runner_pnl": 5.146082635000352,
+              "tp1_unbanked": 77
+            },
+            "2026-10": {
+              "opening_cash": 132.62668083571515,
+              "closing_cash": 143.35394701857285,
+              "return_pct": 8.08831685695699,
+              "cash_drawdown_pct": 2.874582603246194,
+              "return_contribution_pct": {
+                "crypto": 8.088316856956851,
+                "stocks": 0.0
+              },
+              "entries": 187,
+              "rejected_by_account_guard": 0,
+              "closed": 189,
+              "winrate_pct": 20.634920634920636,
+              "bank_pnl": 0.5436397392857178,
+              "runner_pnl": 10.192251140000366,
+              "tp1_unbanked": 83
+            },
+            "2026-11": {
+              "opening_cash": 143.35394701857265,
+              "closing_cash": 143.35394701857265,
+              "return_pct": 0.0,
+              "cash_drawdown_pct": 0.0,
+              "return_contribution_pct": {
+                "crypto": 0.0,
+                "stocks": 0.0
+              },
+              "entries": 0,
+              "rejected_by_account_guard": 0,
+              "closed": 0,
+              "winrate_pct": null,
+              "bank_pnl": 0,
+              "runner_pnl": 0,
+              "tp1_unbanked": 0
+            }
+          }
+        },
+        "half_minimum": {
+          "summary": {
+            "starting_capital": 130.0,
+            "ending_capital": 138.881106,
+            "return_pct": 6.83162,
+            "cash_drawdown_pct": 7.999057,
+            "trades": 637,
+            "skipped": {
+              "slots": 17,
+              "minimum_size": 0
+            },
+            "unplaceable_partials": 0,
+            "tp1_hits_without_bank": 0,
+            "full_tp1_closes": 0,
+            "peak_positions": 4,
+            "peak_by_bot": {
+              "crypto": 4
+            },
+            "peak_reserved_margin_pct": 11.834527268462343,
+            "pnl_by_bot": {
+              "crypto": 8.881106060001212,
+              "stocks": 0
+            },
+            "return_contribution_pct": {
+              "crypto": 6.831620046154778,
+              "stocks": 0.0
+            }
+          },
+          "calendar_months": {
+            "2026-07": {
+              "opening_cash": 130.0,
+              "closing_cash": 128.5695629242859,
+              "return_pct": -1.1003362120877824,
+              "cash_drawdown_pct": 4.2774304176788265,
+              "return_contribution_pct": {
+                "crypto": -1.1003362120877558,
+                "stocks": 0.0
+              },
+              "entries": 102,
+              "rejected_by_account_guard": 0,
+              "closed": 102,
+              "winrate_pct": 66.66666666666667,
+              "bank_pnl": 6.958317225714358,
+              "runner_pnl": -8.388754301428442,
+              "tp1_unbanked": 0
+            },
+            "2026-08": {
+              "opening_cash": 128.56956292428592,
+              "closing_cash": 126.86605623535775,
+              "return_pct": -1.324968873022736,
+              "cash_drawdown_pct": 4.9406830864958335,
+              "return_contribution_pct": {
+                "crypto": -1.3249688730227958,
+                "stocks": 0.0
+              },
+              "entries": 158,
+              "rejected_by_account_guard": 0,
+              "closed": 157,
+              "winrate_pct": 66.87898089171975,
+              "bank_pnl": 10.614610515357244,
+              "runner_pnl": -12.31811720428549,
+              "tp1_unbanked": 0
+            },
+            "2026-09": {
+              "opening_cash": 126.86605623535768,
+              "closing_cash": 128.77620925035805,
+              "return_pct": 1.5056454592209612,
+              "cash_drawdown_pct": 4.184085480217212,
+              "return_contribution_pct": {
+                "crypto": 1.5056454592209358,
+                "stocks": 0.0
+              },
+              "entries": 190,
+              "rejected_by_account_guard": 0,
+              "closed": 189,
+              "winrate_pct": 67.19576719576719,
+              "bank_pnl": 12.090020025000113,
+              "runner_pnl": -10.317862152856913,
+              "tp1_unbanked": 0
+            },
+            "2026-10": {
+              "opening_cash": 128.77620925035802,
+              "closing_cash": 138.88110606000117,
+              "return_pct": 7.84686617851742,
+              "cash_drawdown_pct": 2.1148816161601256,
+              "return_contribution_pct": {
+                "crypto": 7.846866178517444,
+                "stocks": 0.0
+              },
+              "entries": 187,
+              "rejected_by_account_guard": 0,
+              "closed": 189,
+              "winrate_pct": 75.13227513227513,
+              "bank_pnl": 13.368635723214389,
+              "runner_pnl": -3.125743770714048,
+              "tp1_unbanked": 0
+            },
+            "2026-11": {
+              "opening_cash": 138.8811060600012,
+              "closing_cash": 138.8811060600012,
+              "return_pct": 0.0,
+              "cash_drawdown_pct": 0.0,
+              "return_contribution_pct": {
+                "crypto": 0.0,
+                "stocks": 0.0
+              },
+              "entries": 0,
+              "rejected_by_account_guard": 0,
+              "closed": 0,
+              "winrate_pct": null,
+              "bank_pnl": 0,
+              "runner_pnl": 0,
+              "tp1_unbanked": 0
+            }
+          }
+        }
+      }
+    },
+    "with_below_1pct": {
+      "status": "SCORED_CANDLE_PROXY",
+      "clients": {
+        "requested5": {
+          "summary": {
+            "starting_capital": 130.0,
+            "ending_capital": 134.531573,
+            "return_pct": 3.485825,
+            "cash_drawdown_pct": 8.883826,
+            "trades": 994,
+            "skipped": {
+              "slots": 42,
+              "minimum_size": 0
+            },
+            "unplaceable_partials": 625,
+            "tp1_hits_without_bank": 421,
+            "full_tp1_closes": 0,
+            "peak_positions": 4,
+            "peak_by_bot": {
+              "crypto": 4
+            },
+            "peak_reserved_margin_pct": 11.804936195680932,
+            "pnl_by_bot": {
+              "crypto": 4.531572615002109,
+              "stocks": 0
+            },
+            "return_contribution_pct": {
+              "crypto": 3.485825088463161,
+              "stocks": 0.0
+            }
+          },
+          "calendar_months": {
+            "2026-07": {
+              "opening_cash": 130.0,
+              "closing_cash": 129.73896934071462,
+              "return_pct": -0.20079281483490474,
+              "cash_drawdown_pct": 4.003069167743153,
+              "return_contribution_pct": {
+                "crypto": -0.2007928148347898,
+                "stocks": 0.0
+              },
+              "entries": 204,
+              "rejected_by_account_guard": 0,
+              "closed": 204,
+              "winrate_pct": 19.11764705882353,
+              "bank_pnl": 0.3682165828571472,
+              "runner_pnl": -0.6292472421423754,
+              "tp1_unbanked": 81
+            },
+            "2026-08": {
+              "opening_cash": 129.73896934071476,
+              "closing_cash": 124.37710312071509,
+              "return_pct": -4.13281086418883,
+              "cash_drawdown_pct": 6.438074748279847,
+              "return_contribution_pct": {
+                "crypto": -4.132810864188746,
+                "stocks": 0.0
+              },
+              "entries": 230,
+              "rejected_by_account_guard": 0,
+              "closed": 228,
+              "winrate_pct": 17.105263157894736,
+              "bank_pnl": 0.20660598571428937,
+              "runner_pnl": -5.568472205713856,
+              "tp1_unbanked": 118
+            },
+            "2026-09": {
+              "opening_cash": 124.3771031207152,
+              "closing_cash": 126.77657970214447,
+              "return_pct": 1.9291947804094045,
+              "cash_drawdown_pct": 6.252708322354904,
+              "return_contribution_pct": {
+                "crypto": 1.929194780409324,
+                "stocks": 0.0
+              },
+              "entries": 279,
+              "rejected_by_account_guard": 0,
+              "closed": 279,
+              "winrate_pct": 18.63799283154122,
+              "bank_pnl": 0.5588479250000075,
+              "runner_pnl": 1.8320039600005802,
+              "tp1_unbanked": 117
+            },
+            "2026-10": {
+              "opening_cash": 126.77657970214436,
+              "closing_cash": 134.53157261500215,
+              "return_pct": 6.117054846469094,
+              "cash_drawdown_pct": 4.289455287402582,
+              "return_contribution_pct": {
+                "crypto": 6.117054846469069,
+                "stocks": 0.0
+              },
+              "entries": 281,
+              "rejected_by_account_guard": 0,
+              "closed": 283,
+              "winrate_pct": 21.20141342756184,
+              "bank_pnl": 0.6793830142857235,
+              "runner_pnl": 7.084234595000592,
+              "tp1_unbanked": 105
+            },
+            "2026-11": {
+              "opening_cash": 134.53157261500212,
+              "closing_cash": 134.53157261500212,
+              "return_pct": 0.0,
+              "cash_drawdown_pct": 0.0,
+              "return_contribution_pct": {
+                "crypto": 0.0,
+                "stocks": 0.0
+              },
+              "entries": 0,
+              "rejected_by_account_guard": 0,
+              "closed": 0,
+              "winrate_pct": null,
+              "bank_pnl": 0,
+              "runner_pnl": 0,
+              "tp1_unbanked": 0
+            }
+          }
+        },
+        "half_minimum": {
+          "summary": {
+            "starting_capital": 130.0,
+            "ending_capital": 131.652413,
+            "return_pct": 1.271087,
+            "cash_drawdown_pct": 7.653351,
+            "trades": 994,
+            "skipped": {
+              "slots": 42,
+              "minimum_size": 0
+            },
+            "unplaceable_partials": 0,
+            "tp1_hits_without_bank": 0,
+            "full_tp1_closes": 0,
+            "peak_positions": 4,
+            "peak_by_bot": {
+              "crypto": 4
+            },
+            "peak_reserved_margin_pct": 11.929479664671447,
+            "pnl_by_bot": {
+              "crypto": 1.6524129585734924,
+              "stocks": 0
+            },
+            "return_contribution_pct": {
+              "crypto": 1.2710868912103788,
+              "stocks": 0.0
+            }
+          },
+          "calendar_months": {
+            "2026-07": {
+              "opening_cash": 130.0,
+              "closing_cash": 128.35534452678633,
+              "return_pct": -1.265119594779751,
+              "cash_drawdown_pct": 3.312031251730036,
+              "return_contribution_pct": {
+                "crypto": -1.26511959477987,
+                "stocks": 0.0
+              },
+              "entries": 204,
+              "rejected_by_account_guard": 0,
+              "closed": 204,
+              "winrate_pct": 67.15686274509804,
+              "bank_pnl": 10.982977660357273,
+              "runner_pnl": -12.627633133571106,
+              "tp1_unbanked": 0
+            },
+            "2026-08": {
+              "opening_cash": 128.35534452678615,
+              "closing_cash": 123.36202986285802,
+              "return_pct": -3.8902273078984195,
+              "cash_drawdown_pct": 5.2442002535778975,
+              "return_contribution_pct": {
+                "crypto": -3.8902273078984115,
+                "stocks": 0.0
+              },
+              "entries": 230,
+              "rejected_by_account_guard": 0,
+              "closed": 228,
+              "winrate_pct": 64.03508771929825,
+              "bank_pnl": 12.325343729643008,
+              "runner_pnl": -17.318658393571134,
+              "tp1_unbanked": 0
+            },
+            "2026-09": {
+              "opening_cash": 123.36202986285804,
+              "closing_cash": 125.7390775096445,
+              "return_pct": 1.9268875920970485,
+              "cash_drawdown_pct": 4.950713492675618,
+              "return_contribution_pct": {
+                "crypto": 1.9268875920968898,
+                "stocks": 0.0
+              },
+              "entries": 279,
+              "rejected_by_account_guard": 0,
+              "closed": 279,
+              "winrate_pct": 70.60931899641577,
+              "bank_pnl": 15.860344850357318,
+              "runner_pnl": -13.621292346428193,
+              "tp1_unbanked": 0
+            },
+            "2026-10": {
+              "opening_cash": 125.73907750964432,
+              "closing_cash": 131.6524129585735,
+              "return_pct": 4.702862122139906,
+              "cash_drawdown_pct": 3.8074174933436074,
+              "return_contribution_pct": {
+                "crypto": 4.702862122139893,
+                "stocks": 0.0
+              },
+              "entries": 281,
+              "rejected_by_account_guard": 0,
+              "closed": 283,
+              "winrate_pct": 71.73144876325088,
+              "bank_pnl": 15.638719150357332,
+              "runner_pnl": -9.587388558571007,
+              "tp1_unbanked": 0
+            },
+            "2026-11": {
+              "opening_cash": 131.6524129585735,
+              "closing_cash": 131.6524129585735,
+              "return_pct": 0.0,
+              "cash_drawdown_pct": 0.0,
+              "return_contribution_pct": {
+                "crypto": 0.0,
+                "stocks": 0.0
+              },
+              "entries": 0,
+              "rejected_by_account_guard": 0,
+              "closed": 0,
+              "winrate_pct": null,
+              "bank_pnl": 0,
+              "runner_pnl": 0,
+              "tp1_unbanked": 0
+            }
+          }
+        }
+      }
+    },
+    "with_narrow_reversal": {
+      "status": "SCORED_CANDLE_PROXY",
+      "clients": {
+        "requested5": {
+          "summary": {
+            "starting_capital": 130.0,
+            "ending_capital": 137.854695,
+            "return_pct": 6.042073,
+            "cash_drawdown_pct": 10.36422,
+            "trades": 791,
+            "skipped": {
+              "slots": 27,
+              "minimum_size": 0
+            },
+            "unplaceable_partials": 509,
+            "tp1_hits_without_bank": 345,
+            "full_tp1_closes": 0,
+            "peak_positions": 4,
+            "peak_by_bot": {
+              "crypto": 4
+            },
+            "peak_reserved_margin_pct": 11.82466856817176,
+            "pnl_by_bot": {
+              "crypto": 7.854695475358769,
+              "stocks": 0
+            },
+            "return_contribution_pct": {
+              "crypto": 6.042073442583669,
+              "stocks": 0.0
+            }
+          },
+          "calendar_months": {
+            "2026-07": {
+              "opening_cash": 130.0,
+              "closing_cash": 127.03701756392891,
+              "return_pct": -2.2792172585162196,
+              "cash_drawdown_pct": 6.049371695314341,
+              "return_contribution_pct": {
+                "crypto": -2.2792172585162094,
+                "stocks": 0.0
+              },
+              "entries": 148,
+              "rejected_by_account_guard": 0,
+              "closed": 148,
+              "winrate_pct": 16.89189189189189,
+              "bank_pnl": 0.22365024964285976,
+              "runner_pnl": -3.186632685713932,
+              "tp1_unbanked": 67
+            },
+            "2026-08": {
+              "opening_cash": 127.03701756392893,
+              "closing_cash": 123.16567727750068,
+              "return_pct": -3.0474111882232036,
+              "cash_drawdown_pct": 4.9669212116637755,
+              "return_contribution_pct": {
+                "crypto": -3.047411188223199,
+                "stocks": 0.0
+              },
+              "entries": 173,
+              "rejected_by_account_guard": 0,
+              "closed": 171,
+              "winrate_pct": 16.95906432748538,
+              "bank_pnl": 0.15520679642857452,
+              "runner_pnl": -4.0265470828568155,
+              "tp1_unbanked": 90
+            },
+            "2026-09": {
+              "opening_cash": 123.16567727750069,
+              "closing_cash": 126.22189143250124,
+              "return_pct": 2.481384605318815,
+              "cash_drawdown_pct": 4.217101342039772,
+              "return_contribution_pct": {
+                "crypto": 2.481384605318753,
+                "stocks": 0.0
+              },
+              "entries": 240,
+              "rejected_by_account_guard": 0,
+              "closed": 240,
+              "winrate_pct": 20.833333333333332,
+              "bank_pnl": 0.49811101785714956,
+              "runner_pnl": 2.54947844071476,
+              "tp1_unbanked": 98
+            },
+            "2026-10": {
+              "opening_cash": 126.22189143250117,
+              "closing_cash": 137.8546954753588,
+              "return_pct": 9.216154116244102,
+              "cash_drawdown_pct": 3.657529399180786,
+              "return_contribution_pct": {
+                "crypto": 9.216154116244088,
+                "stocks": 0.0
+              },
+              "entries": 230,
+              "rejected_by_account_guard": 0,
+              "closed": 232,
+              "winrate_pct": 21.551724137931036,
+              "bank_pnl": 0.6202944107142923,
+              "runner_pnl": 11.021134328571879,
+              "tp1_unbanked": 90
+            },
+            "2026-11": {
+              "opening_cash": 137.85469547535877,
+              "closing_cash": 137.85469547535877,
+              "return_pct": 0.0,
+              "cash_drawdown_pct": 0.0,
+              "return_contribution_pct": {
+                "crypto": 0.0,
+                "stocks": 0.0
+              },
+              "entries": 0,
+              "rejected_by_account_guard": 0,
+              "closed": 0,
+              "winrate_pct": null,
+              "bank_pnl": 0,
+              "runner_pnl": 0,
+              "tp1_unbanked": 0
+            }
+          }
+        },
+        "half_minimum": {
+          "summary": {
+            "starting_capital": 130.0,
+            "ending_capital": 135.304576,
+            "return_pct": 4.080443,
+            "cash_drawdown_pct": 7.943527,
+            "trades": 791,
+            "skipped": {
+              "slots": 27,
+              "minimum_size": 0
+            },
+            "unplaceable_partials": 0,
+            "tp1_hits_without_bank": 0,
+            "full_tp1_closes": 0,
+            "peak_positions": 4,
+            "peak_by_bot": {
+              "crypto": 4
+            },
+            "peak_reserved_margin_pct": 11.990260597247088,
+            "pnl_by_bot": {
+              "crypto": 5.304575893930197,
+              "stocks": 0
+            },
+            "return_contribution_pct": {
+              "crypto": 4.0804429953309205,
+              "stocks": 0.0
+            }
+          },
+          "calendar_months": {
+            "2026-07": {
+              "opening_cash": 130.0,
+              "closing_cash": 127.19734795678612,
+              "return_pct": -2.1558861870875967,
+              "cash_drawdown_pct": 4.648983168252764,
+              "return_contribution_pct": {
+                "crypto": -2.1558861870876473,
+                "stocks": 0.0
+              },
+              "entries": 148,
+              "rejected_by_account_guard": 0,
+              "closed": 148,
+              "winrate_pct": 67.56756756756756,
+              "bank_pnl": 8.976520260357248,
+              "runner_pnl": -11.779172303571189,
+              "tp1_unbanked": 0
+            },
+            "2026-08": {
+              "opening_cash": 127.19734795678606,
+              "closing_cash": 123.8320450514294,
+              "return_pct": -2.645733546661666,
+              "cash_drawdown_pct": 3.6552451823547916,
+              "return_contribution_pct": {
+                "crypto": -2.645733546661775,
+                "stocks": 0.0
+              },
+              "entries": 173,
+              "rejected_by_account_guard": 0,
+              "closed": 171,
+              "winrate_pct": 65.49707602339181,
+              "bank_pnl": 10.1382569182144,
+              "runner_pnl": -13.503559823571193,
+              "tp1_unbanked": 0
+            },
+            "2026-09": {
+              "opening_cash": 123.83204505142926,
+              "closing_cash": 125.70793693642968,
+              "return_pct": 1.5148678875660293,
+              "cash_drawdown_pct": 3.4022666999641555,
+              "return_contribution_pct": {
+                "crypto": 1.5148678875660857,
+                "stocks": 0.0
+              },
+              "entries": 240,
+              "rejected_by_account_guard": 0,
+              "closed": 240,
+              "winrate_pct": 69.58333333333333,
+              "bank_pnl": 14.253217789285879,
+              "runner_pnl": -12.51532104714255,
+              "tp1_unbanked": 0
+            },
+            "2026-10": {
+              "opening_cash": 125.70793693642973,
+              "closing_cash": 135.3045758939301,
+              "return_pct": 7.634075613183722,
+              "cash_drawdown_pct": 2.8772083690801256,
+              "return_contribution_pct": {
+                "crypto": 7.634075613183803,
+                "stocks": 0.0
+              },
+              "entries": 230,
+              "rejected_by_account_guard": 0,
+              "closed": 232,
+              "winrate_pct": 72.84482758620689,
+              "bank_pnl": 14.723020651071574,
+              "runner_pnl": -4.98838655071397,
+              "tp1_unbanked": 0
+            },
+            "2026-11": {
+              "opening_cash": 135.3045758939302,
+              "closing_cash": 135.3045758939302,
+              "return_pct": 0.0,
+              "cash_drawdown_pct": 0.0,
+              "return_contribution_pct": {
+                "crypto": 0.0,
+                "stocks": 0.0
+              },
+              "entries": 0,
+              "rejected_by_account_guard": 0,
+              "closed": 0,
+              "winrate_pct": null,
+              "bank_pnl": 0,
+              "runner_pnl": 0,
+              "tp1_unbanked": 0
+            }
+          }
+        }
+      }
+    }
+  },
+  "rule": "0.8\u20131.0% stop. Both last-closed BTC 1h and 4h returns oppose candidate direction.",
+  "extrapolated_family_proposals": 1552,
+  "reversal_proposals": 552,
+  "reversal_candidates_by_phase": {
+    "bull": 202,
+    "bear": 173,
+    "bear_rally": 93,
+    "bull_pullback": 84
+  },
+  "live_activation_supported": false,
+  "limitations": [
+    "The filter was motivated by two profitable hours in the newer public-book sample.",
+    "July\u2013October entries and causal phase measurements precede and do not overlap those hours.",
+    "Uses the original candle-based delayed stop and lot-rounded cash proxies.",
+    "A favorable result would need fresh entry and exit depth for execution validation."
+  ]
+}
