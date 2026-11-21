@@ -11,8 +11,9 @@ NUMERIC=frozenset('signal_bar_ts entry entry_time entry_reference_price entry_dr
     'btc_z20 btc_atr_pct btc_slow_long_atr btc_return96_atr btc_eff96 '
     'signal_open signal_high signal_low signal_close signal_volume '
     'reference_observed_at reference_bar_ts reference_volume reference_high reference_low reference_close '
-    'market_observed_at market_reference_price'.split())
-LABELS=frozenset('module family direction btc_regime utc_session reference_sample_kind market_sample_kind'.split())
+    'market_observed_at market_reference_price wick_btc_aligned_4h wick_directional_close wick_would_skip'.split())
+LABELS=frozenset('module family direction btc_regime utc_session reference_sample_kind market_sample_kind '
+    'wick_shadow_profile'.split())
 
 
 def forming_entry_evidence(candles, observed_at):

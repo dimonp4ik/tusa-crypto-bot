@@ -2817,6 +2817,40 @@ def weak_long_impulse_outcomes(since_ts: float) -> dict:
         return dict(row)
 
 
+def countertrend_wick_shadow_outcomes(since_ts: float) -> dict:
+    """Use the recorded decision snapshot and the linked paper signal outcome."""
+    with _conn() as c:
+        rows = c.execute("""
+            SELECT s.id AS signal_id, q.decision_context_json, s.realized_r
+              FROM signals AS s
+              JOIN setup_log AS q ON q.signal_id = s.id
+             WHERE q.source = 'venue_shadow_profit_first_2r' AND s.opened_at >= ?
+               AND q.decision_context_json IS NOT NULL
+             ORDER BY s.id, q.id
+        """, (since_ts,)).fetchall()
+    groups = {name: {"observed": 0, "resolved": 0, "total_r": 0.}
+              for name in ("kept", "would_skip")}
+    seen = set()
+    for row in rows:
+        if row["signal_id"] in seen:
+            continue
+        seen.add(row["signal_id"])
+        try:
+            evidence = json.loads(row["decision_context_json"])["decision_evidence"]
+            flag = evidence.get("wick_would_skip")
+            if evidence.get("wick_shadow_profile") != "countertrend_wick_v1" or flag not in (0, 1):
+                continue
+        except (ValueError, KeyError, TypeError, AttributeError):
+            continue
+        group = groups["would_skip" if flag else "kept"]
+        group["observed"] += 1
+        r = row["realized_r"]
+        if isinstance(r, (int, float)) and math.isfinite(r):
+            group["resolved"] += 1
+            group["total_r"] += r
+    return groups
+
+
 def model_quality_shadow_outcomes(since_ts: float) -> list[dict]:
     """Compare scored signals against the frozen July cutoff."""
     with _conn() as c:

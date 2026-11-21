@@ -46,6 +46,7 @@ from src.binance_client import (
 )
 from src.filter_variants import VARIANTS
 from src.crypto_venue_router import ROBUST_SYMBOLS, prequalified_2r_shadow_setups
+from src.crypto_wick_shadow import countertrend_wick_evidence
 from src.crypto_profit_first_material_shadow_router import (
     REQUIRED_BTC_HISTORY_BARS, REQUIRED_SYMBOL_HISTORY_BARS,
     shadow_setups as profit_first_material_shadow_setups,
@@ -836,7 +837,7 @@ def _crypto_scan_status_text() -> str:
 def status():
     deploy_sha = (os.getenv("RAILWAY_GIT_COMMIT_SHA")
                   or os.getenv("GIT_COMMIT_SHA") or "unknown")[:8]
-    from src.db import get_tp1_volume_forward_stats
+    from src.db import countertrend_wick_shadow_outcomes, get_tp1_volume_forward_stats
 
     try:
         tp1 = get_tp1_volume_forward_stats(since=1794009600)
@@ -850,6 +851,14 @@ def status():
         )
     except Exception:
         tp1_status = "TP1 next-open shadow: unavailable. "
+    try:
+        wick = countertrend_wick_shadow_outcomes(time.time() - 30 * 86400)
+        kept, skipped = wick["kept"], wick["would_skip"]
+        wick_status = (f"Countertrend wick shadow: kept {kept['resolved']}/{kept['observed']} closed "
+                       f"({kept['total_r']:+.2f}R), would skip {skipped['resolved']}/{skipped['observed']} closed "
+                       f"({skipped['total_r']:+.2f}R). ")
+    except Exception:
+        wick_status = "Countertrend wick shadow: unavailable. "
     return (f"Mode: {DEPLOYMENT_MODE}. Strategy: audited direct-venue router. "
             f"Build: {deploy_sha}. "
             f"Execution: {_execution_state_text()}. "
@@ -863,7 +872,7 @@ def status():
             f"{autotrader._shared_capacity.status_text()} "
             f"Persistent intent storage: {autotrader._shared_capacity.persistent_storage_ready()}. "
             f"Signal cache: {len(_signal_cache)} entries. "
-            f"{tp1_status}"
+            f"{tp1_status}{wick_status}"
             f"{_crypto_scan_status_text().replace(chr(10), ' | ')}"), 200
 
 
@@ -4743,6 +4752,7 @@ def _run_venue_strategy_scan(*, early: bool = False) -> None:
             raw_setups += len(rows)
             for row in rows:
                 row.update(reference_samples.get(symbol, {}))
+                row.update(countertrend_wick_evidence(candles, btc, row["direction"]))
                 # The 5m supplement already carries its own bar timestamp.
                 # Production 15m rows do not, so only fill a missing value.
                 row.setdefault("signal_bar_ts", candles["time"][-1])
