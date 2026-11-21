@@ -47,6 +47,7 @@ from src.binance_client import (
 from src.filter_variants import VARIANTS
 from src.crypto_venue_router import ROBUST_SYMBOLS, prequalified_2r_shadow_setups
 from src.crypto_wick_shadow import countertrend_wick_evidence
+from src.db import LOSS_PAUSE_RESEARCH_SOURCE, loss_pause_research_summary
 from src.crypto_profit_first_material_shadow_router import (
     REQUIRED_BTC_HISTORY_BARS, REQUIRED_SYMBOL_HISTORY_BARS,
     shadow_setups as profit_first_material_shadow_setups,
@@ -815,6 +816,8 @@ def _crypto_scan_status_text() -> str:
                     result += f" · пересчёт серии с {reset_text}"
                 else:
                     result += " · начался новый день UTC, серия проверится на следующем скане"
+            if row.get("strategy", {}).get("symbols_evaluated"):
+                result += f" · теневых сетапов за скан {row.get('pause_observed', 0)}"
         strategy = row.get("strategy") or {}
         timing = ""
         if row.get("entry_bar") and row.get("scan_started_at"):
@@ -867,6 +870,13 @@ def status():
                        f"({skipped['total_r']:+.2f}R). ")
     except Exception:
         wick_status = "Countertrend wick shadow: unavailable. "
+    try:
+        pause = loss_pause_research_summary(time.time() - 30 * 86400)
+        pause_status = (f"Loss-pause shadow: {pause['observed']} setups, {pause['with_book']} books, "
+                        f"{pause['priced']} modeled closes ({pause['total_r']:+.2f}R), "
+                        f"{pause['unpriced']} unpriced. ")
+    except Exception:
+        pause_status = "Loss-pause shadow: unavailable. "
     return (f"Mode: {DEPLOYMENT_MODE}. Strategy: audited direct-venue router. "
             f"Build: {deploy_sha}. "
             f"Execution: {_execution_state_text()}. "
@@ -880,7 +890,7 @@ def status():
             f"{autotrader._shared_capacity.status_text()} "
             f"Persistent intent storage: {autotrader._shared_capacity.persistent_storage_ready()}. "
             f"Signal cache: {len(_signal_cache)} entries. "
-            f"{tp1_status}{wick_status}"
+            f"{tp1_status}{wick_status}{pause_status}"
             f"{_crypto_scan_status_text().replace(chr(10), ' | ')}"), 200
 
 
@@ -4084,7 +4094,7 @@ def _check_open_signals():
 
 
 # ── Exact counterfactual tracker for blocked venue setups ────────────────────
-def _fixed_be_counterfactual(setup: dict, candles: dict):
+def _fixed_be_counterfactual(setup: dict, candles: dict, *, require_ordered_candles=False):
     """Replay a fixed-runner setup with breakeven active from the next bar.
 
     This mirrors the live monitor's stop-first ordering. On the candle that
@@ -4122,6 +4132,12 @@ def _fixed_be_counterfactual(setup: dict, candles: dict):
         stop_hit = (c <= active_stop if sign > 0 else c >= active_stop)
         if not stop_on_close:
             stop_hit = l <= active_stop if sign > 0 else h >= active_stop
+        target1_hit = h >= tp1 if sign > 0 else l <= tp1
+        target2_hit = h >= tp2 if sign > 0 else l <= tp2
+        if require_ordered_candles and (
+                (i == 0 and (stop_hit or target1_hit or target2_hit))
+                or (stop_hit and (target2_hit or (not reached and target1_hit)))):
+            return "UNVERIFIED_INTRABAR", 0, 0, None
         if stop_hit:
             fill = (min(o, active_stop) if sign > 0
                     else max(o, active_stop))
@@ -4129,14 +4145,12 @@ def _fixed_be_counterfactual(setup: dict, candles: dict):
             net_r = banked + (1.0 - fraction) * runner_r if reached else runner_r
             return ("TP1" if reached else "SL", int(reached), 0, net_r)
 
-        target2_hit = h >= tp2 if sign > 0 else l <= tp2
         if target2_hit:
             if not reached:
                 banked = fraction * tp1_r
             net_r = banked + (1.0 - fraction) * tp2_r
             return "TP2", 1, 1, net_r
 
-        target1_hit = h >= tp1 if sign > 0 else l <= tp1
         if not reached and target1_hit:
             reached = True
             activation_index = i
@@ -4182,7 +4196,11 @@ def _resolve_unsent_venue_setup(setup: dict, candles: dict,
 
     runner_mode = str(setup.get("strategy_runner_mode") or "").lower()
     if runner_mode == "fixed_be":
-        value = _fixed_be_counterfactual(setup, sliced)
+        pause_research = setup.get("source") == LOSS_PAUSE_RESEARCH_SOURCE
+        if pause_research and any(float(ts) != entry_bar + i * bar_seconds
+                                  for i, ts in enumerate(sliced["time"])):
+            return ("UNVERIFIED_GAP", 0, 0, None) if now >= entry_bar + max_bars * bar_seconds else None
+        value = _fixed_be_counterfactual(setup, sliced, require_ordered_candles=pause_research)
     else:
         result = simulate_exit(
             sliced, trade_indices,
@@ -4585,7 +4603,7 @@ def _persist_crypto_scan_audit(
         log.warning("Crypto scan audit persistence failed: %s", exc)
 
 
-def _run_venue_strategy_scan(*, early: bool = False) -> None:
+def _run_venue_strategy_scan(*, early: bool = False, observation_only: bool = False) -> None:
     """Fast deterministic path for the frozen X-Perp precision portfolio.
 
     It deliberately skips Claude, news scoring, legacy SMC and adaptive sizing.
@@ -4614,21 +4632,40 @@ def _run_venue_strategy_scan(*, early: bool = False) -> None:
         })
         log.warning("Venue scan disabled by REGIME_FILTER_MODE=off")
         return
-    if _venue_daily_loss_pause():
-        _persist_crypto_scan_audit({
-            "ts": time.time(), "result": "daily_loss_pause",
-            "loss_pause_streak": VENUE_LOSS_PAUSE_STREAK,
-            "targets": 0, "fetched": 0, "published": 0,
-        })
-        log.warning("Venue scan paused after %s consecutive UTC-day stops",
-                    VENUE_LOSS_PAUSE_STREAK)
-        return
+    loss_paused = observation_only or _venue_daily_loss_pause()
+    entry_bar = int(now_utc.timestamp()) // KLINES_INTERVAL_SEC * KLINES_INTERVAL_SEC
+
+    def record_scan(audit, state_key="crypto_scan_audit"):
+        if loss_paused:
+            audit = dict(audit, result="daily_loss_pause", pause_observation_result=audit["result"],
+                         loss_pause_streak=VENUE_LOSS_PAUSE_STREAK, entry_bar=entry_bar)
+        if observation_only:
+            # Market reads run without the live monitor lock. Recheck the
+            # pause while saving, so a late observation cannot replace a live
+            # scan recorded after recovery.
+            with _portfolio_state_lock:
+                if _venue_daily_loss_pause():
+                    _persist_crypto_scan_audit(audit, state_key)
+        else:
+            _persist_crypto_scan_audit(audit, state_key)
+
+    if loss_paused:
+        try:
+            last = json.loads(get_bot_state("crypto_scan_audit") or "{}")
+            if (last.get("result") == "daily_loss_pause" and last.get("entry_bar") == entry_bar
+                    and (last.get("strategy") or {}).get("symbols_evaluated")):
+                return
+        except (ValueError, AttributeError, TypeError):
+            pass
+        if now_utc.timestamp() - entry_bar >= _MAX_VENUE_ENTRY_DELAY_SEC:
+            record_scan(dict(ts=time.time(), result="waiting_fresh_bar", targets=0, fetched=0, published=0))
+            return
 
     instruments = get_xperp_instruments()
     available = set(instruments)
     symbols = _venue_scan_universe(available)
     if "BTCUSDT" not in symbols:
-        _persist_crypto_scan_audit({
+        record_scan({
             "ts": time.time(), "result": "btc_instrument_unavailable",
             "available_instruments": len(available), "targets": len(symbols),
             "fetched": 0, "published": 0,
@@ -4679,19 +4716,18 @@ def _run_venue_strategy_scan(*, early: bool = False) -> None:
             except Exception as exc:
                 log.warning("Venue candle fetch failed: %s", exc)
 
-    entry_bar = int(now_utc.timestamp()) // KLINES_INTERVAL_SEC * KLINES_INTERVAL_SEC
     if early and any(
             symbol not in market_prices
             or fetched[symbol]["time"][-1] + KLINES_INTERVAL_SEC != entry_bar
             for symbol in symbols):
-        _persist_crypto_scan_audit({
+        record_scan({
             "ts": time.time(), "result": "waiting_fresh_bar",
             "targets": len(symbols), "fetched": len(fetched), "published": 0,
         })
         return
     btc = fetched.get("BTCUSDT")
     if not btc:
-        _persist_crypto_scan_audit({
+        record_scan({
             "ts": time.time(), "result": "btc_history_unavailable",
             "available_instruments": len(available), "targets": len(symbols),
             "fetched": len(fetched), "published": 0,
@@ -4778,7 +4814,11 @@ def _run_venue_strategy_scan(*, early: bool = False) -> None:
                 # Production 15m rows do not, so only fill a missing value.
                 row.setdefault("signal_bar_ts", candles["time"][-1])
                 analysis = _venue_analysis(symbol, row)
-                setup_id = log_setup_candidate_once(analysis)
+                if loss_paused:
+                    analysis.update(source=LOSS_PAUSE_RESEARCH_SOURCE, _shadow_only=True)
+                    setup_id = log_setup_candidate_once(analysis, block_reason="daily_loss_pause")
+                else:
+                    setup_id = log_setup_candidate_once(analysis)
                 if not setup_id:
                     portfolio_rejects["duplicate_bar"] += 1
                     continue
@@ -4788,6 +4828,9 @@ def _run_venue_strategy_scan(*, early: bool = False) -> None:
                     mark_setup_blocked(setup_id, "cooldown")
                     continue
                 candidates.append((analysis, setup_id))
+
+            if loss_paused:
+                continue
 
             # The prequalified 2R union improved aggregate sealed checks but
             # missed the newest monthly non-inferiority gate.  Persist exact
@@ -4812,8 +4855,10 @@ def _run_venue_strategy_scan(*, early: bool = False) -> None:
             portfolio_rejects["strategy_error"] += 1
             log.warning("Venue strategy failed for %s: %s", symbol, exc)
     publish_rejects = {}
-    published = _publish_venue_candidates(
-        candidates, open_direction_counts, publish_rejects, instruments=instruments)
+    published = 0
+    if not loss_paused:
+        published = _publish_venue_candidates(
+            candidates, open_direction_counts, publish_rejects, instruments=instruments)
     _record_candidate_decision_books(candidates)
     now = time.time()
     symbol_lengths = [len(row.get("close") or []) for key, row in fetched.items()
@@ -4842,21 +4887,25 @@ def _run_venue_strategy_scan(*, early: bool = False) -> None:
         "raw_setups": raw_setups,
         "portfolio_rejects": portfolio_rejects,
         "publish_rejects": publish_rejects,
-        "publish_candidates": len(candidates),
+        "publish_candidates": 0 if loss_paused else len(candidates),
+        "pause_observed": len(candidates) if loss_paused else 0,
         "published": published,
         "open_long": open_direction_counts.get("LONG", 0),
         "open_short": open_direction_counts.get("SHORT", 0),
     }
-    if early:
+    if early and not loss_paused:
         set_bot_state("crypto_completed_early_bar", str(entry_bar))
-    _persist_crypto_scan_audit(audit)
+    record_scan(audit)
     if strategy_audit["symbols_evaluated"]:
-        _persist_crypto_scan_audit(audit, "crypto_decision_audit")
+        record_scan(audit, "crypto_decision_audit")
     _last_scan_stats.update(
         coins=len(fetched), setups=raw_setups, fresh=len(candidates),
         enriched=len(candidates), sent=published, ts=now)
     log.info("Venue scan complete: %s symbols, %s candidates, %s paper signals",
              len(symbols), len(candidates), published)
+
+
+_loss_pause_observer_lock = threading.Lock()
 
 
 def run_scan(early: bool = False):
@@ -4879,9 +4928,17 @@ def run_scan(early: bool = False):
             # admitting a new batch after stops or while positions are open.
             log.warning("Venue scan refused: open-signal reconciliation failed: %s", exc)
             return None
-        if early:
-            return _run_venue_strategy_scan(early=True)
-        return _run_venue_strategy_scan()
+        if not _venue_daily_loss_pause():
+            if early:
+                return _run_venue_strategy_scan(early=True)
+            return _run_venue_strategy_scan()
+
+    if not _loss_pause_observer_lock.acquire(blocking=False):
+        return None
+    try:
+        return _run_venue_strategy_scan(early=early, observation_only=True)
+    finally:
+        _loss_pause_observer_lock.release()
 
 
 # ── Morning digest ────────────────────────────────────────────────────────────

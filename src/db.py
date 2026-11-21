@@ -1728,7 +1728,10 @@ def log_setup_candidate(analysis: dict) -> int:
         return _insert_setup_candidate(c, values)
 
 
-def log_setup_candidate_once(analysis: dict) -> int | None:
+LOSS_PAUSE_RESEARCH_SOURCE = "venue_shadow_loss_pause_v1"
+
+
+def log_setup_candidate_once(analysis: dict, *, block_reason: str | None = None) -> int | None:
     """Atomically claim one regime setup per closed bar, including on restart.
 
     The old SELECT-then-INSERT used two connections.  A startup scan landing on
@@ -1737,6 +1740,8 @@ def log_setup_candidate_once(analysis: dict) -> int | None:
     """
     signal_bar_ts = analysis.get("signal_bar_ts")
     if signal_bar_ts is None:
+        if block_reason is not None:
+            raise ValueError("blocked setup requires a signal bar")
         return log_setup_candidate(analysis)
     values = _prepared_setup_candidate(analysis)
     with _conn() as c:
@@ -1749,7 +1754,10 @@ def log_setup_candidate_once(analysis: dict) -> int | None:
         ).fetchone()
         if row:
             return None
-        return _insert_setup_candidate(c, values)
+        setup_id = _insert_setup_candidate(c, values)
+        if block_reason is not None:
+            c.execute("UPDATE setup_log SET block_reason=? WHERE id=?", (block_reason, setup_id))
+        return setup_id
 
 
 def mark_setup_blocked(setup_log_id: int, reason: str) -> None:
@@ -2849,6 +2857,20 @@ def countertrend_wick_shadow_outcomes(since_ts: float) -> dict:
             group["resolved"] += 1
             group["total_r"] += r
     return groups
+
+
+def loss_pause_research_summary(since_ts: float) -> dict:
+    with _conn() as c:
+        row = c.execute("""
+            SELECT COUNT(*) AS observed,
+                   COUNT(CASE WHEN book_sample_kind='decision_snapshot' THEN book_spread_bps END) AS with_book,
+                   COUNT(net_r) AS priced, COUNT(CASE WHEN resolved=1 AND net_r IS NULL THEN 1 END) AS unpriced,
+                   COALESCE(SUM(net_r), 0) AS total_r
+              FROM setup_log
+             WHERE source=? AND block_reason='daily_loss_pause'
+               AND COALESCE(sent,0)=0 AND signal_id IS NULL AND ts>=?
+        """, (LOSS_PAUSE_RESEARCH_SOURCE, since_ts)).fetchone()
+    return dict(row)
 
 
 def model_quality_shadow_outcomes(since_ts: float) -> list[dict]:
