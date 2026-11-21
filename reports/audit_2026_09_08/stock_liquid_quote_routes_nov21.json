@@ -1,0 +1,870 @@
+{
+  "plan_sha256": "1cfc2e8c07199b9c0e6790766f20e056b9043c559dca5aced521bea456ae795d",
+  "capture_sha256": "42ce34576428d9caeed0b9e2988f83e908862938904ad635e723a12b8d76d243",
+  "count": {
+    "legacy_discovery": {
+      "native": {
+        "wide": 113,
+        "depth slippage exceeds limit": 30,
+        "qualified": 4,
+        "executable price outside signal bracket": 2,
+        "insufficient displayed depth": 2
+      },
+      "reversal_z1_25": {
+        "wide": 259,
+        "executable price outside signal bracket": 4,
+        "depth slippage exceeds limit": 81,
+        "insufficient displayed depth": 10,
+        "qualified": 13,
+        "no_stop_geometry": 1
+      },
+      "aligned_continuation": {
+        "wide": 383,
+        "no_stop_geometry": 108,
+        "depth slippage exceeds limit": 153,
+        "qualified": 59,
+        "insufficient displayed depth": 24
+      }
+    },
+    "contract_followup": {
+      "native": {
+        "wide": 2
+      },
+      "reversal_z1_25": {
+        "wide": 3,
+        "depth slippage exceeds limit": 1
+      },
+      "aligned_continuation": {
+        "no_stop_geometry": 6,
+        "qualified": 26,
+        "wide": 123,
+        "depth slippage exceeds limit": 40,
+        "insufficient displayed depth": 2
+      }
+    }
+  },
+  "tape": {
+    "MSTRUSDT": {
+      "error": "ValueError: trade catalogue is incomplete"
+    },
+    "GOOGLUSDT": {
+      "error": "ValueError: trade catalogue is incomplete"
+    },
+    "AMZNUSDT": {
+      "tape_trades": 2401,
+      "reconciled_bars": 154,
+      "mismatches": {}
+    },
+    "SNDKUSDT": {
+      "tape_trades": 16154,
+      "reconciled_bars": 64,
+      "mismatches": {}
+    },
+    "TSLAUSDT": {
+      "tape_trades": 4865,
+      "reconciled_bars": 209,
+      "mismatches": {}
+    },
+    "MUUSDT": {
+      "tape_trades": 2939,
+      "reconciled_bars": 64,
+      "mismatches": {}
+    },
+    "NVDAUSDT": {
+      "error": "ValueError: trade catalogue is incomplete"
+    },
+    "INTCUSDT": {
+      "error": "ValueError: trade catalogue is incomplete"
+    },
+    "MSFTUSDT": {
+      "tape_trades": 2303,
+      "reconciled_bars": 164,
+      "mismatches": {}
+    },
+    "SPCXUSDT": {
+      "error": "ValueError: trade catalogue is incomplete"
+    },
+    "CRCLUSDT": {
+      "error": "ValueError: trade catalogue is incomplete"
+    }
+  },
+  "close_book_checks": {
+    "1794960000:AMZNUSDT": {
+      "snapshot": 96,
+      "update": 304237,
+      "first_ts": 1794960000008,
+      "last_ts": 1795046399998
+    },
+    "1794960000:MSFTUSDT": {
+      "snapshot": 96,
+      "update": 315098,
+      "first_ts": 1794960000009,
+      "last_ts": 1795046398539
+    },
+    "1794960000:MUUSDT": {
+      "snapshot": 96,
+      "update": 1154707,
+      "first_ts": 1794960000008,
+      "last_ts": 1795046399998
+    },
+    "1794960000:SNDKUSDT": {
+      "snapshot": 96,
+      "update": 1241358,
+      "first_ts": 1794960000009,
+      "last_ts": 1795046399997
+    },
+    "1794960000:TSLAUSDT": {
+      "snapshot": 96,
+      "update": 736291,
+      "first_ts": 1794960000008,
+      "last_ts": 1795046399998
+    },
+    "1795046400:AMZNUSDT": {
+      "snapshot": 96,
+      "update": 359566,
+      "first_ts": 1795046400008,
+      "last_ts": 1795132799990
+    },
+    "1795046400:MSFTUSDT": {
+      "snapshot": 96,
+      "update": 353843,
+      "first_ts": 1795046400009,
+      "last_ts": 1795132791182
+    },
+    "1795046400:TSLAUSDT": {
+      "snapshot": 96,
+      "update": 670800,
+      "first_ts": 1795046400008,
+      "last_ts": 1795132799990
+    }
+  },
+  "close_book_files": {
+    "1794960000:AMZNUSDT": {
+      "path": "reports\\audit_2026_09_08\\okx_xperp_l2_nov19\\AMZN-USD_UM_XPERP-futureschain-L2orderbook-400lv-2026-11-18.tar.gz",
+      "sha256": "0306ce23577a07d3f4c2334aa81b0c136d8ca59ce1377964de75f631bfcd32c5",
+      "bytes": 3926639,
+      "catalogue": {
+        "dateTs": "1794960000000",
+        "filename": "AMZN-USD_UM_XPERP-futureschain-L2orderbook-400lv-2026-11-18.tar.gz",
+        "sizeMB": "3.74",
+        "url": "https://static.okx.com/cdn/okx/match/orderbook/pro/L2/400lv/daily/20261118/AMZN-USD_UM_XPERP-futureschain-L2orderbook-400lv-2026-11-18.tar.gz"
+      },
+      "instrument": "AMZN-USD_UM_XPERP-310613"
+    },
+    "1794960000:MSFTUSDT": {
+      "path": "reports\\audit_2026_09_08\\okx_xperp_l2_nov19\\MSFT-USD_UM_XPERP-futureschain-L2orderbook-400lv-2026-11-18.tar.gz",
+      "sha256": "06b330fada94f76f7115fdd7d52ad81598bacb79ace4cab9597c6ccc29832fc1",
+      "bytes": 4587686,
+      "catalogue": {
+        "dateTs": "1794960000000",
+        "filename": "MSFT-USD_UM_XPERP-futureschain-L2orderbook-400lv-2026-11-18.tar.gz",
+        "sizeMB": "4.38",
+        "url": "https://static.okx.com/cdn/okx/match/orderbook/pro/L2/400lv/daily/20261118/MSFT-USD_UM_XPERP-futureschain-L2orderbook-400lv-2026-11-18.tar.gz"
+      },
+      "instrument": "MSFT-USD_UM_XPERP-310613"
+    },
+    "1794960000:MUUSDT": {
+      "path": "reports\\audit_2026_09_08\\okx_xperp_l2_nov19\\MU-USD_UM_XPERP-futureschain-L2orderbook-400lv-2026-11-18.tar.gz",
+      "sha256": "ab39ecb1d5ea0c27baa0dedfa130448a3295c7c60ca73b791641afa2abc14646",
+      "bytes": 16629392,
+      "catalogue": {
+        "dateTs": "1794960000000",
+        "filename": "MU-USD_UM_XPERP-futureschain-L2orderbook-400lv-2026-11-18.tar.gz",
+        "sizeMB": "15.86",
+        "url": "https://static.okx.com/cdn/okx/match/orderbook/pro/L2/400lv/daily/20261118/MU-USD_UM_XPERP-futureschain-L2orderbook-400lv-2026-11-18.tar.gz"
+      },
+      "instrument": "MU-USD_UM_XPERP-310627"
+    },
+    "1794960000:SNDKUSDT": {
+      "path": "reports\\audit_2026_09_08\\okx_xperp_l2_nov19\\SNDK-USD_UM_XPERP-futureschain-L2orderbook-400lv-2026-11-18.tar.gz",
+      "sha256": "07bfebac9ec8791e93fa874a99e15ae44aebbad7236c672779631d534ca76cdf",
+      "bytes": 18415748,
+      "catalogue": {
+        "dateTs": "1794960000000",
+        "filename": "SNDK-USD_UM_XPERP-futureschain-L2orderbook-400lv-2026-11-18.tar.gz",
+        "sizeMB": "17.56",
+        "url": "https://static.okx.com/cdn/okx/match/orderbook/pro/L2/400lv/daily/20261118/SNDK-USD_UM_XPERP-futureschain-L2orderbook-400lv-2026-11-18.tar.gz"
+      },
+      "instrument": "SNDK-USD_UM_XPERP-310627"
+    },
+    "1794960000:TSLAUSDT": {
+      "path": "reports\\audit_2026_09_08\\okx_xperp_l2_nov19\\TSLA-USD_UM_XPERP-futureschain-L2orderbook-400lv-2026-11-18.tar.gz",
+      "sha256": "1339ab5a0d3ee8cedeb9af0877b4429c0e846422cc4c1266486ff55ced1a3db7",
+      "bytes": 9960245,
+      "catalogue": {
+        "dateTs": "1794960000000",
+        "filename": "TSLA-USD_UM_XPERP-futureschain-L2orderbook-400lv-2026-11-18.tar.gz",
+        "sizeMB": "9.5",
+        "url": "https://static.okx.com/cdn/okx/match/orderbook/pro/L2/400lv/daily/20261118/TSLA-USD_UM_XPERP-futureschain-L2orderbook-400lv-2026-11-18.tar.gz"
+      },
+      "instrument": "TSLA-USD_UM_XPERP-310613"
+    },
+    "1795046400:AMZNUSDT": {
+      "path": "reports\\audit_2026_09_08\\okx_xperp_l2_nov19\\AMZN-USD_UM_XPERP-futureschain-L2orderbook-400lv-2026-11-19.tar.gz",
+      "sha256": "91442362e62d9251b98fdb1f2de26443a50c16c299145b83658ac1a31901feef",
+      "bytes": 4772434,
+      "catalogue": {
+        "dateTs": "1795046400000",
+        "filename": "AMZN-USD_UM_XPERP-futureschain-L2orderbook-400lv-2026-11-19.tar.gz",
+        "sizeMB": "4.55",
+        "url": "https://static.okx.com/cdn/okx/match/orderbook/pro/L2/400lv/daily/20261119/AMZN-USD_UM_XPERP-futureschain-L2orderbook-400lv-2026-11-19.tar.gz"
+      },
+      "instrument": "AMZN-USD_UM_XPERP-310613"
+    },
+    "1795046400:MSFTUSDT": {
+      "path": "reports\\audit_2026_09_08\\okx_xperp_l2_nov19\\MSFT-USD_UM_XPERP-futureschain-L2orderbook-400lv-2026-11-19.tar.gz",
+      "sha256": "87b7f223dc0d5b4cb3c7d417948492abca3e7c794eee09510d158e250ac962aa",
+      "bytes": 5514273,
+      "catalogue": {
+        "dateTs": "1795046400000",
+        "filename": "MSFT-USD_UM_XPERP-futureschain-L2orderbook-400lv-2026-11-19.tar.gz",
+        "sizeMB": "5.26",
+        "url": "https://static.okx.com/cdn/okx/match/orderbook/pro/L2/400lv/daily/20261119/MSFT-USD_UM_XPERP-futureschain-L2orderbook-400lv-2026-11-19.tar.gz"
+      },
+      "instrument": "MSFT-USD_UM_XPERP-310613"
+    },
+    "1795046400:TSLAUSDT": {
+      "path": "reports\\audit_2026_09_08\\okx_xperp_l2_nov19\\TSLA-USD_UM_XPERP-futureschain-L2orderbook-400lv-2026-11-19.tar.gz",
+      "sha256": "769741d502a9f80bc8691a87553ad8e19d6ddd8a61c840a18f39fde5ec5393bb",
+      "bytes": 9406052,
+      "catalogue": {
+        "dateTs": "1795046400000",
+        "filename": "TSLA-USD_UM_XPERP-futureschain-L2orderbook-400lv-2026-11-19.tar.gz",
+        "sizeMB": "8.97",
+        "url": "https://static.okx.com/cdn/okx/match/orderbook/pro/L2/400lv/daily/20261119/TSLA-USD_UM_XPERP-futureschain-L2orderbook-400lv-2026-11-19.tar.gz"
+      },
+      "instrument": "TSLA-USD_UM_XPERP-310613"
+    }
+  },
+  "results": {
+    "legacy_discovery": {
+      "native|all": {
+        "status": "UNSCORABLE",
+        "symbol": "NVDAUSDT",
+        "entry_ms": 1794996032136,
+        "reason": "trade_archive_incomplete",
+        "qualified": 4,
+        "unknown_paths": [
+          [
+            "NVDAUSDT",
+            1794996032136,
+            "trade_archive_incomplete"
+          ],
+          [
+            "MSTRUSDT",
+            1795010431727,
+            "trade_archive_incomplete"
+          ],
+          [
+            "MSTRUSDT",
+            1795059031282,
+            "trade_archive_incomplete"
+          ],
+          [
+            "SPCXUSDT",
+            1795093234075,
+            "trade_archive_incomplete"
+          ]
+        ]
+      },
+      "native|regular": {
+        "status": "SCORED_PUBLIC_L2_SIMULATION",
+        "trades": 0,
+        "skipped": {},
+        "return_pct": 0.0,
+        "drawdown_pct": 0.0,
+        "contribution_pct": {
+          "crypto": 0.0,
+          "stocks": 0.0
+        },
+        "peak_reservations": 0,
+        "peak_margin_pct": 0.0,
+        "closed": [],
+        "qualified": 0,
+        "unknown_paths": []
+      },
+      "reversal_z1_25|all": {
+        "status": "UNSCORABLE",
+        "symbol": "NVDAUSDT",
+        "entry_ms": 1794985231842,
+        "reason": "trade_archive_incomplete",
+        "qualified": 13,
+        "unknown_paths": [
+          [
+            "NVDAUSDT",
+            1794985231842,
+            "trade_archive_incomplete"
+          ],
+          [
+            "NVDAUSDT",
+            1794986131875,
+            "trade_archive_incomplete"
+          ],
+          [
+            "NVDAUSDT",
+            1794987031721,
+            "trade_archive_incomplete"
+          ],
+          [
+            "NVDAUSDT",
+            1794995132032,
+            "trade_archive_incomplete"
+          ],
+          [
+            "NVDAUSDT",
+            1794996032136,
+            "trade_archive_incomplete"
+          ],
+          [
+            "MSTRUSDT",
+            1795009531675,
+            "trade_archive_incomplete"
+          ],
+          [
+            "MSTRUSDT",
+            1795010431727,
+            "trade_archive_incomplete"
+          ],
+          [
+            "MSTRUSDT",
+            1795059031282,
+            "trade_archive_incomplete"
+          ],
+          [
+            "SPCXUSDT",
+            1795093234075,
+            "trade_archive_incomplete"
+          ],
+          [
+            "MSTRUSDT",
+            1795096831877,
+            "trade_archive_incomplete"
+          ],
+          [
+            "INTCUSDT",
+            1795097730677,
+            "trade_archive_incomplete"
+          ]
+        ]
+      },
+      "reversal_z1_25|regular": {
+        "status": "SCORED_PUBLIC_L2_SIMULATION",
+        "trades": 1,
+        "skipped": {},
+        "return_pct": -0.10553846153846802,
+        "drawdown_pct": 0.10553846153846701,
+        "contribution_pct": {
+          "crypto": 0.0,
+          "stocks": -0.10553846153846351
+        },
+        "peak_reservations": 1,
+        "peak_margin_pct": 2.7701692307692314,
+        "closed": [
+          {
+            "symbol": "MSFTUSDT",
+            "bot": "stocks",
+            "entry_ms": 1795104931632,
+            "exit_ms": 1795107028493,
+            "code": "SL",
+            "entry_px": 514.46,
+            "qty": 0.07,
+            "bank_qty": 0.0,
+            "bank_px": null,
+            "runner_px": 512.5,
+            "bank_pnl": 0.0,
+            "runner_pnl": -0.13720000000000257
+          }
+        ],
+        "qualified": 1,
+        "unknown_paths": []
+      },
+      "aligned_continuation|all": {
+        "status": "UNSCORABLE",
+        "symbol": "MSTRUSDT",
+        "entry_ms": 1794954631997,
+        "reason": "trade_archive_incomplete",
+        "qualified": 59,
+        "unknown_paths": [
+          [
+            "MSTRUSDT",
+            1794954631997,
+            "trade_archive_incomplete"
+          ],
+          [
+            "GOOGLUSDT",
+            1794955530180,
+            "trade_archive_incomplete"
+          ],
+          [
+            "MSTRUSDT",
+            1794963631324,
+            "trade_archive_incomplete"
+          ],
+          [
+            "INTCUSDT",
+            1794985230325,
+            "trade_archive_incomplete"
+          ],
+          [
+            "NVDAUSDT",
+            1794985231842,
+            "trade_archive_incomplete"
+          ],
+          [
+            "NVDAUSDT",
+            1794986131875,
+            "trade_archive_incomplete"
+          ],
+          [
+            "NVDAUSDT",
+            1794987031721,
+            "trade_archive_incomplete"
+          ],
+          [
+            "NVDAUSDT",
+            1794991531730,
+            "trade_archive_incomplete"
+          ],
+          [
+            "INTCUSDT",
+            1794994230633,
+            "trade_archive_incomplete"
+          ],
+          [
+            "NVDAUSDT",
+            1794994232078,
+            "trade_archive_incomplete"
+          ],
+          [
+            "NVDAUSDT",
+            1794996032136,
+            "trade_archive_incomplete"
+          ],
+          [
+            "INTCUSDT",
+            1794999630628,
+            "trade_archive_incomplete"
+          ],
+          [
+            "INTCUSDT",
+            1795004130574,
+            "trade_archive_incomplete"
+          ],
+          [
+            "MSTRUSDT",
+            1795005931770,
+            "trade_archive_incomplete"
+          ],
+          [
+            "MSTRUSDT",
+            1795009531675,
+            "trade_archive_incomplete"
+          ],
+          [
+            "MSTRUSDT",
+            1795010431727,
+            "trade_archive_incomplete"
+          ],
+          [
+            "NVDAUSDT",
+            1795011332880,
+            "trade_archive_incomplete"
+          ],
+          [
+            "NVDAUSDT",
+            1795025732079,
+            "trade_archive_incomplete"
+          ],
+          [
+            "SPCXUSDT",
+            1795026634025,
+            "trade_archive_incomplete"
+          ],
+          [
+            "NVDAUSDT",
+            1795029332086,
+            "trade_archive_incomplete"
+          ],
+          [
+            "INTCUSDT",
+            1795035630527,
+            "trade_archive_incomplete"
+          ],
+          [
+            "NVDAUSDT",
+            1795038334526,
+            "trade_archive_incomplete"
+          ],
+          [
+            "GOOGLUSDT",
+            1795044630339,
+            "trade_archive_incomplete"
+          ],
+          [
+            "NVDAUSDT",
+            1795044632138,
+            "trade_archive_incomplete"
+          ],
+          [
+            "INTCUSDT",
+            1795045530586,
+            "trade_archive_incomplete"
+          ],
+          [
+            "GOOGLUSDT",
+            1795049129932,
+            "trade_archive_incomplete"
+          ],
+          [
+            "INTCUSDT",
+            1795049130229,
+            "trade_archive_incomplete"
+          ],
+          [
+            "MSTRUSDT",
+            1795049131279,
+            "trade_archive_incomplete"
+          ],
+          [
+            "INTCUSDT",
+            1795053630272,
+            "trade_archive_incomplete"
+          ],
+          [
+            "MSTRUSDT",
+            1795053631325,
+            "trade_archive_incomplete"
+          ],
+          [
+            "SPCXUSDT",
+            1795054533688,
+            "trade_archive_incomplete"
+          ],
+          [
+            "NVDAUSDT",
+            1795060831723,
+            "trade_archive_incomplete"
+          ],
+          [
+            "SPCXUSDT",
+            1795068933978,
+            "trade_archive_incomplete"
+          ],
+          [
+            "INTCUSDT",
+            1795070730478,
+            "trade_archive_incomplete"
+          ],
+          [
+            "CRCLUSDT",
+            1795071629471,
+            "trade_archive_incomplete"
+          ],
+          [
+            "GOOGLUSDT",
+            1795071630276,
+            "trade_archive_incomplete"
+          ],
+          [
+            "INTCUSDT",
+            1795071630575,
+            "trade_archive_incomplete"
+          ],
+          [
+            "INTCUSDT",
+            1795076130628,
+            "trade_archive_incomplete"
+          ],
+          [
+            "MSTRUSDT",
+            1795076131680,
+            "trade_archive_incomplete"
+          ],
+          [
+            "INTCUSDT",
+            1795086930528,
+            "trade_archive_incomplete"
+          ],
+          [
+            "NVDAUSDT",
+            1795114832138,
+            "trade_archive_incomplete"
+          ],
+          [
+            "NVDAUSDT",
+            1795118432038,
+            "trade_archive_incomplete"
+          ],
+          [
+            "SPCXUSDT",
+            1795120234183,
+            "trade_archive_incomplete"
+          ]
+        ]
+      },
+      "aligned_continuation|regular": {
+        "status": "UNSCORABLE",
+        "symbol": "NVDAUSDT",
+        "entry_ms": 1795025732079,
+        "reason": "trade_archive_incomplete",
+        "qualified": 14,
+        "unknown_paths": [
+          [
+            "NVDAUSDT",
+            1795025732079,
+            "trade_archive_incomplete"
+          ],
+          [
+            "SPCXUSDT",
+            1795026634025,
+            "trade_archive_incomplete"
+          ],
+          [
+            "NVDAUSDT",
+            1795029332086,
+            "trade_archive_incomplete"
+          ],
+          [
+            "NVDAUSDT",
+            1795114832138,
+            "trade_archive_incomplete"
+          ],
+          [
+            "NVDAUSDT",
+            1795118432038,
+            "trade_archive_incomplete"
+          ],
+          [
+            "SPCXUSDT",
+            1795120234183,
+            "trade_archive_incomplete"
+          ]
+        ]
+      }
+    },
+    "contract_followup": {
+      "native|all": {
+        "status": "SCORED_PUBLIC_L2_SIMULATION",
+        "trades": 0,
+        "skipped": {},
+        "return_pct": 0.0,
+        "drawdown_pct": 0.0,
+        "contribution_pct": {
+          "crypto": 0.0,
+          "stocks": 0.0
+        },
+        "peak_reservations": 0,
+        "peak_margin_pct": 0.0,
+        "closed": [],
+        "qualified": 0,
+        "unknown_paths": []
+      },
+      "native|regular": {
+        "status": "SCORED_PUBLIC_L2_SIMULATION",
+        "trades": 0,
+        "skipped": {},
+        "return_pct": 0.0,
+        "drawdown_pct": 0.0,
+        "contribution_pct": {
+          "crypto": 0.0,
+          "stocks": 0.0
+        },
+        "peak_reservations": 0,
+        "peak_margin_pct": 0.0,
+        "closed": [],
+        "qualified": 0,
+        "unknown_paths": []
+      },
+      "reversal_z1_25|all": {
+        "status": "SCORED_PUBLIC_L2_SIMULATION",
+        "trades": 0,
+        "skipped": {},
+        "return_pct": 0.0,
+        "drawdown_pct": 0.0,
+        "contribution_pct": {
+          "crypto": 0.0,
+          "stocks": 0.0
+        },
+        "peak_reservations": 0,
+        "peak_margin_pct": 0.0,
+        "closed": [],
+        "qualified": 0,
+        "unknown_paths": []
+      },
+      "reversal_z1_25|regular": {
+        "status": "SCORED_PUBLIC_L2_SIMULATION",
+        "trades": 0,
+        "skipped": {},
+        "return_pct": 0.0,
+        "drawdown_pct": 0.0,
+        "contribution_pct": {
+          "crypto": 0.0,
+          "stocks": 0.0
+        },
+        "peak_reservations": 0,
+        "peak_margin_pct": 0.0,
+        "closed": [],
+        "qualified": 0,
+        "unknown_paths": []
+      },
+      "aligned_continuation|all": {
+        "status": "UNSCORABLE",
+        "symbol": "INTCUSDT",
+        "entry_ms": 1795123976527,
+        "reason": "trade_archive_incomplete",
+        "qualified": 26,
+        "unknown_paths": [
+          [
+            "INTCUSDT",
+            1795123976527,
+            "trade_archive_incomplete"
+          ],
+          [
+            "NVDAUSDT",
+            1795123978028,
+            "trade_archive_incomplete"
+          ],
+          [
+            "SPCXUSDT",
+            1795123979977,
+            "trade_archive_incomplete"
+          ],
+          [
+            "INTCUSDT",
+            1795124730528,
+            "trade_archive_incomplete"
+          ],
+          [
+            "SPCXUSDT",
+            1795130133981,
+            "trade_archive_incomplete"
+          ],
+          [
+            "MSTRUSDT",
+            1795131031524,
+            "trade_archive_incomplete"
+          ],
+          [
+            "NVDAUSDT",
+            1795131031981,
+            "trade_archive_incomplete"
+          ],
+          [
+            "SPCXUSDT",
+            1795131033932,
+            "trade_archive_incomplete"
+          ],
+          [
+            "INTCUSDT",
+            1795139130225,
+            "trade_archive_incomplete"
+          ],
+          [
+            "MSTRUSDT",
+            1795139131276,
+            "trade_archive_incomplete"
+          ],
+          [
+            "NVDAUSDT",
+            1795139131726,
+            "trade_archive_incomplete"
+          ],
+          [
+            "INTCUSDT",
+            1795140030226,
+            "trade_archive_incomplete"
+          ],
+          [
+            "SPCXUSDT",
+            1795140033678,
+            "trade_archive_incomplete"
+          ],
+          [
+            "CRCLUSDT",
+            1795148129170,
+            "trade_archive_incomplete"
+          ],
+          [
+            "MSTRUSDT",
+            1795148131268,
+            "trade_archive_incomplete"
+          ],
+          [
+            "GOOGLUSDT",
+            1795149029873,
+            "trade_archive_incomplete"
+          ],
+          [
+            "INTCUSDT",
+            1795149030189,
+            "trade_archive_incomplete"
+          ],
+          [
+            "MSTRUSDT",
+            1795149031224,
+            "trade_archive_incomplete"
+          ],
+          [
+            "NVDAUSDT",
+            1795149031672,
+            "trade_archive_incomplete"
+          ],
+          [
+            "SPCXUSDT",
+            1795149033624,
+            "trade_archive_incomplete"
+          ],
+          [
+            "INTCUSDT",
+            1795150830276,
+            "trade_archive_incomplete"
+          ],
+          [
+            "INTCUSDT",
+            1795151730229,
+            "trade_archive_incomplete"
+          ],
+          [
+            "CRCLUSDT",
+            1795157129276,
+            "trade_archive_incomplete"
+          ],
+          [
+            "NVDAUSDT",
+            1795159831775,
+            "trade_archive_incomplete"
+          ],
+          [
+            "SPCXUSDT",
+            1795159833724,
+            "trade_archive_incomplete"
+          ]
+        ]
+      },
+      "aligned_continuation|regular": {
+        "status": "SCORED_PUBLIC_L2_SIMULATION",
+        "trades": 0,
+        "skipped": {},
+        "return_pct": 0.0,
+        "drawdown_pct": 0.0,
+        "contribution_pct": {
+          "crypto": 0.0,
+          "stocks": 0.0
+        },
+        "peak_reservations": 0,
+        "peak_margin_pct": 0.0,
+        "closed": [],
+        "qualified": 0,
+        "unknown_paths": []
+      }
+    }
+  },
+  "live_activation_supported": false,
+  "limitations": [
+    "Separate stock-only account scenarios at 3% margin and 10x.",
+    "Readiness assumed for the funding experiment. Actual order readiness remains gated.",
+    "Public entry depth and public last-trade exit triggers followed by an archived market book at +200ms.",
+    "Legacy sample uses base volume and later sample uses contract volume.",
+    "Only mature proposals from the defined archives. Costs outside visible execution and floating equity excluded."
+  ]
+}

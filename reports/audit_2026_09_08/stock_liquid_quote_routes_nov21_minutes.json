@@ -1,0 +1,1705 @@
+{
+  "plan_sha256": "1cfc2e8c07199b9c0e6790766f20e056b9043c559dca5aced521bea456ae795d",
+  "minute_sources": {
+    "AMZN-USD_UM_XPERP-310613": [
+      "cc440b294b1a099f63946f9bc98e37c3b9e2fa85dbaec28b83037972377315f0",
+      "3e2460f6ee13f6529edad6e3e5e2f98bacc1dff717203d171acabb951780afef",
+      "928ac1dace2116ad2d66266575a20491ff08d522750dd0141a18fc30ff074bb9"
+    ],
+    "CRCL-USD_UM_XPERP-310704": [
+      "1015eda7c7d01f0d5c6b1981daf5741563176a6249d025bb7ac9a361d77f1f17",
+      "f12951156198928dc4b278483f6e5c92bea3e46eeaff7b8932410fcd388a4685"
+    ],
+    "GOOGL-USD_UM_XPERP-310613": [
+      "401bf531c6a0090b8de504b4d6c64d7aff7b55097dfeae1e68d33dcee82b59d2",
+      "7b74f8c3915036c7552887b475219330f0320ead1c61112e306ab82b38d853bc",
+      "94653452167132f61986f188afc86fec37e808bacc73b6c63ce0c3c367310a73"
+    ],
+    "INTC-USD_UM_XPERP-310627": [
+      "0500ca22b6de3c41b914c281c169ccf40200c98921a2c441e666176e0e87a446",
+      "62eaa086d4e933286ef49e4ce798324cdcc6a970c10d17cba7b2471ef6e44441",
+      "b9b42d39c89696faa6fdf5e21de5baa76cb3767dfa4191c30fc46d23ba7f23e5"
+    ],
+    "MSFT-USD_UM_XPERP-310613": [
+      "e99a8df17e8769f2126acb20c87f2f661681d2ebaca489cbb1d276c02b56b4aa",
+      "7b9723d3e2232626ecb4bdb185390f6052da1ee9e9fa4fbf792b131fb7c37c34"
+    ],
+    "MSTR-USD_UM_XPERP-310704": [
+      "f3700300390bdc1e47d5a6791cef2c518819db580e4c73672c3ca600171e33bc",
+      "0d5a68216f96c7a254d412b32ca3a8803d8da9ab2ba477d4ce28befa96f2742a",
+      "dc34c1ee050845d432487b553d4159b21f6a3613ee32bb7b7e27b67258d205cd"
+    ],
+    "MU-USD_UM_XPERP-310627": [
+      "d5d1c43a53bc1b6bd08cbb456f26380a28432c045c0b176da85e639915f5323e"
+    ],
+    "NVDA-USD_UM_XPERP-310613": [
+      "ca7b447e683c6335f1ba08f43b126257def2f91891445d18d72cf2e48feb355b",
+      "beb49d94f9fcf6f1d76c48193fc58f9004f1db34a79dc458df3154c4e193b500",
+      "42919e6984244d2450870ac4f848ec3ded3f62ea9d13c66e3171e5ea59d4c409"
+    ],
+    "SNDK-USD_UM_XPERP-310627": [
+      "46ab928610465a765479ce83310b23495717000b25544703add23ddf4f178ca4"
+    ],
+    "SPCX-USD_UM_XPERP-310613": [
+      "9d889c3e01e77f17743dbee6af64bd28ec2adf14280cdaac9e81057873d81d43",
+      "261ae524db3f43b94425fcbed689bf708087bd71efec287cd3cb4e7983f6988e",
+      "375f39a62f0d3fb1b66795477e783b856a1b49431094fcf183b717c345bd26f6"
+    ],
+    "TSLA-USD_UM_XPERP-310613": [
+      "3a546e639dc26c85e2b9442c26fb6990d47c2c50395cb1c028b79ac2e4041932",
+      "da4cd958d9ab2a0dda63e0f676d1ebb5733f88474993b76a93daece708ab8aae",
+      "529e76d70ebd494dd689cfdd19a7b6af147ddd91e876b2ed50498a638e5605b1"
+    ]
+  },
+  "aggregates": {
+    "legacy_discovery": {
+      "native|all": {
+        "qualified": 4,
+        "scored": 4,
+        "wins": 1,
+        "mean_price_pct": 0.5064944147655015,
+        "exits": {
+          "SL": 2,
+          "TARGET": 1,
+          "SL_GAP": 1
+        }
+      },
+      "native|regular": {
+        "qualified": 0,
+        "scored": 0,
+        "wins": 0,
+        "mean_price_pct": null,
+        "exits": {}
+      },
+      "reversal_z1_25|all": {
+        "qualified": 13,
+        "scored": 13,
+        "wins": 3,
+        "mean_price_pct": 0.3834062798906293,
+        "exits": {
+          "SL": 9,
+          "TARGET": 3,
+          "SL_GAP": 1
+        }
+      },
+      "reversal_z1_25|regular": {
+        "qualified": 1,
+        "scored": 1,
+        "wins": 0,
+        "mean_price_pct": -0.3207246433153399,
+        "exits": {
+          "SL": 1
+        }
+      },
+      "aligned_continuation|all": {
+        "qualified": 59,
+        "scored": 59,
+        "wins": 21,
+        "mean_price_pct": 0.1487622288088269,
+        "exits": {
+          "SL_GAP": 14,
+          "TARGET": 21,
+          "SL": 24
+        }
+      },
+      "aligned_continuation|regular": {
+        "qualified": 14,
+        "scored": 14,
+        "wins": 6,
+        "mean_price_pct": 0.29256604664497804,
+        "exits": {
+          "TARGET": 6,
+          "SL_GAP": 4,
+          "SL": 4
+        }
+      }
+    },
+    "contract_followup": {
+      "native|all": {
+        "qualified": 0,
+        "scored": 0,
+        "wins": 0,
+        "mean_price_pct": null,
+        "exits": {}
+      },
+      "native|regular": {
+        "qualified": 0,
+        "scored": 0,
+        "wins": 0,
+        "mean_price_pct": null,
+        "exits": {}
+      },
+      "reversal_z1_25|all": {
+        "qualified": 0,
+        "scored": 0,
+        "wins": 0,
+        "mean_price_pct": null,
+        "exits": {}
+      },
+      "reversal_z1_25|regular": {
+        "qualified": 0,
+        "scored": 0,
+        "wins": 0,
+        "mean_price_pct": null,
+        "exits": {}
+      },
+      "aligned_continuation|all": {
+        "qualified": 26,
+        "scored": 26,
+        "wins": 16,
+        "mean_price_pct": 0.8333789686590086,
+        "exits": {
+          "SL_GAP": 4,
+          "SL": 6,
+          "TARGET": 16
+        }
+      },
+      "aligned_continuation|regular": {
+        "qualified": 0,
+        "scored": 0,
+        "wins": 0,
+        "mean_price_pct": null,
+        "exits": {}
+      }
+    }
+  },
+  "results": [
+    {
+      "cohort": "legacy_discovery",
+      "route": "aligned_continuation",
+      "symbol": "AMZNUSDT",
+      "phase": "postmarket",
+      "direction": "LONG",
+      "entry_ms": 1794957328238,
+      "path": {
+        "known": true,
+        "outcome": "SL_GAP",
+        "fill_reference": 259.52,
+        "exit_time": 1794964200
+      },
+      "price_return": -0.005975180021449367
+    },
+    {
+      "cohort": "legacy_discovery",
+      "route": "aligned_continuation",
+      "symbol": "AMZNUSDT",
+      "phase": "premarket",
+      "direction": "LONG",
+      "entry_ms": 1795084228478,
+      "path": {
+        "known": true,
+        "outcome": "SL_GAP",
+        "fill_reference": 273.31,
+        "exit_time": 1795094940
+      },
+      "price_return": -0.0037181496737505038
+    },
+    {
+      "cohort": "legacy_discovery",
+      "route": "reversal_z1_25",
+      "symbol": "AMZNUSDT",
+      "phase": "premarket",
+      "direction": "LONG",
+      "entry_ms": 1795096828582,
+      "path": {
+        "known": true,
+        "outcome": "SL",
+        "fill_reference": 271.34,
+        "exit_time": 1795099140
+      },
+      "price_return": -0.0028663824783184966
+    },
+    {
+      "cohort": "legacy_discovery",
+      "route": "aligned_continuation",
+      "symbol": "AMZNUSDT",
+      "phase": "regular",
+      "direction": "SHORT",
+      "entry_ms": 1795107628371,
+      "path": {
+        "known": true,
+        "outcome": "TARGET",
+        "fill_reference": 261.26,
+        "exit_time": 1795111740
+      },
+      "price_return": 0.01929429429429419
+    },
+    {
+      "cohort": "legacy_discovery",
+      "route": "aligned_continuation",
+      "symbol": "CRCLUSDT",
+      "phase": "other",
+      "direction": "LONG",
+      "entry_ms": 1795071629471,
+      "path": {
+        "known": true,
+        "outcome": "TARGET",
+        "fill_reference": 55.9,
+        "exit_time": 1795098660
+      },
+      "price_return": 0.019328956965718458
+    },
+    {
+      "cohort": "contract_followup",
+      "route": "aligned_continuation",
+      "symbol": "CRCLUSDT",
+      "phase": "other",
+      "direction": "SHORT",
+      "entry_ms": 1795148129170,
+      "path": {
+        "known": true,
+        "outcome": "SL_GAP",
+        "fill_reference": 51.52,
+        "exit_time": 1795171560
+      },
+      "price_return": -0.01178318931657496
+    },
+    {
+      "cohort": "contract_followup",
+      "route": "aligned_continuation",
+      "symbol": "CRCLUSDT",
+      "phase": "other",
+      "direction": "SHORT",
+      "entry_ms": 1795157129276,
+      "path": {
+        "known": true,
+        "outcome": "SL_GAP",
+        "fill_reference": 51.21,
+        "exit_time": 1795162200
+      },
+      "price_return": -0.004708652148322612
+    },
+    {
+      "cohort": "legacy_discovery",
+      "route": "aligned_continuation",
+      "symbol": "GOOGLUSDT",
+      "phase": "postmarket",
+      "direction": "LONG",
+      "entry_ms": 1794955530180,
+      "path": {
+        "known": true,
+        "outcome": "SL_GAP",
+        "fill_reference": 280.83,
+        "exit_time": 1794970440
+      },
+      "price_return": -0.009329284673434635
+    },
+    {
+      "cohort": "legacy_discovery",
+      "route": "aligned_continuation",
+      "symbol": "GOOGLUSDT",
+      "phase": "postmarket",
+      "direction": "LONG",
+      "entry_ms": 1795044630339,
+      "path": {
+        "known": true,
+        "outcome": "TARGET",
+        "fill_reference": 291.19,
+        "exit_time": 1795080120
+      },
+      "price_return": 0.019798059256784795
+    },
+    {
+      "cohort": "legacy_discovery",
+      "route": "aligned_continuation",
+      "symbol": "GOOGLUSDT",
+      "phase": "postmarket",
+      "direction": "LONG",
+      "entry_ms": 1795049129932,
+      "path": {
+        "known": true,
+        "outcome": "SL",
+        "fill_reference": 285.22,
+        "exit_time": 1795051920
+      },
+      "price_return": -0.006202090592334453
+    },
+    {
+      "cohort": "legacy_discovery",
+      "route": "aligned_continuation",
+      "symbol": "GOOGLUSDT",
+      "phase": "other",
+      "direction": "LONG",
+      "entry_ms": 1795071630276,
+      "path": {
+        "known": true,
+        "outcome": "TARGET",
+        "fill_reference": 294.85,
+        "exit_time": 1795098480
+      },
+      "price_return": 0.019509535335266115
+    },
+    {
+      "cohort": "contract_followup",
+      "route": "aligned_continuation",
+      "symbol": "GOOGLUSDT",
+      "phase": "other",
+      "direction": "SHORT",
+      "entry_ms": 1795149029873,
+      "path": {
+        "known": true,
+        "outcome": "SL",
+        "fill_reference": 273.91,
+        "exit_time": 1795166520
+      },
+      "price_return": -0.00507683396367864
+    },
+    {
+      "cohort": "legacy_discovery",
+      "route": "aligned_continuation",
+      "symbol": "INTCUSDT",
+      "phase": "other",
+      "direction": "LONG",
+      "entry_ms": 1794985230325,
+      "path": {
+        "known": true,
+        "outcome": "SL",
+        "fill_reference": 55.81,
+        "exit_time": 1795000260
+      },
+      "price_return": -0.0032148597963922443
+    },
+    {
+      "cohort": "legacy_discovery",
+      "route": "aligned_continuation",
+      "symbol": "INTCUSDT",
+      "phase": "premarket",
+      "direction": "LONG",
+      "entry_ms": 1794994230633,
+      "path": {
+        "known": true,
+        "outcome": "SL_GAP",
+        "fill_reference": 55.88,
+        "exit_time": 1795000200
+      },
+      "price_return": -0.009746588693957059
+    },
+    {
+      "cohort": "legacy_discovery",
+      "route": "aligned_continuation",
+      "symbol": "INTCUSDT",
+      "phase": "premarket",
+      "direction": "LONG",
+      "entry_ms": 1794999630628,
+      "path": {
+        "known": true,
+        "outcome": "SL_GAP",
+        "fill_reference": 55.88,
+        "exit_time": 1795000200
+      },
+      "price_return": -0.006047669868374128
+    },
+    {
+      "cohort": "legacy_discovery",
+      "route": "aligned_continuation",
+      "symbol": "INTCUSDT",
+      "phase": "premarket",
+      "direction": "SHORT",
+      "entry_ms": 1795004130574,
+      "path": {
+        "known": true,
+        "outcome": "SL",
+        "fill_reference": 55.91,
+        "exit_time": 1795012320
+      },
+      "price_return": -0.007205908845252962
+    },
+    {
+      "cohort": "legacy_discovery",
+      "route": "aligned_continuation",
+      "symbol": "INTCUSDT",
+      "phase": "postmarket",
+      "direction": "LONG",
+      "entry_ms": 1795035630527,
+      "path": {
+        "known": true,
+        "outcome": "TARGET",
+        "fill_reference": 55.82,
+        "exit_time": 1795048320
+      },
+      "price_return": 0.021222100256128806
+    },
+    {
+      "cohort": "legacy_discovery",
+      "route": "aligned_continuation",
+      "symbol": "INTCUSDT",
+      "phase": "postmarket",
+      "direction": "LONG",
+      "entry_ms": 1795045530586,
+      "path": {
+        "known": true,
+        "outcome": "SL_GAP",
+        "fill_reference": 55.0,
+        "exit_time": 1795058100
+      },
+      "price_return": -0.011324824734855521
+    },
+    {
+      "cohort": "legacy_discovery",
+      "route": "aligned_continuation",
+      "symbol": "INTCUSDT",
+      "phase": "postmarket",
+      "direction": "LONG",
+      "entry_ms": 1795049130229,
+      "path": {
+        "known": true,
+        "outcome": "SL_GAP",
+        "fill_reference": 55.47,
+        "exit_time": 1795051500
+      },
+      "price_return": -0.012110418521816602
+    },
+    {
+      "cohort": "legacy_discovery",
+      "route": "aligned_continuation",
+      "symbol": "INTCUSDT",
+      "phase": "other",
+      "direction": "LONG",
+      "entry_ms": 1795053630272,
+      "path": {
+        "known": true,
+        "outcome": "SL",
+        "fill_reference": 55.08,
+        "exit_time": 1795057860
+      },
+      "price_return": -0.011308562197092087
+    },
+    {
+      "cohort": "legacy_discovery",
+      "route": "aligned_continuation",
+      "symbol": "INTCUSDT",
+      "phase": "other",
+      "direction": "LONG",
+      "entry_ms": 1795070730478,
+      "path": {
+        "known": true,
+        "outcome": "TARGET",
+        "fill_reference": 57.53,
+        "exit_time": 1795088100
+      },
+      "price_return": 0.01949317738791434
+    },
+    {
+      "cohort": "legacy_discovery",
+      "route": "aligned_continuation",
+      "symbol": "INTCUSDT",
+      "phase": "other",
+      "direction": "LONG",
+      "entry_ms": 1795071630575,
+      "path": {
+        "known": true,
+        "outcome": "TARGET",
+        "fill_reference": 57.61,
+        "exit_time": 1795098480
+      },
+      "price_return": 0.01784452296819783
+    },
+    {
+      "cohort": "legacy_discovery",
+      "route": "aligned_continuation",
+      "symbol": "INTCUSDT",
+      "phase": "other",
+      "direction": "LONG",
+      "entry_ms": 1795076130628,
+      "path": {
+        "known": true,
+        "outcome": "SL",
+        "fill_reference": 56.59,
+        "exit_time": 1795080480
+      },
+      "price_return": -0.004223121590709034
+    },
+    {
+      "cohort": "legacy_discovery",
+      "route": "aligned_continuation",
+      "symbol": "INTCUSDT",
+      "phase": "premarket",
+      "direction": "LONG",
+      "entry_ms": 1795086930528,
+      "path": {
+        "known": true,
+        "outcome": "SL_GAP",
+        "fill_reference": 57.04,
+        "exit_time": 1795090740
+      },
+      "price_return": -0.0034940600978337066
+    },
+    {
+      "cohort": "legacy_discovery",
+      "route": "reversal_z1_25",
+      "symbol": "INTCUSDT",
+      "phase": "premarket",
+      "direction": "SHORT",
+      "entry_ms": 1795097730677,
+      "path": {
+        "known": true,
+        "outcome": "SL",
+        "fill_reference": 57.64,
+        "exit_time": 1795098540
+      },
+      "price_return": -0.00400627068454984
+    },
+    {
+      "cohort": "contract_followup",
+      "route": "aligned_continuation",
+      "symbol": "INTCUSDT",
+      "phase": "postmarket",
+      "direction": "SHORT",
+      "entry_ms": 1795123976527,
+      "path": {
+        "known": true,
+        "outcome": "TARGET",
+        "fill_reference": 54.17,
+        "exit_time": 1795139580
+      },
+      "price_return": 0.015857773163768463
+    },
+    {
+      "cohort": "contract_followup",
+      "route": "aligned_continuation",
+      "symbol": "INTCUSDT",
+      "phase": "postmarket",
+      "direction": "SHORT",
+      "entry_ms": 1795124730528,
+      "path": {
+        "known": true,
+        "outcome": "TARGET",
+        "fill_reference": 53.87,
+        "exit_time": 1795142160
+      },
+      "price_return": 0.019832605531295622
+    },
+    {
+      "cohort": "contract_followup",
+      "route": "aligned_continuation",
+      "symbol": "INTCUSDT",
+      "phase": "other",
+      "direction": "SHORT",
+      "entry_ms": 1795139130225,
+      "path": {
+        "known": true,
+        "outcome": "TARGET",
+        "fill_reference": 53.15,
+        "exit_time": 1795167060
+      },
+      "price_return": 0.020405476566613956
+    },
+    {
+      "cohort": "contract_followup",
+      "route": "aligned_continuation",
+      "symbol": "INTCUSDT",
+      "phase": "other",
+      "direction": "SHORT",
+      "entry_ms": 1795140030226,
+      "path": {
+        "known": true,
+        "outcome": "SL_GAP",
+        "fill_reference": 54.93,
+        "exit_time": 1795147080
+      },
+      "price_return": -0.01652302648971604
+    },
+    {
+      "cohort": "contract_followup",
+      "route": "aligned_continuation",
+      "symbol": "INTCUSDT",
+      "phase": "other",
+      "direction": "SHORT",
+      "entry_ms": 1795149030189,
+      "path": {
+        "known": true,
+        "outcome": "TARGET",
+        "fill_reference": 53.4,
+        "exit_time": 1795166280
+      },
+      "price_return": 0.0205429200293471
+    },
+    {
+      "cohort": "contract_followup",
+      "route": "aligned_continuation",
+      "symbol": "INTCUSDT",
+      "phase": "other",
+      "direction": "SHORT",
+      "entry_ms": 1795150830276,
+      "path": {
+        "known": true,
+        "outcome": "TARGET",
+        "fill_reference": 53.18,
+        "exit_time": 1795167060
+      },
+      "price_return": 0.020239505198052288
+    },
+    {
+      "cohort": "contract_followup",
+      "route": "aligned_continuation",
+      "symbol": "INTCUSDT",
+      "phase": "other",
+      "direction": "SHORT",
+      "entry_ms": 1795151730229,
+      "path": {
+        "known": true,
+        "outcome": "SL_GAP",
+        "fill_reference": 54.49,
+        "exit_time": 1795161180
+      },
+      "price_return": -0.010196514645902877
+    },
+    {
+      "cohort": "legacy_discovery",
+      "route": "aligned_continuation",
+      "symbol": "MSFTUSDT",
+      "phase": "regular",
+      "direction": "SHORT",
+      "entry_ms": 1795016731582,
+      "path": {
+        "known": true,
+        "outcome": "SL_GAP",
+        "fill_reference": 507.5,
+        "exit_time": 1795026780
+      },
+      "price_return": -0.011843049684983065
+    },
+    {
+      "cohort": "legacy_discovery",
+      "route": "aligned_continuation",
+      "symbol": "MSFTUSDT",
+      "phase": "regular",
+      "direction": "SHORT",
+      "entry_ms": 1795020331479,
+      "path": {
+        "known": true,
+        "outcome": "SL",
+        "fill_reference": 504.88,
+        "exit_time": 1795025100
+      },
+      "price_return": -0.006198058871594636
+    },
+    {
+      "cohort": "legacy_discovery",
+      "route": "aligned_continuation",
+      "symbol": "MSFTUSDT",
+      "phase": "premarket",
+      "direction": "LONG",
+      "entry_ms": 1795093231531,
+      "path": {
+        "known": true,
+        "outcome": "TARGET",
+        "fill_reference": 525.72,
+        "exit_time": 1795099860
+      },
+      "price_return": 0.01956829509532043
+    },
+    {
+      "cohort": "legacy_discovery",
+      "route": "aligned_continuation",
+      "symbol": "MSFTUSDT",
+      "phase": "regular",
+      "direction": "LONG",
+      "entry_ms": 1795099531580,
+      "path": {
+        "known": true,
+        "outcome": "SL",
+        "fill_reference": 515.67,
+        "exit_time": 1795102680
+      },
+      "price_return": -0.015051093496323165
+    },
+    {
+      "cohort": "legacy_discovery",
+      "route": "reversal_z1_25",
+      "symbol": "MSFTUSDT",
+      "phase": "regular",
+      "direction": "LONG",
+      "entry_ms": 1795104931632,
+      "path": {
+        "known": true,
+        "outcome": "SL",
+        "fill_reference": 512.81,
+        "exit_time": 1795107060
+      },
+      "price_return": -0.003207246433153399
+    },
+    {
+      "cohort": "legacy_discovery",
+      "route": "aligned_continuation",
+      "symbol": "MSFTUSDT",
+      "phase": "regular",
+      "direction": "SHORT",
+      "entry_ms": 1795104931632,
+      "path": {
+        "known": true,
+        "outcome": "TARGET",
+        "fill_reference": 504.06,
+        "exit_time": 1795111920
+      },
+      "price_return": 0.01973901713307802
+    },
+    {
+      "cohort": "legacy_discovery",
+      "route": "aligned_continuation",
+      "symbol": "MSFTUSDT",
+      "phase": "regular",
+      "direction": "SHORT",
+      "entry_ms": 1795107631534,
+      "path": {
+        "known": true,
+        "outcome": "TARGET",
+        "fill_reference": 498.82,
+        "exit_time": 1795121880
+      },
+      "price_return": 0.01873038087449652
+    },
+    {
+      "cohort": "legacy_discovery",
+      "route": "aligned_continuation",
+      "symbol": "MSFTUSDT",
+      "phase": "regular",
+      "direction": "SHORT",
+      "entry_ms": 1795111231629,
+      "path": {
+        "known": true,
+        "outcome": "TARGET",
+        "fill_reference": 496.72,
+        "exit_time": 1795131120
+      },
+      "price_return": 0.018713928909083077
+    },
+    {
+      "cohort": "legacy_discovery",
+      "route": "aligned_continuation",
+      "symbol": "MSFTUSDT",
+      "phase": "postmarket",
+      "direction": "SHORT",
+      "entry_ms": 1795122031829,
+      "path": {
+        "known": true,
+        "outcome": "TARGET",
+        "fill_reference": 488.36,
+        "exit_time": 1795178400
+      },
+      "price_return": 0.01910418639350364
+    },
+    {
+      "cohort": "legacy_discovery",
+      "route": "aligned_continuation",
+      "symbol": "MSTRUSDT",
+      "phase": "postmarket",
+      "direction": "LONG",
+      "entry_ms": 1794954631997,
+      "path": {
+        "known": true,
+        "outcome": "TARGET",
+        "fill_reference": 100.8,
+        "exit_time": 1794957120
+      },
+      "price_return": 0.019520582583189894
+    },
+    {
+      "cohort": "legacy_discovery",
+      "route": "aligned_continuation",
+      "symbol": "MSTRUSDT",
+      "phase": "other",
+      "direction": "LONG",
+      "entry_ms": 1794963631324,
+      "path": {
+        "known": true,
+        "outcome": "SL",
+        "fill_reference": 99.75,
+        "exit_time": 1794963900
+      },
+      "price_return": -0.00319776156690299
+    },
+    {
+      "cohort": "legacy_discovery",
+      "route": "aligned_continuation",
+      "symbol": "MSTRUSDT",
+      "phase": "premarket",
+      "direction": "SHORT",
+      "entry_ms": 1795005931770,
+      "path": {
+        "known": true,
+        "outcome": "TARGET",
+        "fill_reference": 94.92,
+        "exit_time": 1795012260
+      },
+      "price_return": 0.018884306490123848
+    },
+    {
+      "cohort": "legacy_discovery",
+      "route": "reversal_z1_25",
+      "symbol": "MSTRUSDT",
+      "phase": "premarket",
+      "direction": "LONG",
+      "entry_ms": 1795009531675,
+      "path": {
+        "known": true,
+        "outcome": "SL",
+        "fill_reference": 95.48,
+        "exit_time": 1795011900
+      },
+      "price_return": -0.005364862753268418
+    },
+    {
+      "cohort": "legacy_discovery",
+      "route": "aligned_continuation",
+      "symbol": "MSTRUSDT",
+      "phase": "premarket",
+      "direction": "SHORT",
+      "entry_ms": 1795009531675,
+      "path": {
+        "known": true,
+        "outcome": "TARGET",
+        "fill_reference": 94.22,
+        "exit_time": 1795012320
+      },
+      "price_return": 0.017845974231747497
+    },
+    {
+      "cohort": "legacy_discovery",
+      "route": "native",
+      "symbol": "MSTRUSDT",
+      "phase": "premarket",
+      "direction": "LONG",
+      "entry_ms": 1795010431727,
+      "path": {
+        "known": true,
+        "outcome": "SL",
+        "fill_reference": 95.45,
+        "exit_time": 1795011900
+      },
+      "price_return": -0.0025080990699132277
+    },
+    {
+      "cohort": "legacy_discovery",
+      "route": "reversal_z1_25",
+      "symbol": "MSTRUSDT",
+      "phase": "premarket",
+      "direction": "LONG",
+      "entry_ms": 1795010431727,
+      "path": {
+        "known": true,
+        "outcome": "SL",
+        "fill_reference": 95.45,
+        "exit_time": 1795011900
+      },
+      "price_return": -0.0025080990699132277
+    },
+    {
+      "cohort": "legacy_discovery",
+      "route": "aligned_continuation",
+      "symbol": "MSTRUSDT",
+      "phase": "premarket",
+      "direction": "SHORT",
+      "entry_ms": 1795010431727,
+      "path": {
+        "known": true,
+        "outcome": "TARGET",
+        "fill_reference": 93.83,
+        "exit_time": 1795012380
+      },
+      "price_return": 0.019053344136326977
+    },
+    {
+      "cohort": "legacy_discovery",
+      "route": "aligned_continuation",
+      "symbol": "MSTRUSDT",
+      "phase": "postmarket",
+      "direction": "LONG",
+      "entry_ms": 1795049131279,
+      "path": {
+        "known": true,
+        "outcome": "SL",
+        "fill_reference": 90.95,
+        "exit_time": 1795051920
+      },
+      "price_return": -0.014918444974534317
+    },
+    {
+      "cohort": "legacy_discovery",
+      "route": "aligned_continuation",
+      "symbol": "MSTRUSDT",
+      "phase": "other",
+      "direction": "LONG",
+      "entry_ms": 1795053631325,
+      "path": {
+        "known": true,
+        "outcome": "SL",
+        "fill_reference": 90.32,
+        "exit_time": 1795058220
+      },
+      "price_return": -0.013978925041978507
+    },
+    {
+      "cohort": "legacy_discovery",
+      "route": "native",
+      "symbol": "MSTRUSDT",
+      "phase": "other",
+      "direction": "SHORT",
+      "entry_ms": 1795059031282,
+      "path": {
+        "known": true,
+        "outcome": "SL",
+        "fill_reference": 91.88,
+        "exit_time": 1795059300
+      },
+      "price_return": -0.0037612173234489177
+    },
+    {
+      "cohort": "legacy_discovery",
+      "route": "reversal_z1_25",
+      "symbol": "MSTRUSDT",
+      "phase": "other",
+      "direction": "SHORT",
+      "entry_ms": 1795059031282,
+      "path": {
+        "known": true,
+        "outcome": "SL",
+        "fill_reference": 91.88,
+        "exit_time": 1795059300
+      },
+      "price_return": -0.0037612173234489177
+    },
+    {
+      "cohort": "legacy_discovery",
+      "route": "aligned_continuation",
+      "symbol": "MSTRUSDT",
+      "phase": "other",
+      "direction": "LONG",
+      "entry_ms": 1795076131680,
+      "path": {
+        "known": true,
+        "outcome": "SL",
+        "fill_reference": 92.98,
+        "exit_time": 1795098360
+      },
+      "price_return": -0.006623931623931489
+    },
+    {
+      "cohort": "legacy_discovery",
+      "route": "reversal_z1_25",
+      "symbol": "MSTRUSDT",
+      "phase": "premarket",
+      "direction": "SHORT",
+      "entry_ms": 1795096831877,
+      "path": {
+        "known": true,
+        "outcome": "TARGET",
+        "fill_reference": 91.62,
+        "exit_time": 1795101360
+      },
+      "price_return": 0.023662364261097024
+    },
+    {
+      "cohort": "contract_followup",
+      "route": "aligned_continuation",
+      "symbol": "MSTRUSDT",
+      "phase": "postmarket",
+      "direction": "SHORT",
+      "entry_ms": 1795131031524,
+      "path": {
+        "known": true,
+        "outcome": "TARGET",
+        "fill_reference": 84.6,
+        "exit_time": 1795140480
+      },
+      "price_return": 0.017938677274063952
+    },
+    {
+      "cohort": "contract_followup",
+      "route": "aligned_continuation",
+      "symbol": "MSTRUSDT",
+      "phase": "other",
+      "direction": "SHORT",
+      "entry_ms": 1795139131276,
+      "path": {
+        "known": true,
+        "outcome": "TARGET",
+        "fill_reference": 84.08,
+        "exit_time": 1795176360
+      },
+      "price_return": 0.020731423247146497
+    },
+    {
+      "cohort": "contract_followup",
+      "route": "aligned_continuation",
+      "symbol": "MSTRUSDT",
+      "phase": "other",
+      "direction": "SHORT",
+      "entry_ms": 1795148131268,
+      "path": {
+        "known": true,
+        "outcome": "TARGET",
+        "fill_reference": 83.66,
+        "exit_time": 1795176480
+      },
+      "price_return": 0.02117702117702125
+    },
+    {
+      "cohort": "contract_followup",
+      "route": "aligned_continuation",
+      "symbol": "MSTRUSDT",
+      "phase": "other",
+      "direction": "SHORT",
+      "entry_ms": 1795149031224,
+      "path": {
+        "known": true,
+        "outcome": "SL",
+        "fill_reference": 86.16,
+        "exit_time": 1795171440
+      },
+      "price_return": -0.01442412096063106
+    },
+    {
+      "cohort": "legacy_discovery",
+      "route": "aligned_continuation",
+      "symbol": "MUUSDT",
+      "phase": "other",
+      "direction": "SHORT",
+      "entry_ms": 1794977131478,
+      "path": {
+        "known": true,
+        "outcome": "SL",
+        "fill_reference": 734.44,
+        "exit_time": 1794985260
+      },
+      "price_return": -0.013495984323683041
+    },
+    {
+      "cohort": "legacy_discovery",
+      "route": "reversal_z1_25",
+      "symbol": "NVDAUSDT",
+      "phase": "other",
+      "direction": "SHORT",
+      "entry_ms": 1794985231842,
+      "path": {
+        "known": true,
+        "outcome": "SL",
+        "fill_reference": 159.39,
+        "exit_time": 1794985620
+      },
+      "price_return": -0.0031468311410409733
+    },
+    {
+      "cohort": "legacy_discovery",
+      "route": "aligned_continuation",
+      "symbol": "NVDAUSDT",
+      "phase": "other",
+      "direction": "LONG",
+      "entry_ms": 1794985231842,
+      "path": {
+        "known": true,
+        "outcome": "SL",
+        "fill_reference": 157.74,
+        "exit_time": 1795012260
+      },
+      "price_return": -0.007414709861458979
+    },
+    {
+      "cohort": "legacy_discovery",
+      "route": "reversal_z1_25",
+      "symbol": "NVDAUSDT",
+      "phase": "other",
+      "direction": "SHORT",
+      "entry_ms": 1794986131875,
+      "path": {
+        "known": true,
+        "outcome": "SL",
+        "fill_reference": 159.88,
+        "exit_time": 1794986460
+      },
+      "price_return": -0.002822555353446665
+    },
+    {
+      "cohort": "legacy_discovery",
+      "route": "aligned_continuation",
+      "symbol": "NVDAUSDT",
+      "phase": "other",
+      "direction": "LONG",
+      "entry_ms": 1794986131875,
+      "path": {
+        "known": true,
+        "outcome": "SL",
+        "fill_reference": 158.2,
+        "exit_time": 1795012260
+      },
+      "price_return": -0.007901668129938644
+    },
+    {
+      "cohort": "legacy_discovery",
+      "route": "reversal_z1_25",
+      "symbol": "NVDAUSDT",
+      "phase": "other",
+      "direction": "SHORT",
+      "entry_ms": 1794987031721,
+      "path": {
+        "known": true,
+        "outcome": "SL",
+        "fill_reference": 160.66,
+        "exit_time": 1794992760
+      },
+      "price_return": -0.0025585023400935825
+    },
+    {
+      "cohort": "legacy_discovery",
+      "route": "aligned_continuation",
+      "symbol": "NVDAUSDT",
+      "phase": "other",
+      "direction": "LONG",
+      "entry_ms": 1794987031721,
+      "path": {
+        "known": true,
+        "outcome": "SL",
+        "fill_reference": 158.5,
+        "exit_time": 1795012260
+      },
+      "price_return": -0.011105565260793648
+    },
+    {
+      "cohort": "legacy_discovery",
+      "route": "aligned_continuation",
+      "symbol": "NVDAUSDT",
+      "phase": "other",
+      "direction": "LONG",
+      "entry_ms": 1794991531730,
+      "path": {
+        "known": true,
+        "outcome": "SL",
+        "fill_reference": 158.97,
+        "exit_time": 1795007340
+      },
+      "price_return": -0.008296943231441145
+    },
+    {
+      "cohort": "legacy_discovery",
+      "route": "aligned_continuation",
+      "symbol": "NVDAUSDT",
+      "phase": "premarket",
+      "direction": "LONG",
+      "entry_ms": 1794994232078,
+      "path": {
+        "known": true,
+        "outcome": "SL",
+        "fill_reference": 159.33,
+        "exit_time": 1795001100
+      },
+      "price_return": -0.0103726708074533
+    },
+    {
+      "cohort": "legacy_discovery",
+      "route": "reversal_z1_25",
+      "symbol": "NVDAUSDT",
+      "phase": "premarket",
+      "direction": "SHORT",
+      "entry_ms": 1794995132032,
+      "path": {
+        "known": true,
+        "outcome": "TARGET",
+        "fill_reference": 156.42,
+        "exit_time": 1795012560
+      },
+      "price_return": 0.029893326717936097
+    },
+    {
+      "cohort": "legacy_discovery",
+      "route": "native",
+      "symbol": "NVDAUSDT",
+      "phase": "premarket",
+      "direction": "SHORT",
+      "entry_ms": 1794996032136,
+      "path": {
+        "known": true,
+        "outcome": "TARGET",
+        "fill_reference": 156.73,
+        "exit_time": 1795012560
+      },
+      "price_return": 0.029475509319462634
+    },
+    {
+      "cohort": "legacy_discovery",
+      "route": "reversal_z1_25",
+      "symbol": "NVDAUSDT",
+      "phase": "premarket",
+      "direction": "SHORT",
+      "entry_ms": 1794996032136,
+      "path": {
+        "known": true,
+        "outcome": "TARGET",
+        "fill_reference": 156.73,
+        "exit_time": 1795012560
+      },
+      "price_return": 0.029475509319462634
+    },
+    {
+      "cohort": "legacy_discovery",
+      "route": "aligned_continuation",
+      "symbol": "NVDAUSDT",
+      "phase": "premarket",
+      "direction": "LONG",
+      "entry_ms": 1794996032136,
+      "path": {
+        "known": true,
+        "outcome": "SL",
+        "fill_reference": 160.58,
+        "exit_time": 1794997920
+      },
+      "price_return": -0.005819712729073778
+    },
+    {
+      "cohort": "legacy_discovery",
+      "route": "aligned_continuation",
+      "symbol": "NVDAUSDT",
+      "phase": "premarket",
+      "direction": "SHORT",
+      "entry_ms": 1795011332880,
+      "path": {
+        "known": true,
+        "outcome": "TARGET",
+        "fill_reference": 156.02,
+        "exit_time": 1795012860
+      },
+      "price_return": 0.020651559851861068
+    },
+    {
+      "cohort": "legacy_discovery",
+      "route": "aligned_continuation",
+      "symbol": "NVDAUSDT",
+      "phase": "regular",
+      "direction": "SHORT",
+      "entry_ms": 1795025732079,
+      "path": {
+        "known": true,
+        "outcome": "SL",
+        "fill_reference": 152.69,
+        "exit_time": 1795028280
+      },
+      "price_return": -0.00665875527426163
+    },
+    {
+      "cohort": "legacy_discovery",
+      "route": "aligned_continuation",
+      "symbol": "NVDAUSDT",
+      "phase": "regular",
+      "direction": "SHORT",
+      "entry_ms": 1795029332086,
+      "path": {
+        "known": true,
+        "outcome": "SL_GAP",
+        "fill_reference": 152.95,
+        "exit_time": 1795069980
+      },
+      "price_return": -0.00804059843142424
+    },
+    {
+      "cohort": "legacy_discovery",
+      "route": "aligned_continuation",
+      "symbol": "NVDAUSDT",
+      "phase": "postmarket",
+      "direction": "SHORT",
+      "entry_ms": 1795038334526,
+      "path": {
+        "known": true,
+        "outcome": "SL",
+        "fill_reference": 151.83,
+        "exit_time": 1795043280
+      },
+      "price_return": -0.010448555836550133
+    },
+    {
+      "cohort": "legacy_discovery",
+      "route": "aligned_continuation",
+      "symbol": "NVDAUSDT",
+      "phase": "postmarket",
+      "direction": "LONG",
+      "entry_ms": 1795044632138,
+      "path": {
+        "known": true,
+        "outcome": "SL",
+        "fill_reference": 150.57,
+        "exit_time": 1795052100
+      },
+      "price_return": -0.011424069332282905
+    },
+    {
+      "cohort": "legacy_discovery",
+      "route": "aligned_continuation",
+      "symbol": "NVDAUSDT",
+      "phase": "other",
+      "direction": "LONG",
+      "entry_ms": 1795060831723,
+      "path": {
+        "known": true,
+        "outcome": "TARGET",
+        "fill_reference": 155.46,
+        "exit_time": 1795098720
+      },
+      "price_return": 0.020078740157480235
+    },
+    {
+      "cohort": "legacy_discovery",
+      "route": "aligned_continuation",
+      "symbol": "NVDAUSDT",
+      "phase": "regular",
+      "direction": "SHORT",
+      "entry_ms": 1795114832138,
+      "path": {
+        "known": true,
+        "outcome": "TARGET",
+        "fill_reference": 145.59,
+        "exit_time": 1795122240
+      },
+      "price_return": 0.01959595959595961
+    },
+    {
+      "cohort": "legacy_discovery",
+      "route": "aligned_continuation",
+      "symbol": "NVDAUSDT",
+      "phase": "regular",
+      "direction": "SHORT",
+      "entry_ms": 1795118432038,
+      "path": {
+        "known": true,
+        "outcome": "TARGET",
+        "fill_reference": 144.54,
+        "exit_time": 1795123980
+      },
+      "price_return": 0.018070652173913015
+    },
+    {
+      "cohort": "contract_followup",
+      "route": "aligned_continuation",
+      "symbol": "NVDAUSDT",
+      "phase": "postmarket",
+      "direction": "SHORT",
+      "entry_ms": 1795123978028,
+      "path": {
+        "known": true,
+        "outcome": "SL",
+        "fill_reference": 146.68,
+        "exit_time": 1795126260
+      },
+      "price_return": -0.014735385679695678
+    },
+    {
+      "cohort": "contract_followup",
+      "route": "aligned_continuation",
+      "symbol": "NVDAUSDT",
+      "phase": "postmarket",
+      "direction": "SHORT",
+      "entry_ms": 1795131031981,
+      "path": {
+        "known": true,
+        "outcome": "SL",
+        "fill_reference": 146.5,
+        "exit_time": 1795132920
+      },
+      "price_return": -0.007703948273490191
+    },
+    {
+      "cohort": "contract_followup",
+      "route": "aligned_continuation",
+      "symbol": "NVDAUSDT",
+      "phase": "other",
+      "direction": "SHORT",
+      "entry_ms": 1795139131726,
+      "path": {
+        "known": true,
+        "outcome": "TARGET",
+        "fill_reference": 141.85,
+        "exit_time": 1795178040
+      },
+      "price_return": 0.020169924708157927
+    },
+    {
+      "cohort": "contract_followup",
+      "route": "aligned_continuation",
+      "symbol": "NVDAUSDT",
+      "phase": "other",
+      "direction": "SHORT",
+      "entry_ms": 1795149031672,
+      "path": {
+        "known": true,
+        "outcome": "TARGET",
+        "fill_reference": 140.96,
+        "exit_time": 1795180980
+      },
+      "price_return": 0.01899923446308016
+    },
+    {
+      "cohort": "contract_followup",
+      "route": "aligned_continuation",
+      "symbol": "NVDAUSDT",
+      "phase": "other",
+      "direction": "SHORT",
+      "entry_ms": 1795159831775,
+      "path": {
+        "known": true,
+        "outcome": "SL",
+        "fill_reference": 144.23,
+        "exit_time": 1795161300
+      },
+      "price_return": -0.006770906044953229
+    },
+    {
+      "cohort": "legacy_discovery",
+      "route": "aligned_continuation",
+      "symbol": "SNDKUSDT",
+      "phase": "other",
+      "direction": "SHORT",
+      "entry_ms": 1794969933024,
+      "path": {
+        "known": true,
+        "outcome": "SL",
+        "fill_reference": 816.4,
+        "exit_time": 1794974040
+      },
+      "price_return": -0.011478350648512547
+    },
+    {
+      "cohort": "legacy_discovery",
+      "route": "aligned_continuation",
+      "symbol": "SPCXUSDT",
+      "phase": "regular",
+      "direction": "SHORT",
+      "entry_ms": 1795026634025,
+      "path": {
+        "known": true,
+        "outcome": "SL_GAP",
+        "fill_reference": 145.55,
+        "exit_time": 1795068840
+      },
+      "price_return": -0.008942187716622918
+    },
+    {
+      "cohort": "legacy_discovery",
+      "route": "aligned_continuation",
+      "symbol": "SPCXUSDT",
+      "phase": "other",
+      "direction": "LONG",
+      "entry_ms": 1795054533688,
+      "path": {
+        "known": true,
+        "outcome": "SL",
+        "fill_reference": 144.33,
+        "exit_time": 1795058040
+      },
+      "price_return": -0.005169561621174545
+    },
+    {
+      "cohort": "legacy_discovery",
+      "route": "aligned_continuation",
+      "symbol": "SPCXUSDT",
+      "phase": "other",
+      "direction": "LONG",
+      "entry_ms": 1795068933978,
+      "path": {
+        "known": true,
+        "outcome": "SL_GAP",
+        "fill_reference": 144.87,
+        "exit_time": 1795096440
+      },
+      "price_return": -0.006713993375667027
+    },
+    {
+      "cohort": "legacy_discovery",
+      "route": "native",
+      "symbol": "SPCXUSDT",
+      "phase": "premarket",
+      "direction": "LONG",
+      "entry_ms": 1795093234075,
+      "path": {
+        "known": true,
+        "outcome": "SL_GAP",
+        "fill_reference": 145.51,
+        "exit_time": 1795094580
+      },
+      "price_return": -0.0029464163354804285
+    },
+    {
+      "cohort": "legacy_discovery",
+      "route": "reversal_z1_25",
+      "symbol": "SPCXUSDT",
+      "phase": "premarket",
+      "direction": "LONG",
+      "entry_ms": 1795093234075,
+      "path": {
+        "known": true,
+        "outcome": "SL_GAP",
+        "fill_reference": 145.51,
+        "exit_time": 1795094580
+      },
+      "price_return": -0.0029464163354804285
+    },
+    {
+      "cohort": "legacy_discovery",
+      "route": "aligned_continuation",
+      "symbol": "SPCXUSDT",
+      "phase": "regular",
+      "direction": "SHORT",
+      "entry_ms": 1795120234183,
+      "path": {
+        "known": true,
+        "outcome": "SL",
+        "fill_reference": 137.63,
+        "exit_time": 1795120980
+      },
+      "price_return": -0.00857394108163545
+    },
+    {
+      "cohort": "contract_followup",
+      "route": "aligned_continuation",
+      "symbol": "SPCXUSDT",
+      "phase": "postmarket",
+      "direction": "SHORT",
+      "entry_ms": 1795123979977,
+      "path": {
+        "known": true,
+        "outcome": "TARGET",
+        "fill_reference": 134.72,
+        "exit_time": 1795151700
+      },
+      "price_return": 0.018075801749271037
+    },
+    {
+      "cohort": "contract_followup",
+      "route": "aligned_continuation",
+      "symbol": "SPCXUSDT",
+      "phase": "postmarket",
+      "direction": "SHORT",
+      "entry_ms": 1795130133981,
+      "path": {
+        "known": true,
+        "outcome": "TARGET",
+        "fill_reference": 134.36,
+        "exit_time": 1795165560
+      },
+      "price_return": 0.020128354725787556
+    },
+    {
+      "cohort": "contract_followup",
+      "route": "aligned_continuation",
+      "symbol": "SPCXUSDT",
+      "phase": "postmarket",
+      "direction": "SHORT",
+      "entry_ms": 1795131033932,
+      "path": {
+        "known": true,
+        "outcome": "TARGET",
+        "fill_reference": 134.2,
+        "exit_time": 1795165980
+      },
+      "price_return": 0.019533145812350217
+    },
+    {
+      "cohort": "contract_followup",
+      "route": "aligned_continuation",
+      "symbol": "SPCXUSDT",
+      "phase": "other",
+      "direction": "SHORT",
+      "entry_ms": 1795140033678,
+      "path": {
+        "known": true,
+        "outcome": "TARGET",
+        "fill_reference": 133.32,
+        "exit_time": 1795168560
+      },
+      "price_return": 0.02114537444933917
+    },
+    {
+      "cohort": "contract_followup",
+      "route": "aligned_continuation",
+      "symbol": "SPCXUSDT",
+      "phase": "other",
+      "direction": "SHORT",
+      "entry_ms": 1795149033624,
+      "path": {
+        "known": true,
+        "outcome": "TARGET",
+        "fill_reference": 133.14,
+        "exit_time": 1795173060
+      },
+      "price_return": 0.01928070272360649
+    },
+    {
+      "cohort": "contract_followup",
+      "route": "aligned_continuation",
+      "symbol": "SPCXUSDT",
+      "phase": "other",
+      "direction": "SHORT",
+      "entry_ms": 1795159833724,
+      "path": {
+        "known": true,
+        "outcome": "SL",
+        "fill_reference": 135.43,
+        "exit_time": 1795161300
+      },
+      "price_return": -0.006246517181902833
+    },
+    {
+      "cohort": "legacy_discovery",
+      "route": "aligned_continuation",
+      "symbol": "TSLAUSDT",
+      "phase": "other",
+      "direction": "SHORT",
+      "entry_ms": 1794970833879,
+      "path": {
+        "known": true,
+        "outcome": "SL_GAP",
+        "fill_reference": 383.02,
+        "exit_time": 1794973140
+      },
+      "price_return": -0.00282766926742406
+    },
+    {
+      "cohort": "legacy_discovery",
+      "route": "aligned_continuation",
+      "symbol": "TSLAUSDT",
+      "phase": "regular",
+      "direction": "SHORT",
+      "entry_ms": 1795029334174,
+      "path": {
+        "known": true,
+        "outcome": "SL_GAP",
+        "fill_reference": 386.4,
+        "exit_time": 1795049040
+      },
+      "price_return": -0.007877301893682409
+    },
+    {
+      "cohort": "legacy_discovery",
+      "route": "aligned_continuation",
+      "symbol": "TSLAUSDT",
+      "phase": "postmarket",
+      "direction": "LONG",
+      "entry_ms": 1795044634230,
+      "path": {
+        "known": true,
+        "outcome": "TARGET",
+        "fill_reference": 392.77,
+        "exit_time": 1795093860
+      },
+      "price_return": 0.01999636429740037
+    },
+    {
+      "cohort": "contract_followup",
+      "route": "aligned_continuation",
+      "symbol": "TSLAUSDT",
+      "phase": "postmarket",
+      "direction": "SHORT",
+      "entry_ms": 1795124734134,
+      "path": {
+        "known": true,
+        "outcome": "TARGET",
+        "fill_reference": 364.56,
+        "exit_time": 1795181160
+      },
+      "price_return": 0.02078968573730866
+    }
+  ],
+  "live_activation_supported": false,
+  "limitations": [
+    "Entry on observed top-five book at 3% margin and 10x.",
+    "Each setup is independent. Exit price is a one-minute trade-based reference.",
+    "Ambiguous entry minute and simultaneous stop/target touches stay unknown.",
+    "Average refers to the underlying price move. Shared account drawdown requires the L2 exit replay."
+  ]
+}
