@@ -94,14 +94,14 @@ def cached_entries(plan,capture,inputs):
     return result
 
 
-def resolve_all(rows,trades,reference,ticks):
+def resolve_all(rows,trades,reference,ticks,*,trade_loader=load_trade_tape):
     by_symbol=defaultdict(list)
     for row in rows:
         by_symbol[row['symbol']].append(row)
     evidence={}
     for symbol,candidates in by_symbol.items():
         try:
-            tape=load_trade_tape(trades['files'][symbol])
+            tape=trade_loader(trades['files'][symbol])
             times=[event.ms for event in tape]
             item=reference['symbols'][symbol]
             path=Path(item['path'])

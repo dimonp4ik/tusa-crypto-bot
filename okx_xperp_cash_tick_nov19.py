@@ -140,7 +140,7 @@ def close_quote(book, stamp, side, contracts):
     return execution_quote(book,opposite,contracts,stamp,max_spread=1.,max_slippage=1.).average
 
 
-def simulate(rows, specs, ticks, books, *, clock, lag, setting):
+def simulate(rows, specs, ticks, books, *, clock, lag, setting, exit_price=None):
     cash=peak=CAPITAL
     drawdown=0.
     max_used=0
@@ -200,9 +200,13 @@ def simulate(rows, specs, ticks, books, *, clock, lag, setting):
                        if path['bank'] else 0.)
             remainder=max(0.,entry.contracts-bank_size)
             bank_at=(path['bank']['ms']+lag) if bank_size else None
-            bank_px=close_quote(books[symbol].get(bank_at),bank_at,side,bank_size) if bank_size else None
+            def quote_exit(stamp, size):
+                if exit_price is not None:
+                    return exit_price(symbol, stamp, side, size)
+                return close_quote(books[symbol].get(stamp),stamp,side,size)
+            bank_px=quote_exit(bank_at,bank_size) if bank_size else None
             end_at=path['end_ms']+lag if remainder>1e-12 else bank_at
-            runner_px=close_quote(books[symbol].get(end_at),end_at,side,remainder) if remainder>1e-12 else None
+            runner_px=quote_exit(end_at,remainder) if remainder>1e-12 else None
         except ValueError as exc:
             return dict(status='UNSCORABLE',symbol=symbol,entry_ms=opened,reason=str(exc))
         sign=1 if side=='LONG' else -1

@@ -1,6 +1,7 @@
 {
   "plan_sha256": "1cfc2e8c07199b9c0e6790766f20e056b9043c559dca5aced521bea456ae795d",
   "capture_sha256": "42ce34576428d9caeed0b9e2988f83e908862938904ad635e723a12b8d76d243",
+  "trade_repair_sha256": "7e420e41049b9011190b021d7c99c2d088bbd688b33ceb5f5f2cc9ebf9ace2d4",
   "count": {
     "legacy_discovery": {
       "native": {
@@ -45,10 +46,14 @@
   },
   "tape": {
     "MSTRUSDT": {
-      "error": "ValueError: trade catalogue is incomplete"
+      "tape_trades": 49039,
+      "reconciled_bars": 280,
+      "mismatches": {}
     },
     "GOOGLUSDT": {
-      "error": "ValueError: trade catalogue is incomplete"
+      "tape_trades": 34813,
+      "reconciled_bars": 222,
+      "mismatches": {}
     },
     "AMZNUSDT": {
       "tape_trades": 2401,
@@ -71,10 +76,14 @@
       "mismatches": {}
     },
     "NVDAUSDT": {
-      "error": "ValueError: trade catalogue is incomplete"
+      "tape_trades": 178445,
+      "reconciled_bars": 258,
+      "mismatches": {}
     },
     "INTCUSDT": {
-      "error": "ValueError: trade catalogue is incomplete"
+      "tape_trades": 13865,
+      "reconciled_bars": 249,
+      "mismatches": {}
     },
     "MSFTUSDT": {
       "tape_trades": 2303,
@@ -82,18 +91,40 @@
       "mismatches": {}
     },
     "SPCXUSDT": {
-      "error": "ValueError: trade catalogue is incomplete"
+      "tape_trades": 18515,
+      "reconciled_bars": 212,
+      "mismatches": {}
     },
     "CRCLUSDT": {
-      "error": "ValueError: trade catalogue is incomplete"
+      "tape_trades": 5825,
+      "reconciled_bars": 138,
+      "mismatches": {}
     }
   },
   "close_book_checks": {
+    "1794873600:MSTRUSDT": {
+      "snapshot": 96,
+      "update": 1718841,
+      "first_ts": 1794873600007,
+      "last_ts": 1794959999999
+    },
     "1794960000:AMZNUSDT": {
       "snapshot": 96,
       "update": 304237,
       "first_ts": 1794960000008,
       "last_ts": 1795046399998
+    },
+    "1794960000:GOOGLUSDT": {
+      "snapshot": 96,
+      "update": 506845,
+      "first_ts": 1794960000008,
+      "last_ts": 1795046399998
+    },
+    "1794960000:INTCUSDT": {
+      "snapshot": 96,
+      "update": 1116812,
+      "first_ts": 1794960000009,
+      "last_ts": 1795046399999
     },
     "1794960000:MSFTUSDT": {
       "snapshot": 96,
@@ -101,11 +132,23 @@
       "first_ts": 1794960000009,
       "last_ts": 1795046398539
     },
+    "1794960000:MSTRUSDT": {
+      "snapshot": 96,
+      "update": 1764608,
+      "first_ts": 1794960000009,
+      "last_ts": 1795046399999
+    },
     "1794960000:MUUSDT": {
       "snapshot": 96,
       "update": 1154707,
       "first_ts": 1794960000008,
       "last_ts": 1795046399998
+    },
+    "1794960000:NVDAUSDT": {
+      "snapshot": 96,
+      "update": 1312895,
+      "first_ts": 1794960000009,
+      "last_ts": 1795046399999
     },
     "1794960000:SNDKUSDT": {
       "snapshot": 96,
@@ -125,11 +168,47 @@
       "first_ts": 1795046400008,
       "last_ts": 1795132799990
     },
+    "1795046400:CRCLUSDT": {
+      "snapshot": 96,
+      "update": 717487,
+      "first_ts": 1795046400009,
+      "last_ts": 1795132799992
+    },
+    "1795046400:GOOGLUSDT": {
+      "snapshot": 96,
+      "update": 607849,
+      "first_ts": 1795046400008,
+      "last_ts": 1795132799990
+    },
+    "1795046400:INTCUSDT": {
+      "snapshot": 96,
+      "update": 1393136,
+      "first_ts": 1795046400009,
+      "last_ts": 1795132799992
+    },
     "1795046400:MSFTUSDT": {
       "snapshot": 96,
       "update": 353843,
       "first_ts": 1795046400009,
       "last_ts": 1795132791182
+    },
+    "1795046400:MSTRUSDT": {
+      "snapshot": 96,
+      "update": 2221901,
+      "first_ts": 1795046400009,
+      "last_ts": 1795132799992
+    },
+    "1795046400:NVDAUSDT": {
+      "snapshot": 96,
+      "update": 1124686,
+      "first_ts": 1795046400009,
+      "last_ts": 1795132799992
+    },
+    "1795046400:SPCXUSDT": {
+      "snapshot": 96,
+      "update": 690441,
+      "first_ts": 1795046400009,
+      "last_ts": 1795132799992
     },
     "1795046400:TSLAUSDT": {
       "snapshot": 96,
@@ -139,6 +218,18 @@
     }
   },
   "close_book_files": {
+    "1794873600:MSTRUSDT": {
+      "path": "reports\\audit_2026_09_08\\okx_xperp_l2_nov19\\MSTR-USD_UM_XPERP-futureschain-L2orderbook-400lv-2026-11-17.tar.gz",
+      "sha256": "f828dd138406729d1cfe454046ddb2d26dbaaa0d14c3e309177bfdfdf050dcd3",
+      "bytes": 30588345,
+      "catalogue": {
+        "dateTs": "1794873600000",
+        "filename": "MSTR-USD_UM_XPERP-futureschain-L2orderbook-400lv-2026-11-17.tar.gz",
+        "sizeMB": "29.17",
+        "url": "https://static.okx.com/cdn/okx/match/orderbook/pro/L2/400lv/daily/20261117/MSTR-USD_UM_XPERP-futureschain-L2orderbook-400lv-2026-11-17.tar.gz"
+      },
+      "instrument": "MSTR-USD_UM_XPERP-310704"
+    },
     "1794960000:AMZNUSDT": {
       "path": "reports\\audit_2026_09_08\\okx_xperp_l2_nov19\\AMZN-USD_UM_XPERP-futureschain-L2orderbook-400lv-2026-11-18.tar.gz",
       "sha256": "0306ce23577a07d3f4c2334aa81b0c136d8ca59ce1377964de75f631bfcd32c5",
@@ -150,6 +241,30 @@
         "url": "https://static.okx.com/cdn/okx/match/orderbook/pro/L2/400lv/daily/20261118/AMZN-USD_UM_XPERP-futureschain-L2orderbook-400lv-2026-11-18.tar.gz"
       },
       "instrument": "AMZN-USD_UM_XPERP-310613"
+    },
+    "1794960000:GOOGLUSDT": {
+      "path": "reports\\audit_2026_09_08\\okx_xperp_l2_nov19\\GOOGL-USD_UM_XPERP-futureschain-L2orderbook-400lv-2026-11-18.tar.gz",
+      "sha256": "671ae451fb0f0c50ef34f858d69d62c49d52546f5f8681900c7aef26cae482eb",
+      "bytes": 7377374,
+      "catalogue": {
+        "dateTs": "1794960000000",
+        "filename": "GOOGL-USD_UM_XPERP-futureschain-L2orderbook-400lv-2026-11-18.tar.gz",
+        "sizeMB": "7.04",
+        "url": "https://static.okx.com/cdn/okx/match/orderbook/pro/L2/400lv/daily/20261118/GOOGL-USD_UM_XPERP-futureschain-L2orderbook-400lv-2026-11-18.tar.gz"
+      },
+      "instrument": "GOOGL-USD_UM_XPERP-310613"
+    },
+    "1794960000:INTCUSDT": {
+      "path": "reports\\audit_2026_09_08\\okx_xperp_l2_nov19\\INTC-USD_UM_XPERP-futureschain-L2orderbook-400lv-2026-11-18.tar.gz",
+      "sha256": "91711959448a3a2006857fc83a8a43e5d23f9e9a0564bc9fda67cb36fa4441ea",
+      "bytes": 16677619,
+      "catalogue": {
+        "dateTs": "1794960000000",
+        "filename": "INTC-USD_UM_XPERP-futureschain-L2orderbook-400lv-2026-11-18.tar.gz",
+        "sizeMB": "15.91",
+        "url": "https://static.okx.com/cdn/okx/match/orderbook/pro/L2/400lv/daily/20261118/INTC-USD_UM_XPERP-futureschain-L2orderbook-400lv-2026-11-18.tar.gz"
+      },
+      "instrument": "INTC-USD_UM_XPERP-310627"
     },
     "1794960000:MSFTUSDT": {
       "path": "reports\\audit_2026_09_08\\okx_xperp_l2_nov19\\MSFT-USD_UM_XPERP-futureschain-L2orderbook-400lv-2026-11-18.tar.gz",
@@ -163,6 +278,18 @@
       },
       "instrument": "MSFT-USD_UM_XPERP-310613"
     },
+    "1794960000:MSTRUSDT": {
+      "path": "reports\\audit_2026_09_08\\okx_xperp_l2_nov19\\MSTR-USD_UM_XPERP-futureschain-L2orderbook-400lv-2026-11-18.tar.gz",
+      "sha256": "2729912a254995279418fee6dc2db5ba3c9efa8cd41c894f399fdbb3535ce993",
+      "bytes": 29031281,
+      "catalogue": {
+        "dateTs": "1794960000000",
+        "filename": "MSTR-USD_UM_XPERP-futureschain-L2orderbook-400lv-2026-11-18.tar.gz",
+        "sizeMB": "27.69",
+        "url": "https://static.okx.com/cdn/okx/match/orderbook/pro/L2/400lv/daily/20261118/MSTR-USD_UM_XPERP-futureschain-L2orderbook-400lv-2026-11-18.tar.gz"
+      },
+      "instrument": "MSTR-USD_UM_XPERP-310704"
+    },
     "1794960000:MUUSDT": {
       "path": "reports\\audit_2026_09_08\\okx_xperp_l2_nov19\\MU-USD_UM_XPERP-futureschain-L2orderbook-400lv-2026-11-18.tar.gz",
       "sha256": "ab39ecb1d5ea0c27baa0dedfa130448a3295c7c60ca73b791641afa2abc14646",
@@ -174,6 +301,18 @@
         "url": "https://static.okx.com/cdn/okx/match/orderbook/pro/L2/400lv/daily/20261118/MU-USD_UM_XPERP-futureschain-L2orderbook-400lv-2026-11-18.tar.gz"
       },
       "instrument": "MU-USD_UM_XPERP-310627"
+    },
+    "1794960000:NVDAUSDT": {
+      "path": "reports\\audit_2026_09_08\\okx_xperp_l2_nov19\\NVDA-USD_UM_XPERP-futureschain-L2orderbook-400lv-2026-11-18.tar.gz",
+      "sha256": "0aa2949cea3e7be825bc2e0b6bdda70c217a593cb16b30eaf68313ce994b3cf3",
+      "bytes": 29723599,
+      "catalogue": {
+        "dateTs": "1794960000000",
+        "filename": "NVDA-USD_UM_XPERP-futureschain-L2orderbook-400lv-2026-11-18.tar.gz",
+        "sizeMB": "28.35",
+        "url": "https://static.okx.com/cdn/okx/match/orderbook/pro/L2/400lv/daily/20261118/NVDA-USD_UM_XPERP-futureschain-L2orderbook-400lv-2026-11-18.tar.gz"
+      },
+      "instrument": "NVDA-USD_UM_XPERP-310613"
     },
     "1794960000:SNDKUSDT": {
       "path": "reports\\audit_2026_09_08\\okx_xperp_l2_nov19\\SNDK-USD_UM_XPERP-futureschain-L2orderbook-400lv-2026-11-18.tar.gz",
@@ -211,6 +350,42 @@
       },
       "instrument": "AMZN-USD_UM_XPERP-310613"
     },
+    "1795046400:CRCLUSDT": {
+      "path": "reports\\audit_2026_09_08\\okx_xperp_l2_nov19\\CRCL-USD_UM_XPERP-futureschain-L2orderbook-400lv-2026-11-19.tar.gz",
+      "sha256": "7ecde3842f555b33e9c25ace69f8a5249c3c5bb956f159e05c767b32fda94ddd",
+      "bytes": 8761058,
+      "catalogue": {
+        "dateTs": "1795046400000",
+        "filename": "CRCL-USD_UM_XPERP-futureschain-L2orderbook-400lv-2026-11-19.tar.gz",
+        "sizeMB": "8.36",
+        "url": "https://static.okx.com/cdn/okx/match/orderbook/pro/L2/400lv/daily/20261119/CRCL-USD_UM_XPERP-futureschain-L2orderbook-400lv-2026-11-19.tar.gz"
+      },
+      "instrument": "CRCL-USD_UM_XPERP-310704"
+    },
+    "1795046400:GOOGLUSDT": {
+      "path": "reports\\audit_2026_09_08\\okx_xperp_l2_nov19\\GOOGL-USD_UM_XPERP-futureschain-L2orderbook-400lv-2026-11-19.tar.gz",
+      "sha256": "0b244f1de06f144a3ac429a3e3b8a2e9815c14f2aa4a1679b3c5481cb73e7a3f",
+      "bytes": 8867206,
+      "catalogue": {
+        "dateTs": "1795046400000",
+        "filename": "GOOGL-USD_UM_XPERP-futureschain-L2orderbook-400lv-2026-11-19.tar.gz",
+        "sizeMB": "8.46",
+        "url": "https://static.okx.com/cdn/okx/match/orderbook/pro/L2/400lv/daily/20261119/GOOGL-USD_UM_XPERP-futureschain-L2orderbook-400lv-2026-11-19.tar.gz"
+      },
+      "instrument": "GOOGL-USD_UM_XPERP-310613"
+    },
+    "1795046400:INTCUSDT": {
+      "path": "reports\\audit_2026_09_08\\okx_xperp_l2_nov19\\INTC-USD_UM_XPERP-futureschain-L2orderbook-400lv-2026-11-19.tar.gz",
+      "sha256": "e6a36f7b2da3a9b9c173c094d55490a70f41ebbc750642764f8915b6fcd03367",
+      "bytes": 23125337,
+      "catalogue": {
+        "dateTs": "1795046400000",
+        "filename": "INTC-USD_UM_XPERP-futureschain-L2orderbook-400lv-2026-11-19.tar.gz",
+        "sizeMB": "22.05",
+        "url": "https://static.okx.com/cdn/okx/match/orderbook/pro/L2/400lv/daily/20261119/INTC-USD_UM_XPERP-futureschain-L2orderbook-400lv-2026-11-19.tar.gz"
+      },
+      "instrument": "INTC-USD_UM_XPERP-310627"
+    },
     "1795046400:MSFTUSDT": {
       "path": "reports\\audit_2026_09_08\\okx_xperp_l2_nov19\\MSFT-USD_UM_XPERP-futureschain-L2orderbook-400lv-2026-11-19.tar.gz",
       "sha256": "87b7f223dc0d5b4cb3c7d417948492abca3e7c794eee09510d158e250ac962aa",
@@ -222,6 +397,42 @@
         "url": "https://static.okx.com/cdn/okx/match/orderbook/pro/L2/400lv/daily/20261119/MSFT-USD_UM_XPERP-futureschain-L2orderbook-400lv-2026-11-19.tar.gz"
       },
       "instrument": "MSFT-USD_UM_XPERP-310613"
+    },
+    "1795046400:MSTRUSDT": {
+      "path": "reports\\audit_2026_09_08\\okx_xperp_l2_nov19\\MSTR-USD_UM_XPERP-futureschain-L2orderbook-400lv-2026-11-19.tar.gz",
+      "sha256": "d12416bb90b9b90774bf281fb9e1fddc0b73b82a952d2a9b2582da0bc77e0079",
+      "bytes": 39136911,
+      "catalogue": {
+        "dateTs": "1795046400000",
+        "filename": "MSTR-USD_UM_XPERP-futureschain-L2orderbook-400lv-2026-11-19.tar.gz",
+        "sizeMB": "37.32",
+        "url": "https://static.okx.com/cdn/okx/match/orderbook/pro/L2/400lv/daily/20261119/MSTR-USD_UM_XPERP-futureschain-L2orderbook-400lv-2026-11-19.tar.gz"
+      },
+      "instrument": "MSTR-USD_UM_XPERP-310704"
+    },
+    "1795046400:NVDAUSDT": {
+      "path": "reports\\audit_2026_09_08\\okx_xperp_l2_nov19\\NVDA-USD_UM_XPERP-futureschain-L2orderbook-400lv-2026-11-19.tar.gz",
+      "sha256": "f29b2fa0bbfe39b7e1e03ec44659b69946b336369e00cfd82e6283c5b00c39bd",
+      "bytes": 20374797,
+      "catalogue": {
+        "dateTs": "1795046400000",
+        "filename": "NVDA-USD_UM_XPERP-futureschain-L2orderbook-400lv-2026-11-19.tar.gz",
+        "sizeMB": "19.43",
+        "url": "https://static.okx.com/cdn/okx/match/orderbook/pro/L2/400lv/daily/20261119/NVDA-USD_UM_XPERP-futureschain-L2orderbook-400lv-2026-11-19.tar.gz"
+      },
+      "instrument": "NVDA-USD_UM_XPERP-310613"
+    },
+    "1795046400:SPCXUSDT": {
+      "path": "reports\\audit_2026_09_08\\okx_xperp_l2_nov19\\SPCX-USD_UM_XPERP-futureschain-L2orderbook-400lv-2026-11-19.tar.gz",
+      "sha256": "aca41f2c65cfced6b134e0393ab8358c6d2e54508a003b1461c18a55b292b134",
+      "bytes": 12194729,
+      "catalogue": {
+        "dateTs": "1795046400000",
+        "filename": "SPCX-USD_UM_XPERP-futureschain-L2orderbook-400lv-2026-11-19.tar.gz",
+        "sizeMB": "11.63",
+        "url": "https://static.okx.com/cdn/okx/match/orderbook/pro/L2/400lv/daily/20261119/SPCX-USD_UM_XPERP-futureschain-L2orderbook-400lv-2026-11-19.tar.gz"
+      },
+      "instrument": "SPCX-USD_UM_XPERP-310613"
     },
     "1795046400:TSLAUSDT": {
       "path": "reports\\audit_2026_09_08\\okx_xperp_l2_nov19\\TSLA-USD_UM_XPERP-futureschain-L2orderbook-400lv-2026-11-19.tar.gz",
@@ -239,33 +450,78 @@
   "results": {
     "legacy_discovery": {
       "native|all": {
-        "status": "UNSCORABLE",
-        "symbol": "NVDAUSDT",
-        "entry_ms": 1794996032136,
-        "reason": "trade_archive_incomplete",
+        "status": "SCORED_PUBLIC_L2_SIMULATION",
+        "trades": 4,
+        "skipped": {},
+        "return_pct": 0.5547692307692698,
+        "drawdown_pct": 0.2055112435720355,
+        "contribution_pct": {
+          "crypto": 0.0,
+          "stocks": 0.5547692307692316
+        },
+        "peak_reservations": 2,
+        "peak_margin_pct": 5.925661538461539,
+        "closed": [
+          {
+            "symbol": "NVDAUSDT",
+            "bot": "stocks",
+            "entry_ms": 1794996032136,
+            "exit_ms": 1795012519379,
+            "code": "TARGET",
+            "entry_px": 161.49,
+            "qty": 0.24,
+            "bank_qty": 0.0,
+            "bank_px": null,
+            "runner_px": 156.88,
+            "bank_pnl": 0.0,
+            "runner_pnl": 1.1064000000000032
+          },
+          {
+            "symbol": "MSTRUSDT",
+            "bot": "stocks",
+            "entry_ms": 1795010431727,
+            "exit_ms": 1795011844702,
+            "code": "SL",
+            "entry_px": 95.69,
+            "qty": 0.4,
+            "bank_qty": 0.0,
+            "bank_px": null,
+            "runner_px": 95.4,
+            "bank_pnl": 0.0,
+            "runner_pnl": -0.11599999999999683
+          },
+          {
+            "symbol": "MSTRUSDT",
+            "bot": "stocks",
+            "entry_ms": 1795059031282,
+            "exit_ms": 1795059293651,
+            "code": "SL",
+            "entry_px": 91.53571428571429,
+            "qty": 0.42,
+            "bank_qty": 0.0,
+            "bank_px": null,
+            "runner_px": 91.89976190476192,
+            "bank_pnl": 0.0,
+            "runner_pnl": -0.15290000000000248
+          },
+          {
+            "symbol": "SPCXUSDT",
+            "bot": "stocks",
+            "entry_ms": 1795093234075,
+            "exit_ms": 1795094524963,
+            "code": "SL",
+            "entry_px": 145.94,
+            "qty": 26.0,
+            "bank_qty": 0.0,
+            "bank_px": null,
+            "runner_px": 145.4926923076923,
+            "bank_pnl": 0.0,
+            "runner_pnl": -0.1163000000000028
+          }
+        ],
         "qualified": 4,
-        "unknown_paths": [
-          [
-            "NVDAUSDT",
-            1794996032136,
-            "trade_archive_incomplete"
-          ],
-          [
-            "MSTRUSDT",
-            1795010431727,
-            "trade_archive_incomplete"
-          ],
-          [
-            "MSTRUSDT",
-            1795059031282,
-            "trade_archive_incomplete"
-          ],
-          [
-            "SPCXUSDT",
-            1795093234075,
-            "trade_archive_incomplete"
-          ]
-        ]
+        "unknown_paths": [],
+        "profitable_closes": 1
       },
       "native|regular": {
         "status": "SCORED_PUBLIC_L2_SIMULATION",
@@ -281,71 +537,168 @@
         "peak_margin_pct": 0.0,
         "closed": [],
         "qualified": 0,
-        "unknown_paths": []
+        "unknown_paths": [],
+        "profitable_closes": 0
       },
       "reversal_z1_25|all": {
-        "status": "UNSCORABLE",
-        "symbol": "NVDAUSDT",
-        "entry_ms": 1794985231842,
-        "reason": "trade_archive_incomplete",
+        "status": "SCORED_PUBLIC_L2_SIMULATION",
+        "trades": 10,
+        "skipped": {
+          "stocks:position_cap": 3
+        },
+        "return_pct": 0.6633846153846212,
+        "drawdown_pct": 0.4287676947039374,
+        "contribution_pct": {
+          "crypto": 0.0,
+          "stocks": 0.6633846153846114
+        },
+        "peak_reservations": 3,
+        "peak_margin_pct": 8.515243016222044,
+        "closed": [
+          {
+            "symbol": "NVDAUSDT",
+            "bot": "stocks",
+            "entry_ms": 1794985231842,
+            "exit_ms": 1794985589372,
+            "code": "SL",
+            "entry_px": 158.89,
+            "qty": 0.24,
+            "bank_qty": 0.0,
+            "bank_px": null,
+            "runner_px": 159.43541666666667,
+            "bank_pnl": 0.0,
+            "runner_pnl": -0.13090000000000374
+          },
+          {
+            "symbol": "NVDAUSDT",
+            "bot": "stocks",
+            "entry_ms": 1794987031721,
+            "exit_ms": 1794992714149,
+            "code": "SL",
+            "entry_px": 160.25,
+            "qty": 0.24,
+            "bank_qty": 0.0,
+            "bank_px": null,
+            "runner_px": 160.67,
+            "bank_pnl": 0.0,
+            "runner_pnl": -0.10079999999999699
+          },
+          {
+            "symbol": "NVDAUSDT",
+            "bot": "stocks",
+            "entry_ms": 1794995132032,
+            "exit_ms": 1795012526193,
+            "code": "TARGET",
+            "entry_px": 161.24,
+            "qty": 0.24,
+            "bank_qty": 0.0,
+            "bank_px": null,
+            "runner_px": 156.56,
+            "bank_pnl": 0.0,
+            "runner_pnl": 1.1232000000000015
+          },
+          {
+            "symbol": "MSTRUSDT",
+            "bot": "stocks",
+            "entry_ms": 1795009531675,
+            "exit_ms": 1795011844653,
+            "code": "SL",
+            "entry_px": 95.995,
+            "qty": 0.4,
+            "bank_qty": 0.0,
+            "bank_px": null,
+            "runner_px": 95.4,
+            "bank_pnl": 0.0,
+            "runner_pnl": -0.23799999999999955
+          },
+          {
+            "symbol": "MSTRUSDT",
+            "bot": "stocks",
+            "entry_ms": 1795059031282,
+            "exit_ms": 1795059293651,
+            "code": "SL",
+            "entry_px": 91.53571428571429,
+            "qty": 0.42,
+            "bank_qty": 0.0,
+            "bank_px": null,
+            "runner_px": 91.89976190476192,
+            "bank_pnl": 0.0,
+            "runner_pnl": -0.15290000000000248
+          },
+          {
+            "symbol": "SPCXUSDT",
+            "bot": "stocks",
+            "entry_ms": 1795093234075,
+            "exit_ms": 1795094524963,
+            "code": "SL",
+            "entry_px": 145.94,
+            "qty": 26.0,
+            "bank_qty": 0.0,
+            "bank_px": null,
+            "runner_px": 145.4926923076923,
+            "bank_pnl": 0.0,
+            "runner_pnl": -0.1163000000000028
+          },
+          {
+            "symbol": "AMZNUSDT",
+            "bot": "stocks",
+            "entry_ms": 1795096828582,
+            "exit_ms": 1795099113146,
+            "code": "SL",
+            "entry_px": 272.12,
+            "qty": 0.14,
+            "bank_qty": 0.0,
+            "bank_px": null,
+            "runner_px": 271.2985714285714,
+            "bank_pnl": 0.0,
+            "runner_pnl": -0.1150000000000057
+          },
+          {
+            "symbol": "MSTRUSDT",
+            "bot": "stocks",
+            "entry_ms": 1795096831877,
+            "exit_ms": 1795101305566,
+            "code": "TARGET",
+            "entry_px": 93.84048780487807,
+            "qty": 0.41,
+            "bank_qty": 0.0,
+            "bank_px": null,
+            "runner_px": 91.63,
+            "bank_pnl": 0.0,
+            "runner_pnl": 0.9063000000000089
+          },
+          {
+            "symbol": "INTCUSDT",
+            "bot": "stocks",
+            "entry_ms": 1795097730677,
+            "exit_ms": 1795098480306,
+            "code": "SL",
+            "entry_px": 57.41,
+            "qty": 0.6,
+            "bank_qty": 0.0,
+            "bank_px": null,
+            "runner_px": 57.70333333333333,
+            "bank_pnl": 0.0,
+            "runner_pnl": -0.17600000000000193
+          },
+          {
+            "symbol": "MSFTUSDT",
+            "bot": "stocks",
+            "entry_ms": 1795104931632,
+            "exit_ms": 1795107028493,
+            "code": "SL",
+            "entry_px": 514.46,
+            "qty": 0.07,
+            "bank_qty": 0.0,
+            "bank_px": null,
+            "runner_px": 512.5,
+            "bank_pnl": 0.0,
+            "runner_pnl": -0.13720000000000257
+          }
+        ],
         "qualified": 13,
-        "unknown_paths": [
-          [
-            "NVDAUSDT",
-            1794985231842,
-            "trade_archive_incomplete"
-          ],
-          [
-            "NVDAUSDT",
-            1794986131875,
-            "trade_archive_incomplete"
-          ],
-          [
-            "NVDAUSDT",
-            1794987031721,
-            "trade_archive_incomplete"
-          ],
-          [
-            "NVDAUSDT",
-            1794995132032,
-            "trade_archive_incomplete"
-          ],
-          [
-            "NVDAUSDT",
-            1794996032136,
-            "trade_archive_incomplete"
-          ],
-          [
-            "MSTRUSDT",
-            1795009531675,
-            "trade_archive_incomplete"
-          ],
-          [
-            "MSTRUSDT",
-            1795010431727,
-            "trade_archive_incomplete"
-          ],
-          [
-            "MSTRUSDT",
-            1795059031282,
-            "trade_archive_incomplete"
-          ],
-          [
-            "SPCXUSDT",
-            1795093234075,
-            "trade_archive_incomplete"
-          ],
-          [
-            "MSTRUSDT",
-            1795096831877,
-            "trade_archive_incomplete"
-          ],
-          [
-            "INTCUSDT",
-            1795097730677,
-            "trade_archive_incomplete"
-          ]
-        ]
+        "unknown_paths": [],
+        "profitable_closes": 2
       },
       "reversal_z1_25|regular": {
         "status": "SCORED_PUBLIC_L2_SIMULATION",
@@ -376,270 +729,877 @@
           }
         ],
         "qualified": 1,
-        "unknown_paths": []
+        "unknown_paths": [],
+        "profitable_closes": 0
       },
       "aligned_continuation|all": {
         "status": "UNSCORABLE",
-        "symbol": "MSTRUSDT",
-        "entry_ms": 1794954631997,
-        "reason": "trade_archive_incomplete",
+        "symbol": "MSFTUSDT",
+        "entry_ms": 1795122031829,
+        "reason": "missing exit L2 sample",
         "qualified": 59,
-        "unknown_paths": [
-          [
-            "MSTRUSDT",
-            1794954631997,
-            "trade_archive_incomplete"
-          ],
-          [
-            "GOOGLUSDT",
-            1794955530180,
-            "trade_archive_incomplete"
-          ],
-          [
-            "MSTRUSDT",
-            1794963631324,
-            "trade_archive_incomplete"
-          ],
-          [
-            "INTCUSDT",
-            1794985230325,
-            "trade_archive_incomplete"
-          ],
-          [
-            "NVDAUSDT",
-            1794985231842,
-            "trade_archive_incomplete"
-          ],
-          [
-            "NVDAUSDT",
-            1794986131875,
-            "trade_archive_incomplete"
-          ],
-          [
-            "NVDAUSDT",
-            1794987031721,
-            "trade_archive_incomplete"
-          ],
-          [
-            "NVDAUSDT",
-            1794991531730,
-            "trade_archive_incomplete"
-          ],
-          [
-            "INTCUSDT",
-            1794994230633,
-            "trade_archive_incomplete"
-          ],
-          [
-            "NVDAUSDT",
-            1794994232078,
-            "trade_archive_incomplete"
-          ],
-          [
-            "NVDAUSDT",
-            1794996032136,
-            "trade_archive_incomplete"
-          ],
-          [
-            "INTCUSDT",
-            1794999630628,
-            "trade_archive_incomplete"
-          ],
-          [
-            "INTCUSDT",
-            1795004130574,
-            "trade_archive_incomplete"
-          ],
-          [
-            "MSTRUSDT",
-            1795005931770,
-            "trade_archive_incomplete"
-          ],
-          [
-            "MSTRUSDT",
-            1795009531675,
-            "trade_archive_incomplete"
-          ],
-          [
-            "MSTRUSDT",
-            1795010431727,
-            "trade_archive_incomplete"
-          ],
-          [
-            "NVDAUSDT",
-            1795011332880,
-            "trade_archive_incomplete"
-          ],
-          [
-            "NVDAUSDT",
-            1795025732079,
-            "trade_archive_incomplete"
-          ],
-          [
-            "SPCXUSDT",
-            1795026634025,
-            "trade_archive_incomplete"
-          ],
-          [
-            "NVDAUSDT",
-            1795029332086,
-            "trade_archive_incomplete"
-          ],
-          [
-            "INTCUSDT",
-            1795035630527,
-            "trade_archive_incomplete"
-          ],
-          [
-            "NVDAUSDT",
-            1795038334526,
-            "trade_archive_incomplete"
-          ],
-          [
-            "GOOGLUSDT",
-            1795044630339,
-            "trade_archive_incomplete"
-          ],
-          [
-            "NVDAUSDT",
-            1795044632138,
-            "trade_archive_incomplete"
-          ],
-          [
-            "INTCUSDT",
-            1795045530586,
-            "trade_archive_incomplete"
-          ],
-          [
-            "GOOGLUSDT",
-            1795049129932,
-            "trade_archive_incomplete"
-          ],
-          [
-            "INTCUSDT",
-            1795049130229,
-            "trade_archive_incomplete"
-          ],
-          [
-            "MSTRUSDT",
-            1795049131279,
-            "trade_archive_incomplete"
-          ],
-          [
-            "INTCUSDT",
-            1795053630272,
-            "trade_archive_incomplete"
-          ],
-          [
-            "MSTRUSDT",
-            1795053631325,
-            "trade_archive_incomplete"
-          ],
-          [
-            "SPCXUSDT",
-            1795054533688,
-            "trade_archive_incomplete"
-          ],
-          [
-            "NVDAUSDT",
-            1795060831723,
-            "trade_archive_incomplete"
-          ],
-          [
-            "SPCXUSDT",
-            1795068933978,
-            "trade_archive_incomplete"
-          ],
-          [
-            "INTCUSDT",
-            1795070730478,
-            "trade_archive_incomplete"
-          ],
-          [
-            "CRCLUSDT",
-            1795071629471,
-            "trade_archive_incomplete"
-          ],
-          [
-            "GOOGLUSDT",
-            1795071630276,
-            "trade_archive_incomplete"
-          ],
-          [
-            "INTCUSDT",
-            1795071630575,
-            "trade_archive_incomplete"
-          ],
-          [
-            "INTCUSDT",
-            1795076130628,
-            "trade_archive_incomplete"
-          ],
-          [
-            "MSTRUSDT",
-            1795076131680,
-            "trade_archive_incomplete"
-          ],
-          [
-            "INTCUSDT",
-            1795086930528,
-            "trade_archive_incomplete"
-          ],
-          [
-            "NVDAUSDT",
-            1795114832138,
-            "trade_archive_incomplete"
-          ],
-          [
-            "NVDAUSDT",
-            1795118432038,
-            "trade_archive_incomplete"
-          ],
-          [
-            "SPCXUSDT",
-            1795120234183,
-            "trade_archive_incomplete"
-          ]
-        ]
+        "unknown_paths": [],
+        "profitable_closes": null
       },
       "aligned_continuation|regular": {
-        "status": "UNSCORABLE",
-        "symbol": "NVDAUSDT",
-        "entry_ms": 1795025732079,
-        "reason": "trade_archive_incomplete",
+        "status": "SCORED_PUBLIC_L2_SIMULATION",
+        "trades": 10,
+        "skipped": {
+          "stocks:position_cap": 4
+        },
+        "return_pct": -0.2974615384615298,
+        "drawdown_pct": 1.7555384615384528,
+        "contribution_pct": {
+          "crypto": 0.0,
+          "stocks": -0.29746153846154144
+        },
+        "peak_reservations": 3,
+        "peak_margin_pct": 8.910762220515663,
+        "closed": [
+          {
+            "symbol": "MSFTUSDT",
+            "bot": "stocks",
+            "entry_ms": 1795016731582,
+            "exit_ms": 1795026752853,
+            "code": "SL",
+            "entry_px": 501.55999999999995,
+            "qty": 0.07,
+            "bank_qty": 0.0,
+            "bank_px": null,
+            "runner_px": 507.9157142857142,
+            "bank_pnl": 0.0,
+            "runner_pnl": -0.444899999999999
+          },
+          {
+            "symbol": "NVDAUSDT",
+            "bot": "stocks",
+            "entry_ms": 1795025732079,
+            "exit_ms": 1795028245645,
+            "code": "SL",
+            "entry_px": 151.68,
+            "qty": 0.25,
+            "bank_qty": 0.0,
+            "bank_px": null,
+            "runner_px": 152.68,
+            "bank_pnl": 0.0,
+            "runner_pnl": -0.25
+          },
+          {
+            "symbol": "SPCXUSDT",
+            "bot": "stocks",
+            "entry_ms": 1795026634025,
+            "exit_ms": 1795068797259,
+            "code": "SL",
+            "entry_px": 144.26,
+            "qty": 27.0,
+            "bank_qty": 0.0,
+            "bank_px": null,
+            "runner_px": 145.58148148148146,
+            "bank_pnl": 0.0,
+            "runner_pnl": -0.35679999999999695
+          },
+          {
+            "symbol": "NVDAUSDT",
+            "bot": "stocks",
+            "entry_ms": 1795029332086,
+            "exit_ms": 1795069922170,
+            "code": "SL",
+            "entry_px": 151.73,
+            "qty": 0.25,
+            "bank_qty": 0.0,
+            "bank_px": null,
+            "runner_px": 152.99,
+            "bank_pnl": 0.0,
+            "runner_pnl": -0.31500000000000483
+          },
+          {
+            "symbol": "TSLAUSDT",
+            "bot": "stocks",
+            "entry_ms": 1795029334174,
+            "exit_ms": 1795048990261,
+            "code": "SL",
+            "entry_px": 383.38,
+            "qty": 0.1,
+            "bank_qty": 0.0,
+            "bank_px": null,
+            "runner_px": 386.58500000000004,
+            "bank_pnl": 0.0,
+            "runner_pnl": -0.3205000000000041
+          },
+          {
+            "symbol": "MSFTUSDT",
+            "bot": "stocks",
+            "entry_ms": 1795099531580,
+            "exit_ms": 1795102677960,
+            "code": "SL",
+            "entry_px": 523.55,
+            "qty": 0.07,
+            "bank_qty": 0.0,
+            "bank_px": null,
+            "runner_px": 515.05,
+            "bank_pnl": 0.0,
+            "runner_pnl": -0.5950000000000001
+          },
+          {
+            "symbol": "MSFTUSDT",
+            "bot": "stocks",
+            "entry_ms": 1795104931632,
+            "exit_ms": 1795111907879,
+            "code": "TARGET",
+            "entry_px": 514.21,
+            "qty": 0.07,
+            "bank_qty": 0.0,
+            "bank_px": null,
+            "runner_px": 503.7699999999999,
+            "bank_pnl": 0.0,
+            "runner_pnl": 0.7308000000000079
+          },
+          {
+            "symbol": "AMZNUSDT",
+            "bot": "stocks",
+            "entry_ms": 1795107628371,
+            "exit_ms": 1795111685140,
+            "code": "TARGET",
+            "entry_px": 266.4,
+            "qty": 0.14,
+            "bank_qty": 0.0,
+            "bank_px": null,
+            "runner_px": 261.04,
+            "bank_pnl": 0.0,
+            "runner_pnl": 0.7503999999999941
+          },
+          {
+            "symbol": "NVDAUSDT",
+            "bot": "stocks",
+            "entry_ms": 1795114832138,
+            "exit_ms": 1795122209961,
+            "code": "TARGET",
+            "entry_px": 148.5,
+            "qty": 0.26,
+            "bank_qty": 0.0,
+            "bank_px": null,
+            "runner_px": 145.58,
+            "bank_pnl": 0.0,
+            "runner_pnl": 0.7591999999999968
+          },
+          {
+            "symbol": "SPCXUSDT",
+            "bot": "stocks",
+            "entry_ms": 1795120234183,
+            "exit_ms": 1795120976598,
+            "code": "SL",
+            "entry_px": 136.46,
+            "qty": 28.0,
+            "bank_qty": 0.0,
+            "bank_px": null,
+            "runner_px": 137.69178571428571,
+            "bank_pnl": 0.0,
+            "runner_pnl": -0.3448999999999979
+          }
+        ],
         "qualified": 14,
-        "unknown_paths": [
-          [
-            "NVDAUSDT",
-            1795025732079,
-            "trade_archive_incomplete"
-          ],
-          [
-            "SPCXUSDT",
-            1795026634025,
-            "trade_archive_incomplete"
-          ],
-          [
-            "NVDAUSDT",
-            1795029332086,
-            "trade_archive_incomplete"
-          ],
-          [
-            "NVDAUSDT",
-            1795114832138,
-            "trade_archive_incomplete"
-          ],
-          [
-            "NVDAUSDT",
-            1795118432038,
-            "trade_archive_incomplete"
-          ],
-          [
-            "SPCXUSDT",
-            1795120234183,
-            "trade_archive_incomplete"
-          ]
-        ]
+        "unknown_paths": [],
+        "profitable_closes": 3
+      },
+      "aligned_continuation|stock_cadence": {
+        "status": "SCORED_PUBLIC_L2_SIMULATION",
+        "trades": 26,
+        "skipped": {
+          "stocks:publication_rate_limit": 15,
+          "stocks:position_cap": 18
+        },
+        "return_pct": 0.9480769230769237,
+        "drawdown_pct": 2.3397337098650826,
+        "contribution_pct": {
+          "crypto": 0.0,
+          "stocks": 0.9480769230769244
+        },
+        "peak_reservations": 5,
+        "peak_margin_pct": 14.267258915050048,
+        "closed": [
+          {
+            "symbol": "MSTRUSDT",
+            "bot": "stocks",
+            "entry_ms": 1794954631997,
+            "exit_ms": 1794957086485,
+            "code": "TARGET",
+            "entry_px": 98.87,
+            "qty": 0.39,
+            "bank_qty": 0.0,
+            "bank_px": null,
+            "runner_px": 100.76,
+            "bank_pnl": 0.0,
+            "runner_pnl": 0.7371000000000002
+          },
+          {
+            "symbol": "GOOGLUSDT",
+            "bot": "stocks",
+            "entry_ms": 1794955530180,
+            "exit_ms": 1794970417617,
+            "code": "SL",
+            "entry_px": 283.47461538461545,
+            "qty": 0.13,
+            "bank_qty": 0.0,
+            "bank_px": null,
+            "runner_px": 280.8092307692308,
+            "bank_pnl": 0.0,
+            "runner_pnl": -0.3465000000000049
+          },
+          {
+            "symbol": "MSTRUSDT",
+            "bot": "stocks",
+            "entry_ms": 1794963631324,
+            "exit_ms": 1794963894542,
+            "code": "SL",
+            "entry_px": 100.07,
+            "qty": 0.39,
+            "bank_qty": 0.0,
+            "bank_px": null,
+            "runner_px": 99.70205128205129,
+            "bank_pnl": 0.0,
+            "runner_pnl": -0.1434999999999957
+          },
+          {
+            "symbol": "SNDKUSDT",
+            "bot": "stocks",
+            "entry_ms": 1794969933024,
+            "exit_ms": 1794974019469,
+            "code": "SL",
+            "entry_px": 807.1354166666667,
+            "qty": 0.048,
+            "bank_qty": 0.0,
+            "bank_px": null,
+            "runner_px": 817.3,
+            "bank_pnl": 0.0,
+            "runner_pnl": -0.48789999999999417
+          },
+          {
+            "symbol": "TSLAUSDT",
+            "bot": "stocks",
+            "entry_ms": 1794970833879,
+            "exit_ms": 1794973080383,
+            "code": "SL",
+            "entry_px": 381.94,
+            "qty": 0.1,
+            "bank_qty": 0.0,
+            "bank_px": null,
+            "runner_px": 383.22100000000006,
+            "bank_pnl": 0.0,
+            "runner_pnl": -0.1281000000000063
+          },
+          {
+            "symbol": "MUUSDT",
+            "bot": "stocks",
+            "entry_ms": 1794977131478,
+            "exit_ms": 1794985247152,
+            "code": "SL",
+            "entry_px": 724.6599999999999,
+            "qty": 0.05,
+            "bank_qty": 0.0,
+            "bank_px": null,
+            "runner_px": 735.11,
+            "bank_pnl": 0.0,
+            "runner_pnl": -0.522500000000008
+          },
+          {
+            "symbol": "INTCUSDT",
+            "bot": "stocks",
+            "entry_ms": 1794985230325,
+            "exit_ms": 1795000257931,
+            "code": "SL",
+            "entry_px": 55.99,
+            "qty": 0.6,
+            "bank_qty": 0.0,
+            "bank_px": null,
+            "runner_px": 55.79,
+            "bank_pnl": 0.0,
+            "runner_pnl": -0.1200000000000017
+          },
+          {
+            "symbol": "NVDAUSDT",
+            "bot": "stocks",
+            "entry_ms": 1794985231842,
+            "exit_ms": 1795012221028,
+            "code": "SL",
+            "entry_px": 158.9183333333333,
+            "qty": 0.24,
+            "bank_qty": 0.0,
+            "bank_px": null,
+            "runner_px": 157.66625000000002,
+            "bank_pnl": 0.0,
+            "runner_pnl": -0.3004999999999859
+          },
+          {
+            "symbol": "INTCUSDT",
+            "bot": "stocks",
+            "entry_ms": 1795004130574,
+            "exit_ms": 1795012287682,
+            "code": "SL",
+            "entry_px": 55.51,
+            "qty": 0.6,
+            "bank_qty": 0.0,
+            "bank_px": null,
+            "runner_px": 55.96,
+            "bank_pnl": 0.0,
+            "runner_pnl": -0.2700000000000017
+          },
+          {
+            "symbol": "MSTRUSDT",
+            "bot": "stocks",
+            "entry_ms": 1795005931770,
+            "exit_ms": 1795012201061,
+            "code": "TARGET",
+            "entry_px": 96.7474358974359,
+            "qty": 0.39,
+            "bank_qty": 0.0,
+            "bank_px": null,
+            "runner_px": 94.89512820512822,
+            "bank_pnl": 0.0,
+            "runner_pnl": 0.7223999999999992
+          },
+          {
+            "symbol": "MSFTUSDT",
+            "bot": "stocks",
+            "entry_ms": 1795016731582,
+            "exit_ms": 1795026752853,
+            "code": "SL",
+            "entry_px": 501.55999999999995,
+            "qty": 0.07,
+            "bank_qty": 0.0,
+            "bank_px": null,
+            "runner_px": 507.9157142857142,
+            "bank_pnl": 0.0,
+            "runner_pnl": -0.444899999999999
+          },
+          {
+            "symbol": "NVDAUSDT",
+            "bot": "stocks",
+            "entry_ms": 1795025732079,
+            "exit_ms": 1795028245645,
+            "code": "SL",
+            "entry_px": 151.68,
+            "qty": 0.25,
+            "bank_qty": 0.0,
+            "bank_px": null,
+            "runner_px": 152.68,
+            "bank_pnl": 0.0,
+            "runner_pnl": -0.25
+          },
+          {
+            "symbol": "SPCXUSDT",
+            "bot": "stocks",
+            "entry_ms": 1795026634025,
+            "exit_ms": 1795068797259,
+            "code": "SL",
+            "entry_px": 144.26,
+            "qty": 26.0,
+            "bank_qty": 0.0,
+            "bank_px": null,
+            "runner_px": 145.58038461538462,
+            "bank_pnl": 0.0,
+            "runner_pnl": -0.3433000000000027
+          },
+          {
+            "symbol": "NVDAUSDT",
+            "bot": "stocks",
+            "entry_ms": 1795029332086,
+            "exit_ms": 1795069922170,
+            "code": "SL",
+            "entry_px": 151.73,
+            "qty": 0.25,
+            "bank_qty": 0.0,
+            "bank_px": null,
+            "runner_px": 152.99,
+            "bank_pnl": 0.0,
+            "runner_pnl": -0.31500000000000483
+          },
+          {
+            "symbol": "INTCUSDT",
+            "bot": "stocks",
+            "entry_ms": 1795035630527,
+            "exit_ms": 1795048277456,
+            "code": "TARGET",
+            "entry_px": 54.66,
+            "qty": 0.7,
+            "bank_qty": 0.0,
+            "bank_px": null,
+            "runner_px": 55.87,
+            "bank_pnl": 0.0,
+            "runner_pnl": 0.8470000000000005
+          },
+          {
+            "symbol": "GOOGLUSDT",
+            "bot": "stocks",
+            "entry_ms": 1795044630339,
+            "exit_ms": 1795080077601,
+            "code": "TARGET",
+            "entry_px": 285.5369230769231,
+            "qty": 0.13,
+            "bank_qty": 0.0,
+            "bank_px": null,
+            "runner_px": 291.24,
+            "bank_pnl": 0.0,
+            "runner_pnl": 0.7414000000000016
+          },
+          {
+            "symbol": "INTCUSDT",
+            "bot": "stocks",
+            "entry_ms": 1795053630272,
+            "exit_ms": 1795057809149,
+            "code": "SL",
+            "entry_px": 55.71000000000001,
+            "qty": 0.6,
+            "bank_qty": 0.0,
+            "bank_px": null,
+            "runner_px": 55.06333333333333,
+            "bank_pnl": 0.0,
+            "runner_pnl": -0.38800000000000523
+          },
+          {
+            "symbol": "MSTRUSDT",
+            "bot": "stocks",
+            "entry_ms": 1795053631325,
+            "exit_ms": 1795058163609,
+            "code": "SL",
+            "entry_px": 91.6004761904762,
+            "qty": 0.42,
+            "bank_qty": 0.0,
+            "bank_px": null,
+            "runner_px": 90.24785714285714,
+            "bank_pnl": 0.0,
+            "runner_pnl": -0.5681000000000043
+          },
+          {
+            "symbol": "INTCUSDT",
+            "bot": "stocks",
+            "entry_ms": 1795070730478,
+            "exit_ms": 1795088061317,
+            "code": "TARGET",
+            "entry_px": 56.43,
+            "qty": 0.6,
+            "bank_qty": 0.0,
+            "bank_px": null,
+            "runner_px": 57.540000000000006,
+            "bank_pnl": 0.0,
+            "runner_pnl": 0.6660000000000039
+          },
+          {
+            "symbol": "MSTRUSDT",
+            "bot": "stocks",
+            "entry_ms": 1795076131680,
+            "exit_ms": 1795098330491,
+            "code": "SL",
+            "entry_px": 93.6,
+            "qty": 0.4,
+            "bank_qty": 0.0,
+            "bank_px": null,
+            "runner_px": 92.93,
+            "bank_pnl": 0.0,
+            "runner_pnl": -0.267999999999995
+          },
+          {
+            "symbol": "AMZNUSDT",
+            "bot": "stocks",
+            "entry_ms": 1795084228478,
+            "exit_ms": 1795094916954,
+            "code": "SL",
+            "entry_px": 274.33,
+            "qty": 0.14,
+            "bank_qty": 0.0,
+            "bank_px": null,
+            "runner_px": 273.0,
+            "bank_pnl": 0.0,
+            "runner_pnl": -0.18619999999999778
+          },
+          {
+            "symbol": "MSFTUSDT",
+            "bot": "stocks",
+            "entry_ms": 1795093231531,
+            "exit_ms": 1795099840158,
+            "code": "TARGET",
+            "entry_px": 515.63,
+            "qty": 0.07,
+            "bank_qty": 0.0,
+            "bank_px": null,
+            "runner_px": 525.71,
+            "bank_pnl": 0.0,
+            "runner_pnl": 0.7056000000000029
+          },
+          {
+            "symbol": "MSFTUSDT",
+            "bot": "stocks",
+            "entry_ms": 1795104931632,
+            "exit_ms": 1795111907879,
+            "code": "TARGET",
+            "entry_px": 514.21,
+            "qty": 0.07,
+            "bank_qty": 0.0,
+            "bank_px": null,
+            "runner_px": 503.7699999999999,
+            "bank_pnl": 0.0,
+            "runner_pnl": 0.7308000000000079
+          },
+          {
+            "symbol": "AMZNUSDT",
+            "bot": "stocks",
+            "entry_ms": 1795107628371,
+            "exit_ms": 1795111685140,
+            "code": "TARGET",
+            "entry_px": 266.4,
+            "qty": 0.14,
+            "bank_qty": 0.0,
+            "bank_px": null,
+            "runner_px": 261.04,
+            "bank_pnl": 0.0,
+            "runner_pnl": 0.7503999999999941
+          },
+          {
+            "symbol": "NVDAUSDT",
+            "bot": "stocks",
+            "entry_ms": 1795114832138,
+            "exit_ms": 1795122209961,
+            "code": "TARGET",
+            "entry_px": 148.5,
+            "qty": 0.26,
+            "bank_qty": 0.0,
+            "bank_px": null,
+            "runner_px": 145.58,
+            "bank_pnl": 0.0,
+            "runner_pnl": 0.7591999999999968
+          },
+          {
+            "symbol": "SPCXUSDT",
+            "bot": "stocks",
+            "entry_ms": 1795120234183,
+            "exit_ms": 1795120976598,
+            "code": "SL",
+            "entry_px": 136.46,
+            "qty": 28.0,
+            "bank_qty": 0.0,
+            "bank_px": null,
+            "runner_px": 137.69178571428571,
+            "bank_pnl": 0.0,
+            "runner_pnl": -0.3448999999999979
+          }
+        ],
+        "qualified": 59,
+        "unknown_paths": [],
+        "profitable_closes": 9
+      },
+      "aligned_continuation|one_per_side_hour": {
+        "status": "SCORED_PUBLIC_L2_SIMULATION",
+        "trades": 21,
+        "skipped": {
+          "stocks:publication_rate_limit": 32,
+          "stocks:position_cap": 6
+        },
+        "return_pct": 0.7249230769230897,
+        "drawdown_pct": 1.4534512391662446,
+        "contribution_pct": {
+          "crypto": 0.0,
+          "stocks": 0.7249230769230859
+        },
+        "peak_reservations": 3,
+        "peak_margin_pct": 8.795407216410826,
+        "closed": [
+          {
+            "symbol": "MSTRUSDT",
+            "bot": "stocks",
+            "entry_ms": 1794954631997,
+            "exit_ms": 1794957086485,
+            "code": "TARGET",
+            "entry_px": 98.87,
+            "qty": 0.39,
+            "bank_qty": 0.0,
+            "bank_px": null,
+            "runner_px": 100.76,
+            "bank_pnl": 0.0,
+            "runner_pnl": 0.7371000000000002
+          },
+          {
+            "symbol": "MSTRUSDT",
+            "bot": "stocks",
+            "entry_ms": 1794963631324,
+            "exit_ms": 1794963894542,
+            "code": "SL",
+            "entry_px": 100.07,
+            "qty": 0.39,
+            "bank_qty": 0.0,
+            "bank_px": null,
+            "runner_px": 99.70205128205129,
+            "bank_pnl": 0.0,
+            "runner_pnl": -0.1434999999999957
+          },
+          {
+            "symbol": "SNDKUSDT",
+            "bot": "stocks",
+            "entry_ms": 1794969933024,
+            "exit_ms": 1794974019469,
+            "code": "SL",
+            "entry_px": 807.1354166666667,
+            "qty": 0.048,
+            "bank_qty": 0.0,
+            "bank_px": null,
+            "runner_px": 817.3,
+            "bank_pnl": 0.0,
+            "runner_pnl": -0.48789999999999417
+          },
+          {
+            "symbol": "MUUSDT",
+            "bot": "stocks",
+            "entry_ms": 1794977131478,
+            "exit_ms": 1794985247152,
+            "code": "SL",
+            "entry_px": 724.6599999999999,
+            "qty": 0.05,
+            "bank_qty": 0.0,
+            "bank_px": null,
+            "runner_px": 735.11,
+            "bank_pnl": 0.0,
+            "runner_pnl": -0.522500000000008
+          },
+          {
+            "symbol": "INTCUSDT",
+            "bot": "stocks",
+            "entry_ms": 1794985230325,
+            "exit_ms": 1795000257931,
+            "code": "SL",
+            "entry_px": 55.99,
+            "qty": 0.6,
+            "bank_qty": 0.0,
+            "bank_px": null,
+            "runner_px": 55.79,
+            "bank_pnl": 0.0,
+            "runner_pnl": -0.1200000000000017
+          },
+          {
+            "symbol": "NVDAUSDT",
+            "bot": "stocks",
+            "entry_ms": 1794991531730,
+            "exit_ms": 1795007328966,
+            "code": "SL",
+            "entry_px": 160.3,
+            "qty": 0.24,
+            "bank_qty": 0.0,
+            "bank_px": null,
+            "runner_px": 158.99,
+            "bank_pnl": 0.0,
+            "runner_pnl": -0.3144000000000005
+          },
+          {
+            "symbol": "INTCUSDT",
+            "bot": "stocks",
+            "entry_ms": 1795004130574,
+            "exit_ms": 1795012287682,
+            "code": "SL",
+            "entry_px": 55.51,
+            "qty": 0.6,
+            "bank_qty": 0.0,
+            "bank_px": null,
+            "runner_px": 55.96,
+            "bank_pnl": 0.0,
+            "runner_pnl": -0.2700000000000017
+          },
+          {
+            "symbol": "MSTRUSDT",
+            "bot": "stocks",
+            "entry_ms": 1795009531675,
+            "exit_ms": 1795012302508,
+            "code": "TARGET",
+            "entry_px": 95.932,
+            "qty": 0.4,
+            "bank_qty": 0.0,
+            "bank_px": null,
+            "runner_px": 94.2995,
+            "bank_pnl": 0.0,
+            "runner_pnl": 0.653000000000003
+          },
+          {
+            "symbol": "MSFTUSDT",
+            "bot": "stocks",
+            "entry_ms": 1795016731582,
+            "exit_ms": 1795026752853,
+            "code": "SL",
+            "entry_px": 501.55999999999995,
+            "qty": 0.07,
+            "bank_qty": 0.0,
+            "bank_px": null,
+            "runner_px": 507.9157142857142,
+            "bank_pnl": 0.0,
+            "runner_pnl": -0.444899999999999
+          },
+          {
+            "symbol": "NVDAUSDT",
+            "bot": "stocks",
+            "entry_ms": 1795025732079,
+            "exit_ms": 1795028245645,
+            "code": "SL",
+            "entry_px": 151.68,
+            "qty": 0.25,
+            "bank_qty": 0.0,
+            "bank_px": null,
+            "runner_px": 152.68,
+            "bank_pnl": 0.0,
+            "runner_pnl": -0.25
+          },
+          {
+            "symbol": "NVDAUSDT",
+            "bot": "stocks",
+            "entry_ms": 1795029332086,
+            "exit_ms": 1795069922170,
+            "code": "SL",
+            "entry_px": 151.73,
+            "qty": 0.25,
+            "bank_qty": 0.0,
+            "bank_px": null,
+            "runner_px": 152.99,
+            "bank_pnl": 0.0,
+            "runner_pnl": -0.31500000000000483
+          },
+          {
+            "symbol": "INTCUSDT",
+            "bot": "stocks",
+            "entry_ms": 1795035630527,
+            "exit_ms": 1795048277456,
+            "code": "TARGET",
+            "entry_px": 54.66,
+            "qty": 0.7,
+            "bank_qty": 0.0,
+            "bank_px": null,
+            "runner_px": 55.87,
+            "bank_pnl": 0.0,
+            "runner_pnl": 0.8470000000000005
+          },
+          {
+            "symbol": "GOOGLUSDT",
+            "bot": "stocks",
+            "entry_ms": 1795044630339,
+            "exit_ms": 1795080077601,
+            "code": "TARGET",
+            "entry_px": 285.5369230769231,
+            "qty": 0.13,
+            "bank_qty": 0.0,
+            "bank_px": null,
+            "runner_px": 291.24,
+            "bank_pnl": 0.0,
+            "runner_pnl": 0.7414000000000016
+          },
+          {
+            "symbol": "INTCUSDT",
+            "bot": "stocks",
+            "entry_ms": 1795053630272,
+            "exit_ms": 1795057809149,
+            "code": "SL",
+            "entry_px": 55.71000000000001,
+            "qty": 0.6,
+            "bank_qty": 0.0,
+            "bank_px": null,
+            "runner_px": 55.06333333333333,
+            "bank_pnl": 0.0,
+            "runner_pnl": -0.38800000000000523
+          },
+          {
+            "symbol": "SPCXUSDT",
+            "bot": "stocks",
+            "entry_ms": 1795068933978,
+            "exit_ms": 1795096415988,
+            "code": "SL",
+            "entry_px": 145.84923076923076,
+            "qty": 26.0,
+            "bank_qty": 0.0,
+            "bank_px": null,
+            "runner_px": 144.8323076923077,
+            "bank_pnl": 0.0,
+            "runner_pnl": -0.2643999999999966
+          },
+          {
+            "symbol": "INTCUSDT",
+            "bot": "stocks",
+            "entry_ms": 1795076130628,
+            "exit_ms": 1795080438141,
+            "code": "SL",
+            "entry_px": 56.83,
+            "qty": 0.6,
+            "bank_qty": 0.0,
+            "bank_px": null,
+            "runner_px": 56.53,
+            "bank_pnl": 0.0,
+            "runner_pnl": -0.1799999999999983
+          },
+          {
+            "symbol": "AMZNUSDT",
+            "bot": "stocks",
+            "entry_ms": 1795084228478,
+            "exit_ms": 1795094916954,
+            "code": "SL",
+            "entry_px": 274.33,
+            "qty": 0.14,
+            "bank_qty": 0.0,
+            "bank_px": null,
+            "runner_px": 273.0,
+            "bank_pnl": 0.0,
+            "runner_pnl": -0.18619999999999778
+          },
+          {
+            "symbol": "MSFTUSDT",
+            "bot": "stocks",
+            "entry_ms": 1795093231531,
+            "exit_ms": 1795099840158,
+            "code": "TARGET",
+            "entry_px": 515.63,
+            "qty": 0.07,
+            "bank_qty": 0.0,
+            "bank_px": null,
+            "runner_px": 525.71,
+            "bank_pnl": 0.0,
+            "runner_pnl": 0.7056000000000029
+          },
+          {
+            "symbol": "MSFTUSDT",
+            "bot": "stocks",
+            "entry_ms": 1795104931632,
+            "exit_ms": 1795111907879,
+            "code": "TARGET",
+            "entry_px": 514.21,
+            "qty": 0.07,
+            "bank_qty": 0.0,
+            "bank_px": null,
+            "runner_px": 503.7699999999999,
+            "bank_pnl": 0.0,
+            "runner_pnl": 0.7308000000000079
+          },
+          {
+            "symbol": "NVDAUSDT",
+            "bot": "stocks",
+            "entry_ms": 1795114832138,
+            "exit_ms": 1795122209961,
+            "code": "TARGET",
+            "entry_px": 148.5,
+            "qty": 0.26,
+            "bank_qty": 0.0,
+            "bank_px": null,
+            "runner_px": 145.58,
+            "bank_pnl": 0.0,
+            "runner_pnl": 0.7591999999999968
+          },
+          {
+            "symbol": "SPCXUSDT",
+            "bot": "stocks",
+            "entry_ms": 1795120234183,
+            "exit_ms": 1795120976598,
+            "code": "SL",
+            "entry_px": 136.46,
+            "qty": 28.0,
+            "bank_qty": 0.0,
+            "bank_px": null,
+            "runner_px": 137.69178571428571,
+            "bank_pnl": 0.0,
+            "runner_pnl": -0.3448999999999979
+          }
+        ],
+        "qualified": 59,
+        "unknown_paths": [],
+        "profitable_closes": 7
       }
     },
     "contract_followup": {
@@ -657,7 +1617,8 @@
         "peak_margin_pct": 0.0,
         "closed": [],
         "qualified": 0,
-        "unknown_paths": []
+        "unknown_paths": [],
+        "profitable_closes": 0
       },
       "native|regular": {
         "status": "SCORED_PUBLIC_L2_SIMULATION",
@@ -673,7 +1634,8 @@
         "peak_margin_pct": 0.0,
         "closed": [],
         "qualified": 0,
-        "unknown_paths": []
+        "unknown_paths": [],
+        "profitable_closes": 0
       },
       "reversal_z1_25|all": {
         "status": "SCORED_PUBLIC_L2_SIMULATION",
@@ -689,7 +1651,8 @@
         "peak_margin_pct": 0.0,
         "closed": [],
         "qualified": 0,
-        "unknown_paths": []
+        "unknown_paths": [],
+        "profitable_closes": 0
       },
       "reversal_z1_25|regular": {
         "status": "SCORED_PUBLIC_L2_SIMULATION",
@@ -705,141 +1668,17 @@
         "peak_margin_pct": 0.0,
         "closed": [],
         "qualified": 0,
-        "unknown_paths": []
+        "unknown_paths": [],
+        "profitable_closes": 0
       },
       "aligned_continuation|all": {
         "status": "UNSCORABLE",
         "symbol": "INTCUSDT",
         "entry_ms": 1795123976527,
-        "reason": "trade_archive_incomplete",
+        "reason": "missing exit L2 sample",
         "qualified": 26,
-        "unknown_paths": [
-          [
-            "INTCUSDT",
-            1795123976527,
-            "trade_archive_incomplete"
-          ],
-          [
-            "NVDAUSDT",
-            1795123978028,
-            "trade_archive_incomplete"
-          ],
-          [
-            "SPCXUSDT",
-            1795123979977,
-            "trade_archive_incomplete"
-          ],
-          [
-            "INTCUSDT",
-            1795124730528,
-            "trade_archive_incomplete"
-          ],
-          [
-            "SPCXUSDT",
-            1795130133981,
-            "trade_archive_incomplete"
-          ],
-          [
-            "MSTRUSDT",
-            1795131031524,
-            "trade_archive_incomplete"
-          ],
-          [
-            "NVDAUSDT",
-            1795131031981,
-            "trade_archive_incomplete"
-          ],
-          [
-            "SPCXUSDT",
-            1795131033932,
-            "trade_archive_incomplete"
-          ],
-          [
-            "INTCUSDT",
-            1795139130225,
-            "trade_archive_incomplete"
-          ],
-          [
-            "MSTRUSDT",
-            1795139131276,
-            "trade_archive_incomplete"
-          ],
-          [
-            "NVDAUSDT",
-            1795139131726,
-            "trade_archive_incomplete"
-          ],
-          [
-            "INTCUSDT",
-            1795140030226,
-            "trade_archive_incomplete"
-          ],
-          [
-            "SPCXUSDT",
-            1795140033678,
-            "trade_archive_incomplete"
-          ],
-          [
-            "CRCLUSDT",
-            1795148129170,
-            "trade_archive_incomplete"
-          ],
-          [
-            "MSTRUSDT",
-            1795148131268,
-            "trade_archive_incomplete"
-          ],
-          [
-            "GOOGLUSDT",
-            1795149029873,
-            "trade_archive_incomplete"
-          ],
-          [
-            "INTCUSDT",
-            1795149030189,
-            "trade_archive_incomplete"
-          ],
-          [
-            "MSTRUSDT",
-            1795149031224,
-            "trade_archive_incomplete"
-          ],
-          [
-            "NVDAUSDT",
-            1795149031672,
-            "trade_archive_incomplete"
-          ],
-          [
-            "SPCXUSDT",
-            1795149033624,
-            "trade_archive_incomplete"
-          ],
-          [
-            "INTCUSDT",
-            1795150830276,
-            "trade_archive_incomplete"
-          ],
-          [
-            "INTCUSDT",
-            1795151730229,
-            "trade_archive_incomplete"
-          ],
-          [
-            "CRCLUSDT",
-            1795157129276,
-            "trade_archive_incomplete"
-          ],
-          [
-            "NVDAUSDT",
-            1795159831775,
-            "trade_archive_incomplete"
-          ],
-          [
-            "SPCXUSDT",
-            1795159833724,
-            "trade_archive_incomplete"
-          ]
-        ]
+        "unknown_paths": [],
+        "profitable_closes": null
       },
       "aligned_continuation|regular": {
         "status": "SCORED_PUBLIC_L2_SIMULATION",
@@ -855,7 +1694,26 @@
         "peak_margin_pct": 0.0,
         "closed": [],
         "qualified": 0,
-        "unknown_paths": []
+        "unknown_paths": [],
+        "profitable_closes": 0
+      },
+      "aligned_continuation|stock_cadence": {
+        "status": "UNSCORABLE",
+        "symbol": "INTCUSDT",
+        "entry_ms": 1795123976527,
+        "reason": "missing exit L2 sample",
+        "qualified": 26,
+        "unknown_paths": [],
+        "profitable_closes": null
+      },
+      "aligned_continuation|one_per_side_hour": {
+        "status": "UNSCORABLE",
+        "symbol": "INTCUSDT",
+        "entry_ms": 1795123976527,
+        "reason": "missing exit L2 sample",
+        "qualified": 26,
+        "unknown_paths": [],
+        "profitable_closes": null
       }
     }
   },
@@ -865,6 +1723,7 @@
     "Readiness assumed for the funding experiment. Actual order readiness remains gated.",
     "Public entry depth and public last-trade exit triggers followed by an archived market book at +200ms.",
     "Legacy sample uses base volume and later sample uses contract volume.",
+    "Cadence consumes the slot at quote eligibility before the separate account admission checks.",
     "Only mature proposals from the defined archives. Costs outside visible execution and floating equity excluded."
   ]
 }

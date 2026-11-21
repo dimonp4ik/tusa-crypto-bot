@@ -1,0 +1,154 @@
+{
+  "status": "FROZEN_HISTORICAL_ENTRY_COMPARISON",
+  "calendar": "https://www.bls.gov/schedule/2026/11_sched.htm",
+  "sample": "2026-11-05 to 2026-11-14",
+  "baseline_parity": true,
+  "exposure": {
+    "US productivity and costs": {
+      "release_ms": 1793885400000,
+      "open_at_release": 0,
+      "gross_outcome_cash": 0.0,
+      "symbols": []
+    },
+    "US employment situation": {
+      "release_ms": 1793971800000,
+      "open_at_release": 0,
+      "gross_outcome_cash": 0.0,
+      "symbols": []
+    },
+    "US CPI": {
+      "release_ms": 1794317400000,
+      "open_at_release": 0,
+      "gross_outcome_cash": 0.0,
+      "symbols": []
+    },
+    "US PPI": {
+      "release_ms": 1794576600000,
+      "open_at_release": 2,
+      "gross_outcome_cash": 0.7515000000000001,
+      "symbols": [
+        "AVAXUSDT",
+        "HYPEUSDT"
+      ]
+    }
+  },
+  "baseline": {
+    "status": "SCORED_PUBLIC_L2_SIMULATION",
+    "trades": 39,
+    "skipped": {
+      "stocks:wide": 46,
+      "crypto:wide": 21,
+      "stocks:stale order book": 7,
+      "stocks:depth slippage exceeds limit": 1,
+      "stocks:paper_guard": 1
+    },
+    "return_pct": 0.1768384615384644,
+    "drawdown_pct": 2.49785462871079,
+    "contribution_pct": {
+      "crypto": 0.1768384615384778,
+      "stocks": 0.0
+    },
+    "peak_reservations": 4,
+    "peak_margin_pct": 11.776710195715747,
+    "cash_pnl_by_entry_day": {
+      "2026-11-05": 2.072500000000013,
+      "2026-11-06": -0.015959999999999624,
+      "2026-11-07": 0.642800000000002,
+      "2026-11-08": 0.40949999999999587,
+      "2026-11-09": -0.7937999999999992,
+      "2026-11-10": -0.020700000000001495,
+      "2026-11-11": 0.6482000000000017,
+      "2026-11-12": 0.4116500000000023,
+      "2026-11-13": -3.1174999999999935,
+      "2026-11-14": -0.006799999999999695
+    },
+    "exit_counts": {
+      "TARGET": 8,
+      "SL": 13,
+      "BE": 17,
+      "TIME": 1
+    }
+  },
+  "cases": {
+    "15m_before_45m_after": {
+      "status": "SCORED_PUBLIC_L2_SIMULATION",
+      "trades": 39,
+      "skipped": {
+        "stocks:wide": 46,
+        "crypto:wide": 21,
+        "stocks:stale order book": 7,
+        "stocks:depth slippage exceeds limit": 1,
+        "stocks:paper_guard": 1
+      },
+      "return_pct": 0.1768384615384644,
+      "drawdown_pct": 2.49785462871079,
+      "contribution_pct": {
+        "crypto": 0.1768384615384778,
+        "stocks": 0.0
+      },
+      "peak_reservations": 4,
+      "peak_margin_pct": 11.776710195715747,
+      "cash_pnl_by_entry_day": {
+        "2026-11-05": 2.072500000000013,
+        "2026-11-06": -0.015959999999999624,
+        "2026-11-07": 0.642800000000002,
+        "2026-11-08": 0.40949999999999587,
+        "2026-11-09": -0.7937999999999992,
+        "2026-11-10": -0.020700000000001495,
+        "2026-11-11": 0.6482000000000017,
+        "2026-11-12": 0.4116500000000023,
+        "2026-11-13": -3.1174999999999935,
+        "2026-11-14": -0.006799999999999695
+      },
+      "exit_counts": {
+        "TARGET": 8,
+        "SL": 13,
+        "BE": 17,
+        "TIME": 1
+      }
+    },
+    "30m_before_120m_after": {
+      "status": "SCORED_PUBLIC_L2_SIMULATION",
+      "trades": 38,
+      "skipped": {
+        "stocks:wide": 46,
+        "crypto:scheduled_release": 1,
+        "crypto:wide": 21,
+        "stocks:stale order book": 7,
+        "stocks:depth slippage exceeds limit": 1,
+        "stocks:paper_guard": 1
+      },
+      "return_pct": -0.33239230769233075,
+      "drawdown_pct": 2.5095917597984614,
+      "contribution_pct": {
+        "crypto": -0.3323923076922917,
+        "stocks": 0.0
+      },
+      "peak_reservations": 4,
+      "peak_margin_pct": 11.48625929783413,
+      "cash_pnl_by_entry_day": {
+        "2026-11-05": 1.4095000000000129,
+        "2026-11-06": -0.015959999999999624,
+        "2026-11-07": 0.642800000000002,
+        "2026-11-08": 0.40949999999999587,
+        "2026-11-09": -0.7937999999999992,
+        "2026-11-10": -0.020700000000001495,
+        "2026-11-11": 0.6482000000000017,
+        "2026-11-12": 0.4116500000000023,
+        "2026-11-13": -3.116499999999994,
+        "2026-11-14": -0.006799999999999695
+      },
+      "exit_counts": {
+        "TARGET": 7,
+        "SL": 13,
+        "BE": 17,
+        "TIME": 1
+      }
+    }
+  },
+  "limitations": [
+    "Four scheduled US releases. Open exposure shows whole-trade outcomes.",
+    "Historical public-market replay with the same account assumptions.",
+    "The simulation isolates new-entry blackout. It preserves existing positions."
+  ]
+}

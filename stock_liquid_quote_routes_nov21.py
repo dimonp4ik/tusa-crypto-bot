@@ -6,12 +6,13 @@ import importlib.util
 import json
 import math
 import pickle
-from bisect import bisect_left
-from collections import Counter, defaultdict
+from bisect import bisect_left, bisect_right
+from collections import Counter, defaultdict, deque
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 from unittest.mock import patch
 
+from okx_recent_trade_repair_nov21 import load_repaired_tape, repair_recent_days
 from okx_xperp_cash_tick_nov19 import simulate
 from okx_xperp_l2_entry_replay_nov19 import cash_phase
 from okx_xperp_multiday_capture_nov20 import file_hash, trade_files
@@ -272,7 +273,36 @@ def score_minutes():
     print(json.dumps(aggregates, indent=2))
 
 
-def score():
+def repair_trades():
+    plan = load_plan()
+    capture_path = DATA / "capture.json"
+    captured = json.loads(capture_path.read_bytes())
+    if captured["plan_sha256"] != file_hash(DATA / "plan.json"):
+        raise ValueError("trade repair plan changed")
+    rows = [r for cohort in plan["cases"].values() for r in cohort]
+    evidence = repair_recent_days(captured["trades"], rows, hold_seconds=HOLD_SECONDS,
+                                  folder=DATA / "repaired_prints")
+    write_json(DATA / "trade_repair.json", dict(capture_sha256=file_hash(capture_path), intervals=evidence))
+
+
+def limit_bursts(proposals, *, max_same_side):
+    """Admit proposals in quote receipt order, including visible per-scan limits."""
+    last_scan = Counter()
+    recent = deque()
+    for row in sorted(proposals, key=lambda r: (r["entry_ms"], r["symbol"])):
+        at = row["entry_ms"]
+        while recent and recent[0]["entry_ms"] <= at - 3_600_000:
+            recent.popleft()
+        side_count = sum(r["direction"] == row["direction"] for r in recent)
+        if last_scan[row["epoch"]] >= 2 or len(recent) >= 4 or side_count >= max_same_side:
+            yield dict(row, entry_status="publication_rate_limit")
+        else:
+            last_scan[row["epoch"]] += 1
+            recent.append(row)
+            yield row
+
+
+def score(*, stress=False):
     plan = load_plan()
     capture_path = DATA / "capture.json"
     captured = json.loads(capture_path.read_bytes())
@@ -284,19 +314,57 @@ def score():
     books = defaultdict(dict)
     for row in rows:
         books[row["symbol"]][row["entry_ms"]] = row["book"]
-    tape = resolve_all(rows, {"files": captured["trades"]}, {"symbols": captured["reference"]}, ticks)
-    extra, exits = exit_books(rows, captured, specs, books)
+    repair_path = DATA / "trade_repair.json"
+    repair = json.loads(repair_path.read_bytes()) if repair_path.exists() else None
+    if repair:
+        if repair["capture_sha256"] != file_hash(capture_path):
+            raise ValueError("trade repair and archive capture disagree")
+        for symbol, intervals in repair["intervals"].items():
+            captured["trades"][symbol]["repaired"] = intervals
+    stored_tapes = {}
+
+    def load_tape(item):
+        tape = load_repaired_tape(item)
+        if stress:
+            stored_tapes[item["instrument"]] = ([t.ms for t in tape], tape)
+        return tape
+
+    tape = resolve_all(rows, {"files": captured["trades"]}, {"symbols": captured["reference"]},
+                       ticks, trade_loader=load_tape)
+    extra, exits = ({}, {}) if stress else exit_books(rows, captured, specs, books)
+
+    def stressed_exit_penalty(bps):
+        def price(symbol, at, side, _):
+            times, entries = stored_tapes[specs[symbol]["instId"]]
+            index = bisect_right(times, at) - 1
+            if index < 0 or at - times[index] > 60_000:
+                raise ValueError("no recent trade for exit stress proxy")
+            sign = 1 if side == "LONG" else -1
+            return entries[index].price * (1 - sign * bps / 10_000)
+        return price
+
     results = {}
     for cohort, cases in plan["cases"].items():
         results[cohort] = {}
         for route in ROUTES:
             proposals = [r for r in cases if r["route"] == route]
-            for label, subset in (("all", proposals), ("regular", [r for r in proposals if r["phase"] == "regular"])):
+            subsets = {"all": proposals, "regular": [r for r in proposals if r["phase"] == "regular"]}
+            if route == "aligned_continuation":
+                subsets.update(stock_cadence=list(limit_bursts(proposals, max_same_side=2)),
+                               one_per_side_hour=list(limit_bursts(proposals, max_same_side=1)))
+            for label, subset in subsets.items():
                 unknown = [(r["symbol"], r["entry_ms"], r["path"][60].get("reason"))
-                           for r in subset if not r["path"][60]["known"]]
-                case = simulate(subset, specs, ticks, books, clock=60, lag=200, setting="requested5")
-                results[cohort][f"{route}|{label}"] = dict(case, qualified=len(subset), unknown_paths=unknown)
+                           for r in subset if r["entry_status"] == "eligible" and not r["path"][60]["known"]]
+                pricers = ({f"|stress_{bps}bps": stressed_exit_penalty(bps) for bps in (5, 15, 30, 50)}
+                           if stress else {"": None})
+                for suffix, exit_price in pricers.items():
+                    case = simulate(subset, specs, ticks, books, clock=60, lag=200, setting="requested5",
+                                    exit_price=exit_price)
+                    results[cohort][f"{route}|{label}{suffix}"] = dict(case, qualified=len(subset), unknown_paths=unknown,
+                        profitable_closes=sum(t["bank_pnl"] + t["runner_pnl"] > 0 for t in case.get("closed", []))
+                        if "closed" in case else None)
     report = dict(plan_sha256=captured["plan_sha256"], capture_sha256=file_hash(capture_path),
+                  trade_repair_sha256=file_hash(repair_path) if repair else None,
                   count=plan["counts"], tape=tape, close_book_checks=exits, close_book_files=extra,
                   results=results, live_activation_supported=False,
                   limitations=[
@@ -304,23 +372,35 @@ def score():
                       "Readiness assumed for the funding experiment. Actual order readiness remains gated.",
                       "Public entry depth and public last-trade exit triggers followed by an archived market book at +200ms.",
                       "Legacy sample uses base volume and later sample uses contract volume.",
+                      "Cadence consumes the slot at quote eligibility before the separate account admission checks.",
                       "Only mature proposals from the defined archives. Costs outside visible execution and floating equity excluded.",
                   ])
-    write_json(ROOT / "stock_liquid_quote_routes_nov21.json", report)
+    if stress:
+        report["execution_model"] = "LAST_PUBLIC_TRADE_EXIT_PENALTY"
+        report["limitations"][2] = ("Exit uses the last public trade observed by trigger plus 200ms, "
+                                    "with an adverse price penalty. Actual exit depth is unobserved.")
+        for cohort in report["results"].values():
+            for result in cohort.values():
+                if result.get("status") == "SCORED_PUBLIC_L2_SIMULATION":
+                    result["status"] = "SCORED_PUBLIC_TRADE_EXIT_STRESS"
+    suffix = "_exit_stress" if stress else ""
+    write_json(ROOT / f"stock_liquid_quote_routes_nov21{suffix}.json", report)
     print(json.dumps({cohort: {key: {k: v for k, v in case.items() if k != "closed"}
                               for key, case in cases.items()} for cohort, cases in results.items()}, indent=2))
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("stage", choices=("freeze", "capture", "score", "minute"))
+    parser.add_argument("stage", choices=("freeze", "capture", "repair", "score", "stress", "minute"))
     args = parser.parse_args()
     if args.stage == "freeze":
         plan = load_plan()
         print(json.dumps(plan["counts"], indent=2))
     elif args.stage == "capture":
         capture()
-    elif args.stage == "score":
-        score()
+    elif args.stage == "repair":
+        repair_trades()
+    elif args.stage in ("score", "stress"):
+        score(stress=args.stage == "stress")
     else:
         score_minutes()
