@@ -18,12 +18,12 @@ EXIT_STRESS = .0005
 STOP_CODES = {"SL", "LOCK", "TP1_STOP"}
 
 
-def shorten(control, candles, i):
+def shorten(control, candles, i, *, target_px=None):
     if not control["known"]:
         return control
     entry = control["entry"]
     sign = 1 if control["direction"] == "LONG" else -1
-    target = entry + TARGET_R * (entry - control["sl"])
+    target = entry + TARGET_R * (entry - control["sl"]) if target_px is None else target_px
     for j in range(i, min(i + 48, len(candles["time"]))):
         close_time = int(candles["time"][j]) + 900
         if close_time > control["exit_time"]:

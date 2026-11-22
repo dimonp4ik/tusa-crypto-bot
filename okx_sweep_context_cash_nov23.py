@@ -210,15 +210,14 @@ def holdout_inputs():
     return selection,specs,ticks,books,{},captured['trades'],captured['references']
 
 
-def stock_paper():
+def stock_paper_rows():
     import stock_native_geometry_match_nov22 as observer
 
     plan = observer.freeze()
-    _, _, ticks, _, _, notes, _ = observer.prepare_cases(plan)
+    _, _, ticks, _, tapes, notes, _ = observer.prepare_cases(plan)
     folder,_ = observer.ARCHIVES['contract_followup']
     observations = {}
-    outcomes = {label: Counter() for label in POLICIES}
-    features = Counter()
+    rows = []
     for row in notes:
         path = row.get('paper_path')
         if not path or not path['known']:
@@ -231,12 +230,21 @@ def stock_paper():
             observations[epoch] = {r['symbol']: r['closed_frame'] for r in json.loads(source.read_bytes())['observations']}
         ctx = market_context(window(observations[epoch][symbol],epoch),direction=row['direction'],
                              entry=row['ticker_reference'],stop=row['fixed_stop'],tick=ticks[symbol])
+        rows.append((row,ctx))
+    return rows,ticks,tapes,file_hash(observer.DATA/'plan.json')
+
+
+def stock_paper():
+    rows,_,_,digest = stock_paper_rows()
+    outcomes = {label: Counter() for label in POLICIES}
+    features = Counter()
+    for row,ctx in rows:
         features[ctx['sweep'] if ctx else 'unknown'] += 1
         for label in POLICIES:
             if not refuses(label,ctx):
-                outcomes[label][path['code']] += 1
+                outcomes[label][row['paper_path']['code']] += 1
     print('native stock at ticker', {k:dict(v) for k,v in outcomes.items()},flush=True)
-    return dict(paper_counts=outcomes, context=features, plan_sha256=file_hash(observer.DATA/'plan.json'),
+    return dict(paper_counts=outcomes, context=features, plan_sha256=digest,
                 limitation='Native paper outcomes at the observed ticker; executable cash is in the separate book study.')
 
 
