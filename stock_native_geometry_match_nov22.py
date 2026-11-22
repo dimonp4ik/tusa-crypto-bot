@@ -129,7 +129,7 @@ def cash_view(rows, specs, ticks, books, tapes, penalty):
     return result
 
 
-def score(plan):
+def prepare_cases(plan):
     capture_path, repair_path = DATA / "capture.json", DATA / "trade_repair.json"
     captured, repair = map(read_json, (capture_path, repair_path))
     if (captured["plan_sha256"] != file_hash(DATA / "plan.json")
@@ -199,6 +199,7 @@ def score(plan):
         book = row["public_book"]
         books[symbol][at] = dict(ts=book["exchange_at"]*1000, bids=book["bids"], asks=book["asks"])
         fixed_candidate = dict(ticker, entry_status="eligible", stock_reference_ready=True,
+                               reference_entry=quote["average"],
                                path={60: path(ticker, quote["average"])})
         cases["production_1pct"].append(fixed_candidate)
         if row["structural"] is not None:
@@ -211,6 +212,12 @@ def score(plan):
                 cases["production_matched"].append(fixed_candidate)
                 cases["structural_matched"].append(moved)
                 notes["structural_width"] = width
+    return cases, specs, ticks, books, tapes, diagnostics, tape_checks
+
+
+def score(plan):
+    cases, specs, ticks, books, tapes, diagnostics, tape_checks = prepare_cases(plan)
+    capture_path, repair_path = DATA / "capture.json", DATA / "trade_repair.json"
     results = {name: {str(bps): cash_view(cohort, specs, ticks, books, tapes, bps) for bps in (5, 15, 30)}
                for name, cohort in cases.items()}
     paper_stats = Counter(r["paper_path"]["code"] for r in diagnostics if (r.get("paper_path") or {}).get("known"))
