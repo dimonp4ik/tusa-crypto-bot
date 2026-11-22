@@ -1,0 +1,1031 @@
+{
+  "maturity_cutoff": 1795339800,
+  "source_hashes": {
+    "plan.json": "39de5b14596979188505a32cec1fc3292fa7e6fcc3c6a5e96d4478f86c50506d",
+    "capture.json": "51ddf7edd02c3bad03c44580901eafa27ac15fc27e39d1ba3ed226fa70e2a926",
+    "trade_repair.json": "c30041b9edb8d0a22c9b5660292b0e4c0d671bc7b8d6268589854779d66ab4c7"
+  },
+  "starting_capital_usd": 130.0,
+  "examined": 23,
+  "status_counts": {
+    "wide": 18,
+    "executable price outside signal bracket": 1,
+    "depth slippage exceeds limit": 3,
+    "qualified_5bp": 1
+  },
+  "ticker_paper_path_counts": {
+    "TARGET": 9,
+    "SL": 7,
+    "TIME": 7
+  },
+  "matched_cases": {
+    "production_1pct": 1,
+    "structural_matched": 1,
+    "production_matched": 1
+  },
+  "diagnostics": [
+    {
+      "symbol": "SOFTBANKUSDT",
+      "epoch": 1795163400,
+      "entry_ms": 1795163433193,
+      "direction": "SHORT",
+      "phase": "other",
+      "index_returns_signed": {
+        "QQQUSDT": 0.000669667190979828,
+        "SPYUSDT": -0.0005182145408200167
+      },
+      "ticker_reference": 19.16,
+      "ticker_anchor": "carried_closed_price",
+      "current_bucket_trade_age_ms": null,
+      "paper_path": {
+        "known": true,
+        "code": "TARGET",
+        "end_ms": 1795188246644,
+        "trigger_price": 18.72,
+        "bank": null,
+        "be_level": 19.16,
+        "simultaneous_targets": false
+      },
+      "ticker_backing": true,
+      "fixed_stop": 19.3516,
+      "fixed_target": 18.7768,
+      "paper_stop_recovery": null,
+      "quote": {
+        "status": "wide",
+        "average": 19.12,
+        "worst": 19.12,
+        "contracts": 2.0,
+        "spread_bps": 41.75365344467552
+      },
+      "status": "wide"
+    },
+    {
+      "symbol": "WDCUSDT",
+      "epoch": 1795163400,
+      "entry_ms": 1795163433925,
+      "direction": "SHORT",
+      "phase": "other",
+      "index_returns_signed": {
+        "QQQUSDT": 0.000669667190979828,
+        "SPYUSDT": -0.0005182145408200167
+      },
+      "ticker_reference": 288.75,
+      "ticker_anchor": "carried_closed_price",
+      "current_bucket_trade_age_ms": null,
+      "paper_path": {
+        "known": true,
+        "code": "TARGET",
+        "end_ms": 1795166931870,
+        "trigger_price": 282.5,
+        "bank": null,
+        "be_level": 288.75,
+        "simultaneous_targets": false
+      },
+      "ticker_backing": true,
+      "fixed_stop": 291.6375,
+      "fixed_target": 282.975,
+      "paper_stop_recovery": null,
+      "quote": {
+        "status": "wide",
+        "average": 288.21,
+        "worst": 288.21,
+        "contracts": 0.13,
+        "spread_bps": 46.73139830728569
+      },
+      "status": "wide"
+    },
+    {
+      "symbol": "BMNRUSDT",
+      "epoch": 1795164300,
+      "entry_ms": 1795164328773,
+      "direction": "SHORT",
+      "phase": "other",
+      "index_returns_signed": {
+        "QQQUSDT": -0.0007331035235762506,
+        "SPYUSDT": -0.0014005798400538172
+      },
+      "ticker_reference": 15.08,
+      "ticker_anchor": "carried_closed_price",
+      "current_bucket_trade_age_ms": null,
+      "paper_path": {
+        "known": true,
+        "code": "TARGET",
+        "end_ms": 1795167094500,
+        "trigger_price": 14.77,
+        "bank": null,
+        "be_level": 15.08,
+        "simultaneous_targets": false
+      },
+      "ticker_backing": true,
+      "fixed_stop": 15.2308,
+      "fixed_target": 14.7784,
+      "paper_stop_recovery": null,
+      "quote": {
+        "status": "wide",
+        "average": 15.039999999999997,
+        "worst": 15.04,
+        "contracts": 2.5,
+        "spread_bps": 53.05039787798413
+      },
+      "status": "wide"
+    },
+    {
+      "symbol": "AXTIUSDT",
+      "epoch": 1795172400,
+      "entry_ms": 1795172428529,
+      "direction": "SHORT",
+      "phase": "premarket",
+      "index_returns_signed": {
+        "QQQUSDT": -0.002458772493070027,
+        "SPYUSDT": -0.0033703131582643042
+      },
+      "ticker_reference": 33.02,
+      "ticker_anchor": "carried_closed_price",
+      "current_bucket_trade_age_ms": null,
+      "paper_path": {
+        "known": true,
+        "code": "TARGET",
+        "end_ms": 1795175995255,
+        "trigger_price": 32.22,
+        "bank": null,
+        "be_level": 33.02,
+        "simultaneous_targets": false
+      },
+      "ticker_backing": true,
+      "fixed_stop": 33.3502,
+      "fixed_target": 32.3596,
+      "paper_stop_recovery": null,
+      "quote": {
+        "status": "wide",
+        "average": 32.87,
+        "worst": 32.87,
+        "contracts": 1.18,
+        "spread_bps": 48.55842185129095
+      },
+      "status": "wide"
+    },
+    {
+      "symbol": "BMNRUSDT",
+      "epoch": 1795172400,
+      "entry_ms": 1795172428831,
+      "direction": "SHORT",
+      "phase": "premarket",
+      "index_returns_signed": {
+        "QQQUSDT": -0.002458772493070027,
+        "SPYUSDT": -0.0033703131582643042
+      },
+      "ticker_reference": 15.08,
+      "ticker_anchor": "carried_closed_price",
+      "current_bucket_trade_age_ms": null,
+      "paper_path": {
+        "known": true,
+        "code": "TARGET",
+        "end_ms": 1795176331055,
+        "trigger_price": 14.77,
+        "bank": null,
+        "be_level": 15.08,
+        "simultaneous_targets": false
+      },
+      "ticker_backing": true,
+      "fixed_stop": 15.2308,
+      "fixed_target": 14.7784,
+      "paper_stop_recovery": null,
+      "quote": {
+        "status": "wide",
+        "average": 14.97,
+        "worst": 14.97,
+        "contracts": 2.6,
+        "spread_bps": 53.29780146568959
+      },
+      "status": "wide"
+    },
+    {
+      "symbol": "AXTIUSDT",
+      "epoch": 1795185000,
+      "entry_ms": 1795185028475,
+      "direction": "SHORT",
+      "phase": "regular",
+      "index_returns_signed": {
+        "QQQUSDT": -0.0009730679892021588,
+        "SPYUSDT": 1.403508771924411e-05
+      },
+      "ticker_reference": 32.43,
+      "ticker_anchor": "current_bucket_trade",
+      "current_bucket_trade_age_ms": 14517,
+      "paper_path": {
+        "known": true,
+        "code": "SL",
+        "end_ms": 1795186675858,
+        "trigger_price": 33.3,
+        "bank": null,
+        "be_level": 32.43
+      },
+      "ticker_backing": true,
+      "fixed_stop": 32.7543,
+      "fixed_target": 31.61925,
+      "paper_stop_recovery": {
+        "target_reached_after_stop": true,
+        "entry_reclaimed": true,
+        "another_stop_distance_adverse": true
+      },
+      "quote": {
+        "status": "wide",
+        "average": 32.23,
+        "worst": 32.23,
+        "contracts": 1.21,
+        "spread_bps": 153.94088669950742
+      },
+      "status": "wide"
+    },
+    {
+      "symbol": "BEUSDT",
+      "epoch": 1795187700,
+      "entry_ms": 1795187728679,
+      "direction": "SHORT",
+      "phase": "regular",
+      "index_returns_signed": {
+        "QQQUSDT": -0.00552797657265458,
+        "SPYUSDT": -0.004285834337096173
+      },
+      "ticker_reference": 159.97,
+      "ticker_anchor": "carried_closed_price",
+      "current_bucket_trade_age_ms": null,
+      "paper_path": {
+        "known": true,
+        "code": "TARGET",
+        "end_ms": 1795188111862,
+        "trigger_price": 152.86,
+        "bank": null,
+        "be_level": 159.97,
+        "simultaneous_targets": false
+      },
+      "ticker_backing": true,
+      "fixed_stop": 161.5697,
+      "fixed_target": 155.97075,
+      "paper_stop_recovery": null,
+      "quote": {
+        "status": "executable price outside signal bracket",
+        "spread_bps": 103.01597071495513
+      },
+      "status": "executable price outside signal bracket"
+    },
+    {
+      "symbol": "BEUSDT",
+      "epoch": 1795216500,
+      "entry_ms": 1795216528474,
+      "direction": "SHORT",
+      "phase": "postmarket",
+      "index_returns_signed": {
+        "QQQUSDT": 0.0075491093657142905,
+        "SPYUSDT": 0.00844200216388602
+      },
+      "ticker_reference": 145.86,
+      "ticker_anchor": "carried_closed_price",
+      "current_bucket_trade_age_ms": null,
+      "paper_path": {
+        "known": true,
+        "code": "TIME",
+        "end_ms": 1795274100000,
+        "trigger_price": null,
+        "bank": null,
+        "be_level": 145.86
+      },
+      "ticker_backing": true,
+      "fixed_stop": 147.3186,
+      "fixed_target": 142.9428,
+      "paper_stop_recovery": null,
+      "quote": {
+        "status": "wide",
+        "average": 145.56,
+        "worst": 145.56,
+        "contracts": 0.26,
+        "spread_bps": 54.126271796101
+      },
+      "status": "wide"
+    },
+    {
+      "symbol": "SKHYUSDT",
+      "epoch": 1795216500,
+      "entry_ms": 1795216532726,
+      "direction": "SHORT",
+      "phase": "postmarket",
+      "index_returns_signed": {
+        "QQQUSDT": 0.0075491093657142905,
+        "SPYUSDT": 0.00844200216388602
+      },
+      "ticker_reference": 106.79,
+      "ticker_anchor": "carried_closed_price",
+      "current_bucket_trade_age_ms": null,
+      "paper_path": {
+        "known": true,
+        "code": "TARGET",
+        "end_ms": 1795231948235,
+        "trigger_price": 104.19,
+        "bank": null,
+        "be_level": 106.79,
+        "simultaneous_targets": false
+      },
+      "ticker_backing": true,
+      "fixed_stop": 107.8579,
+      "fixed_target": 104.6542,
+      "paper_stop_recovery": null,
+      "quote": {
+        "status": "wide",
+        "average": 106.6,
+        "worst": 106.6,
+        "contracts": 0.36,
+        "spread_bps": 22.488755622189757
+      },
+      "status": "wide"
+    },
+    {
+      "symbol": "BEUSDT",
+      "epoch": 1795217400,
+      "entry_ms": 1795217428476,
+      "direction": "SHORT",
+      "phase": "postmarket",
+      "index_returns_signed": {
+        "QQQUSDT": -0.0010028630121476922,
+        "SPYUSDT": 0.001244742037943225
+      },
+      "ticker_reference": 145.86,
+      "ticker_anchor": "carried_closed_price",
+      "current_bucket_trade_age_ms": null,
+      "paper_path": {
+        "known": true,
+        "code": "TIME",
+        "end_ms": 1795275000000,
+        "trigger_price": null,
+        "bank": null,
+        "be_level": 145.86
+      },
+      "ticker_backing": true,
+      "fixed_stop": 147.3186,
+      "fixed_target": 142.9428,
+      "paper_stop_recovery": null,
+      "quote": {
+        "status": "depth slippage exceeds limit",
+        "spread_bps": 60.89425609797724
+      },
+      "status": "depth slippage exceeds limit"
+    },
+    {
+      "symbol": "AMZNUSDT",
+      "epoch": 1795221000,
+      "entry_ms": 1795221028069,
+      "direction": "SHORT",
+      "phase": "postmarket",
+      "index_returns_signed": {
+        "QQQUSDT": -0.008278199654531804,
+        "SPYUSDT": -0.005111959104327157
+      },
+      "ticker_reference": 251.04,
+      "ticker_anchor": "carried_closed_price",
+      "current_bucket_trade_age_ms": null,
+      "paper_path": {
+        "known": true,
+        "code": "SL",
+        "end_ms": 1795267959333,
+        "trigger_price": 253.9,
+        "bank": null,
+        "be_level": 251.04
+      },
+      "ticker_backing": true,
+      "fixed_stop": 253.5504,
+      "fixed_target": 246.0192,
+      "paper_stop_recovery": {
+        "target_reached_after_stop": false,
+        "entry_reclaimed": false,
+        "another_stop_distance_adverse": false
+      },
+      "quote": {
+        "status": "wide",
+        "average": 250.92,
+        "worst": 250.92,
+        "contracts": 0.15,
+        "spread_bps": 7.967492630069997
+      },
+      "status": "wide"
+    },
+    {
+      "symbol": "CRCLUSDT",
+      "epoch": 1795221000,
+      "entry_ms": 1795221029276,
+      "direction": "SHORT",
+      "phase": "postmarket",
+      "index_returns_signed": {
+        "QQQUSDT": -0.008278199654531804,
+        "SPYUSDT": -0.005111959104327157
+      },
+      "ticker_reference": 48.84,
+      "ticker_anchor": "carried_closed_price",
+      "current_bucket_trade_age_ms": null,
+      "paper_path": {
+        "known": true,
+        "code": "TARGET",
+        "end_ms": 1795231826385,
+        "trigger_price": 47.85,
+        "bank": null,
+        "be_level": 48.84,
+        "simultaneous_targets": false
+      },
+      "ticker_backing": true,
+      "fixed_stop": 49.3284,
+      "fixed_target": 47.8632,
+      "paper_stop_recovery": null,
+      "quote": {
+        "status": "wide",
+        "average": 48.85,
+        "worst": 48.85,
+        "contracts": 0.7,
+        "spread_bps": 6.139363552645275
+      },
+      "status": "wide"
+    },
+    {
+      "symbol": "NVDAUSDT",
+      "epoch": 1795221900,
+      "entry_ms": 1795221931679,
+      "direction": "SHORT",
+      "phase": "postmarket",
+      "index_returns_signed": {
+        "QQQUSDT": -0.009286611937131761,
+        "SPYUSDT": -0.006748183181451317
+      },
+      "ticker_reference": 130.41,
+      "ticker_anchor": "carried_closed_price",
+      "current_bucket_trade_age_ms": null,
+      "paper_path": {
+        "known": true,
+        "code": "TIME",
+        "end_ms": 1795279500000,
+        "trigger_price": null,
+        "bank": null,
+        "be_level": 130.41
+      },
+      "ticker_backing": true,
+      "fixed_stop": 131.7141,
+      "fixed_target": 127.14975,
+      "paper_stop_recovery": null,
+      "quote": {
+        "status": "qualified_5bp",
+        "average": 130.32,
+        "worst": 130.32,
+        "contracts": 0.29,
+        "spread_bps": 2.3017608470480795
+      },
+      "status": "qualified_5bp",
+      "structural_width": 0.003692679558010914
+    },
+    {
+      "symbol": "SNXXUSDT",
+      "epoch": 1795221900,
+      "entry_ms": 1795221933023,
+      "direction": "SHORT",
+      "phase": "postmarket",
+      "index_returns_signed": {
+        "QQQUSDT": -0.009286611937131761,
+        "SPYUSDT": -0.006748183181451317
+      },
+      "ticker_reference": 1.836,
+      "ticker_anchor": "carried_closed_price",
+      "current_bucket_trade_age_ms": null,
+      "paper_path": {
+        "known": true,
+        "code": "TARGET",
+        "end_ms": 1795228414845,
+        "trigger_price": 1.79,
+        "bank": null,
+        "be_level": 1.836,
+        "simultaneous_targets": false
+      },
+      "ticker_backing": true,
+      "fixed_stop": 1.85436,
+      "fixed_target": 1.7901,
+      "paper_stop_recovery": null,
+      "quote": {
+        "status": "wide",
+        "average": 1.825,
+        "worst": 1.825,
+        "contracts": 21.3,
+        "spread_bps": 60.092870800328434
+      },
+      "status": "wide"
+    },
+    {
+      "symbol": "WDCUSDT",
+      "epoch": 1795223700,
+      "entry_ms": 1795223733978,
+      "direction": "SHORT",
+      "phase": "other",
+      "index_returns_signed": {
+        "QQQUSDT": -0.012253979680316718,
+        "SPYUSDT": -0.00995471184871155
+      },
+      "ticker_reference": 269.37,
+      "ticker_anchor": "carried_closed_price",
+      "current_bucket_trade_age_ms": null,
+      "paper_path": {
+        "known": true,
+        "code": "TIME",
+        "end_ms": 1795281300000,
+        "trigger_price": null,
+        "bank": null,
+        "be_level": 269.37
+      },
+      "ticker_backing": true,
+      "fixed_stop": 272.0637,
+      "fixed_target": 262.63575,
+      "paper_stop_recovery": null,
+      "quote": {
+        "status": "wide",
+        "average": 267.5,
+        "worst": 267.5,
+        "contracts": 0.14,
+        "spread_bps": 58.519857614104154
+      },
+      "status": "wide"
+    },
+    {
+      "symbol": "WDCUSDT",
+      "epoch": 1795224600,
+      "entry_ms": 1795224633924,
+      "direction": "SHORT",
+      "phase": "other",
+      "index_returns_signed": {
+        "QQQUSDT": -0.008423350766573856,
+        "SPYUSDT": -0.007393209200438067
+      },
+      "ticker_reference": 269.37,
+      "ticker_anchor": "carried_closed_price",
+      "current_bucket_trade_age_ms": null,
+      "paper_path": {
+        "known": true,
+        "code": "TIME",
+        "end_ms": 1795282200000,
+        "trigger_price": null,
+        "bank": null,
+        "be_level": 269.37
+      },
+      "ticker_backing": true,
+      "fixed_stop": 272.0637,
+      "fixed_target": 262.63575,
+      "paper_stop_recovery": null,
+      "quote": {
+        "status": "wide",
+        "average": 267.53,
+        "worst": 267.53,
+        "contracts": 0.14,
+        "spread_bps": 38.798731579929886
+      },
+      "status": "wide"
+    },
+    {
+      "symbol": "SOXSUSDT",
+      "epoch": 1795228200,
+      "entry_ms": 1795228233471,
+      "direction": "SHORT",
+      "phase": "other",
+      "index_returns_signed": {
+        "QQQUSDT": -0.004073749472522481,
+        "SPYUSDT": -0.0065469509913953505
+      },
+      "ticker_reference": 76.42,
+      "ticker_anchor": "carried_closed_price",
+      "current_bucket_trade_age_ms": null,
+      "paper_path": {
+        "known": true,
+        "code": "SL",
+        "end_ms": 1795231832827,
+        "trigger_price": 77.33,
+        "bank": null,
+        "be_level": 76.42
+      },
+      "ticker_backing": true,
+      "fixed_stop": 77.1842,
+      "fixed_target": 74.5095,
+      "paper_stop_recovery": {
+        "target_reached_after_stop": false,
+        "entry_reclaimed": false,
+        "another_stop_distance_adverse": true
+      },
+      "quote": {
+        "status": "wide",
+        "average": 76.12,
+        "worst": 76.12,
+        "contracts": 0.5,
+        "spread_bps": 56.33064780244876
+      },
+      "status": "wide"
+    },
+    {
+      "symbol": "DELLUSDT",
+      "epoch": 1795230900,
+      "entry_ms": 1795230929576,
+      "direction": "SHORT",
+      "phase": "other",
+      "index_returns_signed": {
+        "QQQUSDT": -0.0008577578533395247,
+        "SPYUSDT": -0.0021248797576489675
+      },
+      "ticker_reference": 285.54,
+      "ticker_anchor": "carried_closed_price",
+      "current_bucket_trade_age_ms": null,
+      "paper_path": {
+        "known": true,
+        "code": "TIME",
+        "end_ms": 1795288500000,
+        "trigger_price": null,
+        "bank": null,
+        "be_level": 285.54
+      },
+      "ticker_backing": true,
+      "fixed_stop": 288.3954,
+      "fixed_target": 278.4015,
+      "paper_stop_recovery": null,
+      "quote": {
+        "status": "depth slippage exceeds limit",
+        "spread_bps": 41.96978175713447
+      },
+      "status": "depth slippage exceeds limit"
+    },
+    {
+      "symbol": "HOODUSDT",
+      "epoch": 1795245300,
+      "entry_ms": 1795245330078,
+      "direction": "SHORT",
+      "phase": "non_cash_day",
+      "index_returns_signed": null,
+      "ticker_reference": 63.1,
+      "ticker_anchor": "carried_closed_price",
+      "current_bucket_trade_age_ms": null,
+      "paper_path": {
+        "known": true,
+        "code": "SL",
+        "end_ms": 1795268187481,
+        "trigger_price": 64.0,
+        "bank": null,
+        "be_level": 63.1
+      },
+      "ticker_backing": true,
+      "fixed_stop": 63.731,
+      "fixed_target": 61.207,
+      "paper_stop_recovery": {
+        "target_reached_after_stop": false,
+        "entry_reclaimed": false,
+        "another_stop_distance_adverse": true
+      },
+      "quote": {
+        "status": "wide",
+        "average": 63.29,
+        "worst": 63.29,
+        "contracts": 0.6,
+        "spread_bps": 48.86121837812315
+      },
+      "status": "wide"
+    },
+    {
+      "symbol": "SKHYUSDT",
+      "epoch": 1795246200,
+      "entry_ms": 1795246232880,
+      "direction": "SHORT",
+      "phase": "non_cash_day",
+      "index_returns_signed": null,
+      "ticker_reference": 105.77,
+      "ticker_anchor": "carried_closed_price",
+      "current_bucket_trade_age_ms": null,
+      "paper_path": {
+        "known": true,
+        "code": "TIME",
+        "end_ms": 1795303800000,
+        "trigger_price": null,
+        "bank": null,
+        "be_level": 105.77
+      },
+      "ticker_backing": true,
+      "fixed_stop": 106.8277,
+      "fixed_target": 102.5969,
+      "paper_stop_recovery": null,
+      "quote": {
+        "status": "wide",
+        "average": 105.62,
+        "worst": 105.62,
+        "contracts": 0.36,
+        "spread_bps": 21.75249444365534
+      },
+      "status": "wide"
+    },
+    {
+      "symbol": "COINUSDT",
+      "epoch": 1795247100,
+      "entry_ms": 1795247129133,
+      "direction": "SHORT",
+      "phase": "non_cash_day",
+      "index_returns_signed": null,
+      "ticker_reference": 100.45,
+      "ticker_anchor": "carried_closed_price",
+      "current_bucket_trade_age_ms": null,
+      "paper_path": {
+        "known": true,
+        "code": "SL",
+        "end_ms": 1795264532851,
+        "trigger_price": 101.6,
+        "bank": null,
+        "be_level": 100.45
+      },
+      "ticker_backing": true,
+      "fixed_stop": 101.4545,
+      "fixed_target": 97.4365,
+      "paper_stop_recovery": {
+        "target_reached_after_stop": false,
+        "entry_reclaimed": false,
+        "another_stop_distance_adverse": true
+      },
+      "quote": {
+        "status": "depth slippage exceeds limit",
+        "spread_bps": 46.78246155377483
+      },
+      "status": "depth slippage exceeds limit"
+    },
+    {
+      "symbol": "ARMUSDT",
+      "epoch": 1795248000,
+      "entry_ms": 1795248028179,
+      "direction": "SHORT",
+      "phase": "non_cash_day",
+      "index_returns_signed": null,
+      "ticker_reference": 155.57,
+      "ticker_anchor": "carried_closed_price",
+      "current_bucket_trade_age_ms": null,
+      "paper_path": {
+        "known": true,
+        "code": "SL",
+        "end_ms": 1795290130664,
+        "trigger_price": 157.13,
+        "bank": null,
+        "be_level": 155.57
+      },
+      "ticker_backing": true,
+      "fixed_stop": 157.1257,
+      "fixed_target": 150.9029,
+      "paper_stop_recovery": {
+        "target_reached_after_stop": false,
+        "entry_reclaimed": false,
+        "another_stop_distance_adverse": false
+      },
+      "quote": {
+        "status": "wide",
+        "average": 154.97,
+        "worst": 154.97,
+        "contracts": 0.25,
+        "spread_bps": 62.39747836994622
+      },
+      "status": "wide"
+    },
+    {
+      "symbol": "SOXSUSDT",
+      "epoch": 1795248000,
+      "entry_ms": 1795248033624,
+      "direction": "SHORT",
+      "phase": "non_cash_day",
+      "index_returns_signed": null,
+      "ticker_reference": 79.87,
+      "ticker_anchor": "carried_closed_price",
+      "current_bucket_trade_age_ms": null,
+      "paper_path": {
+        "known": true,
+        "code": "SL",
+        "end_ms": 1795249415790,
+        "trigger_price": 80.67,
+        "bank": null,
+        "be_level": 79.87
+      },
+      "ticker_backing": true,
+      "fixed_stop": 80.6687,
+      "fixed_target": 77.4739,
+      "paper_stop_recovery": {
+        "target_reached_after_stop": true,
+        "entry_reclaimed": true,
+        "another_stop_distance_adverse": true
+      },
+      "quote": {
+        "status": "wide",
+        "average": 79.67,
+        "worst": 79.67,
+        "contracts": 0.4,
+        "spread_bps": 43.83493017721764
+      },
+      "status": "wide"
+    }
+  ],
+  "results": {
+    "production_1pct": {
+      "5": {
+        "status": "UNSCORABLE",
+        "symbol": "NVDAUSDT",
+        "entry_ms": 1795221931679,
+        "reason": "no recent trade at the evaluated market exit"
+      },
+      "15": {
+        "status": "UNSCORABLE",
+        "symbol": "NVDAUSDT",
+        "entry_ms": 1795221931679,
+        "reason": "no recent trade at the evaluated market exit"
+      },
+      "30": {
+        "status": "UNSCORABLE",
+        "symbol": "NVDAUSDT",
+        "entry_ms": 1795221931679,
+        "reason": "no recent trade at the evaluated market exit"
+      }
+    },
+    "structural_matched": {
+      "5": {
+        "status": "SCORED_OBSERVED_ENTRY_AND_EXIT_STRESS",
+        "trades": 1,
+        "skipped": {},
+        "return_pct": -0.12166615384614499,
+        "drawdown_pct": 0.12166615384614943,
+        "contribution_pct": {
+          "crypto": 0.0,
+          "stocks": -0.12166615384615402
+        },
+        "peak_reservations": 1,
+        "peak_margin_pct": 2.907138461538461,
+        "cash_pnl_by_entry_day": {
+          "2026-11-21": -0.15816600000000022
+        },
+        "exit_counts": {
+          "SL": 1
+        },
+        "cash_pnl_usd": -0.15816600000000022,
+        "by_bot": {
+          "stocks": {
+            "trades": 1,
+            "profitable": 0,
+            "tp1_executions": 0,
+            "tp1_full_exits": 0,
+            "cash_pnl_usd": -0.15816600000000022,
+            "exit_counts": {
+              "SL": 1
+            }
+          }
+        }
+      },
+      "15": {
+        "status": "SCORED_OBSERVED_ENTRY_AND_EXIT_STRESS",
+        "trades": 1,
+        "skipped": {},
+        "return_pct": -0.15084461538461547,
+        "drawdown_pct": 0.15084461538462027,
+        "contribution_pct": {
+          "crypto": 0.0,
+          "stocks": -0.15084461538462046
+        },
+        "peak_reservations": 1,
+        "peak_margin_pct": 2.907138461538461,
+        "cash_pnl_by_entry_day": {
+          "2026-11-21": -0.1960980000000066
+        },
+        "exit_counts": {
+          "SL": 1
+        },
+        "cash_pnl_usd": -0.1960980000000066,
+        "by_bot": {
+          "stocks": {
+            "trades": 1,
+            "profitable": 0,
+            "tp1_executions": 0,
+            "tp1_full_exits": 0,
+            "cash_pnl_usd": -0.1960980000000066,
+            "exit_counts": {
+              "SL": 1
+            }
+          }
+        }
+      },
+      "30": {
+        "status": "SCORED_OBSERVED_ENTRY_AND_EXIT_STRESS",
+        "trades": 1,
+        "skipped": {},
+        "return_pct": -0.19461230769231008,
+        "drawdown_pct": 0.19461230769230461,
+        "contribution_pct": {
+          "crypto": 0.0,
+          "stocks": -0.19461230769230742
+        },
+        "peak_reservations": 1,
+        "peak_margin_pct": 2.907138461538461,
+        "cash_pnl_by_entry_day": {
+          "2026-11-21": -0.25299599999999967
+        },
+        "exit_counts": {
+          "SL": 1
+        },
+        "cash_pnl_usd": -0.25299599999999967,
+        "by_bot": {
+          "stocks": {
+            "trades": 1,
+            "profitable": 0,
+            "tp1_executions": 0,
+            "tp1_full_exits": 0,
+            "cash_pnl_usd": -0.25299599999999967,
+            "exit_counts": {
+              "SL": 1
+            }
+          }
+        }
+      }
+    },
+    "production_matched": {
+      "5": {
+        "status": "UNSCORABLE",
+        "symbol": "NVDAUSDT",
+        "entry_ms": 1795221931679,
+        "reason": "no recent trade at the evaluated market exit"
+      },
+      "15": {
+        "status": "UNSCORABLE",
+        "symbol": "NVDAUSDT",
+        "entry_ms": 1795221931679,
+        "reason": "no recent trade at the evaluated market exit"
+      },
+      "30": {
+        "status": "UNSCORABLE",
+        "symbol": "NVDAUSDT",
+        "entry_ms": 1795221931679,
+        "reason": "no recent trade at the evaluated market exit"
+      }
+    }
+  },
+  "tape_checks": {
+    "AMZNUSDT": {
+      "bars_checked": 64,
+      "mismatches": {}
+    },
+    "ARMUSDT": {
+      "bars_checked": 64,
+      "mismatches": {}
+    },
+    "AXTIUSDT": {
+      "bars_checked": 78,
+      "mismatches": {}
+    },
+    "BEUSDT": {
+      "bars_checked": 97,
+      "mismatches": {}
+    },
+    "BMNRUSDT": {
+      "bars_checked": 73,
+      "mismatches": {}
+    },
+    "COINUSDT": {
+      "bars_checked": 64,
+      "mismatches": {}
+    },
+    "CRCLUSDT": {
+      "bars_checked": 64,
+      "mismatches": {}
+    },
+    "DELLUSDT": {
+      "bars_checked": 64,
+      "mismatches": {}
+    },
+    "HOODUSDT": {
+      "bars_checked": 64,
+      "mismatches": {}
+    },
+    "NVDAUSDT": {
+      "bars_checked": 64,
+      "mismatches": {}
+    },
+    "SKHYUSDT": {
+      "bars_checked": 97,
+      "mismatches": {}
+    },
+    "SNXXUSDT": {
+      "bars_checked": 64,
+      "mismatches": {}
+    },
+    "SOFTBANKUSDT": {
+      "bars_checked": 64,
+      "mismatches": {}
+    },
+    "SOXSUSDT": {
+      "bars_checked": 86,
+      "mismatches": {}
+    },
+    "WDCUSDT": {
+      "bars_checked": 129,
+      "mismatches": {}
+    }
+  },
+  "live_activation_supported": false,
+  "limitations": [
+    "The quote observer is independent of the Telegram signal journal and portfolios.",
+    "The last current-bucket contract trade, or the preceding confirmed close if no trade occurred, proxies the ticker.",
+    "Native fixed stop is 1%; the structural observer stores a different known-close stop.",
+    "The matched structural comparison keeps the native target and the same executable entry.",
+    "Unverified tape windows do not produce an outcome. Cash uses adverse exit assumptions."
+  ]
+}
