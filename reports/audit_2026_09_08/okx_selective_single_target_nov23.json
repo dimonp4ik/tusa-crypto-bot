@@ -1,0 +1,2394 @@
+{
+  "capital_usd": 130.0,
+  "margin_fraction": 0.03,
+  "leverage": 10,
+  "baseline_sha256": "18603c1de6047e4ab15f4df5e7096f40361b1175989c58b342523b05f810ba45",
+  "policies": {
+    "indivisible_tp1": [
+      "crypto",
+      "indivisible",
+      0.5,
+      false
+    ],
+    "indivisible_1r": [
+      "crypto",
+      "indivisible",
+      1.0,
+      false
+    ],
+    "small_tp1": [
+      "crypto",
+      "small",
+      0.5,
+      false
+    ],
+    "small_1r": [
+      "crypto",
+      "small",
+      1.0,
+      false
+    ],
+    "small_1_5r": [
+      "crypto",
+      "small",
+      1.5,
+      false
+    ],
+    "adverse_book_1r": [
+      "crypto",
+      "adverse",
+      1.0,
+      false
+    ],
+    "adverse_book_1_5r": [
+      "crypto",
+      "adverse",
+      1.5,
+      false
+    ],
+    "small_1r_with_breakeven": [
+      "crypto",
+      "small",
+      1.0,
+      true
+    ],
+    "small_1_5r_with_breakeven": [
+      "crypto",
+      "small",
+      1.5,
+      true
+    ],
+    "adverse_book_1_5r_with_breakeven": [
+      "crypto",
+      "adverse",
+      1.5,
+      true
+    ],
+    "stocks_adverse_book_1_5r": [
+      "stocks",
+      "adverse",
+      1.5,
+      false
+    ]
+  },
+  "cases": {
+    "nov05_08": {
+      "200": {
+        "baseline": {
+          "status": "SCORED_PUBLIC_L2_SIMULATION",
+          "trades": 15,
+          "skipped": {
+            "stocks:wide": 25,
+            "crypto:wide": 7,
+            "stocks:stale order book": 4,
+            "stocks:depth slippage exceeds limit": 1
+          },
+          "return_pct": 2.3914153846153585,
+          "drawdown_pct": 0.8673799541490397,
+          "contribution_pct": {
+            "crypto": 2.3914153846153936,
+            "stocks": 0.0
+          },
+          "peak_reservations": 4,
+          "peak_margin_pct": 11.236707734641675,
+          "cash_pnl_usd": 3.1088400000000114,
+          "profitable": 6,
+          "routed": 0,
+          "exit_counts": {
+            "TARGET": 5,
+            "SL": 3,
+            "BE": 6,
+            "TIME": 1
+          }
+        },
+        "indivisible_tp1": {
+          "status": "SCORED_PUBLIC_L2_SIMULATION",
+          "trades": 15,
+          "skipped": {
+            "stocks:wide": 25,
+            "crypto:wide": 7,
+            "stocks:stale order book": 4,
+            "stocks:depth slippage exceeds limit": 1
+          },
+          "return_pct": 2.3914153846153585,
+          "drawdown_pct": 0.8673799541490397,
+          "contribution_pct": {
+            "crypto": 2.3914153846153936,
+            "stocks": 0.0
+          },
+          "peak_reservations": 4,
+          "peak_margin_pct": 11.236707734641675,
+          "cash_pnl_usd": 3.1088400000000114,
+          "profitable": 6,
+          "routed": 0,
+          "exit_counts": {
+            "TARGET": 5,
+            "SL": 3,
+            "BE": 6,
+            "TIME": 1
+          }
+        },
+        "indivisible_1r": {
+          "status": "SCORED_PUBLIC_L2_SIMULATION",
+          "trades": 15,
+          "skipped": {
+            "stocks:wide": 25,
+            "crypto:wide": 7,
+            "stocks:stale order book": 4,
+            "stocks:depth slippage exceeds limit": 1
+          },
+          "return_pct": 2.3914153846153585,
+          "drawdown_pct": 0.8673799541490397,
+          "contribution_pct": {
+            "crypto": 2.3914153846153936,
+            "stocks": 0.0
+          },
+          "peak_reservations": 4,
+          "peak_margin_pct": 11.236707734641675,
+          "cash_pnl_usd": 3.1088400000000114,
+          "profitable": 6,
+          "routed": 0,
+          "exit_counts": {
+            "TARGET": 5,
+            "SL": 3,
+            "BE": 6,
+            "TIME": 1
+          }
+        },
+        "small_tp1": {
+          "status": "SCORED_PUBLIC_L2_SIMULATION",
+          "trades": 15,
+          "skipped": {
+            "stocks:wide": 25,
+            "crypto:wide": 7,
+            "stocks:stale order book": 4,
+            "stocks:depth slippage exceeds limit": 1
+          },
+          "return_pct": 0.4037999999999764,
+          "drawdown_pct": 0.8796469897659115,
+          "contribution_pct": {
+            "crypto": 0.40380000000000826,
+            "stocks": 0.0
+          },
+          "peak_reservations": 3,
+          "peak_margin_pct": 8.884574024466643,
+          "cash_pnl_usd": 0.5249400000000107,
+          "profitable": 9,
+          "routed": 11,
+          "exit_counts": {
+            "SINGLE_TARGET": 8,
+            "SL": 3,
+            "BE": 3,
+            "TIME": 1
+          }
+        },
+        "small_1r": {
+          "status": "SCORED_PUBLIC_L2_SIMULATION",
+          "trades": 15,
+          "skipped": {
+            "stocks:wide": 25,
+            "crypto:wide": 7,
+            "stocks:stale order book": 4,
+            "stocks:depth slippage exceeds limit": 1
+          },
+          "return_pct": 1.862261538461496,
+          "drawdown_pct": 0.8708407009125507,
+          "contribution_pct": {
+            "crypto": 1.8622615384615457,
+            "stocks": 0.0
+          },
+          "peak_reservations": 3,
+          "peak_margin_pct": 8.844036886782494,
+          "cash_pnl_usd": 2.4209400000000096,
+          "profitable": 9,
+          "routed": 11,
+          "exit_counts": {
+            "SINGLE_TARGET": 8,
+            "SL": 3,
+            "BE": 3,
+            "TIME": 1
+          }
+        },
+        "small_1_5r": {
+          "status": "SCORED_PUBLIC_L2_SIMULATION",
+          "trades": 13,
+          "skipped": {
+            "stocks:wide": 25,
+            "crypto:wide": 7,
+            "stocks:stale order book": 4,
+            "crypto:position_cap": 2,
+            "stocks:depth slippage exceeds limit": 1
+          },
+          "return_pct": 1.0780307692307645,
+          "drawdown_pct": 1.2433082716768111,
+          "contribution_pct": {
+            "crypto": 1.0780307692307773,
+            "stocks": 0.0
+          },
+          "peak_reservations": 4,
+          "peak_margin_pct": 11.269619156541038,
+          "cash_pnl_usd": 1.40144000000001,
+          "profitable": 6,
+          "routed": 9,
+          "exit_counts": {
+            "SINGLE_TARGET": 5,
+            "SL": 4,
+            "BE": 3,
+            "TIME": 1
+          }
+        },
+        "adverse_book_1r": {
+          "status": "SCORED_PUBLIC_L2_SIMULATION",
+          "trades": 15,
+          "skipped": {
+            "stocks:wide": 25,
+            "crypto:wide": 7,
+            "stocks:stale order book": 4,
+            "stocks:depth slippage exceeds limit": 1
+          },
+          "return_pct": 2.086107692307637,
+          "drawdown_pct": 0.8699714490982955,
+          "contribution_pct": {
+            "crypto": 2.086107692307706,
+            "stocks": 0.0
+          },
+          "peak_reservations": 4,
+          "peak_margin_pct": 11.697334634366317,
+          "cash_pnl_usd": 2.711940000000018,
+          "profitable": 8,
+          "routed": 7,
+          "exit_counts": {
+            "TARGET": 3,
+            "SL": 3,
+            "TIME": 2,
+            "SINGLE_TARGET": 3,
+            "BE": 4
+          }
+        },
+        "adverse_book_1_5r": {
+          "status": "SCORED_PUBLIC_L2_SIMULATION",
+          "trades": 15,
+          "skipped": {
+            "stocks:wide": 25,
+            "crypto:wide": 7,
+            "stocks:stale order book": 4,
+            "stocks:depth slippage exceeds limit": 1
+          },
+          "return_pct": 2.6189538461538486,
+          "drawdown_pct": 0.8654585942053021,
+          "contribution_pct": {
+            "crypto": 2.6189538461538597,
+            "stocks": 0.0
+          },
+          "peak_reservations": 4,
+          "peak_margin_pct": 11.678653102167996,
+          "cash_pnl_usd": 3.404640000000017,
+          "profitable": 8,
+          "routed": 7,
+          "exit_counts": {
+            "TARGET": 3,
+            "SL": 3,
+            "TIME": 2,
+            "SINGLE_TARGET": 3,
+            "BE": 4
+          }
+        },
+        "small_1r_with_breakeven": {
+          "status": "SCORED_PUBLIC_L2_SIMULATION",
+          "trades": 15,
+          "skipped": {
+            "stocks:wide": 25,
+            "crypto:wide": 7,
+            "stocks:stale order book": 4,
+            "stocks:depth slippage exceeds limit": 1
+          },
+          "return_pct": 1.862261538461496,
+          "drawdown_pct": 0.8708407009125507,
+          "contribution_pct": {
+            "crypto": 1.8622615384615457,
+            "stocks": 0.0
+          },
+          "peak_reservations": 3,
+          "peak_margin_pct": 8.844036886782494,
+          "cash_pnl_usd": 2.4209400000000096,
+          "profitable": 9,
+          "routed": 11,
+          "exit_counts": {
+            "SINGLE_TARGET": 8,
+            "SL": 3,
+            "BE": 3,
+            "TIME": 1
+          }
+        },
+        "small_1_5r_with_breakeven": {
+          "status": "SCORED_PUBLIC_L2_SIMULATION",
+          "trades": 15,
+          "skipped": {
+            "stocks:wide": 25,
+            "crypto:wide": 7,
+            "stocks:stale order book": 4,
+            "stocks:depth slippage exceeds limit": 1
+          },
+          "return_pct": 2.1704153846153984,
+          "drawdown_pct": 0.8674834737530321,
+          "contribution_pct": {
+            "crypto": 2.1704153846153944,
+            "stocks": 0.0
+          },
+          "peak_reservations": 4,
+          "peak_margin_pct": 11.269619156541038,
+          "cash_pnl_usd": 2.821540000000012,
+          "profitable": 7,
+          "routed": 11,
+          "exit_counts": {
+            "SINGLE_TARGET": 6,
+            "SL": 3,
+            "BE": 5,
+            "TIME": 1
+          }
+        },
+        "adverse_book_1_5r_with_breakeven": {
+          "status": "SCORED_PUBLIC_L2_SIMULATION",
+          "trades": 15,
+          "skipped": {
+            "stocks:wide": 25,
+            "crypto:wide": 7,
+            "stocks:stale order book": 4,
+            "stocks:depth slippage exceeds limit": 1
+          },
+          "return_pct": 2.5625692307692294,
+          "drawdown_pct": 0.8659339183850907,
+          "contribution_pct": {
+            "crypto": 2.562569230769242,
+            "stocks": 0.0
+          },
+          "peak_reservations": 4,
+          "peak_margin_pct": 11.249185245354282,
+          "cash_pnl_usd": 3.331340000000014,
+          "profitable": 7,
+          "routed": 7,
+          "exit_counts": {
+            "TARGET": 3,
+            "SL": 3,
+            "BE": 5,
+            "SINGLE_TARGET": 3,
+            "TIME": 1
+          }
+        },
+        "stocks_adverse_book_1_5r": {
+          "status": "SCORED_PUBLIC_L2_SIMULATION",
+          "trades": 15,
+          "skipped": {
+            "stocks:wide": 25,
+            "crypto:wide": 7,
+            "stocks:stale order book": 4,
+            "stocks:depth slippage exceeds limit": 1
+          },
+          "return_pct": 2.3914153846153585,
+          "drawdown_pct": 0.8673799541490397,
+          "contribution_pct": {
+            "crypto": 2.3914153846153936,
+            "stocks": 0.0
+          },
+          "peak_reservations": 4,
+          "peak_margin_pct": 11.236707734641675,
+          "cash_pnl_usd": 3.1088400000000114,
+          "profitable": 6,
+          "routed": 0,
+          "exit_counts": {
+            "TARGET": 5,
+            "SL": 3,
+            "BE": 6,
+            "TIME": 1
+          }
+        }
+      },
+      "1000": {
+        "baseline": {
+          "status": "SCORED_PUBLIC_L2_SIMULATION",
+          "trades": 15,
+          "skipped": {
+            "stocks:wide": 25,
+            "crypto:wide": 7,
+            "stocks:stale order book": 4,
+            "stocks:depth slippage exceeds limit": 1
+          },
+          "return_pct": 2.3970384615385143,
+          "drawdown_pct": 0.9060876710170203,
+          "contribution_pct": {
+            "crypto": 2.397038461538472,
+            "stocks": 0.0
+          },
+          "peak_reservations": 4,
+          "peak_margin_pct": 11.23403636374684,
+          "cash_pnl_usd": 3.116150000000013,
+          "profitable": 6,
+          "routed": 0,
+          "exit_counts": {
+            "TARGET": 5,
+            "SL": 3,
+            "BE": 6,
+            "TIME": 1
+          }
+        },
+        "indivisible_tp1": {
+          "status": "SCORED_PUBLIC_L2_SIMULATION",
+          "trades": 15,
+          "skipped": {
+            "stocks:wide": 25,
+            "crypto:wide": 7,
+            "stocks:stale order book": 4,
+            "stocks:depth slippage exceeds limit": 1
+          },
+          "return_pct": 2.3970384615385143,
+          "drawdown_pct": 0.9060876710170203,
+          "contribution_pct": {
+            "crypto": 2.397038461538472,
+            "stocks": 0.0
+          },
+          "peak_reservations": 4,
+          "peak_margin_pct": 11.23403636374684,
+          "cash_pnl_usd": 3.116150000000013,
+          "profitable": 6,
+          "routed": 0,
+          "exit_counts": {
+            "TARGET": 5,
+            "SL": 3,
+            "BE": 6,
+            "TIME": 1
+          }
+        },
+        "indivisible_1r": {
+          "status": "SCORED_PUBLIC_L2_SIMULATION",
+          "trades": 15,
+          "skipped": {
+            "stocks:wide": 25,
+            "crypto:wide": 7,
+            "stocks:stale order book": 4,
+            "stocks:depth slippage exceeds limit": 1
+          },
+          "return_pct": 2.3970384615385143,
+          "drawdown_pct": 0.9060876710170203,
+          "contribution_pct": {
+            "crypto": 2.397038461538472,
+            "stocks": 0.0
+          },
+          "peak_reservations": 4,
+          "peak_margin_pct": 11.23403636374684,
+          "cash_pnl_usd": 3.116150000000013,
+          "profitable": 6,
+          "routed": 0,
+          "exit_counts": {
+            "TARGET": 5,
+            "SL": 3,
+            "BE": 6,
+            "TIME": 1
+          }
+        },
+        "small_tp1": {
+          "status": "SCORED_PUBLIC_L2_SIMULATION",
+          "trades": 15,
+          "skipped": {
+            "stocks:wide": 25,
+            "crypto:wide": 7,
+            "stocks:stale order book": 4,
+            "stocks:depth slippage exceeds limit": 1
+          },
+          "return_pct": 0.4630384615384564,
+          "drawdown_pct": 0.8372151460177122,
+          "contribution_pct": {
+            "crypto": 0.4630384615384564,
+            "stocks": 0.0
+          },
+          "peak_reservations": 3,
+          "peak_margin_pct": 8.884061858681198,
+          "cash_pnl_usd": 0.6019499999999934,
+          "profitable": 9,
+          "routed": 11,
+          "exit_counts": {
+            "SINGLE_TARGET": 8,
+            "SL": 3,
+            "BE": 3,
+            "TIME": 1
+          }
+        },
+        "small_1r": {
+          "status": "SCORED_PUBLIC_L2_SIMULATION",
+          "trades": 15,
+          "skipped": {
+            "stocks:wide": 25,
+            "crypto:wide": 7,
+            "stocks:stale order book": 4,
+            "stocks:depth slippage exceeds limit": 1
+          },
+          "return_pct": 1.8755769230769381,
+          "drawdown_pct": 0.829043282543912,
+          "contribution_pct": {
+            "crypto": 1.8755769230769241,
+            "stocks": 0.0
+          },
+          "peak_reservations": 3,
+          "peak_margin_pct": 8.844889622832095,
+          "cash_pnl_usd": 2.4382500000000014,
+          "profitable": 9,
+          "routed": 11,
+          "exit_counts": {
+            "SINGLE_TARGET": 8,
+            "SL": 3,
+            "BE": 3,
+            "TIME": 1
+          }
+        },
+        "small_1_5r": {
+          "status": "SCORED_PUBLIC_L2_SIMULATION",
+          "trades": 13,
+          "skipped": {
+            "stocks:wide": 25,
+            "crypto:wide": 7,
+            "stocks:stale order book": 4,
+            "crypto:position_cap": 2,
+            "stocks:depth slippage exceeds limit": 1
+          },
+          "return_pct": 1.1805000000000065,
+          "drawdown_pct": 1.1989344652278566,
+          "contribution_pct": {
+            "crypto": 1.1805000000000019,
+            "stocks": 0.0
+          },
+          "peak_reservations": 4,
+          "peak_margin_pct": 11.270718379396191,
+          "cash_pnl_usd": 1.5346500000000018,
+          "profitable": 6,
+          "routed": 9,
+          "exit_counts": {
+            "SINGLE_TARGET": 5,
+            "SL": 4,
+            "BE": 3,
+            "TIME": 1
+          }
+        },
+        "adverse_book_1r": {
+          "status": "SCORED_PUBLIC_L2_SIMULATION",
+          "trades": 15,
+          "skipped": {
+            "stocks:wide": 25,
+            "crypto:wide": 7,
+            "stocks:stale order book": 4,
+            "stocks:depth slippage exceeds limit": 1
+          },
+          "return_pct": 2.0725384615384757,
+          "drawdown_pct": 0.9089649918626066,
+          "contribution_pct": {
+            "crypto": 2.072538461538473,
+            "stocks": 0.0
+          },
+          "peak_reservations": 4,
+          "peak_margin_pct": 11.695935900560565,
+          "cash_pnl_usd": 2.694300000000015,
+          "profitable": 8,
+          "routed": 7,
+          "exit_counts": {
+            "TARGET": 3,
+            "SL": 3,
+            "TIME": 2,
+            "SINGLE_TARGET": 3,
+            "BE": 4
+          }
+        },
+        "adverse_book_1_5r": {
+          "status": "SCORED_PUBLIC_L2_SIMULATION",
+          "trades": 15,
+          "skipped": {
+            "stocks:wide": 25,
+            "crypto:wide": 7,
+            "stocks:stale order book": 4,
+            "stocks:depth slippage exceeds limit": 1
+          },
+          "return_pct": 2.6077692307692635,
+          "drawdown_pct": 0.9042288706237642,
+          "contribution_pct": {
+            "crypto": 2.6077692307692413,
+            "stocks": 0.0
+          },
+          "peak_reservations": 4,
+          "peak_margin_pct": 11.676992449185986,
+          "cash_pnl_usd": 3.3901000000000137,
+          "profitable": 8,
+          "routed": 7,
+          "exit_counts": {
+            "TARGET": 3,
+            "SL": 3,
+            "TIME": 2,
+            "SINGLE_TARGET": 3,
+            "BE": 4
+          }
+        },
+        "small_1r_with_breakeven": {
+          "status": "SCORED_PUBLIC_L2_SIMULATION",
+          "trades": 15,
+          "skipped": {
+            "stocks:wide": 25,
+            "crypto:wide": 7,
+            "stocks:stale order book": 4,
+            "stocks:depth slippage exceeds limit": 1
+          },
+          "return_pct": 1.8755769230769381,
+          "drawdown_pct": 0.829043282543912,
+          "contribution_pct": {
+            "crypto": 1.8755769230769241,
+            "stocks": 0.0
+          },
+          "peak_reservations": 3,
+          "peak_margin_pct": 8.844889622832095,
+          "cash_pnl_usd": 2.4382500000000014,
+          "profitable": 9,
+          "routed": 11,
+          "exit_counts": {
+            "SINGLE_TARGET": 8,
+            "SL": 3,
+            "BE": 3,
+            "TIME": 1
+          }
+        },
+        "small_1_5r_with_breakeven": {
+          "status": "SCORED_PUBLIC_L2_SIMULATION",
+          "trades": 15,
+          "skipped": {
+            "stocks:wide": 25,
+            "crypto:wide": 7,
+            "stocks:stale order book": 4,
+            "stocks:depth slippage exceeds limit": 1
+          },
+          "return_pct": 2.0927307692307995,
+          "drawdown_pct": 0.9065482060293225,
+          "contribution_pct": {
+            "crypto": 2.0927307692307737,
+            "stocks": 0.0
+          },
+          "peak_reservations": 4,
+          "peak_margin_pct": 11.270718379396191,
+          "cash_pnl_usd": 2.7205500000000056,
+          "profitable": 7,
+          "routed": 11,
+          "exit_counts": {
+            "SINGLE_TARGET": 6,
+            "SL": 3,
+            "BE": 5,
+            "TIME": 1
+          }
+        },
+        "adverse_book_1_5r_with_breakeven": {
+          "status": "SCORED_PUBLIC_L2_SIMULATION",
+          "trades": 15,
+          "skipped": {
+            "stocks:wide": 25,
+            "crypto:wide": 7,
+            "stocks:stale order book": 4,
+            "stocks:depth slippage exceeds limit": 1
+          },
+          "return_pct": 2.5522692307692774,
+          "drawdown_pct": 0.9047176812554183,
+          "contribution_pct": {
+            "crypto": 2.55226923076924,
+            "stocks": 0.0
+          },
+          "peak_reservations": 4,
+          "peak_margin_pct": 11.247619764622858,
+          "cash_pnl_usd": 3.3179500000000126,
+          "profitable": 7,
+          "routed": 7,
+          "exit_counts": {
+            "TARGET": 3,
+            "SL": 3,
+            "BE": 5,
+            "SINGLE_TARGET": 3,
+            "TIME": 1
+          }
+        },
+        "stocks_adverse_book_1_5r": {
+          "status": "SCORED_PUBLIC_L2_SIMULATION",
+          "trades": 15,
+          "skipped": {
+            "stocks:wide": 25,
+            "crypto:wide": 7,
+            "stocks:stale order book": 4,
+            "stocks:depth slippage exceeds limit": 1
+          },
+          "return_pct": 2.3970384615385143,
+          "drawdown_pct": 0.9060876710170203,
+          "contribution_pct": {
+            "crypto": 2.397038461538472,
+            "stocks": 0.0
+          },
+          "peak_reservations": 4,
+          "peak_margin_pct": 11.23403636374684,
+          "cash_pnl_usd": 3.116150000000013,
+          "profitable": 6,
+          "routed": 0,
+          "exit_counts": {
+            "TARGET": 5,
+            "SL": 3,
+            "BE": 6,
+            "TIME": 1
+          }
+        }
+      }
+    },
+    "nov09_14": {
+      "200": {
+        "baseline": {
+          "status": "SCORED_PUBLIC_L2_SIMULATION",
+          "trades": 24,
+          "skipped": {
+            "crypto:wide": 14,
+            "stocks:wide": 21,
+            "stocks:stale order book": 3,
+            "stocks:paper_guard": 1
+          },
+          "return_pct": -2.2007307692307743,
+          "drawdown_pct": 2.444807692307686,
+          "contribution_pct": {
+            "crypto": -2.200730769230761,
+            "stocks": 0.0
+          },
+          "peak_reservations": 4,
+          "peak_margin_pct": 11.56279155866751,
+          "cash_pnl_usd": -2.8609499999999897,
+          "profitable": 4,
+          "routed": 0,
+          "exit_counts": {
+            "SL": 10,
+            "BE": 11,
+            "TARGET": 3
+          }
+        },
+        "indivisible_tp1": {
+          "status": "SCORED_PUBLIC_L2_SIMULATION",
+          "trades": 24,
+          "skipped": {
+            "crypto:wide": 14,
+            "stocks:wide": 21,
+            "stocks:stale order book": 3,
+            "stocks:paper_guard": 1
+          },
+          "return_pct": -2.2007307692307743,
+          "drawdown_pct": 2.444807692307686,
+          "contribution_pct": {
+            "crypto": -2.200730769230761,
+            "stocks": 0.0
+          },
+          "peak_reservations": 4,
+          "peak_margin_pct": 11.56279155866751,
+          "cash_pnl_usd": -2.8609499999999897,
+          "profitable": 4,
+          "routed": 0,
+          "exit_counts": {
+            "SL": 10,
+            "BE": 11,
+            "TARGET": 3
+          }
+        },
+        "indivisible_1r": {
+          "status": "SCORED_PUBLIC_L2_SIMULATION",
+          "trades": 24,
+          "skipped": {
+            "crypto:wide": 14,
+            "stocks:wide": 21,
+            "stocks:stale order book": 3,
+            "stocks:paper_guard": 1
+          },
+          "return_pct": -2.2007307692307743,
+          "drawdown_pct": 2.444807692307686,
+          "contribution_pct": {
+            "crypto": -2.200730769230761,
+            "stocks": 0.0
+          },
+          "peak_reservations": 4,
+          "peak_margin_pct": 11.56279155866751,
+          "cash_pnl_usd": -2.8609499999999897,
+          "profitable": 4,
+          "routed": 0,
+          "exit_counts": {
+            "SL": 10,
+            "BE": 11,
+            "TARGET": 3
+          }
+        },
+        "small_tp1": {
+          "status": "SCORED_PUBLIC_L2_SIMULATION",
+          "trades": 24,
+          "skipped": {
+            "crypto:wide": 14,
+            "stocks:wide": 21,
+            "stocks:stale order book": 3,
+            "stocks:paper_guard": 1
+          },
+          "return_pct": -2.207807692307706,
+          "drawdown_pct": 2.3684230769230927,
+          "contribution_pct": {
+            "crypto": -2.20780769230769,
+            "stocks": 0.0
+          },
+          "peak_reservations": 4,
+          "peak_margin_pct": 11.487081726112018,
+          "cash_pnl_usd": -2.8701499999999975,
+          "profitable": 9,
+          "routed": 9,
+          "exit_counts": {
+            "SL": 10,
+            "BE": 6,
+            "SINGLE_TARGET": 7,
+            "TARGET": 1
+          }
+        },
+        "small_1r": {
+          "status": "SCORED_PUBLIC_L2_SIMULATION",
+          "trades": 23,
+          "skipped": {
+            "crypto:wide": 14,
+            "stocks:wide": 21,
+            "stocks:stale order book": 3,
+            "crypto:position_cap": 1,
+            "stocks:paper_guard": 1
+          },
+          "return_pct": -4.2227307692307425,
+          "drawdown_pct": 4.2227307692307425,
+          "contribution_pct": {
+            "crypto": -4.222730769230751,
+            "stocks": 0.0
+          },
+          "peak_reservations": 4,
+          "peak_margin_pct": 11.228154718137136,
+          "cash_pnl_usd": -5.489549999999976,
+          "profitable": 3,
+          "routed": 8,
+          "exit_counts": {
+            "SL": 14,
+            "BE": 6,
+            "TIME": 1,
+            "SINGLE_TARGET": 1,
+            "TARGET": 1
+          }
+        },
+        "small_1_5r": {
+          "status": "SCORED_PUBLIC_L2_SIMULATION",
+          "trades": 23,
+          "skipped": {
+            "crypto:wide": 14,
+            "stocks:wide": 21,
+            "stocks:stale order book": 3,
+            "crypto:position_cap": 1,
+            "stocks:paper_guard": 1
+          },
+          "return_pct": -4.093499999999994,
+          "drawdown_pct": 4.093499999999991,
+          "contribution_pct": {
+            "crypto": -4.093499999999979,
+            "stocks": 0.0
+          },
+          "peak_reservations": 4,
+          "peak_margin_pct": 11.213488763186653,
+          "cash_pnl_usd": -5.321549999999974,
+          "profitable": 3,
+          "routed": 8,
+          "exit_counts": {
+            "SL": 14,
+            "BE": 6,
+            "TIME": 1,
+            "SINGLE_TARGET": 1,
+            "TARGET": 1
+          }
+        },
+        "adverse_book_1r": {
+          "status": "SCORED_PUBLIC_L2_SIMULATION",
+          "trades": 24,
+          "skipped": {
+            "crypto:wide": 14,
+            "stocks:wide": 21,
+            "stocks:stale order book": 3,
+            "stocks:paper_guard": 1
+          },
+          "return_pct": -2.5161153846153805,
+          "drawdown_pct": 2.516115384615384,
+          "contribution_pct": {
+            "crypto": -2.516115384615372,
+            "stocks": 0.0
+          },
+          "peak_reservations": 4,
+          "peak_margin_pct": 11.563875421768342,
+          "cash_pnl_usd": -3.2709499999999845,
+          "profitable": 4,
+          "routed": 4,
+          "exit_counts": {
+            "SL": 11,
+            "BE": 9,
+            "TIME": 1,
+            "TARGET": 3
+          }
+        },
+        "adverse_book_1_5r": {
+          "status": "SCORED_PUBLIC_L2_SIMULATION",
+          "trades": 24,
+          "skipped": {
+            "crypto:wide": 14,
+            "stocks:wide": 21,
+            "stocks:stale order book": 3,
+            "stocks:paper_guard": 1
+          },
+          "return_pct": -2.5161153846153805,
+          "drawdown_pct": 2.516115384615384,
+          "contribution_pct": {
+            "crypto": -2.516115384615372,
+            "stocks": 0.0
+          },
+          "peak_reservations": 4,
+          "peak_margin_pct": 11.563875421768342,
+          "cash_pnl_usd": -3.2709499999999845,
+          "profitable": 4,
+          "routed": 4,
+          "exit_counts": {
+            "SL": 11,
+            "BE": 9,
+            "TIME": 1,
+            "TARGET": 3
+          }
+        },
+        "small_1r_with_breakeven": {
+          "status": "SCORED_PUBLIC_L2_SIMULATION",
+          "trades": 24,
+          "skipped": {
+            "crypto:wide": 14,
+            "stocks:wide": 21,
+            "stocks:stale order book": 3,
+            "stocks:paper_guard": 1
+          },
+          "return_pct": -2.759192307692282,
+          "drawdown_pct": 2.7591923076922873,
+          "contribution_pct": {
+            "crypto": -2.7591923076923015,
+            "stocks": 0.0
+          },
+          "peak_reservations": 4,
+          "peak_margin_pct": 11.592944366938651,
+          "cash_pnl_usd": -3.5869499999999923,
+          "profitable": 4,
+          "routed": 9,
+          "exit_counts": {
+            "SL": 10,
+            "BE": 11,
+            "SINGLE_TARGET": 2,
+            "TARGET": 1
+          }
+        },
+        "small_1_5r_with_breakeven": {
+          "status": "SCORED_PUBLIC_L2_SIMULATION",
+          "trades": 24,
+          "skipped": {
+            "crypto:wide": 14,
+            "stocks:wide": 21,
+            "stocks:stale order book": 3,
+            "stocks:paper_guard": 1
+          },
+          "return_pct": -2.5161153846153805,
+          "drawdown_pct": 2.5717307692307676,
+          "contribution_pct": {
+            "crypto": -2.516115384615374,
+            "stocks": 0.0
+          },
+          "peak_reservations": 4,
+          "peak_margin_pct": 11.577712509057436,
+          "cash_pnl_usd": -3.2709499999999863,
+          "profitable": 4,
+          "routed": 9,
+          "exit_counts": {
+            "SL": 10,
+            "BE": 11,
+            "SINGLE_TARGET": 2,
+            "TARGET": 1
+          }
+        },
+        "adverse_book_1_5r_with_breakeven": {
+          "status": "SCORED_PUBLIC_L2_SIMULATION",
+          "trades": 24,
+          "skipped": {
+            "crypto:wide": 14,
+            "stocks:wide": 21,
+            "stocks:stale order book": 3,
+            "stocks:paper_guard": 1
+          },
+          "return_pct": -2.2007307692307743,
+          "drawdown_pct": 2.444807692307686,
+          "contribution_pct": {
+            "crypto": -2.200730769230761,
+            "stocks": 0.0
+          },
+          "peak_reservations": 4,
+          "peak_margin_pct": 11.56279155866751,
+          "cash_pnl_usd": -2.8609499999999897,
+          "profitable": 4,
+          "routed": 4,
+          "exit_counts": {
+            "SL": 10,
+            "BE": 11,
+            "TARGET": 3
+          }
+        },
+        "stocks_adverse_book_1_5r": {
+          "status": "SCORED_PUBLIC_L2_SIMULATION",
+          "trades": 24,
+          "skipped": {
+            "crypto:wide": 14,
+            "stocks:wide": 21,
+            "stocks:stale order book": 3,
+            "stocks:paper_guard": 1
+          },
+          "return_pct": -2.2007307692307743,
+          "drawdown_pct": 2.444807692307686,
+          "contribution_pct": {
+            "crypto": -2.200730769230761,
+            "stocks": 0.0
+          },
+          "peak_reservations": 4,
+          "peak_margin_pct": 11.56279155866751,
+          "cash_pnl_usd": -2.8609499999999897,
+          "profitable": 4,
+          "routed": 0,
+          "exit_counts": {
+            "SL": 10,
+            "BE": 11,
+            "TARGET": 3
+          }
+        }
+      },
+      "1000": {
+        "baseline": {
+          "status": "SCORED_PUBLIC_L2_SIMULATION",
+          "trades": 24,
+          "skipped": {
+            "crypto:wide": 14,
+            "stocks:wide": 21,
+            "stocks:stale order book": 3,
+            "stocks:paper_guard": 1
+          },
+          "return_pct": -2.2082307692307457,
+          "drawdown_pct": 2.4665384615384327,
+          "contribution_pct": {
+            "crypto": -2.208230769230765,
+            "stocks": 0.0
+          },
+          "peak_reservations": 4,
+          "peak_margin_pct": 11.563997369082973,
+          "cash_pnl_usd": -2.8706999999999945,
+          "profitable": 5,
+          "routed": 0,
+          "exit_counts": {
+            "SL": 10,
+            "BE": 11,
+            "TARGET": 3
+          }
+        },
+        "indivisible_tp1": {
+          "status": "SCORED_PUBLIC_L2_SIMULATION",
+          "trades": 24,
+          "skipped": {
+            "crypto:wide": 14,
+            "stocks:wide": 21,
+            "stocks:stale order book": 3,
+            "stocks:paper_guard": 1
+          },
+          "return_pct": -2.2082307692307457,
+          "drawdown_pct": 2.4665384615384327,
+          "contribution_pct": {
+            "crypto": -2.208230769230765,
+            "stocks": 0.0
+          },
+          "peak_reservations": 4,
+          "peak_margin_pct": 11.563997369082973,
+          "cash_pnl_usd": -2.8706999999999945,
+          "profitable": 5,
+          "routed": 0,
+          "exit_counts": {
+            "SL": 10,
+            "BE": 11,
+            "TARGET": 3
+          }
+        },
+        "indivisible_1r": {
+          "status": "SCORED_PUBLIC_L2_SIMULATION",
+          "trades": 24,
+          "skipped": {
+            "crypto:wide": 14,
+            "stocks:wide": 21,
+            "stocks:stale order book": 3,
+            "stocks:paper_guard": 1
+          },
+          "return_pct": -2.2082307692307457,
+          "drawdown_pct": 2.4665384615384327,
+          "contribution_pct": {
+            "crypto": -2.208230769230765,
+            "stocks": 0.0
+          },
+          "peak_reservations": 4,
+          "peak_margin_pct": 11.563997369082973,
+          "cash_pnl_usd": -2.8706999999999945,
+          "profitable": 5,
+          "routed": 0,
+          "exit_counts": {
+            "SL": 10,
+            "BE": 11,
+            "TARGET": 3
+          }
+        },
+        "small_tp1": {
+          "status": "SCORED_PUBLIC_L2_SIMULATION",
+          "trades": 24,
+          "skipped": {
+            "crypto:wide": 14,
+            "stocks:wide": 21,
+            "stocks:stale order book": 3,
+            "stocks:paper_guard": 1
+          },
+          "return_pct": -2.2019230769230624,
+          "drawdown_pct": 2.3829230769230603,
+          "contribution_pct": {
+            "crypto": -2.2019230769230735,
+            "stocks": 0.0
+          },
+          "peak_reservations": 4,
+          "peak_margin_pct": 11.488397558361678,
+          "cash_pnl_usd": -2.8624999999999954,
+          "profitable": 10,
+          "routed": 9,
+          "exit_counts": {
+            "SL": 10,
+            "BE": 6,
+            "SINGLE_TARGET": 7,
+            "TARGET": 1
+          }
+        },
+        "small_1r": {
+          "status": "SCORED_PUBLIC_L2_SIMULATION",
+          "trades": 23,
+          "skipped": {
+            "crypto:wide": 14,
+            "stocks:wide": 21,
+            "stocks:stale order book": 3,
+            "crypto:position_cap": 1,
+            "stocks:paper_guard": 1
+          },
+          "return_pct": -4.207846153846173,
+          "drawdown_pct": 4.207846153846169,
+          "contribution_pct": {
+            "crypto": -4.207846153846147,
+            "stocks": 0.0
+          },
+          "peak_reservations": 4,
+          "peak_margin_pct": 11.226472298395983,
+          "cash_pnl_usd": -5.470199999999993,
+          "profitable": 4,
+          "routed": 8,
+          "exit_counts": {
+            "SL": 14,
+            "BE": 6,
+            "TIME": 1,
+            "SINGLE_TARGET": 1,
+            "TARGET": 1
+          }
+        },
+        "small_1_5r": {
+          "status": "SCORED_PUBLIC_L2_SIMULATION",
+          "trades": 23,
+          "skipped": {
+            "crypto:wide": 14,
+            "stocks:wide": 21,
+            "stocks:stale order book": 3,
+            "crypto:position_cap": 1,
+            "stocks:paper_guard": 1
+          },
+          "return_pct": -4.090153846153866,
+          "drawdown_pct": 4.090153846153868,
+          "contribution_pct": {
+            "crypto": -4.090153846153839,
+            "stocks": 0.0
+          },
+          "peak_reservations": 4,
+          "peak_margin_pct": 11.213118246297931,
+          "cash_pnl_usd": -5.317199999999993,
+          "profitable": 4,
+          "routed": 8,
+          "exit_counts": {
+            "SL": 14,
+            "BE": 6,
+            "TIME": 1,
+            "SINGLE_TARGET": 1,
+            "TARGET": 1
+          }
+        },
+        "adverse_book_1r": {
+          "status": "SCORED_PUBLIC_L2_SIMULATION",
+          "trades": 24,
+          "skipped": {
+            "crypto:wide": 14,
+            "stocks:wide": 21,
+            "stocks:stale order book": 3,
+            "stocks:paper_guard": 1
+          },
+          "return_pct": -2.533615384615373,
+          "drawdown_pct": 2.5336153846153744,
+          "contribution_pct": {
+            "crypto": -2.533615384615377,
+            "stocks": 0.0
+          },
+          "peak_reservations": 4,
+          "peak_margin_pct": 11.564268372324102,
+          "cash_pnl_usd": -3.293699999999991,
+          "profitable": 5,
+          "routed": 4,
+          "exit_counts": {
+            "SL": 11,
+            "BE": 9,
+            "TIME": 1,
+            "TARGET": 3
+          }
+        },
+        "adverse_book_1_5r": {
+          "status": "SCORED_PUBLIC_L2_SIMULATION",
+          "trades": 24,
+          "skipped": {
+            "crypto:wide": 14,
+            "stocks:wide": 21,
+            "stocks:stale order book": 3,
+            "stocks:paper_guard": 1
+          },
+          "return_pct": -2.533615384615373,
+          "drawdown_pct": 2.5336153846153744,
+          "contribution_pct": {
+            "crypto": -2.533615384615377,
+            "stocks": 0.0
+          },
+          "peak_reservations": 4,
+          "peak_margin_pct": 11.564268372324102,
+          "cash_pnl_usd": -3.293699999999991,
+          "profitable": 5,
+          "routed": 4,
+          "exit_counts": {
+            "SL": 11,
+            "BE": 9,
+            "TIME": 1,
+            "TARGET": 3
+          }
+        },
+        "small_1r_with_breakeven": {
+          "status": "SCORED_PUBLIC_L2_SIMULATION",
+          "trades": 24,
+          "skipped": {
+            "crypto:wide": 14,
+            "stocks:wide": 21,
+            "stocks:stale order book": 3,
+            "stocks:paper_guard": 1
+          },
+          "return_pct": -2.7613076923076685,
+          "drawdown_pct": 2.7730769230768932,
+          "contribution_pct": {
+            "crypto": -2.76130769230769,
+            "stocks": 0.0
+          },
+          "peak_reservations": 4,
+          "peak_margin_pct": 11.59361167585042,
+          "cash_pnl_usd": -3.5896999999999974,
+          "profitable": 5,
+          "routed": 9,
+          "exit_counts": {
+            "SL": 10,
+            "BE": 11,
+            "SINGLE_TARGET": 2,
+            "TARGET": 1
+          }
+        },
+        "small_1_5r_with_breakeven": {
+          "status": "SCORED_PUBLIC_L2_SIMULATION",
+          "trades": 24,
+          "skipped": {
+            "crypto:wide": 14,
+            "stocks:wide": 21,
+            "stocks:stale order book": 3,
+            "stocks:paper_guard": 1
+          },
+          "return_pct": -2.517461538461485,
+          "drawdown_pct": 2.60038461538457,
+          "contribution_pct": {
+            "crypto": -2.517461538461529,
+            "stocks": 0.0
+          },
+          "peak_reservations": 4,
+          "peak_margin_pct": 11.579736581504381,
+          "cash_pnl_usd": -3.2726999999999884,
+          "profitable": 5,
+          "routed": 9,
+          "exit_counts": {
+            "SL": 10,
+            "BE": 11,
+            "SINGLE_TARGET": 2,
+            "TARGET": 1
+          }
+        },
+        "adverse_book_1_5r_with_breakeven": {
+          "status": "SCORED_PUBLIC_L2_SIMULATION",
+          "trades": 24,
+          "skipped": {
+            "crypto:wide": 14,
+            "stocks:wide": 21,
+            "stocks:stale order book": 3,
+            "stocks:paper_guard": 1
+          },
+          "return_pct": -2.2082307692307457,
+          "drawdown_pct": 2.4665384615384327,
+          "contribution_pct": {
+            "crypto": -2.208230769230765,
+            "stocks": 0.0
+          },
+          "peak_reservations": 4,
+          "peak_margin_pct": 11.563997369082973,
+          "cash_pnl_usd": -2.8706999999999945,
+          "profitable": 5,
+          "routed": 4,
+          "exit_counts": {
+            "SL": 10,
+            "BE": 11,
+            "TARGET": 3
+          }
+        },
+        "stocks_adverse_book_1_5r": {
+          "status": "SCORED_PUBLIC_L2_SIMULATION",
+          "trades": 24,
+          "skipped": {
+            "crypto:wide": 14,
+            "stocks:wide": 21,
+            "stocks:stale order book": 3,
+            "stocks:paper_guard": 1
+          },
+          "return_pct": -2.2082307692307457,
+          "drawdown_pct": 2.4665384615384327,
+          "contribution_pct": {
+            "crypto": -2.208230769230765,
+            "stocks": 0.0
+          },
+          "peak_reservations": 4,
+          "peak_margin_pct": 11.563997369082973,
+          "cash_pnl_usd": -2.8706999999999945,
+          "profitable": 5,
+          "routed": 0,
+          "exit_counts": {
+            "SL": 10,
+            "BE": 11,
+            "TARGET": 3
+          }
+        }
+      }
+    },
+    "nov17_19_joint": {
+      "200": {
+        "baseline": {
+          "status": "SCORED_PUBLIC_L2_SIMULATION",
+          "trades": 28,
+          "skipped": {
+            "crypto:wide": 6,
+            "crypto:publication_rate_limit": 27,
+            "stocks:publication_rate_limit": 13,
+            "stocks:position_cap": 14,
+            "crypto:position_cap": 4,
+            "crypto:depth slippage exceeds limit": 2
+          },
+          "return_pct": -0.47119999999996054,
+          "drawdown_pct": 1.5556153846153966,
+          "contribution_pct": {
+            "crypto": -0.2076615384615254,
+            "stocks": -0.2635384615384638
+          },
+          "peak_reservations": 6,
+          "peak_margin_pct": 17.47789166318587,
+          "cash_pnl_usd": -0.612559999999986,
+          "profitable": 7,
+          "routed": 0,
+          "exit_counts": {
+            "TARGET": 6,
+            "SL": 15,
+            "BE": 7
+          }
+        },
+        "indivisible_tp1": {
+          "status": "SCORED_PUBLIC_L2_SIMULATION",
+          "trades": 28,
+          "skipped": {
+            "crypto:wide": 6,
+            "crypto:publication_rate_limit": 27,
+            "stocks:publication_rate_limit": 13,
+            "stocks:position_cap": 14,
+            "crypto:position_cap": 4,
+            "crypto:depth slippage exceeds limit": 2
+          },
+          "return_pct": -0.47119999999996054,
+          "drawdown_pct": 1.5556153846153966,
+          "contribution_pct": {
+            "crypto": -0.2076615384615254,
+            "stocks": -0.2635384615384638
+          },
+          "peak_reservations": 6,
+          "peak_margin_pct": 17.47789166318587,
+          "cash_pnl_usd": -0.612559999999986,
+          "profitable": 7,
+          "routed": 0,
+          "exit_counts": {
+            "TARGET": 6,
+            "SL": 15,
+            "BE": 7
+          }
+        },
+        "indivisible_1r": {
+          "status": "SCORED_PUBLIC_L2_SIMULATION",
+          "trades": 28,
+          "skipped": {
+            "crypto:wide": 6,
+            "crypto:publication_rate_limit": 27,
+            "stocks:publication_rate_limit": 13,
+            "stocks:position_cap": 14,
+            "crypto:position_cap": 4,
+            "crypto:depth slippage exceeds limit": 2
+          },
+          "return_pct": -0.47119999999996054,
+          "drawdown_pct": 1.5556153846153966,
+          "contribution_pct": {
+            "crypto": -0.2076615384615254,
+            "stocks": -0.2635384615384638
+          },
+          "peak_reservations": 6,
+          "peak_margin_pct": 17.47789166318587,
+          "cash_pnl_usd": -0.612559999999986,
+          "profitable": 7,
+          "routed": 0,
+          "exit_counts": {
+            "TARGET": 6,
+            "SL": 15,
+            "BE": 7
+          }
+        },
+        "small_tp1": {
+          "status": "SCORED_PUBLIC_L2_SIMULATION",
+          "trades": 29,
+          "skipped": {
+            "crypto:wide": 6,
+            "crypto:publication_rate_limit": 27,
+            "stocks:publication_rate_limit": 13,
+            "stocks:position_cap": 13,
+            "crypto:position_cap": 4,
+            "crypto:depth slippage exceeds limit": 2
+          },
+          "return_pct": -0.5275076923076827,
+          "drawdown_pct": 1.6117384615384585,
+          "contribution_pct": {
+            "crypto": 0.17303076923077662,
+            "stocks": -0.7005384615384671
+          },
+          "peak_reservations": 6,
+          "peak_margin_pct": 17.43997310391801,
+          "cash_pnl_usd": -0.6857599999999976,
+          "profitable": 9,
+          "routed": 3,
+          "exit_counts": {
+            "TARGET": 6,
+            "SL": 16,
+            "SINGLE_TARGET": 2,
+            "BE": 5
+          }
+        },
+        "small_1r": {
+          "status": "SCORED_PUBLIC_L2_SIMULATION",
+          "trades": 29,
+          "skipped": {
+            "crypto:wide": 6,
+            "crypto:publication_rate_limit": 27,
+            "stocks:publication_rate_limit": 13,
+            "stocks:position_cap": 13,
+            "crypto:position_cap": 4,
+            "crypto:depth slippage exceeds limit": 2
+          },
+          "return_pct": -0.21843076923077076,
+          "drawdown_pct": 1.5469230769230955,
+          "contribution_pct": {
+            "crypto": 0.5321076923077029,
+            "stocks": -0.7505384615384647
+          },
+          "peak_reservations": 6,
+          "peak_margin_pct": 17.403312901455966,
+          "cash_pnl_usd": -0.2839599999999903,
+          "profitable": 9,
+          "routed": 3,
+          "exit_counts": {
+            "TARGET": 6,
+            "SL": 16,
+            "SINGLE_TARGET": 2,
+            "BE": 5
+          }
+        },
+        "small_1_5r": {
+          "status": "SCORED_PUBLIC_L2_SIMULATION",
+          "trades": 28,
+          "skipped": {
+            "crypto:wide": 6,
+            "crypto:publication_rate_limit": 27,
+            "stocks:publication_rate_limit": 13,
+            "stocks:position_cap": 14,
+            "crypto:position_cap": 4,
+            "crypto:depth slippage exceeds limit": 2
+          },
+          "return_pct": 0.6090307692308006,
+          "drawdown_pct": 1.5469230769230955,
+          "contribution_pct": {
+            "crypto": 0.872569230769236,
+            "stocks": -0.2635384615384638
+          },
+          "peak_reservations": 6,
+          "peak_margin_pct": 17.36895919449419,
+          "cash_pnl_usd": 0.7917400000000038,
+          "profitable": 9,
+          "routed": 3,
+          "exit_counts": {
+            "TARGET": 6,
+            "SL": 15,
+            "SINGLE_TARGET": 2,
+            "BE": 5
+          }
+        },
+        "adverse_book_1r": {
+          "status": "SCORED_PUBLIC_L2_SIMULATION",
+          "trades": 28,
+          "skipped": {
+            "crypto:wide": 6,
+            "crypto:publication_rate_limit": 27,
+            "stocks:publication_rate_limit": 13,
+            "stocks:position_cap": 14,
+            "crypto:position_cap": 4,
+            "crypto:depth slippage exceeds limit": 2
+          },
+          "return_pct": -0.47119999999996054,
+          "drawdown_pct": 1.5556153846153966,
+          "contribution_pct": {
+            "crypto": -0.2076615384615254,
+            "stocks": -0.2635384615384638
+          },
+          "peak_reservations": 6,
+          "peak_margin_pct": 17.47789166318587,
+          "cash_pnl_usd": -0.612559999999986,
+          "profitable": 7,
+          "routed": 1,
+          "exit_counts": {
+            "TARGET": 6,
+            "SL": 15,
+            "BE": 7
+          }
+        },
+        "adverse_book_1_5r": {
+          "status": "SCORED_PUBLIC_L2_SIMULATION",
+          "trades": 28,
+          "skipped": {
+            "crypto:wide": 6,
+            "crypto:publication_rate_limit": 27,
+            "stocks:publication_rate_limit": 13,
+            "stocks:position_cap": 14,
+            "crypto:position_cap": 4,
+            "crypto:depth slippage exceeds limit": 2
+          },
+          "return_pct": -0.47119999999996054,
+          "drawdown_pct": 1.5556153846153966,
+          "contribution_pct": {
+            "crypto": -0.2076615384615254,
+            "stocks": -0.2635384615384638
+          },
+          "peak_reservations": 6,
+          "peak_margin_pct": 17.47789166318587,
+          "cash_pnl_usd": -0.612559999999986,
+          "profitable": 7,
+          "routed": 1,
+          "exit_counts": {
+            "TARGET": 6,
+            "SL": 15,
+            "BE": 7
+          }
+        },
+        "small_1r_with_breakeven": {
+          "status": "SCORED_PUBLIC_L2_SIMULATION",
+          "trades": 29,
+          "skipped": {
+            "crypto:wide": 6,
+            "crypto:publication_rate_limit": 27,
+            "stocks:publication_rate_limit": 13,
+            "stocks:position_cap": 13,
+            "crypto:position_cap": 4,
+            "crypto:depth slippage exceeds limit": 2
+          },
+          "return_pct": -0.591276923076911,
+          "drawdown_pct": 1.6755076923076855,
+          "contribution_pct": {
+            "crypto": 0.1092615384615507,
+            "stocks": -0.7005384615384671
+          },
+          "peak_reservations": 6,
+          "peak_margin_pct": 17.47789166318587,
+          "cash_pnl_usd": -0.7686599999999912,
+          "profitable": 8,
+          "routed": 3,
+          "exit_counts": {
+            "TARGET": 6,
+            "SL": 16,
+            "BE": 6,
+            "SINGLE_TARGET": 1
+          }
+        },
+        "small_1_5r_with_breakeven": {
+          "status": "SCORED_PUBLIC_L2_SIMULATION",
+          "trades": 28,
+          "skipped": {
+            "crypto:wide": 6,
+            "crypto:publication_rate_limit": 27,
+            "stocks:publication_rate_limit": 13,
+            "stocks:position_cap": 14,
+            "crypto:position_cap": 4,
+            "crypto:depth slippage exceeds limit": 2
+          },
+          "return_pct": -0.00981538461537479,
+          "drawdown_pct": 1.5556153846153966,
+          "contribution_pct": {
+            "crypto": 0.25372307692308343,
+            "stocks": -0.2635384615384638
+          },
+          "peak_reservations": 6,
+          "peak_margin_pct": 17.47789166318587,
+          "cash_pnl_usd": -0.012759999999994503,
+          "profitable": 8,
+          "routed": 3,
+          "exit_counts": {
+            "TARGET": 6,
+            "SL": 15,
+            "BE": 6,
+            "SINGLE_TARGET": 1
+          }
+        },
+        "adverse_book_1_5r_with_breakeven": {
+          "status": "SCORED_PUBLIC_L2_SIMULATION",
+          "trades": 28,
+          "skipped": {
+            "crypto:wide": 6,
+            "crypto:publication_rate_limit": 27,
+            "stocks:publication_rate_limit": 13,
+            "stocks:position_cap": 14,
+            "crypto:position_cap": 4,
+            "crypto:depth slippage exceeds limit": 2
+          },
+          "return_pct": -0.47119999999996054,
+          "drawdown_pct": 1.5556153846153966,
+          "contribution_pct": {
+            "crypto": -0.2076615384615254,
+            "stocks": -0.2635384615384638
+          },
+          "peak_reservations": 6,
+          "peak_margin_pct": 17.47789166318587,
+          "cash_pnl_usd": -0.612559999999986,
+          "profitable": 7,
+          "routed": 1,
+          "exit_counts": {
+            "TARGET": 6,
+            "SL": 15,
+            "BE": 7
+          }
+        },
+        "stocks_adverse_book_1_5r": {
+          "status": "SCORED_PUBLIC_L2_SIMULATION",
+          "trades": 29,
+          "skipped": {
+            "crypto:wide": 6,
+            "crypto:publication_rate_limit": 27,
+            "stocks:publication_rate_limit": 13,
+            "stocks:position_cap": 13,
+            "crypto:position_cap": 4,
+            "crypto:depth slippage exceeds limit": 2
+          },
+          "return_pct": -0.4388923076922846,
+          "drawdown_pct": 1.523307692307692,
+          "contribution_pct": {
+            "crypto": -0.2076615384615254,
+            "stocks": -0.2312307692307716
+          },
+          "peak_reservations": 6,
+          "peak_margin_pct": 17.47217090405849,
+          "cash_pnl_usd": -0.5705599999999859,
+          "profitable": 8,
+          "routed": 2,
+          "exit_counts": {
+            "TARGET": 5,
+            "SL": 15,
+            "SINGLE_TARGET": 2,
+            "BE": 7
+          }
+        }
+      },
+      "1000": {
+        "baseline": {
+          "status": "SCORED_PUBLIC_L2_SIMULATION",
+          "trades": 28,
+          "skipped": {
+            "crypto:wide": 6,
+            "crypto:publication_rate_limit": 27,
+            "stocks:publication_rate_limit": 13,
+            "stocks:position_cap": 14,
+            "crypto:position_cap": 4,
+            "crypto:depth slippage exceeds limit": 2
+          },
+          "return_pct": -0.5407846153846041,
+          "drawdown_pct": 1.6293230769230589,
+          "contribution_pct": {
+            "crypto": -0.23863076923077123,
+            "stocks": -0.3021538461538477
+          },
+          "peak_reservations": 6,
+          "peak_margin_pct": 17.491563089429064,
+          "cash_pnl_usd": -0.7030200000000044,
+          "profitable": 8,
+          "routed": 0,
+          "exit_counts": {
+            "TARGET": 6,
+            "SL": 15,
+            "BE": 7
+          }
+        },
+        "indivisible_tp1": {
+          "status": "SCORED_PUBLIC_L2_SIMULATION",
+          "trades": 28,
+          "skipped": {
+            "crypto:wide": 6,
+            "crypto:publication_rate_limit": 27,
+            "stocks:publication_rate_limit": 13,
+            "stocks:position_cap": 14,
+            "crypto:position_cap": 4,
+            "crypto:depth slippage exceeds limit": 2
+          },
+          "return_pct": -0.5407846153846041,
+          "drawdown_pct": 1.6293230769230589,
+          "contribution_pct": {
+            "crypto": -0.23863076923077123,
+            "stocks": -0.3021538461538477
+          },
+          "peak_reservations": 6,
+          "peak_margin_pct": 17.491563089429064,
+          "cash_pnl_usd": -0.7030200000000044,
+          "profitable": 8,
+          "routed": 0,
+          "exit_counts": {
+            "TARGET": 6,
+            "SL": 15,
+            "BE": 7
+          }
+        },
+        "indivisible_1r": {
+          "status": "SCORED_PUBLIC_L2_SIMULATION",
+          "trades": 28,
+          "skipped": {
+            "crypto:wide": 6,
+            "crypto:publication_rate_limit": 27,
+            "stocks:publication_rate_limit": 13,
+            "stocks:position_cap": 14,
+            "crypto:position_cap": 4,
+            "crypto:depth slippage exceeds limit": 2
+          },
+          "return_pct": -0.5407846153846041,
+          "drawdown_pct": 1.6293230769230589,
+          "contribution_pct": {
+            "crypto": -0.23863076923077123,
+            "stocks": -0.3021538461538477
+          },
+          "peak_reservations": 6,
+          "peak_margin_pct": 17.491563089429064,
+          "cash_pnl_usd": -0.7030200000000044,
+          "profitable": 8,
+          "routed": 0,
+          "exit_counts": {
+            "TARGET": 6,
+            "SL": 15,
+            "BE": 7
+          }
+        },
+        "small_tp1": {
+          "status": "SCORED_PUBLIC_L2_SIMULATION",
+          "trades": 29,
+          "skipped": {
+            "crypto:wide": 6,
+            "crypto:publication_rate_limit": 27,
+            "stocks:publication_rate_limit": 13,
+            "stocks:position_cap": 13,
+            "crypto:position_cap": 4,
+            "crypto:depth slippage exceeds limit": 2
+          },
+          "return_pct": -0.6173230769230265,
+          "drawdown_pct": 1.7058615384614813,
+          "contribution_pct": {
+            "crypto": 0.12498461538461547,
+            "stocks": -0.7423076923077008
+          },
+          "peak_reservations": 6,
+          "peak_margin_pct": 17.45768962366568,
+          "cash_pnl_usd": -0.8025200000000108,
+          "profitable": 10,
+          "routed": 3,
+          "exit_counts": {
+            "TARGET": 6,
+            "SL": 16,
+            "SINGLE_TARGET": 2,
+            "BE": 5
+          }
+        },
+        "small_1r": {
+          "status": "SCORED_PUBLIC_L2_SIMULATION",
+          "trades": 29,
+          "skipped": {
+            "crypto:wide": 6,
+            "crypto:publication_rate_limit": 27,
+            "stocks:publication_rate_limit": 13,
+            "stocks:position_cap": 13,
+            "crypto:position_cap": 4,
+            "crypto:depth slippage exceeds limit": 2
+          },
+          "return_pct": -0.23916923076919838,
+          "drawdown_pct": 1.6107692307692263,
+          "contribution_pct": {
+            "crypto": 0.503138461538462,
+            "stocks": -0.7423076923077008
+          },
+          "peak_reservations": 6,
+          "peak_margin_pct": 17.417057285253513,
+          "cash_pnl_usd": -0.3109200000000103,
+          "profitable": 10,
+          "routed": 3,
+          "exit_counts": {
+            "TARGET": 6,
+            "SL": 16,
+            "SINGLE_TARGET": 2,
+            "BE": 5
+          }
+        },
+        "small_1_5r": {
+          "status": "SCORED_PUBLIC_L2_SIMULATION",
+          "trades": 28,
+          "skipped": {
+            "crypto:wide": 6,
+            "crypto:publication_rate_limit": 27,
+            "stocks:publication_rate_limit": 13,
+            "stocks:position_cap": 14,
+            "crypto:position_cap": 4,
+            "crypto:depth slippage exceeds limit": 2
+          },
+          "return_pct": 0.5366769230769064,
+          "drawdown_pct": 1.6107692307692263,
+          "contribution_pct": {
+            "crypto": 0.8388307692307658,
+            "stocks": -0.3021538461538477
+          },
+          "peak_reservations": 6,
+          "peak_margin_pct": 17.383619762553966,
+          "cash_pnl_usd": 0.6976799999999936,
+          "profitable": 10,
+          "routed": 3,
+          "exit_counts": {
+            "TARGET": 6,
+            "SL": 15,
+            "SINGLE_TARGET": 2,
+            "BE": 5
+          }
+        },
+        "adverse_book_1r": {
+          "status": "SCORED_PUBLIC_L2_SIMULATION",
+          "trades": 28,
+          "skipped": {
+            "crypto:wide": 6,
+            "crypto:publication_rate_limit": 27,
+            "stocks:publication_rate_limit": 13,
+            "stocks:position_cap": 14,
+            "crypto:position_cap": 4,
+            "crypto:depth slippage exceeds limit": 2
+          },
+          "return_pct": -0.5407846153846041,
+          "drawdown_pct": 1.6293230769230589,
+          "contribution_pct": {
+            "crypto": -0.23863076923077123,
+            "stocks": -0.3021538461538477
+          },
+          "peak_reservations": 6,
+          "peak_margin_pct": 17.491563089429064,
+          "cash_pnl_usd": -0.7030200000000044,
+          "profitable": 8,
+          "routed": 1,
+          "exit_counts": {
+            "TARGET": 6,
+            "SL": 15,
+            "BE": 7
+          }
+        },
+        "adverse_book_1_5r": {
+          "status": "SCORED_PUBLIC_L2_SIMULATION",
+          "trades": 28,
+          "skipped": {
+            "crypto:wide": 6,
+            "crypto:publication_rate_limit": 27,
+            "stocks:publication_rate_limit": 13,
+            "stocks:position_cap": 14,
+            "crypto:position_cap": 4,
+            "crypto:depth slippage exceeds limit": 2
+          },
+          "return_pct": -0.5407846153846041,
+          "drawdown_pct": 1.6293230769230589,
+          "contribution_pct": {
+            "crypto": -0.23863076923077123,
+            "stocks": -0.3021538461538477
+          },
+          "peak_reservations": 6,
+          "peak_margin_pct": 17.491563089429064,
+          "cash_pnl_usd": -0.7030200000000044,
+          "profitable": 8,
+          "routed": 1,
+          "exit_counts": {
+            "TARGET": 6,
+            "SL": 15,
+            "BE": 7
+          }
+        },
+        "small_1r_with_breakeven": {
+          "status": "SCORED_PUBLIC_L2_SIMULATION",
+          "trades": 29,
+          "skipped": {
+            "crypto:wide": 6,
+            "crypto:publication_rate_limit": 27,
+            "stocks:publication_rate_limit": 13,
+            "stocks:position_cap": 13,
+            "crypto:position_cap": 4,
+            "crypto:depth slippage exceeds limit": 2
+          },
+          "return_pct": -0.6609384615384517,
+          "drawdown_pct": 1.7494769230769143,
+          "contribution_pct": {
+            "crypto": 0.08136923076923178,
+            "stocks": -0.7423076923077008
+          },
+          "peak_reservations": 6,
+          "peak_margin_pct": 17.491563089429064,
+          "cash_pnl_usd": -0.8592200000000095,
+          "profitable": 9,
+          "routed": 3,
+          "exit_counts": {
+            "TARGET": 6,
+            "SL": 16,
+            "BE": 6,
+            "SINGLE_TARGET": 1
+          }
+        },
+        "small_1_5r_with_breakeven": {
+          "status": "SCORED_PUBLIC_L2_SIMULATION",
+          "trades": 28,
+          "skipped": {
+            "crypto:wide": 6,
+            "crypto:publication_rate_limit": 27,
+            "stocks:publication_rate_limit": 13,
+            "stocks:position_cap": 14,
+            "crypto:position_cap": 4,
+            "crypto:depth slippage exceeds limit": 2
+          },
+          "return_pct": -0.07539999999996994,
+          "drawdown_pct": 1.6180769230769207,
+          "contribution_pct": {
+            "crypto": 0.2267538461538472,
+            "stocks": -0.3021538461538477
+          },
+          "peak_reservations": 6,
+          "peak_margin_pct": 17.491563089429064,
+          "cash_pnl_usd": -0.09802000000000047,
+          "profitable": 9,
+          "routed": 3,
+          "exit_counts": {
+            "TARGET": 6,
+            "SL": 15,
+            "BE": 6,
+            "SINGLE_TARGET": 1
+          }
+        },
+        "adverse_book_1_5r_with_breakeven": {
+          "status": "SCORED_PUBLIC_L2_SIMULATION",
+          "trades": 28,
+          "skipped": {
+            "crypto:wide": 6,
+            "crypto:publication_rate_limit": 27,
+            "stocks:publication_rate_limit": 13,
+            "stocks:position_cap": 14,
+            "crypto:position_cap": 4,
+            "crypto:depth slippage exceeds limit": 2
+          },
+          "return_pct": -0.5407846153846041,
+          "drawdown_pct": 1.6293230769230589,
+          "contribution_pct": {
+            "crypto": -0.23863076923077123,
+            "stocks": -0.3021538461538477
+          },
+          "peak_reservations": 6,
+          "peak_margin_pct": 17.491563089429064,
+          "cash_pnl_usd": -0.7030200000000044,
+          "profitable": 8,
+          "routed": 1,
+          "exit_counts": {
+            "TARGET": 6,
+            "SL": 15,
+            "BE": 7
+          }
+        },
+        "stocks_adverse_book_1_5r": {
+          "status": "SCORED_PUBLIC_L2_SIMULATION",
+          "trades": 29,
+          "skipped": {
+            "crypto:wide": 6,
+            "crypto:publication_rate_limit": 27,
+            "stocks:publication_rate_limit": 13,
+            "stocks:position_cap": 13,
+            "crypto:position_cap": 4,
+            "crypto:depth slippage exceeds limit": 2
+          },
+          "return_pct": -0.5130923076922866,
+          "drawdown_pct": 1.60163076923075,
+          "contribution_pct": {
+            "crypto": -0.23863076923077123,
+            "stocks": -0.274461538461539
+          },
+          "peak_reservations": 6,
+          "peak_margin_pct": 17.486651678859076,
+          "cash_pnl_usd": -0.6670200000000032,
+          "profitable": 9,
+          "routed": 2,
+          "exit_counts": {
+            "TARGET": 5,
+            "SL": 15,
+            "SINGLE_TARGET": 2,
+            "BE": 7
+          }
+        }
+      }
+    }
+  },
+  "source_checks": {
+    "earlier": {
+      "tape": {
+        "HYPEUSDT": {
+          "tape_trades": 319465,
+          "reconciled_bars": 96,
+          "mismatches": {}
+        },
+        "AVAXUSDT": {
+          "tape_trades": 64676,
+          "reconciled_bars": 144,
+          "mismatches": {}
+        },
+        "LINKUSDT": {
+          "tape_trades": 147051,
+          "reconciled_bars": 336,
+          "mismatches": {}
+        },
+        "BTCUSDT": {
+          "tape_trades": 1363632,
+          "reconciled_bars": 48,
+          "mismatches": {}
+        },
+        "ZECUSDT": {
+          "tape_trades": 498603,
+          "reconciled_bars": 322,
+          "mismatches": {}
+        },
+        "SOLUSDT": {
+          "tape_trades": 239497,
+          "reconciled_bars": 48,
+          "mismatches": {}
+        }
+      },
+      "books": {
+        "1793836800:HYPEUSDT": {
+          "snapshot": 96,
+          "update": 1113507,
+          "first_ts": 1793836800001,
+          "last_ts": 1793923199936
+        },
+        "1793836800:LINKUSDT": {
+          "snapshot": 96,
+          "update": 1545782,
+          "first_ts": 1793836800000,
+          "last_ts": 1793923199988
+        },
+        "1793923200:BTCUSDT": {
+          "snapshot": 96,
+          "update": 2163168,
+          "first_ts": 1793923200006,
+          "last_ts": 1794009599881
+        },
+        "1793923200:LINKUSDT": {
+          "snapshot": 96,
+          "update": 1144247,
+          "first_ts": 1793923200008,
+          "last_ts": 1794009599900
+        },
+        "1794009600:ZECUSDT": {
+          "snapshot": 96,
+          "update": 1342577,
+          "first_ts": 1794009600000,
+          "last_ts": 1794095999990
+        },
+        "1794096000:ZECUSDT": {
+          "snapshot": 96,
+          "update": 1671762,
+          "first_ts": 1794096000000,
+          "last_ts": 1794182399998
+        },
+        "1794355200:LINKUSDT": {
+          "snapshot": 96,
+          "update": 964148,
+          "first_ts": 1794355200004,
+          "last_ts": 1794441599922
+        },
+        "1794355200:ZECUSDT": {
+          "snapshot": 96,
+          "update": 3052561,
+          "first_ts": 1794355200004,
+          "last_ts": 1794441599972
+        },
+        "1794528000:AVAXUSDT": {
+          "snapshot": 96,
+          "update": 1117616,
+          "first_ts": 1794528000004,
+          "last_ts": 1794614399992
+        },
+        "1794528000:LINKUSDT": {
+          "snapshot": 96,
+          "update": 1491641,
+          "first_ts": 1794528000003,
+          "last_ts": 1794614399762
+        },
+        "1794614400:AVAXUSDT": {
+          "snapshot": 96,
+          "update": 1323660,
+          "first_ts": 1794614400002,
+          "last_ts": 1794700799913
+        }
+      },
+      "stock_tape_sha256": {},
+      "added_book_archive_sha256": {
+        "1793923200:BTCUSDT": "e62553fbd7262529b1a86b2d646d50c70ce5bb3388351353e59cf444e6f93851"
+      }
+    },
+    "joint": {
+      "tape": {
+        "LINKUSDT": {
+          "tape_trades": 38213,
+          "reconciled_bars": 96,
+          "mismatches": {}
+        },
+        "ZECUSDT": {
+          "tape_trades": 101490,
+          "reconciled_bars": 57,
+          "mismatches": {}
+        },
+        "INTCUSDT": {
+          "tape_trades": 13865,
+          "reconciled_bars": 120,
+          "mismatches": {}
+        },
+        "NVDAUSDT": {
+          "tape_trades": 178445,
+          "reconciled_bars": 64,
+          "mismatches": {}
+        },
+        "MSTRUSDT": {
+          "tape_trades": 49039,
+          "reconciled_bars": 64,
+          "mismatches": {}
+        }
+      },
+      "books": {
+        "1794960000:INTCUSDT": {
+          "snapshot": 96,
+          "update": 1116812,
+          "first_ts": 1794960000009,
+          "last_ts": 1795046399999
+        },
+        "1794960000:MSTRUSDT": {
+          "snapshot": 96,
+          "update": 1764608,
+          "first_ts": 1794960000009,
+          "last_ts": 1795046399999
+        },
+        "1794960000:ZECUSDT": {
+          "snapshot": 96,
+          "update": 2254448,
+          "first_ts": 1794960000008,
+          "last_ts": 1795046399628
+        },
+        "1795046400:LINKUSDT": {
+          "snapshot": 96,
+          "update": 1270564,
+          "first_ts": 1795046400008,
+          "last_ts": 1795132799920
+        }
+      },
+      "stock_tape_sha256": {
+        "capture.json": "42ce34576428d9caeed0b9e2988f83e908862938904ad635e723a12b8d76d243",
+        "trade_repair.json": "7e420e41049b9011190b021d7c99c2d088bbd688b33ceb5f5f2cc9ebf9ace2d4"
+      },
+      "added_book_archive_sha256": {}
+    }
+  },
+  "live_activation_supported": false,
+  "limitations": [
+    "Retrospective cohorts with separate initial balances. The equity drawdown of open positions is unavailable.",
+    "Route classification uses the displayed executable size for the initial account balance at each entry.",
+    "A routed position has one full-size market take. Guarded variants can move the stop to entry after a 0.5R favorable move.",
+    "Exchange market exits are estimated from public depth at 200 ms and at 1000 ms after the trigger.",
+    "Entry and pre-admission rules are held to the existing cohort. Account limits match the control.",
+    "Trigger comparisons hold baseline admissions fixed; the cash runs can admit different trades."
+  ],
+  "paired_trigger_diagnostics": {
+    "nov05_08": {
+      "indivisible_tp1": {},
+      "indivisible_1r": {},
+      "small_tp1": {
+        "TARGET -> SINGLE_TARGET": 5,
+        "SL -> SL": 3,
+        "BE -> SINGLE_TARGET": 3
+      },
+      "small_1r": {
+        "TARGET -> SINGLE_TARGET": 5,
+        "SL -> SL": 3,
+        "BE -> SINGLE_TARGET": 3
+      },
+      "small_1_5r": {
+        "TARGET -> SINGLE_TARGET": 5,
+        "SL -> SL": 3,
+        "BE -> SINGLE_TARGET": 2,
+        "BE -> SL": 1
+      },
+      "adverse_book_1r": {
+        "SL -> SL": 3,
+        "BE -> TIME": 1,
+        "TARGET -> SINGLE_TARGET": 2,
+        "BE -> SINGLE_TARGET": 1
+      },
+      "adverse_book_1_5r": {
+        "SL -> SL": 3,
+        "BE -> TIME": 1,
+        "TARGET -> SINGLE_TARGET": 2,
+        "BE -> SINGLE_TARGET": 1
+      },
+      "small_1r_with_breakeven": {
+        "TARGET -> SINGLE_TARGET": 5,
+        "SL -> SL": 3,
+        "BE -> SINGLE_TARGET": 3
+      },
+      "small_1_5r_with_breakeven": {
+        "TARGET -> SINGLE_TARGET": 5,
+        "SL -> SL": 3,
+        "BE -> SINGLE_TARGET": 1,
+        "BE -> BE": 2
+      },
+      "adverse_book_1_5r_with_breakeven": {
+        "SL -> SL": 3,
+        "BE -> BE": 1,
+        "TARGET -> SINGLE_TARGET": 2,
+        "BE -> SINGLE_TARGET": 1
+      },
+      "stocks_adverse_book_1_5r": {}
+    },
+    "nov09_14": {
+      "indivisible_tp1": {},
+      "indivisible_1r": {},
+      "small_tp1": {
+        "SL -> SL": 2,
+        "BE -> SINGLE_TARGET": 5,
+        "TARGET -> SINGLE_TARGET": 2
+      },
+      "small_1r": {
+        "SL -> SL": 2,
+        "BE -> TIME": 1,
+        "BE -> SL": 4,
+        "TARGET -> SINGLE_TARGET": 2
+      },
+      "small_1_5r": {
+        "SL -> SL": 2,
+        "BE -> TIME": 1,
+        "BE -> SL": 4,
+        "TARGET -> SINGLE_TARGET": 2
+      },
+      "adverse_book_1r": {
+        "BE -> TIME": 1,
+        "SL -> SL": 2,
+        "BE -> SL": 1
+      },
+      "adverse_book_1_5r": {
+        "BE -> TIME": 1,
+        "SL -> SL": 2,
+        "BE -> SL": 1
+      },
+      "small_1r_with_breakeven": {
+        "SL -> SL": 2,
+        "BE -> BE": 5,
+        "TARGET -> SINGLE_TARGET": 2
+      },
+      "small_1_5r_with_breakeven": {
+        "SL -> SL": 2,
+        "BE -> BE": 5,
+        "TARGET -> SINGLE_TARGET": 2
+      },
+      "adverse_book_1_5r_with_breakeven": {
+        "BE -> BE": 2,
+        "SL -> SL": 2
+      },
+      "stocks_adverse_book_1_5r": {}
+    },
+    "nov17_19_joint": {
+      "indivisible_tp1": {},
+      "indivisible_1r": {},
+      "small_tp1": {
+        "SL -> SL": 1,
+        "BE -> SINGLE_TARGET": 2
+      },
+      "small_1r": {
+        "SL -> SL": 1,
+        "BE -> SINGLE_TARGET": 2
+      },
+      "small_1_5r": {
+        "SL -> SL": 1,
+        "BE -> SINGLE_TARGET": 2
+      },
+      "adverse_book_1r": {
+        "SL -> SL": 1
+      },
+      "adverse_book_1_5r": {
+        "SL -> SL": 1
+      },
+      "small_1r_with_breakeven": {
+        "SL -> SL": 1,
+        "BE -> BE": 1,
+        "BE -> SINGLE_TARGET": 1
+      },
+      "small_1_5r_with_breakeven": {
+        "SL -> SL": 1,
+        "BE -> BE": 1,
+        "BE -> SINGLE_TARGET": 1
+      },
+      "adverse_book_1_5r_with_breakeven": {
+        "SL -> SL": 1
+      },
+      "stocks_adverse_book_1_5r": {
+        "SL -> SINGLE_TARGET": 1,
+        "TARGET -> SINGLE_TARGET": 1
+      }
+    }
+  }
+}
