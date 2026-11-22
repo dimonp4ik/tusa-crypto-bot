@@ -84,9 +84,9 @@ def refuses(name, context):
             'require_aligned_sweep': context['sweep'] != 'aligned'}[name]
 
 
-def contexts(rows, specs, references):
+def context_windows(rows, specs, references):
     frames = load_native(references)
-    contexts = {}
+    windows = {}
     downloads = {}
     for row in rows:
         if row['entry_status'] != 'eligible' or row['bot'] == 'stocks' and not row['stock_reference_ready']:
@@ -104,9 +104,16 @@ def contexts(rows, specs, references):
                 except (ValueError, OSError) as exc:
                     downloads[identity] = (None, type(exc).__name__)
             bars = downloads[identity][0]
-        contexts[key(row)] = market_context(bars, direction=row['direction'], entry=row['reference_entry'],
-                                            stop=row['stop'], tick=float(specs[symbol].get('tickSz') or 0))
-    return contexts, {f'{s}:{at}': digest for (s,at),(_,digest) in downloads.items()}
+        windows[key(row)] = bars
+    return windows, {f'{s}:{at}': digest for (s,at),(_,digest) in downloads.items()}
+
+
+def contexts(rows, specs, references):
+    windows, evidence = context_windows(rows, specs, references)
+    features = {key(row): market_context(windows[key(row)], direction=row['direction'],
+                entry=row['reference_entry'], stop=row['stop'], tick=float(specs[row['symbol']].get('tickSz') or 0))
+                for row in rows if key(row) in windows}
+    return features,evidence
 
 
 def evaluate(material, cohorts, cap, controls, *, joint=False):
