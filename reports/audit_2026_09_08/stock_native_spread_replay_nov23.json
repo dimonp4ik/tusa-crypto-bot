@@ -1,0 +1,2220 @@
+{
+  "initial_capital": 130.0,
+  "margin": 0.03,
+  "leverage": 10,
+  "policies": {
+    "current": {
+      "max_delay_ms": 0,
+      "retries_stale": false
+    },
+    "retry_60s": {
+      "max_delay_ms": 60000,
+      "retries_stale": false
+    },
+    "retry_before_deadline": {
+      "max_delay_ms": 145000,
+      "retries_stale": false
+    },
+    "retry_wide_or_stale": {
+      "max_delay_ms": 145000,
+      "retries_stale": true
+    }
+  },
+  "fast_offsets_ms": [
+    0,
+    200,
+    800
+  ],
+  "delayed_offsets_ms": [
+    10000,
+    25000,
+    55000,
+    90000,
+    130000,
+    145000
+  ],
+  "source_hashes": {
+    "plan.json": "39de5b14596979188505a32cec1fc3292fa7e6fcc3c6a5e96d4478f86c50506d",
+    "capture.json": "51ddf7edd02c3bad03c44580901eafa27ac15fc27e39d1ba3ed226fa70e2a926",
+    "trade_repair.json": "c30041b9edb8d0a22c9b5660292b0e4c0d671bc7b8d6268589854779d66ab4c7"
+  },
+  "production_observer_statuses": {
+    "wide": 18,
+    "executable price outside signal bracket": 1,
+    "depth slippage exceeds limit": 3,
+    "qualified_5bp": 1
+  },
+  "publication_cap_rejections": 8,
+  "entries_by_phase": {
+    "other": 2,
+    "premarket": 2,
+    "regular": 2,
+    "postmarket": 2
+  },
+  "missing_entry_archive": [
+    [
+      "stocks",
+      "AMZNUSDT",
+      1795221028069
+    ],
+    [
+      "stocks",
+      "CRCLUSDT",
+      1795221029276
+    ],
+    [
+      "stocks",
+      "WDCUSDT",
+      1795224633924
+    ],
+    [
+      "stocks",
+      "SOXSUSDT",
+      1795228233471
+    ],
+    [
+      "stocks",
+      "DELLUSDT",
+      1795230929576
+    ],
+    [
+      "stocks",
+      "HOODUSDT",
+      1795245330078
+    ],
+    [
+      "stocks",
+      "SKHYUSDT",
+      1795246232880
+    ]
+  ],
+  "archive_sha256": {
+    "1795132800:AXTIUSDT": "1b5354afab67a85c4147579e93c5ee2f407c0e57537b692373284bd18510b2a5",
+    "1795132800:BEUSDT": "2c05cf8b3facb6525129c5a51aca09fffb91712cd05776a58d1978d63e22a901",
+    "1795132800:BMNRUSDT": "1d5186dd4a89624d7b05aefacd590e4b0d26ba5f2c794cf708f44f20159bd2cf",
+    "1795132800:SKHYUSDT": "b803a7d5229b31bd883de066043515467ab9874507adee3dafc69b64d4c87aa6",
+    "1795132800:SOFTBANKUSDT": "a3ade8667f2580dfdecba5605fccd910ad473095b1c4bb5e200ca245ffbbdd7e",
+    "1795132800:WDCUSDT": "0f312caf4df0ca9dd993a67c5b62e07c165f9abe7a745c9973bf177d547c2d1a"
+  },
+  "entry_book_checks": {
+    "1795132800:AXTIUSDT": {
+      "snapshot": 96,
+      "update": 758745,
+      "first_ts": 1795132800002,
+      "last_ts": 1795219199858
+    },
+    "1795132800:BEUSDT": {
+      "snapshot": 96,
+      "update": 1266930,
+      "first_ts": 1795132800000,
+      "last_ts": 1795219199065
+    },
+    "1795132800:BMNRUSDT": {
+      "snapshot": 96,
+      "update": 405070,
+      "first_ts": 1795132800005,
+      "last_ts": 1795219187395
+    },
+    "1795132800:SKHYUSDT": {
+      "snapshot": 96,
+      "update": 1275457,
+      "first_ts": 1795132800005,
+      "last_ts": 1795219199055
+    },
+    "1795132800:SOFTBANKUSDT": {
+      "snapshot": 96,
+      "update": 163954,
+      "first_ts": 1795132800000,
+      "last_ts": 1795219198375
+    },
+    "1795132800:WDCUSDT": {
+      "snapshot": 96,
+      "update": 1395011,
+      "first_ts": 1795132800006,
+      "last_ts": 1795219199643
+    }
+  },
+  "tape_checks": {
+    "AMZNUSDT": {
+      "bars_checked": 64,
+      "mismatches": {}
+    },
+    "ARMUSDT": {
+      "bars_checked": 64,
+      "mismatches": {}
+    },
+    "AXTIUSDT": {
+      "bars_checked": 78,
+      "mismatches": {}
+    },
+    "BEUSDT": {
+      "bars_checked": 97,
+      "mismatches": {}
+    },
+    "BMNRUSDT": {
+      "bars_checked": 73,
+      "mismatches": {}
+    },
+    "COINUSDT": {
+      "bars_checked": 64,
+      "mismatches": {}
+    },
+    "CRCLUSDT": {
+      "bars_checked": 64,
+      "mismatches": {}
+    },
+    "DELLUSDT": {
+      "bars_checked": 64,
+      "mismatches": {}
+    },
+    "HOODUSDT": {
+      "bars_checked": 64,
+      "mismatches": {}
+    },
+    "NVDAUSDT": {
+      "bars_checked": 64,
+      "mismatches": {}
+    },
+    "SKHYUSDT": {
+      "bars_checked": 97,
+      "mismatches": {}
+    },
+    "SNXXUSDT": {
+      "bars_checked": 64,
+      "mismatches": {}
+    },
+    "SOFTBANKUSDT": {
+      "bars_checked": 64,
+      "mismatches": {}
+    },
+    "SOXSUSDT": {
+      "bars_checked": 86,
+      "mismatches": {}
+    },
+    "WDCUSDT": {
+      "bars_checked": 129,
+      "mismatches": {}
+    }
+  },
+  "exit_book_checks": {},
+  "attempts": {
+    "current": [
+      {
+        "entry_ms": 1795163433193,
+        "symbol": "SOFTBANKUSDT",
+        "epoch": 1795163400,
+        "phase": "other",
+        "direction": "SHORT",
+        "entry_status": "stale order book",
+        "entry_attempts": [
+          {
+            "at": 1795163433193,
+            "delay_ms": 0,
+            "status": "wide",
+            "spread_bps": 41.75365344467552
+          }
+        ],
+        "observed_gate": "wide"
+      },
+      {
+        "entry_ms": 1795163433925,
+        "symbol": "WDCUSDT",
+        "epoch": 1795163400,
+        "phase": "other",
+        "direction": "SHORT",
+        "entry_status": "wide",
+        "entry_attempts": [
+          {
+            "at": 1795163433925,
+            "delay_ms": 0,
+            "status": "wide",
+            "spread_bps": 46.73139830728569
+          },
+          {
+            "at": 1795163434125,
+            "delay_ms": 200,
+            "status": "wide",
+            "spread_bps": 46.73139830728569
+          },
+          {
+            "at": 1795163434725,
+            "delay_ms": 800,
+            "status": "wide",
+            "spread_bps": 46.73139830728569
+          }
+        ],
+        "observed_gate": "wide"
+      },
+      {
+        "entry_ms": 1795172428529,
+        "symbol": "AXTIUSDT",
+        "epoch": 1795172400,
+        "phase": "premarket",
+        "direction": "SHORT",
+        "entry_status": "wide",
+        "entry_attempts": [
+          {
+            "at": 1795172428529,
+            "delay_ms": 0,
+            "status": "wide",
+            "spread_bps": 48.55842185129095
+          },
+          {
+            "at": 1795172428729,
+            "delay_ms": 200,
+            "status": "wide",
+            "spread_bps": 48.55842185129095
+          },
+          {
+            "at": 1795172429329,
+            "delay_ms": 800,
+            "status": "wide",
+            "spread_bps": 48.55842185129095
+          }
+        ],
+        "observed_gate": "wide"
+      },
+      {
+        "entry_ms": 1795172428831,
+        "symbol": "BMNRUSDT",
+        "epoch": 1795172400,
+        "phase": "premarket",
+        "direction": "SHORT",
+        "entry_status": "stale order book",
+        "entry_attempts": [
+          {
+            "at": 1795172428831,
+            "delay_ms": 0,
+            "status": "wide",
+            "spread_bps": 53.29780146568959
+          },
+          {
+            "at": 1795172429031,
+            "delay_ms": 200,
+            "status": "wide",
+            "spread_bps": 53.29780146568959
+          }
+        ],
+        "observed_gate": "wide"
+      },
+      {
+        "entry_ms": 1795185028475,
+        "symbol": "AXTIUSDT",
+        "epoch": 1795185000,
+        "phase": "regular",
+        "direction": "SHORT",
+        "entry_status": "wide",
+        "entry_attempts": [
+          {
+            "at": 1795185028475,
+            "delay_ms": 0,
+            "status": "wide",
+            "spread_bps": 153.94088669950742
+          },
+          {
+            "at": 1795185028675,
+            "delay_ms": 200,
+            "status": "wide",
+            "spread_bps": 153.94088669950742
+          },
+          {
+            "at": 1795185029275,
+            "delay_ms": 800,
+            "status": "wide",
+            "spread_bps": 55.693069306930624
+          }
+        ],
+        "observed_gate": "wide"
+      },
+      {
+        "entry_ms": 1795187728679,
+        "symbol": "BEUSDT",
+        "epoch": 1795187700,
+        "phase": "regular",
+        "direction": "SHORT",
+        "entry_status": "wide",
+        "entry_attempts": [
+          {
+            "at": 1795187728679,
+            "delay_ms": 0,
+            "status": "wide",
+            "spread_bps": 103.01597071495513
+          },
+          {
+            "at": 1795187728879,
+            "delay_ms": 200,
+            "status": "wide",
+            "spread_bps": 103.01597071495513
+          },
+          {
+            "at": 1795187729479,
+            "delay_ms": 800,
+            "status": "wide",
+            "spread_bps": 103.01597071495513
+          }
+        ],
+        "observed_gate": "executable price outside signal bracket"
+      },
+      {
+        "entry_ms": 1795216528474,
+        "symbol": "BEUSDT",
+        "epoch": 1795216500,
+        "phase": "postmarket",
+        "direction": "SHORT",
+        "entry_status": "wide",
+        "entry_attempts": [
+          {
+            "at": 1795216528474,
+            "delay_ms": 0,
+            "status": "wide",
+            "spread_bps": 54.126271796101
+          },
+          {
+            "at": 1795216528674,
+            "delay_ms": 200,
+            "status": "wide",
+            "spread_bps": 54.126271796101
+          },
+          {
+            "at": 1795216529274,
+            "delay_ms": 800,
+            "status": "wide",
+            "spread_bps": 54.126271796101
+          }
+        ],
+        "observed_gate": "wide"
+      },
+      {
+        "entry_ms": 1795216532726,
+        "symbol": "SKHYUSDT",
+        "epoch": 1795216500,
+        "phase": "postmarket",
+        "direction": "SHORT",
+        "entry_status": "wide",
+        "entry_attempts": [
+          {
+            "at": 1795216532726,
+            "delay_ms": 0,
+            "status": "wide",
+            "spread_bps": 27.16754883132758
+          },
+          {
+            "at": 1795216532926,
+            "delay_ms": 200,
+            "status": "wide",
+            "spread_bps": 33.714178685146976
+          },
+          {
+            "at": 1795216533526,
+            "delay_ms": 800,
+            "status": "wide",
+            "spread_bps": 18.74414245548293
+          }
+        ],
+        "observed_gate": "wide"
+      }
+    ],
+    "retry_60s": [
+      {
+        "entry_ms": 1795163433193,
+        "symbol": "SOFTBANKUSDT",
+        "epoch": 1795163400,
+        "phase": "other",
+        "direction": "SHORT",
+        "entry_status": "stale order book",
+        "entry_attempts": [
+          {
+            "at": 1795163433193,
+            "delay_ms": 0,
+            "status": "wide",
+            "spread_bps": 41.75365344467552
+          }
+        ],
+        "observed_gate": "wide"
+      },
+      {
+        "entry_ms": 1795163433925,
+        "symbol": "WDCUSDT",
+        "epoch": 1795163400,
+        "phase": "other",
+        "direction": "SHORT",
+        "entry_status": "wide",
+        "entry_attempts": [
+          {
+            "at": 1795163433925,
+            "delay_ms": 0,
+            "status": "wide",
+            "spread_bps": 46.73139830728569
+          },
+          {
+            "at": 1795163434125,
+            "delay_ms": 200,
+            "status": "wide",
+            "spread_bps": 46.73139830728569
+          },
+          {
+            "at": 1795163434725,
+            "delay_ms": 800,
+            "status": "wide",
+            "spread_bps": 46.73139830728569
+          },
+          {
+            "at": 1795163443925,
+            "delay_ms": 10000,
+            "status": "wide",
+            "spread_bps": 46.73139830728569
+          },
+          {
+            "at": 1795163458925,
+            "delay_ms": 25000,
+            "status": "wide",
+            "spread_bps": 46.73139830728569
+          },
+          {
+            "at": 1795163488925,
+            "delay_ms": 55000,
+            "status": "wide",
+            "spread_bps": 46.73139830728569
+          }
+        ],
+        "observed_gate": "wide"
+      },
+      {
+        "entry_ms": 1795172428529,
+        "symbol": "AXTIUSDT",
+        "epoch": 1795172400,
+        "phase": "premarket",
+        "direction": "SHORT",
+        "entry_status": "wide",
+        "entry_attempts": [
+          {
+            "at": 1795172428529,
+            "delay_ms": 0,
+            "status": "wide",
+            "spread_bps": 48.55842185129095
+          },
+          {
+            "at": 1795172428729,
+            "delay_ms": 200,
+            "status": "wide",
+            "spread_bps": 48.55842185129095
+          },
+          {
+            "at": 1795172429329,
+            "delay_ms": 800,
+            "status": "wide",
+            "spread_bps": 48.55842185129095
+          },
+          {
+            "at": 1795172438529,
+            "delay_ms": 10000,
+            "status": "wide",
+            "spread_bps": 51.58549537247814
+          },
+          {
+            "at": 1795172453529,
+            "delay_ms": 25000,
+            "status": "wide",
+            "spread_bps": 51.58549537247814
+          },
+          {
+            "at": 1795172483529,
+            "delay_ms": 55000,
+            "status": "wide",
+            "spread_bps": 54.61165048543682
+          }
+        ],
+        "observed_gate": "wide"
+      },
+      {
+        "entry_ms": 1795172428831,
+        "symbol": "BMNRUSDT",
+        "epoch": 1795172400,
+        "phase": "premarket",
+        "direction": "SHORT",
+        "entry_status": "stale order book",
+        "entry_attempts": [
+          {
+            "at": 1795172428831,
+            "delay_ms": 0,
+            "status": "wide",
+            "spread_bps": 53.29780146568959
+          },
+          {
+            "at": 1795172429031,
+            "delay_ms": 200,
+            "status": "wide",
+            "spread_bps": 53.29780146568959
+          }
+        ],
+        "observed_gate": "wide"
+      },
+      {
+        "entry_ms": 1795185028475,
+        "symbol": "AXTIUSDT",
+        "epoch": 1795185000,
+        "phase": "regular",
+        "direction": "SHORT",
+        "entry_status": "wide",
+        "entry_attempts": [
+          {
+            "at": 1795185028475,
+            "delay_ms": 0,
+            "status": "wide",
+            "spread_bps": 153.94088669950742
+          },
+          {
+            "at": 1795185028675,
+            "delay_ms": 200,
+            "status": "wide",
+            "spread_bps": 153.94088669950742
+          },
+          {
+            "at": 1795185029275,
+            "delay_ms": 800,
+            "status": "wide",
+            "spread_bps": 55.693069306930624
+          },
+          {
+            "at": 1795185038475,
+            "delay_ms": 10000,
+            "status": "wide",
+            "spread_bps": 80.54522924411339
+          },
+          {
+            "at": 1795185053475,
+            "delay_ms": 25000,
+            "status": "wide",
+            "spread_bps": 127.38853503184717
+          },
+          {
+            "at": 1795185083475,
+            "delay_ms": 55000,
+            "status": "wide",
+            "spread_bps": 55.71030640668514
+          }
+        ],
+        "observed_gate": "wide"
+      },
+      {
+        "entry_ms": 1795187728679,
+        "symbol": "BEUSDT",
+        "epoch": 1795187700,
+        "phase": "regular",
+        "direction": "SHORT",
+        "entry_status": "wide",
+        "entry_attempts": [
+          {
+            "at": 1795187728679,
+            "delay_ms": 0,
+            "status": "wide",
+            "spread_bps": 103.01597071495513
+          },
+          {
+            "at": 1795187728879,
+            "delay_ms": 200,
+            "status": "wide",
+            "spread_bps": 103.01597071495513
+          },
+          {
+            "at": 1795187729479,
+            "delay_ms": 800,
+            "status": "wide",
+            "spread_bps": 103.01597071495513
+          },
+          {
+            "at": 1795187738679,
+            "delay_ms": 10000,
+            "status": "wide",
+            "spread_bps": 92.69763070041672
+          },
+          {
+            "at": 1795187753679,
+            "delay_ms": 25000,
+            "status": "wide",
+            "spread_bps": 103.01597071495513
+          },
+          {
+            "at": 1795187783679,
+            "delay_ms": 55000,
+            "status": "wide",
+            "spread_bps": 112.7892655733442
+          }
+        ],
+        "observed_gate": "executable price outside signal bracket"
+      },
+      {
+        "entry_ms": 1795216528474,
+        "symbol": "BEUSDT",
+        "epoch": 1795216500,
+        "phase": "postmarket",
+        "direction": "SHORT",
+        "entry_status": "wide",
+        "entry_attempts": [
+          {
+            "at": 1795216528474,
+            "delay_ms": 0,
+            "status": "wide",
+            "spread_bps": 54.126271796101
+          },
+          {
+            "at": 1795216528674,
+            "delay_ms": 200,
+            "status": "wide",
+            "spread_bps": 54.126271796101
+          },
+          {
+            "at": 1795216529274,
+            "delay_ms": 800,
+            "status": "wide",
+            "spread_bps": 54.126271796101
+          },
+          {
+            "at": 1795216538474,
+            "delay_ms": 10000,
+            "status": "wide",
+            "spread_bps": 57.5421290587754
+          },
+          {
+            "at": 1795216553474,
+            "delay_ms": 25000,
+            "status": "wide",
+            "spread_bps": 57.5421290587754
+          },
+          {
+            "at": 1795216583474,
+            "delay_ms": 55000,
+            "status": "wide",
+            "spread_bps": 50.02569813260166
+          }
+        ],
+        "observed_gate": "wide"
+      },
+      {
+        "entry_ms": 1795216532726,
+        "symbol": "SKHYUSDT",
+        "epoch": 1795216500,
+        "phase": "postmarket",
+        "direction": "SHORT",
+        "entry_status": "wide",
+        "entry_attempts": [
+          {
+            "at": 1795216532726,
+            "delay_ms": 0,
+            "status": "wide",
+            "spread_bps": 27.16754883132758
+          },
+          {
+            "at": 1795216532926,
+            "delay_ms": 200,
+            "status": "wide",
+            "spread_bps": 33.714178685146976
+          },
+          {
+            "at": 1795216533526,
+            "delay_ms": 800,
+            "status": "wide",
+            "spread_bps": 18.74414245548293
+          },
+          {
+            "at": 1795216542726,
+            "delay_ms": 10000,
+            "status": "wide",
+            "spread_bps": 23.4246896228625
+          },
+          {
+            "at": 1795216557726,
+            "delay_ms": 25000,
+            "status": "wide",
+            "spread_bps": 18.74414245548293
+          },
+          {
+            "at": 1795216587726,
+            "delay_ms": 55000,
+            "status": "wide",
+            "spread_bps": 23.4246896228625
+          }
+        ],
+        "observed_gate": "wide"
+      }
+    ],
+    "retry_before_deadline": [
+      {
+        "entry_ms": 1795163433193,
+        "symbol": "SOFTBANKUSDT",
+        "epoch": 1795163400,
+        "phase": "other",
+        "direction": "SHORT",
+        "entry_status": "stale order book",
+        "entry_attempts": [
+          {
+            "at": 1795163433193,
+            "delay_ms": 0,
+            "status": "wide",
+            "spread_bps": 41.75365344467552
+          }
+        ],
+        "observed_gate": "wide"
+      },
+      {
+        "entry_ms": 1795163433925,
+        "symbol": "WDCUSDT",
+        "epoch": 1795163400,
+        "phase": "other",
+        "direction": "SHORT",
+        "entry_status": "wide",
+        "entry_attempts": [
+          {
+            "at": 1795163433925,
+            "delay_ms": 0,
+            "status": "wide",
+            "spread_bps": 46.73139830728569
+          },
+          {
+            "at": 1795163434125,
+            "delay_ms": 200,
+            "status": "wide",
+            "spread_bps": 46.73139830728569
+          },
+          {
+            "at": 1795163434725,
+            "delay_ms": 800,
+            "status": "wide",
+            "spread_bps": 46.73139830728569
+          },
+          {
+            "at": 1795163443925,
+            "delay_ms": 10000,
+            "status": "wide",
+            "spread_bps": 46.73139830728569
+          },
+          {
+            "at": 1795163458925,
+            "delay_ms": 25000,
+            "status": "wide",
+            "spread_bps": 46.73139830728569
+          },
+          {
+            "at": 1795163488925,
+            "delay_ms": 55000,
+            "status": "wide",
+            "spread_bps": 46.73139830728569
+          },
+          {
+            "at": 1795163523925,
+            "delay_ms": 90000,
+            "status": "wide",
+            "spread_bps": 71.39638859044129
+          },
+          {
+            "at": 1795163563925,
+            "delay_ms": 130000,
+            "status": "wide",
+            "spread_bps": 71.39638859044129
+          },
+          {
+            "at": 1795163578925,
+            "delay_ms": 145000,
+            "status": "wide",
+            "spread_bps": 71.39638859044129
+          }
+        ],
+        "observed_gate": "wide"
+      },
+      {
+        "entry_ms": 1795172428529,
+        "symbol": "AXTIUSDT",
+        "epoch": 1795172400,
+        "phase": "premarket",
+        "direction": "SHORT",
+        "entry_status": "wide",
+        "entry_attempts": [
+          {
+            "at": 1795172428529,
+            "delay_ms": 0,
+            "status": "wide",
+            "spread_bps": 48.55842185129095
+          },
+          {
+            "at": 1795172428729,
+            "delay_ms": 200,
+            "status": "wide",
+            "spread_bps": 48.55842185129095
+          },
+          {
+            "at": 1795172429329,
+            "delay_ms": 800,
+            "status": "wide",
+            "spread_bps": 48.55842185129095
+          },
+          {
+            "at": 1795172438529,
+            "delay_ms": 10000,
+            "status": "wide",
+            "spread_bps": 51.58549537247814
+          },
+          {
+            "at": 1795172453529,
+            "delay_ms": 25000,
+            "status": "wide",
+            "spread_bps": 51.58549537247814
+          },
+          {
+            "at": 1795172483529,
+            "delay_ms": 55000,
+            "status": "wide",
+            "spread_bps": 54.61165048543682
+          },
+          {
+            "at": 1795172518529,
+            "delay_ms": 90000,
+            "status": "wide",
+            "spread_bps": 51.58549537247814
+          },
+          {
+            "at": 1795172558529,
+            "delay_ms": 130000,
+            "status": "wide",
+            "spread_bps": 36.54080389768497
+          },
+          {
+            "at": 1795172573529,
+            "delay_ms": 145000,
+            "status": "wide",
+            "spread_bps": 45.69687738004526
+          }
+        ],
+        "observed_gate": "wide"
+      },
+      {
+        "entry_ms": 1795172428831,
+        "symbol": "BMNRUSDT",
+        "epoch": 1795172400,
+        "phase": "premarket",
+        "direction": "SHORT",
+        "entry_status": "stale order book",
+        "entry_attempts": [
+          {
+            "at": 1795172428831,
+            "delay_ms": 0,
+            "status": "wide",
+            "spread_bps": 53.29780146568959
+          },
+          {
+            "at": 1795172429031,
+            "delay_ms": 200,
+            "status": "wide",
+            "spread_bps": 53.29780146568959
+          }
+        ],
+        "observed_gate": "wide"
+      },
+      {
+        "entry_ms": 1795185028475,
+        "symbol": "AXTIUSDT",
+        "epoch": 1795185000,
+        "phase": "regular",
+        "direction": "SHORT",
+        "entry_status": "wide",
+        "entry_attempts": [
+          {
+            "at": 1795185028475,
+            "delay_ms": 0,
+            "status": "wide",
+            "spread_bps": 153.94088669950742
+          },
+          {
+            "at": 1795185028675,
+            "delay_ms": 200,
+            "status": "wide",
+            "spread_bps": 153.94088669950742
+          },
+          {
+            "at": 1795185029275,
+            "delay_ms": 800,
+            "status": "wide",
+            "spread_bps": 55.693069306930624
+          },
+          {
+            "at": 1795185038475,
+            "delay_ms": 10000,
+            "status": "wide",
+            "spread_bps": 80.54522924411339
+          },
+          {
+            "at": 1795185053475,
+            "delay_ms": 25000,
+            "status": "wide",
+            "spread_bps": 127.38853503184717
+          },
+          {
+            "at": 1795185083475,
+            "delay_ms": 55000,
+            "status": "wide",
+            "spread_bps": 55.71030640668514
+          },
+          {
+            "at": 1795185118475,
+            "delay_ms": 90000,
+            "status": "wide",
+            "spread_bps": 119.01033510804855
+          },
+          {
+            "at": 1795185158475,
+            "delay_ms": 130000,
+            "status": "wide",
+            "spread_bps": 47.22178498347193
+          },
+          {
+            "at": 1795185173475,
+            "delay_ms": 145000,
+            "status": "wide",
+            "spread_bps": 174.243624267385
+          }
+        ],
+        "observed_gate": "wide"
+      },
+      {
+        "entry_ms": 1795187728679,
+        "symbol": "BEUSDT",
+        "epoch": 1795187700,
+        "phase": "regular",
+        "direction": "SHORT",
+        "entry_status": "wide",
+        "entry_attempts": [
+          {
+            "at": 1795187728679,
+            "delay_ms": 0,
+            "status": "wide",
+            "spread_bps": 103.01597071495513
+          },
+          {
+            "at": 1795187728879,
+            "delay_ms": 200,
+            "status": "wide",
+            "spread_bps": 103.01597071495513
+          },
+          {
+            "at": 1795187729479,
+            "delay_ms": 800,
+            "status": "wide",
+            "spread_bps": 103.01597071495513
+          },
+          {
+            "at": 1795187738679,
+            "delay_ms": 10000,
+            "status": "wide",
+            "spread_bps": 92.69763070041672
+          },
+          {
+            "at": 1795187753679,
+            "delay_ms": 25000,
+            "status": "wide",
+            "spread_bps": 103.01597071495513
+          },
+          {
+            "at": 1795187783679,
+            "delay_ms": 55000,
+            "status": "wide",
+            "spread_bps": 112.7892655733442
+          },
+          {
+            "at": 1795187818679,
+            "delay_ms": 90000,
+            "status": "wide",
+            "spread_bps": 99.24431615476931
+          },
+          {
+            "at": 1795187858679,
+            "delay_ms": 130000,
+            "status": "wide",
+            "spread_bps": 76.62835249042189
+          },
+          {
+            "at": 1795187873679,
+            "delay_ms": 145000,
+            "status": "wide",
+            "spread_bps": 26.72315463581532
+          }
+        ],
+        "observed_gate": "executable price outside signal bracket"
+      },
+      {
+        "entry_ms": 1795216528474,
+        "symbol": "BEUSDT",
+        "epoch": 1795216500,
+        "phase": "postmarket",
+        "direction": "SHORT",
+        "entry_status": "wide",
+        "entry_attempts": [
+          {
+            "at": 1795216528474,
+            "delay_ms": 0,
+            "status": "wide",
+            "spread_bps": 54.126271796101
+          },
+          {
+            "at": 1795216528674,
+            "delay_ms": 200,
+            "status": "wide",
+            "spread_bps": 54.126271796101
+          },
+          {
+            "at": 1795216529274,
+            "delay_ms": 800,
+            "status": "wide",
+            "spread_bps": 54.126271796101
+          },
+          {
+            "at": 1795216538474,
+            "delay_ms": 10000,
+            "status": "wide",
+            "spread_bps": 57.5421290587754
+          },
+          {
+            "at": 1795216553474,
+            "delay_ms": 25000,
+            "status": "wide",
+            "spread_bps": 57.5421290587754
+          },
+          {
+            "at": 1795216583474,
+            "delay_ms": 55000,
+            "status": "wide",
+            "spread_bps": 50.02569813260166
+          },
+          {
+            "at": 1795216618474,
+            "delay_ms": 90000,
+            "status": "wide",
+            "spread_bps": 60.27397260273941
+          },
+          {
+            "at": 1795216658474,
+            "delay_ms": 130000,
+            "status": "wide",
+            "spread_bps": 62.32236414067025
+          },
+          {
+            "at": 1795216673474,
+            "delay_ms": 145000,
+            "status": "wide",
+            "spread_bps": 62.32236414067025
+          }
+        ],
+        "observed_gate": "wide"
+      },
+      {
+        "entry_ms": 1795216532726,
+        "symbol": "SKHYUSDT",
+        "epoch": 1795216500,
+        "phase": "postmarket",
+        "direction": "SHORT",
+        "entry_status": "wide",
+        "entry_attempts": [
+          {
+            "at": 1795216532726,
+            "delay_ms": 0,
+            "status": "wide",
+            "spread_bps": 27.16754883132758
+          },
+          {
+            "at": 1795216532926,
+            "delay_ms": 200,
+            "status": "wide",
+            "spread_bps": 33.714178685146976
+          },
+          {
+            "at": 1795216533526,
+            "delay_ms": 800,
+            "status": "wide",
+            "spread_bps": 18.74414245548293
+          },
+          {
+            "at": 1795216542726,
+            "delay_ms": 10000,
+            "status": "wide",
+            "spread_bps": 23.4246896228625
+          },
+          {
+            "at": 1795216557726,
+            "delay_ms": 25000,
+            "status": "wide",
+            "spread_bps": 18.74414245548293
+          },
+          {
+            "at": 1795216587726,
+            "delay_ms": 55000,
+            "status": "wide",
+            "spread_bps": 23.4246896228625
+          },
+          {
+            "at": 1795216622726,
+            "delay_ms": 90000,
+            "status": "wide",
+            "spread_bps": 21.528525296017595
+          },
+          {
+            "at": 1795216662726,
+            "delay_ms": 130000,
+            "status": "wide",
+            "spread_bps": 24.34001123385182
+          },
+          {
+            "at": 1795216677726,
+            "delay_ms": 145000,
+            "status": "wide",
+            "spread_bps": 22.463496817670805
+          }
+        ],
+        "observed_gate": "wide"
+      }
+    ],
+    "retry_wide_or_stale": [
+      {
+        "entry_ms": 1795163433193,
+        "symbol": "SOFTBANKUSDT",
+        "epoch": 1795163400,
+        "phase": "other",
+        "direction": "SHORT",
+        "entry_status": "stale order book",
+        "entry_attempts": [
+          {
+            "at": 1795163433193,
+            "delay_ms": 0,
+            "status": "wide",
+            "spread_bps": 41.75365344467552
+          },
+          {
+            "at": 1795163433393,
+            "delay_ms": 200,
+            "status": "stale order book",
+            "book_age_ms": 3090.0
+          },
+          {
+            "at": 1795163433993,
+            "delay_ms": 800,
+            "status": "stale order book",
+            "book_age_ms": 3690.0
+          },
+          {
+            "at": 1795163443193,
+            "delay_ms": 10000,
+            "status": "wide",
+            "spread_bps": 10.422094841062833
+          },
+          {
+            "at": 1795163458193,
+            "delay_ms": 25000,
+            "status": "wide",
+            "spread_bps": 41.75365344467552
+          },
+          {
+            "at": 1795163488193,
+            "delay_ms": 55000,
+            "status": "wide",
+            "spread_bps": 41.75365344467552
+          },
+          {
+            "at": 1795163523193,
+            "delay_ms": 90000,
+            "status": "stale order book",
+            "book_age_ms": 5040.0
+          },
+          {
+            "at": 1795163563193,
+            "delay_ms": 130000,
+            "status": "stale order book",
+            "book_age_ms": 8700.0
+          },
+          {
+            "at": 1795163578193,
+            "delay_ms": 145000,
+            "status": "stale order book",
+            "book_age_ms": 23700.0
+          }
+        ],
+        "observed_gate": "wide"
+      },
+      {
+        "entry_ms": 1795163433925,
+        "symbol": "WDCUSDT",
+        "epoch": 1795163400,
+        "phase": "other",
+        "direction": "SHORT",
+        "entry_status": "wide",
+        "entry_attempts": [
+          {
+            "at": 1795163433925,
+            "delay_ms": 0,
+            "status": "wide",
+            "spread_bps": 46.73139830728569
+          },
+          {
+            "at": 1795163434125,
+            "delay_ms": 200,
+            "status": "wide",
+            "spread_bps": 46.73139830728569
+          },
+          {
+            "at": 1795163434725,
+            "delay_ms": 800,
+            "status": "wide",
+            "spread_bps": 46.73139830728569
+          },
+          {
+            "at": 1795163443925,
+            "delay_ms": 10000,
+            "status": "wide",
+            "spread_bps": 46.73139830728569
+          },
+          {
+            "at": 1795163458925,
+            "delay_ms": 25000,
+            "status": "wide",
+            "spread_bps": 46.73139830728569
+          },
+          {
+            "at": 1795163488925,
+            "delay_ms": 55000,
+            "status": "wide",
+            "spread_bps": 46.73139830728569
+          },
+          {
+            "at": 1795163523925,
+            "delay_ms": 90000,
+            "status": "wide",
+            "spread_bps": 71.39638859044129
+          },
+          {
+            "at": 1795163563925,
+            "delay_ms": 130000,
+            "status": "wide",
+            "spread_bps": 71.39638859044129
+          },
+          {
+            "at": 1795163578925,
+            "delay_ms": 145000,
+            "status": "wide",
+            "spread_bps": 71.39638859044129
+          }
+        ],
+        "observed_gate": "wide"
+      },
+      {
+        "entry_ms": 1795172428529,
+        "symbol": "AXTIUSDT",
+        "epoch": 1795172400,
+        "phase": "premarket",
+        "direction": "SHORT",
+        "entry_status": "wide",
+        "entry_attempts": [
+          {
+            "at": 1795172428529,
+            "delay_ms": 0,
+            "status": "wide",
+            "spread_bps": 48.55842185129095
+          },
+          {
+            "at": 1795172428729,
+            "delay_ms": 200,
+            "status": "wide",
+            "spread_bps": 48.55842185129095
+          },
+          {
+            "at": 1795172429329,
+            "delay_ms": 800,
+            "status": "wide",
+            "spread_bps": 48.55842185129095
+          },
+          {
+            "at": 1795172438529,
+            "delay_ms": 10000,
+            "status": "wide",
+            "spread_bps": 51.58549537247814
+          },
+          {
+            "at": 1795172453529,
+            "delay_ms": 25000,
+            "status": "wide",
+            "spread_bps": 51.58549537247814
+          },
+          {
+            "at": 1795172483529,
+            "delay_ms": 55000,
+            "status": "wide",
+            "spread_bps": 54.61165048543682
+          },
+          {
+            "at": 1795172518529,
+            "delay_ms": 90000,
+            "status": "wide",
+            "spread_bps": 51.58549537247814
+          },
+          {
+            "at": 1795172558529,
+            "delay_ms": 130000,
+            "status": "wide",
+            "spread_bps": 36.54080389768497
+          },
+          {
+            "at": 1795172573529,
+            "delay_ms": 145000,
+            "status": "wide",
+            "spread_bps": 45.69687738004526
+          }
+        ],
+        "observed_gate": "wide"
+      },
+      {
+        "entry_ms": 1795172428831,
+        "symbol": "BMNRUSDT",
+        "epoch": 1795172400,
+        "phase": "premarket",
+        "direction": "SHORT",
+        "entry_status": "wide",
+        "entry_attempts": [
+          {
+            "at": 1795172428831,
+            "delay_ms": 0,
+            "status": "wide",
+            "spread_bps": 53.29780146568959
+          },
+          {
+            "at": 1795172429031,
+            "delay_ms": 200,
+            "status": "wide",
+            "spread_bps": 53.29780146568959
+          },
+          {
+            "at": 1795172429631,
+            "delay_ms": 800,
+            "status": "stale order book",
+            "book_age_ms": 3395.0
+          },
+          {
+            "at": 1795172438831,
+            "delay_ms": 10000,
+            "status": "stale order book",
+            "book_age_ms": 3795.0
+          },
+          {
+            "at": 1795172453831,
+            "delay_ms": 25000,
+            "status": "wide",
+            "spread_bps": 46.65111629456749
+          },
+          {
+            "at": 1795172483831,
+            "delay_ms": 55000,
+            "status": "stale order book",
+            "book_age_ms": 3675.0
+          },
+          {
+            "at": 1795172518831,
+            "delay_ms": 90000,
+            "status": "wide",
+            "spread_bps": 33.344448149382416
+          },
+          {
+            "at": 1795172558831,
+            "delay_ms": 130000,
+            "status": "wide",
+            "spread_bps": 59.980006664445085
+          },
+          {
+            "at": 1795172573831,
+            "delay_ms": 145000,
+            "status": "wide",
+            "spread_bps": 33.366700033365994
+          }
+        ],
+        "observed_gate": "wide"
+      },
+      {
+        "entry_ms": 1795185028475,
+        "symbol": "AXTIUSDT",
+        "epoch": 1795185000,
+        "phase": "regular",
+        "direction": "SHORT",
+        "entry_status": "wide",
+        "entry_attempts": [
+          {
+            "at": 1795185028475,
+            "delay_ms": 0,
+            "status": "wide",
+            "spread_bps": 153.94088669950742
+          },
+          {
+            "at": 1795185028675,
+            "delay_ms": 200,
+            "status": "wide",
+            "spread_bps": 153.94088669950742
+          },
+          {
+            "at": 1795185029275,
+            "delay_ms": 800,
+            "status": "wide",
+            "spread_bps": 55.693069306930624
+          },
+          {
+            "at": 1795185038475,
+            "delay_ms": 10000,
+            "status": "wide",
+            "spread_bps": 80.54522924411339
+          },
+          {
+            "at": 1795185053475,
+            "delay_ms": 25000,
+            "status": "wide",
+            "spread_bps": 127.38853503184717
+          },
+          {
+            "at": 1795185083475,
+            "delay_ms": 55000,
+            "status": "wide",
+            "spread_bps": 55.71030640668514
+          },
+          {
+            "at": 1795185118475,
+            "delay_ms": 90000,
+            "status": "wide",
+            "spread_bps": 119.01033510804855
+          },
+          {
+            "at": 1795185158475,
+            "delay_ms": 130000,
+            "status": "wide",
+            "spread_bps": 47.22178498347193
+          },
+          {
+            "at": 1795185173475,
+            "delay_ms": 145000,
+            "status": "wide",
+            "spread_bps": 174.243624267385
+          }
+        ],
+        "observed_gate": "wide"
+      },
+      {
+        "entry_ms": 1795187728679,
+        "symbol": "BEUSDT",
+        "epoch": 1795187700,
+        "phase": "regular",
+        "direction": "SHORT",
+        "entry_status": "wide",
+        "entry_attempts": [
+          {
+            "at": 1795187728679,
+            "delay_ms": 0,
+            "status": "wide",
+            "spread_bps": 103.01597071495513
+          },
+          {
+            "at": 1795187728879,
+            "delay_ms": 200,
+            "status": "wide",
+            "spread_bps": 103.01597071495513
+          },
+          {
+            "at": 1795187729479,
+            "delay_ms": 800,
+            "status": "wide",
+            "spread_bps": 103.01597071495513
+          },
+          {
+            "at": 1795187738679,
+            "delay_ms": 10000,
+            "status": "wide",
+            "spread_bps": 92.69763070041672
+          },
+          {
+            "at": 1795187753679,
+            "delay_ms": 25000,
+            "status": "wide",
+            "spread_bps": 103.01597071495513
+          },
+          {
+            "at": 1795187783679,
+            "delay_ms": 55000,
+            "status": "wide",
+            "spread_bps": 112.7892655733442
+          },
+          {
+            "at": 1795187818679,
+            "delay_ms": 90000,
+            "status": "wide",
+            "spread_bps": 99.24431615476931
+          },
+          {
+            "at": 1795187858679,
+            "delay_ms": 130000,
+            "status": "wide",
+            "spread_bps": 76.62835249042189
+          },
+          {
+            "at": 1795187873679,
+            "delay_ms": 145000,
+            "status": "wide",
+            "spread_bps": 26.72315463581532
+          }
+        ],
+        "observed_gate": "executable price outside signal bracket"
+      },
+      {
+        "entry_ms": 1795216528474,
+        "symbol": "BEUSDT",
+        "epoch": 1795216500,
+        "phase": "postmarket",
+        "direction": "SHORT",
+        "entry_status": "wide",
+        "entry_attempts": [
+          {
+            "at": 1795216528474,
+            "delay_ms": 0,
+            "status": "wide",
+            "spread_bps": 54.126271796101
+          },
+          {
+            "at": 1795216528674,
+            "delay_ms": 200,
+            "status": "wide",
+            "spread_bps": 54.126271796101
+          },
+          {
+            "at": 1795216529274,
+            "delay_ms": 800,
+            "status": "wide",
+            "spread_bps": 54.126271796101
+          },
+          {
+            "at": 1795216538474,
+            "delay_ms": 10000,
+            "status": "wide",
+            "spread_bps": 57.5421290587754
+          },
+          {
+            "at": 1795216553474,
+            "delay_ms": 25000,
+            "status": "wide",
+            "spread_bps": 57.5421290587754
+          },
+          {
+            "at": 1795216583474,
+            "delay_ms": 55000,
+            "status": "wide",
+            "spread_bps": 50.02569813260166
+          },
+          {
+            "at": 1795216618474,
+            "delay_ms": 90000,
+            "status": "wide",
+            "spread_bps": 60.27397260273941
+          },
+          {
+            "at": 1795216658474,
+            "delay_ms": 130000,
+            "status": "wide",
+            "spread_bps": 62.32236414067025
+          },
+          {
+            "at": 1795216673474,
+            "delay_ms": 145000,
+            "status": "wide",
+            "spread_bps": 62.32236414067025
+          }
+        ],
+        "observed_gate": "wide"
+      },
+      {
+        "entry_ms": 1795216532726,
+        "symbol": "SKHYUSDT",
+        "epoch": 1795216500,
+        "phase": "postmarket",
+        "direction": "SHORT",
+        "entry_status": "wide",
+        "entry_attempts": [
+          {
+            "at": 1795216532726,
+            "delay_ms": 0,
+            "status": "wide",
+            "spread_bps": 27.16754883132758
+          },
+          {
+            "at": 1795216532926,
+            "delay_ms": 200,
+            "status": "wide",
+            "spread_bps": 33.714178685146976
+          },
+          {
+            "at": 1795216533526,
+            "delay_ms": 800,
+            "status": "wide",
+            "spread_bps": 18.74414245548293
+          },
+          {
+            "at": 1795216542726,
+            "delay_ms": 10000,
+            "status": "wide",
+            "spread_bps": 23.4246896228625
+          },
+          {
+            "at": 1795216557726,
+            "delay_ms": 25000,
+            "status": "wide",
+            "spread_bps": 18.74414245548293
+          },
+          {
+            "at": 1795216587726,
+            "delay_ms": 55000,
+            "status": "wide",
+            "spread_bps": 23.4246896228625
+          },
+          {
+            "at": 1795216622726,
+            "delay_ms": 90000,
+            "status": "wide",
+            "spread_bps": 21.528525296017595
+          },
+          {
+            "at": 1795216662726,
+            "delay_ms": 130000,
+            "status": "wide",
+            "spread_bps": 24.34001123385182
+          },
+          {
+            "at": 1795216677726,
+            "delay_ms": 145000,
+            "status": "wide",
+            "spread_bps": 22.463496817670805
+          }
+        ],
+        "observed_gate": "wide"
+      }
+    ]
+  },
+  "results": {
+    "current": {
+      "statuses": {
+        "stale order book": 2,
+        "wide": 6
+      },
+      "modes": {
+        "200ms_exact": {
+          "status": "SCORED_PUBLIC_L2_SIMULATION",
+          "trades": 0,
+          "skipped": {
+            "stocks:stale order book": 2,
+            "stocks:wide": 6
+          },
+          "return_pct": 0.0,
+          "drawdown_pct": 0.0,
+          "contribution_pct": {
+            "crypto": 0.0,
+            "stocks": 0.0
+          },
+          "peak_reservations": 0,
+          "peak_margin_pct": 0.0,
+          "cash_pnl_usd": 0,
+          "profitable": 0,
+          "routed": 0,
+          "exit_counts": {}
+        },
+        "200ms_stress_5bps_if_no_book": {
+          "status": "SCORED_PUBLIC_L2_SIMULATION",
+          "trades": 0,
+          "skipped": {
+            "stocks:stale order book": 2,
+            "stocks:wide": 6
+          },
+          "return_pct": 0.0,
+          "drawdown_pct": 0.0,
+          "contribution_pct": {
+            "crypto": 0.0,
+            "stocks": 0.0
+          },
+          "peak_reservations": 0,
+          "peak_margin_pct": 0.0,
+          "cash_pnl_usd": 0,
+          "profitable": 0,
+          "routed": 0,
+          "exit_counts": {}
+        },
+        "200ms_stress_30bps_if_no_book": {
+          "status": "SCORED_PUBLIC_L2_SIMULATION",
+          "trades": 0,
+          "skipped": {
+            "stocks:stale order book": 2,
+            "stocks:wide": 6
+          },
+          "return_pct": 0.0,
+          "drawdown_pct": 0.0,
+          "contribution_pct": {
+            "crypto": 0.0,
+            "stocks": 0.0
+          },
+          "peak_reservations": 0,
+          "peak_margin_pct": 0.0,
+          "cash_pnl_usd": 0,
+          "profitable": 0,
+          "routed": 0,
+          "exit_counts": {}
+        },
+        "1000ms_exact": {
+          "status": "SCORED_PUBLIC_L2_SIMULATION",
+          "trades": 0,
+          "skipped": {
+            "stocks:stale order book": 2,
+            "stocks:wide": 6
+          },
+          "return_pct": 0.0,
+          "drawdown_pct": 0.0,
+          "contribution_pct": {
+            "crypto": 0.0,
+            "stocks": 0.0
+          },
+          "peak_reservations": 0,
+          "peak_margin_pct": 0.0,
+          "cash_pnl_usd": 0,
+          "profitable": 0,
+          "routed": 0,
+          "exit_counts": {}
+        },
+        "1000ms_stress_5bps_if_no_book": {
+          "status": "SCORED_PUBLIC_L2_SIMULATION",
+          "trades": 0,
+          "skipped": {
+            "stocks:stale order book": 2,
+            "stocks:wide": 6
+          },
+          "return_pct": 0.0,
+          "drawdown_pct": 0.0,
+          "contribution_pct": {
+            "crypto": 0.0,
+            "stocks": 0.0
+          },
+          "peak_reservations": 0,
+          "peak_margin_pct": 0.0,
+          "cash_pnl_usd": 0,
+          "profitable": 0,
+          "routed": 0,
+          "exit_counts": {}
+        },
+        "1000ms_stress_30bps_if_no_book": {
+          "status": "SCORED_PUBLIC_L2_SIMULATION",
+          "trades": 0,
+          "skipped": {
+            "stocks:stale order book": 2,
+            "stocks:wide": 6
+          },
+          "return_pct": 0.0,
+          "drawdown_pct": 0.0,
+          "contribution_pct": {
+            "crypto": 0.0,
+            "stocks": 0.0
+          },
+          "peak_reservations": 0,
+          "peak_margin_pct": 0.0,
+          "cash_pnl_usd": 0,
+          "profitable": 0,
+          "routed": 0,
+          "exit_counts": {}
+        }
+      }
+    },
+    "retry_60s": {
+      "statuses": {
+        "stale order book": 2,
+        "wide": 6
+      },
+      "modes": {
+        "200ms_exact": {
+          "status": "SCORED_PUBLIC_L2_SIMULATION",
+          "trades": 0,
+          "skipped": {
+            "stocks:stale order book": 2,
+            "stocks:wide": 6
+          },
+          "return_pct": 0.0,
+          "drawdown_pct": 0.0,
+          "contribution_pct": {
+            "crypto": 0.0,
+            "stocks": 0.0
+          },
+          "peak_reservations": 0,
+          "peak_margin_pct": 0.0,
+          "cash_pnl_usd": 0,
+          "profitable": 0,
+          "routed": 0,
+          "exit_counts": {}
+        },
+        "200ms_stress_5bps_if_no_book": {
+          "status": "SCORED_PUBLIC_L2_SIMULATION",
+          "trades": 0,
+          "skipped": {
+            "stocks:stale order book": 2,
+            "stocks:wide": 6
+          },
+          "return_pct": 0.0,
+          "drawdown_pct": 0.0,
+          "contribution_pct": {
+            "crypto": 0.0,
+            "stocks": 0.0
+          },
+          "peak_reservations": 0,
+          "peak_margin_pct": 0.0,
+          "cash_pnl_usd": 0,
+          "profitable": 0,
+          "routed": 0,
+          "exit_counts": {}
+        },
+        "200ms_stress_30bps_if_no_book": {
+          "status": "SCORED_PUBLIC_L2_SIMULATION",
+          "trades": 0,
+          "skipped": {
+            "stocks:stale order book": 2,
+            "stocks:wide": 6
+          },
+          "return_pct": 0.0,
+          "drawdown_pct": 0.0,
+          "contribution_pct": {
+            "crypto": 0.0,
+            "stocks": 0.0
+          },
+          "peak_reservations": 0,
+          "peak_margin_pct": 0.0,
+          "cash_pnl_usd": 0,
+          "profitable": 0,
+          "routed": 0,
+          "exit_counts": {}
+        },
+        "1000ms_exact": {
+          "status": "SCORED_PUBLIC_L2_SIMULATION",
+          "trades": 0,
+          "skipped": {
+            "stocks:stale order book": 2,
+            "stocks:wide": 6
+          },
+          "return_pct": 0.0,
+          "drawdown_pct": 0.0,
+          "contribution_pct": {
+            "crypto": 0.0,
+            "stocks": 0.0
+          },
+          "peak_reservations": 0,
+          "peak_margin_pct": 0.0,
+          "cash_pnl_usd": 0,
+          "profitable": 0,
+          "routed": 0,
+          "exit_counts": {}
+        },
+        "1000ms_stress_5bps_if_no_book": {
+          "status": "SCORED_PUBLIC_L2_SIMULATION",
+          "trades": 0,
+          "skipped": {
+            "stocks:stale order book": 2,
+            "stocks:wide": 6
+          },
+          "return_pct": 0.0,
+          "drawdown_pct": 0.0,
+          "contribution_pct": {
+            "crypto": 0.0,
+            "stocks": 0.0
+          },
+          "peak_reservations": 0,
+          "peak_margin_pct": 0.0,
+          "cash_pnl_usd": 0,
+          "profitable": 0,
+          "routed": 0,
+          "exit_counts": {}
+        },
+        "1000ms_stress_30bps_if_no_book": {
+          "status": "SCORED_PUBLIC_L2_SIMULATION",
+          "trades": 0,
+          "skipped": {
+            "stocks:stale order book": 2,
+            "stocks:wide": 6
+          },
+          "return_pct": 0.0,
+          "drawdown_pct": 0.0,
+          "contribution_pct": {
+            "crypto": 0.0,
+            "stocks": 0.0
+          },
+          "peak_reservations": 0,
+          "peak_margin_pct": 0.0,
+          "cash_pnl_usd": 0,
+          "profitable": 0,
+          "routed": 0,
+          "exit_counts": {}
+        }
+      }
+    },
+    "retry_before_deadline": {
+      "statuses": {
+        "stale order book": 2,
+        "wide": 6
+      },
+      "modes": {
+        "200ms_exact": {
+          "status": "SCORED_PUBLIC_L2_SIMULATION",
+          "trades": 0,
+          "skipped": {
+            "stocks:stale order book": 2,
+            "stocks:wide": 6
+          },
+          "return_pct": 0.0,
+          "drawdown_pct": 0.0,
+          "contribution_pct": {
+            "crypto": 0.0,
+            "stocks": 0.0
+          },
+          "peak_reservations": 0,
+          "peak_margin_pct": 0.0,
+          "cash_pnl_usd": 0,
+          "profitable": 0,
+          "routed": 0,
+          "exit_counts": {}
+        },
+        "200ms_stress_5bps_if_no_book": {
+          "status": "SCORED_PUBLIC_L2_SIMULATION",
+          "trades": 0,
+          "skipped": {
+            "stocks:stale order book": 2,
+            "stocks:wide": 6
+          },
+          "return_pct": 0.0,
+          "drawdown_pct": 0.0,
+          "contribution_pct": {
+            "crypto": 0.0,
+            "stocks": 0.0
+          },
+          "peak_reservations": 0,
+          "peak_margin_pct": 0.0,
+          "cash_pnl_usd": 0,
+          "profitable": 0,
+          "routed": 0,
+          "exit_counts": {}
+        },
+        "200ms_stress_30bps_if_no_book": {
+          "status": "SCORED_PUBLIC_L2_SIMULATION",
+          "trades": 0,
+          "skipped": {
+            "stocks:stale order book": 2,
+            "stocks:wide": 6
+          },
+          "return_pct": 0.0,
+          "drawdown_pct": 0.0,
+          "contribution_pct": {
+            "crypto": 0.0,
+            "stocks": 0.0
+          },
+          "peak_reservations": 0,
+          "peak_margin_pct": 0.0,
+          "cash_pnl_usd": 0,
+          "profitable": 0,
+          "routed": 0,
+          "exit_counts": {}
+        },
+        "1000ms_exact": {
+          "status": "SCORED_PUBLIC_L2_SIMULATION",
+          "trades": 0,
+          "skipped": {
+            "stocks:stale order book": 2,
+            "stocks:wide": 6
+          },
+          "return_pct": 0.0,
+          "drawdown_pct": 0.0,
+          "contribution_pct": {
+            "crypto": 0.0,
+            "stocks": 0.0
+          },
+          "peak_reservations": 0,
+          "peak_margin_pct": 0.0,
+          "cash_pnl_usd": 0,
+          "profitable": 0,
+          "routed": 0,
+          "exit_counts": {}
+        },
+        "1000ms_stress_5bps_if_no_book": {
+          "status": "SCORED_PUBLIC_L2_SIMULATION",
+          "trades": 0,
+          "skipped": {
+            "stocks:stale order book": 2,
+            "stocks:wide": 6
+          },
+          "return_pct": 0.0,
+          "drawdown_pct": 0.0,
+          "contribution_pct": {
+            "crypto": 0.0,
+            "stocks": 0.0
+          },
+          "peak_reservations": 0,
+          "peak_margin_pct": 0.0,
+          "cash_pnl_usd": 0,
+          "profitable": 0,
+          "routed": 0,
+          "exit_counts": {}
+        },
+        "1000ms_stress_30bps_if_no_book": {
+          "status": "SCORED_PUBLIC_L2_SIMULATION",
+          "trades": 0,
+          "skipped": {
+            "stocks:stale order book": 2,
+            "stocks:wide": 6
+          },
+          "return_pct": 0.0,
+          "drawdown_pct": 0.0,
+          "contribution_pct": {
+            "crypto": 0.0,
+            "stocks": 0.0
+          },
+          "peak_reservations": 0,
+          "peak_margin_pct": 0.0,
+          "cash_pnl_usd": 0,
+          "profitable": 0,
+          "routed": 0,
+          "exit_counts": {}
+        }
+      }
+    },
+    "retry_wide_or_stale": {
+      "statuses": {
+        "stale order book": 1,
+        "wide": 7
+      },
+      "modes": {
+        "200ms_exact": {
+          "status": "SCORED_PUBLIC_L2_SIMULATION",
+          "trades": 0,
+          "skipped": {
+            "stocks:stale order book": 1,
+            "stocks:wide": 7
+          },
+          "return_pct": 0.0,
+          "drawdown_pct": 0.0,
+          "contribution_pct": {
+            "crypto": 0.0,
+            "stocks": 0.0
+          },
+          "peak_reservations": 0,
+          "peak_margin_pct": 0.0,
+          "cash_pnl_usd": 0,
+          "profitable": 0,
+          "routed": 0,
+          "exit_counts": {}
+        },
+        "200ms_stress_5bps_if_no_book": {
+          "status": "SCORED_PUBLIC_L2_SIMULATION",
+          "trades": 0,
+          "skipped": {
+            "stocks:stale order book": 1,
+            "stocks:wide": 7
+          },
+          "return_pct": 0.0,
+          "drawdown_pct": 0.0,
+          "contribution_pct": {
+            "crypto": 0.0,
+            "stocks": 0.0
+          },
+          "peak_reservations": 0,
+          "peak_margin_pct": 0.0,
+          "cash_pnl_usd": 0,
+          "profitable": 0,
+          "routed": 0,
+          "exit_counts": {}
+        },
+        "200ms_stress_30bps_if_no_book": {
+          "status": "SCORED_PUBLIC_L2_SIMULATION",
+          "trades": 0,
+          "skipped": {
+            "stocks:stale order book": 1,
+            "stocks:wide": 7
+          },
+          "return_pct": 0.0,
+          "drawdown_pct": 0.0,
+          "contribution_pct": {
+            "crypto": 0.0,
+            "stocks": 0.0
+          },
+          "peak_reservations": 0,
+          "peak_margin_pct": 0.0,
+          "cash_pnl_usd": 0,
+          "profitable": 0,
+          "routed": 0,
+          "exit_counts": {}
+        },
+        "1000ms_exact": {
+          "status": "SCORED_PUBLIC_L2_SIMULATION",
+          "trades": 0,
+          "skipped": {
+            "stocks:stale order book": 1,
+            "stocks:wide": 7
+          },
+          "return_pct": 0.0,
+          "drawdown_pct": 0.0,
+          "contribution_pct": {
+            "crypto": 0.0,
+            "stocks": 0.0
+          },
+          "peak_reservations": 0,
+          "peak_margin_pct": 0.0,
+          "cash_pnl_usd": 0,
+          "profitable": 0,
+          "routed": 0,
+          "exit_counts": {}
+        },
+        "1000ms_stress_5bps_if_no_book": {
+          "status": "SCORED_PUBLIC_L2_SIMULATION",
+          "trades": 0,
+          "skipped": {
+            "stocks:stale order book": 1,
+            "stocks:wide": 7
+          },
+          "return_pct": 0.0,
+          "drawdown_pct": 0.0,
+          "contribution_pct": {
+            "crypto": 0.0,
+            "stocks": 0.0
+          },
+          "peak_reservations": 0,
+          "peak_margin_pct": 0.0,
+          "cash_pnl_usd": 0,
+          "profitable": 0,
+          "routed": 0,
+          "exit_counts": {}
+        },
+        "1000ms_stress_30bps_if_no_book": {
+          "status": "SCORED_PUBLIC_L2_SIMULATION",
+          "trades": 0,
+          "skipped": {
+            "stocks:stale order book": 1,
+            "stocks:wide": 7
+          },
+          "return_pct": 0.0,
+          "drawdown_pct": 0.0,
+          "contribution_pct": {
+            "crypto": 0.0,
+            "stocks": 0.0
+          },
+          "peak_reservations": 0,
+          "peak_margin_pct": 0.0,
+          "cash_pnl_usd": 0,
+          "profitable": 0,
+          "routed": 0,
+          "exit_counts": {}
+        }
+      }
+    }
+  },
+  "live_activation_supported": false,
+  "limitations": [
+    "Native observer signals are cloned before any variant compares exits.",
+    "The publication limit is applied once using original receipt times. It is an approximation of live publication.",
+    "Delayed variants keep the existing spread, depth, price and backing checks and cannot enter after the original deadline.",
+    "The stale-book retry was added after seeing stale initial books and is exploratory.",
+    "Market price and size are inferred from timestamped OKX public depth. Some instrument-days have no archive.",
+    "Stock-only account replay, with the common 12-position and 90% capacity rules; crypto fills are outside this cohort.",
+    "A mode using trade-print stress is labeled explicitly and fails when it has neither an exit book nor a recent print."
+  ]
+}
