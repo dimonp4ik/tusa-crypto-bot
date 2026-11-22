@@ -1,0 +1,458 @@
+{
+  "capital_usd": 130.0,
+  "margin_fraction": 0.03,
+  "leverage": 10,
+  "rules": {
+    "liquidity_lookback": 4,
+    "minimum_passing_quotes": 3,
+    "minimum_liquid_universe": 5,
+    "market_trend": 0.0035,
+    "trend_member_move": 0.003,
+    "trend_pullback": 0.0018,
+    "relative_stretch": 0.0045,
+    "reversal_close_move": 0.0008,
+    "max_entry_drift": 0.001,
+    "stop_fraction": 0.01,
+    "pullback_target": 0.02,
+    "range_target": 0.015
+  },
+  "source_hashes": {
+    "plan.json": "fe19f40d05eee1f46d2529f51e1107b8048f6f49ef81eeb87f1d59e67e14e8e2",
+    "capture.json": "2dadd92f9c99a4e15a3b64fe7ad5d20f973f27ade60f0c2ad5a572156e13b8d3",
+    "trade_repair.json": "c1759d0f3469f151018ce7bfab82e9747cf777a3f4c4e2b424a89f7b40c4c60f"
+  },
+  "uses_independent_indexes": false,
+  "eligible": {
+    "legacy_discovery": {
+      "range_reversal:regular": 1
+    },
+    "contract_followup": {
+      "trend_pullback:other": 2,
+      "trend_pullback:non_cash_day": 1
+    }
+  },
+  "diagnostics": {
+    "legacy_discovery": {
+      "windows": 191,
+      "windows_without_liquid_universe": 177,
+      "range_reversal:proposed": 2,
+      "range_reversal:eligible": 2,
+      "range_reversal:drift_veto": 1,
+      "trend_pullback:proposed": 4,
+      "trend_pullback:eligible": 1,
+      "trend_pullback:drift_veto": 1,
+      "trend_pullback:wide": 3
+    },
+    "contract_followup": {
+      "windows": 177,
+      "windows_without_liquid_universe": 163,
+      "trend_pullback:proposed": 5,
+      "trend_pullback:eligible": 3,
+      "trend_pullback:wide": 2,
+      "thin_market_veto": 0
+    }
+  },
+  "results": {
+    "legacy_discovery": {
+      "all": {
+        "15": {
+          "status": "SCORED_REAL_ENTRY_BOOK_EXIT_STRESS",
+          "trades": 1,
+          "skipped": {},
+          "return_pct": -0.35997261538461833,
+          "drawdown_pct": 0.35997261538461506,
+          "contribution_pct": {
+            "crypto": 0.0,
+            "stocks": -0.35997261538461073
+          },
+          "peak_reservations": 1,
+          "peak_margin_pct": 2.9631076923076924,
+          "cash_pnl_by_entry_day": {
+            "2026-11-18": -0.4679643999999939
+          },
+          "exit_counts": {
+            "SL": 1
+          },
+          "cash_pnl_usd": -0.4679643999999939,
+          "by_bot": {
+            "stocks": {
+              "trades": 1,
+              "profitable": 0,
+              "tp1_executions": 0,
+              "tp1_full_exits": 0,
+              "cash_pnl_usd": -0.4679643999999939,
+              "exit_counts": {
+                "SL": 1
+              }
+            }
+          }
+        },
+        "30": {
+          "status": "SCORED_REAL_ENTRY_BOOK_EXIT_STRESS",
+          "trades": 1,
+          "skipped": {},
+          "return_pct": -0.4039452307692315,
+          "drawdown_pct": 0.4039452307692343,
+          "contribution_pct": {
+            "crypto": 0.0,
+            "stocks": -0.4039452307692281
+          },
+          "peak_reservations": 1,
+          "peak_margin_pct": 2.9631076923076924,
+          "cash_pnl_by_entry_day": {
+            "2026-11-18": -0.5251287999999965
+          },
+          "exit_counts": {
+            "SL": 1
+          },
+          "cash_pnl_usd": -0.5251287999999965,
+          "by_bot": {
+            "stocks": {
+              "trades": 1,
+              "profitable": 0,
+              "tp1_executions": 0,
+              "tp1_full_exits": 0,
+              "cash_pnl_usd": -0.5251287999999965,
+              "exit_counts": {
+                "SL": 1
+              }
+            }
+          }
+        }
+      },
+      "regular": {
+        "15": {
+          "status": "SCORED_REAL_ENTRY_BOOK_EXIT_STRESS",
+          "trades": 1,
+          "skipped": {},
+          "return_pct": -0.35997261538461833,
+          "drawdown_pct": 0.35997261538461506,
+          "contribution_pct": {
+            "crypto": 0.0,
+            "stocks": -0.35997261538461073
+          },
+          "peak_reservations": 1,
+          "peak_margin_pct": 2.9631076923076924,
+          "cash_pnl_by_entry_day": {
+            "2026-11-18": -0.4679643999999939
+          },
+          "exit_counts": {
+            "SL": 1
+          },
+          "cash_pnl_usd": -0.4679643999999939,
+          "by_bot": {
+            "stocks": {
+              "trades": 1,
+              "profitable": 0,
+              "tp1_executions": 0,
+              "tp1_full_exits": 0,
+              "cash_pnl_usd": -0.4679643999999939,
+              "exit_counts": {
+                "SL": 1
+              }
+            }
+          }
+        },
+        "30": {
+          "status": "SCORED_REAL_ENTRY_BOOK_EXIT_STRESS",
+          "trades": 1,
+          "skipped": {},
+          "return_pct": -0.4039452307692315,
+          "drawdown_pct": 0.4039452307692343,
+          "contribution_pct": {
+            "crypto": 0.0,
+            "stocks": -0.4039452307692281
+          },
+          "peak_reservations": 1,
+          "peak_margin_pct": 2.9631076923076924,
+          "cash_pnl_by_entry_day": {
+            "2026-11-18": -0.5251287999999965
+          },
+          "exit_counts": {
+            "SL": 1
+          },
+          "cash_pnl_usd": -0.5251287999999965,
+          "by_bot": {
+            "stocks": {
+              "trades": 1,
+              "profitable": 0,
+              "tp1_executions": 0,
+              "tp1_full_exits": 0,
+              "cash_pnl_usd": -0.5251287999999965,
+              "exit_counts": {
+                "SL": 1
+              }
+            }
+          }
+        }
+      },
+      "trend_pullback": {
+        "15": {
+          "status": "NO_QUALIFIED_ENTRIES",
+          "trades": 0
+        },
+        "30": {
+          "status": "NO_QUALIFIED_ENTRIES",
+          "trades": 0
+        }
+      },
+      "range_reversal": {
+        "15": {
+          "status": "SCORED_REAL_ENTRY_BOOK_EXIT_STRESS",
+          "trades": 1,
+          "skipped": {},
+          "return_pct": -0.35997261538461833,
+          "drawdown_pct": 0.35997261538461506,
+          "contribution_pct": {
+            "crypto": 0.0,
+            "stocks": -0.35997261538461073
+          },
+          "peak_reservations": 1,
+          "peak_margin_pct": 2.9631076923076924,
+          "cash_pnl_by_entry_day": {
+            "2026-11-18": -0.4679643999999939
+          },
+          "exit_counts": {
+            "SL": 1
+          },
+          "cash_pnl_usd": -0.4679643999999939,
+          "by_bot": {
+            "stocks": {
+              "trades": 1,
+              "profitable": 0,
+              "tp1_executions": 0,
+              "tp1_full_exits": 0,
+              "cash_pnl_usd": -0.4679643999999939,
+              "exit_counts": {
+                "SL": 1
+              }
+            }
+          }
+        },
+        "30": {
+          "status": "SCORED_REAL_ENTRY_BOOK_EXIT_STRESS",
+          "trades": 1,
+          "skipped": {},
+          "return_pct": -0.4039452307692315,
+          "drawdown_pct": 0.4039452307692343,
+          "contribution_pct": {
+            "crypto": 0.0,
+            "stocks": -0.4039452307692281
+          },
+          "peak_reservations": 1,
+          "peak_margin_pct": 2.9631076923076924,
+          "cash_pnl_by_entry_day": {
+            "2026-11-18": -0.5251287999999965
+          },
+          "exit_counts": {
+            "SL": 1
+          },
+          "cash_pnl_usd": -0.5251287999999965,
+          "by_bot": {
+            "stocks": {
+              "trades": 1,
+              "profitable": 0,
+              "tp1_executions": 0,
+              "tp1_full_exits": 0,
+              "cash_pnl_usd": -0.5251287999999965,
+              "exit_counts": {
+                "SL": 1
+              }
+            }
+          }
+        }
+      }
+    },
+    "contract_followup": {
+      "all": {
+        "15": {
+          "status": "SCORED_REAL_ENTRY_BOOK_EXIT_STRESS",
+          "trades": 3,
+          "skipped": {},
+          "return_pct": -0.14067376923077024,
+          "drawdown_pct": 0.3420422307692224,
+          "contribution_pct": {
+            "crypto": 0.0,
+            "stocks": -0.14067376923076694
+          },
+          "peak_reservations": 1,
+          "peak_margin_pct": 2.973115384615385,
+          "cash_pnl_by_entry_day": {
+            "2026-11-20": -0.4446549000000019,
+            "2026-11-21": 0.26177900000000487
+          },
+          "exit_counts": {
+            "SL": 2,
+            "TARGET": 1
+          },
+          "cash_pnl_usd": -0.18287589999999704,
+          "by_bot": {
+            "stocks": {
+              "trades": 3,
+              "profitable": 1,
+              "tp1_executions": 0,
+              "tp1_full_exits": 0,
+              "cash_pnl_usd": -0.18287589999999704,
+              "exit_counts": {
+                "SL": 2,
+                "TARGET": 1
+              }
+            }
+          }
+        },
+        "30": {
+          "status": "SCORED_REAL_ENTRY_BOOK_EXIT_STRESS",
+          "trades": 3,
+          "skipped": {},
+          "return_pct": -0.26973215384615834,
+          "drawdown_pct": 0.3870844615384674,
+          "contribution_pct": {
+            "crypto": 0.0,
+            "stocks": -0.2697321538461387
+          },
+          "peak_reservations": 1,
+          "peak_margin_pct": 2.973115384615385,
+          "cash_pnl_by_entry_day": {
+            "2026-11-20": -0.5032097999999943,
+            "2026-11-21": 0.15255800000001396
+          },
+          "exit_counts": {
+            "SL": 2,
+            "TARGET": 1
+          },
+          "cash_pnl_usd": -0.3506517999999803,
+          "by_bot": {
+            "stocks": {
+              "trades": 3,
+              "profitable": 1,
+              "tp1_executions": 0,
+              "tp1_full_exits": 0,
+              "cash_pnl_usd": -0.3506517999999803,
+              "exit_counts": {
+                "SL": 2,
+                "TARGET": 1
+              }
+            }
+          }
+        }
+      },
+      "regular": {
+        "15": {
+          "status": "NO_QUALIFIED_ENTRIES",
+          "trades": 0
+        },
+        "30": {
+          "status": "NO_QUALIFIED_ENTRIES",
+          "trades": 0
+        }
+      },
+      "trend_pullback": {
+        "15": {
+          "status": "SCORED_REAL_ENTRY_BOOK_EXIT_STRESS",
+          "trades": 3,
+          "skipped": {},
+          "return_pct": -0.14067376923077024,
+          "drawdown_pct": 0.3420422307692224,
+          "contribution_pct": {
+            "crypto": 0.0,
+            "stocks": -0.14067376923076694
+          },
+          "peak_reservations": 1,
+          "peak_margin_pct": 2.973115384615385,
+          "cash_pnl_by_entry_day": {
+            "2026-11-20": -0.4446549000000019,
+            "2026-11-21": 0.26177900000000487
+          },
+          "exit_counts": {
+            "SL": 2,
+            "TARGET": 1
+          },
+          "cash_pnl_usd": -0.18287589999999704,
+          "by_bot": {
+            "stocks": {
+              "trades": 3,
+              "profitable": 1,
+              "tp1_executions": 0,
+              "tp1_full_exits": 0,
+              "cash_pnl_usd": -0.18287589999999704,
+              "exit_counts": {
+                "SL": 2,
+                "TARGET": 1
+              }
+            }
+          }
+        },
+        "30": {
+          "status": "SCORED_REAL_ENTRY_BOOK_EXIT_STRESS",
+          "trades": 3,
+          "skipped": {},
+          "return_pct": -0.26973215384615834,
+          "drawdown_pct": 0.3870844615384674,
+          "contribution_pct": {
+            "crypto": 0.0,
+            "stocks": -0.2697321538461387
+          },
+          "peak_reservations": 1,
+          "peak_margin_pct": 2.973115384615385,
+          "cash_pnl_by_entry_day": {
+            "2026-11-20": -0.5032097999999943,
+            "2026-11-21": 0.15255800000001396
+          },
+          "exit_counts": {
+            "SL": 2,
+            "TARGET": 1
+          },
+          "cash_pnl_usd": -0.3506517999999803,
+          "by_bot": {
+            "stocks": {
+              "trades": 3,
+              "profitable": 1,
+              "tp1_executions": 0,
+              "tp1_full_exits": 0,
+              "cash_pnl_usd": -0.3506517999999803,
+              "exit_counts": {
+                "SL": 2,
+                "TARGET": 1
+              }
+            }
+          }
+        }
+      },
+      "range_reversal": {
+        "15": {
+          "status": "NO_QUALIFIED_ENTRIES",
+          "trades": 0
+        },
+        "30": {
+          "status": "NO_QUALIFIED_ENTRIES",
+          "trades": 0
+        }
+      }
+    }
+  },
+  "tape_checks": {
+    "SOXLUSDT": {
+      "tape_trades": 40819,
+      "reconciled_bars": 64,
+      "mismatches": {}
+    },
+    "NVDAUSDT": {
+      "tape_trades": 53394,
+      "reconciled_bars": 64,
+      "mismatches": {}
+    },
+    "INTCUSDT": {
+      "tape_trades": 19087,
+      "reconciled_bars": 76,
+      "mismatches": {}
+    }
+  },
+  "live_activation_supported": false,
+  "limitations": [
+    "Stocks-only on a modeled six-position account. The live route is different.",
+    "Universe preselection uses four strictly earlier quote windows, each at original receipt time.",
+    "Eligibility and quantity use actual public entry books; exits are trade-print stress marked.",
+    "Missing exit quotes and unverified trade paths are not counted as flat.",
+    "Both date groups are short, previously researched market windows, with separate $130 starts."
+  ]
+}
