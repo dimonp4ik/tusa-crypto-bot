@@ -42,7 +42,7 @@ def admitted_records(records):
     return admitted,[]
 
 
-def cash_result(admitted,specs,client):
+def cash_result(admitted,specs,client,*,post_close_rule=None):
     rows=[]
     for row in admitted:
         if row['entry_time']<START:continue
@@ -51,7 +51,7 @@ def cash_result(admitted,specs,client):
         rows.append(dict(row,bot='crypto',actual_risk_fraction=row['risk_pct'],risk_pct=unit,
             sequential_runner_r=row['runner_price_return']/unit))
     v=simulate(rows,specs,capital=130.,slots=12,bot_slots=dict(crypto=4,stocks=8),
-        simultaneous_writers=2,release_delay=900,**CLIENTS[client])
+        simultaneous_writers=2,release_delay=900,post_close_rule=post_close_rule,**CLIENTS[client])
     if (v['peak_positions']>12 or v['peak_by_bot'].get('crypto',0)>4
             or v['peak_reserved_margin_pct']>90+1e-9):raise ValueError('runner_shared_capacity_violation')
     months=calendar_months(v)

@@ -2,6 +2,7 @@ import pytest
 
 from okx_xperp_cash_tick_nov19 import simulate
 from okx_xperp_tick_path_nov19 import Trade, reconcile, resolve_ticks
+from post_close_replay_nov23 import PostCloseRule, PostCloseState
 
 
 def signal():
@@ -61,3 +62,44 @@ def test_simultaneous_bots_share_twelve_slots_and_one_margin_balance():
     assert result['trades']==result['peak_reservations']==12
     assert result['skipped']=={'crypto:position_cap':1,'stocks:position_cap':1}
     assert result['peak_margin_pct']==pytest.approx(100*36/130)
+
+
+def test_loss_delay_only_starts_after_confirmation_and_is_local_to_one_bot_side():
+    schedule = (
+        ('A','crypto',10_000,60_000,98.),
+        ('B','crypto',70_000,120_000,102.),
+        ('C','crypto',1_100_000,1_160_000,102.),
+        ('D','stocks',1_100_000,1_160_000,102.),
+        ('E','crypto',1_860_200,1_920_000,102.),
+    )
+    proposals, specs, ticks, books = [], {}, {}, {}
+    for symbol,bot,entry,end,sale in schedule:
+        proposals.append(dict(signal(),symbol=symbol,bot=bot,entry_ms=entry,
+            entry_status='eligible',stock_reference_ready=True,
+            path={60:dict(known=True,code='SL' if sale<100. else 'TARGET',end_ms=end,be_level=100.,bank=None)}))
+        specs[symbol] = dict(ctVal=.1,lotSz=1,minSz=1)
+        ticks[symbol] = .01
+        books[symbol] = {
+            entry:dict(ts=entry,bids=[(99.99,6)],asks=[(100.,6)]),
+            end+200:dict(ts=end+200,bids=[(sale,6)],asks=[(sale+.01,6)]),
+        }
+    score = simulate(proposals,specs,ticks,books,clock=60,lag=200,setting='requested5',
+                     post_close_rule=PostCloseRule(direction_loss_seconds=1800))
+    assert [trade['symbol'] for trade in score['closed']] == ['A','B','D','E']
+    assert score['skipped'] == {'crypto:post_close_direction_loss':1}
+    prompt = simulate(proposals,specs,ticks,books,clock=60,lag=200,setting='requested5',
+                      post_close_rule=PostCloseRule(direction_loss_seconds=1800),release_delay_ms=0)
+    assert [trade['symbol'] for trade in prompt['closed']] == ['A','D','E']
+    assert prompt['skipped'] == {'crypto:post_close_direction_loss':2}
+
+
+def test_optional_loss_floor_and_stock_scope_exclude_small_losses_and_crypto():
+    state = PostCloseState(PostCloseRule(direction_loss_seconds=3600,
+                                        direction_loss_bot='stocks',loss_margin_floor=.02))
+    def closed(bot, pnl):
+        state.confirm(symbol='A',bot=bot,direction='LONG',closed_at=60,pnl=pnl,margin=4.)
+        return state.refusal(symbol='B',bot=bot,direction='LONG',now=960)
+
+    assert closed('crypto',-.4) is None
+    assert closed('stocks',-.03) is None
+    assert closed('stocks',-.4) == 'post_close_direction_loss'

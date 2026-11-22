@@ -1,13 +1,14 @@
 """Versioned research cash ledger for explicit client TP1 volume policies."""
 import heapq
 import math
+from post_close_replay_nov23 import PostCloseState
 from src.okx_trader import calc_contracts
 from src.tp1_plan import plan_tp1_close
 
 
 def simulate(rows,specs,*,capital=130.,margin_fraction=.03,tp1_pct=5.,minimum_close=False,
         slots=12,bot_slots=None,simultaneous_writers=2,release_delay=900,margin_cap=.9,
-        tie_key=None,capture_events=True):
+        tie_key=None,capture_events=True,post_close_rule=None):
     if bot_slots is None:bot_slots=dict(crypto=4,stocks=8)
     if not (math.isfinite(capital) and capital>0 and 0<margin_fraction<=.1 and 0<=tp1_pct<=100
             and slots>0 and simultaneous_writers>=1 and release_delay>=0 and 0<margin_cap<=.9):
@@ -15,6 +16,7 @@ def simulate(rows,specs,*,capital=130.,margin_fraction=.03,tp1_pct=5.,minimum_cl
     equity=peak=capital;drawdown=0.;pending=[];active={};sequence=0
     ledger=[];events=[];peak_positions=0;peak_margin=0.;peak_by_bot={}
     skipped=dict(slots=0,minimum_size=0)
+    cooldown = PostCloseState(post_close_rule) if post_close_rule is not None else None
 
     def realize(until):
         nonlocal equity,peak,drawdown
@@ -23,7 +25,11 @@ def simulate(rows,specs,*,capital=130.,margin_fraction=.03,tp1_pct=5.,minimum_cl
             equity+=pnl
             if capture_events and kind!='slot_release':
                 events.append(dict(time=stamp,bot=bot,kind=kind,pnl=pnl,equity=equity))
-            if release is not None:del active[release]
+            if release is not None:
+                closed = active.pop(release)
+                if cooldown is not None:
+                    cooldown.confirm(symbol=release, bot=bot, direction=closed['direction'],
+                                     closed_at=closed['exit_time'], pnl=closed['cash_pnl'], margin=closed['margin'])
             peak=max(peak,equity);drawdown=max(drawdown,(peak-equity)/peak)
 
     for row in sorted(rows,key=lambda r:(r['entry_time'],tie_key(r) if tie_key else r['symbol'])):
@@ -38,6 +44,11 @@ def simulate(rows,specs,*,capital=130.,margin_fraction=.03,tp1_pct=5.,minimum_cl
             skipped['slots']+=1;continue
         if equity<=0 or sum(v['margin'] for v in active.values())+equity*margin_fraction*simultaneous_writers>equity*margin_cap+1e-9:
             skipped['margin']=skipped.get('margin',0)+1;continue
+        if cooldown is not None:
+            refusal = cooldown.refusal(symbol=symbol, bot=bot, direction=row['direction'], now=now)
+            if refusal:
+                skipped[refusal] = skipped.get(refusal,0)+1
+                continue
         spec=specs[symbol];size=calc_contracts(equity*margin_fraction,10,entry,spec)
         if size<=0:skipped['minimum_size']+=1;continue
         partial=plan_tp1_close(size,tp1_pct,spec,ensure_minimum=minimum_close)
@@ -57,7 +68,8 @@ def simulate(rows,specs,*,capital=130.,margin_fraction=.03,tp1_pct=5.,minimum_cl
         if release_delay:
             sequence+=1;heapq.heappush(pending,(end+release_delay,sequence,0.,symbol,bot,'slot_release'))
         actual_margin=size*float(spec['ctVal'])*entry/10
-        active[symbol]=dict(bot=bot,margin=actual_margin)
+        active[symbol]=dict(bot=bot,margin=actual_margin,direction=row['direction'],
+                            exit_time=end,cash_pnl=bank_pnl+runner_pnl)
         peak_positions=max(peak_positions,len(active))
         peak_margin=max(peak_margin,sum(v['margin'] for v in active.values())/equity)
         peak_by_bot[bot]=max(peak_by_bot.get(bot,0),sum(v['bot']==bot for v in active.values()))

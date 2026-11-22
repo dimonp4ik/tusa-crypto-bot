@@ -303,7 +303,7 @@ def limit_bursts(proposals, *, max_same_side):
             yield row
 
 
-def score(*, stress=False, data=DATA, stem="stock_liquid_quote_routes_nov21", extra_variants=None):
+def load_replay(data, *, keep_tapes=False):
     plan = load_plan(data)
     capture_path = data / "capture.json"
     captured = json.loads(capture_path.read_bytes())
@@ -326,23 +326,30 @@ def score(*, stress=False, data=DATA, stem="stock_liquid_quote_routes_nov21", ex
 
     def load_tape(item):
         tape = load_repaired_tape(item)
-        if stress:
+        if keep_tapes:
             stored_tapes[item["instrument"]] = ([t.ms for t in tape], tape)
         return tape
 
     tape = resolve_all(rows, {"files": captured["trades"]}, {"symbols": captured["reference"]},
                        ticks, trade_loader=load_tape)
-    extra, exits = ({}, {}) if stress else exit_books(rows, captured, specs, books)
+    return plan, captured, rows, specs, ticks, books, tape, stored_tapes, repair
 
-    def stressed_exit_penalty(bps):
-        def price(symbol, at, side, _):
-            times, entries = stored_tapes[specs[symbol]["instId"]]
-            index = bisect_right(times, at) - 1
-            if index < 0 or at - times[index] > 60_000:
-                raise ValueError("no recent trade for exit stress proxy")
-            sign = 1 if side == "LONG" else -1
-            return entries[index].price * (1 - sign * bps / 10_000)
-        return price
+
+def stressed_exit_penalty(stored_tapes, specs, bps):
+    def price(symbol, at, side, _):
+        times, entries = stored_tapes[specs[symbol]["instId"]]
+        index = bisect_right(times, at) - 1
+        if index < 0 or at - times[index] > 60_000:
+            raise ValueError("no recent trade for exit stress proxy")
+        sign = 1 if side == "LONG" else -1
+        return entries[index].price * (1 - sign * bps / 10_000)
+    return price
+
+
+def score(*, stress=False, data=DATA, stem="stock_liquid_quote_routes_nov21", extra_variants=None):
+    plan, captured, rows, specs, ticks, books, tape, stored_tapes, repair = load_replay(data, keep_tapes=stress)
+    capture_path, repair_path = data / "capture.json", data / "trade_repair.json"
+    extra, exits = ({}, {}) if stress else exit_books(rows, captured, specs, books)
 
     results = {}
     for cohort, cases in plan["cases"].items():
@@ -358,7 +365,8 @@ def score(*, stress=False, data=DATA, stem="stock_liquid_quote_routes_nov21", ex
             for label, subset in subsets.items():
                 unknown = [(r["symbol"], r["entry_ms"], r["path"][60].get("reason"))
                            for r in subset if r["entry_status"] == "eligible" and not r["path"][60]["known"]]
-                pricers = ({f"|stress_{bps}bps": stressed_exit_penalty(bps) for bps in (5, 15, 30, 50)}
+                pricers = ({f"|stress_{bps}bps": stressed_exit_penalty(stored_tapes, specs, bps)
+                            for bps in (5, 15, 30, 50)}
                            if stress else {"": None})
                 for suffix, exit_price in pricers.items():
                     case = simulate(subset, specs, ticks, books, clock=60, lag=200, setting="requested5",

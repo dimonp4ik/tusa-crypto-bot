@@ -120,7 +120,7 @@ def evaluate(material, cohorts, cap, controls, *, joint=False, capacity_override
     return values,evidence
 
 
-def historical_crypto():
+def historical_brackets():
     candles = load_native(json.loads(MANIFEST.read_bytes())['symbols'])
     spec_path = ROOT/'shared_xperp_specs_nov14.json'
     specs = json.loads(spec_path.read_bytes())
@@ -152,6 +152,11 @@ def historical_crypto():
                 candidate = shorten(original,c,i,target_px=targets[policy])
                 changed[policy] += candidate is not original
             cases[policy].append(candidate)
+    return cases,specs,spec_path,universe,metadata,assigned,changed
+
+
+def historical_crypto():
+    cases,specs,spec_path,universe,metadata,assigned,changed = historical_brackets()
     reference = ROOT/'crypto_nearer_target_long_history_nov22.json'
     baseline = json.loads(reference.read_bytes())['cases']['control_2r']['clients']['requested5']
     results = {}

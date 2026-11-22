@@ -10,6 +10,7 @@ from pathlib import Path
 from okx_xperp_l2_capture_nov19 import START, END, ROOT_L2, catalogue, download
 from okx_xperp_l2_entry_replay_nov19 import archive
 from okx_xperp_tick_path_nov19 import load_trade_tape, reconcile, resolve_ticks
+from post_close_replay_nov23 import PostCloseState
 from src.execution_guard import execution_quote
 from src.okx_trader import calc_contracts, round_to_tick
 from src.tp1_plan import plan_tp1_close
@@ -141,9 +142,11 @@ def close_quote(book, stamp, side, contracts):
 
 
 def simulate(rows, specs, ticks, books, *, clock, lag, setting, exit_price=None, max_positions=12,
-             unbankable_runner=None):
+             unbankable_runner=None, post_close_rule=None, release_delay_ms=RELEASE_MS):
     if not isinstance(max_positions, int) or not 1 <= max_positions <= 12:
         raise ValueError('invalid shared position cap')
+    if type(release_delay_ms) is not int or release_delay_ms < 0:
+        raise ValueError('invalid shared release delay')
     cash=peak=CAPITAL
     drawdown=0.
     max_used=0
@@ -153,13 +156,19 @@ def simulate(rows, specs, ticks, books, *, clock, lag, setting, exit_price=None,
     closed=[]
     skipped=Counter()
     contribution={bot:0. for bot in CAPS}
+    cooldown = PostCloseState(post_close_rule) if post_close_rule is not None else None
 
     def drain(until):
         nonlocal cash,peak,drawdown
         while events and (until is None or events[0][0]<until):
             _,index,kind,symbol,pnl=heapq.heappop(events)
             if kind=='release':
-                del active[symbol]
+                bot, margin, side = active.pop(symbol)
+                if cooldown is not None:
+                    trade = closed[index]
+                    cooldown.confirm(symbol=symbol, bot=bot, direction=side,
+                                     closed_at=trade['exit_ms']/1000,
+                                     pnl=trade['bank_pnl']+trade['runner_pnl'], margin=margin)
             else:
                 cash+=pnl
                 contribution[closed[index]['bot']]+=pnl
@@ -182,6 +191,11 @@ def simulate(rows, specs, ticks, books, *, clock, lag, setting, exit_price=None,
         if cash<=0 or reserved+cash*FRACTION>cash*.9:
             skipped[bot+':margin_cap']+=1
             continue
+        if cooldown is not None:
+            refusal = cooldown.refusal(symbol=symbol, bot=bot, direction=side, now=opened/1000)
+            if refusal:
+                skipped[bot+':'+refusal] += 1
+                continue
         path=row['path'][clock]
         if not path['known']:
             return dict(status='UNSCORABLE',symbol=symbol,entry_ms=opened,reason=path['reason'])
@@ -230,9 +244,9 @@ def simulate(rows, specs, ticks, books, *, clock, lag, setting, exit_price=None,
             heapq.heappush(events,(bank_at,index,'bank',symbol,bank_pnl))
         if runner_px is not None:
             heapq.heappush(events,(end_at,index,'runner',symbol,runner_pnl))
-        heapq.heappush(events,(end_at+RELEASE_MS,index,'release',symbol,0.))
+        heapq.heappush(events,(end_at+release_delay_ms,index,'release',symbol,0.))
         margin=entry.contracts*float(spec['ctVal'])*max(entry.best,entry.worst)/LEVERAGE
-        active[symbol]=(bot,margin)
+        active[symbol]=(bot,margin,side)
         max_used=max(max_used,len(active))
         max_reserved=max(max_reserved,(reserved+margin)/cash)
     drain(None)
