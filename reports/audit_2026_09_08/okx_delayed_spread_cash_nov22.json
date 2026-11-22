@@ -1,0 +1,5487 @@
+{
+  "capital_usd": 130.0,
+  "margin_fraction": 0.03,
+  "leverage": 10,
+  "start_lag_ms": 10000,
+  "additional_offsets_ms": [
+    30000,
+    60000,
+    120000
+  ],
+  "live_activation_supported": false,
+  "policies": {
+    "short_cautious": [
+      60000,
+      true
+    ],
+    "full_cautious": [
+      120000,
+      true
+    ],
+    "full_instantaneous": [
+      120000,
+      false
+    ]
+  },
+  "windows": {
+    "nov09_14": {
+      "cases": {
+        "current": {
+          "200": {
+            "status": "SCORED_PUBLIC_L2_SIMULATION",
+            "trades": 24,
+            "skipped": {
+              "crypto:wide": 14,
+              "stocks:wide": 21,
+              "stocks:stale order book": 3,
+              "stocks:paper_guard": 1
+            },
+            "return_pct": -2.2007307692307743,
+            "drawdown_pct": 2.444807692307686,
+            "contribution_pct": {
+              "crypto": -2.200730769230761,
+              "stocks": 0.0
+            },
+            "peak_reservations": 4,
+            "peak_margin_pct": 11.56279155866751,
+            "cash_pnl_by_entry_day": {
+              "2026-11-09": -0.7841999999999887,
+              "2026-11-10": -0.020700000000001495,
+              "2026-11-11": 0.6482000000000017,
+              "2026-11-12": 0.394049999999997,
+              "2026-11-13": -3.0910999999999937,
+              "2026-11-14": -0.00720000000000387
+            },
+            "exit_counts": {
+              "SL": 10,
+              "BE": 11,
+              "TARGET": 3
+            },
+            "cash_pnl_usd": -2.8609499999999897,
+            "by_bot": {
+              "crypto": {
+                "trades": 24,
+                "profitable": 4,
+                "tp1_executions": 2,
+                "tp1_full_exits": 0,
+                "cash_pnl_usd": -2.8609499999999897,
+                "exit_counts": {
+                  "SL": 10,
+                  "BE": 11,
+                  "TARGET": 3
+                }
+              }
+            },
+            "entered_after_retry": []
+          },
+          "1000": {
+            "status": "SCORED_PUBLIC_L2_SIMULATION",
+            "trades": 24,
+            "skipped": {
+              "crypto:wide": 14,
+              "stocks:wide": 21,
+              "stocks:stale order book": 3,
+              "stocks:paper_guard": 1
+            },
+            "return_pct": -2.2082307692307457,
+            "drawdown_pct": 2.4665384615384327,
+            "contribution_pct": {
+              "crypto": -2.208230769230765,
+              "stocks": 0.0
+            },
+            "peak_reservations": 4,
+            "peak_margin_pct": 11.563997369082973,
+            "cash_pnl_by_entry_day": {
+              "2026-11-09": -0.7631999999999897,
+              "2026-11-10": -0.029700000000001836,
+              "2026-11-11": 0.657200000000002,
+              "2026-11-12": 0.3540000000000001,
+              "2026-11-13": -3.104300000000001,
+              "2026-11-14": 0.015299999999995983
+            },
+            "exit_counts": {
+              "SL": 10,
+              "BE": 11,
+              "TARGET": 3
+            },
+            "cash_pnl_usd": -2.8706999999999945,
+            "by_bot": {
+              "crypto": {
+                "trades": 24,
+                "profitable": 5,
+                "tp1_executions": 2,
+                "tp1_full_exits": 0,
+                "cash_pnl_usd": -2.8706999999999945,
+                "exit_counts": {
+                  "SL": 10,
+                  "BE": 11,
+                  "TARGET": 3
+                }
+              }
+            },
+            "entered_after_retry": []
+          }
+        },
+        "short_cautious": {
+          "200": {
+            "status": "SCORED_PUBLIC_L2_SIMULATION",
+            "trades": 27,
+            "skipped": {
+              "crypto:wide": 11,
+              "stocks:wide": 21,
+              "stocks:stale order book": 3,
+              "stocks:paper_guard": 1
+            },
+            "return_pct": -2.6669615384615097,
+            "drawdown_pct": 2.8902692307691997,
+            "contribution_pct": {
+              "crypto": -2.6669615384615337,
+              "stocks": 0.0
+            },
+            "peak_reservations": 4,
+            "peak_margin_pct": 11.575058127047356,
+            "cash_pnl_by_entry_day": {
+              "2026-11-09": -0.7841999999999887,
+              "2026-11-10": -0.020700000000001495,
+              "2026-11-11": 0.2441999999999982,
+              "2026-11-12": 0.052049999999998264,
+              "2026-11-13": -2.9511999999999956,
+              "2026-11-14": -0.00720000000000387
+            },
+            "exit_counts": {
+              "SL": 12,
+              "BE": 12,
+              "TARGET": 3
+            },
+            "cash_pnl_usd": -3.4670499999999933,
+            "by_bot": {
+              "crypto": {
+                "trades": 27,
+                "profitable": 4,
+                "tp1_executions": 2,
+                "tp1_full_exits": 0,
+                "cash_pnl_usd": -3.4670499999999933,
+                "exit_counts": {
+                  "SL": 12,
+                  "BE": 12,
+                  "TARGET": 3
+                }
+              }
+            },
+            "entered_after_retry": [
+              {
+                "symbol": "AVAXUSDT",
+                "entered": 1794438960000,
+                "outcome": "SL",
+                "usd": -0.40400000000000347
+              },
+              {
+                "symbol": "AVAXUSDT",
+                "entered": 1794476730000,
+                "outcome": "SL",
+                "usd": -0.34199999999999875
+              },
+              {
+                "symbol": "AVAXUSDT",
+                "entered": 1794609930000,
+                "outcome": "BE",
+                "usd": -0.027000000000001023
+              }
+            ]
+          },
+          "1000": {
+            "status": "SCORED_PUBLIC_L2_SIMULATION",
+            "trades": 27,
+            "skipped": {
+              "crypto:wide": 11,
+              "stocks:wide": 21,
+              "stocks:stale order book": 3,
+              "stocks:paper_guard": 1
+            },
+            "return_pct": -2.6761538461538614,
+            "drawdown_pct": 2.906769230769234,
+            "contribution_pct": {
+              "crypto": -2.6761538461538397,
+              "stocks": 0.0
+            },
+            "peak_reservations": 4,
+            "peak_margin_pct": 11.576339838388328,
+            "cash_pnl_by_entry_day": {
+              "2026-11-09": -0.7631999999999897,
+              "2026-11-10": -0.029700000000001836,
+              "2026-11-11": 0.2571999999999963,
+              "2026-11-12": 0.012000000000001287,
+              "2026-11-13": -2.970599999999995,
+              "2026-11-14": 0.015299999999995983
+            },
+            "exit_counts": {
+              "SL": 12,
+              "BE": 12,
+              "TARGET": 3
+            },
+            "cash_pnl_usd": -3.478999999999993,
+            "by_bot": {
+              "crypto": {
+                "trades": 27,
+                "profitable": 5,
+                "tp1_executions": 2,
+                "tp1_full_exits": 0,
+                "cash_pnl_usd": -3.478999999999993,
+                "exit_counts": {
+                  "SL": 12,
+                  "BE": 12,
+                  "TARGET": 3
+                }
+              }
+            },
+            "entered_after_retry": [
+              {
+                "symbol": "AVAXUSDT",
+                "entered": 1794438960000,
+                "outcome": "SL",
+                "usd": -0.4000000000000057
+              },
+              {
+                "symbol": "AVAXUSDT",
+                "entered": 1794476730000,
+                "outcome": "SL",
+                "usd": -0.34199999999999875
+              },
+              {
+                "symbol": "AVAXUSDT",
+                "entered": 1794609930000,
+                "outcome": "BE",
+                "usd": -0.03599999999999426
+              }
+            ]
+          }
+        },
+        "full_cautious": {
+          "200": {
+            "status": "SCORED_PUBLIC_L2_SIMULATION",
+            "trades": 27,
+            "skipped": {
+              "crypto:wide": 9,
+              "stocks:wide": 21,
+              "stocks:stale order book": 3,
+              "crypto:depth slippage exceeds limit": 1,
+              "stocks:paper_guard": 1,
+              "crypto:below_delayed_reward_risk": 1
+            },
+            "return_pct": -2.6669615384615097,
+            "drawdown_pct": 2.8902692307691997,
+            "contribution_pct": {
+              "crypto": -2.6669615384615337,
+              "stocks": 0.0
+            },
+            "peak_reservations": 4,
+            "peak_margin_pct": 11.575058127047356,
+            "cash_pnl_by_entry_day": {
+              "2026-11-09": -0.7841999999999887,
+              "2026-11-10": -0.020700000000001495,
+              "2026-11-11": 0.2441999999999982,
+              "2026-11-12": 0.052049999999998264,
+              "2026-11-13": -2.9511999999999956,
+              "2026-11-14": -0.00720000000000387
+            },
+            "exit_counts": {
+              "SL": 12,
+              "BE": 12,
+              "TARGET": 3
+            },
+            "cash_pnl_usd": -3.4670499999999933,
+            "by_bot": {
+              "crypto": {
+                "trades": 27,
+                "profitable": 4,
+                "tp1_executions": 2,
+                "tp1_full_exits": 0,
+                "cash_pnl_usd": -3.4670499999999933,
+                "exit_counts": {
+                  "SL": 12,
+                  "BE": 12,
+                  "TARGET": 3
+                }
+              }
+            },
+            "entered_after_retry": [
+              {
+                "symbol": "AVAXUSDT",
+                "entered": 1794438960000,
+                "outcome": "SL",
+                "usd": -0.40400000000000347
+              },
+              {
+                "symbol": "AVAXUSDT",
+                "entered": 1794476730000,
+                "outcome": "SL",
+                "usd": -0.34199999999999875
+              },
+              {
+                "symbol": "AVAXUSDT",
+                "entered": 1794609930000,
+                "outcome": "BE",
+                "usd": -0.027000000000001023
+              }
+            ]
+          },
+          "1000": {
+            "status": "SCORED_PUBLIC_L2_SIMULATION",
+            "trades": 27,
+            "skipped": {
+              "crypto:wide": 9,
+              "stocks:wide": 21,
+              "stocks:stale order book": 3,
+              "crypto:depth slippage exceeds limit": 1,
+              "stocks:paper_guard": 1,
+              "crypto:below_delayed_reward_risk": 1
+            },
+            "return_pct": -2.6761538461538614,
+            "drawdown_pct": 2.906769230769234,
+            "contribution_pct": {
+              "crypto": -2.6761538461538397,
+              "stocks": 0.0
+            },
+            "peak_reservations": 4,
+            "peak_margin_pct": 11.576339838388328,
+            "cash_pnl_by_entry_day": {
+              "2026-11-09": -0.7631999999999897,
+              "2026-11-10": -0.029700000000001836,
+              "2026-11-11": 0.2571999999999963,
+              "2026-11-12": 0.012000000000001287,
+              "2026-11-13": -2.970599999999995,
+              "2026-11-14": 0.015299999999995983
+            },
+            "exit_counts": {
+              "SL": 12,
+              "BE": 12,
+              "TARGET": 3
+            },
+            "cash_pnl_usd": -3.478999999999993,
+            "by_bot": {
+              "crypto": {
+                "trades": 27,
+                "profitable": 5,
+                "tp1_executions": 2,
+                "tp1_full_exits": 0,
+                "cash_pnl_usd": -3.478999999999993,
+                "exit_counts": {
+                  "SL": 12,
+                  "BE": 12,
+                  "TARGET": 3
+                }
+              }
+            },
+            "entered_after_retry": [
+              {
+                "symbol": "AVAXUSDT",
+                "entered": 1794438960000,
+                "outcome": "SL",
+                "usd": -0.4000000000000057
+              },
+              {
+                "symbol": "AVAXUSDT",
+                "entered": 1794476730000,
+                "outcome": "SL",
+                "usd": -0.34199999999999875
+              },
+              {
+                "symbol": "AVAXUSDT",
+                "entered": 1794609930000,
+                "outcome": "BE",
+                "usd": -0.03599999999999426
+              }
+            ]
+          }
+        },
+        "full_instantaneous": {
+          "200": {
+            "status": "SCORED_PUBLIC_L2_SIMULATION",
+            "trades": 27,
+            "skipped": {
+              "crypto:wide": 9,
+              "stocks:wide": 21,
+              "stocks:stale order book": 3,
+              "crypto:depth slippage exceeds limit": 1,
+              "stocks:paper_guard": 1,
+              "crypto:below_delayed_reward_risk": 1
+            },
+            "return_pct": -2.6669615384615097,
+            "drawdown_pct": 2.8902692307691997,
+            "contribution_pct": {
+              "crypto": -2.6669615384615337,
+              "stocks": 0.0
+            },
+            "peak_reservations": 4,
+            "peak_margin_pct": 11.575058127047356,
+            "cash_pnl_by_entry_day": {
+              "2026-11-09": -0.7841999999999887,
+              "2026-11-10": -0.020700000000001495,
+              "2026-11-11": 0.2441999999999982,
+              "2026-11-12": 0.052049999999998264,
+              "2026-11-13": -2.9511999999999956,
+              "2026-11-14": -0.00720000000000387
+            },
+            "exit_counts": {
+              "SL": 12,
+              "BE": 12,
+              "TARGET": 3
+            },
+            "cash_pnl_usd": -3.4670499999999933,
+            "by_bot": {
+              "crypto": {
+                "trades": 27,
+                "profitable": 4,
+                "tp1_executions": 2,
+                "tp1_full_exits": 0,
+                "cash_pnl_usd": -3.4670499999999933,
+                "exit_counts": {
+                  "SL": 12,
+                  "BE": 12,
+                  "TARGET": 3
+                }
+              }
+            },
+            "entered_after_retry": [
+              {
+                "symbol": "AVAXUSDT",
+                "entered": 1794438960000,
+                "outcome": "SL",
+                "usd": -0.40400000000000347
+              },
+              {
+                "symbol": "AVAXUSDT",
+                "entered": 1794476730000,
+                "outcome": "SL",
+                "usd": -0.34199999999999875
+              },
+              {
+                "symbol": "AVAXUSDT",
+                "entered": 1794609930000,
+                "outcome": "BE",
+                "usd": -0.027000000000001023
+              }
+            ]
+          },
+          "1000": {
+            "status": "SCORED_PUBLIC_L2_SIMULATION",
+            "trades": 27,
+            "skipped": {
+              "crypto:wide": 9,
+              "stocks:wide": 21,
+              "stocks:stale order book": 3,
+              "crypto:depth slippage exceeds limit": 1,
+              "stocks:paper_guard": 1,
+              "crypto:below_delayed_reward_risk": 1
+            },
+            "return_pct": -2.6761538461538614,
+            "drawdown_pct": 2.906769230769234,
+            "contribution_pct": {
+              "crypto": -2.6761538461538397,
+              "stocks": 0.0
+            },
+            "peak_reservations": 4,
+            "peak_margin_pct": 11.576339838388328,
+            "cash_pnl_by_entry_day": {
+              "2026-11-09": -0.7631999999999897,
+              "2026-11-10": -0.029700000000001836,
+              "2026-11-11": 0.2571999999999963,
+              "2026-11-12": 0.012000000000001287,
+              "2026-11-13": -2.970599999999995,
+              "2026-11-14": 0.015299999999995983
+            },
+            "exit_counts": {
+              "SL": 12,
+              "BE": 12,
+              "TARGET": 3
+            },
+            "cash_pnl_usd": -3.478999999999993,
+            "by_bot": {
+              "crypto": {
+                "trades": 27,
+                "profitable": 5,
+                "tp1_executions": 2,
+                "tp1_full_exits": 0,
+                "cash_pnl_usd": -3.478999999999993,
+                "exit_counts": {
+                  "SL": 12,
+                  "BE": 12,
+                  "TARGET": 3
+                }
+              }
+            },
+            "entered_after_retry": [
+              {
+                "symbol": "AVAXUSDT",
+                "entered": 1794438960000,
+                "outcome": "SL",
+                "usd": -0.4000000000000057
+              },
+              {
+                "symbol": "AVAXUSDT",
+                "entered": 1794476730000,
+                "outcome": "SL",
+                "usd": -0.34199999999999875
+              },
+              {
+                "symbol": "AVAXUSDT",
+                "entered": 1794609930000,
+                "outcome": "BE",
+                "usd": -0.03599999999999426
+              }
+            ]
+          }
+        }
+      },
+      "delayed_candidates": {
+        "short_cautious": [
+          {
+            "epoch": 1794192300,
+            "entry": 130.48,
+            "stop": 128.3057142857143,
+            "target": 134.8285714285714,
+            "bot": "crypto",
+            "direction": "LONG",
+            "symbol": "AAVEUSDT",
+            "paper_reference_ready": false,
+            "entry_status": "wide",
+            "entry_ms": 1794192310800,
+            "tries": [
+              {
+                "ms": 1794192310000,
+                "status": "wide",
+                "spread_bps": 8.43138006361964
+              },
+              {
+                "ms": 1794192310200,
+                "status": "wide",
+                "spread_bps": 8.43138006361964
+              },
+              {
+                "ms": 1794192310800,
+                "status": "wide",
+                "spread_bps": 8.43138006361964
+              }
+            ],
+            "stock_reference_ready": false,
+            "paper_path": {
+              "known": true,
+              "code": "SL",
+              "end_ms": 1794207682577,
+              "trigger_price": 128.26,
+              "bank": null,
+              "be_level": 130.48
+            },
+            "delayed_attempts": [
+              {
+                "ms": 1794192330000,
+                "status": "wide",
+                "spread_bps": 11.487650775416864
+              },
+              {
+                "ms": 1794192360000,
+                "status": "wide",
+                "spread_bps": 8.43138006361964
+              }
+            ]
+          },
+          {
+            "epoch": 1794285900,
+            "entry": 126.15,
+            "stop": 127.59714285714286,
+            "target": 123.2557142857143,
+            "bot": "crypto",
+            "direction": "SHORT",
+            "symbol": "AAVEUSDT",
+            "paper_reference_ready": false,
+            "entry_status": "wide",
+            "entry_ms": 1794285910800,
+            "tries": [
+              {
+                "ms": 1794285910000,
+                "status": "wide",
+                "spread_bps": 9.504197687311132
+              },
+              {
+                "ms": 1794285910200,
+                "status": "wide",
+                "spread_bps": 9.50796291894385
+              },
+              {
+                "ms": 1794285910800,
+                "status": "wide",
+                "spread_bps": 8.715287406409653
+              }
+            ],
+            "stock_reference_ready": false,
+            "paper_path": {
+              "known": true,
+              "code": "BE",
+              "end_ms": 1794292422574,
+              "trigger_price": 126.18,
+              "bank": {
+                "ms": 1794291222628,
+                "price": 125.39
+              },
+              "be_level": 126.15
+            },
+            "delayed_attempts": [
+              {
+                "ms": 1794285930000,
+                "status": "wide",
+                "spread_bps": 9.507209633972789
+              },
+              {
+                "ms": 1794285960000,
+                "status": "wide",
+                "spread_bps": 8.722197993894417
+              }
+            ]
+          },
+          {
+            "epoch": 1794346200,
+            "entry": 123.31,
+            "stop": 124.63857142857142,
+            "target": 120.65285714285716,
+            "bot": "crypto",
+            "direction": "SHORT",
+            "symbol": "AAVEUSDT",
+            "paper_reference_ready": false,
+            "entry_status": "wide",
+            "entry_ms": 1794346210800,
+            "tries": [
+              {
+                "ms": 1794346210000,
+                "status": "wide",
+                "spread_bps": 5.677900798961202
+              },
+              {
+                "ms": 1794346210200,
+                "status": "wide",
+                "spread_bps": 5.677900798961202
+              },
+              {
+                "ms": 1794346210800,
+                "status": "wide",
+                "spread_bps": 5.677900798961202
+              }
+            ],
+            "stock_reference_ready": false,
+            "paper_path": {
+              "known": true,
+              "code": "SL",
+              "end_ms": 1794348529456,
+              "trigger_price": 124.71,
+              "bank": null,
+              "be_level": 123.31
+            },
+            "delayed_attempts": [
+              {
+                "ms": 1794346230000,
+                "status": "wide",
+                "spread_bps": 8.112932013630418
+              },
+              {
+                "ms": 1794346260000,
+                "status": "wide",
+                "spread_bps": 9.737098344692496
+              }
+            ]
+          },
+          {
+            "epoch": 1794384900,
+            "entry": 8.64,
+            "stop": 8.543571428571429,
+            "target": 8.832857142857144,
+            "bot": "crypto",
+            "direction": "LONG",
+            "symbol": "AVAXUSDT",
+            "paper_reference_ready": false,
+            "entry_status": "wide",
+            "entry_ms": 1794384910800,
+            "tries": [
+              {
+                "ms": 1794384910000,
+                "status": "wide",
+                "spread_bps": 8.099508244143998
+              },
+              {
+                "ms": 1794384910200,
+                "status": "wide",
+                "spread_bps": 8.099508244143998
+              },
+              {
+                "ms": 1794384910800,
+                "status": "wide",
+                "spread_bps": 6.942837306179388
+              }
+            ],
+            "stock_reference_ready": false,
+            "paper_path": {
+              "known": true,
+              "code": "BE",
+              "end_ms": 1794394991897,
+              "trigger_price": 8.638,
+              "bank": {
+                "ms": 1794393004181,
+                "price": 8.69
+              },
+              "be_level": 8.64
+            },
+            "delayed_attempts": [
+              {
+                "ms": 1794384930000,
+                "status": "wide",
+                "spread_bps": 6.93641618497136
+              },
+              {
+                "ms": 1794384960000,
+                "status": "wide",
+                "spread_bps": 8.09669770400749
+              }
+            ]
+          },
+          {
+            "epoch": 1794433500,
+            "entry": 122.17,
+            "stop": 123.44142857142857,
+            "target": 119.62714285714286,
+            "bot": "crypto",
+            "direction": "SHORT",
+            "symbol": "AAVEUSDT",
+            "paper_reference_ready": false,
+            "entry_status": "wide",
+            "entry_ms": 1794433510800,
+            "tries": [
+              {
+                "ms": 1794433510000,
+                "status": "wide",
+                "spread_bps": 9.001268360541665
+              },
+              {
+                "ms": 1794433510200,
+                "status": "wide",
+                "spread_bps": 9.001268360541665
+              },
+              {
+                "ms": 1794433510800,
+                "status": "wide",
+                "spread_bps": 9.001268360541665
+              }
+            ],
+            "stock_reference_ready": false,
+            "paper_path": {
+              "known": true,
+              "code": "TARGET",
+              "end_ms": 1794438513238,
+              "trigger_price": 119.63,
+              "bank": {
+                "ms": 1794436303547,
+                "price": 121.52
+              },
+              "be_level": 122.17,
+              "simultaneous_targets": false
+            },
+            "delayed_attempts": [
+              {
+                "ms": 1794433530000,
+                "status": "wide",
+                "spread_bps": 7.365276811652621
+              },
+              {
+                "ms": 1794433560000,
+                "status": "wide",
+                "spread_bps": 8.181966944853079
+              }
+            ]
+          },
+          {
+            "epoch": 1794438900,
+            "entry": 8.406,
+            "stop": 8.49957142857143,
+            "target": 8.218857142857141,
+            "bot": "crypto",
+            "direction": "SHORT",
+            "symbol": "AVAXUSDT",
+            "paper_reference_ready": false,
+            "entry_status": "eligible",
+            "entry_ms": 1794438960000,
+            "tries": [
+              {
+                "ms": 1794438910000,
+                "status": "wide",
+                "spread_bps": 13.083556348499567
+              },
+              {
+                "ms": 1794438910200,
+                "status": "wide",
+                "spread_bps": 9.515879624121707
+              },
+              {
+                "ms": 1794438910800,
+                "status": "wide",
+                "spread_bps": 14.275517487509463
+              }
+            ],
+            "stock_reference_ready": false,
+            "paper_path": {
+              "known": true,
+              "code": "SL",
+              "end_ms": 1794441085189,
+              "trigger_price": 8.5,
+              "bank": null,
+              "be_level": 8.406
+            },
+            "reference_entry": 8.402,
+            "delayed_attempts": [
+              {
+                "ms": 1794438930000,
+                "status": "wide",
+                "spread_bps": 9.523809523808474
+              },
+              {
+                "ms": 1794438960000,
+                "status": "eligible",
+                "average": 8.402,
+                "worst": 8.402,
+                "contracts": 0.4,
+                "spread_bps": 4.75963826749326,
+                "slippage_bps": -0.0,
+                "last_event_ms": 1794438959898
+              }
+            ],
+            "delay_ms": 60000,
+            "delayed_rr": 1.868804664723028,
+            "path": {
+              "60": {
+                "known": true,
+                "code": "SL",
+                "end_ms": 1794441085189,
+                "trigger_price": 8.5,
+                "bank": null,
+                "be_level": 8.402
+              },
+              "900": {
+                "known": true,
+                "code": "SL",
+                "end_ms": 1794441085189,
+                "trigger_price": 8.5,
+                "bank": null,
+                "be_level": 8.402
+              }
+            }
+          },
+          {
+            "epoch": 1794476700,
+            "entry": 8.66,
+            "stop": 8.572571428571429,
+            "target": 8.834857142857143,
+            "bot": "crypto",
+            "direction": "LONG",
+            "symbol": "AVAXUSDT",
+            "paper_reference_ready": false,
+            "entry_status": "eligible",
+            "entry_ms": 1794476730000,
+            "tries": [
+              {
+                "ms": 1794476710000,
+                "status": "wide",
+                "spread_bps": 6.930807439066913
+              },
+              {
+                "ms": 1794476710200,
+                "status": "wide",
+                "spread_bps": 6.930807439066913
+              },
+              {
+                "ms": 1794476710800,
+                "status": "wide",
+                "spread_bps": 6.930807439066913
+              }
+            ],
+            "stock_reference_ready": false,
+            "paper_path": {
+              "known": true,
+              "code": "SL",
+              "end_ms": 1794479473600,
+              "trigger_price": 8.571,
+              "bank": null,
+              "be_level": 8.66
+            },
+            "reference_entry": 8.6545,
+            "delayed_attempts": [
+              {
+                "ms": 1794476730000,
+                "status": "eligible",
+                "average": 8.6545,
+                "worst": 8.655,
+                "contracts": 0.4,
+                "spread_bps": 1.1557353366093293,
+                "slippage_bps": 2.311337108515943,
+                "last_event_ms": 1794476729449
+              }
+            ],
+            "delay_ms": 30000,
+            "delayed_rr": 2.193379790940798,
+            "path": {
+              "60": {
+                "known": true,
+                "code": "SL",
+                "end_ms": 1794479473600,
+                "trigger_price": 8.571,
+                "bank": null,
+                "be_level": 8.654
+              },
+              "900": {
+                "known": true,
+                "code": "SL",
+                "end_ms": 1794479473600,
+                "trigger_price": 8.571,
+                "bank": null,
+                "be_level": 8.654
+              }
+            }
+          },
+          {
+            "epoch": 1794536100,
+            "entry": 8.275,
+            "stop": 8.190857142857142,
+            "target": 8.443285714285716,
+            "bot": "crypto",
+            "direction": "LONG",
+            "symbol": "AVAXUSDT",
+            "paper_reference_ready": false,
+            "entry_status": "wide",
+            "entry_ms": 1794536110800,
+            "tries": [
+              {
+                "ms": 1794536110000,
+                "status": "wide",
+                "spread_bps": 16.920473773267005
+              },
+              {
+                "ms": 1794536110200,
+                "status": "wide",
+                "spread_bps": 16.920473773267005
+              },
+              {
+                "ms": 1794536110800,
+                "status": "wide",
+                "spread_bps": 10.874161783362943
+              }
+            ],
+            "stock_reference_ready": false,
+            "paper_path": {
+              "known": true,
+              "code": "BE",
+              "end_ms": 1794537011243,
+              "trigger_price": 8.275,
+              "bank": {
+                "ms": 1794536569287,
+                "price": 8.317
+              },
+              "be_level": 8.275
+            },
+            "delayed_attempts": [
+              {
+                "ms": 1794536130000,
+                "status": "wide",
+                "spread_bps": 9.657170449059507
+              },
+              {
+                "ms": 1794536160000,
+                "status": "wide",
+                "spread_bps": 6.043391551337409
+              }
+            ]
+          },
+          {
+            "epoch": 1794539700,
+            "entry": 112.2,
+            "stop": 110.95714285714286,
+            "target": 114.6857142857143,
+            "bot": "crypto",
+            "direction": "LONG",
+            "symbol": "AAVEUSDT",
+            "paper_reference_ready": false,
+            "entry_status": "wide",
+            "entry_ms": 1794539710800,
+            "tries": [
+              {
+                "ms": 1794539710000,
+                "status": "wide",
+                "spread_bps": 12.459950160199407
+              },
+              {
+                "ms": 1794539710200,
+                "status": "wide",
+                "spread_bps": 12.459950160199407
+              },
+              {
+                "ms": 1794539710800,
+                "status": "wide",
+                "spread_bps": 11.56943888221507
+              }
+            ],
+            "stock_reference_ready": false,
+            "paper_path": {
+              "known": true,
+              "code": "SL",
+              "end_ms": 1794540127316,
+              "trigger_price": 110.96,
+              "bank": null,
+              "be_level": 112.2
+            },
+            "delayed_attempts": [
+              {
+                "ms": 1794539730000,
+                "status": "wide",
+                "spread_bps": 7.1275837491089
+              },
+              {
+                "ms": 1794539760000,
+                "status": "wide",
+                "spread_bps": 9.823621344049961
+              }
+            ]
+          },
+          {
+            "epoch": 1794609900,
+            "entry": 8.197,
+            "stop": 8.107571428571427,
+            "target": 8.375857142857143,
+            "bot": "crypto",
+            "direction": "LONG",
+            "symbol": "AVAXUSDT",
+            "paper_reference_ready": false,
+            "entry_status": "eligible",
+            "entry_ms": 1794609930000,
+            "tries": [
+              {
+                "ms": 1794609910000,
+                "status": "wide",
+                "spread_bps": 6.099420555046057
+              },
+              {
+                "ms": 1794609910200,
+                "status": "wide",
+                "spread_bps": 6.099420555046057
+              },
+              {
+                "ms": 1794609910800,
+                "status": "wide",
+                "spread_bps": 6.099420555046057
+              }
+            ],
+            "stock_reference_ready": false,
+            "paper_path": {
+              "known": true,
+              "code": "BE",
+              "end_ms": 1794618178854,
+              "trigger_price": 8.197,
+              "bank": {
+                "ms": 1794614496238,
+                "price": 8.243
+              },
+              "be_level": 8.197
+            },
+            "reference_entry": 8.203,
+            "delayed_attempts": [
+              {
+                "ms": 1794609930000,
+                "status": "eligible",
+                "average": 8.203,
+                "worst": 8.203,
+                "contracts": 0.4,
+                "spread_bps": 1.2191405059426343,
+                "slippage_bps": 0.0,
+                "last_event_ms": 1794609929812
+              }
+            ],
+            "delay_ms": 30000,
+            "delayed_rr": 1.8195488721804796,
+            "path": {
+              "60": {
+                "known": true,
+                "code": "BE",
+                "end_ms": 1794618178508,
+                "trigger_price": 8.199,
+                "bank": {
+                  "ms": 1794614496238,
+                  "price": 8.243
+                },
+                "be_level": 8.203
+              },
+              "900": {
+                "known": true,
+                "code": "BE",
+                "end_ms": 1794618178508,
+                "trigger_price": 8.199,
+                "bank": {
+                  "ms": 1794614496238,
+                  "price": 8.243
+                },
+                "be_level": 8.203
+              }
+            }
+          },
+          {
+            "epoch": 1794622500,
+            "entry": 110.09,
+            "stop": 108.97857142857143,
+            "target": 112.31285714285715,
+            "bot": "crypto",
+            "direction": "LONG",
+            "symbol": "AAVEUSDT",
+            "paper_reference_ready": false,
+            "entry_status": "wide",
+            "entry_ms": 1794622510800,
+            "tries": [
+              {
+                "ms": 1794622510000,
+                "status": "wide",
+                "spread_bps": 9.084302325580879
+              },
+              {
+                "ms": 1794622510200,
+                "status": "wide",
+                "spread_bps": 9.084302325580879
+              },
+              {
+                "ms": 1794622510800,
+                "status": "wide",
+                "spread_bps": 7.26678172404381
+              }
+            ],
+            "stock_reference_ready": false,
+            "paper_path": {
+              "known": true,
+              "code": "SL",
+              "end_ms": 1794622900554,
+              "trigger_price": 108.98,
+              "bank": null,
+              "be_level": 110.09
+            },
+            "delayed_attempts": [
+              {
+                "ms": 1794622530000,
+                "status": "wide",
+                "spread_bps": 7.26678172404381
+              },
+              {
+                "ms": 1794622560000,
+                "status": "wide",
+                "spread_bps": 7.264802034144415
+              }
+            ]
+          },
+          {
+            "epoch": 1794641400,
+            "entry": 107.75,
+            "stop": 106.27857142857142,
+            "target": 110.69285714285715,
+            "bot": "crypto",
+            "direction": "LONG",
+            "symbol": "AAVEUSDT",
+            "paper_reference_ready": false,
+            "entry_status": "wide",
+            "entry_ms": 1794641410800,
+            "tries": [
+              {
+                "ms": 1794641410000,
+                "status": "wide",
+                "spread_bps": 10.208343000324758
+              },
+              {
+                "ms": 1794641410200,
+                "status": "wide",
+                "spread_bps": 10.208343000324758
+              },
+              {
+                "ms": 1794641410800,
+                "status": "wide",
+                "spread_bps": 10.208343000324758
+              }
+            ],
+            "stock_reference_ready": false,
+            "paper_path": {
+              "known": true,
+              "code": "SL",
+              "end_ms": 1794661244987,
+              "trigger_price": 106.27,
+              "bank": null,
+              "be_level": 107.75
+            },
+            "delayed_attempts": [
+              {
+                "ms": 1794641430000,
+                "status": "wide",
+                "spread_bps": 8.351505590869337
+              },
+              {
+                "ms": 1794641460000,
+                "status": "wide",
+                "spread_bps": 6.49079697714249
+              }
+            ]
+          }
+        ],
+        "full_cautious": [
+          {
+            "epoch": 1794192300,
+            "entry": 130.48,
+            "stop": 128.3057142857143,
+            "target": 134.8285714285714,
+            "bot": "crypto",
+            "direction": "LONG",
+            "symbol": "AAVEUSDT",
+            "paper_reference_ready": false,
+            "entry_status": "wide",
+            "entry_ms": 1794192310800,
+            "tries": [
+              {
+                "ms": 1794192310000,
+                "status": "wide",
+                "spread_bps": 8.43138006361964
+              },
+              {
+                "ms": 1794192310200,
+                "status": "wide",
+                "spread_bps": 8.43138006361964
+              },
+              {
+                "ms": 1794192310800,
+                "status": "wide",
+                "spread_bps": 8.43138006361964
+              }
+            ],
+            "stock_reference_ready": false,
+            "paper_path": {
+              "known": true,
+              "code": "SL",
+              "end_ms": 1794207682577,
+              "trigger_price": 128.26,
+              "bank": null,
+              "be_level": 130.48
+            },
+            "delayed_attempts": [
+              {
+                "ms": 1794192330000,
+                "status": "wide",
+                "spread_bps": 11.487650775416864
+              },
+              {
+                "ms": 1794192360000,
+                "status": "wide",
+                "spread_bps": 8.43138006361964
+              },
+              {
+                "ms": 1794192420000,
+                "status": "wide",
+                "spread_bps": 5.381096975054247
+              }
+            ]
+          },
+          {
+            "epoch": 1794285900,
+            "entry": 126.15,
+            "stop": 127.59714285714286,
+            "target": 123.2557142857143,
+            "bot": "crypto",
+            "direction": "SHORT",
+            "symbol": "AAVEUSDT",
+            "paper_reference_ready": false,
+            "entry_status": "wide",
+            "entry_ms": 1794285910800,
+            "tries": [
+              {
+                "ms": 1794285910000,
+                "status": "wide",
+                "spread_bps": 9.504197687311132
+              },
+              {
+                "ms": 1794285910200,
+                "status": "wide",
+                "spread_bps": 9.50796291894385
+              },
+              {
+                "ms": 1794285910800,
+                "status": "wide",
+                "spread_bps": 8.715287406409653
+              }
+            ],
+            "stock_reference_ready": false,
+            "paper_path": {
+              "known": true,
+              "code": "BE",
+              "end_ms": 1794292422574,
+              "trigger_price": 126.18,
+              "bank": {
+                "ms": 1794291222628,
+                "price": 125.39
+              },
+              "be_level": 126.15
+            },
+            "delayed_attempts": [
+              {
+                "ms": 1794285930000,
+                "status": "wide",
+                "spread_bps": 9.507209633972789
+              },
+              {
+                "ms": 1794285960000,
+                "status": "wide",
+                "spread_bps": 8.722197993894417
+              },
+              {
+                "ms": 1794286020000,
+                "status": "wide",
+                "spread_bps": 11.901455944777696
+              }
+            ]
+          },
+          {
+            "epoch": 1794346200,
+            "entry": 123.31,
+            "stop": 124.63857142857142,
+            "target": 120.65285714285716,
+            "bot": "crypto",
+            "direction": "SHORT",
+            "symbol": "AAVEUSDT",
+            "paper_reference_ready": false,
+            "entry_status": "wide",
+            "entry_ms": 1794346210800,
+            "tries": [
+              {
+                "ms": 1794346210000,
+                "status": "wide",
+                "spread_bps": 5.677900798961202
+              },
+              {
+                "ms": 1794346210200,
+                "status": "wide",
+                "spread_bps": 5.677900798961202
+              },
+              {
+                "ms": 1794346210800,
+                "status": "wide",
+                "spread_bps": 5.677900798961202
+              }
+            ],
+            "stock_reference_ready": false,
+            "paper_path": {
+              "known": true,
+              "code": "SL",
+              "end_ms": 1794348529456,
+              "trigger_price": 124.71,
+              "bank": null,
+              "be_level": 123.31
+            },
+            "delayed_attempts": [
+              {
+                "ms": 1794346230000,
+                "status": "wide",
+                "spread_bps": 8.112932013630418
+              },
+              {
+                "ms": 1794346260000,
+                "status": "wide",
+                "spread_bps": 9.737098344692496
+              },
+              {
+                "ms": 1794346320000,
+                "status": "wide",
+                "spread_bps": 5.676979846722143
+              }
+            ]
+          },
+          {
+            "epoch": 1794384900,
+            "entry": 8.64,
+            "stop": 8.543571428571429,
+            "target": 8.832857142857144,
+            "bot": "crypto",
+            "direction": "LONG",
+            "symbol": "AVAXUSDT",
+            "paper_reference_ready": false,
+            "entry_status": "wide",
+            "entry_ms": 1794384910800,
+            "tries": [
+              {
+                "ms": 1794384910000,
+                "status": "wide",
+                "spread_bps": 8.099508244143998
+              },
+              {
+                "ms": 1794384910200,
+                "status": "wide",
+                "spread_bps": 8.099508244143998
+              },
+              {
+                "ms": 1794384910800,
+                "status": "wide",
+                "spread_bps": 6.942837306179388
+              }
+            ],
+            "stock_reference_ready": false,
+            "paper_path": {
+              "known": true,
+              "code": "BE",
+              "end_ms": 1794394991897,
+              "trigger_price": 8.638,
+              "bank": {
+                "ms": 1794393004181,
+                "price": 8.69
+              },
+              "be_level": 8.64
+            },
+            "delayed_attempts": [
+              {
+                "ms": 1794384930000,
+                "status": "wide",
+                "spread_bps": 6.93641618497136
+              },
+              {
+                "ms": 1794384960000,
+                "status": "wide",
+                "spread_bps": 8.09669770400749
+              },
+              {
+                "ms": 1794385020000,
+                "status": "wide",
+                "spread_bps": 8.115471566865311
+              }
+            ]
+          },
+          {
+            "epoch": 1794433500,
+            "entry": 122.17,
+            "stop": 123.44142857142857,
+            "target": 119.62714285714286,
+            "bot": "crypto",
+            "direction": "SHORT",
+            "symbol": "AAVEUSDT",
+            "paper_reference_ready": false,
+            "entry_status": "wide",
+            "entry_ms": 1794433510800,
+            "tries": [
+              {
+                "ms": 1794433510000,
+                "status": "wide",
+                "spread_bps": 9.001268360541665
+              },
+              {
+                "ms": 1794433510200,
+                "status": "wide",
+                "spread_bps": 9.001268360541665
+              },
+              {
+                "ms": 1794433510800,
+                "status": "wide",
+                "spread_bps": 9.001268360541665
+              }
+            ],
+            "stock_reference_ready": false,
+            "paper_path": {
+              "known": true,
+              "code": "TARGET",
+              "end_ms": 1794438513238,
+              "trigger_price": 119.63,
+              "bank": {
+                "ms": 1794436303547,
+                "price": 121.52
+              },
+              "be_level": 122.17,
+              "simultaneous_targets": false
+            },
+            "delayed_attempts": [
+              {
+                "ms": 1794433530000,
+                "status": "wide",
+                "spread_bps": 7.365276811652621
+              },
+              {
+                "ms": 1794433560000,
+                "status": "wide",
+                "spread_bps": 8.181966944853079
+              },
+              {
+                "ms": 1794433620000,
+                "status": "wide",
+                "spread_bps": 7.3731208782209
+              }
+            ]
+          },
+          {
+            "epoch": 1794438900,
+            "entry": 8.406,
+            "stop": 8.49957142857143,
+            "target": 8.218857142857141,
+            "bot": "crypto",
+            "direction": "SHORT",
+            "symbol": "AVAXUSDT",
+            "paper_reference_ready": false,
+            "entry_status": "eligible",
+            "entry_ms": 1794438960000,
+            "tries": [
+              {
+                "ms": 1794438910000,
+                "status": "wide",
+                "spread_bps": 13.083556348499567
+              },
+              {
+                "ms": 1794438910200,
+                "status": "wide",
+                "spread_bps": 9.515879624121707
+              },
+              {
+                "ms": 1794438910800,
+                "status": "wide",
+                "spread_bps": 14.275517487509463
+              }
+            ],
+            "stock_reference_ready": false,
+            "paper_path": {
+              "known": true,
+              "code": "SL",
+              "end_ms": 1794441085189,
+              "trigger_price": 8.5,
+              "bank": null,
+              "be_level": 8.406
+            },
+            "reference_entry": 8.402,
+            "delayed_attempts": [
+              {
+                "ms": 1794438930000,
+                "status": "wide",
+                "spread_bps": 9.523809523808474
+              },
+              {
+                "ms": 1794438960000,
+                "status": "eligible",
+                "average": 8.402,
+                "worst": 8.402,
+                "contracts": 0.4,
+                "spread_bps": 4.75963826749326,
+                "slippage_bps": -0.0,
+                "last_event_ms": 1794438959898
+              }
+            ],
+            "delay_ms": 60000,
+            "delayed_rr": 1.868804664723028,
+            "path": {
+              "60": {
+                "known": true,
+                "code": "SL",
+                "end_ms": 1794441085189,
+                "trigger_price": 8.5,
+                "bank": null,
+                "be_level": 8.402
+              },
+              "900": {
+                "known": true,
+                "code": "SL",
+                "end_ms": 1794441085189,
+                "trigger_price": 8.5,
+                "bank": null,
+                "be_level": 8.402
+              }
+            }
+          },
+          {
+            "epoch": 1794476700,
+            "entry": 8.66,
+            "stop": 8.572571428571429,
+            "target": 8.834857142857143,
+            "bot": "crypto",
+            "direction": "LONG",
+            "symbol": "AVAXUSDT",
+            "paper_reference_ready": false,
+            "entry_status": "eligible",
+            "entry_ms": 1794476730000,
+            "tries": [
+              {
+                "ms": 1794476710000,
+                "status": "wide",
+                "spread_bps": 6.930807439066913
+              },
+              {
+                "ms": 1794476710200,
+                "status": "wide",
+                "spread_bps": 6.930807439066913
+              },
+              {
+                "ms": 1794476710800,
+                "status": "wide",
+                "spread_bps": 6.930807439066913
+              }
+            ],
+            "stock_reference_ready": false,
+            "paper_path": {
+              "known": true,
+              "code": "SL",
+              "end_ms": 1794479473600,
+              "trigger_price": 8.571,
+              "bank": null,
+              "be_level": 8.66
+            },
+            "reference_entry": 8.6545,
+            "delayed_attempts": [
+              {
+                "ms": 1794476730000,
+                "status": "eligible",
+                "average": 8.6545,
+                "worst": 8.655,
+                "contracts": 0.4,
+                "spread_bps": 1.1557353366093293,
+                "slippage_bps": 2.311337108515943,
+                "last_event_ms": 1794476729449
+              }
+            ],
+            "delay_ms": 30000,
+            "delayed_rr": 2.193379790940798,
+            "path": {
+              "60": {
+                "known": true,
+                "code": "SL",
+                "end_ms": 1794479473600,
+                "trigger_price": 8.571,
+                "bank": null,
+                "be_level": 8.654
+              },
+              "900": {
+                "known": true,
+                "code": "SL",
+                "end_ms": 1794479473600,
+                "trigger_price": 8.571,
+                "bank": null,
+                "be_level": 8.654
+              }
+            }
+          },
+          {
+            "epoch": 1794536100,
+            "entry": 8.275,
+            "stop": 8.190857142857142,
+            "target": 8.443285714285716,
+            "bot": "crypto",
+            "direction": "LONG",
+            "symbol": "AVAXUSDT",
+            "paper_reference_ready": false,
+            "entry_status": "wide",
+            "entry_ms": 1794536110800,
+            "tries": [
+              {
+                "ms": 1794536110000,
+                "status": "wide",
+                "spread_bps": 16.920473773267005
+              },
+              {
+                "ms": 1794536110200,
+                "status": "wide",
+                "spread_bps": 16.920473773267005
+              },
+              {
+                "ms": 1794536110800,
+                "status": "wide",
+                "spread_bps": 10.874161783362943
+              }
+            ],
+            "stock_reference_ready": false,
+            "paper_path": {
+              "known": true,
+              "code": "BE",
+              "end_ms": 1794537011243,
+              "trigger_price": 8.275,
+              "bank": {
+                "ms": 1794536569287,
+                "price": 8.317
+              },
+              "be_level": 8.275
+            },
+            "delayed_attempts": [
+              {
+                "ms": 1794536130000,
+                "status": "wide",
+                "spread_bps": 9.657170449059507
+              },
+              {
+                "ms": 1794536160000,
+                "status": "wide",
+                "spread_bps": 6.043391551337409
+              },
+              {
+                "ms": 1794536220000,
+                "status": "wide",
+                "spread_bps": 13.292248202526745
+              }
+            ]
+          },
+          {
+            "epoch": 1794539700,
+            "entry": 112.2,
+            "stop": 110.95714285714286,
+            "target": 114.6857142857143,
+            "bot": "crypto",
+            "direction": "LONG",
+            "symbol": "AAVEUSDT",
+            "paper_reference_ready": false,
+            "entry_status": "wide",
+            "entry_ms": 1794539710800,
+            "tries": [
+              {
+                "ms": 1794539710000,
+                "status": "wide",
+                "spread_bps": 12.459950160199407
+              },
+              {
+                "ms": 1794539710200,
+                "status": "wide",
+                "spread_bps": 12.459950160199407
+              },
+              {
+                "ms": 1794539710800,
+                "status": "wide",
+                "spread_bps": 11.56943888221507
+              }
+            ],
+            "stock_reference_ready": false,
+            "paper_path": {
+              "known": true,
+              "code": "SL",
+              "end_ms": 1794540127316,
+              "trigger_price": 110.96,
+              "bank": null,
+              "be_level": 112.2
+            },
+            "delayed_attempts": [
+              {
+                "ms": 1794539730000,
+                "status": "wide",
+                "spread_bps": 7.1275837491089
+              },
+              {
+                "ms": 1794539760000,
+                "status": "wide",
+                "spread_bps": 9.823621344049961
+              },
+              {
+                "ms": 1794539820000,
+                "status": "wide",
+                "spread_bps": 10.7047279214978
+              }
+            ]
+          },
+          {
+            "epoch": 1794609900,
+            "entry": 8.197,
+            "stop": 8.107571428571427,
+            "target": 8.375857142857143,
+            "bot": "crypto",
+            "direction": "LONG",
+            "symbol": "AVAXUSDT",
+            "paper_reference_ready": false,
+            "entry_status": "eligible",
+            "entry_ms": 1794609930000,
+            "tries": [
+              {
+                "ms": 1794609910000,
+                "status": "wide",
+                "spread_bps": 6.099420555046057
+              },
+              {
+                "ms": 1794609910200,
+                "status": "wide",
+                "spread_bps": 6.099420555046057
+              },
+              {
+                "ms": 1794609910800,
+                "status": "wide",
+                "spread_bps": 6.099420555046057
+              }
+            ],
+            "stock_reference_ready": false,
+            "paper_path": {
+              "known": true,
+              "code": "BE",
+              "end_ms": 1794618178854,
+              "trigger_price": 8.197,
+              "bank": {
+                "ms": 1794614496238,
+                "price": 8.243
+              },
+              "be_level": 8.197
+            },
+            "reference_entry": 8.203,
+            "delayed_attempts": [
+              {
+                "ms": 1794609930000,
+                "status": "eligible",
+                "average": 8.203,
+                "worst": 8.203,
+                "contracts": 0.4,
+                "spread_bps": 1.2191405059426343,
+                "slippage_bps": 0.0,
+                "last_event_ms": 1794609929812
+              }
+            ],
+            "delay_ms": 30000,
+            "delayed_rr": 1.8195488721804796,
+            "path": {
+              "60": {
+                "known": true,
+                "code": "BE",
+                "end_ms": 1794618178508,
+                "trigger_price": 8.199,
+                "bank": {
+                  "ms": 1794614496238,
+                  "price": 8.243
+                },
+                "be_level": 8.203
+              },
+              "900": {
+                "known": true,
+                "code": "BE",
+                "end_ms": 1794618178508,
+                "trigger_price": 8.199,
+                "bank": {
+                  "ms": 1794614496238,
+                  "price": 8.243
+                },
+                "be_level": 8.203
+              }
+            }
+          },
+          {
+            "epoch": 1794622500,
+            "entry": 110.09,
+            "stop": 108.97857142857143,
+            "target": 112.31285714285715,
+            "bot": "crypto",
+            "direction": "LONG",
+            "symbol": "AAVEUSDT",
+            "paper_reference_ready": false,
+            "entry_status": "depth slippage exceeds limit",
+            "entry_ms": 1794622510800,
+            "tries": [
+              {
+                "ms": 1794622510000,
+                "status": "wide",
+                "spread_bps": 9.084302325580879
+              },
+              {
+                "ms": 1794622510200,
+                "status": "wide",
+                "spread_bps": 9.084302325580879
+              },
+              {
+                "ms": 1794622510800,
+                "status": "wide",
+                "spread_bps": 7.26678172404381
+              }
+            ],
+            "stock_reference_ready": false,
+            "paper_path": {
+              "known": true,
+              "code": "SL",
+              "end_ms": 1794622900554,
+              "trigger_price": 108.98,
+              "bank": null,
+              "be_level": 110.09
+            },
+            "delayed_attempts": [
+              {
+                "ms": 1794622530000,
+                "status": "wide",
+                "spread_bps": 7.26678172404381
+              },
+              {
+                "ms": 1794622560000,
+                "status": "wide",
+                "spread_bps": 7.264802034144415
+              },
+              {
+                "ms": 1794622620000,
+                "status": "depth slippage exceeds limit"
+              }
+            ]
+          },
+          {
+            "epoch": 1794641400,
+            "entry": 107.75,
+            "stop": 106.27857142857142,
+            "target": 110.69285714285715,
+            "bot": "crypto",
+            "direction": "LONG",
+            "symbol": "AAVEUSDT",
+            "paper_reference_ready": false,
+            "entry_status": "below_delayed_reward_risk",
+            "entry_ms": 1794641410800,
+            "tries": [
+              {
+                "ms": 1794641410000,
+                "status": "wide",
+                "spread_bps": 10.208343000324758
+              },
+              {
+                "ms": 1794641410200,
+                "status": "wide",
+                "spread_bps": 10.208343000324758
+              },
+              {
+                "ms": 1794641410800,
+                "status": "wide",
+                "spread_bps": 10.208343000324758
+              }
+            ],
+            "stock_reference_ready": false,
+            "paper_path": {
+              "known": true,
+              "code": "SL",
+              "end_ms": 1794661244987,
+              "trigger_price": 106.27,
+              "bank": null,
+              "be_level": 107.75
+            },
+            "delayed_attempts": [
+              {
+                "ms": 1794641430000,
+                "status": "wide",
+                "spread_bps": 8.351505590869337
+              },
+              {
+                "ms": 1794641460000,
+                "status": "wide",
+                "spread_bps": 6.49079697714249
+              },
+              {
+                "ms": 1794641520000,
+                "status": "eligible",
+                "average": 108.05861111111112,
+                "worst": 108.06,
+                "contracts": 3.6,
+                "spread_bps": 0.9258830609698733,
+                "slippage_bps": 4.629200999906047,
+                "last_event_ms": 1794641519687
+              }
+            ]
+          }
+        ],
+        "full_instantaneous": [
+          {
+            "epoch": 1794192300,
+            "entry": 130.48,
+            "stop": 128.3057142857143,
+            "target": 134.8285714285714,
+            "bot": "crypto",
+            "direction": "LONG",
+            "symbol": "AAVEUSDT",
+            "paper_reference_ready": false,
+            "entry_status": "wide",
+            "entry_ms": 1794192310800,
+            "tries": [
+              {
+                "ms": 1794192310000,
+                "status": "wide",
+                "spread_bps": 8.43138006361964
+              },
+              {
+                "ms": 1794192310200,
+                "status": "wide",
+                "spread_bps": 8.43138006361964
+              },
+              {
+                "ms": 1794192310800,
+                "status": "wide",
+                "spread_bps": 8.43138006361964
+              }
+            ],
+            "stock_reference_ready": false,
+            "paper_path": {
+              "known": true,
+              "code": "SL",
+              "end_ms": 1794207682577,
+              "trigger_price": 128.26,
+              "bank": null,
+              "be_level": 130.48
+            },
+            "delayed_attempts": [
+              {
+                "ms": 1794192330000,
+                "status": "wide",
+                "spread_bps": 11.487650775416864
+              },
+              {
+                "ms": 1794192360000,
+                "status": "wide",
+                "spread_bps": 8.43138006361964
+              },
+              {
+                "ms": 1794192420000,
+                "status": "wide",
+                "spread_bps": 5.381096975054247
+              }
+            ]
+          },
+          {
+            "epoch": 1794285900,
+            "entry": 126.15,
+            "stop": 127.59714285714286,
+            "target": 123.2557142857143,
+            "bot": "crypto",
+            "direction": "SHORT",
+            "symbol": "AAVEUSDT",
+            "paper_reference_ready": false,
+            "entry_status": "wide",
+            "entry_ms": 1794285910800,
+            "tries": [
+              {
+                "ms": 1794285910000,
+                "status": "wide",
+                "spread_bps": 9.504197687311132
+              },
+              {
+                "ms": 1794285910200,
+                "status": "wide",
+                "spread_bps": 9.50796291894385
+              },
+              {
+                "ms": 1794285910800,
+                "status": "wide",
+                "spread_bps": 8.715287406409653
+              }
+            ],
+            "stock_reference_ready": false,
+            "paper_path": {
+              "known": true,
+              "code": "BE",
+              "end_ms": 1794292422574,
+              "trigger_price": 126.18,
+              "bank": {
+                "ms": 1794291222628,
+                "price": 125.39
+              },
+              "be_level": 126.15
+            },
+            "delayed_attempts": [
+              {
+                "ms": 1794285930000,
+                "status": "wide",
+                "spread_bps": 9.507209633972789
+              },
+              {
+                "ms": 1794285960000,
+                "status": "wide",
+                "spread_bps": 8.722197993894417
+              },
+              {
+                "ms": 1794286020000,
+                "status": "wide",
+                "spread_bps": 11.901455944777696
+              }
+            ]
+          },
+          {
+            "epoch": 1794346200,
+            "entry": 123.31,
+            "stop": 124.63857142857142,
+            "target": 120.65285714285716,
+            "bot": "crypto",
+            "direction": "SHORT",
+            "symbol": "AAVEUSDT",
+            "paper_reference_ready": false,
+            "entry_status": "wide",
+            "entry_ms": 1794346210800,
+            "tries": [
+              {
+                "ms": 1794346210000,
+                "status": "wide",
+                "spread_bps": 5.677900798961202
+              },
+              {
+                "ms": 1794346210200,
+                "status": "wide",
+                "spread_bps": 5.677900798961202
+              },
+              {
+                "ms": 1794346210800,
+                "status": "wide",
+                "spread_bps": 5.677900798961202
+              }
+            ],
+            "stock_reference_ready": false,
+            "paper_path": {
+              "known": true,
+              "code": "SL",
+              "end_ms": 1794348529456,
+              "trigger_price": 124.71,
+              "bank": null,
+              "be_level": 123.31
+            },
+            "delayed_attempts": [
+              {
+                "ms": 1794346230000,
+                "status": "wide",
+                "spread_bps": 8.112932013630418
+              },
+              {
+                "ms": 1794346260000,
+                "status": "wide",
+                "spread_bps": 9.737098344692496
+              },
+              {
+                "ms": 1794346320000,
+                "status": "wide",
+                "spread_bps": 5.676979846722143
+              }
+            ]
+          },
+          {
+            "epoch": 1794384900,
+            "entry": 8.64,
+            "stop": 8.543571428571429,
+            "target": 8.832857142857144,
+            "bot": "crypto",
+            "direction": "LONG",
+            "symbol": "AVAXUSDT",
+            "paper_reference_ready": false,
+            "entry_status": "wide",
+            "entry_ms": 1794384910800,
+            "tries": [
+              {
+                "ms": 1794384910000,
+                "status": "wide",
+                "spread_bps": 8.099508244143998
+              },
+              {
+                "ms": 1794384910200,
+                "status": "wide",
+                "spread_bps": 8.099508244143998
+              },
+              {
+                "ms": 1794384910800,
+                "status": "wide",
+                "spread_bps": 6.942837306179388
+              }
+            ],
+            "stock_reference_ready": false,
+            "paper_path": {
+              "known": true,
+              "code": "BE",
+              "end_ms": 1794394991897,
+              "trigger_price": 8.638,
+              "bank": {
+                "ms": 1794393004181,
+                "price": 8.69
+              },
+              "be_level": 8.64
+            },
+            "delayed_attempts": [
+              {
+                "ms": 1794384930000,
+                "status": "wide",
+                "spread_bps": 6.93641618497136
+              },
+              {
+                "ms": 1794384960000,
+                "status": "wide",
+                "spread_bps": 8.09669770400749
+              },
+              {
+                "ms": 1794385020000,
+                "status": "wide",
+                "spread_bps": 8.115471566865311
+              }
+            ]
+          },
+          {
+            "epoch": 1794433500,
+            "entry": 122.17,
+            "stop": 123.44142857142857,
+            "target": 119.62714285714286,
+            "bot": "crypto",
+            "direction": "SHORT",
+            "symbol": "AAVEUSDT",
+            "paper_reference_ready": false,
+            "entry_status": "wide",
+            "entry_ms": 1794433510800,
+            "tries": [
+              {
+                "ms": 1794433510000,
+                "status": "wide",
+                "spread_bps": 9.001268360541665
+              },
+              {
+                "ms": 1794433510200,
+                "status": "wide",
+                "spread_bps": 9.001268360541665
+              },
+              {
+                "ms": 1794433510800,
+                "status": "wide",
+                "spread_bps": 9.001268360541665
+              }
+            ],
+            "stock_reference_ready": false,
+            "paper_path": {
+              "known": true,
+              "code": "TARGET",
+              "end_ms": 1794438513238,
+              "trigger_price": 119.63,
+              "bank": {
+                "ms": 1794436303547,
+                "price": 121.52
+              },
+              "be_level": 122.17,
+              "simultaneous_targets": false
+            },
+            "delayed_attempts": [
+              {
+                "ms": 1794433530000,
+                "status": "wide",
+                "spread_bps": 7.365276811652621
+              },
+              {
+                "ms": 1794433560000,
+                "status": "wide",
+                "spread_bps": 8.181966944853079
+              },
+              {
+                "ms": 1794433620000,
+                "status": "wide",
+                "spread_bps": 7.3731208782209
+              }
+            ]
+          },
+          {
+            "epoch": 1794438900,
+            "entry": 8.406,
+            "stop": 8.49957142857143,
+            "target": 8.218857142857141,
+            "bot": "crypto",
+            "direction": "SHORT",
+            "symbol": "AVAXUSDT",
+            "paper_reference_ready": false,
+            "entry_status": "eligible",
+            "entry_ms": 1794438960000,
+            "tries": [
+              {
+                "ms": 1794438910000,
+                "status": "wide",
+                "spread_bps": 13.083556348499567
+              },
+              {
+                "ms": 1794438910200,
+                "status": "wide",
+                "spread_bps": 9.515879624121707
+              },
+              {
+                "ms": 1794438910800,
+                "status": "wide",
+                "spread_bps": 14.275517487509463
+              }
+            ],
+            "stock_reference_ready": false,
+            "paper_path": {
+              "known": true,
+              "code": "SL",
+              "end_ms": 1794441085189,
+              "trigger_price": 8.5,
+              "bank": null,
+              "be_level": 8.406
+            },
+            "reference_entry": 8.402,
+            "delayed_attempts": [
+              {
+                "ms": 1794438930000,
+                "status": "wide",
+                "spread_bps": 9.523809523808474
+              },
+              {
+                "ms": 1794438960000,
+                "status": "eligible",
+                "average": 8.402,
+                "worst": 8.402,
+                "contracts": 0.4,
+                "spread_bps": 4.75963826749326,
+                "slippage_bps": -0.0,
+                "last_event_ms": 1794438959898
+              }
+            ],
+            "delay_ms": 60000,
+            "delayed_rr": 1.868804664723028,
+            "path": {
+              "60": {
+                "known": true,
+                "code": "SL",
+                "end_ms": 1794441085189,
+                "trigger_price": 8.5,
+                "bank": null,
+                "be_level": 8.402
+              },
+              "900": {
+                "known": true,
+                "code": "SL",
+                "end_ms": 1794441085189,
+                "trigger_price": 8.5,
+                "bank": null,
+                "be_level": 8.402
+              }
+            }
+          },
+          {
+            "epoch": 1794476700,
+            "entry": 8.66,
+            "stop": 8.572571428571429,
+            "target": 8.834857142857143,
+            "bot": "crypto",
+            "direction": "LONG",
+            "symbol": "AVAXUSDT",
+            "paper_reference_ready": false,
+            "entry_status": "eligible",
+            "entry_ms": 1794476730000,
+            "tries": [
+              {
+                "ms": 1794476710000,
+                "status": "wide",
+                "spread_bps": 6.930807439066913
+              },
+              {
+                "ms": 1794476710200,
+                "status": "wide",
+                "spread_bps": 6.930807439066913
+              },
+              {
+                "ms": 1794476710800,
+                "status": "wide",
+                "spread_bps": 6.930807439066913
+              }
+            ],
+            "stock_reference_ready": false,
+            "paper_path": {
+              "known": true,
+              "code": "SL",
+              "end_ms": 1794479473600,
+              "trigger_price": 8.571,
+              "bank": null,
+              "be_level": 8.66
+            },
+            "reference_entry": 8.6545,
+            "delayed_attempts": [
+              {
+                "ms": 1794476730000,
+                "status": "eligible",
+                "average": 8.6545,
+                "worst": 8.655,
+                "contracts": 0.4,
+                "spread_bps": 1.1557353366093293,
+                "slippage_bps": 2.311337108515943,
+                "last_event_ms": 1794476729449
+              }
+            ],
+            "delay_ms": 30000,
+            "delayed_rr": 2.193379790940798,
+            "path": {
+              "60": {
+                "known": true,
+                "code": "SL",
+                "end_ms": 1794479473600,
+                "trigger_price": 8.571,
+                "bank": null,
+                "be_level": 8.654
+              },
+              "900": {
+                "known": true,
+                "code": "SL",
+                "end_ms": 1794479473600,
+                "trigger_price": 8.571,
+                "bank": null,
+                "be_level": 8.654
+              }
+            }
+          },
+          {
+            "epoch": 1794536100,
+            "entry": 8.275,
+            "stop": 8.190857142857142,
+            "target": 8.443285714285716,
+            "bot": "crypto",
+            "direction": "LONG",
+            "symbol": "AVAXUSDT",
+            "paper_reference_ready": false,
+            "entry_status": "wide",
+            "entry_ms": 1794536110800,
+            "tries": [
+              {
+                "ms": 1794536110000,
+                "status": "wide",
+                "spread_bps": 16.920473773267005
+              },
+              {
+                "ms": 1794536110200,
+                "status": "wide",
+                "spread_bps": 16.920473773267005
+              },
+              {
+                "ms": 1794536110800,
+                "status": "wide",
+                "spread_bps": 10.874161783362943
+              }
+            ],
+            "stock_reference_ready": false,
+            "paper_path": {
+              "known": true,
+              "code": "BE",
+              "end_ms": 1794537011243,
+              "trigger_price": 8.275,
+              "bank": {
+                "ms": 1794536569287,
+                "price": 8.317
+              },
+              "be_level": 8.275
+            },
+            "delayed_attempts": [
+              {
+                "ms": 1794536130000,
+                "status": "wide",
+                "spread_bps": 9.657170449059507
+              },
+              {
+                "ms": 1794536160000,
+                "status": "wide",
+                "spread_bps": 6.043391551337409
+              },
+              {
+                "ms": 1794536220000,
+                "status": "wide",
+                "spread_bps": 13.292248202526745
+              }
+            ]
+          },
+          {
+            "epoch": 1794539700,
+            "entry": 112.2,
+            "stop": 110.95714285714286,
+            "target": 114.6857142857143,
+            "bot": "crypto",
+            "direction": "LONG",
+            "symbol": "AAVEUSDT",
+            "paper_reference_ready": false,
+            "entry_status": "wide",
+            "entry_ms": 1794539710800,
+            "tries": [
+              {
+                "ms": 1794539710000,
+                "status": "wide",
+                "spread_bps": 12.459950160199407
+              },
+              {
+                "ms": 1794539710200,
+                "status": "wide",
+                "spread_bps": 12.459950160199407
+              },
+              {
+                "ms": 1794539710800,
+                "status": "wide",
+                "spread_bps": 11.56943888221507
+              }
+            ],
+            "stock_reference_ready": false,
+            "paper_path": {
+              "known": true,
+              "code": "SL",
+              "end_ms": 1794540127316,
+              "trigger_price": 110.96,
+              "bank": null,
+              "be_level": 112.2
+            },
+            "delayed_attempts": [
+              {
+                "ms": 1794539730000,
+                "status": "wide",
+                "spread_bps": 7.1275837491089
+              },
+              {
+                "ms": 1794539760000,
+                "status": "wide",
+                "spread_bps": 9.823621344049961
+              },
+              {
+                "ms": 1794539820000,
+                "status": "wide",
+                "spread_bps": 10.7047279214978
+              }
+            ]
+          },
+          {
+            "epoch": 1794609900,
+            "entry": 8.197,
+            "stop": 8.107571428571427,
+            "target": 8.375857142857143,
+            "bot": "crypto",
+            "direction": "LONG",
+            "symbol": "AVAXUSDT",
+            "paper_reference_ready": false,
+            "entry_status": "eligible",
+            "entry_ms": 1794609930000,
+            "tries": [
+              {
+                "ms": 1794609910000,
+                "status": "wide",
+                "spread_bps": 6.099420555046057
+              },
+              {
+                "ms": 1794609910200,
+                "status": "wide",
+                "spread_bps": 6.099420555046057
+              },
+              {
+                "ms": 1794609910800,
+                "status": "wide",
+                "spread_bps": 6.099420555046057
+              }
+            ],
+            "stock_reference_ready": false,
+            "paper_path": {
+              "known": true,
+              "code": "BE",
+              "end_ms": 1794618178854,
+              "trigger_price": 8.197,
+              "bank": {
+                "ms": 1794614496238,
+                "price": 8.243
+              },
+              "be_level": 8.197
+            },
+            "reference_entry": 8.203,
+            "delayed_attempts": [
+              {
+                "ms": 1794609930000,
+                "status": "eligible",
+                "average": 8.203,
+                "worst": 8.203,
+                "contracts": 0.4,
+                "spread_bps": 1.2191405059426343,
+                "slippage_bps": 0.0,
+                "last_event_ms": 1794609929812
+              }
+            ],
+            "delay_ms": 30000,
+            "delayed_rr": 1.8195488721804796,
+            "path": {
+              "60": {
+                "known": true,
+                "code": "BE",
+                "end_ms": 1794618178508,
+                "trigger_price": 8.199,
+                "bank": {
+                  "ms": 1794614496238,
+                  "price": 8.243
+                },
+                "be_level": 8.203
+              },
+              "900": {
+                "known": true,
+                "code": "BE",
+                "end_ms": 1794618178508,
+                "trigger_price": 8.199,
+                "bank": {
+                  "ms": 1794614496238,
+                  "price": 8.243
+                },
+                "be_level": 8.203
+              }
+            }
+          },
+          {
+            "epoch": 1794622500,
+            "entry": 110.09,
+            "stop": 108.97857142857143,
+            "target": 112.31285714285715,
+            "bot": "crypto",
+            "direction": "LONG",
+            "symbol": "AAVEUSDT",
+            "paper_reference_ready": false,
+            "entry_status": "depth slippage exceeds limit",
+            "entry_ms": 1794622510800,
+            "tries": [
+              {
+                "ms": 1794622510000,
+                "status": "wide",
+                "spread_bps": 9.084302325580879
+              },
+              {
+                "ms": 1794622510200,
+                "status": "wide",
+                "spread_bps": 9.084302325580879
+              },
+              {
+                "ms": 1794622510800,
+                "status": "wide",
+                "spread_bps": 7.26678172404381
+              }
+            ],
+            "stock_reference_ready": false,
+            "paper_path": {
+              "known": true,
+              "code": "SL",
+              "end_ms": 1794622900554,
+              "trigger_price": 108.98,
+              "bank": null,
+              "be_level": 110.09
+            },
+            "delayed_attempts": [
+              {
+                "ms": 1794622530000,
+                "status": "wide",
+                "spread_bps": 7.26678172404381
+              },
+              {
+                "ms": 1794622560000,
+                "status": "wide",
+                "spread_bps": 7.264802034144415
+              },
+              {
+                "ms": 1794622620000,
+                "status": "depth slippage exceeds limit"
+              }
+            ]
+          },
+          {
+            "epoch": 1794641400,
+            "entry": 107.75,
+            "stop": 106.27857142857142,
+            "target": 110.69285714285715,
+            "bot": "crypto",
+            "direction": "LONG",
+            "symbol": "AAVEUSDT",
+            "paper_reference_ready": false,
+            "entry_status": "below_delayed_reward_risk",
+            "entry_ms": 1794641410800,
+            "tries": [
+              {
+                "ms": 1794641410000,
+                "status": "wide",
+                "spread_bps": 10.208343000324758
+              },
+              {
+                "ms": 1794641410200,
+                "status": "wide",
+                "spread_bps": 10.208343000324758
+              },
+              {
+                "ms": 1794641410800,
+                "status": "wide",
+                "spread_bps": 10.208343000324758
+              }
+            ],
+            "stock_reference_ready": false,
+            "paper_path": {
+              "known": true,
+              "code": "SL",
+              "end_ms": 1794661244987,
+              "trigger_price": 106.27,
+              "bank": null,
+              "be_level": 107.75
+            },
+            "delayed_attempts": [
+              {
+                "ms": 1794641430000,
+                "status": "wide",
+                "spread_bps": 8.351505590869337
+              },
+              {
+                "ms": 1794641460000,
+                "status": "wide",
+                "spread_bps": 6.49079697714249
+              },
+              {
+                "ms": 1794641520000,
+                "status": "eligible",
+                "average": 108.05861111111112,
+                "worst": 108.06,
+                "contracts": 3.6,
+                "spread_bps": 0.9258830609698733,
+                "slippage_bps": 4.629200999906047,
+                "last_event_ms": 1794641519687
+              }
+            ]
+          }
+        ]
+      },
+      "archive_entry": {
+        "1794182400:AAVEUSDT": {
+          "snapshot": 96,
+          "update": 1673737,
+          "first_ts": 1794182400009,
+          "last_ts": 1794268799989
+        },
+        "1794268800:AAVEUSDT": {
+          "snapshot": 96,
+          "update": 1918828,
+          "first_ts": 1794268800009,
+          "last_ts": 1794355199999
+        },
+        "1794355200:AAVEUSDT": {
+          "snapshot": 96,
+          "update": 1617867,
+          "first_ts": 1794355200009,
+          "last_ts": 1794441599857
+        },
+        "1794355200:AVAXUSDT": {
+          "snapshot": 96,
+          "update": 761905,
+          "first_ts": 1794355200003,
+          "last_ts": 1794441599848
+        },
+        "1794441600:AVAXUSDT": {
+          "snapshot": 96,
+          "update": 795157,
+          "first_ts": 1794441600008,
+          "last_ts": 1794527999194
+        },
+        "1794528000:AAVEUSDT": {
+          "snapshot": 96,
+          "update": 1383628,
+          "first_ts": 1794528000008,
+          "last_ts": 1794614399426
+        },
+        "1794528000:AVAXUSDT": {
+          "snapshot": 96,
+          "update": 1117616,
+          "first_ts": 1794528000004,
+          "last_ts": 1794614399992
+        },
+        "1794614400:AAVEUSDT": {
+          "snapshot": 96,
+          "update": 1721107,
+          "first_ts": 1794614400006,
+          "last_ts": 1794700799971
+        }
+      },
+      "archive_exit": {
+        "1794355200:AVAXUSDT": {
+          "snapshot": 96,
+          "update": 761905,
+          "first_ts": 1794355200003,
+          "last_ts": 1794441599848
+        },
+        "1794441600:AVAXUSDT": {
+          "snapshot": 96,
+          "update": 795157,
+          "first_ts": 1794441600008,
+          "last_ts": 1794527999194
+        },
+        "1794614400:AVAXUSDT": {
+          "snapshot": 96,
+          "update": 1323660,
+          "first_ts": 1794614400002,
+          "last_ts": 1794700799913
+        }
+      },
+      "archive_exit_extra": {},
+      "tape": {
+        "AVAXUSDT": {
+          "tape_trades": 64676,
+          "reconciled_bars": 234,
+          "mismatches": {}
+        },
+        "AAVEUSDT": {
+          "tape_trades": 58999,
+          "reconciled_bars": 309,
+          "mismatches": {}
+        }
+      },
+      "wide": 12
+    },
+    "nov17_19_joint": {
+      "cases": {
+        "current": {
+          "200": {
+            "status": "SCORED_PUBLIC_L2_SIMULATION",
+            "trades": 28,
+            "skipped": {
+              "crypto:wide": 6,
+              "crypto:publication_rate_limit": 27,
+              "stocks:publication_rate_limit": 13,
+              "stocks:position_cap": 14,
+              "crypto:position_cap": 4,
+              "crypto:depth slippage exceeds limit": 2
+            },
+            "return_pct": -0.47119999999996054,
+            "drawdown_pct": 1.5556153846153966,
+            "contribution_pct": {
+              "crypto": -0.2076615384615254,
+              "stocks": -0.2635384615384638
+            },
+            "peak_reservations": 6,
+            "peak_margin_pct": 17.47789166318587,
+            "cash_pnl_by_entry_day": {
+              "2026-11-17": -0.612700000000007,
+              "2026-11-18": -0.23795999999998318,
+              "2026-11-19": 0.23810000000000392
+            },
+            "exit_counts": {
+              "TARGET": 6,
+              "SL": 15,
+              "BE": 7
+            },
+            "cash_pnl_usd": -0.612559999999986,
+            "by_bot": {
+              "crypto": {
+                "trades": 10,
+                "profitable": 2,
+                "tp1_executions": 2,
+                "tp1_full_exits": 0,
+                "cash_pnl_usd": -0.2699599999999831,
+                "exit_counts": {
+                  "SL": 2,
+                  "BE": 7,
+                  "TARGET": 1
+                }
+              },
+              "stocks": {
+                "trades": 18,
+                "profitable": 5,
+                "tp1_executions": 0,
+                "tp1_full_exits": 0,
+                "cash_pnl_usd": -0.3426000000000029,
+                "exit_counts": {
+                  "TARGET": 5,
+                  "SL": 13
+                }
+              }
+            },
+            "entered_after_retry": []
+          },
+          "1000": {
+            "status": "SCORED_PUBLIC_L2_SIMULATION",
+            "trades": 28,
+            "skipped": {
+              "crypto:wide": 6,
+              "crypto:publication_rate_limit": 27,
+              "stocks:publication_rate_limit": 13,
+              "stocks:position_cap": 14,
+              "crypto:position_cap": 4,
+              "crypto:depth slippage exceeds limit": 2
+            },
+            "return_pct": -0.5407846153846041,
+            "drawdown_pct": 1.6293230769230589,
+            "contribution_pct": {
+              "crypto": -0.23863076923077123,
+              "stocks": -0.3021538461538477
+            },
+            "peak_reservations": 6,
+            "peak_margin_pct": 17.491563089429064,
+            "cash_pnl_by_entry_day": {
+              "2026-11-17": -0.6808999999999996,
+              "2026-11-18": -0.2618199999999947,
+              "2026-11-19": 0.23969999999998903
+            },
+            "exit_counts": {
+              "TARGET": 6,
+              "SL": 15,
+              "BE": 7
+            },
+            "cash_pnl_usd": -0.7030200000000044,
+            "by_bot": {
+              "crypto": {
+                "trades": 10,
+                "profitable": 3,
+                "tp1_executions": 2,
+                "tp1_full_exits": 0,
+                "cash_pnl_usd": -0.31022000000000255,
+                "exit_counts": {
+                  "SL": 2,
+                  "BE": 7,
+                  "TARGET": 1
+                }
+              },
+              "stocks": {
+                "trades": 18,
+                "profitable": 5,
+                "tp1_executions": 0,
+                "tp1_full_exits": 0,
+                "cash_pnl_usd": -0.3928000000000019,
+                "exit_counts": {
+                  "TARGET": 5,
+                  "SL": 13
+                }
+              }
+            },
+            "entered_after_retry": []
+          }
+        },
+        "short_cautious": {
+          "200": {
+            "status": "SCORED_PUBLIC_L2_SIMULATION",
+            "trades": 28,
+            "skipped": {
+              "crypto:wide": 4,
+              "crypto:publication_rate_limit": 29,
+              "stocks:publication_rate_limit": 13,
+              "stocks:position_cap": 14,
+              "crypto:position_cap": 4,
+              "crypto:depth slippage exceeds limit": 2
+            },
+            "return_pct": -0.47119999999996054,
+            "drawdown_pct": 1.5556153846153966,
+            "contribution_pct": {
+              "crypto": -0.2076615384615254,
+              "stocks": -0.2635384615384638
+            },
+            "peak_reservations": 6,
+            "peak_margin_pct": 17.47789166318587,
+            "cash_pnl_by_entry_day": {
+              "2026-11-17": -0.612700000000007,
+              "2026-11-18": -0.23795999999998318,
+              "2026-11-19": 0.23810000000000392
+            },
+            "exit_counts": {
+              "TARGET": 6,
+              "SL": 15,
+              "BE": 7
+            },
+            "cash_pnl_usd": -0.612559999999986,
+            "by_bot": {
+              "crypto": {
+                "trades": 10,
+                "profitable": 2,
+                "tp1_executions": 2,
+                "tp1_full_exits": 0,
+                "cash_pnl_usd": -0.2699599999999831,
+                "exit_counts": {
+                  "SL": 2,
+                  "BE": 7,
+                  "TARGET": 1
+                }
+              },
+              "stocks": {
+                "trades": 18,
+                "profitable": 5,
+                "tp1_executions": 0,
+                "tp1_full_exits": 0,
+                "cash_pnl_usd": -0.3426000000000029,
+                "exit_counts": {
+                  "TARGET": 5,
+                  "SL": 13
+                }
+              }
+            },
+            "entered_after_retry": []
+          },
+          "1000": {
+            "status": "SCORED_PUBLIC_L2_SIMULATION",
+            "trades": 28,
+            "skipped": {
+              "crypto:wide": 4,
+              "crypto:publication_rate_limit": 29,
+              "stocks:publication_rate_limit": 13,
+              "stocks:position_cap": 14,
+              "crypto:position_cap": 4,
+              "crypto:depth slippage exceeds limit": 2
+            },
+            "return_pct": -0.5407846153846041,
+            "drawdown_pct": 1.6293230769230589,
+            "contribution_pct": {
+              "crypto": -0.23863076923077123,
+              "stocks": -0.3021538461538477
+            },
+            "peak_reservations": 6,
+            "peak_margin_pct": 17.491563089429064,
+            "cash_pnl_by_entry_day": {
+              "2026-11-17": -0.6808999999999996,
+              "2026-11-18": -0.2618199999999947,
+              "2026-11-19": 0.23969999999998903
+            },
+            "exit_counts": {
+              "TARGET": 6,
+              "SL": 15,
+              "BE": 7
+            },
+            "cash_pnl_usd": -0.7030200000000044,
+            "by_bot": {
+              "crypto": {
+                "trades": 10,
+                "profitable": 3,
+                "tp1_executions": 2,
+                "tp1_full_exits": 0,
+                "cash_pnl_usd": -0.31022000000000255,
+                "exit_counts": {
+                  "SL": 2,
+                  "BE": 7,
+                  "TARGET": 1
+                }
+              },
+              "stocks": {
+                "trades": 18,
+                "profitable": 5,
+                "tp1_executions": 0,
+                "tp1_full_exits": 0,
+                "cash_pnl_usd": -0.3928000000000019,
+                "exit_counts": {
+                  "TARGET": 5,
+                  "SL": 13
+                }
+              }
+            },
+            "entered_after_retry": []
+          }
+        },
+        "full_cautious": {
+          "200": {
+            "status": "SCORED_PUBLIC_L2_SIMULATION",
+            "trades": 28,
+            "skipped": {
+              "crypto:wide": 4,
+              "crypto:publication_rate_limit": 29,
+              "stocks:publication_rate_limit": 13,
+              "stocks:position_cap": 14,
+              "crypto:position_cap": 4,
+              "crypto:depth slippage exceeds limit": 2
+            },
+            "return_pct": -0.47119999999996054,
+            "drawdown_pct": 1.5556153846153966,
+            "contribution_pct": {
+              "crypto": -0.2076615384615254,
+              "stocks": -0.2635384615384638
+            },
+            "peak_reservations": 6,
+            "peak_margin_pct": 17.47789166318587,
+            "cash_pnl_by_entry_day": {
+              "2026-11-17": -0.612700000000007,
+              "2026-11-18": -0.23795999999998318,
+              "2026-11-19": 0.23810000000000392
+            },
+            "exit_counts": {
+              "TARGET": 6,
+              "SL": 15,
+              "BE": 7
+            },
+            "cash_pnl_usd": -0.612559999999986,
+            "by_bot": {
+              "crypto": {
+                "trades": 10,
+                "profitable": 2,
+                "tp1_executions": 2,
+                "tp1_full_exits": 0,
+                "cash_pnl_usd": -0.2699599999999831,
+                "exit_counts": {
+                  "SL": 2,
+                  "BE": 7,
+                  "TARGET": 1
+                }
+              },
+              "stocks": {
+                "trades": 18,
+                "profitable": 5,
+                "tp1_executions": 0,
+                "tp1_full_exits": 0,
+                "cash_pnl_usd": -0.3426000000000029,
+                "exit_counts": {
+                  "TARGET": 5,
+                  "SL": 13
+                }
+              }
+            },
+            "entered_after_retry": []
+          },
+          "1000": {
+            "status": "SCORED_PUBLIC_L2_SIMULATION",
+            "trades": 28,
+            "skipped": {
+              "crypto:wide": 4,
+              "crypto:publication_rate_limit": 29,
+              "stocks:publication_rate_limit": 13,
+              "stocks:position_cap": 14,
+              "crypto:position_cap": 4,
+              "crypto:depth slippage exceeds limit": 2
+            },
+            "return_pct": -0.5407846153846041,
+            "drawdown_pct": 1.6293230769230589,
+            "contribution_pct": {
+              "crypto": -0.23863076923077123,
+              "stocks": -0.3021538461538477
+            },
+            "peak_reservations": 6,
+            "peak_margin_pct": 17.491563089429064,
+            "cash_pnl_by_entry_day": {
+              "2026-11-17": -0.6808999999999996,
+              "2026-11-18": -0.2618199999999947,
+              "2026-11-19": 0.23969999999998903
+            },
+            "exit_counts": {
+              "TARGET": 6,
+              "SL": 15,
+              "BE": 7
+            },
+            "cash_pnl_usd": -0.7030200000000044,
+            "by_bot": {
+              "crypto": {
+                "trades": 10,
+                "profitable": 3,
+                "tp1_executions": 2,
+                "tp1_full_exits": 0,
+                "cash_pnl_usd": -0.31022000000000255,
+                "exit_counts": {
+                  "SL": 2,
+                  "BE": 7,
+                  "TARGET": 1
+                }
+              },
+              "stocks": {
+                "trades": 18,
+                "profitable": 5,
+                "tp1_executions": 0,
+                "tp1_full_exits": 0,
+                "cash_pnl_usd": -0.3928000000000019,
+                "exit_counts": {
+                  "TARGET": 5,
+                  "SL": 13
+                }
+              }
+            },
+            "entered_after_retry": []
+          }
+        },
+        "full_instantaneous": {
+          "200": {
+            "status": "SCORED_PUBLIC_L2_SIMULATION",
+            "trades": 28,
+            "skipped": {
+              "crypto:wide": 4,
+              "crypto:publication_rate_limit": 29,
+              "stocks:publication_rate_limit": 13,
+              "stocks:position_cap": 14,
+              "crypto:position_cap": 4,
+              "crypto:depth slippage exceeds limit": 2
+            },
+            "return_pct": -0.47119999999996054,
+            "drawdown_pct": 1.5556153846153966,
+            "contribution_pct": {
+              "crypto": -0.2076615384615254,
+              "stocks": -0.2635384615384638
+            },
+            "peak_reservations": 6,
+            "peak_margin_pct": 17.47789166318587,
+            "cash_pnl_by_entry_day": {
+              "2026-11-17": -0.612700000000007,
+              "2026-11-18": -0.23795999999998318,
+              "2026-11-19": 0.23810000000000392
+            },
+            "exit_counts": {
+              "TARGET": 6,
+              "SL": 15,
+              "BE": 7
+            },
+            "cash_pnl_usd": -0.612559999999986,
+            "by_bot": {
+              "crypto": {
+                "trades": 10,
+                "profitable": 2,
+                "tp1_executions": 2,
+                "tp1_full_exits": 0,
+                "cash_pnl_usd": -0.2699599999999831,
+                "exit_counts": {
+                  "SL": 2,
+                  "BE": 7,
+                  "TARGET": 1
+                }
+              },
+              "stocks": {
+                "trades": 18,
+                "profitable": 5,
+                "tp1_executions": 0,
+                "tp1_full_exits": 0,
+                "cash_pnl_usd": -0.3426000000000029,
+                "exit_counts": {
+                  "TARGET": 5,
+                  "SL": 13
+                }
+              }
+            },
+            "entered_after_retry": []
+          },
+          "1000": {
+            "status": "SCORED_PUBLIC_L2_SIMULATION",
+            "trades": 28,
+            "skipped": {
+              "crypto:wide": 4,
+              "crypto:publication_rate_limit": 29,
+              "stocks:publication_rate_limit": 13,
+              "stocks:position_cap": 14,
+              "crypto:position_cap": 4,
+              "crypto:depth slippage exceeds limit": 2
+            },
+            "return_pct": -0.5407846153846041,
+            "drawdown_pct": 1.6293230769230589,
+            "contribution_pct": {
+              "crypto": -0.23863076923077123,
+              "stocks": -0.3021538461538477
+            },
+            "peak_reservations": 6,
+            "peak_margin_pct": 17.491563089429064,
+            "cash_pnl_by_entry_day": {
+              "2026-11-17": -0.6808999999999996,
+              "2026-11-18": -0.2618199999999947,
+              "2026-11-19": 0.23969999999998903
+            },
+            "exit_counts": {
+              "TARGET": 6,
+              "SL": 15,
+              "BE": 7
+            },
+            "cash_pnl_usd": -0.7030200000000044,
+            "by_bot": {
+              "crypto": {
+                "trades": 10,
+                "profitable": 3,
+                "tp1_executions": 2,
+                "tp1_full_exits": 0,
+                "cash_pnl_usd": -0.31022000000000255,
+                "exit_counts": {
+                  "SL": 2,
+                  "BE": 7,
+                  "TARGET": 1
+                }
+              },
+              "stocks": {
+                "trades": 18,
+                "profitable": 5,
+                "tp1_executions": 0,
+                "tp1_full_exits": 0,
+                "cash_pnl_usd": -0.3928000000000019,
+                "exit_counts": {
+                  "TARGET": 5,
+                  "SL": 13
+                }
+              }
+            },
+            "entered_after_retry": []
+          }
+        }
+      },
+      "delayed_candidates": {
+        "short_cautious": [
+          {
+            "epoch": 1794954600,
+            "bot": "crypto",
+            "symbol": "AAVEUSDT",
+            "direction": "SHORT",
+            "entry": 111.35,
+            "stop": 112.75999999999999,
+            "target": 108.53,
+            "market_anchor": 111.35,
+            "opening_anchor": 111.28,
+            "prints_before_decision": 3,
+            "paper_reference_ready": false,
+            "entry_status": "wide",
+            "entry_ms": 1794954610800,
+            "tries": [
+              {
+                "ms": 1794954610000,
+                "status": "wide",
+                "spread_bps": 8.084437457893861
+              },
+              {
+                "ms": 1794954610200,
+                "status": "wide",
+                "spread_bps": 8.084437457893861
+              },
+              {
+                "ms": 1794954610800,
+                "status": "wide",
+                "spread_bps": 8.084437457893861
+              }
+            ],
+            "stock_reference_ready": false,
+            "paper_path": {
+              "known": true,
+              "code": "SL",
+              "end_ms": 1794956800914,
+              "trigger_price": 112.76,
+              "bank": null,
+              "be_level": 111.35
+            },
+            "delayed_attempts": [
+              {
+                "ms": 1794954630000,
+                "status": "wide",
+                "spread_bps": 8.982304859426419
+              },
+              {
+                "ms": 1794954660000,
+                "status": "wide",
+                "spread_bps": 7.1910112359561795
+              }
+            ]
+          },
+          {
+            "epoch": 1794957300,
+            "bot": "crypto",
+            "symbol": "AAVEUSDT",
+            "direction": "SHORT",
+            "entry": 112.95,
+            "stop": 114.45285714285714,
+            "target": 109.94428571428573,
+            "market_anchor": 112.95,
+            "opening_anchor": 112.95,
+            "prints_before_decision": 0,
+            "paper_reference_ready": false,
+            "entry_status": "wide",
+            "entry_ms": 1794957310800,
+            "tries": [
+              {
+                "ms": 1794957310000,
+                "status": "wide",
+                "spread_bps": 8.855042946959047
+              },
+              {
+                "ms": 1794957310200,
+                "status": "wide",
+                "spread_bps": 8.855042946959047
+              },
+              {
+                "ms": 1794957310800,
+                "status": "wide",
+                "spread_bps": 6.199353495993216
+              }
+            ],
+            "stock_reference_ready": false,
+            "paper_path": {
+              "known": true,
+              "code": "TIME",
+              "end_ms": 1795000500000,
+              "trigger_price": null,
+              "bank": {
+                "ms": 1794958211898,
+                "price": 112.2
+              },
+              "be_level": 112.95
+            },
+            "delayed_attempts": [
+              {
+                "ms": 1794957330000,
+                "status": "wide",
+                "spread_bps": 8.865248226949852
+              },
+              {
+                "ms": 1794957360000,
+                "status": "wide",
+                "spread_bps": 9.761725163065131
+              }
+            ]
+          },
+          {
+            "epoch": 1794982500,
+            "bot": "crypto",
+            "symbol": "AAVEUSDT",
+            "direction": "SHORT",
+            "entry": 112.21,
+            "stop": 113.33285714285714,
+            "target": 109.96428571428571,
+            "market_anchor": 112.21,
+            "opening_anchor": 112.21,
+            "prints_before_decision": 0,
+            "paper_reference_ready": false,
+            "entry_status": "wide",
+            "entry_ms": 1794982510800,
+            "tries": [
+              {
+                "ms": 1794982510000,
+                "status": "wide",
+                "spread_bps": 11.584903978968537
+              },
+              {
+                "ms": 1794982510200,
+                "status": "wide",
+                "spread_bps": 11.584903978968537
+              },
+              {
+                "ms": 1794982510800,
+                "status": "wide",
+                "spread_bps": 11.584903978968537
+              }
+            ],
+            "stock_reference_ready": false,
+            "paper_path": {
+              "known": true,
+              "code": "TARGET",
+              "end_ms": 1795009437269,
+              "trigger_price": 109.96,
+              "bank": {
+                "ms": 1794983929994,
+                "price": 111.61
+              },
+              "be_level": 112.21,
+              "simultaneous_targets": false
+            },
+            "delayed_attempts": [
+              {
+                "ms": 1794982530000,
+                "status": "wide",
+                "spread_bps": 11.585936455594265
+              },
+              {
+                "ms": 1794982560000,
+                "status": "wide",
+                "spread_bps": 9.809604494582372
+              }
+            ]
+          },
+          {
+            "epoch": 1795019400,
+            "bot": "crypto",
+            "symbol": "AVAXUSDT",
+            "direction": "SHORT",
+            "entry": 6.9,
+            "stop": 7.004857142857143,
+            "target": 6.690285714285714,
+            "market_anchor": 6.9,
+            "opening_anchor": 6.9,
+            "prints_before_decision": 1,
+            "paper_reference_ready": false,
+            "entry_status": "eligible",
+            "entry_ms": 1795019430000,
+            "tries": [
+              {
+                "ms": 1795019410000,
+                "status": "wide",
+                "spread_bps": 5.793742757820915
+              },
+              {
+                "ms": 1795019410200,
+                "status": "wide",
+                "spread_bps": 5.793742757820915
+              },
+              {
+                "ms": 1795019410800,
+                "status": "wide",
+                "spread_bps": 5.793742757820915
+              }
+            ],
+            "stock_reference_ready": false,
+            "paper_path": {
+              "known": true,
+              "code": "BE",
+              "end_ms": 1795020619049,
+              "trigger_price": 6.9,
+              "bank": {
+                "ms": 1795020011092,
+                "price": 6.848
+              },
+              "be_level": 6.9
+            },
+            "reference_entry": 6.906,
+            "delayed_attempts": [
+              {
+                "ms": 1795019430000,
+                "status": "eligible",
+                "average": 6.906,
+                "worst": 6.906,
+                "contracts": 0.5,
+                "spread_bps": 4.343105320304183,
+                "slippage_bps": -0.0,
+                "last_event_ms": 1795019429886
+              }
+            ],
+            "delay_ms": 30000,
+            "delayed_rr": 2.1789321789321705,
+            "path": {
+              "60": {
+                "known": true,
+                "code": "BE",
+                "end_ms": 1795020651276,
+                "trigger_price": 6.907,
+                "bank": {
+                  "ms": 1795020011092,
+                  "price": 6.848
+                },
+                "be_level": 6.906
+              },
+              "900": {
+                "known": true,
+                "code": "BE",
+                "end_ms": 1795020651276,
+                "trigger_price": 6.907,
+                "bank": {
+                  "ms": 1795020011092,
+                  "price": 6.848
+                },
+                "be_level": 6.906
+              }
+            }
+          },
+          {
+            "epoch": 1795050900,
+            "bot": "crypto",
+            "symbol": "AAVEUSDT",
+            "direction": "SHORT",
+            "entry": 109.67,
+            "stop": 111.16428571428571,
+            "target": 106.68142857142858,
+            "market_anchor": 109.67,
+            "opening_anchor": 109.67,
+            "prints_before_decision": 0,
+            "paper_reference_ready": false,
+            "entry_status": "eligible",
+            "entry_ms": 1795050960000,
+            "tries": [
+              {
+                "ms": 1795050910000,
+                "status": "wide",
+                "spread_bps": 9.121590805437247
+              },
+              {
+                "ms": 1795050910200,
+                "status": "wide",
+                "spread_bps": 9.121590805437247
+              },
+              {
+                "ms": 1795050910800,
+                "status": "wide",
+                "spread_bps": 8.20980615735493
+              }
+            ],
+            "stock_reference_ready": false,
+            "paper_path": {
+              "known": true,
+              "code": "BE",
+              "end_ms": 1795060039129,
+              "trigger_price": 109.67,
+              "bank": {
+                "ms": 1795051230849,
+                "price": 108.92
+              },
+              "be_level": 109.67
+            },
+            "reference_entry": 109.42857142857143,
+            "delayed_attempts": [
+              {
+                "ms": 1795050930000,
+                "status": "wide",
+                "spread_bps": 6.394153916419949
+              },
+              {
+                "ms": 1795050960000,
+                "status": "eligible",
+                "average": 109.42857142857143,
+                "worst": 109.39,
+                "contracts": 3.5,
+                "spread_bps": 0.9137009456809462,
+                "slippage_bps": 4.5687134502925275,
+                "last_event_ms": 1795050959897
+              }
+            ],
+            "delay_ms": 60000,
+            "delayed_rr": 1.530266343825663,
+            "path": {
+              "60": {
+                "known": true,
+                "code": "BE",
+                "end_ms": 1795059342051,
+                "trigger_price": 109.44,
+                "bank": {
+                  "ms": 1795051230849,
+                  "price": 108.92
+                },
+                "be_level": 109.43
+              },
+              "900": {
+                "known": true,
+                "code": "BE",
+                "end_ms": 1795059342051,
+                "trigger_price": 109.44,
+                "bank": {
+                  "ms": 1795051230849,
+                  "price": 108.92
+                },
+                "be_level": 109.43
+              }
+            }
+          }
+        ],
+        "full_cautious": [
+          {
+            "epoch": 1794954600,
+            "bot": "crypto",
+            "symbol": "AAVEUSDT",
+            "direction": "SHORT",
+            "entry": 111.35,
+            "stop": 112.75999999999999,
+            "target": 108.53,
+            "market_anchor": 111.35,
+            "opening_anchor": 111.28,
+            "prints_before_decision": 3,
+            "paper_reference_ready": false,
+            "entry_status": "wide",
+            "entry_ms": 1794954610800,
+            "tries": [
+              {
+                "ms": 1794954610000,
+                "status": "wide",
+                "spread_bps": 8.084437457893861
+              },
+              {
+                "ms": 1794954610200,
+                "status": "wide",
+                "spread_bps": 8.084437457893861
+              },
+              {
+                "ms": 1794954610800,
+                "status": "wide",
+                "spread_bps": 8.084437457893861
+              }
+            ],
+            "stock_reference_ready": false,
+            "paper_path": {
+              "known": true,
+              "code": "SL",
+              "end_ms": 1794956800914,
+              "trigger_price": 112.76,
+              "bank": null,
+              "be_level": 111.35
+            },
+            "delayed_attempts": [
+              {
+                "ms": 1794954630000,
+                "status": "wide",
+                "spread_bps": 8.982304859426419
+              },
+              {
+                "ms": 1794954660000,
+                "status": "wide",
+                "spread_bps": 7.1910112359561795
+              },
+              {
+                "ms": 1794954720000,
+                "status": "wide",
+                "spread_bps": 6.295813284165416
+              }
+            ]
+          },
+          {
+            "epoch": 1794957300,
+            "bot": "crypto",
+            "symbol": "AAVEUSDT",
+            "direction": "SHORT",
+            "entry": 112.95,
+            "stop": 114.45285714285714,
+            "target": 109.94428571428573,
+            "market_anchor": 112.95,
+            "opening_anchor": 112.95,
+            "prints_before_decision": 0,
+            "paper_reference_ready": false,
+            "entry_status": "wide",
+            "entry_ms": 1794957310800,
+            "tries": [
+              {
+                "ms": 1794957310000,
+                "status": "wide",
+                "spread_bps": 8.855042946959047
+              },
+              {
+                "ms": 1794957310200,
+                "status": "wide",
+                "spread_bps": 8.855042946959047
+              },
+              {
+                "ms": 1794957310800,
+                "status": "wide",
+                "spread_bps": 6.199353495993216
+              }
+            ],
+            "stock_reference_ready": false,
+            "paper_path": {
+              "known": true,
+              "code": "TIME",
+              "end_ms": 1795000500000,
+              "trigger_price": null,
+              "bank": {
+                "ms": 1794958211898,
+                "price": 112.2
+              },
+              "be_level": 112.95
+            },
+            "delayed_attempts": [
+              {
+                "ms": 1794957330000,
+                "status": "wide",
+                "spread_bps": 8.865248226949852
+              },
+              {
+                "ms": 1794957360000,
+                "status": "wide",
+                "spread_bps": 9.761725163065131
+              },
+              {
+                "ms": 1794957420000,
+                "status": "wide",
+                "spread_bps": 6.214212792401561
+              }
+            ]
+          },
+          {
+            "epoch": 1794982500,
+            "bot": "crypto",
+            "symbol": "AAVEUSDT",
+            "direction": "SHORT",
+            "entry": 112.21,
+            "stop": 113.33285714285714,
+            "target": 109.96428571428571,
+            "market_anchor": 112.21,
+            "opening_anchor": 112.21,
+            "prints_before_decision": 0,
+            "paper_reference_ready": false,
+            "entry_status": "wide",
+            "entry_ms": 1794982510800,
+            "tries": [
+              {
+                "ms": 1794982510000,
+                "status": "wide",
+                "spread_bps": 11.584903978968537
+              },
+              {
+                "ms": 1794982510200,
+                "status": "wide",
+                "spread_bps": 11.584903978968537
+              },
+              {
+                "ms": 1794982510800,
+                "status": "wide",
+                "spread_bps": 11.584903978968537
+              }
+            ],
+            "stock_reference_ready": false,
+            "paper_path": {
+              "known": true,
+              "code": "TARGET",
+              "end_ms": 1795009437269,
+              "trigger_price": 109.96,
+              "bank": {
+                "ms": 1794983929994,
+                "price": 111.61
+              },
+              "be_level": 112.21,
+              "simultaneous_targets": false
+            },
+            "delayed_attempts": [
+              {
+                "ms": 1794982530000,
+                "status": "wide",
+                "spread_bps": 11.585936455594265
+              },
+              {
+                "ms": 1794982560000,
+                "status": "wide",
+                "spread_bps": 9.809604494582372
+              },
+              {
+                "ms": 1794982620000,
+                "status": "wide",
+                "spread_bps": 9.801737580752903
+              }
+            ]
+          },
+          {
+            "epoch": 1795019400,
+            "bot": "crypto",
+            "symbol": "AVAXUSDT",
+            "direction": "SHORT",
+            "entry": 6.9,
+            "stop": 7.004857142857143,
+            "target": 6.690285714285714,
+            "market_anchor": 6.9,
+            "opening_anchor": 6.9,
+            "prints_before_decision": 1,
+            "paper_reference_ready": false,
+            "entry_status": "eligible",
+            "entry_ms": 1795019430000,
+            "tries": [
+              {
+                "ms": 1795019410000,
+                "status": "wide",
+                "spread_bps": 5.793742757820915
+              },
+              {
+                "ms": 1795019410200,
+                "status": "wide",
+                "spread_bps": 5.793742757820915
+              },
+              {
+                "ms": 1795019410800,
+                "status": "wide",
+                "spread_bps": 5.793742757820915
+              }
+            ],
+            "stock_reference_ready": false,
+            "paper_path": {
+              "known": true,
+              "code": "BE",
+              "end_ms": 1795020619049,
+              "trigger_price": 6.9,
+              "bank": {
+                "ms": 1795020011092,
+                "price": 6.848
+              },
+              "be_level": 6.9
+            },
+            "reference_entry": 6.906,
+            "delayed_attempts": [
+              {
+                "ms": 1795019430000,
+                "status": "eligible",
+                "average": 6.906,
+                "worst": 6.906,
+                "contracts": 0.5,
+                "spread_bps": 4.343105320304183,
+                "slippage_bps": -0.0,
+                "last_event_ms": 1795019429886
+              }
+            ],
+            "delay_ms": 30000,
+            "delayed_rr": 2.1789321789321705,
+            "path": {
+              "60": {
+                "known": true,
+                "code": "BE",
+                "end_ms": 1795020651276,
+                "trigger_price": 6.907,
+                "bank": {
+                  "ms": 1795020011092,
+                  "price": 6.848
+                },
+                "be_level": 6.906
+              },
+              "900": {
+                "known": true,
+                "code": "BE",
+                "end_ms": 1795020651276,
+                "trigger_price": 6.907,
+                "bank": {
+                  "ms": 1795020011092,
+                  "price": 6.848
+                },
+                "be_level": 6.906
+              }
+            }
+          },
+          {
+            "epoch": 1795050900,
+            "bot": "crypto",
+            "symbol": "AAVEUSDT",
+            "direction": "SHORT",
+            "entry": 109.67,
+            "stop": 111.16428571428571,
+            "target": 106.68142857142858,
+            "market_anchor": 109.67,
+            "opening_anchor": 109.67,
+            "prints_before_decision": 0,
+            "paper_reference_ready": false,
+            "entry_status": "eligible",
+            "entry_ms": 1795050960000,
+            "tries": [
+              {
+                "ms": 1795050910000,
+                "status": "wide",
+                "spread_bps": 9.121590805437247
+              },
+              {
+                "ms": 1795050910200,
+                "status": "wide",
+                "spread_bps": 9.121590805437247
+              },
+              {
+                "ms": 1795050910800,
+                "status": "wide",
+                "spread_bps": 8.20980615735493
+              }
+            ],
+            "stock_reference_ready": false,
+            "paper_path": {
+              "known": true,
+              "code": "BE",
+              "end_ms": 1795060039129,
+              "trigger_price": 109.67,
+              "bank": {
+                "ms": 1795051230849,
+                "price": 108.92
+              },
+              "be_level": 109.67
+            },
+            "reference_entry": 109.42857142857143,
+            "delayed_attempts": [
+              {
+                "ms": 1795050930000,
+                "status": "wide",
+                "spread_bps": 6.394153916419949
+              },
+              {
+                "ms": 1795050960000,
+                "status": "eligible",
+                "average": 109.42857142857143,
+                "worst": 109.39,
+                "contracts": 3.5,
+                "spread_bps": 0.9137009456809462,
+                "slippage_bps": 4.5687134502925275,
+                "last_event_ms": 1795050959897
+              }
+            ],
+            "delay_ms": 60000,
+            "delayed_rr": 1.530266343825663,
+            "path": {
+              "60": {
+                "known": true,
+                "code": "BE",
+                "end_ms": 1795059342051,
+                "trigger_price": 109.44,
+                "bank": {
+                  "ms": 1795051230849,
+                  "price": 108.92
+                },
+                "be_level": 109.43
+              },
+              "900": {
+                "known": true,
+                "code": "BE",
+                "end_ms": 1795059342051,
+                "trigger_price": 109.44,
+                "bank": {
+                  "ms": 1795051230849,
+                  "price": 108.92
+                },
+                "be_level": 109.43
+              }
+            }
+          }
+        ],
+        "full_instantaneous": [
+          {
+            "epoch": 1794954600,
+            "bot": "crypto",
+            "symbol": "AAVEUSDT",
+            "direction": "SHORT",
+            "entry": 111.35,
+            "stop": 112.75999999999999,
+            "target": 108.53,
+            "market_anchor": 111.35,
+            "opening_anchor": 111.28,
+            "prints_before_decision": 3,
+            "paper_reference_ready": false,
+            "entry_status": "wide",
+            "entry_ms": 1794954610800,
+            "tries": [
+              {
+                "ms": 1794954610000,
+                "status": "wide",
+                "spread_bps": 8.084437457893861
+              },
+              {
+                "ms": 1794954610200,
+                "status": "wide",
+                "spread_bps": 8.084437457893861
+              },
+              {
+                "ms": 1794954610800,
+                "status": "wide",
+                "spread_bps": 8.084437457893861
+              }
+            ],
+            "stock_reference_ready": false,
+            "paper_path": {
+              "known": true,
+              "code": "SL",
+              "end_ms": 1794956800914,
+              "trigger_price": 112.76,
+              "bank": null,
+              "be_level": 111.35
+            },
+            "delayed_attempts": [
+              {
+                "ms": 1794954630000,
+                "status": "wide",
+                "spread_bps": 8.982304859426419
+              },
+              {
+                "ms": 1794954660000,
+                "status": "wide",
+                "spread_bps": 7.1910112359561795
+              },
+              {
+                "ms": 1794954720000,
+                "status": "wide",
+                "spread_bps": 6.295813284165416
+              }
+            ]
+          },
+          {
+            "epoch": 1794957300,
+            "bot": "crypto",
+            "symbol": "AAVEUSDT",
+            "direction": "SHORT",
+            "entry": 112.95,
+            "stop": 114.45285714285714,
+            "target": 109.94428571428573,
+            "market_anchor": 112.95,
+            "opening_anchor": 112.95,
+            "prints_before_decision": 0,
+            "paper_reference_ready": false,
+            "entry_status": "wide",
+            "entry_ms": 1794957310800,
+            "tries": [
+              {
+                "ms": 1794957310000,
+                "status": "wide",
+                "spread_bps": 8.855042946959047
+              },
+              {
+                "ms": 1794957310200,
+                "status": "wide",
+                "spread_bps": 8.855042946959047
+              },
+              {
+                "ms": 1794957310800,
+                "status": "wide",
+                "spread_bps": 6.199353495993216
+              }
+            ],
+            "stock_reference_ready": false,
+            "paper_path": {
+              "known": true,
+              "code": "TIME",
+              "end_ms": 1795000500000,
+              "trigger_price": null,
+              "bank": {
+                "ms": 1794958211898,
+                "price": 112.2
+              },
+              "be_level": 112.95
+            },
+            "delayed_attempts": [
+              {
+                "ms": 1794957330000,
+                "status": "wide",
+                "spread_bps": 8.865248226949852
+              },
+              {
+                "ms": 1794957360000,
+                "status": "wide",
+                "spread_bps": 9.761725163065131
+              },
+              {
+                "ms": 1794957420000,
+                "status": "wide",
+                "spread_bps": 6.214212792401561
+              }
+            ]
+          },
+          {
+            "epoch": 1794982500,
+            "bot": "crypto",
+            "symbol": "AAVEUSDT",
+            "direction": "SHORT",
+            "entry": 112.21,
+            "stop": 113.33285714285714,
+            "target": 109.96428571428571,
+            "market_anchor": 112.21,
+            "opening_anchor": 112.21,
+            "prints_before_decision": 0,
+            "paper_reference_ready": false,
+            "entry_status": "wide",
+            "entry_ms": 1794982510800,
+            "tries": [
+              {
+                "ms": 1794982510000,
+                "status": "wide",
+                "spread_bps": 11.584903978968537
+              },
+              {
+                "ms": 1794982510200,
+                "status": "wide",
+                "spread_bps": 11.584903978968537
+              },
+              {
+                "ms": 1794982510800,
+                "status": "wide",
+                "spread_bps": 11.584903978968537
+              }
+            ],
+            "stock_reference_ready": false,
+            "paper_path": {
+              "known": true,
+              "code": "TARGET",
+              "end_ms": 1795009437269,
+              "trigger_price": 109.96,
+              "bank": {
+                "ms": 1794983929994,
+                "price": 111.61
+              },
+              "be_level": 112.21,
+              "simultaneous_targets": false
+            },
+            "delayed_attempts": [
+              {
+                "ms": 1794982530000,
+                "status": "wide",
+                "spread_bps": 11.585936455594265
+              },
+              {
+                "ms": 1794982560000,
+                "status": "wide",
+                "spread_bps": 9.809604494582372
+              },
+              {
+                "ms": 1794982620000,
+                "status": "wide",
+                "spread_bps": 9.801737580752903
+              }
+            ]
+          },
+          {
+            "epoch": 1795019400,
+            "bot": "crypto",
+            "symbol": "AVAXUSDT",
+            "direction": "SHORT",
+            "entry": 6.9,
+            "stop": 7.004857142857143,
+            "target": 6.690285714285714,
+            "market_anchor": 6.9,
+            "opening_anchor": 6.9,
+            "prints_before_decision": 1,
+            "paper_reference_ready": false,
+            "entry_status": "eligible",
+            "entry_ms": 1795019430000,
+            "tries": [
+              {
+                "ms": 1795019410000,
+                "status": "wide",
+                "spread_bps": 5.793742757820915
+              },
+              {
+                "ms": 1795019410200,
+                "status": "wide",
+                "spread_bps": 5.793742757820915
+              },
+              {
+                "ms": 1795019410800,
+                "status": "wide",
+                "spread_bps": 5.793742757820915
+              }
+            ],
+            "stock_reference_ready": false,
+            "paper_path": {
+              "known": true,
+              "code": "BE",
+              "end_ms": 1795020619049,
+              "trigger_price": 6.9,
+              "bank": {
+                "ms": 1795020011092,
+                "price": 6.848
+              },
+              "be_level": 6.9
+            },
+            "reference_entry": 6.906,
+            "delayed_attempts": [
+              {
+                "ms": 1795019430000,
+                "status": "eligible",
+                "average": 6.906,
+                "worst": 6.906,
+                "contracts": 0.5,
+                "spread_bps": 4.343105320304183,
+                "slippage_bps": -0.0,
+                "last_event_ms": 1795019429886
+              }
+            ],
+            "delay_ms": 30000,
+            "delayed_rr": 2.1789321789321705,
+            "path": {
+              "60": {
+                "known": true,
+                "code": "BE",
+                "end_ms": 1795020651276,
+                "trigger_price": 6.907,
+                "bank": {
+                  "ms": 1795020011092,
+                  "price": 6.848
+                },
+                "be_level": 6.906
+              },
+              "900": {
+                "known": true,
+                "code": "BE",
+                "end_ms": 1795020651276,
+                "trigger_price": 6.907,
+                "bank": {
+                  "ms": 1795020011092,
+                  "price": 6.848
+                },
+                "be_level": 6.906
+              }
+            }
+          },
+          {
+            "epoch": 1795050900,
+            "bot": "crypto",
+            "symbol": "AAVEUSDT",
+            "direction": "SHORT",
+            "entry": 109.67,
+            "stop": 111.16428571428571,
+            "target": 106.68142857142858,
+            "market_anchor": 109.67,
+            "opening_anchor": 109.67,
+            "prints_before_decision": 0,
+            "paper_reference_ready": false,
+            "entry_status": "eligible",
+            "entry_ms": 1795050960000,
+            "tries": [
+              {
+                "ms": 1795050910000,
+                "status": "wide",
+                "spread_bps": 9.121590805437247
+              },
+              {
+                "ms": 1795050910200,
+                "status": "wide",
+                "spread_bps": 9.121590805437247
+              },
+              {
+                "ms": 1795050910800,
+                "status": "wide",
+                "spread_bps": 8.20980615735493
+              }
+            ],
+            "stock_reference_ready": false,
+            "paper_path": {
+              "known": true,
+              "code": "BE",
+              "end_ms": 1795060039129,
+              "trigger_price": 109.67,
+              "bank": {
+                "ms": 1795051230849,
+                "price": 108.92
+              },
+              "be_level": 109.67
+            },
+            "reference_entry": 109.42857142857143,
+            "delayed_attempts": [
+              {
+                "ms": 1795050930000,
+                "status": "wide",
+                "spread_bps": 6.394153916419949
+              },
+              {
+                "ms": 1795050960000,
+                "status": "eligible",
+                "average": 109.42857142857143,
+                "worst": 109.39,
+                "contracts": 3.5,
+                "spread_bps": 0.9137009456809462,
+                "slippage_bps": 4.5687134502925275,
+                "last_event_ms": 1795050959897
+              }
+            ],
+            "delay_ms": 60000,
+            "delayed_rr": 1.530266343825663,
+            "path": {
+              "60": {
+                "known": true,
+                "code": "BE",
+                "end_ms": 1795059342051,
+                "trigger_price": 109.44,
+                "bank": {
+                  "ms": 1795051230849,
+                  "price": 108.92
+                },
+                "be_level": 109.43
+              },
+              "900": {
+                "known": true,
+                "code": "BE",
+                "end_ms": 1795059342051,
+                "trigger_price": 109.44,
+                "bank": {
+                  "ms": 1795051230849,
+                  "price": 108.92
+                },
+                "be_level": 109.43
+              }
+            }
+          }
+        ]
+      },
+      "archive_entry": {
+        "1794873600:AAVEUSDT": {
+          "snapshot": 96,
+          "update": 1309299,
+          "first_ts": 1794873600002,
+          "last_ts": 1794959997699
+        },
+        "1794960000:AAVEUSDT": {
+          "snapshot": 96,
+          "update": 1075007,
+          "first_ts": 1794960000009,
+          "last_ts": 1795046399987
+        },
+        "1794960000:AVAXUSDT": {
+          "snapshot": 96,
+          "update": 713262,
+          "first_ts": 1794960000009,
+          "last_ts": 1795046398729
+        },
+        "1795046400:AAVEUSDT": {
+          "snapshot": 96,
+          "update": 1301688,
+          "first_ts": 1795046400007,
+          "last_ts": 1795132799896
+        }
+      },
+      "archive_exit": {
+        "1794960000:AVAXUSDT": {
+          "snapshot": 96,
+          "update": 713262,
+          "first_ts": 1794960000009,
+          "last_ts": 1795046398729
+        },
+        "1795046400:AAVEUSDT": {
+          "snapshot": 96,
+          "update": 1301688,
+          "first_ts": 1795046400007,
+          "last_ts": 1795132799896
+        }
+      },
+      "archive_exit_extra": {},
+      "tape": {
+        "AVAXUSDT": {
+          "tape_trades": 20180,
+          "reconciled_bars": 48,
+          "mismatches": {}
+        },
+        "AAVEUSDT": {
+          "tape_trades": 23880,
+          "reconciled_bars": 127,
+          "mismatches": {}
+        }
+      },
+      "wide": 5
+    },
+    "nov20_targeted": {
+      "cases": {
+        "current": {
+          "200": {
+            "status": "SCORED_PUBLIC_L2_SIMULATION",
+            "trades": 1,
+            "skipped": {
+              "crypto:wide": 3,
+              "crypto:position_cap": 1
+            },
+            "return_pct": 0.6038461538461437,
+            "drawdown_pct": 0.0,
+            "contribution_pct": {
+              "crypto": 0.6038461538461539,
+              "stocks": 0.0
+            },
+            "peak_reservations": 1,
+            "peak_margin_pct": 2.6869230769230765,
+            "cash_pnl_by_entry_day": {
+              "2026-11-20": 0.7850000000000001
+            },
+            "exit_counts": {
+              "TARGET": 1
+            },
+            "cash_pnl_usd": 0.7850000000000001,
+            "by_bot": {
+              "crypto": {
+                "trades": 1,
+                "profitable": 1,
+                "tp1_executions": 0,
+                "tp1_full_exits": 0,
+                "cash_pnl_usd": 0.7850000000000001,
+                "exit_counts": {
+                  "TARGET": 1
+                }
+              }
+            },
+            "entered_after_retry": []
+          },
+          "1000": {
+            "status": "SCORED_PUBLIC_L2_SIMULATION",
+            "trades": 1,
+            "skipped": {
+              "crypto:wide": 3,
+              "crypto:position_cap": 1
+            },
+            "return_pct": 0.5961538461538574,
+            "drawdown_pct": 0.0,
+            "contribution_pct": {
+              "crypto": 0.5961538461538437,
+              "stocks": 0.0
+            },
+            "peak_reservations": 1,
+            "peak_margin_pct": 2.6869230769230765,
+            "cash_pnl_by_entry_day": {
+              "2026-11-20": 0.7749999999999968
+            },
+            "exit_counts": {
+              "TARGET": 1
+            },
+            "cash_pnl_usd": 0.7749999999999968,
+            "by_bot": {
+              "crypto": {
+                "trades": 1,
+                "profitable": 1,
+                "tp1_executions": 0,
+                "tp1_full_exits": 0,
+                "cash_pnl_usd": 0.7749999999999968,
+                "exit_counts": {
+                  "TARGET": 1
+                }
+              }
+            },
+            "entered_after_retry": []
+          }
+        },
+        "short_cautious": {
+          "200": {
+            "status": "SCORED_PUBLIC_L2_SIMULATION",
+            "trades": 2,
+            "skipped": {
+              "crypto:wide": 2,
+              "crypto:position_cap": 1
+            },
+            "return_pct": 0.5833076923076774,
+            "drawdown_pct": 0.025590501757953018,
+            "contribution_pct": {
+              "crypto": 0.5833076923076963,
+              "stocks": 0.0
+            },
+            "peak_reservations": 2,
+            "peak_margin_pct": 5.619315384615385,
+            "cash_pnl_by_entry_day": {
+              "2026-11-20": 0.7583000000000054
+            },
+            "exit_counts": {
+              "TARGET": 1,
+              "BE": 1
+            },
+            "cash_pnl_usd": 0.7583000000000054,
+            "by_bot": {
+              "crypto": {
+                "trades": 2,
+                "profitable": 1,
+                "tp1_executions": 1,
+                "tp1_full_exits": 0,
+                "cash_pnl_usd": 0.7583000000000054,
+                "exit_counts": {
+                  "TARGET": 1,
+                  "BE": 1
+                }
+              }
+            },
+            "entered_after_retry": [
+              {
+                "symbol": "AAVEUSDT",
+                "entered": 1795140930000,
+                "outcome": "BE",
+                "usd": -0.02669999999999476
+              }
+            ]
+          },
+          "1000": {
+            "status": "SCORED_PUBLIC_L2_SIMULATION",
+            "trades": 2,
+            "skipped": {
+              "crypto:wide": 2,
+              "crypto:position_cap": 1
+            },
+            "return_pct": 0.5757692307692297,
+            "drawdown_pct": 0.025592419353449625,
+            "contribution_pct": {
+              "crypto": 0.5757692307692323,
+              "stocks": 0.0
+            },
+            "peak_reservations": 2,
+            "peak_margin_pct": 5.619315384615385,
+            "cash_pnl_by_entry_day": {
+              "2026-11-20": 0.748500000000002
+            },
+            "exit_counts": {
+              "TARGET": 1,
+              "BE": 1
+            },
+            "cash_pnl_usd": 0.748500000000002,
+            "by_bot": {
+              "crypto": {
+                "trades": 2,
+                "profitable": 1,
+                "tp1_executions": 1,
+                "tp1_full_exits": 0,
+                "cash_pnl_usd": 0.748500000000002,
+                "exit_counts": {
+                  "TARGET": 1,
+                  "BE": 1
+                }
+              }
+            },
+            "entered_after_retry": [
+              {
+                "symbol": "AAVEUSDT",
+                "entered": 1795140930000,
+                "outcome": "BE",
+                "usd": -0.0264999999999948
+              }
+            ]
+          }
+        },
+        "full_cautious": {
+          "200": {
+            "status": "SCORED_PUBLIC_L2_SIMULATION",
+            "trades": 2,
+            "skipped": {
+              "crypto:wide": 1,
+              "crypto:position_cap": 1,
+              "crypto:publication_rate_limit": 1
+            },
+            "return_pct": 0.5833076923076774,
+            "drawdown_pct": 0.025590501757953018,
+            "contribution_pct": {
+              "crypto": 0.5833076923076963,
+              "stocks": 0.0
+            },
+            "peak_reservations": 2,
+            "peak_margin_pct": 5.619315384615385,
+            "cash_pnl_by_entry_day": {
+              "2026-11-20": 0.7583000000000054
+            },
+            "exit_counts": {
+              "TARGET": 1,
+              "BE": 1
+            },
+            "cash_pnl_usd": 0.7583000000000054,
+            "by_bot": {
+              "crypto": {
+                "trades": 2,
+                "profitable": 1,
+                "tp1_executions": 1,
+                "tp1_full_exits": 0,
+                "cash_pnl_usd": 0.7583000000000054,
+                "exit_counts": {
+                  "TARGET": 1,
+                  "BE": 1
+                }
+              }
+            },
+            "entered_after_retry": [
+              {
+                "symbol": "AAVEUSDT",
+                "entered": 1795140930000,
+                "outcome": "BE",
+                "usd": -0.02669999999999476
+              }
+            ]
+          },
+          "1000": {
+            "status": "SCORED_PUBLIC_L2_SIMULATION",
+            "trades": 2,
+            "skipped": {
+              "crypto:wide": 1,
+              "crypto:position_cap": 1,
+              "crypto:publication_rate_limit": 1
+            },
+            "return_pct": 0.5757692307692297,
+            "drawdown_pct": 0.025592419353449625,
+            "contribution_pct": {
+              "crypto": 0.5757692307692323,
+              "stocks": 0.0
+            },
+            "peak_reservations": 2,
+            "peak_margin_pct": 5.619315384615385,
+            "cash_pnl_by_entry_day": {
+              "2026-11-20": 0.748500000000002
+            },
+            "exit_counts": {
+              "TARGET": 1,
+              "BE": 1
+            },
+            "cash_pnl_usd": 0.748500000000002,
+            "by_bot": {
+              "crypto": {
+                "trades": 2,
+                "profitable": 1,
+                "tp1_executions": 1,
+                "tp1_full_exits": 0,
+                "cash_pnl_usd": 0.748500000000002,
+                "exit_counts": {
+                  "TARGET": 1,
+                  "BE": 1
+                }
+              }
+            },
+            "entered_after_retry": [
+              {
+                "symbol": "AAVEUSDT",
+                "entered": 1795140930000,
+                "outcome": "BE",
+                "usd": -0.0264999999999948
+              }
+            ]
+          }
+        },
+        "full_instantaneous": {
+          "200": {
+            "status": "SCORED_PUBLIC_L2_SIMULATION",
+            "trades": 2,
+            "skipped": {
+              "crypto:wide": 1,
+              "crypto:position_cap": 1,
+              "crypto:publication_rate_limit": 1
+            },
+            "return_pct": 0.5833076923076774,
+            "drawdown_pct": 0.025590501757953018,
+            "contribution_pct": {
+              "crypto": 0.5833076923076963,
+              "stocks": 0.0
+            },
+            "peak_reservations": 2,
+            "peak_margin_pct": 5.619315384615385,
+            "cash_pnl_by_entry_day": {
+              "2026-11-20": 0.7583000000000054
+            },
+            "exit_counts": {
+              "TARGET": 1,
+              "BE": 1
+            },
+            "cash_pnl_usd": 0.7583000000000054,
+            "by_bot": {
+              "crypto": {
+                "trades": 2,
+                "profitable": 1,
+                "tp1_executions": 1,
+                "tp1_full_exits": 0,
+                "cash_pnl_usd": 0.7583000000000054,
+                "exit_counts": {
+                  "TARGET": 1,
+                  "BE": 1
+                }
+              }
+            },
+            "entered_after_retry": [
+              {
+                "symbol": "AAVEUSDT",
+                "entered": 1795140930000,
+                "outcome": "BE",
+                "usd": -0.02669999999999476
+              }
+            ]
+          },
+          "1000": {
+            "status": "SCORED_PUBLIC_L2_SIMULATION",
+            "trades": 2,
+            "skipped": {
+              "crypto:wide": 1,
+              "crypto:position_cap": 1,
+              "crypto:publication_rate_limit": 1
+            },
+            "return_pct": 0.5757692307692297,
+            "drawdown_pct": 0.025592419353449625,
+            "contribution_pct": {
+              "crypto": 0.5757692307692323,
+              "stocks": 0.0
+            },
+            "peak_reservations": 2,
+            "peak_margin_pct": 5.619315384615385,
+            "cash_pnl_by_entry_day": {
+              "2026-11-20": 0.748500000000002
+            },
+            "exit_counts": {
+              "TARGET": 1,
+              "BE": 1
+            },
+            "cash_pnl_usd": 0.748500000000002,
+            "by_bot": {
+              "crypto": {
+                "trades": 2,
+                "profitable": 1,
+                "tp1_executions": 1,
+                "tp1_full_exits": 0,
+                "cash_pnl_usd": 0.748500000000002,
+                "exit_counts": {
+                  "TARGET": 1,
+                  "BE": 1
+                }
+              }
+            },
+            "entered_after_retry": [
+              {
+                "symbol": "AAVEUSDT",
+                "entered": 1795140930000,
+                "outcome": "BE",
+                "usd": -0.0264999999999948
+              }
+            ]
+          }
+        }
+      },
+      "delayed_candidates": {
+        "short_cautious": [
+          {
+            "epoch": 1795140000,
+            "bot": "crypto",
+            "symbol": "AAVEUSDT",
+            "direction": "LONG",
+            "entry": 102.92,
+            "stop": 101.67714285714285,
+            "target": 105.4057142857143,
+            "market_anchor": 102.92,
+            "opening_anchor": 102.94,
+            "prints_before_decision": 8,
+            "paper_reference_ready": false,
+            "model_quality": 0.33047427606143953,
+            "market_alignment": "mixed",
+            "entry_status": "wide",
+            "entry_ms": 1795140010800,
+            "tries": [
+              {
+                "ms": 1795140010000,
+                "status": "wide",
+                "spread_bps": 5.830903790087684
+              },
+              {
+                "ms": 1795140010200,
+                "status": "wide",
+                "spread_bps": 9.716284492809397
+              },
+              {
+                "ms": 1795140010800,
+                "status": "wide",
+                "spread_bps": 7.773782917111874
+              }
+            ],
+            "stock_reference_ready": false,
+            "paper_path": {
+              "known": true,
+              "code": "BE",
+              "end_ms": 1795143934288,
+              "trigger_price": 102.92,
+              "bank": {
+                "ms": 1795143594412,
+                "price": 103.54
+              },
+              "be_level": 102.92
+            },
+            "delayed_attempts": [
+              {
+                "ms": 1795140030000,
+                "status": "wide",
+                "spread_bps": 7.760209525657027
+              },
+              {
+                "ms": 1795140060000,
+                "status": "wide",
+                "spread_bps": 6.7951269232629405
+              }
+            ]
+          },
+          {
+            "epoch": 1795140900,
+            "bot": "crypto",
+            "symbol": "AAVEUSDT",
+            "direction": "LONG",
+            "entry": 102.98,
+            "stop": 101.67571428571428,
+            "target": 105.58857142857146,
+            "market_anchor": 102.98,
+            "opening_anchor": 102.98,
+            "prints_before_decision": 3,
+            "paper_reference_ready": false,
+            "model_quality": 0.33640596436142395,
+            "market_alignment": "opposed",
+            "entry_status": "eligible",
+            "entry_ms": 1795140930000,
+            "tries": [
+              {
+                "ms": 1795140910000,
+                "status": "wide",
+                "spread_bps": 7.766990291263349
+              },
+              {
+                "ms": 1795140910200,
+                "status": "wide",
+                "spread_bps": 7.766990291263349
+              },
+              {
+                "ms": 1795140910800,
+                "status": "wide",
+                "spread_bps": 7.766990291263349
+              }
+            ],
+            "stock_reference_ready": false,
+            "paper_path": {
+              "known": true,
+              "code": "BE",
+              "end_ms": 1795147221417,
+              "trigger_price": 102.98,
+              "bank": {
+                "ms": 1795143640501,
+                "price": 103.66
+              },
+              "be_level": 102.98
+            },
+            "reference_entry": 103.02297297297297,
+            "delayed_attempts": [
+              {
+                "ms": 1795140930000,
+                "status": "eligible",
+                "average": 103.02297297297297,
+                "worst": 103.03,
+                "contracts": 3.7,
+                "spread_bps": 3.8834951456302953,
+                "slippage_bps": 0.9706853038249363,
+                "last_event_ms": 1795140929917
+              }
+            ],
+            "delay_ms": 30000,
+            "delayed_rr": 1.8952380952381225,
+            "path": {
+              "60": {
+                "known": true,
+                "code": "BE",
+                "end_ms": 1795143902058,
+                "trigger_price": 102.98,
+                "bank": {
+                  "ms": 1795143640501,
+                  "price": 103.66
+                },
+                "be_level": 103.02
+              },
+              "900": {
+                "known": true,
+                "code": "BE",
+                "end_ms": 1795147221417,
+                "trigger_price": 102.98,
+                "bank": {
+                  "ms": 1795143640501,
+                  "price": 103.66
+                },
+                "be_level": 103.02
+              }
+            }
+          },
+          {
+            "epoch": 1795141800,
+            "bot": "crypto",
+            "symbol": "AAVEUSDT",
+            "direction": "LONG",
+            "entry": 102.49,
+            "stop": 101.09857142857142,
+            "target": 105.27285714285715,
+            "market_anchor": 102.49,
+            "opening_anchor": 102.49,
+            "prints_before_decision": 1,
+            "paper_reference_ready": false,
+            "model_quality": 0.3460705932865942,
+            "market_alignment": "opposed",
+            "entry_status": "wide",
+            "entry_ms": 1795141810800,
+            "tries": [
+              {
+                "ms": 1795141810000,
+                "status": "wide",
+                "spread_bps": 6.829601443973598
+              },
+              {
+                "ms": 1795141810200,
+                "status": "wide",
+                "spread_bps": 6.829601443973598
+              },
+              {
+                "ms": 1795141810800,
+                "status": "wide",
+                "spread_bps": 6.829601443973598
+              }
+            ],
+            "stock_reference_ready": false,
+            "paper_path": {
+              "known": true,
+              "code": "BE",
+              "end_ms": 1795147754281,
+              "trigger_price": 102.49,
+              "bank": {
+                "ms": 1795143526465,
+                "price": 103.23
+              },
+              "be_level": 102.49
+            },
+            "delayed_attempts": [
+              {
+                "ms": 1795141830000,
+                "status": "wide",
+                "spread_bps": 5.856515373353077
+              },
+              {
+                "ms": 1795141860000,
+                "status": "wide",
+                "spread_bps": 5.852516582130538
+              }
+            ]
+          }
+        ],
+        "full_cautious": [
+          {
+            "epoch": 1795140000,
+            "bot": "crypto",
+            "symbol": "AAVEUSDT",
+            "direction": "LONG",
+            "entry": 102.92,
+            "stop": 101.67714285714285,
+            "target": 105.4057142857143,
+            "market_anchor": 102.92,
+            "opening_anchor": 102.94,
+            "prints_before_decision": 8,
+            "paper_reference_ready": false,
+            "model_quality": 0.33047427606143953,
+            "market_alignment": "mixed",
+            "entry_status": "wide",
+            "entry_ms": 1795140010800,
+            "tries": [
+              {
+                "ms": 1795140010000,
+                "status": "wide",
+                "spread_bps": 5.830903790087684
+              },
+              {
+                "ms": 1795140010200,
+                "status": "wide",
+                "spread_bps": 9.716284492809397
+              },
+              {
+                "ms": 1795140010800,
+                "status": "wide",
+                "spread_bps": 7.773782917111874
+              }
+            ],
+            "stock_reference_ready": false,
+            "paper_path": {
+              "known": true,
+              "code": "BE",
+              "end_ms": 1795143934288,
+              "trigger_price": 102.92,
+              "bank": {
+                "ms": 1795143594412,
+                "price": 103.54
+              },
+              "be_level": 102.92
+            },
+            "delayed_attempts": [
+              {
+                "ms": 1795140030000,
+                "status": "wide",
+                "spread_bps": 7.760209525657027
+              },
+              {
+                "ms": 1795140060000,
+                "status": "wide",
+                "spread_bps": 6.7951269232629405
+              },
+              {
+                "ms": 1795140120000,
+                "status": "wide",
+                "spread_bps": 5.828071879553402
+              }
+            ]
+          },
+          {
+            "epoch": 1795140900,
+            "bot": "crypto",
+            "symbol": "AAVEUSDT",
+            "direction": "LONG",
+            "entry": 102.98,
+            "stop": 101.67571428571428,
+            "target": 105.58857142857146,
+            "market_anchor": 102.98,
+            "opening_anchor": 102.98,
+            "prints_before_decision": 3,
+            "paper_reference_ready": false,
+            "model_quality": 0.33640596436142395,
+            "market_alignment": "opposed",
+            "entry_status": "eligible",
+            "entry_ms": 1795140930000,
+            "tries": [
+              {
+                "ms": 1795140910000,
+                "status": "wide",
+                "spread_bps": 7.766990291263349
+              },
+              {
+                "ms": 1795140910200,
+                "status": "wide",
+                "spread_bps": 7.766990291263349
+              },
+              {
+                "ms": 1795140910800,
+                "status": "wide",
+                "spread_bps": 7.766990291263349
+              }
+            ],
+            "stock_reference_ready": false,
+            "paper_path": {
+              "known": true,
+              "code": "BE",
+              "end_ms": 1795147221417,
+              "trigger_price": 102.98,
+              "bank": {
+                "ms": 1795143640501,
+                "price": 103.66
+              },
+              "be_level": 102.98
+            },
+            "reference_entry": 103.02297297297297,
+            "delayed_attempts": [
+              {
+                "ms": 1795140930000,
+                "status": "eligible",
+                "average": 103.02297297297297,
+                "worst": 103.03,
+                "contracts": 3.7,
+                "spread_bps": 3.8834951456302953,
+                "slippage_bps": 0.9706853038249363,
+                "last_event_ms": 1795140929917
+              }
+            ],
+            "delay_ms": 30000,
+            "delayed_rr": 1.8952380952381225,
+            "path": {
+              "60": {
+                "known": true,
+                "code": "BE",
+                "end_ms": 1795143902058,
+                "trigger_price": 102.98,
+                "bank": {
+                  "ms": 1795143640501,
+                  "price": 103.66
+                },
+                "be_level": 103.02
+              },
+              "900": {
+                "known": true,
+                "code": "BE",
+                "end_ms": 1795147221417,
+                "trigger_price": 102.98,
+                "bank": {
+                  "ms": 1795143640501,
+                  "price": 103.66
+                },
+                "be_level": 103.02
+              }
+            }
+          },
+          {
+            "epoch": 1795141800,
+            "bot": "crypto",
+            "symbol": "AAVEUSDT",
+            "direction": "LONG",
+            "entry": 102.49,
+            "stop": 101.09857142857142,
+            "target": 105.27285714285715,
+            "market_anchor": 102.49,
+            "opening_anchor": 102.49,
+            "prints_before_decision": 1,
+            "paper_reference_ready": false,
+            "model_quality": 0.3460705932865942,
+            "market_alignment": "opposed",
+            "entry_status": "eligible",
+            "entry_ms": 1795141920000,
+            "tries": [
+              {
+                "ms": 1795141810000,
+                "status": "wide",
+                "spread_bps": 6.829601443973598
+              },
+              {
+                "ms": 1795141810200,
+                "status": "wide",
+                "spread_bps": 6.829601443973598
+              },
+              {
+                "ms": 1795141810800,
+                "status": "wide",
+                "spread_bps": 6.829601443973598
+              }
+            ],
+            "stock_reference_ready": false,
+            "paper_path": {
+              "known": true,
+              "code": "BE",
+              "end_ms": 1795147754281,
+              "trigger_price": 102.49,
+              "bank": {
+                "ms": 1795143526465,
+                "price": 103.23
+              },
+              "be_level": 102.49
+            },
+            "reference_entry": 102.65756756756757,
+            "delayed_attempts": [
+              {
+                "ms": 1795141830000,
+                "status": "wide",
+                "spread_bps": 5.856515373353077
+              },
+              {
+                "ms": 1795141860000,
+                "status": "wide",
+                "spread_bps": 5.852516582130538
+              },
+              {
+                "ms": 1795141920000,
+                "status": "eligible",
+                "average": 102.65756756756757,
+                "worst": 102.67,
+                "contracts": 3.7,
+                "spread_bps": 3.897495858911259,
+                "slippage_bps": 1.94836824159772,
+                "last_event_ms": 1795141919997
+              }
+            ],
+            "delay_ms": 120000,
+            "delayed_rr": 1.657870791628748,
+            "path": {
+              "60": {
+                "known": true,
+                "code": "BE",
+                "end_ms": 1795144354368,
+                "trigger_price": 102.65,
+                "bank": {
+                  "ms": 1795143526465,
+                  "price": 103.23
+                },
+                "be_level": 102.66
+              },
+              "900": {
+                "known": true,
+                "code": "BE",
+                "end_ms": 1795144354368,
+                "trigger_price": 102.65,
+                "bank": {
+                  "ms": 1795143526465,
+                  "price": 103.23
+                },
+                "be_level": 102.66
+              }
+            }
+          }
+        ],
+        "full_instantaneous": [
+          {
+            "epoch": 1795140000,
+            "bot": "crypto",
+            "symbol": "AAVEUSDT",
+            "direction": "LONG",
+            "entry": 102.92,
+            "stop": 101.67714285714285,
+            "target": 105.4057142857143,
+            "market_anchor": 102.92,
+            "opening_anchor": 102.94,
+            "prints_before_decision": 8,
+            "paper_reference_ready": false,
+            "model_quality": 0.33047427606143953,
+            "market_alignment": "mixed",
+            "entry_status": "wide",
+            "entry_ms": 1795140010800,
+            "tries": [
+              {
+                "ms": 1795140010000,
+                "status": "wide",
+                "spread_bps": 5.830903790087684
+              },
+              {
+                "ms": 1795140010200,
+                "status": "wide",
+                "spread_bps": 9.716284492809397
+              },
+              {
+                "ms": 1795140010800,
+                "status": "wide",
+                "spread_bps": 7.773782917111874
+              }
+            ],
+            "stock_reference_ready": false,
+            "paper_path": {
+              "known": true,
+              "code": "BE",
+              "end_ms": 1795143934288,
+              "trigger_price": 102.92,
+              "bank": {
+                "ms": 1795143594412,
+                "price": 103.54
+              },
+              "be_level": 102.92
+            },
+            "delayed_attempts": [
+              {
+                "ms": 1795140030000,
+                "status": "wide",
+                "spread_bps": 7.760209525657027
+              },
+              {
+                "ms": 1795140060000,
+                "status": "wide",
+                "spread_bps": 6.7951269232629405
+              },
+              {
+                "ms": 1795140120000,
+                "status": "wide",
+                "spread_bps": 5.828071879553402
+              }
+            ]
+          },
+          {
+            "epoch": 1795140900,
+            "bot": "crypto",
+            "symbol": "AAVEUSDT",
+            "direction": "LONG",
+            "entry": 102.98,
+            "stop": 101.67571428571428,
+            "target": 105.58857142857146,
+            "market_anchor": 102.98,
+            "opening_anchor": 102.98,
+            "prints_before_decision": 3,
+            "paper_reference_ready": false,
+            "model_quality": 0.33640596436142395,
+            "market_alignment": "opposed",
+            "entry_status": "eligible",
+            "entry_ms": 1795140930000,
+            "tries": [
+              {
+                "ms": 1795140910000,
+                "status": "wide",
+                "spread_bps": 7.766990291263349
+              },
+              {
+                "ms": 1795140910200,
+                "status": "wide",
+                "spread_bps": 7.766990291263349
+              },
+              {
+                "ms": 1795140910800,
+                "status": "wide",
+                "spread_bps": 7.766990291263349
+              }
+            ],
+            "stock_reference_ready": false,
+            "paper_path": {
+              "known": true,
+              "code": "BE",
+              "end_ms": 1795147221417,
+              "trigger_price": 102.98,
+              "bank": {
+                "ms": 1795143640501,
+                "price": 103.66
+              },
+              "be_level": 102.98
+            },
+            "reference_entry": 103.02297297297297,
+            "delayed_attempts": [
+              {
+                "ms": 1795140930000,
+                "status": "eligible",
+                "average": 103.02297297297297,
+                "worst": 103.03,
+                "contracts": 3.7,
+                "spread_bps": 3.8834951456302953,
+                "slippage_bps": 0.9706853038249363,
+                "last_event_ms": 1795140929917
+              }
+            ],
+            "delay_ms": 30000,
+            "delayed_rr": 1.8952380952381225,
+            "path": {
+              "60": {
+                "known": true,
+                "code": "BE",
+                "end_ms": 1795143902058,
+                "trigger_price": 102.98,
+                "bank": {
+                  "ms": 1795143640501,
+                  "price": 103.66
+                },
+                "be_level": 103.02
+              },
+              "900": {
+                "known": true,
+                "code": "BE",
+                "end_ms": 1795147221417,
+                "trigger_price": 102.98,
+                "bank": {
+                  "ms": 1795143640501,
+                  "price": 103.66
+                },
+                "be_level": 103.02
+              }
+            }
+          },
+          {
+            "epoch": 1795141800,
+            "bot": "crypto",
+            "symbol": "AAVEUSDT",
+            "direction": "LONG",
+            "entry": 102.49,
+            "stop": 101.09857142857142,
+            "target": 105.27285714285715,
+            "market_anchor": 102.49,
+            "opening_anchor": 102.49,
+            "prints_before_decision": 1,
+            "paper_reference_ready": false,
+            "model_quality": 0.3460705932865942,
+            "market_alignment": "opposed",
+            "entry_status": "eligible",
+            "entry_ms": 1795141920000,
+            "tries": [
+              {
+                "ms": 1795141810000,
+                "status": "wide",
+                "spread_bps": 6.829601443973598
+              },
+              {
+                "ms": 1795141810200,
+                "status": "wide",
+                "spread_bps": 6.829601443973598
+              },
+              {
+                "ms": 1795141810800,
+                "status": "wide",
+                "spread_bps": 6.829601443973598
+              }
+            ],
+            "stock_reference_ready": false,
+            "paper_path": {
+              "known": true,
+              "code": "BE",
+              "end_ms": 1795147754281,
+              "trigger_price": 102.49,
+              "bank": {
+                "ms": 1795143526465,
+                "price": 103.23
+              },
+              "be_level": 102.49
+            },
+            "reference_entry": 102.65756756756757,
+            "delayed_attempts": [
+              {
+                "ms": 1795141830000,
+                "status": "wide",
+                "spread_bps": 5.856515373353077
+              },
+              {
+                "ms": 1795141860000,
+                "status": "wide",
+                "spread_bps": 5.852516582130538
+              },
+              {
+                "ms": 1795141920000,
+                "status": "eligible",
+                "average": 102.65756756756757,
+                "worst": 102.67,
+                "contracts": 3.7,
+                "spread_bps": 3.897495858911259,
+                "slippage_bps": 1.94836824159772,
+                "last_event_ms": 1795141919997
+              }
+            ],
+            "delay_ms": 120000,
+            "delayed_rr": 1.657870791628748,
+            "path": {
+              "60": {
+                "known": true,
+                "code": "BE",
+                "end_ms": 1795144354368,
+                "trigger_price": 102.65,
+                "bank": {
+                  "ms": 1795143526465,
+                  "price": 103.23
+                },
+                "be_level": 102.66
+              },
+              "900": {
+                "known": true,
+                "code": "BE",
+                "end_ms": 1795144354368,
+                "trigger_price": 102.65,
+                "bank": {
+                  "ms": 1795143526465,
+                  "price": 103.23
+                },
+                "be_level": 102.66
+              }
+            }
+          }
+        ]
+      },
+      "archive_entry": {
+        "1795132800:AAVEUSDT": {
+          "snapshot": 96,
+          "update": 1611963,
+          "first_ts": 1795132800006,
+          "last_ts": 1795219199983
+        }
+      },
+      "archive_exit": {
+        "1795132800:AAVEUSDT": {
+          "snapshot": 96,
+          "update": 1611963,
+          "first_ts": 1795132800006,
+          "last_ts": 1795219199983
+        }
+      },
+      "archive_exit_extra": {},
+      "tape": {
+        "AAVEUSDT": {
+          "tape_trades": 7861,
+          "reconciled_bars": 50,
+          "mismatches": {}
+        }
+      },
+      "wide": 3,
+      "baseline_quotes": {
+        "1795132800:AAVEUSDT": {
+          "snapshot": 96,
+          "update": 1611963,
+          "first_ts": 1795132800006,
+          "last_ts": 1795219199983
+        },
+        "1795132800:AVAXUSDT": {
+          "snapshot": 96,
+          "update": 1243690,
+          "first_ts": 1795132800002,
+          "last_ts": 1795219199688
+        }
+      },
+      "baseline_tape": {
+        "AVAXUSDT": {
+          "tape_trades": 9680,
+          "reconciled_bars": 52,
+          "mismatches": {}
+        },
+        "AAVEUSDT": {
+          "tape_trades": 7861,
+          "reconciled_bars": 50,
+          "mismatches": {}
+        }
+      },
+      "baseline_exits": {
+        "1795132800:AVAXUSDT": {
+          "snapshot": 96,
+          "update": 1243690,
+          "first_ts": 1795132800002,
+          "last_ts": 1795219199688
+        }
+      }
+    }
+  },
+  "limitations": [
+    "Only already-wide AAVE and AVAX get extra checks. A tight book still needs reward/risk >= 1.5 and room to TP1.",
+    "Cautious variants reject either original stop or TP1 touched during the wait, using verified ordered trades.",
+    "New positions are replayed at observed delayed bids/asks. Exits use public books and two delays.",
+    "The fresh November 20 sample contains the two targeted instruments, not the full account."
+  ]
+}
