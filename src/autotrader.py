@@ -334,6 +334,7 @@ def _open_for_account_locked(
     account_key: str | None,
 ) -> None:
     uid = u["user_id"]
+    locked_at = time.time()
     if not _shared_capacity.prepare(_creds_of):
         _entry_skip(uid, sig, inst_id, "shared reservation is not ready",
                     f"⏸ Автотрейдинг: {disp} пропущен — общая бронь счёта "
@@ -512,14 +513,25 @@ def _open_for_account_locked(
     def size_for_price(price):
         return okx.calc_contracts(margin, AUTOTRADE_LEVERAGE, price, spec)
 
+    quote_started = time.time()
+    quote_receipts = []
+    quote_accepted = False
+
+    def fetch_entry_book():
+        try:
+            return okx.get_order_book(inst_id)
+        finally:
+            quote_receipts.append(round(time.time() * 1000))
+
     try:
         book, quote = execution_quote_with_retry(
-            lambda: okx.get_order_book(inst_id), direction, None,
+            fetch_entry_book, direction, None,
             clock_ms=lambda: time.time()*1000, deadline_ms=deadline_ms,
             size_for_price=size_for_price)
         book_observed_at = time.time()
         quote.validate_bracket(original_sl, target1)
         sz, px = quote.contracts, quote.average
+        quote_accepted = True
     except (TypeError, ValueError, KeyError, IndexError) as exc:
         log.warning("autotrade execution filter refused %s: %s", inst_id, exc)
         detail = str(exc)
@@ -542,6 +554,10 @@ def _open_for_account_locked(
             uid, sig, inst_id, friendly,
             f"ℹ️ Автотрейдинг: {disp} пропущен — {friendly}.")
         return
+    finally:
+        log.info("autotrade entry book timing signal=%s inst=%s published_at=%s lock_ms=%s started_ms=%s "
+                 "receipts_ms=%s accepted=%s", sig.get('id'), inst_id, sig.get('opened_at'),
+                 round(locked_at * 1000), round(quote_started * 1000), ','.join(map(str, quote_receipts)), quote_accepted)
 
     if deadline_ms is not None and time.time() * 1000 >= deadline_ms:
         _entry_skip(uid, sig, inst_id, "истёк срок входа",
@@ -643,9 +659,13 @@ def _open_for_account_locked(
             "shared short-cap audit signal_id=%s inst=%s shorts=%d unknown_sides=%d total=%d",
             sig["id"], inst_id, latest_positions.get("short_count", 0),
             latest_positions.get("unknown_side_count", 0), latest_positions["count"])
+    submitted_at = time.time()
     ok, ord_id = okx.place_market_entry(
         creds, inst_id, sig["direction"], sz, client_order_id,
         deadline_ms=deadline_ms)
+    log.info("autotrade order timing signal=%s inst=%s submit_ms=%s response_ms=%s book_ms=%s accepted=%s",
+             sig.get('id'), inst_id, round(submitted_at * 1000), round(time.time() * 1000),
+             round(book_observed_at * 1000), ok)
     if not ok:
         ambiguous = okx.is_ambiguous_request_error(ord_id)
         if ambiguous:

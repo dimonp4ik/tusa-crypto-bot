@@ -1,3 +1,4 @@
+import logging
 from unittest.mock import Mock, patch
 
 import pytest
@@ -40,7 +41,8 @@ def test_execution_rechecks_are_staggered_and_cannot_run_past_the_deadline():
     assert elapsed == pytest.approx([.2, .6])
 
 
-def test_wide_candidate_does_not_take_the_remaining_signal_slot():
+def test_wide_candidate_does_not_take_the_remaining_signal_slot(caplog):
+    caplog.set_level(logging.INFO, logger=main.log.name)
     stock = hasattr(main, '_publish_stock_venue_candidates')
     publish = main._publish_stock_venue_candidates if stock else main._publish_venue_candidates
     source = 'stock_xperp_native_shadow' if stock else 'venue_shadow_profit_first_2r'
@@ -65,3 +67,6 @@ def test_wide_candidate_does_not_take_the_remaining_signal_slot():
     blocked.assert_called_once_with(1, 'spread_at_publish')
     sent.assert_called_once_with(2)
     assert send.call_args.args[0]['symbol'] == 'LINKUSDT'
+    if not stock:
+        assert 'setup=1 symbol=BILLUSDT bar=980.0 started_ms=1000000 receipts_ms=1000000,1000000 wide=True' in caplog.text
+        assert 'setup=2 symbol=LINKUSDT bar=980.0 started_ms=1000000 receipts_ms=1000000 wide=False' in caplog.text

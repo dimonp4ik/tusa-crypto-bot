@@ -4579,10 +4579,22 @@ def _publish_venue_candidates(
             inst_id = instruments.get(_base_of_symbol(analysis['symbol']))
             wide = False
             if inst_id:
+                book_started = time.time()
+                receipts = []
+
+                def fetch_publication_book():
+                    try:
+                        return _okx_trade.get_order_book(inst_id, timeout=1.0)
+                    finally:
+                        receipts.append(round(time.time() * 1000))
+
                 wide, snapshot, observed_at = publication_book(
-                    lambda: _okx_trade.get_order_book(inst_id, timeout=1.0),
+                    fetch_publication_book,
                     clock=time.time,
                 )
+                log.info("venue publication book timing setup=%s symbol=%s bar=%s started_ms=%s receipts_ms=%s wide=%s",
+                         setup_id, analysis['symbol'], entry_bar, round(book_started * 1000),
+                         ','.join(map(str, receipts)), wide)
                 if snapshot is not None:
                     analysis['_publication_book'] = (snapshot, observed_at)
             late = time.time() - float(entry_bar) >= _MAX_VENUE_ENTRY_DELAY_SEC
@@ -4592,7 +4604,12 @@ def _publish_venue_candidates(
                 if reject_audit is not None:
                     reject_audit[reason] = reject_audit.get(reason, 0) + 1
                 continue
-        if not send_signal(analysis):
+        send_started = time.monotonic()
+        sent = send_signal(analysis)
+        if entry_bar and not analysis.get('_shadow_only', True):
+            log.info("venue publication dispatch timing setup=%s signal=%s send_ms=%s sent=%s", setup_id,
+                     analysis.get('_signal_id'), round((time.monotonic() - send_started) * 1000), sent)
+        if not sent:
             mark_setup_blocked(setup_id, "send_failed")
             if reject_audit is not None:
                 reject_audit["send_failed"] = reject_audit.get("send_failed", 0) + 1
