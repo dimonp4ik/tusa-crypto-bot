@@ -11,7 +11,7 @@ from okx_xperp_l2_capture_nov19 import START, END, ROOT_L2, catalogue, download
 from okx_xperp_l2_entry_replay_nov19 import archive
 from okx_xperp_tick_path_nov19 import load_trade_tape, reconcile, resolve_ticks
 from post_close_replay_nov23 import PostCloseState
-from src.execution_guard import execution_quote
+from src.execution_guard import MAX_ENTRY_SPREAD, execution_quote
 from src.okx_trader import calc_contracts, round_to_tick
 from src.tp1_plan import plan_tp1_close
 
@@ -232,8 +232,17 @@ def simulate(rows, specs, ticks, books, *, clock, lag, setting, exit_price=None,
             if book is None:
                 raise ValueError('missing entry L2 sample')
             entry=execution_quote(book,side,None,opened,
-                size_for_price=lambda price:calc_contracts(cash*FRACTION,LEVERAGE,price,spec))
+                size_for_price=lambda price:calc_contracts(cash*FRACTION,LEVERAGE,price,spec),
+                max_spread=row.get('research_entry_spread', MAX_ENTRY_SPREAD))
             entry.validate_bracket(row['stop'],row['target'])
+            minimum_reward = row.get('research_minimum_reward_r')
+            if minimum_reward is not None:
+                reward_r = abs(row['target'] - entry.worst) / abs(entry.worst - row['stop'])
+                backing = row['research_backing_level']
+                sign = 1 if side == 'LONG' else -1
+                if reward_r < minimum_reward or any(sign * (price - backing) < 0 for price in (entry.best, entry.worst)):
+                    skipped[bot + ':research_geometry_at_actual_size'] += 1
+                    continue
             if bot=='crypto' and round_to_tick(entry.average,ticks[symbol])!=path['be_level']:
                 if reprice_path is None:
                     raise ValueError('compounded size changed the precomputed BE level')

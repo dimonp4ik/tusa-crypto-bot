@@ -1,0 +1,2542 @@
+{
+  "cases": {
+    "nov20": {
+      "window_utc": [
+        1795147200,
+        1795176000
+      ],
+      "crypto_source_sha256": "efcb4dc1b6a4b77008ef09ee37ea91474691e2d6cc63a2716b4237174d650ace",
+      "crypto_tape_checks": {
+        "AVAXUSDT": {
+          "tape_trades": 24372,
+          "reconciled_bars": 48,
+          "mismatches": {}
+        },
+        "ETHUSDT": {
+          "tape_trades": 384444,
+          "reconciled_bars": 48,
+          "mismatches": {}
+        },
+        "ZECUSDT": {
+          "tape_trades": 93247,
+          "reconciled_bars": 49,
+          "mismatches": {}
+        },
+        "SUIUSDT": {
+          "tape_trades": 45382,
+          "reconciled_bars": 48,
+          "mismatches": {}
+        }
+      },
+      "repaired_trade_source_sha256": {},
+      "entries": {
+        "1795132800:AVAXUSDT": {
+          "snapshot": 96,
+          "update": 1243690,
+          "first_ts": 1795132800002,
+          "last_ts": 1795219199688
+        },
+        "1795132800:ETHUSDT": {
+          "snapshot": 96,
+          "update": 4240347,
+          "first_ts": 1795132800002,
+          "last_ts": 1795219199998
+        },
+        "1795132800:SOFTBANKUSDT": {
+          "snapshot": 96,
+          "update": 163954,
+          "first_ts": 1795132800000,
+          "last_ts": 1795219198375
+        },
+        "1795132800:SUIUSDT": {
+          "snapshot": 96,
+          "update": 2001875,
+          "first_ts": 1795132800006,
+          "last_ts": 1795219199343
+        },
+        "1795132800:ZECUSDT": {
+          "snapshot": 96,
+          "update": 3183379,
+          "first_ts": 1795132800000,
+          "last_ts": 1795219199995
+        }
+      },
+      "exits": {
+        "1795132800:AVAXUSDT": {
+          "snapshot": 96,
+          "update": 1243690,
+          "first_ts": 1795132800002,
+          "last_ts": 1795219199688
+        },
+        "1795132800:ETHUSDT": {
+          "snapshot": 96,
+          "update": 4240347,
+          "first_ts": 1795132800002,
+          "last_ts": 1795219199998
+        },
+        "1795132800:SOFTBANKUSDT": {
+          "snapshot": 96,
+          "update": 163954,
+          "first_ts": 1795132800000,
+          "last_ts": 1795219198375
+        },
+        "1795132800:SUIUSDT": {
+          "snapshot": 96,
+          "update": 2001875,
+          "first_ts": 1795132800006,
+          "last_ts": 1795219199343
+        },
+        "1795132800:ZECUSDT": {
+          "snapshot": 96,
+          "update": 3183379,
+          "first_ts": 1795132800000,
+          "last_ts": 1795219199995
+        }
+      },
+      "dynamic_fill_checks": {
+        "repriced": [],
+        "extra_exit_checks": {}
+      },
+      "results": {
+        "fast": {
+          "200": {
+            "current": {
+              "status": "SCORED_PUBLIC_L2_SIMULATION",
+              "trades": 4,
+              "skipped": {
+                "crypto:spread_at_publish": 2,
+                "crypto:publication_rate_limit": 4,
+                "crypto:position_cap": 1
+              },
+              "return_pct": -0.7763307692307708,
+              "drawdown_pct": 0.782734098930072,
+              "contribution_pct": {
+                "crypto": -0.7763307692307616,
+                "stocks": 0.0
+              },
+              "peak_reservations": 2,
+              "peak_margin_pct": 5.608912307692307,
+              "cash_pnl_usd": -1.00922999999999,
+              "profitable": 1,
+              "routed": 0,
+              "exit_counts": {
+                "BE": 2,
+                "SL": 2
+              },
+              "closed_stock_positions": [],
+              "changes": {
+                "transition": {},
+                "removed": 0,
+                "added": 0,
+                "added_positions": [],
+                "removed_positions": []
+              }
+            },
+            "two_fresh_quotes_five_seconds_apart": {
+              "status": "SCORED_PUBLIC_L2_SIMULATION",
+              "trades": 4,
+              "skipped": {
+                "crypto:spread_at_publish": 2,
+                "crypto:publication_rate_limit": 4,
+                "crypto:position_cap": 1
+              },
+              "return_pct": -0.7763307692307708,
+              "drawdown_pct": 0.782734098930072,
+              "contribution_pct": {
+                "crypto": -0.7763307692307616,
+                "stocks": 0.0
+              },
+              "peak_reservations": 2,
+              "peak_margin_pct": 5.608912307692307,
+              "cash_pnl_usd": -1.00922999999999,
+              "profitable": 1,
+              "routed": 0,
+              "exit_counts": {
+                "BE": 2,
+                "SL": 2
+              },
+              "closed_stock_positions": [],
+              "changes": {
+                "transition": {},
+                "removed": 0,
+                "added": 0,
+                "added_positions": [],
+                "removed_positions": []
+              }
+            },
+            "two_quotes_up_to_10bp_with_2r": {
+              "status": "SCORED_PUBLIC_L2_SIMULATION",
+              "trades": 4,
+              "skipped": {
+                "crypto:spread_at_publish": 2,
+                "crypto:publication_rate_limit": 4,
+                "crypto:position_cap": 1
+              },
+              "return_pct": -0.7763307692307708,
+              "drawdown_pct": 0.782734098930072,
+              "contribution_pct": {
+                "crypto": -0.7763307692307616,
+                "stocks": 0.0
+              },
+              "peak_reservations": 2,
+              "peak_margin_pct": 5.608912307692307,
+              "cash_pnl_usd": -1.00922999999999,
+              "profitable": 1,
+              "routed": 0,
+              "exit_counts": {
+                "BE": 2,
+                "SL": 2
+              },
+              "closed_stock_positions": [],
+              "changes": {
+                "transition": {},
+                "removed": 0,
+                "added": 0,
+                "added_positions": [],
+                "removed_positions": []
+              }
+            },
+            "two_quotes_up_to_15bp_with_2r": {
+              "status": "SCORED_PUBLIC_L2_SIMULATION",
+              "trades": 5,
+              "skipped": {
+                "crypto:spread_at_publish": 2,
+                "crypto:publication_rate_limit": 4,
+                "crypto:position_cap": 1
+              },
+              "return_pct": -0.1917153846153985,
+              "drawdown_pct": 0.782734098930072,
+              "contribution_pct": {
+                "crypto": -0.7763307692307616,
+                "stocks": 0.5846153846153831
+              },
+              "peak_reservations": 3,
+              "peak_margin_pct": 8.195845310677125,
+              "cash_pnl_usd": -0.24922999999999199,
+              "profitable": 2,
+              "routed": 1,
+              "exit_counts": {
+                "BE": 2,
+                "TARGET": 1,
+                "SL": 2
+              },
+              "closed_stock_positions": [
+                {
+                  "symbol": "SOFTBANKUSDT",
+                  "bot": "stocks",
+                  "entry_ms": 1795163443193,
+                  "exit_ms": 1795188246844,
+                  "code": "TARGET",
+                  "entry_px": 19.18,
+                  "qty": 2.0,
+                  "bank_qty": 0.0,
+                  "bank_px": null,
+                  "runner_px": 18.8,
+                  "bank_pnl": 0.0,
+                  "runner_pnl": 0.759999999999998
+                }
+              ],
+              "changes": {
+                "transition": {},
+                "removed": 0,
+                "added": 1,
+                "added_positions": [
+                  {
+                    "bot": "stocks",
+                    "symbol": "SOFTBANKUSDT",
+                    "entry_ms": 1795163443193,
+                    "exit": "TARGET",
+                    "cash_pnl_usd": 0.759999999999998
+                  }
+                ],
+                "removed_positions": []
+              }
+            }
+          },
+          "1000": {
+            "current": {
+              "status": "SCORED_PUBLIC_L2_SIMULATION",
+              "trades": 4,
+              "skipped": {
+                "crypto:spread_at_publish": 2,
+                "crypto:publication_rate_limit": 4,
+                "crypto:position_cap": 1
+              },
+              "return_pct": -0.7887923076923098,
+              "drawdown_pct": 0.7951948331949896,
+              "contribution_pct": {
+                "crypto": -0.7887923076923052,
+                "stocks": 0.0
+              },
+              "peak_reservations": 2,
+              "peak_margin_pct": 5.608912307692307,
+              "cash_pnl_usd": -1.0254299999999967,
+              "profitable": 1,
+              "routed": 0,
+              "exit_counts": {
+                "BE": 2,
+                "SL": 2
+              },
+              "closed_stock_positions": [],
+              "changes": {
+                "transition": {},
+                "removed": 0,
+                "added": 0,
+                "added_positions": [],
+                "removed_positions": []
+              }
+            },
+            "two_fresh_quotes_five_seconds_apart": {
+              "status": "SCORED_PUBLIC_L2_SIMULATION",
+              "trades": 4,
+              "skipped": {
+                "crypto:spread_at_publish": 2,
+                "crypto:publication_rate_limit": 4,
+                "crypto:position_cap": 1
+              },
+              "return_pct": -0.7887923076923098,
+              "drawdown_pct": 0.7951948331949896,
+              "contribution_pct": {
+                "crypto": -0.7887923076923052,
+                "stocks": 0.0
+              },
+              "peak_reservations": 2,
+              "peak_margin_pct": 5.608912307692307,
+              "cash_pnl_usd": -1.0254299999999967,
+              "profitable": 1,
+              "routed": 0,
+              "exit_counts": {
+                "BE": 2,
+                "SL": 2
+              },
+              "closed_stock_positions": [],
+              "changes": {
+                "transition": {},
+                "removed": 0,
+                "added": 0,
+                "added_positions": [],
+                "removed_positions": []
+              }
+            },
+            "two_quotes_up_to_10bp_with_2r": {
+              "status": "SCORED_PUBLIC_L2_SIMULATION",
+              "trades": 4,
+              "skipped": {
+                "crypto:spread_at_publish": 2,
+                "crypto:publication_rate_limit": 4,
+                "crypto:position_cap": 1
+              },
+              "return_pct": -0.7887923076923098,
+              "drawdown_pct": 0.7951948331949896,
+              "contribution_pct": {
+                "crypto": -0.7887923076923052,
+                "stocks": 0.0
+              },
+              "peak_reservations": 2,
+              "peak_margin_pct": 5.608912307692307,
+              "cash_pnl_usd": -1.0254299999999967,
+              "profitable": 1,
+              "routed": 0,
+              "exit_counts": {
+                "BE": 2,
+                "SL": 2
+              },
+              "closed_stock_positions": [],
+              "changes": {
+                "transition": {},
+                "removed": 0,
+                "added": 0,
+                "added_positions": [],
+                "removed_positions": []
+              }
+            },
+            "two_quotes_up_to_15bp_with_2r": {
+              "status": "SCORED_PUBLIC_L2_SIMULATION",
+              "trades": 5,
+              "skipped": {
+                "crypto:spread_at_publish": 2,
+                "crypto:publication_rate_limit": 4,
+                "crypto:position_cap": 1
+              },
+              "return_pct": -0.20417692307692636,
+              "drawdown_pct": 0.7951948331949896,
+              "contribution_pct": {
+                "crypto": -0.7887923076923052,
+                "stocks": 0.5846153846153831
+              },
+              "peak_reservations": 3,
+              "peak_margin_pct": 8.195845310677125,
+              "cash_pnl_usd": -0.26542999999999867,
+              "profitable": 2,
+              "routed": 1,
+              "exit_counts": {
+                "BE": 2,
+                "TARGET": 1,
+                "SL": 2
+              },
+              "closed_stock_positions": [
+                {
+                  "symbol": "SOFTBANKUSDT",
+                  "bot": "stocks",
+                  "entry_ms": 1795163443193,
+                  "exit_ms": 1795188247644,
+                  "code": "TARGET",
+                  "entry_px": 19.18,
+                  "qty": 2.0,
+                  "bank_qty": 0.0,
+                  "bank_px": null,
+                  "runner_px": 18.8,
+                  "bank_pnl": 0.0,
+                  "runner_pnl": 0.759999999999998
+                }
+              ],
+              "changes": {
+                "transition": {},
+                "removed": 0,
+                "added": 1,
+                "added_positions": [
+                  {
+                    "bot": "stocks",
+                    "symbol": "SOFTBANKUSDT",
+                    "entry_ms": 1795163443193,
+                    "exit": "TARGET",
+                    "cash_pnl_usd": 0.759999999999998
+                  }
+                ],
+                "removed_positions": []
+              }
+            }
+          }
+        },
+        "middle": {
+          "200": {
+            "current": {
+              "status": "SCORED_PUBLIC_L2_SIMULATION",
+              "trades": 3,
+              "skipped": {
+                "crypto:execution_spread": 1,
+                "crypto:spread_at_publish": 1,
+                "crypto:publication_rate_limit": 5,
+                "crypto:position_cap": 1
+              },
+              "return_pct": -0.7695384615384548,
+              "drawdown_pct": 0.7695384615384498,
+              "contribution_pct": {
+                "crypto": -0.7695384615384552,
+                "stocks": 0.0
+              },
+              "peak_reservations": 2,
+              "peak_margin_pct": 5.246538461538461,
+              "cash_pnl_usd": -1.0003999999999917,
+              "profitable": 0,
+              "routed": 0,
+              "exit_counts": {
+                "BE": 1,
+                "SL": 2
+              },
+              "closed_stock_positions": [],
+              "changes": {
+                "transition": {},
+                "removed": 0,
+                "added": 0,
+                "added_positions": [],
+                "removed_positions": []
+              }
+            },
+            "two_fresh_quotes_five_seconds_apart": {
+              "status": "SCORED_PUBLIC_L2_SIMULATION",
+              "trades": 3,
+              "skipped": {
+                "crypto:execution_spread": 1,
+                "crypto:spread_at_publish": 1,
+                "crypto:publication_rate_limit": 5,
+                "crypto:position_cap": 1
+              },
+              "return_pct": -0.7695384615384548,
+              "drawdown_pct": 0.7695384615384498,
+              "contribution_pct": {
+                "crypto": -0.7695384615384552,
+                "stocks": 0.0
+              },
+              "peak_reservations": 2,
+              "peak_margin_pct": 5.246538461538461,
+              "cash_pnl_usd": -1.0003999999999917,
+              "profitable": 0,
+              "routed": 0,
+              "exit_counts": {
+                "BE": 1,
+                "SL": 2
+              },
+              "closed_stock_positions": [],
+              "changes": {
+                "transition": {},
+                "removed": 0,
+                "added": 0,
+                "added_positions": [],
+                "removed_positions": []
+              }
+            },
+            "two_quotes_up_to_10bp_with_2r": {
+              "status": "SCORED_PUBLIC_L2_SIMULATION",
+              "trades": 3,
+              "skipped": {
+                "crypto:execution_spread": 1,
+                "crypto:spread_at_publish": 1,
+                "crypto:publication_rate_limit": 5,
+                "crypto:position_cap": 1
+              },
+              "return_pct": -0.7695384615384548,
+              "drawdown_pct": 0.7695384615384498,
+              "contribution_pct": {
+                "crypto": -0.7695384615384552,
+                "stocks": 0.0
+              },
+              "peak_reservations": 2,
+              "peak_margin_pct": 5.246538461538461,
+              "cash_pnl_usd": -1.0003999999999917,
+              "profitable": 0,
+              "routed": 0,
+              "exit_counts": {
+                "BE": 1,
+                "SL": 2
+              },
+              "closed_stock_positions": [],
+              "changes": {
+                "transition": {},
+                "removed": 0,
+                "added": 0,
+                "added_positions": [],
+                "removed_positions": []
+              }
+            },
+            "two_quotes_up_to_15bp_with_2r": {
+              "status": "SCORED_PUBLIC_L2_SIMULATION",
+              "trades": 4,
+              "skipped": {
+                "crypto:execution_spread": 1,
+                "crypto:spread_at_publish": 1,
+                "crypto:publication_rate_limit": 5,
+                "crypto:position_cap": 1
+              },
+              "return_pct": -0.18492307692307142,
+              "drawdown_pct": 0.7695384615384498,
+              "contribution_pct": {
+                "crypto": -0.7695384615384552,
+                "stocks": 0.5846153846153831
+              },
+              "peak_reservations": 3,
+              "peak_margin_pct": 8.19730769230769,
+              "cash_pnl_usd": -0.24039999999999379,
+              "profitable": 1,
+              "routed": 1,
+              "exit_counts": {
+                "BE": 1,
+                "TARGET": 1,
+                "SL": 2
+              },
+              "closed_stock_positions": [
+                {
+                  "symbol": "SOFTBANKUSDT",
+                  "bot": "stocks",
+                  "entry_ms": 1795163443193,
+                  "exit_ms": 1795188246844,
+                  "code": "TARGET",
+                  "entry_px": 19.18,
+                  "qty": 2.0,
+                  "bank_qty": 0.0,
+                  "bank_px": null,
+                  "runner_px": 18.8,
+                  "bank_pnl": 0.0,
+                  "runner_pnl": 0.759999999999998
+                }
+              ],
+              "changes": {
+                "transition": {},
+                "removed": 0,
+                "added": 1,
+                "added_positions": [
+                  {
+                    "bot": "stocks",
+                    "symbol": "SOFTBANKUSDT",
+                    "entry_ms": 1795163443193,
+                    "exit": "TARGET",
+                    "cash_pnl_usd": 0.759999999999998
+                  }
+                ],
+                "removed_positions": []
+              }
+            }
+          },
+          "1000": {
+            "current": {
+              "status": "SCORED_PUBLIC_L2_SIMULATION",
+              "trades": 3,
+              "skipped": {
+                "crypto:execution_spread": 1,
+                "crypto:spread_at_publish": 1,
+                "crypto:publication_rate_limit": 5,
+                "crypto:position_cap": 1
+              },
+              "return_pct": -0.7819999999999827,
+              "drawdown_pct": 0.7819999999999867,
+              "contribution_pct": {
+                "crypto": -0.7819999999999988,
+                "stocks": 0.0
+              },
+              "peak_reservations": 2,
+              "peak_margin_pct": 5.246538461538461,
+              "cash_pnl_usd": -1.0165999999999984,
+              "profitable": 0,
+              "routed": 0,
+              "exit_counts": {
+                "BE": 1,
+                "SL": 2
+              },
+              "closed_stock_positions": [],
+              "changes": {
+                "transition": {},
+                "removed": 0,
+                "added": 0,
+                "added_positions": [],
+                "removed_positions": []
+              }
+            },
+            "two_fresh_quotes_five_seconds_apart": {
+              "status": "SCORED_PUBLIC_L2_SIMULATION",
+              "trades": 3,
+              "skipped": {
+                "crypto:execution_spread": 1,
+                "crypto:spread_at_publish": 1,
+                "crypto:publication_rate_limit": 5,
+                "crypto:position_cap": 1
+              },
+              "return_pct": -0.7819999999999827,
+              "drawdown_pct": 0.7819999999999867,
+              "contribution_pct": {
+                "crypto": -0.7819999999999988,
+                "stocks": 0.0
+              },
+              "peak_reservations": 2,
+              "peak_margin_pct": 5.246538461538461,
+              "cash_pnl_usd": -1.0165999999999984,
+              "profitable": 0,
+              "routed": 0,
+              "exit_counts": {
+                "BE": 1,
+                "SL": 2
+              },
+              "closed_stock_positions": [],
+              "changes": {
+                "transition": {},
+                "removed": 0,
+                "added": 0,
+                "added_positions": [],
+                "removed_positions": []
+              }
+            },
+            "two_quotes_up_to_10bp_with_2r": {
+              "status": "SCORED_PUBLIC_L2_SIMULATION",
+              "trades": 3,
+              "skipped": {
+                "crypto:execution_spread": 1,
+                "crypto:spread_at_publish": 1,
+                "crypto:publication_rate_limit": 5,
+                "crypto:position_cap": 1
+              },
+              "return_pct": -0.7819999999999827,
+              "drawdown_pct": 0.7819999999999867,
+              "contribution_pct": {
+                "crypto": -0.7819999999999988,
+                "stocks": 0.0
+              },
+              "peak_reservations": 2,
+              "peak_margin_pct": 5.246538461538461,
+              "cash_pnl_usd": -1.0165999999999984,
+              "profitable": 0,
+              "routed": 0,
+              "exit_counts": {
+                "BE": 1,
+                "SL": 2
+              },
+              "closed_stock_positions": [],
+              "changes": {
+                "transition": {},
+                "removed": 0,
+                "added": 0,
+                "added_positions": [],
+                "removed_positions": []
+              }
+            },
+            "two_quotes_up_to_15bp_with_2r": {
+              "status": "SCORED_PUBLIC_L2_SIMULATION",
+              "trades": 4,
+              "skipped": {
+                "crypto:execution_spread": 1,
+                "crypto:spread_at_publish": 1,
+                "crypto:publication_rate_limit": 5,
+                "crypto:position_cap": 1
+              },
+              "return_pct": -0.19738461538461038,
+              "drawdown_pct": 0.7819999999999867,
+              "contribution_pct": {
+                "crypto": -0.7819999999999988,
+                "stocks": 0.5846153846153831
+              },
+              "peak_reservations": 3,
+              "peak_margin_pct": 8.19730769230769,
+              "cash_pnl_usd": -0.25660000000000044,
+              "profitable": 1,
+              "routed": 1,
+              "exit_counts": {
+                "BE": 1,
+                "TARGET": 1,
+                "SL": 2
+              },
+              "closed_stock_positions": [
+                {
+                  "symbol": "SOFTBANKUSDT",
+                  "bot": "stocks",
+                  "entry_ms": 1795163443193,
+                  "exit_ms": 1795188247644,
+                  "code": "TARGET",
+                  "entry_px": 19.18,
+                  "qty": 2.0,
+                  "bank_qty": 0.0,
+                  "bank_px": null,
+                  "runner_px": 18.8,
+                  "bank_pnl": 0.0,
+                  "runner_pnl": 0.759999999999998
+                }
+              ],
+              "changes": {
+                "transition": {},
+                "removed": 0,
+                "added": 1,
+                "added_positions": [
+                  {
+                    "bot": "stocks",
+                    "symbol": "SOFTBANKUSDT",
+                    "entry_ms": 1795163443193,
+                    "exit": "TARGET",
+                    "cash_pnl_usd": 0.759999999999998
+                  }
+                ],
+                "removed_positions": []
+              }
+            }
+          }
+        },
+        "slow": {
+          "200": {
+            "current": {
+              "status": "SCORED_PUBLIC_L2_SIMULATION",
+              "trades": 4,
+              "skipped": {
+                "crypto:spread_at_publish": 2,
+                "crypto:publication_rate_limit": 4,
+                "crypto:position_cap": 1
+              },
+              "return_pct": -0.787007692307673,
+              "drawdown_pct": 0.7938376550229602,
+              "contribution_pct": {
+                "crypto": -0.7870076923076819,
+                "stocks": 0.0
+              },
+              "peak_reservations": 2,
+              "peak_margin_pct": 5.611398461538461,
+              "cash_pnl_usd": -1.0231099999999864,
+              "profitable": 1,
+              "routed": 0,
+              "exit_counts": {
+                "BE": 2,
+                "SL": 2
+              },
+              "closed_stock_positions": [],
+              "changes": {
+                "transition": {},
+                "removed": 0,
+                "added": 0,
+                "added_positions": [],
+                "removed_positions": []
+              }
+            },
+            "two_fresh_quotes_five_seconds_apart": {
+              "status": "SCORED_PUBLIC_L2_SIMULATION",
+              "trades": 4,
+              "skipped": {
+                "crypto:spread_at_publish": 2,
+                "crypto:publication_rate_limit": 4,
+                "crypto:position_cap": 1
+              },
+              "return_pct": -0.787007692307673,
+              "drawdown_pct": 0.7938376550229602,
+              "contribution_pct": {
+                "crypto": -0.7870076923076819,
+                "stocks": 0.0
+              },
+              "peak_reservations": 2,
+              "peak_margin_pct": 5.611398461538461,
+              "cash_pnl_usd": -1.0231099999999864,
+              "profitable": 1,
+              "routed": 0,
+              "exit_counts": {
+                "BE": 2,
+                "SL": 2
+              },
+              "closed_stock_positions": [],
+              "changes": {
+                "transition": {},
+                "removed": 0,
+                "added": 0,
+                "added_positions": [],
+                "removed_positions": []
+              }
+            },
+            "two_quotes_up_to_10bp_with_2r": {
+              "status": "SCORED_PUBLIC_L2_SIMULATION",
+              "trades": 4,
+              "skipped": {
+                "crypto:spread_at_publish": 2,
+                "crypto:publication_rate_limit": 4,
+                "crypto:position_cap": 1
+              },
+              "return_pct": -0.787007692307673,
+              "drawdown_pct": 0.7938376550229602,
+              "contribution_pct": {
+                "crypto": -0.7870076923076819,
+                "stocks": 0.0
+              },
+              "peak_reservations": 2,
+              "peak_margin_pct": 5.611398461538461,
+              "cash_pnl_usd": -1.0231099999999864,
+              "profitable": 1,
+              "routed": 0,
+              "exit_counts": {
+                "BE": 2,
+                "SL": 2
+              },
+              "closed_stock_positions": [],
+              "changes": {
+                "transition": {},
+                "removed": 0,
+                "added": 0,
+                "added_positions": [],
+                "removed_positions": []
+              }
+            },
+            "two_quotes_up_to_15bp_with_2r": {
+              "status": "SCORED_PUBLIC_L2_SIMULATION",
+              "trades": 5,
+              "skipped": {
+                "crypto:spread_at_publish": 2,
+                "crypto:publication_rate_limit": 4,
+                "crypto:position_cap": 1
+              },
+              "return_pct": -0.20239230769228955,
+              "drawdown_pct": 0.7938376550229602,
+              "contribution_pct": {
+                "crypto": -0.7870076923076819,
+                "stocks": 0.5846153846153831
+              },
+              "peak_reservations": 3,
+              "peak_margin_pct": 8.19817131775379,
+              "cash_pnl_usd": -0.26310999999998846,
+              "profitable": 2,
+              "routed": 1,
+              "exit_counts": {
+                "BE": 2,
+                "TARGET": 1,
+                "SL": 2
+              },
+              "closed_stock_positions": [
+                {
+                  "symbol": "SOFTBANKUSDT",
+                  "bot": "stocks",
+                  "entry_ms": 1795163443193,
+                  "exit_ms": 1795188246844,
+                  "code": "TARGET",
+                  "entry_px": 19.18,
+                  "qty": 2.0,
+                  "bank_qty": 0.0,
+                  "bank_px": null,
+                  "runner_px": 18.8,
+                  "bank_pnl": 0.0,
+                  "runner_pnl": 0.759999999999998
+                }
+              ],
+              "changes": {
+                "transition": {},
+                "removed": 0,
+                "added": 1,
+                "added_positions": [
+                  {
+                    "bot": "stocks",
+                    "symbol": "SOFTBANKUSDT",
+                    "entry_ms": 1795163443193,
+                    "exit": "TARGET",
+                    "cash_pnl_usd": 0.759999999999998
+                  }
+                ],
+                "removed_positions": []
+              }
+            }
+          },
+          "1000": {
+            "current": {
+              "status": "SCORED_PUBLIC_L2_SIMULATION",
+              "trades": 4,
+              "skipped": {
+                "crypto:spread_at_publish": 2,
+                "crypto:publication_rate_limit": 4,
+                "crypto:position_cap": 1
+              },
+              "return_pct": -0.799469230769212,
+              "drawdown_pct": 0.806298335614564,
+              "contribution_pct": {
+                "crypto": -0.7994692307692254,
+                "stocks": 0.0
+              },
+              "peak_reservations": 2,
+              "peak_margin_pct": 5.611398461538461,
+              "cash_pnl_usd": -1.039309999999993,
+              "profitable": 1,
+              "routed": 0,
+              "exit_counts": {
+                "BE": 2,
+                "SL": 2
+              },
+              "closed_stock_positions": [],
+              "changes": {
+                "transition": {},
+                "removed": 0,
+                "added": 0,
+                "added_positions": [],
+                "removed_positions": []
+              }
+            },
+            "two_fresh_quotes_five_seconds_apart": {
+              "status": "SCORED_PUBLIC_L2_SIMULATION",
+              "trades": 4,
+              "skipped": {
+                "crypto:spread_at_publish": 2,
+                "crypto:publication_rate_limit": 4,
+                "crypto:position_cap": 1
+              },
+              "return_pct": -0.799469230769212,
+              "drawdown_pct": 0.806298335614564,
+              "contribution_pct": {
+                "crypto": -0.7994692307692254,
+                "stocks": 0.0
+              },
+              "peak_reservations": 2,
+              "peak_margin_pct": 5.611398461538461,
+              "cash_pnl_usd": -1.039309999999993,
+              "profitable": 1,
+              "routed": 0,
+              "exit_counts": {
+                "BE": 2,
+                "SL": 2
+              },
+              "closed_stock_positions": [],
+              "changes": {
+                "transition": {},
+                "removed": 0,
+                "added": 0,
+                "added_positions": [],
+                "removed_positions": []
+              }
+            },
+            "two_quotes_up_to_10bp_with_2r": {
+              "status": "SCORED_PUBLIC_L2_SIMULATION",
+              "trades": 4,
+              "skipped": {
+                "crypto:spread_at_publish": 2,
+                "crypto:publication_rate_limit": 4,
+                "crypto:position_cap": 1
+              },
+              "return_pct": -0.799469230769212,
+              "drawdown_pct": 0.806298335614564,
+              "contribution_pct": {
+                "crypto": -0.7994692307692254,
+                "stocks": 0.0
+              },
+              "peak_reservations": 2,
+              "peak_margin_pct": 5.611398461538461,
+              "cash_pnl_usd": -1.039309999999993,
+              "profitable": 1,
+              "routed": 0,
+              "exit_counts": {
+                "BE": 2,
+                "SL": 2
+              },
+              "closed_stock_positions": [],
+              "changes": {
+                "transition": {},
+                "removed": 0,
+                "added": 0,
+                "added_positions": [],
+                "removed_positions": []
+              }
+            },
+            "two_quotes_up_to_15bp_with_2r": {
+              "status": "SCORED_PUBLIC_L2_SIMULATION",
+              "trades": 5,
+              "skipped": {
+                "crypto:spread_at_publish": 2,
+                "crypto:publication_rate_limit": 4,
+                "crypto:position_cap": 1
+              },
+              "return_pct": -0.21485384615382852,
+              "drawdown_pct": 0.806298335614564,
+              "contribution_pct": {
+                "crypto": -0.7994692307692254,
+                "stocks": 0.5846153846153831
+              },
+              "peak_reservations": 3,
+              "peak_margin_pct": 8.19817131775379,
+              "cash_pnl_usd": -0.2793099999999951,
+              "profitable": 2,
+              "routed": 1,
+              "exit_counts": {
+                "BE": 2,
+                "TARGET": 1,
+                "SL": 2
+              },
+              "closed_stock_positions": [
+                {
+                  "symbol": "SOFTBANKUSDT",
+                  "bot": "stocks",
+                  "entry_ms": 1795163443193,
+                  "exit_ms": 1795188247644,
+                  "code": "TARGET",
+                  "entry_px": 19.18,
+                  "qty": 2.0,
+                  "bank_qty": 0.0,
+                  "bank_px": null,
+                  "runner_px": 18.8,
+                  "bank_pnl": 0.0,
+                  "runner_pnl": 0.759999999999998
+                }
+              ],
+              "changes": {
+                "transition": {},
+                "removed": 0,
+                "added": 1,
+                "added_positions": [
+                  {
+                    "bot": "stocks",
+                    "symbol": "SOFTBANKUSDT",
+                    "entry_ms": 1795163443193,
+                    "exit": "TARGET",
+                    "cash_pnl_usd": 0.759999999999998
+                  }
+                ],
+                "removed_positions": []
+              }
+            }
+          }
+        }
+      }
+    },
+    "nov21": {
+      "window_utc": [
+        1795219200,
+        1795262400
+      ],
+      "crypto_source_sha256": "3eadf291b45a12acf023ffe2b7f7ef40c3f3b21e955337dfebf5ac1d7f364e12",
+      "crypto_tape_checks": {
+        "ETHUSDT": {
+          "tape_trades": 255882,
+          "reconciled_bars": 88,
+          "mismatches": {}
+        },
+        "LINKUSDT": {
+          "tape_trades": 26140,
+          "reconciled_bars": 95,
+          "mismatches": {}
+        },
+        "SUIUSDT": {
+          "tape_trades": 28200,
+          "reconciled_bars": 48,
+          "mismatches": {}
+        },
+        "AVAXUSDT": {
+          "tape_trades": 15459,
+          "reconciled_bars": 48,
+          "mismatches": {}
+        },
+        "BTCUSDT": {
+          "tape_trades": 548285,
+          "reconciled_bars": 48,
+          "mismatches": {}
+        },
+        "AAVEUSDT": {
+          "tape_trades": 13889,
+          "reconciled_bars": 48,
+          "mismatches": {}
+        },
+        "SOLUSDT": {
+          "tape_trades": 121640,
+          "reconciled_bars": 48,
+          "mismatches": {}
+        }
+      },
+      "repaired_trade_source_sha256": {
+        "AAVEUSDT": {
+          "2026-11-22": "6fdd73c907bf33187b94bf64b6db151ba8b78237e8f9cfc81ee021cae86b90f4"
+        },
+        "AVAXUSDT": {
+          "2026-11-22": "fb77bdacc3d08bc018cebcc1d8527cd04a12062e8e08a1d1fd745d27126f4c8d"
+        },
+        "BTCUSDT": {
+          "2026-11-22": "d0a0371633392da891877b76753c19bf6001e18339fd0b06c0a5205c83b64566"
+        },
+        "ETHUSDT": {
+          "2026-11-22": "57699278f9ee3b40a8f8b9d60fcbe03caed079ce8b891812041b9907b629eb3c"
+        },
+        "LINKUSDT": {
+          "2026-11-22": "9d4095998dbcfcf21ad9ba978515f5a1c2de78a3e58276e2bc5696682fd93863"
+        },
+        "SOLUSDT": {
+          "2026-11-22": "644ea43893bf8d5b58145ef97fd4b85d1b41183120b6742cc243399fd4279231"
+        }
+      },
+      "entries": {
+        "1795219200:AAVEUSDT": {
+          "snapshot": 96,
+          "update": 1702823,
+          "first_ts": 1795219200003,
+          "last_ts": 1795305599992
+        },
+        "1795219200:AMZNUSDT": {
+          "snapshot": 96,
+          "update": 187981,
+          "first_ts": 1795219200005,
+          "last_ts": 1795305594471
+        },
+        "1795219200:AVAXUSDT": {
+          "snapshot": 96,
+          "update": 999778,
+          "first_ts": 1795219200008,
+          "last_ts": 1795305599613
+        },
+        "1795219200:BTCUSDT": {
+          "snapshot": 96,
+          "update": 3174854,
+          "first_ts": 1795219200008,
+          "last_ts": 1795305599993
+        },
+        "1795219200:CRCLUSDT": {
+          "snapshot": 96,
+          "update": 584187,
+          "first_ts": 1795219200008,
+          "last_ts": 1795305597323
+        },
+        "1795219200:ETHUSDT": {
+          "snapshot": 96,
+          "update": 2925111,
+          "first_ts": 1795219200008,
+          "last_ts": 1795305599993
+        },
+        "1795219200:LINKUSDT": {
+          "snapshot": 96,
+          "update": 1711102,
+          "first_ts": 1795219200005,
+          "last_ts": 1795305599811
+        },
+        "1795219200:SOLUSDT": {
+          "snapshot": 96,
+          "update": 1372472,
+          "first_ts": 1795219200005,
+          "last_ts": 1795305599971
+        },
+        "1795219200:SUIUSDT": {
+          "snapshot": 96,
+          "update": 1384640,
+          "first_ts": 1795219200003,
+          "last_ts": 1795305592642
+        }
+      },
+      "exits": {
+        "1795219200:AAVEUSDT": {
+          "snapshot": 96,
+          "update": 1702823,
+          "first_ts": 1795219200003,
+          "last_ts": 1795305599992
+        },
+        "1795219200:AMZNUSDT": {
+          "snapshot": 96,
+          "update": 187981,
+          "first_ts": 1795219200005,
+          "last_ts": 1795305594471
+        },
+        "1795219200:AVAXUSDT": {
+          "snapshot": 96,
+          "update": 999778,
+          "first_ts": 1795219200008,
+          "last_ts": 1795305599613
+        },
+        "1795219200:BTCUSDT": {
+          "snapshot": 96,
+          "update": 3174854,
+          "first_ts": 1795219200008,
+          "last_ts": 1795305599993
+        },
+        "1795219200:CRCLUSDT": {
+          "snapshot": 96,
+          "update": 584187,
+          "first_ts": 1795219200008,
+          "last_ts": 1795305597323
+        },
+        "1795219200:ETHUSDT": {
+          "snapshot": 96,
+          "update": 2925111,
+          "first_ts": 1795219200008,
+          "last_ts": 1795305599993
+        },
+        "1795219200:LINKUSDT": {
+          "snapshot": 96,
+          "update": 1711102,
+          "first_ts": 1795219200005,
+          "last_ts": 1795305599811
+        },
+        "1795219200:SOLUSDT": {
+          "snapshot": 96,
+          "update": 1372472,
+          "first_ts": 1795219200005,
+          "last_ts": 1795305599971
+        },
+        "1795219200:SUIUSDT": {
+          "snapshot": 96,
+          "update": 1384640,
+          "first_ts": 1795219200003,
+          "last_ts": 1795305592642
+        }
+      },
+      "dynamic_fill_checks": {
+        "repriced": [],
+        "extra_exit_checks": {}
+      },
+      "results": {
+        "fast": {
+          "200": {
+            "current": {
+              "status": "SCORED_PUBLIC_L2_SIMULATION",
+              "trades": 7,
+              "skipped": {
+                "crypto:spread_at_publish": 7,
+                "crypto:publication_rate_limit": 31,
+                "crypto:position_cap": 2,
+                "crypto:depth slippage exceeds limit": 1
+              },
+              "return_pct": -0.7488076923077069,
+              "drawdown_pct": 2.155784925642694,
+              "contribution_pct": {
+                "crypto": -0.7488076923076915,
+                "stocks": 0.0
+              },
+              "peak_reservations": 3,
+              "peak_margin_pct": 8.604476923076923,
+              "cash_pnl_usd": -0.9734499999999989,
+              "profitable": 2,
+              "routed": 0,
+              "exit_counts": {
+                "TARGET": 2,
+                "SL": 5
+              },
+              "closed_stock_positions": [],
+              "changes": {
+                "transition": {},
+                "removed": 0,
+                "added": 0,
+                "added_positions": [],
+                "removed_positions": []
+              }
+            },
+            "two_fresh_quotes_five_seconds_apart": {
+              "status": "SCORED_PUBLIC_L2_SIMULATION",
+              "trades": 8,
+              "skipped": {
+                "crypto:spread_at_publish": 7,
+                "crypto:publication_rate_limit": 31,
+                "crypto:position_cap": 2,
+                "crypto:depth slippage exceeds limit": 1
+              },
+              "return_pct": -1.176807692307702,
+              "drawdown_pct": 2.5777176307128684,
+              "contribution_pct": {
+                "crypto": -0.7488076923076915,
+                "stocks": -0.42799999999999505
+              },
+              "peak_reservations": 4,
+              "peak_margin_pct": 11.499246153846155,
+              "cash_pnl_usd": -1.5298499999999926,
+              "profitable": 2,
+              "routed": 1,
+              "exit_counts": {
+                "TARGET": 2,
+                "SL": 6
+              },
+              "closed_stock_positions": [
+                {
+                  "symbol": "AMZNUSDT",
+                  "bot": "stocks",
+                  "entry_ms": 1795221178069,
+                  "exit_ms": 1795267959533,
+                  "code": "SL",
+                  "entry_px": 250.85333333333335,
+                  "qty": 0.15,
+                  "bank_qty": 0.0,
+                  "bank_px": null,
+                  "runner_px": 254.56266666666664,
+                  "bank_pnl": 0.0,
+                  "runner_pnl": -0.5563999999999936
+                }
+              ],
+              "changes": {
+                "transition": {},
+                "removed": 0,
+                "added": 1,
+                "added_positions": [
+                  {
+                    "bot": "stocks",
+                    "symbol": "AMZNUSDT",
+                    "entry_ms": 1795221178069,
+                    "exit": "SL",
+                    "cash_pnl_usd": -0.5563999999999936
+                  }
+                ],
+                "removed_positions": []
+              }
+            },
+            "two_quotes_up_to_10bp_with_2r": {
+              "status": "SCORED_PUBLIC_L2_SIMULATION",
+              "trades": 8,
+              "skipped": {
+                "crypto:spread_at_publish": 7,
+                "crypto:publication_rate_limit": 31,
+                "crypto:position_cap": 2,
+                "crypto:depth slippage exceeds limit": 1
+              },
+              "return_pct": -0.20496153846155662,
+              "drawdown_pct": 2.144288608897641,
+              "contribution_pct": {
+                "crypto": -0.7488076923076915,
+                "stocks": 0.5438461538461526
+              },
+              "peak_reservations": 4,
+              "peak_margin_pct": 11.235938461538462,
+              "cash_pnl_usd": -0.2664500000000004,
+              "profitable": 3,
+              "routed": 1,
+              "exit_counts": {
+                "TARGET": 3,
+                "SL": 5
+              },
+              "closed_stock_positions": [
+                {
+                  "symbol": "CRCLUSDT",
+                  "bot": "stocks",
+                  "entry_ms": 1795221039276,
+                  "exit_ms": 1795231826585,
+                  "code": "TARGET",
+                  "entry_px": 48.87,
+                  "qty": 0.7,
+                  "bank_qty": 0.0,
+                  "bank_px": null,
+                  "runner_px": 47.86,
+                  "bank_pnl": 0.0,
+                  "runner_pnl": 0.7069999999999985
+                }
+              ],
+              "changes": {
+                "transition": {},
+                "removed": 0,
+                "added": 1,
+                "added_positions": [
+                  {
+                    "bot": "stocks",
+                    "symbol": "CRCLUSDT",
+                    "entry_ms": 1795221039276,
+                    "exit": "TARGET",
+                    "cash_pnl_usd": 0.7069999999999985
+                  }
+                ],
+                "removed_positions": []
+              }
+            },
+            "two_quotes_up_to_15bp_with_2r": {
+              "status": "SCORED_PUBLIC_L2_SIMULATION",
+              "trades": 8,
+              "skipped": {
+                "crypto:spread_at_publish": 7,
+                "crypto:publication_rate_limit": 31,
+                "crypto:position_cap": 2,
+                "crypto:depth slippage exceeds limit": 1
+              },
+              "return_pct": -0.20496153846155662,
+              "drawdown_pct": 2.144288608897641,
+              "contribution_pct": {
+                "crypto": -0.7488076923076915,
+                "stocks": 0.5438461538461526
+              },
+              "peak_reservations": 4,
+              "peak_margin_pct": 11.235938461538462,
+              "cash_pnl_usd": -0.2664500000000004,
+              "profitable": 3,
+              "routed": 1,
+              "exit_counts": {
+                "TARGET": 3,
+                "SL": 5
+              },
+              "closed_stock_positions": [
+                {
+                  "symbol": "CRCLUSDT",
+                  "bot": "stocks",
+                  "entry_ms": 1795221039276,
+                  "exit_ms": 1795231826585,
+                  "code": "TARGET",
+                  "entry_px": 48.87,
+                  "qty": 0.7,
+                  "bank_qty": 0.0,
+                  "bank_px": null,
+                  "runner_px": 47.86,
+                  "bank_pnl": 0.0,
+                  "runner_pnl": 0.7069999999999985
+                }
+              ],
+              "changes": {
+                "transition": {},
+                "removed": 0,
+                "added": 1,
+                "added_positions": [
+                  {
+                    "bot": "stocks",
+                    "symbol": "CRCLUSDT",
+                    "entry_ms": 1795221039276,
+                    "exit": "TARGET",
+                    "cash_pnl_usd": 0.7069999999999985
+                  }
+                ],
+                "removed_positions": []
+              }
+            }
+          },
+          "1000": {
+            "current": {
+              "status": "SCORED_PUBLIC_L2_SIMULATION",
+              "trades": 7,
+              "skipped": {
+                "crypto:spread_at_publish": 7,
+                "crypto:publication_rate_limit": 31,
+                "crypto:position_cap": 2,
+                "crypto:depth slippage exceeds limit": 1
+              },
+              "return_pct": -0.7150461538461661,
+              "drawdown_pct": 2.1262352662836896,
+              "contribution_pct": {
+                "crypto": -0.7150461538461576,
+                "stocks": 0.0
+              },
+              "peak_reservations": 3,
+              "peak_margin_pct": 8.604476923076923,
+              "cash_pnl_usd": -0.9295600000000047,
+              "profitable": 2,
+              "routed": 0,
+              "exit_counts": {
+                "TARGET": 2,
+                "SL": 5
+              },
+              "closed_stock_positions": [],
+              "changes": {
+                "transition": {},
+                "removed": 0,
+                "added": 0,
+                "added_positions": [],
+                "removed_positions": []
+              }
+            },
+            "two_fresh_quotes_five_seconds_apart": {
+              "status": "SCORED_PUBLIC_L2_SIMULATION",
+              "trades": 8,
+              "skipped": {
+                "crypto:spread_at_publish": 7,
+                "crypto:publication_rate_limit": 31,
+                "crypto:position_cap": 2,
+                "crypto:depth slippage exceeds limit": 1
+              },
+              "return_pct": -1.1796615384615294,
+              "drawdown_pct": 2.5842468288007394,
+              "contribution_pct": {
+                "crypto": -0.7150461538461576,
+                "stocks": -0.46461538461538177
+              },
+              "peak_reservations": 4,
+              "peak_margin_pct": 11.499246153846155,
+              "cash_pnl_usd": -1.533560000000001,
+              "profitable": 2,
+              "routed": 1,
+              "exit_counts": {
+                "TARGET": 2,
+                "SL": 6
+              },
+              "closed_stock_positions": [
+                {
+                  "symbol": "AMZNUSDT",
+                  "bot": "stocks",
+                  "entry_ms": 1795221178069,
+                  "exit_ms": 1795267960333,
+                  "code": "SL",
+                  "entry_px": 250.85333333333335,
+                  "qty": 0.15,
+                  "bank_qty": 0.0,
+                  "bank_px": null,
+                  "runner_px": 254.88,
+                  "bank_pnl": 0.0,
+                  "runner_pnl": -0.6039999999999963
+                }
+              ],
+              "changes": {
+                "transition": {},
+                "removed": 0,
+                "added": 1,
+                "added_positions": [
+                  {
+                    "bot": "stocks",
+                    "symbol": "AMZNUSDT",
+                    "entry_ms": 1795221178069,
+                    "exit": "SL",
+                    "cash_pnl_usd": -0.6039999999999963
+                  }
+                ],
+                "removed_positions": []
+              }
+            },
+            "two_quotes_up_to_10bp_with_2r": {
+              "status": "SCORED_PUBLIC_L2_SIMULATION",
+              "trades": 8,
+              "skipped": {
+                "crypto:spread_at_publish": 7,
+                "crypto:publication_rate_limit": 31,
+                "crypto:position_cap": 2,
+                "crypto:depth slippage exceeds limit": 1
+              },
+              "return_pct": -0.19812307692308462,
+              "drawdown_pct": 2.1154554178763196,
+              "contribution_pct": {
+                "crypto": -0.7150461538461576,
+                "stocks": 0.5169230769230736
+              },
+              "peak_reservations": 4,
+              "peak_margin_pct": 11.235938461538462,
+              "cash_pnl_usd": -0.2575600000000091,
+              "profitable": 3,
+              "routed": 1,
+              "exit_counts": {
+                "TARGET": 3,
+                "SL": 5
+              },
+              "closed_stock_positions": [
+                {
+                  "symbol": "CRCLUSDT",
+                  "bot": "stocks",
+                  "entry_ms": 1795221039276,
+                  "exit_ms": 1795231827385,
+                  "code": "TARGET",
+                  "entry_px": 48.87,
+                  "qty": 0.7,
+                  "bank_qty": 0.0,
+                  "bank_px": null,
+                  "runner_px": 47.910000000000004,
+                  "bank_pnl": 0.0,
+                  "runner_pnl": 0.6719999999999956
+                }
+              ],
+              "changes": {
+                "transition": {},
+                "removed": 0,
+                "added": 1,
+                "added_positions": [
+                  {
+                    "bot": "stocks",
+                    "symbol": "CRCLUSDT",
+                    "entry_ms": 1795221039276,
+                    "exit": "TARGET",
+                    "cash_pnl_usd": 0.6719999999999956
+                  }
+                ],
+                "removed_positions": []
+              }
+            },
+            "two_quotes_up_to_15bp_with_2r": {
+              "status": "SCORED_PUBLIC_L2_SIMULATION",
+              "trades": 8,
+              "skipped": {
+                "crypto:spread_at_publish": 7,
+                "crypto:publication_rate_limit": 31,
+                "crypto:position_cap": 2,
+                "crypto:depth slippage exceeds limit": 1
+              },
+              "return_pct": -0.19812307692308462,
+              "drawdown_pct": 2.1154554178763196,
+              "contribution_pct": {
+                "crypto": -0.7150461538461576,
+                "stocks": 0.5169230769230736
+              },
+              "peak_reservations": 4,
+              "peak_margin_pct": 11.235938461538462,
+              "cash_pnl_usd": -0.2575600000000091,
+              "profitable": 3,
+              "routed": 1,
+              "exit_counts": {
+                "TARGET": 3,
+                "SL": 5
+              },
+              "closed_stock_positions": [
+                {
+                  "symbol": "CRCLUSDT",
+                  "bot": "stocks",
+                  "entry_ms": 1795221039276,
+                  "exit_ms": 1795231827385,
+                  "code": "TARGET",
+                  "entry_px": 48.87,
+                  "qty": 0.7,
+                  "bank_qty": 0.0,
+                  "bank_px": null,
+                  "runner_px": 47.910000000000004,
+                  "bank_pnl": 0.0,
+                  "runner_pnl": 0.6719999999999956
+                }
+              ],
+              "changes": {
+                "transition": {},
+                "removed": 0,
+                "added": 1,
+                "added_positions": [
+                  {
+                    "bot": "stocks",
+                    "symbol": "CRCLUSDT",
+                    "entry_ms": 1795221039276,
+                    "exit": "TARGET",
+                    "cash_pnl_usd": 0.6719999999999956
+                  }
+                ],
+                "removed_positions": []
+              }
+            }
+          }
+        },
+        "middle": {
+          "200": {
+            "current": {
+              "status": "SCORED_PUBLIC_L2_SIMULATION",
+              "trades": 8,
+              "skipped": {
+                "crypto:spread_at_publish": 6,
+                "crypto:publication_rate_limit": 32,
+                "crypto:position_cap": 1,
+                "crypto:depth slippage exceeds limit": 1
+              },
+              "return_pct": -0.2591461538461459,
+              "drawdown_pct": 2.304341367549993,
+              "contribution_pct": {
+                "crypto": -0.2591461538461567,
+                "stocks": 0.0
+              },
+              "peak_reservations": 4,
+              "peak_margin_pct": 11.273518574673162,
+              "cash_pnl_usd": -0.3368900000000036,
+              "profitable": 3,
+              "routed": 0,
+              "exit_counts": {
+                "TARGET": 3,
+                "SL": 5
+              },
+              "closed_stock_positions": [],
+              "changes": {
+                "transition": {},
+                "removed": 0,
+                "added": 0,
+                "added_positions": [],
+                "removed_positions": []
+              }
+            },
+            "two_fresh_quotes_five_seconds_apart": {
+              "status": "SCORED_PUBLIC_L2_SIMULATION",
+              "trades": 9,
+              "skipped": {
+                "crypto:spread_at_publish": 6,
+                "crypto:publication_rate_limit": 32,
+                "crypto:position_cap": 1,
+                "crypto:depth slippage exceeds limit": 1
+              },
+              "return_pct": -0.687146153846141,
+              "drawdown_pct": 2.7262463656759106,
+              "contribution_pct": {
+                "crypto": -0.2591461538461567,
+                "stocks": -0.42799999999999505
+              },
+              "peak_reservations": 5,
+              "peak_margin_pct": 14.179386208047367,
+              "cash_pnl_usd": -0.8932899999999971,
+              "profitable": 3,
+              "routed": 1,
+              "exit_counts": {
+                "TARGET": 3,
+                "SL": 6
+              },
+              "closed_stock_positions": [
+                {
+                  "symbol": "AMZNUSDT",
+                  "bot": "stocks",
+                  "entry_ms": 1795221178069,
+                  "exit_ms": 1795267959533,
+                  "code": "SL",
+                  "entry_px": 250.85333333333335,
+                  "qty": 0.15,
+                  "bank_qty": 0.0,
+                  "bank_px": null,
+                  "runner_px": 254.56266666666664,
+                  "bank_pnl": 0.0,
+                  "runner_pnl": -0.5563999999999936
+                }
+              ],
+              "changes": {
+                "transition": {},
+                "removed": 0,
+                "added": 1,
+                "added_positions": [
+                  {
+                    "bot": "stocks",
+                    "symbol": "AMZNUSDT",
+                    "entry_ms": 1795221178069,
+                    "exit": "SL",
+                    "cash_pnl_usd": -0.5563999999999936
+                  }
+                ],
+                "removed_positions": []
+              }
+            },
+            "two_quotes_up_to_10bp_with_2r": {
+              "status": "SCORED_PUBLIC_L2_SIMULATION",
+              "trades": 9,
+              "skipped": {
+                "crypto:spread_at_publish": 6,
+                "crypto:publication_rate_limit": 32,
+                "crypto:position_cap": 1,
+                "crypto:depth slippage exceeds limit": 1
+              },
+              "return_pct": 0.26846923076921936,
+              "drawdown_pct": 2.3079679508312583,
+              "contribution_pct": {
+                "crypto": -0.2753769230769247,
+                "stocks": 0.5438461538461526
+              },
+              "peak_reservations": 4,
+              "peak_margin_pct": 11.28799359149006,
+              "cash_pnl_usd": 0.3490099999999966,
+              "profitable": 4,
+              "routed": 1,
+              "exit_counts": {
+                "TARGET": 4,
+                "SL": 5
+              },
+              "closed_stock_positions": [
+                {
+                  "symbol": "CRCLUSDT",
+                  "bot": "stocks",
+                  "entry_ms": 1795221039276,
+                  "exit_ms": 1795231826585,
+                  "code": "TARGET",
+                  "entry_px": 48.87,
+                  "qty": 0.7,
+                  "bank_qty": 0.0,
+                  "bank_px": null,
+                  "runner_px": 47.86,
+                  "bank_pnl": 0.0,
+                  "runner_pnl": 0.7069999999999985
+                }
+              ],
+              "changes": {
+                "transition": {
+                  "crypto SL -> SL": {
+                    "positions": 1,
+                    "cash_delta_usd": -0.021099999999998342
+                  }
+                },
+                "removed": 0,
+                "added": 1,
+                "added_positions": [
+                  {
+                    "bot": "stocks",
+                    "symbol": "CRCLUSDT",
+                    "entry_ms": 1795221039276,
+                    "exit": "TARGET",
+                    "cash_pnl_usd": 0.7069999999999985
+                  }
+                ],
+                "removed_positions": []
+              }
+            },
+            "two_quotes_up_to_15bp_with_2r": {
+              "status": "SCORED_PUBLIC_L2_SIMULATION",
+              "trades": 9,
+              "skipped": {
+                "crypto:spread_at_publish": 6,
+                "crypto:publication_rate_limit": 32,
+                "crypto:position_cap": 1,
+                "crypto:depth slippage exceeds limit": 1
+              },
+              "return_pct": 0.26846923076921936,
+              "drawdown_pct": 2.3079679508312583,
+              "contribution_pct": {
+                "crypto": -0.2753769230769247,
+                "stocks": 0.5438461538461526
+              },
+              "peak_reservations": 4,
+              "peak_margin_pct": 11.28799359149006,
+              "cash_pnl_usd": 0.3490099999999966,
+              "profitable": 4,
+              "routed": 1,
+              "exit_counts": {
+                "TARGET": 4,
+                "SL": 5
+              },
+              "closed_stock_positions": [
+                {
+                  "symbol": "CRCLUSDT",
+                  "bot": "stocks",
+                  "entry_ms": 1795221039276,
+                  "exit_ms": 1795231826585,
+                  "code": "TARGET",
+                  "entry_px": 48.87,
+                  "qty": 0.7,
+                  "bank_qty": 0.0,
+                  "bank_px": null,
+                  "runner_px": 47.86,
+                  "bank_pnl": 0.0,
+                  "runner_pnl": 0.7069999999999985
+                }
+              ],
+              "changes": {
+                "transition": {
+                  "crypto SL -> SL": {
+                    "positions": 1,
+                    "cash_delta_usd": -0.021099999999998342
+                  }
+                },
+                "removed": 0,
+                "added": 1,
+                "added_positions": [
+                  {
+                    "bot": "stocks",
+                    "symbol": "CRCLUSDT",
+                    "entry_ms": 1795221039276,
+                    "exit": "TARGET",
+                    "cash_pnl_usd": 0.7069999999999985
+                  }
+                ],
+                "removed_positions": []
+              }
+            }
+          },
+          "1000": {
+            "current": {
+              "status": "SCORED_PUBLIC_L2_SIMULATION",
+              "trades": 8,
+              "skipped": {
+                "crypto:spread_at_publish": 6,
+                "crypto:publication_rate_limit": 32,
+                "crypto:position_cap": 1,
+                "crypto:depth slippage exceeds limit": 1
+              },
+              "return_pct": -0.24123076923081577,
+              "drawdown_pct": 2.305572830961028,
+              "contribution_pct": {
+                "crypto": -0.2412307692307765,
+                "stocks": 0.0
+              },
+              "peak_reservations": 4,
+              "peak_margin_pct": 11.274511923818048,
+              "cash_pnl_usd": -0.31360000000000965,
+              "profitable": 3,
+              "routed": 0,
+              "exit_counts": {
+                "TARGET": 3,
+                "SL": 5
+              },
+              "closed_stock_positions": [],
+              "changes": {
+                "transition": {},
+                "removed": 0,
+                "added": 0,
+                "added_positions": [],
+                "removed_positions": []
+              }
+            },
+            "two_fresh_quotes_five_seconds_apart": {
+              "status": "SCORED_PUBLIC_L2_SIMULATION",
+              "trades": 9,
+              "skipped": {
+                "crypto:spread_at_publish": 6,
+                "crypto:publication_rate_limit": 32,
+                "crypto:position_cap": 1,
+                "crypto:depth slippage exceeds limit": 1
+              },
+              "return_pct": -0.7058461538461902,
+              "drawdown_pct": 2.7635543185000535,
+              "contribution_pct": {
+                "crypto": -0.2412307692307765,
+                "stocks": -0.46461538461538177
+              },
+              "peak_reservations": 5,
+              "peak_margin_pct": 14.180635603351192,
+              "cash_pnl_usd": -0.917600000000006,
+              "profitable": 3,
+              "routed": 1,
+              "exit_counts": {
+                "TARGET": 3,
+                "SL": 6
+              },
+              "closed_stock_positions": [
+                {
+                  "symbol": "AMZNUSDT",
+                  "bot": "stocks",
+                  "entry_ms": 1795221178069,
+                  "exit_ms": 1795267960333,
+                  "code": "SL",
+                  "entry_px": 250.85333333333335,
+                  "qty": 0.15,
+                  "bank_qty": 0.0,
+                  "bank_px": null,
+                  "runner_px": 254.88,
+                  "bank_pnl": 0.0,
+                  "runner_pnl": -0.6039999999999963
+                }
+              ],
+              "changes": {
+                "transition": {},
+                "removed": 0,
+                "added": 1,
+                "added_positions": [
+                  {
+                    "bot": "stocks",
+                    "symbol": "AMZNUSDT",
+                    "entry_ms": 1795221178069,
+                    "exit": "SL",
+                    "cash_pnl_usd": -0.6039999999999963
+                  }
+                ],
+                "removed_positions": []
+              }
+            },
+            "two_quotes_up_to_10bp_with_2r": {
+              "status": "SCORED_PUBLIC_L2_SIMULATION",
+              "trades": 9,
+              "skipped": {
+                "crypto:spread_at_publish": 6,
+                "crypto:publication_rate_limit": 32,
+                "crypto:position_cap": 1,
+                "crypto:depth slippage exceeds limit": 1
+              },
+              "return_pct": 0.25923076923071164,
+              "drawdown_pct": 2.310028753334676,
+              "contribution_pct": {
+                "crypto": -0.2576923076923155,
+                "stocks": 0.5169230769230736
+              },
+              "peak_reservations": 4,
+              "peak_margin_pct": 11.292045007832945,
+              "cash_pnl_usd": 0.3369999999999852,
+              "profitable": 4,
+              "routed": 1,
+              "exit_counts": {
+                "TARGET": 4,
+                "SL": 5
+              },
+              "closed_stock_positions": [
+                {
+                  "symbol": "CRCLUSDT",
+                  "bot": "stocks",
+                  "entry_ms": 1795221039276,
+                  "exit_ms": 1795231827385,
+                  "code": "TARGET",
+                  "entry_px": 48.87,
+                  "qty": 0.7,
+                  "bank_qty": 0.0,
+                  "bank_px": null,
+                  "runner_px": 47.910000000000004,
+                  "bank_pnl": 0.0,
+                  "runner_pnl": 0.6719999999999956
+                }
+              ],
+              "changes": {
+                "transition": {
+                  "crypto SL -> SL": {
+                    "positions": 1,
+                    "cash_delta_usd": -0.021400000000000752
+                  }
+                },
+                "removed": 0,
+                "added": 1,
+                "added_positions": [
+                  {
+                    "bot": "stocks",
+                    "symbol": "CRCLUSDT",
+                    "entry_ms": 1795221039276,
+                    "exit": "TARGET",
+                    "cash_pnl_usd": 0.6719999999999956
+                  }
+                ],
+                "removed_positions": []
+              }
+            },
+            "two_quotes_up_to_15bp_with_2r": {
+              "status": "SCORED_PUBLIC_L2_SIMULATION",
+              "trades": 9,
+              "skipped": {
+                "crypto:spread_at_publish": 6,
+                "crypto:publication_rate_limit": 32,
+                "crypto:position_cap": 1,
+                "crypto:depth slippage exceeds limit": 1
+              },
+              "return_pct": 0.25923076923071164,
+              "drawdown_pct": 2.310028753334676,
+              "contribution_pct": {
+                "crypto": -0.2576923076923155,
+                "stocks": 0.5169230769230736
+              },
+              "peak_reservations": 4,
+              "peak_margin_pct": 11.292045007832945,
+              "cash_pnl_usd": 0.3369999999999852,
+              "profitable": 4,
+              "routed": 1,
+              "exit_counts": {
+                "TARGET": 4,
+                "SL": 5
+              },
+              "closed_stock_positions": [
+                {
+                  "symbol": "CRCLUSDT",
+                  "bot": "stocks",
+                  "entry_ms": 1795221039276,
+                  "exit_ms": 1795231827385,
+                  "code": "TARGET",
+                  "entry_px": 48.87,
+                  "qty": 0.7,
+                  "bank_qty": 0.0,
+                  "bank_px": null,
+                  "runner_px": 47.910000000000004,
+                  "bank_pnl": 0.0,
+                  "runner_pnl": 0.6719999999999956
+                }
+              ],
+              "changes": {
+                "transition": {
+                  "crypto SL -> SL": {
+                    "positions": 1,
+                    "cash_delta_usd": -0.021400000000000752
+                  }
+                },
+                "removed": 0,
+                "added": 1,
+                "added_positions": [
+                  {
+                    "bot": "stocks",
+                    "symbol": "CRCLUSDT",
+                    "entry_ms": 1795221039276,
+                    "exit": "TARGET",
+                    "cash_pnl_usd": 0.6719999999999956
+                  }
+                ],
+                "removed_positions": []
+              }
+            }
+          }
+        },
+        "slow": {
+          "200": {
+            "current": {
+              "status": "SCORED_PUBLIC_L2_SIMULATION",
+              "trades": 7,
+              "skipped": {
+                "crypto:spread_at_publish": 7,
+                "crypto:publication_rate_limit": 31,
+                "crypto:position_cap": 1,
+                "crypto:execution_spread": 2
+              },
+              "return_pct": 1.8116538461538045,
+              "drawdown_pct": 1.0590434341240464,
+              "contribution_pct": {
+                "crypto": 1.8116538461538427,
+                "stocks": 0.0
+              },
+              "peak_reservations": 4,
+              "peak_margin_pct": 11.18131916098931,
+              "cash_pnl_usd": 2.355149999999995,
+              "profitable": 4,
+              "routed": 0,
+              "exit_counts": {
+                "TARGET": 4,
+                "SL": 3
+              },
+              "closed_stock_positions": [],
+              "changes": {
+                "transition": {},
+                "removed": 0,
+                "added": 0,
+                "added_positions": [],
+                "removed_positions": []
+              }
+            },
+            "two_fresh_quotes_five_seconds_apart": {
+              "status": "SCORED_PUBLIC_L2_SIMULATION",
+              "trades": 8,
+              "skipped": {
+                "crypto:spread_at_publish": 7,
+                "crypto:publication_rate_limit": 31,
+                "crypto:position_cap": 1,
+                "crypto:execution_spread": 2
+              },
+              "return_pct": 1.3836538461538206,
+              "drawdown_pct": 1.4808716013132572,
+              "contribution_pct": {
+                "crypto": 1.8116538461538427,
+                "stocks": -0.42799999999999505
+              },
+              "peak_reservations": 5,
+              "peak_margin_pct": 14.050555499007492,
+              "cash_pnl_usd": 1.7987500000000018,
+              "profitable": 4,
+              "routed": 1,
+              "exit_counts": {
+                "TARGET": 4,
+                "SL": 4
+              },
+              "closed_stock_positions": [
+                {
+                  "symbol": "AMZNUSDT",
+                  "bot": "stocks",
+                  "entry_ms": 1795221178069,
+                  "exit_ms": 1795267959533,
+                  "code": "SL",
+                  "entry_px": 250.85333333333335,
+                  "qty": 0.15,
+                  "bank_qty": 0.0,
+                  "bank_px": null,
+                  "runner_px": 254.56266666666664,
+                  "bank_pnl": 0.0,
+                  "runner_pnl": -0.5563999999999936
+                }
+              ],
+              "changes": {
+                "transition": {},
+                "removed": 0,
+                "added": 1,
+                "added_positions": [
+                  {
+                    "bot": "stocks",
+                    "symbol": "AMZNUSDT",
+                    "entry_ms": 1795221178069,
+                    "exit": "SL",
+                    "cash_pnl_usd": -0.5563999999999936
+                  }
+                ],
+                "removed_positions": []
+              }
+            },
+            "two_quotes_up_to_10bp_with_2r": {
+              "status": "SCORED_PUBLIC_L2_SIMULATION",
+              "trades": 8,
+              "skipped": {
+                "crypto:spread_at_publish": 7,
+                "crypto:publication_rate_limit": 31,
+                "crypto:position_cap": 1,
+                "crypto:execution_spread": 2
+              },
+              "return_pct": 2.355499999999955,
+              "drawdown_pct": 1.0533971851845836,
+              "contribution_pct": {
+                "crypto": 1.8116538461538427,
+                "stocks": 0.5438461538461526
+              },
+              "peak_reservations": 4,
+              "peak_margin_pct": 11.236575384615383,
+              "cash_pnl_usd": 3.0621499999999937,
+              "profitable": 5,
+              "routed": 1,
+              "exit_counts": {
+                "TARGET": 5,
+                "SL": 3
+              },
+              "closed_stock_positions": [
+                {
+                  "symbol": "CRCLUSDT",
+                  "bot": "stocks",
+                  "entry_ms": 1795221039276,
+                  "exit_ms": 1795231826585,
+                  "code": "TARGET",
+                  "entry_px": 48.87,
+                  "qty": 0.7,
+                  "bank_qty": 0.0,
+                  "bank_px": null,
+                  "runner_px": 47.86,
+                  "bank_pnl": 0.0,
+                  "runner_pnl": 0.7069999999999985
+                }
+              ],
+              "changes": {
+                "transition": {},
+                "removed": 0,
+                "added": 1,
+                "added_positions": [
+                  {
+                    "bot": "stocks",
+                    "symbol": "CRCLUSDT",
+                    "entry_ms": 1795221039276,
+                    "exit": "TARGET",
+                    "cash_pnl_usd": 0.7069999999999985
+                  }
+                ],
+                "removed_positions": []
+              }
+            },
+            "two_quotes_up_to_15bp_with_2r": {
+              "status": "SCORED_PUBLIC_L2_SIMULATION",
+              "trades": 8,
+              "skipped": {
+                "crypto:spread_at_publish": 7,
+                "crypto:publication_rate_limit": 31,
+                "crypto:position_cap": 1,
+                "crypto:execution_spread": 2
+              },
+              "return_pct": 2.355499999999955,
+              "drawdown_pct": 1.0533971851845836,
+              "contribution_pct": {
+                "crypto": 1.8116538461538427,
+                "stocks": 0.5438461538461526
+              },
+              "peak_reservations": 4,
+              "peak_margin_pct": 11.236575384615383,
+              "cash_pnl_usd": 3.0621499999999937,
+              "profitable": 5,
+              "routed": 1,
+              "exit_counts": {
+                "TARGET": 5,
+                "SL": 3
+              },
+              "closed_stock_positions": [
+                {
+                  "symbol": "CRCLUSDT",
+                  "bot": "stocks",
+                  "entry_ms": 1795221039276,
+                  "exit_ms": 1795231826585,
+                  "code": "TARGET",
+                  "entry_px": 48.87,
+                  "qty": 0.7,
+                  "bank_qty": 0.0,
+                  "bank_px": null,
+                  "runner_px": 47.86,
+                  "bank_pnl": 0.0,
+                  "runner_pnl": 0.7069999999999985
+                }
+              ],
+              "changes": {
+                "transition": {},
+                "removed": 0,
+                "added": 1,
+                "added_positions": [
+                  {
+                    "bot": "stocks",
+                    "symbol": "CRCLUSDT",
+                    "entry_ms": 1795221039276,
+                    "exit": "TARGET",
+                    "cash_pnl_usd": 0.7069999999999985
+                  }
+                ],
+                "removed_positions": []
+              }
+            }
+          },
+          "1000": {
+            "current": {
+              "status": "SCORED_PUBLIC_L2_SIMULATION",
+              "trades": 7,
+              "skipped": {
+                "crypto:spread_at_publish": 7,
+                "crypto:publication_rate_limit": 31,
+                "crypto:position_cap": 1,
+                "crypto:execution_spread": 2
+              },
+              "return_pct": 1.8665692307691995,
+              "drawdown_pct": 1.0280266987943387,
+              "contribution_pct": {
+                "crypto": 1.866569230769219,
+                "stocks": 0.0
+              },
+              "peak_reservations": 4,
+              "peak_margin_pct": 11.178660798652075,
+              "cash_pnl_usd": 2.4265399999999846,
+              "profitable": 4,
+              "routed": 0,
+              "exit_counts": {
+                "TARGET": 4,
+                "SL": 3
+              },
+              "closed_stock_positions": [],
+              "changes": {
+                "transition": {},
+                "removed": 0,
+                "added": 0,
+                "added_positions": [],
+                "removed_positions": []
+              }
+            },
+            "two_fresh_quotes_five_seconds_apart": {
+              "status": "SCORED_PUBLIC_L2_SIMULATION",
+              "trades": 8,
+              "skipped": {
+                "crypto:spread_at_publish": 7,
+                "crypto:publication_rate_limit": 31,
+                "crypto:position_cap": 1,
+                "crypto:execution_spread": 2
+              },
+              "return_pct": 1.401953846153825,
+              "drawdown_pct": 1.4859247888741018,
+              "contribution_pct": {
+                "crypto": 1.866569230769219,
+                "stocks": -0.46461538461538177
+              },
+              "peak_reservations": 5,
+              "peak_margin_pct": 14.047214974779717,
+              "cash_pnl_usd": 1.8225399999999883,
+              "profitable": 4,
+              "routed": 1,
+              "exit_counts": {
+                "TARGET": 4,
+                "SL": 4
+              },
+              "closed_stock_positions": [
+                {
+                  "symbol": "AMZNUSDT",
+                  "bot": "stocks",
+                  "entry_ms": 1795221178069,
+                  "exit_ms": 1795267960333,
+                  "code": "SL",
+                  "entry_px": 250.85333333333335,
+                  "qty": 0.15,
+                  "bank_qty": 0.0,
+                  "bank_px": null,
+                  "runner_px": 254.88,
+                  "bank_pnl": 0.0,
+                  "runner_pnl": -0.6039999999999963
+                }
+              ],
+              "changes": {
+                "transition": {},
+                "removed": 0,
+                "added": 1,
+                "added_positions": [
+                  {
+                    "bot": "stocks",
+                    "symbol": "AMZNUSDT",
+                    "entry_ms": 1795221178069,
+                    "exit": "SL",
+                    "cash_pnl_usd": -0.6039999999999963
+                  }
+                ],
+                "removed_positions": []
+              }
+            },
+            "two_quotes_up_to_10bp_with_2r": {
+              "status": "SCORED_PUBLIC_L2_SIMULATION",
+              "trades": 8,
+              "skipped": {
+                "crypto:spread_at_publish": 7,
+                "crypto:publication_rate_limit": 31,
+                "crypto:position_cap": 1,
+                "crypto:execution_spread": 2
+              },
+              "return_pct": 2.383492307692303,
+              "drawdown_pct": 1.0228159676473902,
+              "contribution_pct": {
+                "crypto": 1.866569230769219,
+                "stocks": 0.5169230769230736
+              },
+              "peak_reservations": 4,
+              "peak_margin_pct": 11.236575384615383,
+              "cash_pnl_usd": 3.0985399999999803,
+              "profitable": 5,
+              "routed": 1,
+              "exit_counts": {
+                "TARGET": 5,
+                "SL": 3
+              },
+              "closed_stock_positions": [
+                {
+                  "symbol": "CRCLUSDT",
+                  "bot": "stocks",
+                  "entry_ms": 1795221039276,
+                  "exit_ms": 1795231827385,
+                  "code": "TARGET",
+                  "entry_px": 48.87,
+                  "qty": 0.7,
+                  "bank_qty": 0.0,
+                  "bank_px": null,
+                  "runner_px": 47.910000000000004,
+                  "bank_pnl": 0.0,
+                  "runner_pnl": 0.6719999999999956
+                }
+              ],
+              "changes": {
+                "transition": {},
+                "removed": 0,
+                "added": 1,
+                "added_positions": [
+                  {
+                    "bot": "stocks",
+                    "symbol": "CRCLUSDT",
+                    "entry_ms": 1795221039276,
+                    "exit": "TARGET",
+                    "cash_pnl_usd": 0.6719999999999956
+                  }
+                ],
+                "removed_positions": []
+              }
+            },
+            "two_quotes_up_to_15bp_with_2r": {
+              "status": "SCORED_PUBLIC_L2_SIMULATION",
+              "trades": 8,
+              "skipped": {
+                "crypto:spread_at_publish": 7,
+                "crypto:publication_rate_limit": 31,
+                "crypto:position_cap": 1,
+                "crypto:execution_spread": 2
+              },
+              "return_pct": 2.383492307692303,
+              "drawdown_pct": 1.0228159676473902,
+              "contribution_pct": {
+                "crypto": 1.866569230769219,
+                "stocks": 0.5169230769230736
+              },
+              "peak_reservations": 4,
+              "peak_margin_pct": 11.236575384615383,
+              "cash_pnl_usd": 3.0985399999999803,
+              "profitable": 5,
+              "routed": 1,
+              "exit_counts": {
+                "TARGET": 5,
+                "SL": 3
+              },
+              "closed_stock_positions": [
+                {
+                  "symbol": "CRCLUSDT",
+                  "bot": "stocks",
+                  "entry_ms": 1795221039276,
+                  "exit_ms": 1795231827385,
+                  "code": "TARGET",
+                  "entry_px": 48.87,
+                  "qty": 0.7,
+                  "bank_qty": 0.0,
+                  "bank_px": null,
+                  "runner_px": 47.910000000000004,
+                  "bank_pnl": 0.0,
+                  "runner_pnl": 0.6719999999999956
+                }
+              ],
+              "changes": {
+                "transition": {},
+                "removed": 0,
+                "added": 1,
+                "added_positions": [
+                  {
+                    "bot": "stocks",
+                    "symbol": "CRCLUSDT",
+                    "entry_ms": 1795221039276,
+                    "exit": "TARGET",
+                    "cash_pnl_usd": 0.6719999999999956
+                  }
+                ],
+                "removed_positions": []
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "controls": {
+    "crypto_serial_priority_nov23.json": "acdcf365ca94d666b1663c3b7b629da3d42daccf22e8d646b8dc34800977e27c",
+    "stock_spread_recovery_nov23.json": "80d854729a71d834e6eb9fab506b2d50fcde5006dc86a9070369e9533c586e8c"
+  },
+  "stock_tape_checks": {
+    "AMZNUSDT": {
+      "bars_checked": 64,
+      "mismatches": {}
+    },
+    "ARMUSDT": {
+      "bars_checked": 64,
+      "mismatches": {}
+    },
+    "AXTIUSDT": {
+      "bars_checked": 78,
+      "mismatches": {}
+    },
+    "BEUSDT": {
+      "bars_checked": 97,
+      "mismatches": {}
+    },
+    "BMNRUSDT": {
+      "bars_checked": 73,
+      "mismatches": {}
+    },
+    "COINUSDT": {
+      "bars_checked": 64,
+      "mismatches": {}
+    },
+    "CRCLUSDT": {
+      "bars_checked": 64,
+      "mismatches": {}
+    },
+    "DELLUSDT": {
+      "bars_checked": 64,
+      "mismatches": {}
+    },
+    "HOODUSDT": {
+      "bars_checked": 64,
+      "mismatches": {}
+    },
+    "NVDAUSDT": {
+      "bars_checked": 64,
+      "mismatches": {}
+    },
+    "SKHYUSDT": {
+      "bars_checked": 97,
+      "mismatches": {}
+    },
+    "SNXXUSDT": {
+      "bars_checked": 64,
+      "mismatches": {}
+    },
+    "SOFTBANKUSDT": {
+      "bars_checked": 64,
+      "mismatches": {}
+    },
+    "SOXSUSDT": {
+      "bars_checked": 86,
+      "mismatches": {}
+    },
+    "WDCUSDT": {
+      "bars_checked": 129,
+      "mismatches": {}
+    }
+  },
+  "live_activation_supported": false,
+  "limitations": [
+    "The shared model starts flat in both short calendar windows.",
+    "The crypto side retains the published alphabetical sequences and three fixed timing stresses.",
+    "Stock proposals use the frozen observation\u2019s original publication admission and preserved trade levels.",
+    "An independent observed NVDA position from an earlier methodology check is not an extra stock proposal here.",
+    "The results are exact public-book simulations. They do not establish calendar-month or private account returns."
+  ]
+}
