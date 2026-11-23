@@ -1,5 +1,5 @@
 """Reprice the fixed OKX pilot with verified trade order and L2 market legs."""
-from collections import Counter, defaultdict
+from collections import Counter, defaultdict, deque
 from concurrent.futures import ProcessPoolExecutor
 import hashlib
 import heapq
@@ -142,11 +142,16 @@ def close_quote(book, stamp, side, contracts):
 
 
 def simulate(rows, specs, ticks, books, *, clock, lag, setting, exit_price=None, max_positions=12,
-             unbankable_runner=None, post_close_rule=None, release_delay_ms=RELEASE_MS):
+             unbankable_runner=None, post_close_rule=None, release_delay_ms=RELEASE_MS,
+             crypto_publications_per_hour=None, reprice_path=None):
     if not isinstance(max_positions, int) or not 1 <= max_positions <= 12:
         raise ValueError('invalid shared position cap')
     if type(release_delay_ms) is not int or release_delay_ms < 0:
         raise ValueError('invalid shared release delay')
+    if crypto_publications_per_hour is not None and (
+        type(crypto_publications_per_hour) is not int or crypto_publications_per_hour < 1
+    ):
+        raise ValueError('invalid crypto publication limit')
     cash=peak=CAPITAL
     drawdown=0.
     max_used=0
@@ -157,6 +162,8 @@ def simulate(rows, specs, ticks, books, *, clock, lag, setting, exit_price=None,
     skipped=Counter()
     contribution={bot:0. for bot in CAPS}
     cooldown = PostCloseState(post_close_rule) if post_close_rule is not None else None
+    released_stops = {}
+    crypto_publications = deque()
 
     def drain(until):
         nonlocal cash,peak,drawdown
@@ -164,8 +171,11 @@ def simulate(rows, specs, ticks, books, *, clock, lag, setting, exit_price=None,
             _,index,kind,symbol,pnl=heapq.heappop(events)
             if kind=='release':
                 bot, margin, side = active.pop(symbol)
+                trade = closed[index]
+                if (bot == 'crypto' and 'reentry_parent_ms' not in trade and trade['code'] == 'SL'
+                        and trade['bank_pnl'] + trade['runner_pnl'] < 0):
+                    released_stops[symbol, trade['entry_ms']] = trade['exit_ms']
                 if cooldown is not None:
-                    trade = closed[index]
                     cooldown.confirm(symbol=symbol, bot=bot, direction=side,
                                      closed_at=trade['exit_ms']/1000,
                                      pnl=trade['bank_pnl']+trade['runner_pnl'], margin=margin)
@@ -184,6 +194,22 @@ def simulate(rows, specs, ticks, books, *, clock, lag, setting, exit_price=None,
         if bot=='stocks' and not row['stock_reference_ready']:
             skipped['stocks:paper_guard']+=1
             continue
+        parent = row.get('reentry_parent_ms')
+        if parent is not None:
+            stopped = released_stops.get((symbol, parent))
+            if stopped is None or stopped != row.get('previous_stop_ms', stopped - lag) + lag:
+                skipped['crypto:reentry_parent_not_released_as_stop'] += 1
+                continue
+        if parent is not None and symbol in active:
+            skipped['crypto:reentry_instrument_occupied'] += 1
+            continue
+        if bot == 'crypto' and crypto_publications_per_hour is not None:
+            while crypto_publications and crypto_publications[0] <= opened - 3_600_000:
+                crypto_publications.popleft()
+            if len(crypto_publications) >= crypto_publications_per_hour:
+                skipped['crypto:reentry_study_publication_limit'] += 1
+                continue
+            crypto_publications.append(opened)
         if symbol in active or len(active)>=max_positions or sum(r[0]==bot for r in active.values())>=CAPS[bot]:
             skipped[bot+':position_cap']+=1
             continue
@@ -208,7 +234,13 @@ def simulate(rows, specs, ticks, books, *, clock, lag, setting, exit_price=None,
                 size_for_price=lambda price:calc_contracts(cash*FRACTION,LEVERAGE,price,spec))
             entry.validate_bracket(row['stop'],row['target'])
             if bot=='crypto' and round_to_tick(entry.average,ticks[symbol])!=path['be_level']:
-                raise ValueError('compounded size changed the precomputed BE level')
+                if reprice_path is None:
+                    raise ValueError('compounded size changed the precomputed BE level')
+                path = reprice_path(row, entry.average, clock)
+                if not path['known']:
+                    raise ValueError(path['reason'])
+                if round_to_tick(entry.average,ticks[symbol]) != path['be_level']:
+                    raise ValueError('replayed BE level disagrees with market fill')
             tp1=round_to_tick(row['entry']+.5*(row['entry']-row['stop']),ticks[symbol])
             if bot=='crypto' and (1 if side=='LONG' else -1)*(entry.average-tp1)>=0:
                 raise ValueError('compounded entry is already beyond TP1')
@@ -237,9 +269,12 @@ def simulate(rows, specs, ticks, books, *, clock, lag, setting, exit_price=None,
         bank_pnl=unit*bank_size*(bank_px-entry.average) if bank_px is not None else 0.
         runner_pnl=unit*remainder*(runner_px-entry.average) if runner_px is not None else 0.
         index=len(closed)
-        closed.append(dict(symbol=symbol,bot=bot,entry_ms=opened,exit_ms=end_at,code=path['code'],
-                           entry_px=entry.average,qty=entry.contracts,bank_qty=bank_size,
-                           bank_px=bank_px,runner_px=runner_px,bank_pnl=bank_pnl,runner_pnl=runner_pnl))
+        trade = dict(symbol=symbol,bot=bot,entry_ms=opened,exit_ms=end_at,code=path['code'],
+                     entry_px=entry.average,qty=entry.contracts,bank_qty=bank_size,
+                     bank_px=bank_px,runner_px=runner_px,bank_pnl=bank_pnl,runner_pnl=runner_pnl)
+        if parent is not None:
+            trade['reentry_parent_ms'] = parent
+        closed.append(trade)
         if bank_at is not None:
             heapq.heappush(events,(bank_at,index,'bank',symbol,bank_pnl))
         if runner_px is not None:

@@ -1,5 +1,6 @@
 import pytest
 
+from okx_post_stop_reclaim_nov23 import proposal
 from okx_xperp_cash_tick_nov19 import simulate
 from okx_xperp_tick_path_nov19 import Trade, reconcile, resolve_ticks
 from post_close_replay_nov23 import PostCloseRule, PostCloseState
@@ -103,3 +104,55 @@ def test_optional_loss_floor_and_stock_scope_exclude_small_losses_and_crypto():
     assert closed('crypto',-.4) is None
     assert closed('stocks',-.03) is None
     assert closed('stocks',-.4) == 'post_close_direction_loss'
+
+
+def test_reentry_needs_its_own_settled_loss_and_spare_publication_capacity():
+    original = dict(signal(), entry_status='eligible', entry_ms=10_000,
+                    path={60: dict(known=True, code='SL', end_ms=60_000, be_level=100., bank=None)})
+    reopened = dict(signal(), entry_status='eligible', entry_ms=60_201, reentry_parent_ms=10_000,
+                    path={60: dict(known=True, code='TARGET', end_ms=120_000, be_level=100., bank=None)})
+    waiting = dict(reopened, entry_ms=60_200)
+    other_parent = dict(reopened, entry_ms=60_202, reentry_parent_ms=10_001)
+    specs = {'TEST': dict(ctVal=.1, lotSz=1, minSz=1)}
+    quotes = {'TEST': {stamp: dict(ts=stamp, bids=[(bid, 6)], asks=[(ask, 6)]) for stamp, bid, ask in
+                      [(10_000, 99.99, 100.), (60_200, 98., 98.01), (60_201, 99.99, 100.),
+                       (120_200, 104., 104.01)]}}
+    args = dict(clock=60, lag=200, setting='requested5', release_delay_ms=0)
+    rows = [original, waiting, reopened, other_parent]
+    result = simulate(rows, specs, {'TEST': .01}, quotes, **args, crypto_publications_per_hour=2)
+    assert [row['entry_ms'] for row in result['closed']] == [10_000, 60_201]
+    assert 'reentry_parent_ms' not in result['closed'][0]
+    assert result['closed'][1]['reentry_parent_ms'] == 10_000
+    assert result['skipped'] == {'crypto:reentry_parent_not_released_as_stop': 2}
+    capped = simulate(rows, specs, {'TEST': .01}, quotes, **args, crypto_publications_per_hour=1)
+    assert len(capped['closed']) == 1
+    assert capped['skipped']['crypto:reentry_study_publication_limit'] == 1
+
+
+def test_reclaim_uses_the_fully_closed_bar_and_keeps_the_original_target():
+    parent = dict(signal(), entry_ms=10_000)
+    tape = [Trade(60_000, 1, 97.95, 1.), Trade(1_199_000, 2, 98.2, 1.),
+            Trade(1_200_000, 3, 103., 1.), Trade(1_499_000, 4, 99., 1.)]
+    row, reason = proposal(parent, {'end_ms': 60_000}, tape, [event.ms for event in tape], .01, (300, .25))
+    assert reason == 'proposed'
+    assert row['epoch'] == 1500  # A print at 1200 belongs to the following candle.
+    assert row['entry'] == 99. and row['stop'] == 97.94 and row['target'] == 104.
+    assert row['reentry_parent_ms'] == parent['entry_ms']
+
+
+def test_compounded_fill_replays_a_changed_breakeven_at_the_market_price():
+    original = dict(signal(), entry_status='eligible', entry_ms=10_000,
+                    path={60: dict(known=True, code='BE', end_ms=60_000, be_level=100.01, bank=None)})
+    specs = {'TEST': dict(ctVal=.1, lotSz=1, minSz=1)}
+    quotes = {'TEST': {10_000: dict(ts=10_000, bids=[(99.99, 6)], asks=[(100., 6)]),
+                      120_200: dict(ts=120_200, bids=[(104., 6)], asks=[(104.01, 6)])}}
+    args = dict(clock=60, lag=200, setting='requested5')
+    assert simulate([original], specs, {'TEST': .01}, quotes, **args)['status'] == 'UNSCORABLE'
+
+    def path_for(row, actual_fill, clock):
+        assert (row, actual_fill, clock) == (original, 100., 60)
+        return dict(known=True, code='TARGET', end_ms=120_000, be_level=100., bank=None)
+
+    result = simulate([original], specs, {'TEST': .01}, quotes, **args, reprice_path=path_for)
+    assert result['closed'][0]['exit_ms'] == 120_200
+    assert result['closed'][0]['code'] == 'TARGET'
