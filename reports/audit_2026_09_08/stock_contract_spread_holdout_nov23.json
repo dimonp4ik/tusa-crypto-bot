@@ -1,0 +1,1878 @@
+{
+  "evidence": {
+    "entries_utc": [
+      1794951900,
+      1795123800
+    ],
+    "observed_scans": 191,
+    "rechecked_scans": 191,
+    "changed_price_scans": {},
+    "legacy_candidates": 151,
+    "new_vs_legacy": [],
+    "removed_vs_legacy": [],
+    "counts": {
+      "postmarket": 13,
+      "other": 58,
+      "premarket": 67,
+      "regular": 13
+    }
+  },
+  "plan_sha256": "eb01c9421da1a89547db61aefa83656c6874cf3a5d6ec9f49f1ec789373420fe",
+  "parameters": {
+    "retry_every_five_seconds": [
+      1,
+      0.0005,
+      1.5
+    ],
+    "two_fresh_quotes_five_seconds_apart": [
+      2,
+      0.0005,
+      1.5
+    ],
+    "two_quotes_up_to_10bp_with_2r": [
+      2,
+      0.001,
+      2.0
+    ],
+    "two_quotes_up_to_15bp_with_2r": [
+      2,
+      0.0015,
+      2.0
+    ]
+  },
+  "result": {
+    "status": "EVALUATED",
+    "admitted_signals": 77,
+    "missing_entry_archive": [],
+    "outcomes": {
+      "current": {
+        "statuses": {
+          "wide": 67,
+          "stale order book": 7,
+          "eligible": 3
+        },
+        "modes": {
+          "200ms_exact": {
+            "status": "SCORED_PUBLIC_L2_SIMULATION",
+            "trades": 3,
+            "skipped": {
+              "stocks:wide": 67,
+              "stocks:stale order book": 7
+            },
+            "return_pct": -0.9956923076923085,
+            "drawdown_pct": 0.9956923076923045,
+            "contribution_pct": {
+              "crypto": 0.0,
+              "stocks": -0.9956923076923044
+            },
+            "peak_reservations": 1,
+            "peak_margin_pct": 2.967863427283672,
+            "cash_pnl_usd": -1.2943999999999958,
+            "profitable": 0,
+            "routed": 0,
+            "exit_counts": {
+              "SL": 3
+            }
+          },
+          "200ms_stress_5bps_if_no_book": {
+            "status": "SCORED_PUBLIC_L2_SIMULATION",
+            "trades": 3,
+            "skipped": {
+              "stocks:wide": 67,
+              "stocks:stale order book": 7
+            },
+            "return_pct": -0.9956923076923085,
+            "drawdown_pct": 0.9956923076923045,
+            "contribution_pct": {
+              "crypto": 0.0,
+              "stocks": -0.9956923076923044
+            },
+            "peak_reservations": 1,
+            "peak_margin_pct": 2.967863427283672,
+            "cash_pnl_usd": -1.2943999999999958,
+            "profitable": 0,
+            "routed": 0,
+            "exit_counts": {
+              "SL": 3
+            }
+          },
+          "200ms_stress_30bps_if_no_book": {
+            "status": "SCORED_PUBLIC_L2_SIMULATION",
+            "trades": 3,
+            "skipped": {
+              "stocks:wide": 67,
+              "stocks:stale order book": 7
+            },
+            "return_pct": -0.9956923076923085,
+            "drawdown_pct": 0.9956923076923045,
+            "contribution_pct": {
+              "crypto": 0.0,
+              "stocks": -0.9956923076923044
+            },
+            "peak_reservations": 1,
+            "peak_margin_pct": 2.967863427283672,
+            "cash_pnl_usd": -1.2943999999999958,
+            "profitable": 0,
+            "routed": 0,
+            "exit_counts": {
+              "SL": 3
+            }
+          },
+          "1000ms_exact": {
+            "status": "SCORED_PUBLIC_L2_SIMULATION",
+            "trades": 3,
+            "skipped": {
+              "stocks:wide": 67,
+              "stocks:stale order book": 7
+            },
+            "return_pct": -1.026999999999989,
+            "drawdown_pct": 1.0269999999999868,
+            "contribution_pct": {
+              "crypto": 0.0,
+              "stocks": -1.0269999999999953
+            },
+            "peak_reservations": 1,
+            "peak_margin_pct": 2.968385756145155,
+            "cash_pnl_usd": -1.335099999999994,
+            "profitable": 0,
+            "routed": 0,
+            "exit_counts": {
+              "SL": 3
+            }
+          },
+          "1000ms_stress_5bps_if_no_book": {
+            "status": "SCORED_PUBLIC_L2_SIMULATION",
+            "trades": 3,
+            "skipped": {
+              "stocks:wide": 67,
+              "stocks:stale order book": 7
+            },
+            "return_pct": -1.026999999999989,
+            "drawdown_pct": 1.0269999999999868,
+            "contribution_pct": {
+              "crypto": 0.0,
+              "stocks": -1.0269999999999953
+            },
+            "peak_reservations": 1,
+            "peak_margin_pct": 2.968385756145155,
+            "cash_pnl_usd": -1.335099999999994,
+            "profitable": 0,
+            "routed": 0,
+            "exit_counts": {
+              "SL": 3
+            }
+          },
+          "1000ms_stress_30bps_if_no_book": {
+            "status": "SCORED_PUBLIC_L2_SIMULATION",
+            "trades": 3,
+            "skipped": {
+              "stocks:wide": 67,
+              "stocks:stale order book": 7
+            },
+            "return_pct": -1.026999999999989,
+            "drawdown_pct": 1.0269999999999868,
+            "contribution_pct": {
+              "crypto": 0.0,
+              "stocks": -1.0269999999999953
+            },
+            "peak_reservations": 1,
+            "peak_margin_pct": 2.968385756145155,
+            "cash_pnl_usd": -1.335099999999994,
+            "profitable": 0,
+            "routed": 0,
+            "exit_counts": {
+              "SL": 3
+            }
+          }
+        }
+      },
+      "retry_every_five_seconds": {
+        "statuses": {
+          "wide": 56,
+          "stale order book": 6,
+          "depth slippage exceeds limit": 3,
+          "eligible": 5,
+          "backing_broken_while_waiting": 5,
+          "stop_touched_while_waiting": 2
+        },
+        "modes": {
+          "200ms_exact": {
+            "status": "SCORED_PUBLIC_L2_SIMULATION",
+            "trades": 5,
+            "skipped": {
+              "stocks:wide": 56,
+              "stocks:stale order book": 6,
+              "stocks:depth slippage exceeds limit": 3,
+              "stocks:backing_broken_while_waiting": 5,
+              "stocks:stop_touched_while_waiting": 2
+            },
+            "return_pct": -1.6509999999999803,
+            "drawdown_pct": 1.6509999999999754,
+            "contribution_pct": {
+              "crypto": 0.0,
+              "stocks": -1.6509999999999885
+            },
+            "peak_reservations": 2,
+            "peak_margin_pct": 5.556879099327167,
+            "cash_pnl_usd": -2.146299999999985,
+            "profitable": 0,
+            "routed": 2,
+            "exit_counts": {
+              "SL": 5
+            }
+          },
+          "200ms_stress_5bps_if_no_book": {
+            "status": "SCORED_PUBLIC_L2_SIMULATION",
+            "trades": 5,
+            "skipped": {
+              "stocks:wide": 56,
+              "stocks:stale order book": 6,
+              "stocks:depth slippage exceeds limit": 3,
+              "stocks:backing_broken_while_waiting": 5,
+              "stocks:stop_touched_while_waiting": 2
+            },
+            "return_pct": -1.6509999999999803,
+            "drawdown_pct": 1.6509999999999754,
+            "contribution_pct": {
+              "crypto": 0.0,
+              "stocks": -1.6509999999999885
+            },
+            "peak_reservations": 2,
+            "peak_margin_pct": 5.556879099327167,
+            "cash_pnl_usd": -2.146299999999985,
+            "profitable": 0,
+            "routed": 2,
+            "exit_counts": {
+              "SL": 5
+            }
+          },
+          "200ms_stress_30bps_if_no_book": {
+            "status": "SCORED_PUBLIC_L2_SIMULATION",
+            "trades": 5,
+            "skipped": {
+              "stocks:wide": 56,
+              "stocks:stale order book": 6,
+              "stocks:depth slippage exceeds limit": 3,
+              "stocks:backing_broken_while_waiting": 5,
+              "stocks:stop_touched_while_waiting": 2
+            },
+            "return_pct": -1.6509999999999803,
+            "drawdown_pct": 1.6509999999999754,
+            "contribution_pct": {
+              "crypto": 0.0,
+              "stocks": -1.6509999999999885
+            },
+            "peak_reservations": 2,
+            "peak_margin_pct": 5.556879099327167,
+            "cash_pnl_usd": -2.146299999999985,
+            "profitable": 0,
+            "routed": 2,
+            "exit_counts": {
+              "SL": 5
+            }
+          },
+          "1000ms_exact": {
+            "status": "SCORED_PUBLIC_L2_SIMULATION",
+            "trades": 5,
+            "skipped": {
+              "stocks:wide": 56,
+              "stocks:stale order book": 6,
+              "stocks:depth slippage exceeds limit": 3,
+              "stocks:backing_broken_while_waiting": 5,
+              "stocks:stop_touched_while_waiting": 2
+            },
+            "return_pct": -1.6730769230768994,
+            "drawdown_pct": 1.673076923076899,
+            "contribution_pct": {
+              "crypto": 0.0,
+              "stocks": -1.673076923076912
+            },
+            "peak_reservations": 2,
+            "peak_margin_pct": 5.5584555691661,
+            "cash_pnl_usd": -2.1749999999999856,
+            "profitable": 0,
+            "routed": 2,
+            "exit_counts": {
+              "SL": 5
+            }
+          },
+          "1000ms_stress_5bps_if_no_book": {
+            "status": "SCORED_PUBLIC_L2_SIMULATION",
+            "trades": 5,
+            "skipped": {
+              "stocks:wide": 56,
+              "stocks:stale order book": 6,
+              "stocks:depth slippage exceeds limit": 3,
+              "stocks:backing_broken_while_waiting": 5,
+              "stocks:stop_touched_while_waiting": 2
+            },
+            "return_pct": -1.6730769230768994,
+            "drawdown_pct": 1.673076923076899,
+            "contribution_pct": {
+              "crypto": 0.0,
+              "stocks": -1.673076923076912
+            },
+            "peak_reservations": 2,
+            "peak_margin_pct": 5.5584555691661,
+            "cash_pnl_usd": -2.1749999999999856,
+            "profitable": 0,
+            "routed": 2,
+            "exit_counts": {
+              "SL": 5
+            }
+          },
+          "1000ms_stress_30bps_if_no_book": {
+            "status": "SCORED_PUBLIC_L2_SIMULATION",
+            "trades": 5,
+            "skipped": {
+              "stocks:wide": 56,
+              "stocks:stale order book": 6,
+              "stocks:depth slippage exceeds limit": 3,
+              "stocks:backing_broken_while_waiting": 5,
+              "stocks:stop_touched_while_waiting": 2
+            },
+            "return_pct": -1.6730769230768994,
+            "drawdown_pct": 1.673076923076899,
+            "contribution_pct": {
+              "crypto": 0.0,
+              "stocks": -1.673076923076912
+            },
+            "peak_reservations": 2,
+            "peak_margin_pct": 5.5584555691661,
+            "cash_pnl_usd": -2.1749999999999856,
+            "profitable": 0,
+            "routed": 2,
+            "exit_counts": {
+              "SL": 5
+            }
+          }
+        }
+      },
+      "two_fresh_quotes_five_seconds_apart": {
+        "statuses": {
+          "wide": 57,
+          "stale order book": 6,
+          "depth slippage exceeds limit": 3,
+          "eligible": 4,
+          "backing_broken_while_waiting": 5,
+          "stop_touched_while_waiting": 2
+        },
+        "modes": {
+          "200ms_exact": {
+            "status": "SCORED_PUBLIC_L2_SIMULATION",
+            "trades": 4,
+            "skipped": {
+              "stocks:wide": 57,
+              "stocks:stale order book": 6,
+              "stocks:depth slippage exceeds limit": 3,
+              "stocks:backing_broken_while_waiting": 5,
+              "stocks:stop_touched_while_waiting": 2
+            },
+            "return_pct": -1.3141538461538316,
+            "drawdown_pct": 1.3141538461538333,
+            "contribution_pct": {
+              "crypto": 0.0,
+              "stocks": -1.3141538461538418
+            },
+            "peak_reservations": 2,
+            "peak_margin_pct": 5.53947930929796,
+            "cash_pnl_usd": -1.7083999999999944,
+            "profitable": 0,
+            "routed": 1,
+            "exit_counts": {
+              "SL": 4
+            }
+          },
+          "200ms_stress_5bps_if_no_book": {
+            "status": "SCORED_PUBLIC_L2_SIMULATION",
+            "trades": 4,
+            "skipped": {
+              "stocks:wide": 57,
+              "stocks:stale order book": 6,
+              "stocks:depth slippage exceeds limit": 3,
+              "stocks:backing_broken_while_waiting": 5,
+              "stocks:stop_touched_while_waiting": 2
+            },
+            "return_pct": -1.3141538461538316,
+            "drawdown_pct": 1.3141538461538333,
+            "contribution_pct": {
+              "crypto": 0.0,
+              "stocks": -1.3141538461538418
+            },
+            "peak_reservations": 2,
+            "peak_margin_pct": 5.53947930929796,
+            "cash_pnl_usd": -1.7083999999999944,
+            "profitable": 0,
+            "routed": 1,
+            "exit_counts": {
+              "SL": 4
+            }
+          },
+          "200ms_stress_30bps_if_no_book": {
+            "status": "SCORED_PUBLIC_L2_SIMULATION",
+            "trades": 4,
+            "skipped": {
+              "stocks:wide": 57,
+              "stocks:stale order book": 6,
+              "stocks:depth slippage exceeds limit": 3,
+              "stocks:backing_broken_while_waiting": 5,
+              "stocks:stop_touched_while_waiting": 2
+            },
+            "return_pct": -1.3141538461538316,
+            "drawdown_pct": 1.3141538461538333,
+            "contribution_pct": {
+              "crypto": 0.0,
+              "stocks": -1.3141538461538418
+            },
+            "peak_reservations": 2,
+            "peak_margin_pct": 5.53947930929796,
+            "cash_pnl_usd": -1.7083999999999944,
+            "profitable": 0,
+            "routed": 1,
+            "exit_counts": {
+              "SL": 4
+            }
+          },
+          "1000ms_exact": {
+            "status": "SCORED_PUBLIC_L2_SIMULATION",
+            "trades": 4,
+            "skipped": {
+              "stocks:wide": 57,
+              "stocks:stale order book": 6,
+              "stocks:depth slippage exceeds limit": 3,
+              "stocks:backing_broken_while_waiting": 5,
+              "stocks:stop_touched_while_waiting": 2
+            },
+            "return_pct": -1.3362307692307729,
+            "drawdown_pct": 1.3362307692307678,
+            "contribution_pct": {
+              "crypto": 0.0,
+              "stocks": -1.3362307692307651
+            },
+            "peak_reservations": 2,
+            "peak_margin_pct": 5.541045657760083,
+            "cash_pnl_usd": -1.737099999999995,
+            "profitable": 0,
+            "routed": 1,
+            "exit_counts": {
+              "SL": 4
+            }
+          },
+          "1000ms_stress_5bps_if_no_book": {
+            "status": "SCORED_PUBLIC_L2_SIMULATION",
+            "trades": 4,
+            "skipped": {
+              "stocks:wide": 57,
+              "stocks:stale order book": 6,
+              "stocks:depth slippage exceeds limit": 3,
+              "stocks:backing_broken_while_waiting": 5,
+              "stocks:stop_touched_while_waiting": 2
+            },
+            "return_pct": -1.3362307692307729,
+            "drawdown_pct": 1.3362307692307678,
+            "contribution_pct": {
+              "crypto": 0.0,
+              "stocks": -1.3362307692307651
+            },
+            "peak_reservations": 2,
+            "peak_margin_pct": 5.541045657760083,
+            "cash_pnl_usd": -1.737099999999995,
+            "profitable": 0,
+            "routed": 1,
+            "exit_counts": {
+              "SL": 4
+            }
+          },
+          "1000ms_stress_30bps_if_no_book": {
+            "status": "SCORED_PUBLIC_L2_SIMULATION",
+            "trades": 4,
+            "skipped": {
+              "stocks:wide": 57,
+              "stocks:stale order book": 6,
+              "stocks:depth slippage exceeds limit": 3,
+              "stocks:backing_broken_while_waiting": 5,
+              "stocks:stop_touched_while_waiting": 2
+            },
+            "return_pct": -1.3362307692307729,
+            "drawdown_pct": 1.3362307692307678,
+            "contribution_pct": {
+              "crypto": 0.0,
+              "stocks": -1.3362307692307651
+            },
+            "peak_reservations": 2,
+            "peak_margin_pct": 5.541045657760083,
+            "cash_pnl_usd": -1.737099999999995,
+            "profitable": 0,
+            "routed": 1,
+            "exit_counts": {
+              "SL": 4
+            }
+          }
+        }
+      },
+      "two_quotes_up_to_10bp_with_2r": {
+        "statuses": {
+          "wide": 52,
+          "stale order book": 6,
+          "depth slippage exceeds limit": 4,
+          "eligible": 9,
+          "backing_broken_while_waiting": 3,
+          "room_to_target_too_small": 1,
+          "stop_touched_while_waiting": 2
+        },
+        "modes": {
+          "200ms_exact": {
+            "status": "SCORED_PUBLIC_L2_SIMULATION",
+            "trades": 8,
+            "skipped": {
+              "stocks:wide": 52,
+              "stocks:stale order book": 6,
+              "stocks:depth slippage exceeds limit": 4,
+              "stocks:backing_broken_while_waiting": 3,
+              "stocks:room_to_target_too_small": 1,
+              "stocks:position_cap": 1,
+              "stocks:stop_touched_while_waiting": 2
+            },
+            "return_pct": -1.374999999999993,
+            "drawdown_pct": 1.8762307692307554,
+            "contribution_pct": {
+              "crypto": 0.0,
+              "stocks": -1.3749999999999933
+            },
+            "peak_reservations": 3,
+            "peak_margin_pct": 8.561311632202875,
+            "cash_pnl_usd": -1.7874999999999914,
+            "profitable": 1,
+            "routed": 5,
+            "exit_counts": {
+              "SL": 7,
+              "TARGET": 1
+            }
+          },
+          "200ms_stress_5bps_if_no_book": {
+            "status": "SCORED_PUBLIC_L2_SIMULATION",
+            "trades": 8,
+            "skipped": {
+              "stocks:wide": 52,
+              "stocks:stale order book": 6,
+              "stocks:depth slippage exceeds limit": 4,
+              "stocks:backing_broken_while_waiting": 3,
+              "stocks:room_to_target_too_small": 1,
+              "stocks:position_cap": 1,
+              "stocks:stop_touched_while_waiting": 2
+            },
+            "return_pct": -1.374999999999993,
+            "drawdown_pct": 1.8762307692307554,
+            "contribution_pct": {
+              "crypto": 0.0,
+              "stocks": -1.3749999999999933
+            },
+            "peak_reservations": 3,
+            "peak_margin_pct": 8.561311632202875,
+            "cash_pnl_usd": -1.7874999999999914,
+            "profitable": 1,
+            "routed": 5,
+            "exit_counts": {
+              "SL": 7,
+              "TARGET": 1
+            }
+          },
+          "200ms_stress_30bps_if_no_book": {
+            "status": "SCORED_PUBLIC_L2_SIMULATION",
+            "trades": 8,
+            "skipped": {
+              "stocks:wide": 52,
+              "stocks:stale order book": 6,
+              "stocks:depth slippage exceeds limit": 4,
+              "stocks:backing_broken_while_waiting": 3,
+              "stocks:room_to_target_too_small": 1,
+              "stocks:position_cap": 1,
+              "stocks:stop_touched_while_waiting": 2
+            },
+            "return_pct": -1.374999999999993,
+            "drawdown_pct": 1.8762307692307554,
+            "contribution_pct": {
+              "crypto": 0.0,
+              "stocks": -1.3749999999999933
+            },
+            "peak_reservations": 3,
+            "peak_margin_pct": 8.561311632202875,
+            "cash_pnl_usd": -1.7874999999999914,
+            "profitable": 1,
+            "routed": 5,
+            "exit_counts": {
+              "SL": 7,
+              "TARGET": 1
+            }
+          },
+          "1000ms_exact": {
+            "status": "SCORED_PUBLIC_L2_SIMULATION",
+            "trades": 8,
+            "skipped": {
+              "stocks:wide": 52,
+              "stocks:stale order book": 6,
+              "stocks:depth slippage exceeds limit": 4,
+              "stocks:backing_broken_while_waiting": 3,
+              "stocks:room_to_target_too_small": 1,
+              "stocks:position_cap": 1,
+              "stocks:stop_touched_while_waiting": 2
+            },
+            "return_pct": -1.3750461538461156,
+            "drawdown_pct": 1.8950769230769007,
+            "contribution_pct": {
+              "crypto": 0.0,
+              "stocks": -1.375046153846143
+            },
+            "peak_reservations": 3,
+            "peak_margin_pct": 8.563754119169847,
+            "cash_pnl_usd": -1.7875599999999858,
+            "profitable": 1,
+            "routed": 5,
+            "exit_counts": {
+              "SL": 7,
+              "TARGET": 1
+            }
+          },
+          "1000ms_stress_5bps_if_no_book": {
+            "status": "SCORED_PUBLIC_L2_SIMULATION",
+            "trades": 8,
+            "skipped": {
+              "stocks:wide": 52,
+              "stocks:stale order book": 6,
+              "stocks:depth slippage exceeds limit": 4,
+              "stocks:backing_broken_while_waiting": 3,
+              "stocks:room_to_target_too_small": 1,
+              "stocks:position_cap": 1,
+              "stocks:stop_touched_while_waiting": 2
+            },
+            "return_pct": -1.3750461538461156,
+            "drawdown_pct": 1.8950769230769007,
+            "contribution_pct": {
+              "crypto": 0.0,
+              "stocks": -1.375046153846143
+            },
+            "peak_reservations": 3,
+            "peak_margin_pct": 8.563754119169847,
+            "cash_pnl_usd": -1.7875599999999858,
+            "profitable": 1,
+            "routed": 5,
+            "exit_counts": {
+              "SL": 7,
+              "TARGET": 1
+            }
+          },
+          "1000ms_stress_30bps_if_no_book": {
+            "status": "SCORED_PUBLIC_L2_SIMULATION",
+            "trades": 8,
+            "skipped": {
+              "stocks:wide": 52,
+              "stocks:stale order book": 6,
+              "stocks:depth slippage exceeds limit": 4,
+              "stocks:backing_broken_while_waiting": 3,
+              "stocks:room_to_target_too_small": 1,
+              "stocks:position_cap": 1,
+              "stocks:stop_touched_while_waiting": 2
+            },
+            "return_pct": -1.3750461538461156,
+            "drawdown_pct": 1.8950769230769007,
+            "contribution_pct": {
+              "crypto": 0.0,
+              "stocks": -1.375046153846143
+            },
+            "peak_reservations": 3,
+            "peak_margin_pct": 8.563754119169847,
+            "cash_pnl_usd": -1.7875599999999858,
+            "profitable": 1,
+            "routed": 5,
+            "exit_counts": {
+              "SL": 7,
+              "TARGET": 1
+            }
+          }
+        }
+      },
+      "two_quotes_up_to_15bp_with_2r": {
+        "statuses": {
+          "wide": 52,
+          "stale order book": 6,
+          "depth slippage exceeds limit": 4,
+          "eligible": 10,
+          "backing_broken_while_waiting": 3,
+          "stop_touched_while_waiting": 2
+        },
+        "modes": {
+          "200ms_exact": {
+            "status": "SCORED_PUBLIC_L2_SIMULATION",
+            "trades": 8,
+            "skipped": {
+              "stocks:wide": 52,
+              "stocks:stale order book": 6,
+              "stocks:depth slippage exceeds limit": 4,
+              "stocks:backing_broken_while_waiting": 3,
+              "stocks:position_cap": 2,
+              "stocks:stop_touched_while_waiting": 2
+            },
+            "return_pct": -1.4396923076923085,
+            "drawdown_pct": 1.9409230769230683,
+            "contribution_pct": {
+              "crypto": 0.0,
+              "stocks": -1.4396923076923
+            },
+            "peak_reservations": 3,
+            "peak_margin_pct": 8.566941484453922,
+            "cash_pnl_usd": -1.87159999999999,
+            "profitable": 1,
+            "routed": 5,
+            "exit_counts": {
+              "SL": 7,
+              "TARGET": 1
+            }
+          },
+          "200ms_stress_5bps_if_no_book": {
+            "status": "SCORED_PUBLIC_L2_SIMULATION",
+            "trades": 8,
+            "skipped": {
+              "stocks:wide": 52,
+              "stocks:stale order book": 6,
+              "stocks:depth slippage exceeds limit": 4,
+              "stocks:backing_broken_while_waiting": 3,
+              "stocks:position_cap": 2,
+              "stocks:stop_touched_while_waiting": 2
+            },
+            "return_pct": -1.4396923076923085,
+            "drawdown_pct": 1.9409230769230683,
+            "contribution_pct": {
+              "crypto": 0.0,
+              "stocks": -1.4396923076923
+            },
+            "peak_reservations": 3,
+            "peak_margin_pct": 8.566941484453922,
+            "cash_pnl_usd": -1.87159999999999,
+            "profitable": 1,
+            "routed": 5,
+            "exit_counts": {
+              "SL": 7,
+              "TARGET": 1
+            }
+          },
+          "200ms_stress_30bps_if_no_book": {
+            "status": "SCORED_PUBLIC_L2_SIMULATION",
+            "trades": 8,
+            "skipped": {
+              "stocks:wide": 52,
+              "stocks:stale order book": 6,
+              "stocks:depth slippage exceeds limit": 4,
+              "stocks:backing_broken_while_waiting": 3,
+              "stocks:position_cap": 2,
+              "stocks:stop_touched_while_waiting": 2
+            },
+            "return_pct": -1.4396923076923085,
+            "drawdown_pct": 1.9409230769230683,
+            "contribution_pct": {
+              "crypto": 0.0,
+              "stocks": -1.4396923076923
+            },
+            "peak_reservations": 3,
+            "peak_margin_pct": 8.566941484453922,
+            "cash_pnl_usd": -1.87159999999999,
+            "profitable": 1,
+            "routed": 5,
+            "exit_counts": {
+              "SL": 7,
+              "TARGET": 1
+            }
+          },
+          "1000ms_exact": {
+            "status": "SCORED_PUBLIC_L2_SIMULATION",
+            "trades": 8,
+            "skipped": {
+              "stocks:wide": 52,
+              "stocks:stale order book": 6,
+              "stocks:depth slippage exceeds limit": 4,
+              "stocks:backing_broken_while_waiting": 3,
+              "stocks:position_cap": 2,
+              "stocks:stop_touched_while_waiting": 2
+            },
+            "return_pct": -1.4397384615384312,
+            "drawdown_pct": 1.9597692307692136,
+            "contribution_pct": {
+              "crypto": 0.0,
+              "stocks": -1.4397384615384494
+            },
+            "peak_reservations": 3,
+            "peak_margin_pct": 8.569387185256966,
+            "cash_pnl_usd": -1.8716599999999843,
+            "profitable": 1,
+            "routed": 5,
+            "exit_counts": {
+              "SL": 7,
+              "TARGET": 1
+            }
+          },
+          "1000ms_stress_5bps_if_no_book": {
+            "status": "SCORED_PUBLIC_L2_SIMULATION",
+            "trades": 8,
+            "skipped": {
+              "stocks:wide": 52,
+              "stocks:stale order book": 6,
+              "stocks:depth slippage exceeds limit": 4,
+              "stocks:backing_broken_while_waiting": 3,
+              "stocks:position_cap": 2,
+              "stocks:stop_touched_while_waiting": 2
+            },
+            "return_pct": -1.4397384615384312,
+            "drawdown_pct": 1.9597692307692136,
+            "contribution_pct": {
+              "crypto": 0.0,
+              "stocks": -1.4397384615384494
+            },
+            "peak_reservations": 3,
+            "peak_margin_pct": 8.569387185256966,
+            "cash_pnl_usd": -1.8716599999999843,
+            "profitable": 1,
+            "routed": 5,
+            "exit_counts": {
+              "SL": 7,
+              "TARGET": 1
+            }
+          },
+          "1000ms_stress_30bps_if_no_book": {
+            "status": "SCORED_PUBLIC_L2_SIMULATION",
+            "trades": 8,
+            "skipped": {
+              "stocks:wide": 52,
+              "stocks:stale order book": 6,
+              "stocks:depth slippage exceeds limit": 4,
+              "stocks:backing_broken_while_waiting": 3,
+              "stocks:position_cap": 2,
+              "stocks:stop_touched_while_waiting": 2
+            },
+            "return_pct": -1.4397384615384312,
+            "drawdown_pct": 1.9597692307692136,
+            "contribution_pct": {
+              "crypto": 0.0,
+              "stocks": -1.4397384615384494
+            },
+            "peak_reservations": 3,
+            "peak_margin_pct": 8.569387185256966,
+            "cash_pnl_usd": -1.8716599999999843,
+            "profitable": 1,
+            "routed": 5,
+            "exit_counts": {
+              "SL": 7,
+              "TARGET": 1
+            }
+          }
+        }
+      }
+    },
+    "entry_checks": {
+      "1794873600:LITEUSDT": {
+        "snapshot": 96,
+        "update": 1480952,
+        "first_ts": 1794873600002,
+        "last_ts": 1794959999999
+      },
+      "1794873600:QCOMUSDT": {
+        "snapshot": 96,
+        "update": 583847,
+        "first_ts": 1794873600002,
+        "last_ts": 1794959999669
+      },
+      "1794873600:SOFTBANKUSDT": {
+        "snapshot": 96,
+        "update": 184660,
+        "first_ts": 1794873600002,
+        "last_ts": 1794959999548
+      },
+      "1794960000:AAOIUSDT": {
+        "snapshot": 96,
+        "update": 795345,
+        "first_ts": 1794960000008,
+        "last_ts": 1795046399998
+      },
+      "1794960000:ARMUSDT": {
+        "snapshot": 96,
+        "update": 861949,
+        "first_ts": 1794960000009,
+        "last_ts": 1795046399999
+      },
+      "1794960000:AXTIUSDT": {
+        "snapshot": 96,
+        "update": 719317,
+        "first_ts": 1794960000009,
+        "last_ts": 1795046399999
+      },
+      "1794960000:BEUSDT": {
+        "snapshot": 96,
+        "update": 962253,
+        "first_ts": 1794960000008,
+        "last_ts": 1795046399998
+      },
+      "1794960000:CRCLUSDT": {
+        "snapshot": 96,
+        "update": 620644,
+        "first_ts": 1794960000009,
+        "last_ts": 1795046399999
+      },
+      "1794960000:CRWVUSDT": {
+        "snapshot": 96,
+        "update": 724939,
+        "first_ts": 1794960000009,
+        "last_ts": 1795046399997
+      },
+      "1794960000:DELLUSDT": {
+        "snapshot": 96,
+        "update": 888364,
+        "first_ts": 1794960000003,
+        "last_ts": 1795046396905
+      },
+      "1794960000:HOODUSDT": {
+        "snapshot": 96,
+        "update": 501481,
+        "first_ts": 1794960000009,
+        "last_ts": 1795046398437
+      },
+      "1794960000:LITEUSDT": {
+        "snapshot": 96,
+        "update": 1199145,
+        "first_ts": 1794960000009,
+        "last_ts": 1795046399997
+      },
+      "1794960000:MRVLUSDT": {
+        "snapshot": 96,
+        "update": 916925,
+        "first_ts": 1794960000008,
+        "last_ts": 1795046399998
+      },
+      "1794960000:MSTRUSDT": {
+        "snapshot": 96,
+        "update": 1764608,
+        "first_ts": 1794960000009,
+        "last_ts": 1795046399999
+      },
+      "1794960000:OKTAUSDT": {
+        "snapshot": 96,
+        "update": 154080,
+        "first_ts": 1794960000003,
+        "last_ts": 1795046399125
+      },
+      "1794960000:RKLBUSDT": {
+        "snapshot": 96,
+        "update": 531067,
+        "first_ts": 1794960000008,
+        "last_ts": 1795046395368
+      },
+      "1794960000:SKHYNIXUSDT": {
+        "snapshot": 96,
+        "update": 1304623,
+        "first_ts": 1794960000009,
+        "last_ts": 1795046399997
+      },
+      "1794960000:SKHYUSDT": {
+        "snapshot": 96,
+        "update": 1382022,
+        "first_ts": 1794960000003,
+        "last_ts": 1795046399995
+      },
+      "1794960000:SOFTBANKUSDT": {
+        "snapshot": 96,
+        "update": 148767,
+        "first_ts": 1794960000008,
+        "last_ts": 1795046399978
+      },
+      "1794960000:SOXSUSDT": {
+        "snapshot": 96,
+        "update": 2069029,
+        "first_ts": 1794960000008,
+        "last_ts": 1795046399998
+      },
+      "1794960000:WDCUSDT": {
+        "snapshot": 96,
+        "update": 804300,
+        "first_ts": 1794960000009,
+        "last_ts": 1795046399957
+      },
+      "1795046400:AAOIUSDT": {
+        "snapshot": 96,
+        "update": 739287,
+        "first_ts": 1795046400008,
+        "last_ts": 1795132799990
+      },
+      "1795046400:AXTIUSDT": {
+        "snapshot": 96,
+        "update": 666028,
+        "first_ts": 1795046400009,
+        "last_ts": 1795132799992
+      },
+      "1795046400:BEUSDT": {
+        "snapshot": 96,
+        "update": 1007797,
+        "first_ts": 1795046400008,
+        "last_ts": 1795132799990
+      },
+      "1795046400:BMNRUSDT": {
+        "snapshot": 96,
+        "update": 279418,
+        "first_ts": 1795046400005,
+        "last_ts": 1795132799075
+      },
+      "1795046400:CRCLUSDT": {
+        "snapshot": 96,
+        "update": 717487,
+        "first_ts": 1795046400009,
+        "last_ts": 1795132799992
+      },
+      "1795046400:CRWVUSDT": {
+        "snapshot": 96,
+        "update": 760143,
+        "first_ts": 1795046400007,
+        "last_ts": 1795132799996
+      },
+      "1795046400:DELLUSDT": {
+        "snapshot": 96,
+        "update": 713055,
+        "first_ts": 1795046400005,
+        "last_ts": 1795132796305
+      },
+      "1795046400:HOODUSDT": {
+        "snapshot": 96,
+        "update": 624375,
+        "first_ts": 1795046400007,
+        "last_ts": 1795132797486
+      },
+      "1795046400:LITEUSDT": {
+        "snapshot": 96,
+        "update": 1207848,
+        "first_ts": 1795046400007,
+        "last_ts": 1795132799996
+      },
+      "1795046400:MRNAUSDT": {
+        "snapshot": 96,
+        "update": 435257,
+        "first_ts": 1795046400009,
+        "last_ts": 1795132799622
+      },
+      "1795046400:MSTRUSDT": {
+        "snapshot": 96,
+        "update": 2221901,
+        "first_ts": 1795046400009,
+        "last_ts": 1795132799992
+      },
+      "1795046400:NBISUSDT": {
+        "snapshot": 96,
+        "update": 1048181,
+        "first_ts": 1795046400008,
+        "last_ts": 1795132799990
+      },
+      "1795046400:OKTAUSDT": {
+        "snapshot": 96,
+        "update": 150354,
+        "first_ts": 1795046400005,
+        "last_ts": 1795132799655
+      },
+      "1795046400:QCOMUSDT": {
+        "snapshot": 96,
+        "update": 530854,
+        "first_ts": 1795046400007,
+        "last_ts": 1795132799996
+      },
+      "1795046400:SKHYNIXUSDT": {
+        "snapshot": 96,
+        "update": 1366878,
+        "first_ts": 1795046400007,
+        "last_ts": 1795132799996
+      },
+      "1795046400:SKHYUSDT": {
+        "snapshot": 96,
+        "update": 1218592,
+        "first_ts": 1795046400005,
+        "last_ts": 1795132799995
+      },
+      "1795046400:SNDKUSDT": {
+        "snapshot": 96,
+        "update": 1426673,
+        "first_ts": 1795046400007,
+        "last_ts": 1795132799986
+      },
+      "1795046400:SNXXUSDT": {
+        "snapshot": 96,
+        "update": 1215794,
+        "first_ts": 1795046400005,
+        "last_ts": 1795132799995
+      },
+      "1795046400:SOFTBANKUSDT": {
+        "snapshot": 96,
+        "update": 168789,
+        "first_ts": 1795046400008,
+        "last_ts": 1795132797960
+      },
+      "1795046400:SOXSUSDT": {
+        "snapshot": 96,
+        "update": 2125176,
+        "first_ts": 1795046400008,
+        "last_ts": 1795132799990
+      }
+    },
+    "tape_checks": {
+      "AAOIUSDT": {
+        "bars_checked": 170,
+        "mismatches": {}
+      },
+      "AMDUSDT": {
+        "bars_checked": 64,
+        "mismatches": {}
+      },
+      "ARMUSDT": {
+        "bars_checked": 75,
+        "mismatches": {}
+      },
+      "AVGOUSDT": {
+        "bars_checked": 64,
+        "mismatches": {}
+      },
+      "AXTIUSDT": {
+        "bars_checked": 186,
+        "mismatches": {}
+      },
+      "BEUSDT": {
+        "bars_checked": 217,
+        "mismatches": {}
+      },
+      "BMNRUSDT": {
+        "bars_checked": 117,
+        "mismatches": {}
+      },
+      "CBRSUSDT": {
+        "bars_checked": 64,
+        "mismatches": {}
+      },
+      "CRCLUSDT": {
+        "bars_checked": 152,
+        "mismatches": {}
+      },
+      "CRWVUSDT": {
+        "bars_checked": 146,
+        "mismatches": {}
+      },
+      "DELLUSDT": {
+        "bars_checked": 166,
+        "mismatches": {}
+      },
+      "HOODUSDT": {
+        "bars_checked": 144,
+        "mismatches": {}
+      },
+      "KOUSDT": {
+        "bars_checked": 85,
+        "mismatches": {}
+      },
+      "LITEUSDT": {
+        "bars_checked": 190,
+        "mismatches": {}
+      },
+      "MRNAUSDT": {
+        "bars_checked": 128,
+        "mismatches": {}
+      },
+      "MRVLUSDT": {
+        "bars_checked": 71,
+        "mismatches": {}
+      },
+      "MSTRUSDT": {
+        "bars_checked": 159,
+        "mismatches": {}
+      },
+      "NBISUSDT": {
+        "bars_checked": 84,
+        "mismatches": {}
+      },
+      "NVDAUSDT": {
+        "bars_checked": 64,
+        "mismatches": {}
+      },
+      "OKTAUSDT": {
+        "bars_checked": 129,
+        "mismatches": {}
+      },
+      "PLTRUSDT": {
+        "bars_checked": 64,
+        "mismatches": {}
+      },
+      "QCOMUSDT": {
+        "bars_checked": 173,
+        "mismatches": {}
+      },
+      "RKLBUSDT": {
+        "bars_checked": 64,
+        "mismatches": {}
+      },
+      "SAMSUNGUSDT": {
+        "bars_checked": 64,
+        "mismatches": {}
+      },
+      "SKHYNIXUSDT": {
+        "bars_checked": 176,
+        "mismatches": {}
+      },
+      "SKHYUSDT": {
+        "bars_checked": 146,
+        "mismatches": {}
+      },
+      "SNDKUSDT": {
+        "bars_checked": 64,
+        "mismatches": {}
+      },
+      "SNXXUSDT": {
+        "bars_checked": 78,
+        "mismatches": {}
+      },
+      "SOFTBANKUSDT": {
+        "bars_checked": 231,
+        "mismatches": {}
+      },
+      "SOXSUSDT": {
+        "bars_checked": 185,
+        "mismatches": {}
+      },
+      "SPCXUSDT": {
+        "bars_checked": 64,
+        "mismatches": {}
+      },
+      "WDCUSDT": {
+        "bars_checked": 128,
+        "mismatches": {}
+      }
+    },
+    "exact_exit_checks": {
+      "1794960000:CRCLUSDT": {
+        "snapshot": 96,
+        "update": 620644,
+        "first_ts": 1794960000009,
+        "last_ts": 1795046399999
+      },
+      "1794960000:MSTRUSDT": {
+        "snapshot": 96,
+        "update": 1764608,
+        "first_ts": 1794960000009,
+        "last_ts": 1795046399999
+      },
+      "1795046400:CRCLUSDT": {
+        "snapshot": 96,
+        "update": 717487,
+        "first_ts": 1795046400009,
+        "last_ts": 1795132799992
+      },
+      "1795046400:MSTRUSDT": {
+        "snapshot": 96,
+        "update": 2221901,
+        "first_ts": 1795046400009,
+        "last_ts": 1795132799992
+      },
+      "1795046400:SKHYNIXUSDT": {
+        "snapshot": 96,
+        "update": 1366878,
+        "first_ts": 1795046400007,
+        "last_ts": 1795132799996
+      },
+      "1795046400:SNDKUSDT": {
+        "snapshot": 96,
+        "update": 1426673,
+        "first_ts": 1795046400007,
+        "last_ts": 1795132799986
+      }
+    },
+    "publication_cap_rejections": 73,
+    "archive_sha256": {
+      "1794873600:LITEUSDT": "dd1e0d2f01c780944ab818655171eb8ef4599a928fd03b37d6ff87ac0203d184",
+      "1794873600:QCOMUSDT": "0c7cfa2446341ad2e3d66976693d3c74eb92074c558b05afb52321e4a06d03a9",
+      "1794873600:SOFTBANKUSDT": "f34f8f01ac8421abb28dbd1824ededd0fac725ad813c22569c3a50ca69260c5f",
+      "1794960000:AAOIUSDT": "4c116a521c3371f349e64d61ffffb3b527bbd9a97f98f144ca64f72e9174ea6d",
+      "1794960000:ARMUSDT": "2a2a4a9b15293445ebebc3c42b5d434d81ddf4da7028d6a11b1c6508729c0513",
+      "1794960000:AXTIUSDT": "6029b3a576423b15b57cf1d56fe8b97bd88dc36c3ae3902af80508a8123f848f",
+      "1794960000:BEUSDT": "06ba350db914085e3a2f7f9b0c8f2aafc968e72c6659166c1936568dc4021c9c",
+      "1794960000:CRCLUSDT": "6fa2cd0bbdd4673d1f68fee9eba5bd2f4d742e4d2fffe49b1b524ac6103e2762",
+      "1794960000:CRWVUSDT": "da374a81d033e81bddc935a88c5d6c1f78af11c2afbabf05cf3de7b7d3161ce5",
+      "1794960000:DELLUSDT": "bb8adba6df4eff8313f5aa12b04c797358d0cab52e7c652148a356a64466bc37",
+      "1794960000:HOODUSDT": "c43c886d7d92ebd262ad7d0b4d4a968922aa3908bceaa8ba57818bfe2c88ffb5",
+      "1794960000:LITEUSDT": "0ca1f3579f523e7e35fa80f5d966b04e40f5375b02382da7ee073a1ffa3a5253",
+      "1794960000:MRVLUSDT": "422410eb1379de9fea9fe30d7600a0882ad1687c05ce9c7d5b1e292fb912df16",
+      "1794960000:MSTRUSDT": "2729912a254995279418fee6dc2db5ba3c9efa8cd41c894f399fdbb3535ce993",
+      "1794960000:OKTAUSDT": "5f0f12f37e8f624ef00ae135d6e748226cbe034363f69d31004d96170fa2b2cb",
+      "1794960000:RKLBUSDT": "e735146552c296ac1a4fedc89513c92fd371061fc612e0c19ac27aa2ca4c71dd",
+      "1794960000:SKHYNIXUSDT": "f86519cf0617dee496514575d155999f3eb0e67a2b48ecb918776dd4172315c2",
+      "1794960000:SKHYUSDT": "2c5c5605179a2021a7b99d9245960efa4ac9a8746b5d1ccbafa0fec93a9ef725",
+      "1794960000:SOFTBANKUSDT": "332cab22649fef3d3f0c75434101780beca5133169dd17582f77b0eb301de643",
+      "1794960000:SOXSUSDT": "45497eed4324ccdd937ec4d412a21f59f42aab55dd3dbcd0f3f987b7571bfdc3",
+      "1794960000:WDCUSDT": "3c66cfd7a8d91cf42361277167189cbb025f3e04dd92d728113f82efd17cc703",
+      "1795046400:AAOIUSDT": "b321349a05cfe04aee2562e977bb4d52786eb2cf24fb58eb4777f24c0ae1afc8",
+      "1795046400:AXTIUSDT": "64ac39f2f6da00263c41e752b990e9b8a8e26cabb7f9dea535d9da34b3e8b6d8",
+      "1795046400:BEUSDT": "5c157b15f3e9656a372b078fda87ef2865a78fbc577e98d9053f737d5b02f819",
+      "1795046400:BMNRUSDT": "21258b52cf0b5e4e42b528d8b8c1298f385d763dea976861bd04ebadb94e2174",
+      "1795046400:CRCLUSDT": "7ecde3842f555b33e9c25ace69f8a5249c3c5bb956f159e05c767b32fda94ddd",
+      "1795046400:CRWVUSDT": "8cc822011fa286b05d833b57c0575c30d32ac1fb330fab579ceb5b000b845b18",
+      "1795046400:DELLUSDT": "d75b7f7e5928fde510e87580238ee0b786a2391e7db09310daa9f82f9838cb0e",
+      "1795046400:HOODUSDT": "3b9c3fe6bf1670673b6917859290e5ca0b060b976fcfae766fb8c2164c3bb14d",
+      "1795046400:LITEUSDT": "778e32e91155bb97067ab56a6e9703b41ab342b1e872ec3a71ed37027e964d10",
+      "1795046400:MRNAUSDT": "9967f90d6d49fd9a933d5637b4b3cfe5fd725455d5e56d919ba1312774d09bc8",
+      "1795046400:MSTRUSDT": "d12416bb90b9b90774bf281fb9e1fddc0b73b82a952d2a9b2582da0bc77e0079",
+      "1795046400:NBISUSDT": "0d447b8aab5d8c1014c52df65e8d3c3727e7b40ce59b9b3b549d2e71eece101a",
+      "1795046400:OKTAUSDT": "61705f4e8048adca600f5e4a8db8d98f3ccd4367269d30b7a6c0a953bfbccef7",
+      "1795046400:QCOMUSDT": "e603d6c22cdb36f8d79acf13d64629f4ccc252a967334ec84a45632c5de53943",
+      "1795046400:SKHYNIXUSDT": "b0681c0b3340fab1293abacb6bb5632dd1ba6d44e6fff30db022fed7034234c4",
+      "1795046400:SKHYUSDT": "d4363fe008f32d4e20b9046cdf4dcb743e1a05717c81f29122c77639ba6899ce",
+      "1795046400:SNDKUSDT": "6734fc31c1148ca0faeb01c4f1ddaea82f472c7e0e4c230ca545c54fc212a866",
+      "1795046400:SNXXUSDT": "edc4043e2933fea056095efdd2df05c34f143f08686e1bee26bd114b2e429ed0",
+      "1795046400:SOFTBANKUSDT": "0ca12fe6df6fa3f77c01a681a43fd772cdee9eb1dc89913181aa2ee23c332156",
+      "1795046400:SOXSUSDT": "4d8c466795332c0bc646d7ea56253390ec1cc33b867f1adb5b95f27e3b761625"
+    },
+    "fills": {
+      "current": [
+        {
+          "symbol": "MSTRUSDT",
+          "epoch": 1795010400,
+          "entry_ms": 1795010431727,
+          "direction": "LONG",
+          "reference_entry": 95.69,
+          "path": {
+            "60": {
+              "known": true,
+              "code": "SL",
+              "end_ms": 1795012282207,
+              "trigger_price": 94.7,
+              "bank": null,
+              "be_level": 95.69
+            }
+          }
+        },
+        {
+          "symbol": "MSTRUSDT",
+          "epoch": 1795059000,
+          "entry_ms": 1795059031282,
+          "direction": "SHORT",
+          "reference_entry": 91.53571428571429,
+          "path": {
+            "60": {
+              "known": true,
+              "code": "SL",
+              "end_ms": 1795060902884,
+              "trigger_price": 92.55,
+              "bank": null,
+              "be_level": 91.54
+            }
+          }
+        },
+        {
+          "symbol": "SKHYNIXUSDT",
+          "epoch": 1795094100,
+          "entry_ms": 1795094133933,
+          "direction": "LONG",
+          "reference_entry": 889.4000000000001,
+          "path": {
+            "60": {
+              "known": true,
+              "code": "SL",
+              "end_ms": 1795101604231,
+              "trigger_price": 880.5,
+              "bank": null,
+              "be_level": 889.4
+            }
+          }
+        }
+      ],
+      "retry_every_five_seconds": [
+        {
+          "symbol": "MSTRUSDT",
+          "epoch": 1795010400,
+          "entry_ms": 1795010431727,
+          "direction": "LONG",
+          "reference_entry": 95.69,
+          "path": {
+            "60": {
+              "known": true,
+              "code": "SL",
+              "end_ms": 1795012282207,
+              "trigger_price": 94.7,
+              "bank": null,
+              "be_level": 95.69
+            }
+          }
+        },
+        {
+          "symbol": "MSTRUSDT",
+          "epoch": 1795059000,
+          "entry_ms": 1795059031282,
+          "direction": "SHORT",
+          "reference_entry": 91.53571428571429,
+          "path": {
+            "60": {
+              "known": true,
+              "code": "SL",
+              "end_ms": 1795060902884,
+              "trigger_price": 92.55,
+              "bank": null,
+              "be_level": 91.54
+            }
+          }
+        },
+        {
+          "symbol": "MSTRUSDT",
+          "epoch": 1795064400,
+          "entry_ms": 1795064446326,
+          "direction": "SHORT",
+          "reference_entry": 92.81119047619048,
+          "path": {
+            "60": {
+              "known": true,
+              "code": "SL",
+              "end_ms": 1795079140526,
+              "trigger_price": 93.86,
+              "bank": null,
+              "be_level": 92.81
+            }
+          }
+        },
+        {
+          "symbol": "SKHYNIXUSDT",
+          "epoch": 1795094100,
+          "entry_ms": 1795094133933,
+          "direction": "LONG",
+          "reference_entry": 889.4000000000001,
+          "path": {
+            "60": {
+              "known": true,
+              "code": "SL",
+              "end_ms": 1795101604231,
+              "trigger_price": 880.5,
+              "bank": null,
+              "be_level": 889.4
+            }
+          }
+        },
+        {
+          "symbol": "CRCLUSDT",
+          "epoch": 1795096800,
+          "entry_ms": 1795096919790,
+          "direction": "SHORT",
+          "reference_entry": 55.45,
+          "path": {
+            "60": {
+              "known": true,
+              "code": "SL",
+              "end_ms": 1795098669253,
+              "trigger_price": 56.09,
+              "bank": null,
+              "be_level": 55.45
+            }
+          }
+        }
+      ],
+      "two_fresh_quotes_five_seconds_apart": [
+        {
+          "symbol": "MSTRUSDT",
+          "epoch": 1795010400,
+          "entry_ms": 1795010431727,
+          "direction": "LONG",
+          "reference_entry": 95.69,
+          "path": {
+            "60": {
+              "known": true,
+              "code": "SL",
+              "end_ms": 1795012282207,
+              "trigger_price": 94.7,
+              "bank": null,
+              "be_level": 95.69
+            }
+          }
+        },
+        {
+          "symbol": "MSTRUSDT",
+          "epoch": 1795059000,
+          "entry_ms": 1795059031282,
+          "direction": "SHORT",
+          "reference_entry": 91.53571428571429,
+          "path": {
+            "60": {
+              "known": true,
+              "code": "SL",
+              "end_ms": 1795060902884,
+              "trigger_price": 92.55,
+              "bank": null,
+              "be_level": 91.54
+            }
+          }
+        },
+        {
+          "symbol": "SKHYNIXUSDT",
+          "epoch": 1795094100,
+          "entry_ms": 1795094133933,
+          "direction": "LONG",
+          "reference_entry": 889.4000000000001,
+          "path": {
+            "60": {
+              "known": true,
+              "code": "SL",
+              "end_ms": 1795101604231,
+              "trigger_price": 880.5,
+              "bank": null,
+              "be_level": 889.4
+            }
+          }
+        },
+        {
+          "symbol": "CRCLUSDT",
+          "epoch": 1795096800,
+          "entry_ms": 1795096924790,
+          "direction": "SHORT",
+          "reference_entry": 55.46999999999999,
+          "path": {
+            "60": {
+              "known": true,
+              "code": "SL",
+              "end_ms": 1795098669253,
+              "trigger_price": 56.09,
+              "bank": null,
+              "be_level": 55.47
+            }
+          }
+        }
+      ],
+      "two_quotes_up_to_10bp_with_2r": [
+        {
+          "symbol": "CRCLUSDT",
+          "epoch": 1794996900,
+          "entry_ms": 1794996939524,
+          "direction": "LONG",
+          "reference_entry": 56.05,
+          "path": {
+            "60": {
+              "known": true,
+              "code": "SL",
+              "end_ms": 1795005339027,
+              "trigger_price": 55.44,
+              "bank": null,
+              "be_level": 56.05
+            }
+          }
+        },
+        {
+          "symbol": "MSTRUSDT",
+          "epoch": 1795010400,
+          "entry_ms": 1795010431727,
+          "direction": "LONG",
+          "reference_entry": 95.69,
+          "path": {
+            "60": {
+              "known": true,
+              "code": "SL",
+              "end_ms": 1795012282207,
+              "trigger_price": 94.7,
+              "bank": null,
+              "be_level": 95.69
+            }
+          }
+        },
+        {
+          "symbol": "MSTRUSDT",
+          "epoch": 1795059000,
+          "entry_ms": 1795059031282,
+          "direction": "SHORT",
+          "reference_entry": 91.53571428571429,
+          "path": {
+            "60": {
+              "known": true,
+              "code": "SL",
+              "end_ms": 1795060902884,
+              "trigger_price": 92.55,
+              "bank": null,
+              "be_level": 91.54
+            }
+          }
+        },
+        {
+          "symbol": "MSTRUSDT",
+          "epoch": 1795064400,
+          "entry_ms": 1795064441326,
+          "direction": "SHORT",
+          "reference_entry": 92.84999999999998,
+          "path": {
+            "60": {
+              "known": true,
+              "code": "SL",
+              "end_ms": 1795079140526,
+              "trigger_price": 93.86,
+              "bank": null,
+              "be_level": 92.85
+            }
+          }
+        },
+        {
+          "symbol": "SKHYNIXUSDT",
+          "epoch": 1795068000,
+          "entry_ms": 1795068118034,
+          "direction": "SHORT",
+          "reference_entry": 876.1,
+          "path": {
+            "60": {
+              "known": true,
+              "code": "SL",
+              "end_ms": 1795070492013,
+              "trigger_price": 883.5,
+              "bank": null,
+              "be_level": 876.1
+            }
+          }
+        },
+        {
+          "symbol": "MSTRUSDT",
+          "epoch": 1795077900,
+          "entry_ms": 1795077941624,
+          "direction": "LONG",
+          "reference_entry": 93.08,
+          "path": {
+            "60": {
+              "known": true,
+              "code": "SL",
+              "end_ms": 1795100085590,
+              "trigger_price": 92.1,
+              "bank": null,
+              "be_level": 93.08
+            }
+          }
+        },
+        {
+          "symbol": "SNDKUSDT",
+          "epoch": 1795083300,
+          "entry_ms": 1795083343328,
+          "direction": "LONG",
+          "reference_entry": 809.1062499999999,
+          "path": {
+            "60": {
+              "known": true,
+              "code": "TARGET",
+              "end_ms": 1795098753002,
+              "trigger_price": 832.5,
+              "bank": null,
+              "be_level": 809.11,
+              "simultaneous_targets": false
+            }
+          }
+        },
+        {
+          "symbol": "SKHYNIXUSDT",
+          "epoch": 1795094100,
+          "entry_ms": 1795094133933,
+          "direction": "LONG",
+          "reference_entry": 889.4000000000001,
+          "path": {
+            "60": {
+              "known": true,
+              "code": "SL",
+              "end_ms": 1795101604231,
+              "trigger_price": 880.5,
+              "bank": null,
+              "be_level": 889.4
+            }
+          }
+        },
+        {
+          "symbol": "CRCLUSDT",
+          "epoch": 1795096800,
+          "entry_ms": 1795096839790,
+          "direction": "SHORT",
+          "reference_entry": 55.46999999999999,
+          "path": {
+            "60": {
+              "known": true,
+              "code": "SL",
+              "end_ms": 1795098669253,
+              "trigger_price": 56.09,
+              "bank": null,
+              "be_level": 55.47
+            }
+          }
+        }
+      ],
+      "two_quotes_up_to_15bp_with_2r": [
+        {
+          "symbol": "CRCLUSDT",
+          "epoch": 1794996900,
+          "entry_ms": 1794996939524,
+          "direction": "LONG",
+          "reference_entry": 56.05,
+          "path": {
+            "60": {
+              "known": true,
+              "code": "SL",
+              "end_ms": 1795005339027,
+              "trigger_price": 55.44,
+              "bank": null,
+              "be_level": 56.05
+            }
+          }
+        },
+        {
+          "symbol": "MSTRUSDT",
+          "epoch": 1795010400,
+          "entry_ms": 1795010431727,
+          "direction": "LONG",
+          "reference_entry": 95.69,
+          "path": {
+            "60": {
+              "known": true,
+              "code": "SL",
+              "end_ms": 1795012282207,
+              "trigger_price": 94.7,
+              "bank": null,
+              "be_level": 95.69
+            }
+          }
+        },
+        {
+          "symbol": "MSTRUSDT",
+          "epoch": 1795059000,
+          "entry_ms": 1795059031282,
+          "direction": "SHORT",
+          "reference_entry": 91.53571428571429,
+          "path": {
+            "60": {
+              "known": true,
+              "code": "SL",
+              "end_ms": 1795060902884,
+              "trigger_price": 92.55,
+              "bank": null,
+              "be_level": 91.54
+            }
+          }
+        },
+        {
+          "symbol": "MSTRUSDT",
+          "epoch": 1795064400,
+          "entry_ms": 1795064441326,
+          "direction": "SHORT",
+          "reference_entry": 92.84999999999998,
+          "path": {
+            "60": {
+              "known": true,
+              "code": "SL",
+              "end_ms": 1795079140526,
+              "trigger_price": 93.86,
+              "bank": null,
+              "be_level": 92.85
+            }
+          }
+        },
+        {
+          "symbol": "SKHYNIXUSDT",
+          "epoch": 1795067100,
+          "entry_ms": 1795067142630,
+          "direction": "SHORT",
+          "reference_entry": 872.8,
+          "path": {
+            "60": {
+              "known": true,
+              "code": "SL",
+              "end_ms": 1795070139049,
+              "trigger_price": 882.4,
+              "bank": null,
+              "be_level": 872.8
+            }
+          }
+        },
+        {
+          "symbol": "SKHYNIXUSDT",
+          "epoch": 1795068000,
+          "entry_ms": 1795068043034,
+          "direction": "SHORT",
+          "reference_entry": 873.9,
+          "path": {
+            "60": {
+              "known": true,
+              "code": "SL",
+              "end_ms": 1795070492013,
+              "trigger_price": 883.5,
+              "bank": null,
+              "be_level": 873.9
+            }
+          }
+        },
+        {
+          "symbol": "MSTRUSDT",
+          "epoch": 1795077900,
+          "entry_ms": 1795077941624,
+          "direction": "LONG",
+          "reference_entry": 93.08,
+          "path": {
+            "60": {
+              "known": true,
+              "code": "SL",
+              "end_ms": 1795100085590,
+              "trigger_price": 92.1,
+              "bank": null,
+              "be_level": 93.08
+            }
+          }
+        },
+        {
+          "symbol": "SNDKUSDT",
+          "epoch": 1795083300,
+          "entry_ms": 1795083343328,
+          "direction": "LONG",
+          "reference_entry": 809.1062499999999,
+          "path": {
+            "60": {
+              "known": true,
+              "code": "TARGET",
+              "end_ms": 1795098753002,
+              "trigger_price": 832.5,
+              "bank": null,
+              "be_level": 809.11,
+              "simultaneous_targets": false
+            }
+          }
+        },
+        {
+          "symbol": "SKHYNIXUSDT",
+          "epoch": 1795094100,
+          "entry_ms": 1795094133933,
+          "direction": "LONG",
+          "reference_entry": 889.4000000000001,
+          "path": {
+            "60": {
+              "known": true,
+              "code": "SL",
+              "end_ms": 1795101604231,
+              "trigger_price": 880.5,
+              "bank": null,
+              "be_level": 889.4
+            }
+          }
+        },
+        {
+          "symbol": "CRCLUSDT",
+          "epoch": 1795096800,
+          "entry_ms": 1795096839790,
+          "direction": "SHORT",
+          "reference_entry": 55.46999999999999,
+          "path": {
+            "60": {
+              "known": true,
+              "code": "SL",
+              "end_ms": 1795098669253,
+              "trigger_price": 56.09,
+              "bank": null,
+              "be_level": 55.47
+            }
+          }
+        }
+      ]
+    }
+  },
+  "live_activation_supported": false,
+  "limitations": [
+    "The exact stock strategy is replayed on confirmed contract candles using the original observation times.",
+    "Older source volume is replaced only after open, high, low and close agree with the original frozen observations.",
+    "Candidates from revised or missing windows do not enter the portfolio.",
+    "The portfolio is a public-book stock-only replay. The entry dates are disjoint from the November 20\u201321 stock sample."
+  ]
+}
