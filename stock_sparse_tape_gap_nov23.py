@@ -7,8 +7,12 @@ from datetime import datetime
 import math
 from pathlib import Path
 
+from okx_post_close_cash_nov23 import trade_difference
 from okx_recent_trade_repair_nov21 import fetch_interval, validated_print
-from okx_unbankable_tp1_nov21 import read_json
+from okx_selective_single_target_nov23 import cash_summary
+from okx_unbankable_tp1_nov21 import read_json, recent_inputs
+from okx_xperp_cash_tick_nov19 import CLOSE_LAGS, simulate
+from okx_xperp_multiday_replay_nov20 import file_hash
 from public_candle_window import fetch_window
 import stock_native_geometry_match_nov22 as native
 from stock_liquid_quote_routes_nov21 import ROOT, write_json
@@ -89,7 +93,15 @@ def market_activity(row):
     frame, digest = fetch_window(instrument, at - 15 * 60, at, 60, DATA / 'candles')
     active = [i for i, volume in enumerate(frame['volume']) if volume > 0]
     return (symbol, row['entry_ms']), dict(active_minutes=len(active),
-                newest_traded_minute=15-active[-1] if active else 16, candle_sha256=digest)
+                newest_traded_minute=15-active[-1] if active else None, candle_sha256=digest)
+
+
+def admits_activity(point, policy):
+    if policy == 'baseline':
+        return True
+    minimum, recency = POLICIES[policy]
+    newest = point['newest_traded_minute']
+    return point['active_minutes'] >= minimum and newest is not None and newest <= recency
 
 
 def paper_results(rows):
@@ -122,11 +134,9 @@ def research():
                              phase=row['phase'], result=row['paper_path']['code'],
                              execution_gate=row['status'], **activities[key]))
     report = {}
-    for name, (minimum, recency) in POLICIES.items():
+    for name in POLICIES:
         def accepts(row):
-            point = activities[row['symbol'], row['entry_ms']]
-            return name == 'baseline' or (point['active_minutes'] >= minimum and
-                                          point['newest_traded_minute'] <= recency)
+            return admits_activity(activities[row['symbol'], row['entry_ms']], name)
 
         kept = [row for row in original if accepts(row)]
         cash_rows = [row for row in cases['production_1pct'] if accepts(row)]
@@ -140,6 +150,42 @@ def research():
     return dict(cases=report, activity=evidence, tape_checks=checks)
 
 
+def shared_stress():
+    rows, specs, ticks, books, *_ = recent_inputs()
+    eligible = [row for row in rows if row['bot'] == 'stocks' and row['entry_status'] == 'eligible'
+                and row['stock_reference_ready']]
+    with ThreadPoolExecutor(max_workers=4) as pool:
+        activity = dict(pool.map(market_activity, eligible))
+    expected_path = ROOT / 'okx_tp1_cash_sensitivity_nov22.json'
+    controls = read_json(expected_path)['cases']['nov17_19_joint']['baseline']
+    scenarios = {}
+    for cap in (6, 12):
+        for lag in CLOSE_LAGS:
+            outcomes = {}
+            args = dict(clock=60, lag=lag, setting='requested5', max_positions=cap)
+            control = simulate(rows, specs, ticks, books, **args)
+            if cap == 6:
+                expected = controls[str(lag)]['requested5']
+                for field in ('trades', 'return_pct', 'drawdown_pct', 'contribution_pct'):
+                    if control[field] != expected[field]:
+                        raise ValueError(f'published shared book control differs in {field}')
+            for name in POLICIES:
+                rejected = {key for key, point in activity.items() if not admits_activity(point, name)}
+                selected = [dict(row, entry_status='traded_minute_filter')
+                            if row['bot'] == 'stocks' and (row['symbol'], row['entry_ms']) in rejected else row
+                            for row in rows]
+                replay = control if name == 'baseline' else simulate(selected, specs, ticks, books, **args)
+                result = cash_summary(replay, {})
+                if 'closed' in control and 'closed' in replay and name != 'baseline':
+                    result['positions_changed'] = trade_difference(control, replay)
+                outcomes[name] = dict(result, rejected=len(rejected))
+            scenarios[f'{cap}_positions_{lag}ms'] = outcomes
+            print(f'shared {cap} positions {lag} ms', {name: (row.get('trades'), row.get('cash_pnl_usd'))
+                  for name, row in outcomes.items()}, flush=True)
+    return dict(source_sha256=file_hash(expected_path), results=scenarios,
+                entries=[dict(symbol=symbol, entry_ms=at, **point) for (symbol, at), point in sorted(activity.items())])
+
+
 def main():
     DATA.mkdir(parents=True, exist_ok=True)
     with ThreadPoolExecutor(max_workers=4) as pool:
@@ -148,11 +194,13 @@ def main():
         largest = max(row['prices_near_stop_alert'], key=lambda event: event['adverse_jump_bps'], default=None)
         print(row['instrument'], row['active_minutes_last_hour'], 'largest adverse jump', largest, flush=True)
     write_json(ROOT / f'{STEM}.json', dict(incidents=incidents, policies=POLICIES, historical=research(),
+        shared_cash=shared_stress(),
         live_activation_supported=False, limitations=[
             'The stop timestamps are the monitor log times. The R values are stock signal journal estimates.',
             'Public trades spanning the simulated close reconcile against all one-minute candles. They do not identify a private fill.',
             'Activity uses only the 15 completed minutes preceding the original scan.',
             'A historical stock observer sample uses public entry quotes and stressed exits when quoting cash.',
+            'The November 17–19 shared sample uses exact public quotes and includes experimental stock continuation proposals.',
         ]))
 
 
