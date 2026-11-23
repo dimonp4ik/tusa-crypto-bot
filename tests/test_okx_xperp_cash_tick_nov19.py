@@ -156,3 +156,20 @@ def test_compounded_fill_replays_a_changed_breakeven_at_the_market_price():
     result = simulate([original], specs, {'TEST': .01}, quotes, **args, reprice_path=path_for)
     assert result['closed'][0]['exit_ms'] == 120_200
     assert result['closed'][0]['code'] == 'TARGET'
+
+
+def test_same_clock_priority_uses_the_available_slot_without_moving_time():
+    base = dict(signal(), entry_status='eligible', entry_ms=10_000,
+                path={60: dict(known=True, code='TARGET', end_ms=60_000, be_level=100., bank=None)})
+    symbols = ['AAA', 'ZZZ']
+    quotes = {symbol: {10_000: dict(ts=10_000, bids=[(99.99, 6)], asks=[(100., 6)]),
+                       60_200: dict(ts=60_200, bids=[(104., 6)], asks=[(104.01, 6)])} for symbol in symbols}
+    specs = {symbol: dict(ctVal=.1, lotSz=1, minSz=1) for symbol in symbols}
+    ticks = dict.fromkeys(symbols, .01)
+    args = dict(clock=60, lag=200, setting='requested5', max_positions=1)
+    original = simulate([dict(base, symbol=symbol) for symbol in symbols], specs, ticks, quotes, **args)
+    ranked = simulate([dict(base, symbol='AAA', same_clock_priority=1),
+                       dict(base, symbol='ZZZ', same_clock_priority=0)], specs, ticks, quotes, **args)
+    assert original['closed'][0]['symbol'] == 'AAA'
+    assert ranked['closed'][0]['symbol'] == 'ZZZ'
+    assert ranked['closed'][0]['entry_ms'] == original['closed'][0]['entry_ms'] == 10_000

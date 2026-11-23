@@ -185,7 +185,8 @@ def simulate(rows, specs, ticks, books, *, clock, lag, setting, exit_price=None,
                 peak=max(peak,cash)
                 drawdown=max(drawdown,(peak-cash)/peak)
 
-    for row in sorted(rows,key=lambda item:(item['entry_ms'],item['bot'],item['symbol'])):
+    for row in sorted(rows, key=lambda item: (item['entry_ms'], item['bot'],
+                                              item.get('same_clock_priority', 0), item['symbol'])):
         symbol,bot,opened,side=(row[k] for k in ('symbol','bot','entry_ms','direction'))
         drain(opened)
         if row['entry_status']!='eligible':
