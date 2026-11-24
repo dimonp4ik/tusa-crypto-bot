@@ -46,6 +46,19 @@ def test_partial_strategy_window_requires_complete_closed_minutes():
             load_seconds=lambda s:[],load_second_trades=lambda s:[])
 
 
+
+def test_empty_entry_bar_does_not_request_refinement():
+    frame = dict(time=[1800, 2700], open=[98.0, 100.0], high=[98.0, 103.0],
+                 low=[98.0, 100.0], close=[98.0, 102.0], volume_contracts=[0, 1],
+                 confirmed=[1, 1])
+    def unexpected(*args):
+        pytest.fail('an empty bar cannot contain a trade touch')
+    assert clip_native_entry_bar(
+        frame, opened_at=1870., bar_seconds=900, direction='LONG', sl=99., tp1=101., tp2=102.,
+        now=3600., load_minutes=unexpected, load_seconds=unexpected, load_second_trades=unexpected,
+    ) is frame
+
+
 def monitor_state(events, *, status='OPEN', now=2750., next_bar=False):
     row = signal(reason='Frozen X-Perp module: test',opened_at=1830.5, strategy_entry_bar_ts=1800.,
                  strategy_bar_seconds=900,status=status, runner_activation_bar_ts=1800.)

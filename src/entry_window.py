@@ -1,6 +1,8 @@
 """Resolve the price path of a native signal's partially observed entry bar."""
 import math
 
+from src.candle_evidence import bar_has_trade
+
 
 class EntryWindowUnavailable(ValueError):
     pass
@@ -71,6 +73,8 @@ def clip_native_entry_minute(frame,*,opened_at,direction,sl,tp1,tp2,now,
     if not positions or opened==start:
         return frame
     index=positions[0]
+    if not bar_has_trade(frame, index):
+        return frame
     touch=lambda high,low:(low<=sl or high>=min(tp1,tp2)) if direction=='LONG' else (
         high>=sl or low<=max(tp1,tp2))
     if not touch(float(frame['high'][index]),float(frame['low'][index])):
@@ -120,6 +124,8 @@ def clip_native_entry_bar(frame, *, opened_at, bar_seconds, direction, sl, tp1, 
     if opened_at == bucket or bucket not in frame.get('time', []):
         return frame
     i = frame['time'].index(bucket)
+    if not bar_has_trade(frame, i):
+        return frame
     lo, hi = frame['low'][i], frame['high'][i]
     touch = (lo <= sl or hi >= min(tp1,tp2)) if direction == 'LONG' else (hi >= sl or lo <= max(tp1,tp2))
     if not touch:
