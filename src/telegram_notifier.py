@@ -438,8 +438,8 @@ def send_signal_update(sig: dict, new_status: str, exit_price: float) -> bool:
             body = (
                 f"Цена дошла до `{_format_price(exit_price)}`\n"
                 f"Движение: `{sign}{move_pct:.2f}%`  (x{lev}: `{sign}{lev_profit:.0f}%`)\n"
-                f"✅ Зафиксировано {lock_pct}% позиции\n"
-                f"🛡 Остаток {runner_pct}% защищён безубытком от следующей {bar_label} свечи\n"
+                f"Доля TP1 в расчёте сигнала — {lock_pct}%\n"
+                f"🛡 В расчёте стоп для остатка {runner_pct}% переносится в безубыток со следующей {bar_label} свечи\n"
                 f"Цель остатка: TP2 `{_format_price(tp2)}`"
             )
         else:
@@ -455,13 +455,13 @@ def send_signal_update(sig: dict, new_status: str, exit_price: float) -> bool:
         icon  = "🎯"
         title = ("ЦЕЛЬ ДОСТИГНУТА" if single_target
                  else "TP2 ДОСТИГНУТ")
-        closed_text = (f"Закрыт остаток {runner_pct}%"
+        closed_text = (f"Цель расчётного остатка {runner_pct}%"
                        if fixed_be_runner and strategy_frac is not None
                        else "Закрыто 100%")
         body  = (
             f"{closed_text} по `{_format_price(exit_price)}`\n"
             f"Движение: `{sign}{move_pct:.2f}%`  (x{lev}: `{sign}{lev_profit:.0f}%`)\n"
-            f"✅ Сделка полностью закрыта"
+            f"✅ Сигнал завершён"
         )
     elif new_status == "BREAKEVEN":
         from src.live_accounting import marked_r

@@ -62,7 +62,35 @@ def test_one_poll_crossing_both_targets_records_and_notifies_both():
     assert [item.args[1] for item in notify.call_args_list] == [
         "TP1_PARTIAL", "TP2_HIT"]
     assert [item.args[1] for item in mirror.call_args_list] == [
-        "TP1_PARTIAL", "TP2_HIT"]
+        "TP2_HIT"]
+
+
+def test_monitor_prioritizes_all_exchange_actions_over_telegram_delivery():
+    actions = []
+    with patch.object(main, "get_open_signals", return_value=[signal(), signal(id=78)]), \
+         patch.object(main, "get_klines_xperp", return_value=candle(high=101.1, low=99.5, close=101.1)), \
+         patch.object(main, "update_signal_status"), \
+         patch.object(main, "send_signal_update", side_effect=lambda row, *args: actions.append(("channel", row["id"]))), \
+         patch.object(main.autotrader, "_dm", side_effect=lambda uid, message: actions.append(("dm", uid))), \
+         patch.object(main, "time", SimpleNamespace(time=lambda: 2000.0)):
+        def mirror(row, status, price, *, notify):
+            assert status == "TP1_PARTIAL" and row["tp1_hit_at"] == 2000.0
+            actions.append(("exchange", row["id"]))
+            notify(row["id"], "updated")
+
+        with patch.object(main.autotrader, "mirror_transition", side_effect=mirror):
+            main._check_open_signals()
+
+    assert actions == [("exchange", 77), ("exchange", 78), ("channel", 77), ("dm", 77),
+                       ("channel", 78), ("dm", 78)]
+
+
+def test_tp1_channel_update_describes_model_fraction():
+    with patch.object(notifier, "_send_message", return_value=True) as send:
+        notifier.send_signal_update(signal(), "TP1_PARTIAL", 101.)
+    msg = send.call_args.args[0]
+    assert "Доля TP1 в расчёте сигнала — 70%" in msg
+    assert "Зафиксировано 70% позиции" not in msg
 
 
 def test_native_router_defers_exit_until_its_own_market_returns():
