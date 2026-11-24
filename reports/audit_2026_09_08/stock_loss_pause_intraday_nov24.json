@@ -1,0 +1,158 @@
+{
+  "session": "2026-11-24",
+  "quote_interval_utc_start": "2026-11-24T03:15:00Z",
+  "quote_interval_utc_end": "2026-11-24T09:10:00Z",
+  "railway_build": "ab2a81d7",
+  "lines": 43,
+  "scans": 24,
+  "stockCandidates": 21,
+  "rechecks": 19,
+  "distinct": 19,
+  "under5": 1,
+  "under15": 3,
+  "eligible_recheck": {
+    "backing_level": 57.77,
+    "bucket": 1795493700,
+    "direction": "LONG",
+    "distinct_pair": true,
+    "initial_received_at": 1795493730.57543,
+    "instrument": "INTC-USD_UM_XPERP-310627",
+    "max_spread_bps": 3.4566194262004877,
+    "samples": [
+      {
+        "book": {
+          "age_seconds": 0.12015414237976074,
+          "ask": 57.87,
+          "asks": [
+            [
+              57.87,
+              17.4
+            ],
+            [
+              57.88,
+              38.6
+            ],
+            [
+              57.89,
+              3.3
+            ],
+            [
+              57.9,
+              90.4
+            ],
+            [
+              57.91,
+              4.1
+            ]
+          ],
+          "bid": 57.85,
+          "bids": [
+            [
+              57.85,
+              4.1
+            ],
+            [
+              57.84,
+              4.9
+            ],
+            [
+              57.83,
+              38.6
+            ],
+            [
+              57.82,
+              3.4
+            ],
+            [
+              57.81,
+              90.6
+            ]
+          ],
+          "exchange_at": 1795493735.756,
+          "ok": true,
+          "rejection": null,
+          "spread_bps": 3.4566194262004877
+        },
+        "received_at": 1795493735.8761542,
+        "requested_at": 1795493735.5755088
+      },
+      {
+        "book": {
+          "age_seconds": 0.13854575157165527,
+          "ask": 57.87,
+          "asks": [
+            [
+              57.87,
+              26.1
+            ],
+            [
+              57.88,
+              38.6
+            ],
+            [
+              57.89,
+              3.3
+            ],
+            [
+              57.9,
+              90.4
+            ],
+            [
+              57.91,
+              4.1
+            ]
+          ],
+          "bid": 57.85,
+          "bids": [
+            [
+              57.85,
+              4.1
+            ],
+            [
+              57.84,
+              4.9
+            ],
+            [
+              57.83,
+              38.6
+            ],
+            [
+              57.82,
+              3.4
+            ],
+            [
+              57.81,
+              90.6
+            ]
+          ],
+          "exchange_at": 1795493741.056,
+          "ok": true,
+          "rejection": null,
+          "spread_bps": 3.4566194262004877
+        },
+        "received_at": 1795493741.1945457,
+        "requested_at": 1795493740.8762722
+      }
+    ],
+    "symbol": "INTCUSDT",
+    "target_r": 2.5,
+    "assumed_market_entry": 57.87,
+    "stop": 57.29,
+    "target": 59.32,
+    "first_observed_barrier": {
+      "kind": "stop",
+      "minute_open_utc": "2026-11-24T08:55:00Z",
+      "high": 57.35,
+      "low": 57.28
+    },
+    "confirmed_source_sha256": {
+      "initial_1s": "2724df3cd406dc4229c53f2b71b9ce28c7c0ef1938c0bc213b98e8a0d8dea8bc",
+      "later_1m": "9b27b6952cd18bb44a8dc131d84728166d95b9a31d00d74ea0ff5f55939dc78d"
+    }
+  },
+  "limitations": [
+    "Only repeated quotes following a wide or invalid initial book are counted in the spread comparison.",
+    "Stock observer candidates do not imply publication or account entry.",
+    "INTC assumes entry at the second observed ask. The stop is a trade-candle touch and is not an executable exit estimate."
+  ]
+}

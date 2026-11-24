@@ -2,13 +2,14 @@
 import heapq
 import math
 from post_close_replay_nov23 import PostCloseState
+from loss_pause_policy_nov24 import LossPauseState
 from src.okx_trader import calc_contracts
 from src.tp1_plan import plan_tp1_close
 
 
 def simulate(rows,specs,*,capital=130.,margin_fraction=.03,tp1_pct=5.,minimum_close=False,
         slots=12,bot_slots=None,simultaneous_writers=2,release_delay=900,margin_cap=.9,
-        tie_key=None,capture_events=True,post_close_rule=None):
+        tie_key=None,capture_events=True,post_close_rule=None,loss_pause_policy=None):
     if bot_slots is None:bot_slots=dict(crypto=4,stocks=8)
     if not (math.isfinite(capital) and capital>0 and 0<margin_fraction<=.1 and 0<=tp1_pct<=100
             and slots>0 and simultaneous_writers>=1 and release_delay>=0 and 0<margin_cap<=.9):
@@ -17,6 +18,7 @@ def simulate(rows,specs,*,capital=130.,margin_fraction=.03,tp1_pct=5.,minimum_cl
     ledger=[];events=[];peak_positions=0;peak_margin=0.;peak_by_bot={}
     skipped=dict(slots=0,minimum_size=0)
     cooldown = PostCloseState(post_close_rule) if post_close_rule is not None else None
+    loss_pause = LossPauseState(loss_pause_policy) if loss_pause_policy is not None else None
 
     def realize(until):
         nonlocal equity,peak,drawdown
@@ -30,6 +32,9 @@ def simulate(rows,specs,*,capital=130.,margin_fraction=.03,tp1_pct=5.,minimum_cl
                 if cooldown is not None:
                     cooldown.confirm(symbol=release, bot=bot, direction=closed['direction'],
                                      closed_at=closed['exit_time'], pnl=closed['cash_pnl'], margin=closed['margin'])
+                if loss_pause is not None:
+                    loss_pause.confirm(bot=bot, direction=closed['direction'], now_ms=round(stamp*1000),
+                                       outcome=closed['outcome'], pnl=closed['cash_pnl'], risk=closed['risk_dollars'])
             peak=max(peak,equity);drawdown=max(drawdown,(peak-equity)/peak)
 
     for row in sorted(rows,key=lambda r:(r['entry_time'],tie_key(r) if tie_key else r['symbol'])):
@@ -39,6 +44,9 @@ def simulate(rows,specs,*,capital=130.,margin_fraction=.03,tp1_pct=5.,minimum_cl
             raise ValueError('invalid_cash_trade_inputs')
         realize(now);symbol=row['symbol'];bot=row.get('bot','crypto')
         if bot not in bot_slots:raise ValueError('unknown_bot')
+        if loss_pause is not None and loss_pause.blocked(bot, row['direction'], round(now*1000)):
+            skipped['verified_loss_pause'] = skipped.get('verified_loss_pause', 0)+1
+            continue
         if (len(active)+simultaneous_writers>slots or symbol in active
                 or sum(v['bot']==bot for v in active.values())>=bot_slots[bot]):
             skipped['slots']+=1;continue
@@ -70,6 +78,12 @@ def simulate(rows,specs,*,capital=130.,margin_fraction=.03,tp1_pct=5.,minimum_cl
         actual_margin=size*float(spec['ctVal'])*entry/10
         active[symbol]=dict(bot=bot,margin=actual_margin,direction=row['direction'],
                             exit_time=end,cash_pnl=bank_pnl+runner_pnl)
+        if loss_pause is not None:
+            stop_fraction = float(row['actual_risk_fraction'])
+            if not math.isfinite(stop_fraction) or stop_fraction <= 0:
+                raise ValueError('invalid actual stop fraction for loss pause')
+            active[symbol].update(outcome='TP1' if full_tp1 else row['sequential_outcome'],
+                                  risk_dollars=entry*stop_fraction*size*float(spec['ctVal']))
         peak_positions=max(peak_positions,len(active))
         peak_margin=max(peak_margin,sum(v['margin'] for v in active.values())/equity)
         peak_by_bot[bot]=max(peak_by_bot.get(bot,0),sum(v['bot']==bot for v in active.values()))
