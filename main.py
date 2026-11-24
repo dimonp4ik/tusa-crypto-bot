@@ -5338,6 +5338,9 @@ def start_bot():
     if AUTOTRADE_ENABLED:
         scheduler.add_job(autotrader.maintain_equity_guards,'interval',seconds=60,
                           id='equity_guard_recovery',max_instances=1,coalesce=True)
+        from src.entry_execution import audit_entry_fills
+        scheduler.add_job(audit_entry_fills, 'interval', seconds=60,
+                          id='entry_fill_verification', next_run_time=datetime.now(timezone.utc))
     scheduler.add_job(_setup_webhook, 'interval', seconds=60,
                       id='telegram_webhook_setup', max_instances=1, coalesce=True)
     scheduler.start()
