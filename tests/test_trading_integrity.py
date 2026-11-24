@@ -109,6 +109,7 @@ class LiveAccountingTests(unittest.TestCase):
         trader=types.SimpleNamespace(update_trailing=Mock(),mirror_transition=Mock())
         ns=dict(get_open_signals=lambda:[sig],time=types.SimpleNamespace(time=lambda:1000),
             get_klines_xperp=lambda *a,**kw:frame,get_klines=lambda *a,**kw:frame,
+            _is_native_xperp_signal=lambda row:False,
             _last_prices={},_slice_candles_from_open=lambda *a:frame,
             TP1_CLOSE_FRAC=0,TRAIL_RUNNER_ENABLED=True,TRAIL_ATR_MULT=1,
             STOP_CLOSE_CONFIRM=True,SIGNAL_EXPIRY_HOURS=48,SIGNAL_EXPIRY_MAX_DAYS=5,

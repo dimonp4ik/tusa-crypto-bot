@@ -3673,6 +3673,7 @@ def _check_open_signals():
     for sig in active_signals:
         try:
             opened_at  = float(sig["opened_at"])
+            native_signal = _is_native_xperp_signal(sig)
             age_hours  = (now - opened_at) / 3600
             bar_seconds = max(60, int(sig.get("strategy_bar_seconds") or 900))
             bars_per_hour = max(1, int(round(3600 / bar_seconds)))
@@ -3693,7 +3694,7 @@ def _check_open_signals():
             df_all = get_klines_xperp(
                 sig["symbol"], limit=candle_lim, include_forming=True,
                 interval=interval)
-            if not (df_all and df_all.get("close")) and _is_native_xperp_signal(sig):
+            if not (df_all and df_all.get("close")) and native_signal:
                 log.warning("Native exit data unavailable for %s; retrying on OKX",
                             sig["symbol"])
                 continue
@@ -3724,13 +3725,29 @@ def _check_open_signals():
             # Inspect only candles that opened after signal time (OPEN)
             # or after TP1 was recorded (TP1_PARTIAL) to avoid pre-entry moves
             if status == "OPEN":
-                monitor_from = float(sig.get("strategy_entry_bar_ts") or opened_at)
+                monitor_from = (math.floor(opened_at / bar_seconds) * bar_seconds
+                                if native_signal else float(sig.get("strategy_entry_bar_ts") or opened_at))
             elif fixed_be_runner:
                 monitor_from = float(sig.get("runner_activation_bar_ts")
                                      or sig.get("tp1_hit_at") or opened_at)
             else:
                 monitor_from = float(sig.get("tp1_hit_at") or opened_at)
             df = _slice_candles_from_open(df_all, monitor_from)
+            if native_signal and bar_seconds in (300, 900, 3600) and (status == "OPEN" or fixed_be_runner):
+                from src.binance_client import (get_xperp_entry_minutes, get_xperp_entry_seconds,
+                                                get_xperp_entry_second_trades)
+                from src.entry_window import EntryWindowUnavailable, clip_native_entry_bar
+
+                try:
+                    df = clip_native_entry_bar(df, opened_at=opened_at, bar_seconds=bar_seconds,
+                        direction=direction, sl=sl, tp1=tp1, tp2=tp2, now=time.time(),
+                        load_minutes=lambda start,end: get_xperp_entry_minutes(sig['symbol'], start, end),
+                        load_seconds=lambda start: get_xperp_entry_seconds(sig['symbol'], start),
+                        load_second_trades=lambda start: get_xperp_entry_second_trades(sig['symbol'], start))
+                except Exception as exc:
+                    reason = str(exc) if type(exc) is EntryWindowUnavailable else type(exc).__name__
+                    log.warning('Native entry-window verification deferred #%s (%s)', sig['id'], reason)
+                    continue
 
             # A stock-style session expiry and the crypto 72-bar expiry are
             # strategy data, not global bot settings.  Trim first so a delayed
@@ -3853,6 +3870,8 @@ def _check_open_signals():
                 high  = float(df["high"][i])
                 low   = float(df["low"][i])
                 close = float(df["close"][i])
+                stamp = float(df["time"][i])
+                strategy_bar = math.floor(stamp/bar_seconds)*bar_seconds if native_signal else stamp
                 exit_px = close
                 # Close-confirmed stop: the level must be breached by a CLOSED
                 # candle's close, not by a wick. Unconfirmed (still-forming)
@@ -3891,7 +3910,7 @@ def _check_open_signals():
                 # this at the candle open; the live monitor previously booked
                 # an impossible exact -1R.  Exclude the first observed bar so
                 # its pre-publication path can never be mistaken for a gap.
-                _post_entry_bar = float(df["time"][i]) > monitor_from
+                _post_entry_bar = stamp > monitor_from
                 _gap_stop_breached = (
                     not stop_close_confirm and _post_entry_bar and (
                         opening <= sl if direction == "LONG" else opening >= sl))
@@ -3923,13 +3942,13 @@ def _check_open_signals():
                             runner_trail_atr_mult = _post_tp1_trail_mult(
                                 direction, entry, tp1, tp2, high, low, close)
                             if fixed_be_runner:
-                                runner_activation_bar_ts = float(df["time"][i])
+                                runner_activation_bar_ts = strategy_bar
                             realized_r = blended_r(tp1_close_frac, tp1_r, runner_frac, tp2_r)
                             new_status, exit_px = "TP2_HIT", tp2; break
                         if high >= tp1:
                             runner_trail_atr_mult = _post_tp1_trail_mult(direction, entry, tp1, tp2, high, low, close)
                             if fixed_be_runner:
-                                runner_activation_bar_ts = float(df["time"][i])
+                                runner_activation_bar_ts = strategy_bar
                             new_status, exit_px = "TP1_PARTIAL", tp1; break
                     else:
                         if _sl_breached:          realized_r = _sl_r; new_status, exit_px = "SL_HIT", _sl_exit_px;  break
@@ -3938,13 +3957,13 @@ def _check_open_signals():
                             runner_trail_atr_mult = _post_tp1_trail_mult(
                                 direction, entry, tp1, tp2, high, low, close)
                             if fixed_be_runner:
-                                runner_activation_bar_ts = float(df["time"][i])
+                                runner_activation_bar_ts = strategy_bar
                             realized_r = blended_r(tp1_close_frac, tp1_r, runner_frac, tp2_r)
                             new_status, exit_px = "TP2_HIT", tp2; break
                         if low <= tp1:
                             runner_trail_atr_mult = _post_tp1_trail_mult(direction, entry, tp1, tp2, high, low, close)
                             if fixed_be_runner:
-                                runner_activation_bar_ts = float(df["time"][i])
+                                runner_activation_bar_ts = strategy_bar
                             new_status, exit_px = "TP1_PARTIAL", tp1; break
 
                 elif status == "TP1_PARTIAL":
@@ -3979,7 +3998,7 @@ def _check_open_signals():
                         # breakeven starts only on the next strategy bar.
                         activation_ts = float(sig.get("runner_activation_bar_ts") or 0.0)
                         same_activation_bar = (fixed_be_runner and activation_ts
-                                               and float(df["time"][i]) <= activation_ts)
+                                               and strategy_bar <= activation_ts)
                         if direction == "LONG":
                             if same_activation_bar:
                                 if low <= sl:

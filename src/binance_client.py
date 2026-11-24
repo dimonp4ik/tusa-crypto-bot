@@ -19,6 +19,7 @@ import requests
 import sys
 import os
 import logging as _log
+from functools import lru_cache
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from config import (
@@ -449,6 +450,67 @@ def get_klines_xperp(symbol, limit=60, include_forming=False, interval="15m"):
     except Exception as e:
         _logger.debug(f"get_klines_xperp failed for {symbol}: {e}")
         return None
+
+
+@lru_cache(maxsize=192)
+def get_xperp_entry_minutes(symbol: str, start: int, end: int):
+    """Load only closed 1m candles within a single strategy bar."""
+    if start%60 or end%60 or not 0 < end-start <= 3600 or end>time.time():
+        raise ValueError('invalid entry minute bounds')
+    inst = get_xperp_instruments().get(_base_of(symbol))
+    if not inst:
+        raise ValueError('native instrument unavailable')
+    rows = _okx_get('/api/v5/market/history-candles', dict(instId=inst, bar='1m',
+        after=str(end*1000), limit=(end-start)//60), timeout=3).get('data', [])
+    from src.entry_window import checked_window
+    checked_window(rows, start, end, 60)
+    return tuple(tuple(row) for row in rows)
+
+
+@lru_cache(maxsize=128)
+def get_xperp_entry_seconds(symbol: str, start: int):
+    """Closed entry minute only; no credentials or exchange orders."""
+    if start%60 or start+60>time.time():
+        raise ValueError('entry minute not closed')
+    inst=get_xperp_instruments().get(_base_of(symbol))
+    if not inst:raise ValueError('native instrument unavailable')
+    rows=_okx_get('/api/v5/market/history-candles',dict(instId=inst,
+        bar='1s',after=str((start+60)*1000),limit=60),timeout=3).get('data',[])
+    # Validate completeness before caching a response. Cross-timeframe price
+    # and volume reconciliation is performed by the entry-window caller.
+    from src.entry_window import _seconds
+    _seconds(rows,start)
+    return tuple(tuple(r) for r in rows)
+
+
+@lru_cache(maxsize=128)
+def get_xperp_entry_second_trades(symbol: str, start: int):
+    """Bounded public trades for one ambiguous fractional entry second."""
+    if start+1>time.time():raise ValueError('entry second not closed')
+    inst=get_xperp_instruments().get(_base_of(symbol))
+    if not inst:raise ValueError('native instrument unavailable')
+    params=dict(instId=inst,type='2',after=str((start+1)*1000),limit=100)
+    result={};previous=None
+    for _ in range(4):
+        rows=_okx_get('/api/v5/market/history-trades',params,timeout=3).get('data',[])
+        if not rows:raise ValueError('boundary trade coverage unavailable')
+        ids=[int(r['tradeId']) for r in rows]
+        oldest=min(ids)
+        if previous is not None and oldest>=previous:
+            raise ValueError('boundary trade pagination did not advance')
+        for r in rows:
+            stamp=int(r['ts'])
+            if stamp>=(start+1)*1000:raise ValueError('boundary trade outside requested end')
+            if stamp>=start*1000:
+                identity=str(r['tradeId'])
+                if identity in result and result[identity]!=r:
+                    raise ValueError('conflicting boundary trade revision')
+                result[identity]=r
+        if min(int(r['ts']) for r in rows)<start*1000:
+            return tuple(dict(r) for r in result.values())
+        previous=oldest
+        params=dict(instId=inst,type='1',after=str(oldest),limit=100)
+    raise ValueError('boundary trade coverage limit reached')
 
 
 _xperp_oi_cache: dict[tuple[str, str, int], dict] = {}
