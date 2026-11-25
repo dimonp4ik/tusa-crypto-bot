@@ -1,0 +1,707 @@
+{
+  "cases": {
+    "native_joint": {
+      "results": {
+        "200": {
+          "baseline": {
+            "status": "SCORED_PUBLIC_L2_SIMULATION",
+            "trades": 17,
+            "skipped": {
+              "crypto:wide": 12,
+              "crypto:publication_rate_limit": 34,
+              "crypto:position_cap": 4,
+              "crypto:depth slippage exceeds limit": 2
+            },
+            "return_pct": -1.7110769230768708,
+            "drawdown_pct": 1.7110769230768708,
+            "contribution_pct": {
+              "crypto": -0.7153846153845991,
+              "stocks": -0.9956923076923044
+            },
+            "peak_reservations": 3,
+            "peak_margin_pct": 8.68432833845382,
+            "cash_pnl_usd": -2.224399999999975,
+            "profitable": 4,
+            "routed": 0,
+            "exit_counts": {
+              "SL": 6,
+              "BE": 10,
+              "TARGET": 1
+            }
+          },
+          "five_minutes": {
+            "status": "SCORED_PUBLIC_L2_SIMULATION",
+            "trades": 17,
+            "skipped": {
+              "crypto:wide": 12,
+              "crypto:publication_rate_limit": 34,
+              "crypto:position_cap": 4,
+              "crypto:depth slippage exceeds limit": 2
+            },
+            "return_pct": -1.9211538461538336,
+            "drawdown_pct": 1.921153846153837,
+            "contribution_pct": {
+              "crypto": -0.9254615384615269,
+              "stocks": -0.9956923076923044
+            },
+            "peak_reservations": 3,
+            "peak_margin_pct": 8.702833298612491,
+            "cash_pnl_usd": -2.497499999999981,
+            "profitable": 4,
+            "routed": 0,
+            "exit_counts": {
+              "SL": 6,
+              "BE": 9,
+              "TARGET": 1,
+              "EARLY_FAILURE": 1
+            },
+            "cuts_by_original_result": {
+              "crypto:BE:losing": 1
+            },
+            "trade_changes": {
+              "transition": {
+                "crypto BE -> EARLY_FAILURE": {
+                  "positions": 1,
+                  "cash_delta_usd": -0.273100000000006
+                }
+              },
+              "removed": 0,
+              "added": 0,
+              "added_positions": [],
+              "removed_positions": []
+            }
+          },
+          "fifteen_minutes": {
+            "status": "SCORED_PUBLIC_L2_SIMULATION",
+            "trades": 17,
+            "skipped": {
+              "crypto:wide": 12,
+              "crypto:publication_rate_limit": 34,
+              "crypto:position_cap": 4,
+              "crypto:depth slippage exceeds limit": 2
+            },
+            "return_pct": -1.5144615384614868,
+            "drawdown_pct": 1.514461538461485,
+            "contribution_pct": {
+              "crypto": -0.7153846153845991,
+              "stocks": -0.799076923076917
+            },
+            "peak_reservations": 3,
+            "peak_margin_pct": 8.667080310007162,
+            "cash_pnl_usd": -1.968799999999971,
+            "profitable": 4,
+            "routed": 0,
+            "exit_counts": {
+              "SL": 5,
+              "BE": 10,
+              "TARGET": 1,
+              "EARLY_FAILURE": 1
+            },
+            "cuts_by_original_result": {
+              "stocks:SL:losing": 1
+            },
+            "trade_changes": {
+              "transition": {
+                "stocks SL -> EARLY_FAILURE": {
+                  "positions": 1,
+                  "cash_delta_usd": 0.2556000000000037
+                }
+              },
+              "removed": 0,
+              "added": 0,
+              "added_positions": [],
+              "removed_positions": []
+            }
+          },
+          "five_or_fifteen_minutes": {
+            "status": "SCORED_PUBLIC_L2_SIMULATION",
+            "trades": 17,
+            "skipped": {
+              "crypto:wide": 12,
+              "crypto:publication_rate_limit": 34,
+              "crypto:position_cap": 4,
+              "crypto:depth slippage exceeds limit": 2
+            },
+            "return_pct": -1.7245384615384163,
+            "drawdown_pct": 1.7245384615384187,
+            "contribution_pct": {
+              "crypto": -0.9254615384615269,
+              "stocks": -0.799076923076917
+            },
+            "peak_reservations": 3,
+            "peak_margin_pct": 8.68551175939704,
+            "cash_pnl_usd": -2.241899999999977,
+            "profitable": 4,
+            "routed": 0,
+            "exit_counts": {
+              "SL": 5,
+              "BE": 9,
+              "TARGET": 1,
+              "EARLY_FAILURE": 2
+            },
+            "cuts_by_original_result": {
+              "crypto:BE:losing": 1,
+              "stocks:SL:losing": 1
+            },
+            "trade_changes": {
+              "transition": {
+                "crypto BE -> EARLY_FAILURE": {
+                  "positions": 1,
+                  "cash_delta_usd": -0.273100000000006
+                },
+                "stocks SL -> EARLY_FAILURE": {
+                  "positions": 1,
+                  "cash_delta_usd": 0.2556000000000037
+                }
+              },
+              "removed": 0,
+              "added": 0,
+              "added_positions": [],
+              "removed_positions": []
+            }
+          }
+        },
+        "1000": {
+          "baseline": {
+            "status": "SCORED_PUBLIC_L2_SIMULATION",
+            "trades": 17,
+            "skipped": {
+              "crypto:wide": 12,
+              "crypto:publication_rate_limit": 34,
+              "crypto:position_cap": 4,
+              "crypto:depth slippage exceeds limit": 2
+            },
+            "return_pct": -1.7556076923076591,
+            "drawdown_pct": 1.7556076923076618,
+            "contribution_pct": {
+              "crypto": -0.7286076923076891,
+              "stocks": -1.0269999999999953
+            },
+            "peak_reservations": 3,
+            "peak_margin_pct": 8.689232506095276,
+            "cash_pnl_usd": -2.2822899999999895,
+            "profitable": 5,
+            "routed": 0,
+            "exit_counts": {
+              "SL": 6,
+              "BE": 10,
+              "TARGET": 1
+            }
+          },
+          "five_minutes": {
+            "status": "SCORED_PUBLIC_L2_SIMULATION",
+            "trades": 17,
+            "skipped": {
+              "crypto:wide": 12,
+              "crypto:publication_rate_limit": 34,
+              "crypto:position_cap": 4,
+              "crypto:depth slippage exceeds limit": 2
+            },
+            "return_pct": -1.9712230769230565,
+            "drawdown_pct": 1.9712230769230552,
+            "contribution_pct": {
+              "crypto": -0.9442230769230732,
+              "stocks": -1.0269999999999953
+            },
+            "peak_reservations": 3,
+            "peak_margin_pct": 8.70824787928617,
+            "cash_pnl_usd": -2.562589999999989,
+            "profitable": 5,
+            "routed": 0,
+            "exit_counts": {
+              "SL": 6,
+              "BE": 9,
+              "TARGET": 1,
+              "EARLY_FAILURE": 1
+            },
+            "cuts_by_original_result": {
+              "crypto:BE:losing": 1
+            },
+            "trade_changes": {
+              "transition": {
+                "crypto BE -> EARLY_FAILURE": {
+                  "positions": 1,
+                  "cash_delta_usd": -0.28029999999999944
+                }
+              },
+              "removed": 0,
+              "added": 0,
+              "added_positions": [],
+              "removed_positions": []
+            }
+          },
+          "fifteen_minutes": {
+            "status": "SCORED_PUBLIC_L2_SIMULATION",
+            "trades": 17,
+            "skipped": {
+              "crypto:wide": 12,
+              "crypto:publication_rate_limit": 34,
+              "crypto:position_cap": 4,
+              "crypto:depth slippage exceeds limit": 2
+            },
+            "return_pct": -1.5484538461538078,
+            "drawdown_pct": 1.548453846153804,
+            "contribution_pct": {
+              "crypto": -0.7286076923076891,
+              "stocks": -0.81984615384615
+            },
+            "peak_reservations": 3,
+            "peak_margin_pct": 8.671041421771564,
+            "cash_pnl_usd": -2.0129899999999905,
+            "profitable": 5,
+            "routed": 0,
+            "exit_counts": {
+              "SL": 5,
+              "BE": 10,
+              "TARGET": 1,
+              "EARLY_FAILURE": 1
+            },
+            "cuts_by_original_result": {
+              "stocks:SL:losing": 1
+            },
+            "trade_changes": {
+              "transition": {
+                "stocks SL -> EARLY_FAILURE": {
+                  "positions": 1,
+                  "cash_delta_usd": 0.2692999999999989
+                }
+              },
+              "removed": 0,
+              "added": 0,
+              "added_positions": [],
+              "removed_positions": []
+            }
+          },
+          "five_or_fifteen_minutes": {
+            "status": "SCORED_PUBLIC_L2_SIMULATION",
+            "trades": 17,
+            "skipped": {
+              "crypto:wide": 12,
+              "crypto:publication_rate_limit": 34,
+              "crypto:position_cap": 4,
+              "crypto:depth slippage exceeds limit": 2
+            },
+            "return_pct": -1.764069230769194,
+            "drawdown_pct": 1.7640692307691972,
+            "contribution_pct": {
+              "crypto": -0.9442230769230732,
+              "stocks": -0.81984615384615
+            },
+            "peak_reservations": 3,
+            "peak_margin_pct": 8.689977173412643,
+            "cash_pnl_usd": -2.29328999999999,
+            "profitable": 5,
+            "routed": 0,
+            "exit_counts": {
+              "SL": 5,
+              "BE": 9,
+              "TARGET": 1,
+              "EARLY_FAILURE": 2
+            },
+            "cuts_by_original_result": {
+              "crypto:BE:losing": 1,
+              "stocks:SL:losing": 1
+            },
+            "trade_changes": {
+              "transition": {
+                "crypto BE -> EARLY_FAILURE": {
+                  "positions": 1,
+                  "cash_delta_usd": -0.28029999999999944
+                },
+                "stocks SL -> EARLY_FAILURE": {
+                  "positions": 1,
+                  "cash_delta_usd": 0.2692999999999989
+                }
+              },
+              "removed": 0,
+              "added": 0,
+              "added_positions": [],
+              "removed_positions": []
+            }
+          }
+        }
+      },
+      "possible_exit_quotes": 36,
+      "book_checks": {
+        "1794873600:AAVEUSDT": {
+          "snapshot": 96,
+          "update": 1309299,
+          "first_ts": 1794873600002,
+          "last_ts": 1794959997699
+        },
+        "1794873600:LINKUSDT": {
+          "snapshot": 96,
+          "update": 1192953,
+          "first_ts": 1794873600002,
+          "last_ts": 1794959999998
+        },
+        "1794960000:AAVEUSDT": {
+          "snapshot": 96,
+          "update": 1075007,
+          "first_ts": 1794960000009,
+          "last_ts": 1795046399987
+        },
+        "1794960000:AVAXUSDT": {
+          "snapshot": 96,
+          "update": 713262,
+          "first_ts": 1794960000009,
+          "last_ts": 1795046398729
+        },
+        "1794960000:BTCUSDT": {
+          "snapshot": 96,
+          "update": 2739997,
+          "first_ts": 1794960000009,
+          "last_ts": 1795046399999
+        },
+        "1794960000:HYPEUSDT": {
+          "snapshot": 96,
+          "update": 903620,
+          "first_ts": 1794960000009,
+          "last_ts": 1795046399939
+        },
+        "1794960000:MSTRUSDT": {
+          "snapshot": 96,
+          "update": 1764608,
+          "first_ts": 1794960000009,
+          "last_ts": 1795046399999
+        },
+        "1794960000:ZECUSDT": {
+          "snapshot": 96,
+          "update": 2254448,
+          "first_ts": 1794960000008,
+          "last_ts": 1795046399628
+        },
+        "1795046400:AAVEUSDT": {
+          "snapshot": 96,
+          "update": 1301688,
+          "first_ts": 1795046400007,
+          "last_ts": 1795132799896
+        },
+        "1795046400:AVAXUSDT": {
+          "snapshot": 96,
+          "update": 781359,
+          "first_ts": 1795046400009,
+          "last_ts": 1795132799962
+        },
+        "1795046400:ETHUSDT": {
+          "snapshot": 96,
+          "update": 3264194,
+          "first_ts": 1795046400009,
+          "last_ts": 1795132799942
+        },
+        "1795046400:LINKUSDT": {
+          "snapshot": 96,
+          "update": 1270564,
+          "first_ts": 1795046400008,
+          "last_ts": 1795132799920
+        },
+        "1795046400:MSTRUSDT": {
+          "snapshot": 96,
+          "update": 2221901,
+          "first_ts": 1795046400009,
+          "last_ts": 1795132799992
+        },
+        "1795046400:SKHYNIXUSDT": {
+          "snapshot": 96,
+          "update": 1366878,
+          "first_ts": 1795046400007,
+          "last_ts": 1795132799996
+        },
+        "1795046400:SOLUSDT": {
+          "snapshot": 96,
+          "update": 1430357,
+          "first_ts": 1795046400008,
+          "last_ts": 1795132799910
+        },
+        "1795046400:ZECUSDT": {
+          "snapshot": 96,
+          "update": 2334939,
+          "first_ts": 1795046400008,
+          "last_ts": 1795132799840
+        }
+      },
+      "mismatch_counts": {
+        "AAVEUSDT": 0,
+        "LINKUSDT": 0,
+        "ZECUSDT": 0,
+        "HYPEUSDT": 0,
+        "BTCUSDT": 0,
+        "AVAXUSDT": 0,
+        "SOLUSDT": 0,
+        "ETHUSDT": 0,
+        "MSTRUSDT": 0,
+        "SKHYNIXUSDT": 0
+      },
+      "repricing": {
+        "repriced": [],
+        "extra_exit_checks": {}
+      },
+      "start": 1794954600,
+      "end": 1795123800,
+      "baseline_sha256": "708cb1859dec0230636fa50124cc0cbcb0f3a8f393420be5d1145021caa2e028",
+      "stock_evidence": {
+        "entry_books": {
+          "1794960000:CRCLUSDT": {
+            "snapshot": 96,
+            "update": 620644,
+            "first_ts": 1794960000009,
+            "last_ts": 1795046399999
+          },
+          "1794960000:MSTRUSDT": {
+            "snapshot": 96,
+            "update": 1764608,
+            "first_ts": 1794960000009,
+            "last_ts": 1795046399999
+          },
+          "1795046400:CRCLUSDT": {
+            "snapshot": 96,
+            "update": 717487,
+            "first_ts": 1795046400009,
+            "last_ts": 1795132799992
+          },
+          "1795046400:MSTRUSDT": {
+            "snapshot": 96,
+            "update": 2221901,
+            "first_ts": 1795046400009,
+            "last_ts": 1795132799992
+          },
+          "1795046400:SKHYNIXUSDT": {
+            "snapshot": 96,
+            "update": 1366878,
+            "first_ts": 1795046400007,
+            "last_ts": 1795132799996
+          },
+          "1795046400:SNDKUSDT": {
+            "snapshot": 96,
+            "update": 1426673,
+            "first_ts": 1795046400007,
+            "last_ts": 1795132799986
+          }
+        },
+        "exit_books": {
+          "1794960000:CRCLUSDT": {
+            "snapshot": 96,
+            "update": 620644,
+            "first_ts": 1794960000009,
+            "last_ts": 1795046399999
+          },
+          "1794960000:MSTRUSDT": {
+            "snapshot": 96,
+            "update": 1764608,
+            "first_ts": 1794960000009,
+            "last_ts": 1795046399999
+          },
+          "1795046400:CRCLUSDT": {
+            "snapshot": 96,
+            "update": 717487,
+            "first_ts": 1795046400009,
+            "last_ts": 1795132799992
+          },
+          "1795046400:MSTRUSDT": {
+            "snapshot": 96,
+            "update": 2221901,
+            "first_ts": 1795046400009,
+            "last_ts": 1795132799992
+          },
+          "1795046400:SKHYNIXUSDT": {
+            "snapshot": 96,
+            "update": 1366878,
+            "first_ts": 1795046400007,
+            "last_ts": 1795132799996
+          },
+          "1795046400:SNDKUSDT": {
+            "snapshot": 96,
+            "update": 1426673,
+            "first_ts": 1795046400007,
+            "last_ts": 1795132799986
+          }
+        },
+        "tape": {
+          "AAOIUSDT": {
+            "bars_checked": 170,
+            "mismatches": {}
+          },
+          "AMDUSDT": {
+            "bars_checked": 64,
+            "mismatches": {}
+          },
+          "ARMUSDT": {
+            "bars_checked": 75,
+            "mismatches": {}
+          },
+          "AVGOUSDT": {
+            "bars_checked": 64,
+            "mismatches": {}
+          },
+          "AXTIUSDT": {
+            "bars_checked": 186,
+            "mismatches": {}
+          },
+          "BEUSDT": {
+            "bars_checked": 217,
+            "mismatches": {}
+          },
+          "BMNRUSDT": {
+            "bars_checked": 117,
+            "mismatches": {}
+          },
+          "CBRSUSDT": {
+            "bars_checked": 64,
+            "mismatches": {}
+          },
+          "CRCLUSDT": {
+            "bars_checked": 152,
+            "mismatches": {}
+          },
+          "CRWVUSDT": {
+            "bars_checked": 146,
+            "mismatches": {}
+          },
+          "DELLUSDT": {
+            "bars_checked": 166,
+            "mismatches": {}
+          },
+          "HOODUSDT": {
+            "bars_checked": 144,
+            "mismatches": {}
+          },
+          "KOUSDT": {
+            "bars_checked": 85,
+            "mismatches": {}
+          },
+          "LITEUSDT": {
+            "bars_checked": 190,
+            "mismatches": {}
+          },
+          "MRNAUSDT": {
+            "bars_checked": 128,
+            "mismatches": {}
+          },
+          "MRVLUSDT": {
+            "bars_checked": 71,
+            "mismatches": {}
+          },
+          "MSTRUSDT": {
+            "bars_checked": 159,
+            "mismatches": {}
+          },
+          "NBISUSDT": {
+            "bars_checked": 84,
+            "mismatches": {}
+          },
+          "NVDAUSDT": {
+            "bars_checked": 64,
+            "mismatches": {}
+          },
+          "OKTAUSDT": {
+            "bars_checked": 129,
+            "mismatches": {}
+          },
+          "PLTRUSDT": {
+            "bars_checked": 64,
+            "mismatches": {}
+          },
+          "QCOMUSDT": {
+            "bars_checked": 173,
+            "mismatches": {}
+          },
+          "RKLBUSDT": {
+            "bars_checked": 64,
+            "mismatches": {}
+          },
+          "SAMSUNGUSDT": {
+            "bars_checked": 64,
+            "mismatches": {}
+          },
+          "SKHYNIXUSDT": {
+            "bars_checked": 176,
+            "mismatches": {}
+          },
+          "SKHYUSDT": {
+            "bars_checked": 146,
+            "mismatches": {}
+          },
+          "SNDKUSDT": {
+            "bars_checked": 64,
+            "mismatches": {}
+          },
+          "SNXXUSDT": {
+            "bars_checked": 78,
+            "mismatches": {}
+          },
+          "SOFTBANKUSDT": {
+            "bars_checked": 231,
+            "mismatches": {}
+          },
+          "SOXSUSDT": {
+            "bars_checked": 185,
+            "mismatches": {}
+          },
+          "SPCXUSDT": {
+            "bars_checked": 64,
+            "mismatches": {}
+          },
+          "WDCUSDT": {
+            "bars_checked": 128,
+            "mismatches": {}
+          }
+        },
+        "reference_sha256": "1afe284b8928c5bf581120e42bbe24f22d16ebf10adf73c047011e481673a121",
+        "plan_sha256": "eb01c9421da1a89547db61aefa83656c6874cf3a5d6ec9f49f1ec789373420fe"
+      },
+      "crypto_exit_books": {
+        "1795046400:ETHUSDT": {
+          "snapshot": 96,
+          "update": 3264194,
+          "first_ts": 1795046400009,
+          "last_ts": 1795132799942
+        },
+        "1795046400:LINKUSDT": {
+          "snapshot": 96,
+          "update": 1270564,
+          "first_ts": 1795046400008,
+          "last_ts": 1795132799920
+        },
+        "1795046400:SOLUSDT": {
+          "snapshot": 96,
+          "update": 1430357,
+          "first_ts": 1795046400008,
+          "last_ts": 1795132799910
+        },
+        "1795046400:ZECUSDT": {
+          "snapshot": 96,
+          "update": 2334939,
+          "first_ts": 1795046400008,
+          "last_ts": 1795132799840
+        }
+      }
+    }
+  },
+  "policies": {
+    "five_minutes": [
+      5
+    ],
+    "fifteen_minutes": [
+      15
+    ],
+    "five_or_fifteen_minutes": [
+      5,
+      15
+    ]
+  },
+  "minimum_adverse_r": 0.4,
+  "maximum_progress_r": 0.2,
+  "script_sha256": {
+    "first_failed_move_exit_nov25.py": "1a1e3bdc23df000764de1f9a0327c494ee040f9f89d08287e759e36a2b361c1e",
+    "okx_xperp_cash_tick_nov19.py": "522cd4d20f7972313dff6f7e7a698d278694a301885779588199d093b9400802",
+    "first_print_confirmation_nov25.py": "8f7d9cd50d7282f09aa932e486ccb89fa8b526066c510255c04a7bf41c16a199"
+  },
+  "live_activation_supported": false,
+  "limitations": [
+    "New exits are possible only before the first bracket fill and after a confirmed recent print.",
+    "A minute poll triggers a full market close at public order-book prices after a 200 or 1000ms lag.",
+    "The shared account reruns position sizes, open slot reservations and trade sequencing.",
+    "The original signal selection is fixed. The modeled software close does not verify exchange cancellation races.",
+    "Public trades and depth price a historical simulation, not private realized returns or a full month."
+  ]
+}

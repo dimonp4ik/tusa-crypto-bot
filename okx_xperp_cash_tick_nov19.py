@@ -11,6 +11,7 @@ from okx_xperp_l2_capture_nov19 import START, END, ROOT_L2, catalogue, download
 from okx_xperp_l2_entry_replay_nov19 import archive
 from okx_xperp_tick_path_nov19 import load_trade_tape, reconcile, resolve_ticks
 from post_close_replay_nov23 import PostCloseState
+from loss_pause_policy_nov24 import LossPauseState
 from src.execution_guard import MAX_ENTRY_SPREAD, execution_quote
 from src.okx_trader import calc_contracts, round_to_tick
 from src.tp1_plan import plan_tp1_close
@@ -143,7 +144,8 @@ def close_quote(book, stamp, side, contracts):
 
 def simulate(rows, specs, ticks, books, *, clock, lag, setting, exit_price=None, max_positions=12,
              unbankable_runner=None, post_close_rule=None, release_delay_ms=RELEASE_MS,
-             crypto_publications_per_hour=None, reprice_path=None):
+             crypto_publications_per_hour=None, reprice_path=None, loss_pause_policy=None,
+             manage_exit=None):
     if not isinstance(max_positions, int) or not 1 <= max_positions <= 12:
         raise ValueError('invalid shared position cap')
     if type(release_delay_ms) is not int or release_delay_ms < 0:
@@ -162,13 +164,15 @@ def simulate(rows, specs, ticks, books, *, clock, lag, setting, exit_price=None,
     skipped=Counter()
     contribution={bot:0. for bot in CAPS}
     cooldown = PostCloseState(post_close_rule) if post_close_rule is not None else None
+    loss_pause = LossPauseState(loss_pause_policy) if loss_pause_policy is not None else None
+    position_risks = {}
     released_stops = {}
     crypto_publications = deque()
 
     def drain(until):
         nonlocal cash,peak,drawdown
         while events and (until is None or events[0][0]<until):
-            _,index,kind,symbol,pnl=heapq.heappop(events)
+            stamp,index,kind,symbol,pnl=heapq.heappop(events)
             if kind=='release':
                 bot, margin, side = active.pop(symbol)
                 trade = closed[index]
@@ -179,6 +183,9 @@ def simulate(rows, specs, ticks, books, *, clock, lag, setting, exit_price=None,
                     cooldown.confirm(symbol=symbol, bot=bot, direction=side,
                                      closed_at=trade['exit_ms']/1000,
                                      pnl=trade['bank_pnl']+trade['runner_pnl'], margin=margin)
+                if loss_pause is not None:
+                    loss_pause.confirm(bot=bot, direction=side, now_ms=stamp, outcome=trade['code'],
+                                       pnl=trade['bank_pnl']+trade['runner_pnl'], risk=position_risks.pop(index))
             else:
                 cash+=pnl
                 contribution[closed[index]['bot']]+=pnl
@@ -194,6 +201,9 @@ def simulate(rows, specs, ticks, books, *, clock, lag, setting, exit_price=None,
             continue
         if bot=='stocks' and not row['stock_reference_ready']:
             skipped['stocks:paper_guard']+=1
+            continue
+        if loss_pause is not None and loss_pause.blocked(bot, side, opened):
+            skipped[bot+':verified_loss_pause']+=1
             continue
         parent = row.get('reentry_parent_ms')
         if parent is not None:
@@ -262,6 +272,10 @@ def simulate(rows, specs, ticks, books, *, clock, lag, setting, exit_price=None,
                 path=row['runner_paths'][unbankable_runner][clock]
                 if not path['known']:
                     raise ValueError(path['reason'])
+            if manage_exit is not None:
+                path=manage_exit(row, entry.average, path, lag)
+                if not path['known']:
+                    raise ValueError(path['reason'])
             bank_size=planned_bank if path['bank'] else 0.
             remainder=max(0.,entry.contracts-bank_size)
             bank_at=(path['bank']['ms']+lag) if bank_size else None
@@ -279,6 +293,12 @@ def simulate(rows, specs, ticks, books, *, clock, lag, setting, exit_price=None,
         bank_pnl=unit*bank_size*(bank_px-entry.average) if bank_px is not None else 0.
         runner_pnl=unit*remainder*(runner_px-entry.average) if runner_px is not None else 0.
         index=len(closed)
+        if loss_pause is not None:
+            stop_price = round_to_tick(row['stop'], ticks[symbol])
+            risk = abs(entry.average-stop_price)*entry.contracts*float(spec['ctVal'])
+            if not risk > 0:
+                return dict(status='UNSCORABLE',symbol=symbol,entry_ms=opened,reason='zero cash stop risk')
+            position_risks[index] = risk
         trade = dict(symbol=symbol,bot=bot,entry_ms=opened,exit_ms=end_at,code=path['code'],
                      entry_px=entry.average,qty=entry.contracts,bank_qty=bank_size,
                      bank_px=bank_px,runner_px=runner_px,bank_pnl=bank_pnl,runner_pnl=runner_pnl)
