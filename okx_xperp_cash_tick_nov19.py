@@ -145,7 +145,7 @@ def close_quote(book, stamp, side, contracts):
 def simulate(rows, specs, ticks, books, *, clock, lag, setting, exit_price=None, max_positions=12,
              unbankable_runner=None, post_close_rule=None, release_delay_ms=RELEASE_MS,
              crypto_publications_per_hour=None, reprice_path=None, loss_pause_policy=None,
-             manage_exit=None):
+             manage_exit=None, entry_admission=None):
     if not isinstance(max_positions, int) or not 1 <= max_positions <= 12:
         raise ValueError('invalid shared position cap')
     if type(release_delay_ms) is not int or release_delay_ms < 0:
@@ -245,6 +245,12 @@ def simulate(rows, specs, ticks, books, *, clock, lag, setting, exit_price=None,
                 size_for_price=lambda price:calc_contracts(cash*FRACTION,LEVERAGE,price,spec),
                 max_spread=row.get('research_entry_spread', MAX_ENTRY_SPREAD))
             entry.validate_bracket(row['stop'],row['target'])
+            if entry_admission is not None:
+                held={s:(p[0],p[2]) for s,p in active.items()}
+                refusal=entry_admission(row,held)
+                if refusal:
+                    skipped[bot+':'+refusal]+=1
+                    continue
             minimum_reward = row.get('research_minimum_reward_r')
             if minimum_reward is not None:
                 reward_r = abs(row['target'] - entry.worst) / abs(entry.worst - row['stop'])

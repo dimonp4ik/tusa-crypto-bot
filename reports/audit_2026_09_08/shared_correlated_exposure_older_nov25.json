@@ -1,0 +1,1641 @@
+{
+  "cases": {
+    "nov05_08": {
+      "results": {
+        "200": {
+          "baseline": {
+            "status": "SCORED_PUBLIC_L2_SIMULATION",
+            "trades": 15,
+            "skipped": {
+              "stocks:wide": 25,
+              "crypto:wide": 7,
+              "stocks:stale order book": 4,
+              "stocks:depth slippage exceeds limit": 1
+            },
+            "return_pct": 2.3914153846153585,
+            "drawdown_pct": 0.8673799541490397,
+            "contribution_pct": {
+              "crypto": 2.3914153846153936,
+              "stocks": 0.0
+            },
+            "peak_reservations": 4,
+            "peak_margin_pct": 11.236707734641675,
+            "cash_pnl_usd": 3.1088400000000114,
+            "profitable": 6,
+            "routed": 0,
+            "exit_counts": {
+              "TARGET": 5,
+              "SL": 3,
+              "BE": 6,
+              "TIME": 1
+            },
+            "winning_exits_by_bot": {
+              "crypto": 6
+            },
+            "losing_exits_by_bot": {
+              "crypto": 9,
+              "stocks": 0
+            },
+            "overlapping_cross_bot_loss_pairs": 0,
+            "overlapping_loss_pairs": 0,
+            "exposure_counts": {
+              "eligible_attempts": 15,
+              "same:pairs": 11,
+              "same:known": 11,
+              "same:signed_above_065": 2
+            },
+            "rejected_baseline_positions": []
+          },
+          "cross_bot_pair_065": {
+            "status": "SCORED_PUBLIC_L2_SIMULATION",
+            "trades": 15,
+            "skipped": {
+              "stocks:wide": 25,
+              "crypto:wide": 7,
+              "stocks:stale order book": 4,
+              "stocks:depth slippage exceeds limit": 1
+            },
+            "return_pct": 2.3914153846153585,
+            "drawdown_pct": 0.8673799541490397,
+            "contribution_pct": {
+              "crypto": 2.3914153846153936,
+              "stocks": 0.0
+            },
+            "peak_reservations": 4,
+            "peak_margin_pct": 11.236707734641675,
+            "cash_pnl_usd": 3.1088400000000114,
+            "profitable": 6,
+            "routed": 0,
+            "exit_counts": {
+              "TARGET": 5,
+              "SL": 3,
+              "BE": 6,
+              "TIME": 1
+            },
+            "winning_exits_by_bot": {
+              "crypto": 6
+            },
+            "losing_exits_by_bot": {
+              "crypto": 9,
+              "stocks": 0
+            },
+            "overlapping_cross_bot_loss_pairs": 0,
+            "overlapping_loss_pairs": 0,
+            "exposure_counts": {
+              "eligible_attempts": 15
+            },
+            "rejected_baseline_positions": [],
+            "difference": {
+              "transition": {},
+              "removed": 0,
+              "added": 0,
+              "added_positions": [],
+              "removed_positions": []
+            }
+          },
+          "all_pair_080": {
+            "status": "SCORED_PUBLIC_L2_SIMULATION",
+            "trades": 14,
+            "skipped": {
+              "stocks:wide": 25,
+              "crypto:wide": 7,
+              "crypto:all_pair_080": 1,
+              "stocks:stale order book": 4,
+              "stocks:depth slippage exceeds limit": 1
+            },
+            "return_pct": 1.8244923076922825,
+            "drawdown_pct": 0.8722044289600734,
+            "contribution_pct": {
+              "crypto": 1.8244923076923165,
+              "stocks": 0.0
+            },
+            "peak_reservations": 3,
+            "peak_margin_pct": 8.830159086672595,
+            "cash_pnl_usd": 2.3718400000000113,
+            "profitable": 5,
+            "routed": 0,
+            "exit_counts": {
+              "TARGET": 4,
+              "SL": 3,
+              "BE": 6,
+              "TIME": 1
+            },
+            "winning_exits_by_bot": {
+              "crypto": 5
+            },
+            "losing_exits_by_bot": {
+              "crypto": 9,
+              "stocks": 0
+            },
+            "overlapping_cross_bot_loss_pairs": 0,
+            "overlapping_loss_pairs": 0,
+            "exposure_counts": {
+              "eligible_attempts": 15,
+              "same:pairs": 9,
+              "same:known": 9,
+              "same:signed_above_065": 2,
+              "refused:crypto": 1
+            },
+            "rejected_baseline_positions": [
+              {
+                "bot": "crypto",
+                "symbol": "LINKUSDT",
+                "entry_ms": 1793911510000,
+                "cash_pnl_usd": 0.7370000000000001,
+                "outcome": "TARGET",
+                "blocked_by": [
+                  [
+                    "BTCUSDT",
+                    "crypto",
+                    0.8648289320098286
+                  ]
+                ]
+              }
+            ],
+            "difference": {
+              "transition": {},
+              "removed": 1,
+              "added": 0,
+              "added_positions": [],
+              "removed_positions": [
+                {
+                  "bot": "crypto",
+                  "symbol": "LINKUSDT",
+                  "entry_ms": 1793911510000,
+                  "exit": "TARGET",
+                  "cash_pnl_usd": 0.7370000000000001
+                }
+              ]
+            }
+          },
+          "one_btc_loading": {
+            "status": "SCORED_PUBLIC_L2_SIMULATION",
+            "trades": 14,
+            "skipped": {
+              "stocks:wide": 25,
+              "crypto:wide": 7,
+              "crypto:one_btc_loading": 1,
+              "stocks:stale order book": 4,
+              "stocks:depth slippage exceeds limit": 1
+            },
+            "return_pct": 1.8244923076922825,
+            "drawdown_pct": 0.8722044289600734,
+            "contribution_pct": {
+              "crypto": 1.8244923076923165,
+              "stocks": 0.0
+            },
+            "peak_reservations": 3,
+            "peak_margin_pct": 8.830159086672595,
+            "cash_pnl_usd": 2.3718400000000113,
+            "profitable": 5,
+            "routed": 0,
+            "exit_counts": {
+              "TARGET": 4,
+              "SL": 3,
+              "BE": 6,
+              "TIME": 1
+            },
+            "winning_exits_by_bot": {
+              "crypto": 5
+            },
+            "losing_exits_by_bot": {
+              "crypto": 9,
+              "stocks": 0
+            },
+            "overlapping_cross_bot_loss_pairs": 0,
+            "overlapping_loss_pairs": 0,
+            "exposure_counts": {
+              "eligible_attempts": 15,
+              "btc_loaded_attempts": 12,
+              "refused:crypto": 1
+            },
+            "rejected_baseline_positions": [
+              {
+                "bot": "crypto",
+                "symbol": "LINKUSDT",
+                "entry_ms": 1793911510000,
+                "cash_pnl_usd": 0.7370000000000001,
+                "outcome": "TARGET",
+                "blocked_by": [
+                  [
+                    "BTCUSDT",
+                    "crypto",
+                    -0.9999999999999999
+                  ]
+                ]
+              }
+            ],
+            "difference": {
+              "transition": {},
+              "removed": 1,
+              "added": 0,
+              "added_positions": [],
+              "removed_positions": [
+                {
+                  "bot": "crypto",
+                  "symbol": "LINKUSDT",
+                  "entry_ms": 1793911510000,
+                  "exit": "TARGET",
+                  "cash_pnl_usd": 0.7370000000000001
+                }
+              ]
+            }
+          },
+          "two_btc_loadings": {
+            "status": "SCORED_PUBLIC_L2_SIMULATION",
+            "trades": 15,
+            "skipped": {
+              "stocks:wide": 25,
+              "crypto:wide": 7,
+              "stocks:stale order book": 4,
+              "stocks:depth slippage exceeds limit": 1
+            },
+            "return_pct": 2.3914153846153585,
+            "drawdown_pct": 0.8673799541490397,
+            "contribution_pct": {
+              "crypto": 2.3914153846153936,
+              "stocks": 0.0
+            },
+            "peak_reservations": 4,
+            "peak_margin_pct": 11.236707734641675,
+            "cash_pnl_usd": 3.1088400000000114,
+            "profitable": 6,
+            "routed": 0,
+            "exit_counts": {
+              "TARGET": 5,
+              "SL": 3,
+              "BE": 6,
+              "TIME": 1
+            },
+            "winning_exits_by_bot": {
+              "crypto": 6
+            },
+            "losing_exits_by_bot": {
+              "crypto": 9,
+              "stocks": 0
+            },
+            "overlapping_cross_bot_loss_pairs": 0,
+            "overlapping_loss_pairs": 0,
+            "exposure_counts": {
+              "eligible_attempts": 15,
+              "btc_loaded_attempts": 12
+            },
+            "rejected_baseline_positions": [],
+            "difference": {
+              "transition": {},
+              "removed": 0,
+              "added": 0,
+              "added_positions": [],
+              "removed_positions": []
+            }
+          }
+        },
+        "1000": {
+          "baseline": {
+            "status": "SCORED_PUBLIC_L2_SIMULATION",
+            "trades": 15,
+            "skipped": {
+              "stocks:wide": 25,
+              "crypto:wide": 7,
+              "stocks:stale order book": 4,
+              "stocks:depth slippage exceeds limit": 1
+            },
+            "return_pct": 2.3970384615385143,
+            "drawdown_pct": 0.9060876710170203,
+            "contribution_pct": {
+              "crypto": 2.397038461538472,
+              "stocks": 0.0
+            },
+            "peak_reservations": 4,
+            "peak_margin_pct": 11.23403636374684,
+            "cash_pnl_usd": 3.116150000000013,
+            "profitable": 6,
+            "routed": 0,
+            "exit_counts": {
+              "TARGET": 5,
+              "SL": 3,
+              "BE": 6,
+              "TIME": 1
+            },
+            "winning_exits_by_bot": {
+              "crypto": 6
+            },
+            "losing_exits_by_bot": {
+              "crypto": 9,
+              "stocks": 0
+            },
+            "overlapping_cross_bot_loss_pairs": 0,
+            "overlapping_loss_pairs": 0,
+            "exposure_counts": {
+              "eligible_attempts": 15,
+              "same:pairs": 11,
+              "same:known": 11,
+              "same:signed_above_065": 2
+            },
+            "rejected_baseline_positions": []
+          },
+          "cross_bot_pair_065": {
+            "status": "SCORED_PUBLIC_L2_SIMULATION",
+            "trades": 15,
+            "skipped": {
+              "stocks:wide": 25,
+              "crypto:wide": 7,
+              "stocks:stale order book": 4,
+              "stocks:depth slippage exceeds limit": 1
+            },
+            "return_pct": 2.3970384615385143,
+            "drawdown_pct": 0.9060876710170203,
+            "contribution_pct": {
+              "crypto": 2.397038461538472,
+              "stocks": 0.0
+            },
+            "peak_reservations": 4,
+            "peak_margin_pct": 11.23403636374684,
+            "cash_pnl_usd": 3.116150000000013,
+            "profitable": 6,
+            "routed": 0,
+            "exit_counts": {
+              "TARGET": 5,
+              "SL": 3,
+              "BE": 6,
+              "TIME": 1
+            },
+            "winning_exits_by_bot": {
+              "crypto": 6
+            },
+            "losing_exits_by_bot": {
+              "crypto": 9,
+              "stocks": 0
+            },
+            "overlapping_cross_bot_loss_pairs": 0,
+            "overlapping_loss_pairs": 0,
+            "exposure_counts": {
+              "eligible_attempts": 15
+            },
+            "rejected_baseline_positions": [],
+            "difference": {
+              "transition": {},
+              "removed": 0,
+              "added": 0,
+              "added_positions": [],
+              "removed_positions": []
+            }
+          },
+          "all_pair_080": {
+            "status": "SCORED_PUBLIC_L2_SIMULATION",
+            "trades": 14,
+            "skipped": {
+              "stocks:wide": 25,
+              "crypto:wide": 7,
+              "crypto:all_pair_080": 1,
+              "stocks:stale order book": 4,
+              "stocks:depth slippage exceeds limit": 1
+            },
+            "return_pct": 1.8224230769231076,
+            "drawdown_pct": 0.9111952504655093,
+            "contribution_pct": {
+              "crypto": 1.8224230769230856,
+              "stocks": 0.0
+            },
+            "peak_reservations": 3,
+            "peak_margin_pct": 8.828695474832127,
+            "cash_pnl_usd": 2.3691500000000114,
+            "profitable": 5,
+            "routed": 0,
+            "exit_counts": {
+              "TARGET": 4,
+              "SL": 3,
+              "BE": 6,
+              "TIME": 1
+            },
+            "winning_exits_by_bot": {
+              "crypto": 5
+            },
+            "losing_exits_by_bot": {
+              "crypto": 9,
+              "stocks": 0
+            },
+            "overlapping_cross_bot_loss_pairs": 0,
+            "overlapping_loss_pairs": 0,
+            "exposure_counts": {
+              "eligible_attempts": 15,
+              "same:pairs": 9,
+              "same:known": 9,
+              "same:signed_above_065": 2,
+              "refused:crypto": 1
+            },
+            "rejected_baseline_positions": [
+              {
+                "bot": "crypto",
+                "symbol": "LINKUSDT",
+                "entry_ms": 1793911510000,
+                "cash_pnl_usd": 0.7470000000000017,
+                "outcome": "TARGET",
+                "blocked_by": [
+                  [
+                    "BTCUSDT",
+                    "crypto",
+                    0.8648289320098286
+                  ]
+                ]
+              }
+            ],
+            "difference": {
+              "transition": {},
+              "removed": 1,
+              "added": 0,
+              "added_positions": [],
+              "removed_positions": [
+                {
+                  "bot": "crypto",
+                  "symbol": "LINKUSDT",
+                  "entry_ms": 1793911510000,
+                  "exit": "TARGET",
+                  "cash_pnl_usd": 0.7470000000000017
+                }
+              ]
+            }
+          },
+          "one_btc_loading": {
+            "status": "SCORED_PUBLIC_L2_SIMULATION",
+            "trades": 14,
+            "skipped": {
+              "stocks:wide": 25,
+              "crypto:wide": 7,
+              "crypto:one_btc_loading": 1,
+              "stocks:stale order book": 4,
+              "stocks:depth slippage exceeds limit": 1
+            },
+            "return_pct": 1.8224230769231076,
+            "drawdown_pct": 0.9111952504655093,
+            "contribution_pct": {
+              "crypto": 1.8224230769230856,
+              "stocks": 0.0
+            },
+            "peak_reservations": 3,
+            "peak_margin_pct": 8.828695474832127,
+            "cash_pnl_usd": 2.3691500000000114,
+            "profitable": 5,
+            "routed": 0,
+            "exit_counts": {
+              "TARGET": 4,
+              "SL": 3,
+              "BE": 6,
+              "TIME": 1
+            },
+            "winning_exits_by_bot": {
+              "crypto": 5
+            },
+            "losing_exits_by_bot": {
+              "crypto": 9,
+              "stocks": 0
+            },
+            "overlapping_cross_bot_loss_pairs": 0,
+            "overlapping_loss_pairs": 0,
+            "exposure_counts": {
+              "eligible_attempts": 15,
+              "btc_loaded_attempts": 12,
+              "refused:crypto": 1
+            },
+            "rejected_baseline_positions": [
+              {
+                "bot": "crypto",
+                "symbol": "LINKUSDT",
+                "entry_ms": 1793911510000,
+                "cash_pnl_usd": 0.7470000000000017,
+                "outcome": "TARGET",
+                "blocked_by": [
+                  [
+                    "BTCUSDT",
+                    "crypto",
+                    -0.9999999999999999
+                  ]
+                ]
+              }
+            ],
+            "difference": {
+              "transition": {},
+              "removed": 1,
+              "added": 0,
+              "added_positions": [],
+              "removed_positions": [
+                {
+                  "bot": "crypto",
+                  "symbol": "LINKUSDT",
+                  "entry_ms": 1793911510000,
+                  "exit": "TARGET",
+                  "cash_pnl_usd": 0.7470000000000017
+                }
+              ]
+            }
+          },
+          "two_btc_loadings": {
+            "status": "SCORED_PUBLIC_L2_SIMULATION",
+            "trades": 15,
+            "skipped": {
+              "stocks:wide": 25,
+              "crypto:wide": 7,
+              "stocks:stale order book": 4,
+              "stocks:depth slippage exceeds limit": 1
+            },
+            "return_pct": 2.3970384615385143,
+            "drawdown_pct": 0.9060876710170203,
+            "contribution_pct": {
+              "crypto": 2.397038461538472,
+              "stocks": 0.0
+            },
+            "peak_reservations": 4,
+            "peak_margin_pct": 11.23403636374684,
+            "cash_pnl_usd": 3.116150000000013,
+            "profitable": 6,
+            "routed": 0,
+            "exit_counts": {
+              "TARGET": 5,
+              "SL": 3,
+              "BE": 6,
+              "TIME": 1
+            },
+            "winning_exits_by_bot": {
+              "crypto": 6
+            },
+            "losing_exits_by_bot": {
+              "crypto": 9,
+              "stocks": 0
+            },
+            "overlapping_cross_bot_loss_pairs": 0,
+            "overlapping_loss_pairs": 0,
+            "exposure_counts": {
+              "eligible_attempts": 15,
+              "btc_loaded_attempts": 12
+            },
+            "rejected_baseline_positions": [],
+            "difference": {
+              "transition": {},
+              "removed": 0,
+              "added": 0,
+              "added_positions": [],
+              "removed_positions": []
+            }
+          }
+        }
+      },
+      "repricing": {
+        "repriced": [],
+        "extra_exit_checks": {}
+      }
+    },
+    "nov09_14": {
+      "results": {
+        "200": {
+          "baseline": {
+            "status": "SCORED_PUBLIC_L2_SIMULATION",
+            "trades": 24,
+            "skipped": {
+              "crypto:wide": 14,
+              "stocks:wide": 21,
+              "stocks:stale order book": 3,
+              "stocks:paper_guard": 1
+            },
+            "return_pct": -2.2007307692307743,
+            "drawdown_pct": 2.444807692307686,
+            "contribution_pct": {
+              "crypto": -2.200730769230761,
+              "stocks": 0.0
+            },
+            "peak_reservations": 4,
+            "peak_margin_pct": 11.56279155866751,
+            "cash_pnl_usd": -2.8609499999999897,
+            "profitable": 4,
+            "routed": 0,
+            "exit_counts": {
+              "SL": 10,
+              "BE": 11,
+              "TARGET": 3
+            },
+            "winning_exits_by_bot": {
+              "crypto": 4
+            },
+            "losing_exits_by_bot": {
+              "crypto": 20,
+              "stocks": 0
+            },
+            "overlapping_cross_bot_loss_pairs": 0,
+            "overlapping_loss_pairs": 6,
+            "exposure_counts": {
+              "eligible_attempts": 24,
+              "same:pairs": 22,
+              "same:known": 22,
+              "same:signed_above_065": 10
+            },
+            "rejected_baseline_positions": []
+          },
+          "cross_bot_pair_065": {
+            "status": "SCORED_PUBLIC_L2_SIMULATION",
+            "trades": 24,
+            "skipped": {
+              "crypto:wide": 14,
+              "stocks:wide": 21,
+              "stocks:stale order book": 3,
+              "stocks:paper_guard": 1
+            },
+            "return_pct": -2.2007307692307743,
+            "drawdown_pct": 2.444807692307686,
+            "contribution_pct": {
+              "crypto": -2.200730769230761,
+              "stocks": 0.0
+            },
+            "peak_reservations": 4,
+            "peak_margin_pct": 11.56279155866751,
+            "cash_pnl_usd": -2.8609499999999897,
+            "profitable": 4,
+            "routed": 0,
+            "exit_counts": {
+              "SL": 10,
+              "BE": 11,
+              "TARGET": 3
+            },
+            "winning_exits_by_bot": {
+              "crypto": 4
+            },
+            "losing_exits_by_bot": {
+              "crypto": 20,
+              "stocks": 0
+            },
+            "overlapping_cross_bot_loss_pairs": 0,
+            "overlapping_loss_pairs": 6,
+            "exposure_counts": {
+              "eligible_attempts": 24
+            },
+            "rejected_baseline_positions": [],
+            "difference": {
+              "transition": {},
+              "removed": 0,
+              "added": 0,
+              "added_positions": [],
+              "removed_positions": []
+            }
+          },
+          "all_pair_080": {
+            "status": "SCORED_PUBLIC_L2_SIMULATION",
+            "trades": 19,
+            "skipped": {
+              "crypto:wide": 14,
+              "stocks:wide": 21,
+              "stocks:stale order book": 3,
+              "crypto:all_pair_080": 5,
+              "stocks:paper_guard": 1
+            },
+            "return_pct": -0.6174230769230515,
+            "drawdown_pct": 1.3399673352341095,
+            "contribution_pct": {
+              "crypto": -0.6174230769230625,
+              "stocks": 0.0
+            },
+            "peak_reservations": 3,
+            "peak_margin_pct": 8.442774456721226,
+            "cash_pnl_usd": -0.8026499999999811,
+            "profitable": 4,
+            "routed": 0,
+            "exit_counts": {
+              "SL": 6,
+              "BE": 10,
+              "TARGET": 3
+            },
+            "winning_exits_by_bot": {
+              "crypto": 4
+            },
+            "losing_exits_by_bot": {
+              "crypto": 15,
+              "stocks": 0
+            },
+            "overlapping_cross_bot_loss_pairs": 0,
+            "overlapping_loss_pairs": 3,
+            "exposure_counts": {
+              "eligible_attempts": 24,
+              "same:pairs": 16,
+              "same:known": 16,
+              "same:signed_above_065": 7,
+              "refused:crypto": 5
+            },
+            "rejected_baseline_positions": [
+              {
+                "bot": "crypto",
+                "symbol": "LINKUSDT",
+                "entry_ms": 1794204910000,
+                "cash_pnl_usd": -0.33299999999999663,
+                "outcome": "SL",
+                "blocked_by": [
+                  [
+                    "SUIUSDT",
+                    "crypto",
+                    0.9560399056282636
+                  ]
+                ]
+              },
+              {
+                "bot": "crypto",
+                "symbol": "LINKUSDT",
+                "entry_ms": 1794342610000,
+                "cash_pnl_usd": -0.0030000000000036664,
+                "outcome": "BE",
+                "blocked_by": [
+                  [
+                    "HYPEUSDT",
+                    "crypto",
+                    0.8045889307325659
+                  ]
+                ]
+              },
+              {
+                "bot": "crypto",
+                "symbol": "HYPEUSDT",
+                "entry_ms": 1794515410000,
+                "cash_pnl_usd": -0.4247000000000014,
+                "outcome": "SL",
+                "blocked_by": [
+                  [
+                    "SUIUSDT",
+                    "crypto",
+                    0.8524317004949031
+                  ]
+                ]
+              },
+              {
+                "bot": "crypto",
+                "symbol": "ETHUSDT",
+                "entry_ms": 1794549610000,
+                "cash_pnl_usd": -0.7787999999999966,
+                "outcome": "SL",
+                "blocked_by": [
+                  [
+                    "BTCUSDT",
+                    "crypto",
+                    0.8463766651307911
+                  ]
+                ]
+              },
+              {
+                "bot": "crypto",
+                "symbol": "SOLUSDT",
+                "entry_ms": 1794560410000,
+                "cash_pnl_usd": -0.518400000000006,
+                "outcome": "SL",
+                "blocked_by": [
+                  [
+                    "LINKUSDT",
+                    "crypto",
+                    0.841159237733137
+                  ]
+                ]
+              }
+            ],
+            "difference": {
+              "transition": {
+                "crypto BE -> BE": {
+                  "positions": 1,
+                  "cash_delta_usd": 0.0004000000000041748
+                }
+              },
+              "removed": 5,
+              "added": 0,
+              "added_positions": [],
+              "removed_positions": [
+                {
+                  "bot": "crypto",
+                  "symbol": "ETHUSDT",
+                  "entry_ms": 1794549610000,
+                  "exit": "SL",
+                  "cash_pnl_usd": -0.7787999999999966
+                },
+                {
+                  "bot": "crypto",
+                  "symbol": "HYPEUSDT",
+                  "entry_ms": 1794515410000,
+                  "exit": "SL",
+                  "cash_pnl_usd": -0.4247000000000014
+                },
+                {
+                  "bot": "crypto",
+                  "symbol": "LINKUSDT",
+                  "entry_ms": 1794204910000,
+                  "exit": "SL",
+                  "cash_pnl_usd": -0.33299999999999663
+                },
+                {
+                  "bot": "crypto",
+                  "symbol": "LINKUSDT",
+                  "entry_ms": 1794342610000,
+                  "exit": "BE",
+                  "cash_pnl_usd": -0.0030000000000036664
+                },
+                {
+                  "bot": "crypto",
+                  "symbol": "SOLUSDT",
+                  "entry_ms": 1794560410000,
+                  "exit": "SL",
+                  "cash_pnl_usd": -0.518400000000006
+                }
+              ]
+            }
+          },
+          "one_btc_loading": {
+            "status": "SCORED_PUBLIC_L2_SIMULATION",
+            "trades": 18,
+            "skipped": {
+              "crypto:wide": 14,
+              "stocks:wide": 21,
+              "stocks:stale order book": 3,
+              "crypto:one_btc_loading": 6,
+              "stocks:paper_guard": 1
+            },
+            "return_pct": -0.6113461538461262,
+            "drawdown_pct": 1.3398863040946254,
+            "contribution_pct": {
+              "crypto": -0.6113461538461399,
+              "stocks": 0.0
+            },
+            "peak_reservations": 3,
+            "peak_margin_pct": 8.442261771846571,
+            "cash_pnl_usd": -0.7947499999999817,
+            "profitable": 4,
+            "routed": 0,
+            "exit_counts": {
+              "SL": 6,
+              "BE": 9,
+              "TARGET": 3
+            },
+            "winning_exits_by_bot": {
+              "crypto": 4
+            },
+            "losing_exits_by_bot": {
+              "crypto": 14,
+              "stocks": 0
+            },
+            "overlapping_cross_bot_loss_pairs": 0,
+            "overlapping_loss_pairs": 3,
+            "exposure_counts": {
+              "eligible_attempts": 24,
+              "btc_loaded_attempts": 19,
+              "refused:crypto": 6
+            },
+            "rejected_baseline_positions": [
+              {
+                "bot": "crypto",
+                "symbol": "LINKUSDT",
+                "entry_ms": 1794204910000,
+                "cash_pnl_usd": -0.33299999999999663,
+                "outcome": "SL",
+                "blocked_by": [
+                  [
+                    "SUIUSDT",
+                    "crypto",
+                    0.9208746149815776
+                  ]
+                ]
+              },
+              {
+                "bot": "crypto",
+                "symbol": "LINKUSDT",
+                "entry_ms": 1794342610000,
+                "cash_pnl_usd": -0.0030000000000036664,
+                "outcome": "BE",
+                "blocked_by": [
+                  [
+                    "HYPEUSDT",
+                    "crypto",
+                    -0.816190176202106
+                  ]
+                ]
+              },
+              {
+                "bot": "crypto",
+                "symbol": "HYPEUSDT",
+                "entry_ms": 1794437110000,
+                "cash_pnl_usd": -0.007899999999999352,
+                "outcome": "BE",
+                "blocked_by": [
+                  [
+                    "LINKUSDT",
+                    "crypto",
+                    -0.7737173507872739
+                  ]
+                ]
+              },
+              {
+                "bot": "crypto",
+                "symbol": "HYPEUSDT",
+                "entry_ms": 1794515410000,
+                "cash_pnl_usd": -0.4247000000000014,
+                "outcome": "SL",
+                "blocked_by": [
+                  [
+                    "SUIUSDT",
+                    "crypto",
+                    -0.8008365690216995
+                  ]
+                ]
+              },
+              {
+                "bot": "crypto",
+                "symbol": "ETHUSDT",
+                "entry_ms": 1794549610000,
+                "cash_pnl_usd": -0.7787999999999966,
+                "outcome": "SL",
+                "blocked_by": [
+                  [
+                    "BTCUSDT",
+                    "crypto",
+                    -1.0
+                  ]
+                ]
+              },
+              {
+                "bot": "crypto",
+                "symbol": "SOLUSDT",
+                "entry_ms": 1794560410000,
+                "cash_pnl_usd": -0.518400000000006,
+                "outcome": "SL",
+                "blocked_by": [
+                  [
+                    "LINKUSDT",
+                    "crypto",
+                    -0.7663493470628089
+                  ]
+                ]
+              }
+            ],
+            "difference": {
+              "transition": {
+                "crypto BE -> BE": {
+                  "positions": 1,
+                  "cash_delta_usd": 0.0004000000000041748
+                }
+              },
+              "removed": 6,
+              "added": 0,
+              "added_positions": [],
+              "removed_positions": [
+                {
+                  "bot": "crypto",
+                  "symbol": "ETHUSDT",
+                  "entry_ms": 1794549610000,
+                  "exit": "SL",
+                  "cash_pnl_usd": -0.7787999999999966
+                },
+                {
+                  "bot": "crypto",
+                  "symbol": "HYPEUSDT",
+                  "entry_ms": 1794437110000,
+                  "exit": "BE",
+                  "cash_pnl_usd": -0.007899999999999352
+                },
+                {
+                  "bot": "crypto",
+                  "symbol": "HYPEUSDT",
+                  "entry_ms": 1794515410000,
+                  "exit": "SL",
+                  "cash_pnl_usd": -0.4247000000000014
+                },
+                {
+                  "bot": "crypto",
+                  "symbol": "LINKUSDT",
+                  "entry_ms": 1794204910000,
+                  "exit": "SL",
+                  "cash_pnl_usd": -0.33299999999999663
+                },
+                {
+                  "bot": "crypto",
+                  "symbol": "LINKUSDT",
+                  "entry_ms": 1794342610000,
+                  "exit": "BE",
+                  "cash_pnl_usd": -0.0030000000000036664
+                },
+                {
+                  "bot": "crypto",
+                  "symbol": "SOLUSDT",
+                  "entry_ms": 1794560410000,
+                  "exit": "SL",
+                  "cash_pnl_usd": -0.518400000000006
+                }
+              ]
+            }
+          },
+          "two_btc_loadings": {
+            "status": "SCORED_PUBLIC_L2_SIMULATION",
+            "trades": 23,
+            "skipped": {
+              "crypto:wide": 14,
+              "stocks:wide": 21,
+              "stocks:stale order book": 3,
+              "crypto:two_btc_loadings": 1,
+              "stocks:paper_guard": 1
+            },
+            "return_pct": -1.801961538461505,
+            "drawdown_pct": 2.046038461538444,
+            "contribution_pct": {
+              "crypto": -1.8019615384615255,
+              "stocks": 0.0
+            },
+            "peak_reservations": 3,
+            "peak_margin_pct": 8.54388576402813,
+            "cash_pnl_usd": -2.3425499999999837,
+            "profitable": 4,
+            "routed": 0,
+            "exit_counts": {
+              "SL": 9,
+              "BE": 11,
+              "TARGET": 3
+            },
+            "winning_exits_by_bot": {
+              "crypto": 4
+            },
+            "losing_exits_by_bot": {
+              "crypto": 19,
+              "stocks": 0
+            },
+            "overlapping_cross_bot_loss_pairs": 0,
+            "overlapping_loss_pairs": 4,
+            "exposure_counts": {
+              "eligible_attempts": 24,
+              "btc_loaded_attempts": 19,
+              "refused:crypto": 1
+            },
+            "rejected_baseline_positions": [
+              {
+                "bot": "crypto",
+                "symbol": "SOLUSDT",
+                "entry_ms": 1794560410000,
+                "cash_pnl_usd": -0.518400000000006,
+                "outcome": "SL",
+                "blocked_by": [
+                  [
+                    "ETHUSDT",
+                    "crypto",
+                    -0.8509724354531992
+                  ],
+                  [
+                    "LINKUSDT",
+                    "crypto",
+                    -0.7663493470628089
+                  ]
+                ]
+              }
+            ],
+            "difference": {
+              "transition": {},
+              "removed": 1,
+              "added": 0,
+              "added_positions": [],
+              "removed_positions": [
+                {
+                  "bot": "crypto",
+                  "symbol": "SOLUSDT",
+                  "entry_ms": 1794560410000,
+                  "exit": "SL",
+                  "cash_pnl_usd": -0.518400000000006
+                }
+              ]
+            }
+          }
+        },
+        "1000": {
+          "baseline": {
+            "status": "SCORED_PUBLIC_L2_SIMULATION",
+            "trades": 24,
+            "skipped": {
+              "crypto:wide": 14,
+              "stocks:wide": 21,
+              "stocks:stale order book": 3,
+              "stocks:paper_guard": 1
+            },
+            "return_pct": -2.2082307692307457,
+            "drawdown_pct": 2.4665384615384327,
+            "contribution_pct": {
+              "crypto": -2.208230769230765,
+              "stocks": 0.0
+            },
+            "peak_reservations": 4,
+            "peak_margin_pct": 11.563997369082973,
+            "cash_pnl_usd": -2.8706999999999945,
+            "profitable": 5,
+            "routed": 0,
+            "exit_counts": {
+              "SL": 10,
+              "BE": 11,
+              "TARGET": 3
+            },
+            "winning_exits_by_bot": {
+              "crypto": 5
+            },
+            "losing_exits_by_bot": {
+              "crypto": 19,
+              "stocks": 0
+            },
+            "overlapping_cross_bot_loss_pairs": 0,
+            "overlapping_loss_pairs": 6,
+            "exposure_counts": {
+              "eligible_attempts": 24,
+              "same:pairs": 22,
+              "same:known": 22,
+              "same:signed_above_065": 10
+            },
+            "rejected_baseline_positions": []
+          },
+          "cross_bot_pair_065": {
+            "status": "SCORED_PUBLIC_L2_SIMULATION",
+            "trades": 24,
+            "skipped": {
+              "crypto:wide": 14,
+              "stocks:wide": 21,
+              "stocks:stale order book": 3,
+              "stocks:paper_guard": 1
+            },
+            "return_pct": -2.2082307692307457,
+            "drawdown_pct": 2.4665384615384327,
+            "contribution_pct": {
+              "crypto": -2.208230769230765,
+              "stocks": 0.0
+            },
+            "peak_reservations": 4,
+            "peak_margin_pct": 11.563997369082973,
+            "cash_pnl_usd": -2.8706999999999945,
+            "profitable": 5,
+            "routed": 0,
+            "exit_counts": {
+              "SL": 10,
+              "BE": 11,
+              "TARGET": 3
+            },
+            "winning_exits_by_bot": {
+              "crypto": 5
+            },
+            "losing_exits_by_bot": {
+              "crypto": 19,
+              "stocks": 0
+            },
+            "overlapping_cross_bot_loss_pairs": 0,
+            "overlapping_loss_pairs": 6,
+            "exposure_counts": {
+              "eligible_attempts": 24
+            },
+            "rejected_baseline_positions": [],
+            "difference": {
+              "transition": {},
+              "removed": 0,
+              "added": 0,
+              "added_positions": [],
+              "removed_positions": []
+            }
+          },
+          "all_pair_080": {
+            "status": "SCORED_PUBLIC_L2_SIMULATION",
+            "trades": 19,
+            "skipped": {
+              "crypto:wide": 14,
+              "stocks:wide": 21,
+              "stocks:stale order book": 3,
+              "crypto:all_pair_080": 5,
+              "stocks:paper_guard": 1
+            },
+            "return_pct": -0.6349230769230774,
+            "drawdown_pct": 1.3438709148812804,
+            "contribution_pct": {
+              "crypto": -0.6349230769230635,
+              "stocks": 0.0
+            },
+            "peak_reservations": 3,
+            "peak_margin_pct": 8.444517401888042,
+            "cash_pnl_usd": -0.8253999999999827,
+            "profitable": 5,
+            "routed": 0,
+            "exit_counts": {
+              "SL": 6,
+              "BE": 10,
+              "TARGET": 3
+            },
+            "winning_exits_by_bot": {
+              "crypto": 5
+            },
+            "losing_exits_by_bot": {
+              "crypto": 14,
+              "stocks": 0
+            },
+            "overlapping_cross_bot_loss_pairs": 0,
+            "overlapping_loss_pairs": 3,
+            "exposure_counts": {
+              "eligible_attempts": 24,
+              "same:pairs": 16,
+              "same:known": 16,
+              "same:signed_above_065": 7,
+              "refused:crypto": 5
+            },
+            "rejected_baseline_positions": [
+              {
+                "bot": "crypto",
+                "symbol": "LINKUSDT",
+                "entry_ms": 1794204910000,
+                "cash_pnl_usd": -0.3119999999999976,
+                "outcome": "SL",
+                "blocked_by": [
+                  [
+                    "SUIUSDT",
+                    "crypto",
+                    0.9560399056282636
+                  ]
+                ]
+              },
+              {
+                "bot": "crypto",
+                "symbol": "LINKUSDT",
+                "entry_ms": 1794342610000,
+                "cash_pnl_usd": -0.012000000000004007,
+                "outcome": "BE",
+                "blocked_by": [
+                  [
+                    "HYPEUSDT",
+                    "crypto",
+                    0.8045889307325659
+                  ]
+                ]
+              },
+              {
+                "bot": "crypto",
+                "symbol": "HYPEUSDT",
+                "entry_ms": 1794515410000,
+                "cash_pnl_usd": -0.42540000000000333,
+                "outcome": "SL",
+                "blocked_by": [
+                  [
+                    "SUIUSDT",
+                    "crypto",
+                    0.8524317004949031
+                  ]
+                ]
+              },
+              {
+                "bot": "crypto",
+                "symbol": "ETHUSDT",
+                "entry_ms": 1794549610000,
+                "cash_pnl_usd": -0.7814000000000033,
+                "outcome": "SL",
+                "blocked_by": [
+                  [
+                    "BTCUSDT",
+                    "crypto",
+                    0.8463766651307911
+                  ]
+                ]
+              },
+              {
+                "bot": "crypto",
+                "symbol": "SOLUSDT",
+                "entry_ms": 1794560410000,
+                "cash_pnl_usd": -0.5136000000000035,
+                "outcome": "SL",
+                "blocked_by": [
+                  [
+                    "LINKUSDT",
+                    "crypto",
+                    0.841159237733137
+                  ]
+                ]
+              }
+            ],
+            "difference": {
+              "transition": {
+                "crypto BE -> BE": {
+                  "positions": 1,
+                  "cash_delta_usd": 0.0009000000000000119
+                }
+              },
+              "removed": 5,
+              "added": 0,
+              "added_positions": [],
+              "removed_positions": [
+                {
+                  "bot": "crypto",
+                  "symbol": "ETHUSDT",
+                  "entry_ms": 1794549610000,
+                  "exit": "SL",
+                  "cash_pnl_usd": -0.7814000000000033
+                },
+                {
+                  "bot": "crypto",
+                  "symbol": "HYPEUSDT",
+                  "entry_ms": 1794515410000,
+                  "exit": "SL",
+                  "cash_pnl_usd": -0.42540000000000333
+                },
+                {
+                  "bot": "crypto",
+                  "symbol": "LINKUSDT",
+                  "entry_ms": 1794204910000,
+                  "exit": "SL",
+                  "cash_pnl_usd": -0.3119999999999976
+                },
+                {
+                  "bot": "crypto",
+                  "symbol": "LINKUSDT",
+                  "entry_ms": 1794342610000,
+                  "exit": "BE",
+                  "cash_pnl_usd": -0.012000000000004007
+                },
+                {
+                  "bot": "crypto",
+                  "symbol": "SOLUSDT",
+                  "entry_ms": 1794560410000,
+                  "exit": "SL",
+                  "cash_pnl_usd": -0.5136000000000035
+                }
+              ]
+            }
+          },
+          "one_btc_loading": {
+            "status": "SCORED_PUBLIC_L2_SIMULATION",
+            "trades": 18,
+            "skipped": {
+              "crypto:wide": 14,
+              "stocks:wide": 21,
+              "stocks:stale order book": 3,
+              "crypto:one_btc_loading": 6,
+              "stocks:paper_guard": 1
+            },
+            "return_pct": -0.6288461538461521,
+            "drawdown_pct": 1.3437896245658492,
+            "contribution_pct": {
+              "crypto": -0.628846153846141,
+              "stocks": 0.0
+            },
+            "peak_reservations": 3,
+            "peak_margin_pct": 8.44400450531835,
+            "cash_pnl_usd": -0.8174999999999834,
+            "profitable": 5,
+            "routed": 0,
+            "exit_counts": {
+              "SL": 6,
+              "BE": 9,
+              "TARGET": 3
+            },
+            "winning_exits_by_bot": {
+              "crypto": 5
+            },
+            "losing_exits_by_bot": {
+              "crypto": 13,
+              "stocks": 0
+            },
+            "overlapping_cross_bot_loss_pairs": 0,
+            "overlapping_loss_pairs": 3,
+            "exposure_counts": {
+              "eligible_attempts": 24,
+              "btc_loaded_attempts": 19,
+              "refused:crypto": 6
+            },
+            "rejected_baseline_positions": [
+              {
+                "bot": "crypto",
+                "symbol": "LINKUSDT",
+                "entry_ms": 1794204910000,
+                "cash_pnl_usd": -0.3119999999999976,
+                "outcome": "SL",
+                "blocked_by": [
+                  [
+                    "SUIUSDT",
+                    "crypto",
+                    0.9208746149815776
+                  ]
+                ]
+              },
+              {
+                "bot": "crypto",
+                "symbol": "LINKUSDT",
+                "entry_ms": 1794342610000,
+                "cash_pnl_usd": -0.012000000000004007,
+                "outcome": "BE",
+                "blocked_by": [
+                  [
+                    "HYPEUSDT",
+                    "crypto",
+                    -0.816190176202106
+                  ]
+                ]
+              },
+              {
+                "bot": "crypto",
+                "symbol": "HYPEUSDT",
+                "entry_ms": 1794437110000,
+                "cash_pnl_usd": -0.007899999999999352,
+                "outcome": "BE",
+                "blocked_by": [
+                  [
+                    "LINKUSDT",
+                    "crypto",
+                    -0.7737173507872739
+                  ]
+                ]
+              },
+              {
+                "bot": "crypto",
+                "symbol": "HYPEUSDT",
+                "entry_ms": 1794515410000,
+                "cash_pnl_usd": -0.42540000000000333,
+                "outcome": "SL",
+                "blocked_by": [
+                  [
+                    "SUIUSDT",
+                    "crypto",
+                    -0.8008365690216995
+                  ]
+                ]
+              },
+              {
+                "bot": "crypto",
+                "symbol": "ETHUSDT",
+                "entry_ms": 1794549610000,
+                "cash_pnl_usd": -0.7814000000000033,
+                "outcome": "SL",
+                "blocked_by": [
+                  [
+                    "BTCUSDT",
+                    "crypto",
+                    -1.0
+                  ]
+                ]
+              },
+              {
+                "bot": "crypto",
+                "symbol": "SOLUSDT",
+                "entry_ms": 1794560410000,
+                "cash_pnl_usd": -0.5136000000000035,
+                "outcome": "SL",
+                "blocked_by": [
+                  [
+                    "LINKUSDT",
+                    "crypto",
+                    -0.7663493470628089
+                  ]
+                ]
+              }
+            ],
+            "difference": {
+              "transition": {
+                "crypto BE -> BE": {
+                  "positions": 1,
+                  "cash_delta_usd": 0.0009000000000000119
+                }
+              },
+              "removed": 6,
+              "added": 0,
+              "added_positions": [],
+              "removed_positions": [
+                {
+                  "bot": "crypto",
+                  "symbol": "ETHUSDT",
+                  "entry_ms": 1794549610000,
+                  "exit": "SL",
+                  "cash_pnl_usd": -0.7814000000000033
+                },
+                {
+                  "bot": "crypto",
+                  "symbol": "HYPEUSDT",
+                  "entry_ms": 1794437110000,
+                  "exit": "BE",
+                  "cash_pnl_usd": -0.007899999999999352
+                },
+                {
+                  "bot": "crypto",
+                  "symbol": "HYPEUSDT",
+                  "entry_ms": 1794515410000,
+                  "exit": "SL",
+                  "cash_pnl_usd": -0.42540000000000333
+                },
+                {
+                  "bot": "crypto",
+                  "symbol": "LINKUSDT",
+                  "entry_ms": 1794204910000,
+                  "exit": "SL",
+                  "cash_pnl_usd": -0.3119999999999976
+                },
+                {
+                  "bot": "crypto",
+                  "symbol": "LINKUSDT",
+                  "entry_ms": 1794342610000,
+                  "exit": "BE",
+                  "cash_pnl_usd": -0.012000000000004007
+                },
+                {
+                  "bot": "crypto",
+                  "symbol": "SOLUSDT",
+                  "entry_ms": 1794560410000,
+                  "exit": "SL",
+                  "cash_pnl_usd": -0.5136000000000035
+                }
+              ]
+            }
+          },
+          "two_btc_loadings": {
+            "status": "SCORED_PUBLIC_L2_SIMULATION",
+            "trades": 23,
+            "skipped": {
+              "crypto:wide": 14,
+              "stocks:wide": 21,
+              "stocks:stale order book": 3,
+              "crypto:two_btc_loadings": 1,
+              "stocks:paper_guard": 1
+            },
+            "return_pct": -1.8131538461538255,
+            "drawdown_pct": 2.0714615384615125,
+            "contribution_pct": {
+              "crypto": -1.8131538461538392,
+              "stocks": 0.0
+            },
+            "peak_reservations": 3,
+            "peak_margin_pct": 8.54509226654052,
+            "cash_pnl_usd": -2.357099999999991,
+            "profitable": 5,
+            "routed": 0,
+            "exit_counts": {
+              "SL": 9,
+              "BE": 11,
+              "TARGET": 3
+            },
+            "winning_exits_by_bot": {
+              "crypto": 5
+            },
+            "losing_exits_by_bot": {
+              "crypto": 18,
+              "stocks": 0
+            },
+            "overlapping_cross_bot_loss_pairs": 0,
+            "overlapping_loss_pairs": 4,
+            "exposure_counts": {
+              "eligible_attempts": 24,
+              "btc_loaded_attempts": 19,
+              "refused:crypto": 1
+            },
+            "rejected_baseline_positions": [
+              {
+                "bot": "crypto",
+                "symbol": "SOLUSDT",
+                "entry_ms": 1794560410000,
+                "cash_pnl_usd": -0.5136000000000035,
+                "outcome": "SL",
+                "blocked_by": [
+                  [
+                    "ETHUSDT",
+                    "crypto",
+                    -0.8509724354531992
+                  ],
+                  [
+                    "LINKUSDT",
+                    "crypto",
+                    -0.7663493470628089
+                  ]
+                ]
+              }
+            ],
+            "difference": {
+              "transition": {},
+              "removed": 1,
+              "added": 0,
+              "added_positions": [],
+              "removed_positions": [
+                {
+                  "bot": "crypto",
+                  "symbol": "SOLUSDT",
+                  "entry_ms": 1794560410000,
+                  "exit": "SL",
+                  "cash_pnl_usd": -0.5136000000000035
+                }
+              ]
+            }
+          }
+        }
+      },
+      "repricing": {
+        "repriced": [],
+        "extra_exit_checks": {}
+      }
+    }
+  },
+  "policies": [
+    "cross_bot_pair_065",
+    "all_pair_080",
+    "one_btc_loading",
+    "two_btc_loadings"
+  ],
+  "contact_window_bars": 96,
+  "minimum_matched_active_bars": 32,
+  "source_sha256": {
+    "shared_correlated_exposure_nov25.py": "d927cf17e63af46ef6db31eb65d0fe3870039eb422d3555f2893a2a97920397e",
+    "okx_xperp_cash_tick_nov19.py": "ba272aebdd4c2c476a777e8cb15efdababca5bc067d5e04037e99b4b6d07c627",
+    "cash_tp1_policy_nov19.py": "c9957d95eeadf6ae4aeda52b565764fd6d6d8531fe090f1cf8cfbcb6ebcbeb23"
+  },
+  "live_activation_supported": false,
+  "limitations": [
+    "Correlations use only closed 15-minute returns. Equal timestamps reuse the same strictly prior window.",
+    "A return requires trades in both adjacent periods and observes no information after the decision boundary.",
+    "Only held directions already visible in the same simulated cash ledger can block a candidate.",
+    "Unrecognized pair exposure is counted as unknown and does not trigger a veto.",
+    "The exact cash tests use historical OKX depth. Monthly scenarios are candle proxies and exclude private returns."
+  ]
+}
