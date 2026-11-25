@@ -1,0 +1,1692 @@
+{
+  "cases": {
+    "nov05_08": {
+      "results": {
+        "200": {
+          "baseline": {
+            "status": "SCORED_PUBLIC_L2_SIMULATION",
+            "trades": 15,
+            "skipped": {
+              "stocks:wide": 25,
+              "crypto:wide": 7,
+              "stocks:stale order book": 4,
+              "stocks:depth slippage exceeds limit": 1
+            },
+            "return_pct": 2.3914153846153585,
+            "drawdown_pct": 0.8673799541490397,
+            "contribution_pct": {
+              "crypto": 2.3914153846153936,
+              "stocks": 0.0
+            },
+            "peak_reservations": 4,
+            "peak_margin_pct": 11.236707734641675,
+            "cash_pnl_usd": 3.1088400000000114,
+            "profitable": 6,
+            "routed": 0,
+            "exit_counts": {
+              "TARGET": 5,
+              "SL": 3,
+              "BE": 6,
+              "TIME": 1
+            }
+          },
+          "breakout_shallow_cross": {
+            "status": "SCORED_PUBLIC_L2_SIMULATION",
+            "trades": 14,
+            "skipped": {
+              "stocks:wide": 25,
+              "crypto:breakout_shallow_cross": 1,
+              "crypto:wide": 7,
+              "stocks:stale order book": 4,
+              "stocks:depth slippage exceeds limit": 1
+            },
+            "return_pct": 2.7267999999999626,
+            "drawdown_pct": 0.8645508995832953,
+            "contribution_pct": {
+              "crypto": 2.7268000000000088,
+              "stocks": 0.0
+            },
+            "peak_reservations": 4,
+            "peak_margin_pct": 11.199610338375612,
+            "cash_pnl_usd": 3.5448400000000113,
+            "profitable": 6,
+            "routed": 0,
+            "exit_counts": {
+              "TARGET": 5,
+              "BE": 6,
+              "TIME": 1,
+              "SL": 2
+            },
+            "rejected_baseline": [
+              {
+                "symbol": "AVAXUSDT",
+                "bot": "crypto",
+                "entry_ms": 1793849410000,
+                "outcome": "SL",
+                "cash_pnl_usd": -0.43599999999999994,
+                "directional_close": 0.3076923076922762,
+                "breakout_cushion_atr": 0.08454106280194582,
+                "peers": 10,
+                "peer_known": true,
+                "peer_median_atr": 0.21300908867601598,
+                "peer_opposed_fraction": 0.2
+              }
+            ],
+            "difference": {
+              "transition": {},
+              "removed": 1,
+              "added": 0,
+              "added_positions": [],
+              "removed_positions": [
+                {
+                  "bot": "crypto",
+                  "symbol": "AVAXUSDT",
+                  "entry_ms": 1793849410000,
+                  "exit": "SL",
+                  "cash_pnl_usd": -0.43599999999999994
+                }
+              ]
+            },
+            "rejected_candidates": 1
+          },
+          "breakout_weak_close": {
+            "status": "SCORED_PUBLIC_L2_SIMULATION",
+            "trades": 12,
+            "skipped": {
+              "stocks:wide": 25,
+              "crypto:breakout_weak_close": 3,
+              "crypto:wide": 7,
+              "stocks:stale order book": 4,
+              "stocks:depth slippage exceeds limit": 1
+            },
+            "return_pct": 2.728876923076906,
+            "drawdown_pct": 0.8640884797877689,
+            "contribution_pct": {
+              "crypto": 2.728876923076936,
+              "stocks": 0.0
+            },
+            "peak_reservations": 3,
+            "peak_margin_pct": 8.751593634698573,
+            "cash_pnl_usd": 3.547540000000016,
+            "profitable": 6,
+            "routed": 0,
+            "exit_counts": {
+              "TARGET": 5,
+              "BE": 4,
+              "TIME": 1,
+              "SL": 2
+            },
+            "rejected_baseline": [
+              {
+                "symbol": "AVAXUSDT",
+                "bot": "crypto",
+                "entry_ms": 1793849410000,
+                "outcome": "SL",
+                "cash_pnl_usd": -0.43599999999999994,
+                "directional_close": 0.3076923076922762,
+                "breakout_cushion_atr": 0.08454106280194582,
+                "peers": 10,
+                "peer_known": true,
+                "peer_median_atr": 0.21300908867601598,
+                "peer_opposed_fraction": 0.2
+              },
+              {
+                "symbol": "BTCUSDT",
+                "bot": "crypto",
+                "entry_ms": 1793894410000,
+                "outcome": "BE",
+                "cash_pnl_usd": -0.002099999999998545,
+                "directional_close": 0.4450405204885357,
+                "breakout_cushion_atr": 0.2069870036962076,
+                "peers": 10,
+                "peer_known": true,
+                "peer_median_atr": 0.9277513942763553,
+                "peer_opposed_fraction": 0.0
+              },
+              {
+                "symbol": "ZECUSDT",
+                "bot": "crypto",
+                "entry_ms": 1794156310000,
+                "outcome": "BE",
+                "cash_pnl_usd": -0.0006000000000062755,
+                "directional_close": 0.4126315789473761,
+                "breakout_cushion_atr": 0.12332332332333851,
+                "peers": 10,
+                "peer_known": true,
+                "peer_median_atr": 0.8008186110019593,
+                "peer_opposed_fraction": 0.0
+              }
+            ],
+            "difference": {
+              "transition": {},
+              "removed": 3,
+              "added": 0,
+              "added_positions": [],
+              "removed_positions": [
+                {
+                  "bot": "crypto",
+                  "symbol": "AVAXUSDT",
+                  "entry_ms": 1793849410000,
+                  "exit": "SL",
+                  "cash_pnl_usd": -0.43599999999999994
+                },
+                {
+                  "bot": "crypto",
+                  "symbol": "BTCUSDT",
+                  "entry_ms": 1793894410000,
+                  "exit": "BE",
+                  "cash_pnl_usd": -0.002099999999998545
+                },
+                {
+                  "bot": "crypto",
+                  "symbol": "ZECUSDT",
+                  "entry_ms": 1794156310000,
+                  "exit": "BE",
+                  "cash_pnl_usd": -0.0006000000000062755
+                }
+              ]
+            },
+            "rejected_candidates": 3
+          },
+          "breakout_weak_acceptance": {
+            "status": "SCORED_PUBLIC_L2_SIMULATION",
+            "trades": 14,
+            "skipped": {
+              "stocks:wide": 25,
+              "crypto:breakout_weak_acceptance": 1,
+              "crypto:wide": 7,
+              "stocks:stale order book": 4,
+              "stocks:depth slippage exceeds limit": 1
+            },
+            "return_pct": 2.7267999999999626,
+            "drawdown_pct": 0.8645508995832953,
+            "contribution_pct": {
+              "crypto": 2.7268000000000088,
+              "stocks": 0.0
+            },
+            "peak_reservations": 4,
+            "peak_margin_pct": 11.199610338375612,
+            "cash_pnl_usd": 3.5448400000000113,
+            "profitable": 6,
+            "routed": 0,
+            "exit_counts": {
+              "TARGET": 5,
+              "BE": 6,
+              "TIME": 1,
+              "SL": 2
+            },
+            "rejected_baseline": [
+              {
+                "symbol": "AVAXUSDT",
+                "bot": "crypto",
+                "entry_ms": 1793849410000,
+                "outcome": "SL",
+                "cash_pnl_usd": -0.43599999999999994,
+                "directional_close": 0.3076923076922762,
+                "breakout_cushion_atr": 0.08454106280194582,
+                "peers": 10,
+                "peer_known": true,
+                "peer_median_atr": 0.21300908867601598,
+                "peer_opposed_fraction": 0.2
+              }
+            ],
+            "difference": {
+              "transition": {},
+              "removed": 1,
+              "added": 0,
+              "added_positions": [],
+              "removed_positions": [
+                {
+                  "bot": "crypto",
+                  "symbol": "AVAXUSDT",
+                  "entry_ms": 1793849410000,
+                  "exit": "SL",
+                  "cash_pnl_usd": -0.43599999999999994
+                }
+              ]
+            },
+            "rejected_candidates": 1
+          },
+          "breakout_peer_opposition": {
+            "status": "SCORED_PUBLIC_L2_SIMULATION",
+            "trades": 15,
+            "skipped": {
+              "stocks:wide": 25,
+              "crypto:wide": 7,
+              "stocks:stale order book": 4,
+              "stocks:depth slippage exceeds limit": 1
+            },
+            "return_pct": 2.3914153846153585,
+            "drawdown_pct": 0.8673799541490397,
+            "contribution_pct": {
+              "crypto": 2.3914153846153936,
+              "stocks": 0.0
+            },
+            "peak_reservations": 4,
+            "peak_margin_pct": 11.236707734641675,
+            "cash_pnl_usd": 3.1088400000000114,
+            "profitable": 6,
+            "routed": 0,
+            "exit_counts": {
+              "TARGET": 5,
+              "SL": 3,
+              "BE": 6,
+              "TIME": 1
+            },
+            "rejected_baseline": [],
+            "difference": {
+              "transition": {},
+              "removed": 0,
+              "added": 0,
+              "added_positions": [],
+              "removed_positions": []
+            },
+            "rejected_candidates": 0
+          },
+          "stock_shallow_rejection": {
+            "status": "SCORED_PUBLIC_L2_SIMULATION",
+            "trades": 15,
+            "skipped": {
+              "stocks:wide": 25,
+              "crypto:wide": 7,
+              "stocks:stale order book": 4,
+              "stocks:depth slippage exceeds limit": 1
+            },
+            "return_pct": 2.3914153846153585,
+            "drawdown_pct": 0.8673799541490397,
+            "contribution_pct": {
+              "crypto": 2.3914153846153936,
+              "stocks": 0.0
+            },
+            "peak_reservations": 4,
+            "peak_margin_pct": 11.236707734641675,
+            "cash_pnl_usd": 3.1088400000000114,
+            "profitable": 6,
+            "routed": 0,
+            "exit_counts": {
+              "TARGET": 5,
+              "SL": 3,
+              "BE": 6,
+              "TIME": 1
+            },
+            "rejected_baseline": [],
+            "difference": {
+              "transition": {},
+              "removed": 0,
+              "added": 0,
+              "added_positions": [],
+              "removed_positions": []
+            },
+            "rejected_candidates": 0
+          },
+          "joint_pressure_confirmation": {
+            "status": "SCORED_PUBLIC_L2_SIMULATION",
+            "trades": 14,
+            "skipped": {
+              "stocks:wide": 25,
+              "crypto:wide": 7,
+              "crypto:joint_pressure_confirmation": 1,
+              "stocks:stale order book": 4,
+              "stocks:depth slippage exceeds limit": 1
+            },
+            "return_pct": 2.4322615384615,
+            "drawdown_pct": 0.8670344166974943,
+            "contribution_pct": {
+              "crypto": 2.432261538461542,
+              "stocks": 0.0
+            },
+            "peak_reservations": 3,
+            "peak_margin_pct": 8.313036125484608,
+            "cash_pnl_usd": 3.161940000000005,
+            "profitable": 6,
+            "routed": 0,
+            "exit_counts": {
+              "TARGET": 5,
+              "SL": 3,
+              "BE": 5,
+              "TIME": 1
+            },
+            "rejected_baseline": [
+              {
+                "symbol": "HYPEUSDT",
+                "bot": "crypto",
+                "entry_ms": 1793918710000,
+                "outcome": "BE",
+                "cash_pnl_usd": -0.053099999999993486,
+                "directional_close": 0.19349845201238366,
+                "breakout_cushion_atr": null,
+                "peers": 10,
+                "peer_known": true,
+                "peer_median_atr": -0.2585234109003278,
+                "peer_opposed_fraction": 0.7
+              }
+            ],
+            "difference": {
+              "transition": {},
+              "removed": 1,
+              "added": 0,
+              "added_positions": [],
+              "removed_positions": [
+                {
+                  "bot": "crypto",
+                  "symbol": "HYPEUSDT",
+                  "entry_ms": 1793918710000,
+                  "exit": "BE",
+                  "cash_pnl_usd": -0.053099999999993486
+                }
+              ]
+            },
+            "rejected_candidates": 1
+          }
+        },
+        "1000": {
+          "baseline": {
+            "status": "SCORED_PUBLIC_L2_SIMULATION",
+            "trades": 15,
+            "skipped": {
+              "stocks:wide": 25,
+              "crypto:wide": 7,
+              "stocks:stale order book": 4,
+              "stocks:depth slippage exceeds limit": 1
+            },
+            "return_pct": 2.3970384615385143,
+            "drawdown_pct": 0.9060876710170203,
+            "contribution_pct": {
+              "crypto": 2.397038461538472,
+              "stocks": 0.0
+            },
+            "peak_reservations": 4,
+            "peak_margin_pct": 11.23403636374684,
+            "cash_pnl_usd": 3.116150000000013,
+            "profitable": 6,
+            "routed": 0,
+            "exit_counts": {
+              "TARGET": 5,
+              "SL": 3,
+              "BE": 6,
+              "TIME": 1
+            }
+          },
+          "breakout_shallow_cross": {
+            "status": "SCORED_PUBLIC_L2_SIMULATION",
+            "trades": 14,
+            "skipped": {
+              "stocks:wide": 25,
+              "crypto:breakout_shallow_cross": 1,
+              "crypto:wide": 7,
+              "stocks:stale order book": 4,
+              "stocks:depth slippage exceeds limit": 1
+            },
+            "return_pct": 2.7324230769231406,
+            "drawdown_pct": 0.9031329176054895,
+            "contribution_pct": {
+              "crypto": 2.732423076923087,
+              "stocks": 0.0
+            },
+            "peak_reservations": 4,
+            "peak_margin_pct": 11.196956575060597,
+            "cash_pnl_usd": 3.552150000000013,
+            "profitable": 6,
+            "routed": 0,
+            "exit_counts": {
+              "TARGET": 5,
+              "BE": 6,
+              "TIME": 1,
+              "SL": 2
+            },
+            "rejected_baseline": [
+              {
+                "symbol": "AVAXUSDT",
+                "bot": "crypto",
+                "entry_ms": 1793849410000,
+                "outcome": "SL",
+                "cash_pnl_usd": -0.43599999999999994,
+                "directional_close": 0.3076923076922762,
+                "breakout_cushion_atr": 0.08454106280194582,
+                "peers": 10,
+                "peer_known": true,
+                "peer_median_atr": 0.21300908867601598,
+                "peer_opposed_fraction": 0.2
+              }
+            ],
+            "difference": {
+              "transition": {},
+              "removed": 1,
+              "added": 0,
+              "added_positions": [],
+              "removed_positions": [
+                {
+                  "bot": "crypto",
+                  "symbol": "AVAXUSDT",
+                  "entry_ms": 1793849410000,
+                  "exit": "SL",
+                  "cash_pnl_usd": -0.43599999999999994
+                }
+              ]
+            },
+            "rejected_candidates": 1
+          },
+          "breakout_weak_close": {
+            "status": "SCORED_PUBLIC_L2_SIMULATION",
+            "trades": 12,
+            "skipped": {
+              "stocks:wide": 25,
+              "crypto:breakout_weak_close": 3,
+              "crypto:wide": 7,
+              "stocks:stale order book": 4,
+              "stocks:depth slippage exceeds limit": 1
+            },
+            "return_pct": 2.8171153846154207,
+            "drawdown_pct": 0.8223428956716534,
+            "contribution_pct": {
+              "crypto": 2.8171153846153967,
+              "stocks": 0.0
+            },
+            "peak_reservations": 3,
+            "peak_margin_pct": 8.749493580815113,
+            "cash_pnl_usd": 3.6622500000000153,
+            "profitable": 6,
+            "routed": 0,
+            "exit_counts": {
+              "TARGET": 5,
+              "BE": 4,
+              "TIME": 1,
+              "SL": 2
+            },
+            "rejected_baseline": [
+              {
+                "symbol": "AVAXUSDT",
+                "bot": "crypto",
+                "entry_ms": 1793849410000,
+                "outcome": "SL",
+                "cash_pnl_usd": -0.43599999999999994,
+                "directional_close": 0.3076923076922762,
+                "breakout_cushion_atr": 0.08454106280194582,
+                "peers": 10,
+                "peer_known": true,
+                "peer_median_atr": 0.21300908867601598,
+                "peer_opposed_fraction": 0.2
+              },
+              {
+                "symbol": "BTCUSDT",
+                "bot": "crypto",
+                "entry_ms": 1793894410000,
+                "outcome": "BE",
+                "cash_pnl_usd": -0.002099999999998545,
+                "directional_close": 0.4450405204885357,
+                "breakout_cushion_atr": 0.2069870036962076,
+                "peers": 10,
+                "peer_known": true,
+                "peer_median_atr": 0.9277513942763553,
+                "peer_opposed_fraction": 0.0
+              },
+              {
+                "symbol": "ZECUSDT",
+                "bot": "crypto",
+                "entry_ms": 1794156310000,
+                "outcome": "BE",
+                "cash_pnl_usd": -0.10800000000000409,
+                "directional_close": 0.4126315789473761,
+                "breakout_cushion_atr": 0.12332332332333851,
+                "peers": 10,
+                "peer_known": true,
+                "peer_median_atr": 0.8008186110019593,
+                "peer_opposed_fraction": 0.0
+              }
+            ],
+            "difference": {
+              "transition": {},
+              "removed": 3,
+              "added": 0,
+              "added_positions": [],
+              "removed_positions": [
+                {
+                  "bot": "crypto",
+                  "symbol": "AVAXUSDT",
+                  "entry_ms": 1793849410000,
+                  "exit": "SL",
+                  "cash_pnl_usd": -0.43599999999999994
+                },
+                {
+                  "bot": "crypto",
+                  "symbol": "BTCUSDT",
+                  "entry_ms": 1793894410000,
+                  "exit": "BE",
+                  "cash_pnl_usd": -0.002099999999998545
+                },
+                {
+                  "bot": "crypto",
+                  "symbol": "ZECUSDT",
+                  "entry_ms": 1794156310000,
+                  "exit": "BE",
+                  "cash_pnl_usd": -0.10800000000000409
+                }
+              ]
+            },
+            "rejected_candidates": 3
+          },
+          "breakout_weak_acceptance": {
+            "status": "SCORED_PUBLIC_L2_SIMULATION",
+            "trades": 14,
+            "skipped": {
+              "stocks:wide": 25,
+              "crypto:breakout_weak_acceptance": 1,
+              "crypto:wide": 7,
+              "stocks:stale order book": 4,
+              "stocks:depth slippage exceeds limit": 1
+            },
+            "return_pct": 2.7324230769231406,
+            "drawdown_pct": 0.9031329176054895,
+            "contribution_pct": {
+              "crypto": 2.732423076923087,
+              "stocks": 0.0
+            },
+            "peak_reservations": 4,
+            "peak_margin_pct": 11.196956575060597,
+            "cash_pnl_usd": 3.552150000000013,
+            "profitable": 6,
+            "routed": 0,
+            "exit_counts": {
+              "TARGET": 5,
+              "BE": 6,
+              "TIME": 1,
+              "SL": 2
+            },
+            "rejected_baseline": [
+              {
+                "symbol": "AVAXUSDT",
+                "bot": "crypto",
+                "entry_ms": 1793849410000,
+                "outcome": "SL",
+                "cash_pnl_usd": -0.43599999999999994,
+                "directional_close": 0.3076923076922762,
+                "breakout_cushion_atr": 0.08454106280194582,
+                "peers": 10,
+                "peer_known": true,
+                "peer_median_atr": 0.21300908867601598,
+                "peer_opposed_fraction": 0.2
+              }
+            ],
+            "difference": {
+              "transition": {},
+              "removed": 1,
+              "added": 0,
+              "added_positions": [],
+              "removed_positions": [
+                {
+                  "bot": "crypto",
+                  "symbol": "AVAXUSDT",
+                  "entry_ms": 1793849410000,
+                  "exit": "SL",
+                  "cash_pnl_usd": -0.43599999999999994
+                }
+              ]
+            },
+            "rejected_candidates": 1
+          },
+          "breakout_peer_opposition": {
+            "status": "SCORED_PUBLIC_L2_SIMULATION",
+            "trades": 15,
+            "skipped": {
+              "stocks:wide": 25,
+              "crypto:wide": 7,
+              "stocks:stale order book": 4,
+              "stocks:depth slippage exceeds limit": 1
+            },
+            "return_pct": 2.3970384615385143,
+            "drawdown_pct": 0.9060876710170203,
+            "contribution_pct": {
+              "crypto": 2.397038461538472,
+              "stocks": 0.0
+            },
+            "peak_reservations": 4,
+            "peak_margin_pct": 11.23403636374684,
+            "cash_pnl_usd": 3.116150000000013,
+            "profitable": 6,
+            "routed": 0,
+            "exit_counts": {
+              "TARGET": 5,
+              "SL": 3,
+              "BE": 6,
+              "TIME": 1
+            },
+            "rejected_baseline": [],
+            "difference": {
+              "transition": {},
+              "removed": 0,
+              "added": 0,
+              "added_positions": [],
+              "removed_positions": []
+            },
+            "rejected_candidates": 0
+          },
+          "stock_shallow_rejection": {
+            "status": "SCORED_PUBLIC_L2_SIMULATION",
+            "trades": 15,
+            "skipped": {
+              "stocks:wide": 25,
+              "crypto:wide": 7,
+              "stocks:stale order book": 4,
+              "stocks:depth slippage exceeds limit": 1
+            },
+            "return_pct": 2.3970384615385143,
+            "drawdown_pct": 0.9060876710170203,
+            "contribution_pct": {
+              "crypto": 2.397038461538472,
+              "stocks": 0.0
+            },
+            "peak_reservations": 4,
+            "peak_margin_pct": 11.23403636374684,
+            "cash_pnl_usd": 3.116150000000013,
+            "profitable": 6,
+            "routed": 0,
+            "exit_counts": {
+              "TARGET": 5,
+              "SL": 3,
+              "BE": 6,
+              "TIME": 1
+            },
+            "rejected_baseline": [],
+            "difference": {
+              "transition": {},
+              "removed": 0,
+              "added": 0,
+              "added_positions": [],
+              "removed_positions": []
+            },
+            "rejected_candidates": 0
+          },
+          "joint_pressure_confirmation": {
+            "status": "SCORED_PUBLIC_L2_SIMULATION",
+            "trades": 14,
+            "skipped": {
+              "stocks:wide": 25,
+              "crypto:wide": 7,
+              "crypto:joint_pressure_confirmation": 1,
+              "stocks:stale order book": 4,
+              "stocks:depth slippage exceeds limit": 1
+            },
+            "return_pct": 2.435961538461595,
+            "drawdown_pct": 0.9057437656512783,
+            "contribution_pct": {
+              "crypto": 2.4359615384615454,
+              "stocks": 0.0
+            },
+            "peak_reservations": 3,
+            "peak_margin_pct": 8.311059816829282,
+            "cash_pnl_usd": 3.166750000000009,
+            "profitable": 6,
+            "routed": 0,
+            "exit_counts": {
+              "TARGET": 5,
+              "SL": 3,
+              "BE": 5,
+              "TIME": 1
+            },
+            "rejected_baseline": [
+              {
+                "symbol": "HYPEUSDT",
+                "bot": "crypto",
+                "entry_ms": 1793918710000,
+                "outcome": "BE",
+                "cash_pnl_usd": -0.05059999999999576,
+                "directional_close": 0.19349845201238366,
+                "breakout_cushion_atr": null,
+                "peers": 10,
+                "peer_known": true,
+                "peer_median_atr": -0.2585234109003278,
+                "peer_opposed_fraction": 0.7
+              }
+            ],
+            "difference": {
+              "transition": {},
+              "removed": 1,
+              "added": 0,
+              "added_positions": [],
+              "removed_positions": [
+                {
+                  "bot": "crypto",
+                  "symbol": "HYPEUSDT",
+                  "entry_ms": 1793918710000,
+                  "exit": "BE",
+                  "cash_pnl_usd": -0.05059999999999576
+                }
+              ]
+            },
+            "rejected_candidates": 1
+          }
+        }
+      },
+      "feature_coverage": {
+        "trend_pullback:candidates": 6,
+        "trend_pullback:own_context": 6,
+        "trend_pullback:peer_context": 6,
+        "trend_pullback:breakout_range_reproduced": 0,
+        "breakout:candidates": 7,
+        "breakout:own_context": 7,
+        "breakout:peer_context": 7,
+        "breakout:breakout_range_reproduced": 7,
+        "range_reversion:candidates": 2,
+        "range_reversion:own_context": 2,
+        "range_reversion:peer_context": 2,
+        "range_reversion:breakout_range_reproduced": 0
+      },
+      "repricing": {
+        "repriced": [],
+        "extra_exit_checks": {}
+      }
+    },
+    "nov09_14": {
+      "results": {
+        "200": {
+          "baseline": {
+            "status": "SCORED_PUBLIC_L2_SIMULATION",
+            "trades": 24,
+            "skipped": {
+              "crypto:wide": 14,
+              "stocks:wide": 21,
+              "stocks:stale order book": 3,
+              "stocks:paper_guard": 1
+            },
+            "return_pct": -2.2007307692307743,
+            "drawdown_pct": 2.444807692307686,
+            "contribution_pct": {
+              "crypto": -2.200730769230761,
+              "stocks": 0.0
+            },
+            "peak_reservations": 4,
+            "peak_margin_pct": 11.56279155866751,
+            "cash_pnl_usd": -2.8609499999999897,
+            "profitable": 4,
+            "routed": 0,
+            "exit_counts": {
+              "SL": 10,
+              "BE": 11,
+              "TARGET": 3
+            }
+          },
+          "breakout_shallow_cross": {
+            "status": "SCORED_PUBLIC_L2_SIMULATION",
+            "trades": 23,
+            "skipped": {
+              "crypto:wide": 14,
+              "stocks:wide": 21,
+              "stocks:stale order book": 3,
+              "crypto:breakout_shallow_cross": 1,
+              "stocks:paper_guard": 1
+            },
+            "return_pct": -1.601653846153861,
+            "drawdown_pct": 1.8457307692307703,
+            "contribution_pct": {
+              "crypto": -1.601653846153841,
+              "stocks": 0.0
+            },
+            "peak_reservations": 4,
+            "peak_margin_pct": 11.492880702221557,
+            "cash_pnl_usd": -2.082149999999993,
+            "profitable": 4,
+            "routed": 0,
+            "exit_counts": {
+              "SL": 9,
+              "BE": 11,
+              "TARGET": 3
+            },
+            "rejected_baseline": [
+              {
+                "symbol": "ETHUSDT",
+                "bot": "crypto",
+                "entry_ms": 1794549610000,
+                "outcome": "SL",
+                "cash_pnl_usd": -0.7787999999999966,
+                "directional_close": 0.45127188635613114,
+                "breakout_cushion_atr": 0.07363313898968277,
+                "peers": 10,
+                "peer_known": true,
+                "peer_median_atr": 0.10594472484558412,
+                "peer_opposed_fraction": 0.3
+              }
+            ],
+            "difference": {
+              "transition": {},
+              "removed": 1,
+              "added": 0,
+              "added_positions": [],
+              "removed_positions": [
+                {
+                  "bot": "crypto",
+                  "symbol": "ETHUSDT",
+                  "entry_ms": 1794549610000,
+                  "exit": "SL",
+                  "cash_pnl_usd": -0.7787999999999966
+                }
+              ]
+            },
+            "rejected_candidates": 1
+          },
+          "breakout_weak_close": {
+            "status": "SCORED_PUBLIC_L2_SIMULATION",
+            "trades": 20,
+            "skipped": {
+              "crypto:wide": 14,
+              "stocks:wide": 21,
+              "stocks:stale order book": 3,
+              "crypto:breakout_weak_close": 4,
+              "stocks:paper_guard": 1
+            },
+            "return_pct": -1.7698846153846093,
+            "drawdown_pct": 1.769884615384613,
+            "contribution_pct": {
+              "crypto": -1.7698846153846075,
+              "stocks": 0.0
+            },
+            "peak_reservations": 3,
+            "peak_margin_pct": 8.858271323550161,
+            "cash_pnl_usd": -2.3008499999999903,
+            "profitable": 3,
+            "routed": 0,
+            "exit_counts": {
+              "SL": 8,
+              "BE": 10,
+              "TARGET": 2
+            },
+            "rejected_baseline": [
+              {
+                "symbol": "BTCUSDT",
+                "bot": "crypto",
+                "entry_ms": 1794549610000,
+                "outcome": "SL",
+                "cash_pnl_usd": -0.5328000000000029,
+                "directional_close": 0.4667051736942006,
+                "breakout_cushion_atr": 0.3343942019852027,
+                "peers": 10,
+                "peer_known": true,
+                "peer_median_atr": 0.10594472484558412,
+                "peer_opposed_fraction": 0.3
+              },
+              {
+                "symbol": "ETHUSDT",
+                "bot": "crypto",
+                "entry_ms": 1794549610000,
+                "outcome": "SL",
+                "cash_pnl_usd": -0.7787999999999966,
+                "directional_close": 0.45127188635613114,
+                "breakout_cushion_atr": 0.07363313898968277,
+                "peers": 10,
+                "peer_known": true,
+                "peer_median_atr": 0.10594472484558412,
+                "peer_opposed_fraction": 0.3
+              },
+              {
+                "symbol": "AVAXUSDT",
+                "bot": "crypto",
+                "entry_ms": 1794564910000,
+                "outcome": "TARGET",
+                "cash_pnl_usd": 0.7530000000000001,
+                "directional_close": 0.5535714285714297,
+                "breakout_cushion_atr": 0.1926605504587224,
+                "peers": 10,
+                "peer_known": true,
+                "peer_median_atr": 0.6509290378096566,
+                "peer_opposed_fraction": 0.1
+              },
+              {
+                "symbol": "HYPEUSDT",
+                "bot": "crypto",
+                "entry_ms": 1794572110000,
+                "outcome": "BE",
+                "cash_pnl_usd": -0.0015000000000000568,
+                "directional_close": 0.21124361158431776,
+                "breakout_cushion_atr": 0.23195876288657064,
+                "peers": 10,
+                "peer_known": true,
+                "peer_median_atr": 0.6551887779575531,
+                "peer_opposed_fraction": 0.1
+              }
+            ],
+            "difference": {
+              "transition": {},
+              "removed": 4,
+              "added": 0,
+              "added_positions": [],
+              "removed_positions": [
+                {
+                  "bot": "crypto",
+                  "symbol": "AVAXUSDT",
+                  "entry_ms": 1794564910000,
+                  "exit": "TARGET",
+                  "cash_pnl_usd": 0.7530000000000001
+                },
+                {
+                  "bot": "crypto",
+                  "symbol": "BTCUSDT",
+                  "entry_ms": 1794549610000,
+                  "exit": "SL",
+                  "cash_pnl_usd": -0.5328000000000029
+                },
+                {
+                  "bot": "crypto",
+                  "symbol": "ETHUSDT",
+                  "entry_ms": 1794549610000,
+                  "exit": "SL",
+                  "cash_pnl_usd": -0.7787999999999966
+                },
+                {
+                  "bot": "crypto",
+                  "symbol": "HYPEUSDT",
+                  "entry_ms": 1794572110000,
+                  "exit": "BE",
+                  "cash_pnl_usd": -0.0015000000000000568
+                }
+              ]
+            },
+            "rejected_candidates": 4
+          },
+          "breakout_weak_acceptance": {
+            "status": "SCORED_PUBLIC_L2_SIMULATION",
+            "trades": 23,
+            "skipped": {
+              "crypto:wide": 14,
+              "stocks:wide": 21,
+              "stocks:stale order book": 3,
+              "crypto:breakout_weak_acceptance": 1,
+              "stocks:paper_guard": 1
+            },
+            "return_pct": -1.601653846153861,
+            "drawdown_pct": 1.8457307692307703,
+            "contribution_pct": {
+              "crypto": -1.601653846153841,
+              "stocks": 0.0
+            },
+            "peak_reservations": 4,
+            "peak_margin_pct": 11.492880702221557,
+            "cash_pnl_usd": -2.082149999999993,
+            "profitable": 4,
+            "routed": 0,
+            "exit_counts": {
+              "SL": 9,
+              "BE": 11,
+              "TARGET": 3
+            },
+            "rejected_baseline": [
+              {
+                "symbol": "ETHUSDT",
+                "bot": "crypto",
+                "entry_ms": 1794549610000,
+                "outcome": "SL",
+                "cash_pnl_usd": -0.7787999999999966,
+                "directional_close": 0.45127188635613114,
+                "breakout_cushion_atr": 0.07363313898968277,
+                "peers": 10,
+                "peer_known": true,
+                "peer_median_atr": 0.10594472484558412,
+                "peer_opposed_fraction": 0.3
+              }
+            ],
+            "difference": {
+              "transition": {},
+              "removed": 1,
+              "added": 0,
+              "added_positions": [],
+              "removed_positions": [
+                {
+                  "bot": "crypto",
+                  "symbol": "ETHUSDT",
+                  "entry_ms": 1794549610000,
+                  "exit": "SL",
+                  "cash_pnl_usd": -0.7787999999999966
+                }
+              ]
+            },
+            "rejected_candidates": 1
+          },
+          "breakout_peer_opposition": {
+            "status": "SCORED_PUBLIC_L2_SIMULATION",
+            "trades": 23,
+            "skipped": {
+              "crypto:wide": 14,
+              "stocks:wide": 21,
+              "stocks:stale order book": 3,
+              "crypto:breakout_peer_opposition": 1,
+              "stocks:paper_guard": 1
+            },
+            "return_pct": -2.2003846153846207,
+            "drawdown_pct": 2.444461538461531,
+            "contribution_pct": {
+              "crypto": -2.200384615384604,
+              "stocks": 0.0
+            },
+            "peak_reservations": 4,
+            "peak_margin_pct": 11.56275091775365,
+            "cash_pnl_usd": -2.8604999999999854,
+            "profitable": 4,
+            "routed": 0,
+            "exit_counts": {
+              "SL": 10,
+              "BE": 10,
+              "TARGET": 3
+            },
+            "rejected_baseline": [
+              {
+                "symbol": "BTCUSDT",
+                "bot": "crypto",
+                "entry_ms": 1794494710000,
+                "outcome": "BE",
+                "cash_pnl_usd": -0.0004500000000043656,
+                "directional_close": 0.9303709856035391,
+                "breakout_cushion_atr": 0.38296493161337575,
+                "peers": 10,
+                "peer_known": true,
+                "peer_median_atr": -0.48933766916346155,
+                "peer_opposed_fraction": 0.9
+              }
+            ],
+            "difference": {
+              "transition": {},
+              "removed": 1,
+              "added": 0,
+              "added_positions": [],
+              "removed_positions": [
+                {
+                  "bot": "crypto",
+                  "symbol": "BTCUSDT",
+                  "entry_ms": 1794494710000,
+                  "exit": "BE",
+                  "cash_pnl_usd": -0.0004500000000043656
+                }
+              ]
+            },
+            "rejected_candidates": 1
+          },
+          "stock_shallow_rejection": {
+            "status": "SCORED_PUBLIC_L2_SIMULATION",
+            "trades": 24,
+            "skipped": {
+              "crypto:wide": 14,
+              "stocks:wide": 21,
+              "stocks:stale order book": 3,
+              "stocks:paper_guard": 1
+            },
+            "return_pct": -2.2007307692307743,
+            "drawdown_pct": 2.444807692307686,
+            "contribution_pct": {
+              "crypto": -2.200730769230761,
+              "stocks": 0.0
+            },
+            "peak_reservations": 4,
+            "peak_margin_pct": 11.56279155866751,
+            "cash_pnl_usd": -2.8609499999999897,
+            "profitable": 4,
+            "routed": 0,
+            "exit_counts": {
+              "SL": 10,
+              "BE": 11,
+              "TARGET": 3
+            },
+            "rejected_baseline": [],
+            "difference": {
+              "transition": {},
+              "removed": 0,
+              "added": 0,
+              "added_positions": [],
+              "removed_positions": []
+            },
+            "rejected_candidates": 0
+          },
+          "joint_pressure_confirmation": {
+            "status": "SCORED_PUBLIC_L2_SIMULATION",
+            "trades": 22,
+            "skipped": {
+              "crypto:wide": 14,
+              "stocks:wide": 21,
+              "stocks:stale order book": 3,
+              "crypto:joint_pressure_confirmation": 2,
+              "stocks:paper_guard": 1
+            },
+            "return_pct": -2.1954230769230754,
+            "drawdown_pct": 2.444115384615377,
+            "contribution_pct": {
+              "crypto": -2.195423076923065,
+              "stocks": 0.0
+            },
+            "peak_reservations": 4,
+            "peak_margin_pct": 11.56271027712548,
+            "cash_pnl_usd": -2.854049999999985,
+            "profitable": 4,
+            "routed": 0,
+            "exit_counts": {
+              "SL": 10,
+              "BE": 9,
+              "TARGET": 3
+            },
+            "rejected_baseline": [
+              {
+                "symbol": "ZECUSDT",
+                "bot": "crypto",
+                "entry_ms": 1794359710000,
+                "outcome": "BE",
+                "cash_pnl_usd": -0.000900000000002592,
+                "directional_close": 0.04145728643215207,
+                "breakout_cushion_atr": null,
+                "peers": 10,
+                "peer_known": true,
+                "peer_median_atr": -0.5444288096727281,
+                "peer_opposed_fraction": 0.8
+              },
+              {
+                "symbol": "LINKUSDT",
+                "bot": "crypto",
+                "entry_ms": 1794606310000,
+                "outcome": "BE",
+                "cash_pnl_usd": -0.006000000000002004,
+                "directional_close": 0.09756097560976613,
+                "breakout_cushion_atr": null,
+                "peers": 10,
+                "peer_known": true,
+                "peer_median_atr": -1.4359738296746154,
+                "peer_opposed_fraction": 1.0
+              }
+            ],
+            "difference": {
+              "transition": {},
+              "removed": 2,
+              "added": 0,
+              "added_positions": [],
+              "removed_positions": [
+                {
+                  "bot": "crypto",
+                  "symbol": "LINKUSDT",
+                  "entry_ms": 1794606310000,
+                  "exit": "BE",
+                  "cash_pnl_usd": -0.006000000000002004
+                },
+                {
+                  "bot": "crypto",
+                  "symbol": "ZECUSDT",
+                  "entry_ms": 1794359710000,
+                  "exit": "BE",
+                  "cash_pnl_usd": -0.000900000000002592
+                }
+              ]
+            },
+            "rejected_candidates": 2
+          }
+        },
+        "1000": {
+          "baseline": {
+            "status": "SCORED_PUBLIC_L2_SIMULATION",
+            "trades": 24,
+            "skipped": {
+              "crypto:wide": 14,
+              "stocks:wide": 21,
+              "stocks:stale order book": 3,
+              "stocks:paper_guard": 1
+            },
+            "return_pct": -2.2082307692307457,
+            "drawdown_pct": 2.4665384615384327,
+            "contribution_pct": {
+              "crypto": -2.208230769230765,
+              "stocks": 0.0
+            },
+            "peak_reservations": 4,
+            "peak_margin_pct": 11.563997369082973,
+            "cash_pnl_usd": -2.8706999999999945,
+            "profitable": 5,
+            "routed": 0,
+            "exit_counts": {
+              "SL": 10,
+              "BE": 11,
+              "TARGET": 3
+            }
+          },
+          "breakout_shallow_cross": {
+            "status": "SCORED_PUBLIC_L2_SIMULATION",
+            "trades": 23,
+            "skipped": {
+              "crypto:wide": 14,
+              "stocks:wide": 21,
+              "stocks:stale order book": 3,
+              "crypto:breakout_shallow_cross": 1,
+              "stocks:paper_guard": 1
+            },
+            "return_pct": -1.6071538461538304,
+            "drawdown_pct": 1.865461538461528,
+            "contribution_pct": {
+              "crypto": -1.6071538461538393,
+              "stocks": 0.0
+            },
+            "peak_reservations": 4,
+            "peak_margin_pct": 11.493839947328208,
+            "cash_pnl_usd": -2.0892999999999913,
+            "profitable": 5,
+            "routed": 0,
+            "exit_counts": {
+              "SL": 9,
+              "BE": 11,
+              "TARGET": 3
+            },
+            "rejected_baseline": [
+              {
+                "symbol": "ETHUSDT",
+                "bot": "crypto",
+                "entry_ms": 1794549610000,
+                "outcome": "SL",
+                "cash_pnl_usd": -0.7814000000000033,
+                "directional_close": 0.45127188635613114,
+                "breakout_cushion_atr": 0.07363313898968277,
+                "peers": 10,
+                "peer_known": true,
+                "peer_median_atr": 0.10594472484558412,
+                "peer_opposed_fraction": 0.3
+              }
+            ],
+            "difference": {
+              "transition": {},
+              "removed": 1,
+              "added": 0,
+              "added_positions": [],
+              "removed_positions": [
+                {
+                  "bot": "crypto",
+                  "symbol": "ETHUSDT",
+                  "entry_ms": 1794549610000,
+                  "exit": "SL",
+                  "cash_pnl_usd": -0.7814000000000033
+                }
+              ]
+            },
+            "rejected_candidates": 1
+          },
+          "breakout_weak_close": {
+            "status": "SCORED_PUBLIC_L2_SIMULATION",
+            "trades": 20,
+            "skipped": {
+              "crypto:wide": 14,
+              "stocks:wide": 21,
+              "stocks:stale order book": 3,
+              "crypto:breakout_weak_close": 4,
+              "stocks:paper_guard": 1
+            },
+            "return_pct": -1.775384615384612,
+            "drawdown_pct": 1.7871538461538377,
+            "contribution_pct": {
+              "crypto": -1.7753846153846098,
+              "stocks": 0.0
+            },
+            "peak_reservations": 3,
+            "peak_margin_pct": 8.859247380088748,
+            "cash_pnl_usd": -2.3079999999999927,
+            "profitable": 4,
+            "routed": 0,
+            "exit_counts": {
+              "SL": 8,
+              "BE": 10,
+              "TARGET": 2
+            },
+            "rejected_baseline": [
+              {
+                "symbol": "BTCUSDT",
+                "bot": "crypto",
+                "entry_ms": 1794549610000,
+                "outcome": "SL",
+                "cash_pnl_usd": -0.5293000000000029,
+                "directional_close": 0.4667051736942006,
+                "breakout_cushion_atr": 0.3343942019852027,
+                "peers": 10,
+                "peer_known": true,
+                "peer_median_atr": 0.10594472484558412,
+                "peer_opposed_fraction": 0.3
+              },
+              {
+                "symbol": "ETHUSDT",
+                "bot": "crypto",
+                "entry_ms": 1794549610000,
+                "outcome": "SL",
+                "cash_pnl_usd": -0.7814000000000033,
+                "directional_close": 0.45127188635613114,
+                "breakout_cushion_atr": 0.07363313898968277,
+                "peers": 10,
+                "peer_known": true,
+                "peer_median_atr": 0.10594472484558412,
+                "peer_opposed_fraction": 0.3
+              },
+              {
+                "symbol": "AVAXUSDT",
+                "bot": "crypto",
+                "entry_ms": 1794564910000,
+                "outcome": "TARGET",
+                "cash_pnl_usd": 0.7520000000000024,
+                "directional_close": 0.5535714285714297,
+                "breakout_cushion_atr": 0.1926605504587224,
+                "peers": 10,
+                "peer_known": true,
+                "peer_median_atr": 0.6509290378096566,
+                "peer_opposed_fraction": 0.1
+              },
+              {
+                "symbol": "HYPEUSDT",
+                "bot": "crypto",
+                "entry_ms": 1794572110000,
+                "outcome": "BE",
+                "cash_pnl_usd": -0.003999999999997783,
+                "directional_close": 0.21124361158431776,
+                "breakout_cushion_atr": 0.23195876288657064,
+                "peers": 10,
+                "peer_known": true,
+                "peer_median_atr": 0.6551887779575531,
+                "peer_opposed_fraction": 0.1
+              }
+            ],
+            "difference": {
+              "transition": {},
+              "removed": 4,
+              "added": 0,
+              "added_positions": [],
+              "removed_positions": [
+                {
+                  "bot": "crypto",
+                  "symbol": "AVAXUSDT",
+                  "entry_ms": 1794564910000,
+                  "exit": "TARGET",
+                  "cash_pnl_usd": 0.7520000000000024
+                },
+                {
+                  "bot": "crypto",
+                  "symbol": "BTCUSDT",
+                  "entry_ms": 1794549610000,
+                  "exit": "SL",
+                  "cash_pnl_usd": -0.5293000000000029
+                },
+                {
+                  "bot": "crypto",
+                  "symbol": "ETHUSDT",
+                  "entry_ms": 1794549610000,
+                  "exit": "SL",
+                  "cash_pnl_usd": -0.7814000000000033
+                },
+                {
+                  "bot": "crypto",
+                  "symbol": "HYPEUSDT",
+                  "entry_ms": 1794572110000,
+                  "exit": "BE",
+                  "cash_pnl_usd": -0.003999999999997783
+                }
+              ]
+            },
+            "rejected_candidates": 4
+          },
+          "breakout_weak_acceptance": {
+            "status": "SCORED_PUBLIC_L2_SIMULATION",
+            "trades": 23,
+            "skipped": {
+              "crypto:wide": 14,
+              "stocks:wide": 21,
+              "stocks:stale order book": 3,
+              "crypto:breakout_weak_acceptance": 1,
+              "stocks:paper_guard": 1
+            },
+            "return_pct": -1.6071538461538304,
+            "drawdown_pct": 1.865461538461528,
+            "contribution_pct": {
+              "crypto": -1.6071538461538393,
+              "stocks": 0.0
+            },
+            "peak_reservations": 4,
+            "peak_margin_pct": 11.493839947328208,
+            "cash_pnl_usd": -2.0892999999999913,
+            "profitable": 5,
+            "routed": 0,
+            "exit_counts": {
+              "SL": 9,
+              "BE": 11,
+              "TARGET": 3
+            },
+            "rejected_baseline": [
+              {
+                "symbol": "ETHUSDT",
+                "bot": "crypto",
+                "entry_ms": 1794549610000,
+                "outcome": "SL",
+                "cash_pnl_usd": -0.7814000000000033,
+                "directional_close": 0.45127188635613114,
+                "breakout_cushion_atr": 0.07363313898968277,
+                "peers": 10,
+                "peer_known": true,
+                "peer_median_atr": 0.10594472484558412,
+                "peer_opposed_fraction": 0.3
+              }
+            ],
+            "difference": {
+              "transition": {},
+              "removed": 1,
+              "added": 0,
+              "added_positions": [],
+              "removed_positions": [
+                {
+                  "bot": "crypto",
+                  "symbol": "ETHUSDT",
+                  "entry_ms": 1794549610000,
+                  "exit": "SL",
+                  "cash_pnl_usd": -0.7814000000000033
+                }
+              ]
+            },
+            "rejected_candidates": 1
+          },
+          "breakout_peer_opposition": {
+            "status": "SCORED_PUBLIC_L2_SIMULATION",
+            "trades": 23,
+            "skipped": {
+              "crypto:wide": 14,
+              "stocks:wide": 21,
+              "stocks:stale order book": 3,
+              "crypto:breakout_peer_opposition": 1,
+              "stocks:paper_guard": 1
+            },
+            "return_pct": -2.204769230769199,
+            "drawdown_pct": 2.463076923076889,
+            "contribution_pct": {
+              "crypto": -2.204769230769227,
+              "stocks": 0.0
+            },
+            "peak_reservations": 4,
+            "peak_margin_pct": 11.563590888036073,
+            "cash_pnl_usd": -2.8661999999999943,
+            "profitable": 5,
+            "routed": 0,
+            "exit_counts": {
+              "SL": 10,
+              "BE": 10,
+              "TARGET": 3
+            },
+            "rejected_baseline": [
+              {
+                "symbol": "BTCUSDT",
+                "bot": "crypto",
+                "entry_ms": 1794494710000,
+                "outcome": "BE",
+                "cash_pnl_usd": -0.0045000000000000005,
+                "directional_close": 0.9303709856035391,
+                "breakout_cushion_atr": 0.38296493161337575,
+                "peers": 10,
+                "peer_known": true,
+                "peer_median_atr": -0.48933766916346155,
+                "peer_opposed_fraction": 0.9
+              }
+            ],
+            "difference": {
+              "transition": {},
+              "removed": 1,
+              "added": 0,
+              "added_positions": [],
+              "removed_positions": [
+                {
+                  "bot": "crypto",
+                  "symbol": "BTCUSDT",
+                  "entry_ms": 1794494710000,
+                  "exit": "BE",
+                  "cash_pnl_usd": -0.0045000000000000005
+                }
+              ]
+            },
+            "rejected_candidates": 1
+          },
+          "stock_shallow_rejection": {
+            "status": "SCORED_PUBLIC_L2_SIMULATION",
+            "trades": 24,
+            "skipped": {
+              "crypto:wide": 14,
+              "stocks:wide": 21,
+              "stocks:stale order book": 3,
+              "stocks:paper_guard": 1
+            },
+            "return_pct": -2.2082307692307457,
+            "drawdown_pct": 2.4665384615384327,
+            "contribution_pct": {
+              "crypto": -2.208230769230765,
+              "stocks": 0.0
+            },
+            "peak_reservations": 4,
+            "peak_margin_pct": 11.563997369082973,
+            "cash_pnl_usd": -2.8706999999999945,
+            "profitable": 5,
+            "routed": 0,
+            "exit_counts": {
+              "SL": 10,
+              "BE": 11,
+              "TARGET": 3
+            },
+            "rejected_baseline": [],
+            "difference": {
+              "transition": {},
+              "removed": 0,
+              "added": 0,
+              "added_positions": [],
+              "removed_positions": []
+            },
+            "rejected_candidates": 0
+          },
+          "joint_pressure_confirmation": {
+            "status": "SCORED_PUBLIC_L2_SIMULATION",
+            "trades": 22,
+            "skipped": {
+              "crypto:wide": 14,
+              "stocks:wide": 21,
+              "stocks:stale order book": 3,
+              "crypto:joint_pressure_confirmation": 2,
+              "stocks:paper_guard": 1
+            },
+            "return_pct": -2.198307692307666,
+            "drawdown_pct": 2.4658461538461243,
+            "contribution_pct": {
+              "crypto": -2.198307692307683,
+              "stocks": 0.0
+            },
+            "peak_reservations": 4,
+            "peak_margin_pct": 11.563916070587442,
+            "cash_pnl_usd": -2.8577999999999877,
+            "profitable": 5,
+            "routed": 0,
+            "exit_counts": {
+              "SL": 10,
+              "BE": 9,
+              "TARGET": 3
+            },
+            "rejected_baseline": [
+              {
+                "symbol": "ZECUSDT",
+                "bot": "crypto",
+                "entry_ms": 1794359710000,
+                "outcome": "BE",
+                "cash_pnl_usd": -0.000900000000002592,
+                "directional_close": 0.04145728643215207,
+                "breakout_cushion_atr": null,
+                "peers": 10,
+                "peer_known": true,
+                "peer_median_atr": -0.5444288096727281,
+                "peer_opposed_fraction": 0.8
+              },
+              {
+                "symbol": "LINKUSDT",
+                "bot": "crypto",
+                "entry_ms": 1794606310000,
+                "outcome": "BE",
+                "cash_pnl_usd": -0.012000000000004007,
+                "directional_close": 0.09756097560976613,
+                "breakout_cushion_atr": null,
+                "peers": 10,
+                "peer_known": true,
+                "peer_median_atr": -1.4359738296746154,
+                "peer_opposed_fraction": 1.0
+              }
+            ],
+            "difference": {
+              "transition": {},
+              "removed": 2,
+              "added": 0,
+              "added_positions": [],
+              "removed_positions": [
+                {
+                  "bot": "crypto",
+                  "symbol": "LINKUSDT",
+                  "entry_ms": 1794606310000,
+                  "exit": "BE",
+                  "cash_pnl_usd": -0.012000000000004007
+                },
+                {
+                  "bot": "crypto",
+                  "symbol": "ZECUSDT",
+                  "entry_ms": 1794359710000,
+                  "exit": "BE",
+                  "cash_pnl_usd": -0.000900000000002592
+                }
+              ]
+            },
+            "rejected_candidates": 2
+          }
+        }
+      },
+      "feature_coverage": {
+        "range_reversion:candidates": 9,
+        "range_reversion:own_context": 9,
+        "range_reversion:peer_context": 9,
+        "range_reversion:breakout_range_reproduced": 0,
+        "trend_pullback:candidates": 6,
+        "trend_pullback:own_context": 6,
+        "trend_pullback:peer_context": 6,
+        "trend_pullback:breakout_range_reproduced": 0,
+        "breakout:candidates": 9,
+        "breakout:own_context": 9,
+        "breakout:peer_context": 9,
+        "breakout:breakout_range_reproduced": 9
+      },
+      "repricing": {
+        "repriced": [],
+        "extra_exit_checks": {}
+      }
+    }
+  },
+  "script_sha256": "3a73ca585ee24606ae29b1ad81fde3a0664ae3070b3b5c1aa42b6a39762930ae",
+  "policies": [
+    "breakout_shallow_cross",
+    "breakout_weak_close",
+    "breakout_weak_acceptance",
+    "breakout_peer_opposition",
+    "stock_shallow_rejection",
+    "joint_pressure_confirmation"
+  ],
+  "thresholds": {
+    "location": 0.65,
+    "breakout_cushion_atr": 0.1,
+    "rejection": 0.25,
+    "opposed_share": 0.6666666666666666,
+    "opposed_atr": 0.25
+  },
+  "live_activation_supported": false,
+  "limitations": [
+    "All decision inputs come from closed bars strictly before the signal epoch.",
+    "Breakout cushion uses the original 20-bar high/low and 14 true ranges ending one bar before the signal bar.",
+    "Peer pressure excludes the candidate, uses only active contracts in the captured same-bot basket and leaves unknown context unfiltered.",
+    "Historical publication and quote qualification are fixed. Shared cash and closings are recalculated.",
+    "These public order-book cash simulations do not score private market fills or a complete month."
+  ]
+}
