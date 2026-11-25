@@ -1,0 +1,1272 @@
+{
+  "cases": {
+    "nov21_crypto_forward": {
+      "conditions": {
+        "opposed_four_hours": {
+          "results": {
+            "200": {
+              "cases": {
+                "baseline": {
+                  "status": "SCORED_PUBLIC_L2_SIMULATION",
+                  "trades": 8,
+                  "skipped": {
+                    "crypto:publication_rate_limit": 23,
+                    "crypto:wide": 12,
+                    "crypto:position_cap": 4,
+                    "crypto:depth slippage exceeds limit": 1
+                  },
+                  "return_pct": 0.23993076923076728,
+                  "drawdown_pct": 1.5804215934171046,
+                  "contribution_pct": {
+                    "crypto": 0.2399307692307533,
+                    "stocks": 0.0
+                  },
+                  "peak_reservations": 4,
+                  "peak_margin_pct": 11.182069645112172,
+                  "cash_pnl_usd": 0.3119099999999794,
+                  "profitable": 3,
+                  "routed": 0,
+                  "exit_counts": {
+                    "TARGET": 3,
+                    "SL": 5
+                  },
+                  "winning_exits_by_bot": {
+                    "crypto": 3
+                  },
+                  "losing_exits_by_bot": {
+                    "crypto": 5,
+                    "stocks": 0
+                  },
+                  "overlapping_cross_bot_loss_pairs": 0,
+                  "overlapping_loss_pairs": 2,
+                  "exposure_counts": {},
+                  "rejected_baseline_positions": [],
+                  "attribution": {
+                    "removed": [],
+                    "added": 0
+                  },
+                  "book_cash_difference": {
+                    "transition": {},
+                    "removed": 0,
+                    "added": 0,
+                    "added_positions": [],
+                    "removed_positions": []
+                  },
+                  "weak_candidates": 0
+                },
+                "weak_breakout_only": {
+                  "status": "SCORED_PUBLIC_L2_SIMULATION",
+                  "trades": 8,
+                  "skipped": {
+                    "crypto:publication_rate_limit": 23,
+                    "crypto:wide": 12,
+                    "crypto:position_cap": 4,
+                    "crypto:depth slippage exceeds limit": 1
+                  },
+                  "return_pct": 0.23993076923076728,
+                  "drawdown_pct": 1.5804215934171046,
+                  "contribution_pct": {
+                    "crypto": 0.2399307692307533,
+                    "stocks": 0.0
+                  },
+                  "peak_reservations": 4,
+                  "peak_margin_pct": 11.182069645112172,
+                  "cash_pnl_usd": 0.3119099999999794,
+                  "profitable": 3,
+                  "routed": 0,
+                  "exit_counts": {
+                    "TARGET": 3,
+                    "SL": 5
+                  },
+                  "winning_exits_by_bot": {
+                    "crypto": 3
+                  },
+                  "losing_exits_by_bot": {
+                    "crypto": 5,
+                    "stocks": 0
+                  },
+                  "overlapping_cross_bot_loss_pairs": 0,
+                  "overlapping_loss_pairs": 2,
+                  "exposure_counts": {
+                    "eligible_attempts": 8,
+                    "same:pairs": 11,
+                    "same:known": 11,
+                    "same:signed_above_065": 4
+                  },
+                  "rejected_baseline_positions": [],
+                  "attribution": {
+                    "removed": [],
+                    "added": 0
+                  },
+                  "book_cash_difference": {
+                    "transition": {},
+                    "removed": 0,
+                    "added": 0,
+                    "added_positions": [],
+                    "removed_positions": []
+                  },
+                  "weak_candidates": 0
+                },
+                "shared_exposure_only": {
+                  "status": "SCORED_PUBLIC_L2_SIMULATION",
+                  "trades": 7,
+                  "skipped": {
+                    "crypto:publication_rate_limit": 23,
+                    "crypto:wide": 12,
+                    "crypto:position_cap": 4,
+                    "crypto:two_btc_loadings": 1,
+                    "crypto:depth slippage exceeds limit": 1
+                  },
+                  "return_pct": 0.8082538461538391,
+                  "drawdown_pct": 1.0322419187795655,
+                  "contribution_pct": {
+                    "crypto": 0.8082538461538311,
+                    "stocks": 0.0
+                  },
+                  "peak_reservations": 3,
+                  "peak_margin_pct": 8.602827692307692,
+                  "cash_pnl_usd": 1.0507299999999806,
+                  "profitable": 3,
+                  "routed": 0,
+                  "exit_counts": {
+                    "TARGET": 3,
+                    "SL": 4
+                  },
+                  "winning_exits_by_bot": {
+                    "crypto": 3
+                  },
+                  "losing_exits_by_bot": {
+                    "crypto": 4,
+                    "stocks": 0
+                  },
+                  "overlapping_cross_bot_loss_pairs": 0,
+                  "overlapping_loss_pairs": 1,
+                  "exposure_counts": {
+                    "eligible_attempts": 8,
+                    "btc_loaded_attempts": 8,
+                    "state_opposed_True_high_volatility_False": 1,
+                    "refused:crypto": 1
+                  },
+                  "rejected_baseline_positions": [
+                    {
+                      "bot": "crypto",
+                      "symbol": "ETHUSDT",
+                      "entry_ms": 1795255210000,
+                      "cash_pnl_usd": -0.7202200000000012,
+                      "outcome": "SL",
+                      "blocked_by": [
+                        [
+                          "BTCUSDT",
+                          "crypto",
+                          -1.0
+                        ],
+                        [
+                          "LINKUSDT",
+                          "crypto",
+                          -0.9121110346580079
+                        ]
+                      ]
+                    }
+                  ],
+                  "attribution": {
+                    "removed": [
+                      {
+                        "bot": "crypto",
+                        "symbol": "ETHUSDT",
+                        "entry_ms": 1795255210000,
+                        "reason": "two_btc_loadings",
+                        "cash_pnl_usd": -0.7202200000000012,
+                        "outcome": "SL"
+                      }
+                    ],
+                    "added": 0
+                  },
+                  "book_cash_difference": {
+                    "transition": {
+                      "crypto TARGET -> TARGET": {
+                        "positions": 1,
+                        "cash_delta_usd": 0.01859999999999995
+                      }
+                    },
+                    "removed": 1,
+                    "added": 0,
+                    "added_positions": [],
+                    "removed_positions": [
+                      {
+                        "bot": "crypto",
+                        "symbol": "ETHUSDT",
+                        "entry_ms": 1795255210000,
+                        "exit": "SL",
+                        "cash_pnl_usd": -0.7202200000000012
+                      }
+                    ]
+                  },
+                  "weak_candidates": 0
+                },
+                "combined": {
+                  "status": "SCORED_PUBLIC_L2_SIMULATION",
+                  "trades": 7,
+                  "skipped": {
+                    "crypto:publication_rate_limit": 23,
+                    "crypto:wide": 12,
+                    "crypto:position_cap": 4,
+                    "crypto:two_btc_loadings": 1,
+                    "crypto:depth slippage exceeds limit": 1
+                  },
+                  "return_pct": 0.8082538461538391,
+                  "drawdown_pct": 1.0322419187795655,
+                  "contribution_pct": {
+                    "crypto": 0.8082538461538311,
+                    "stocks": 0.0
+                  },
+                  "peak_reservations": 3,
+                  "peak_margin_pct": 8.602827692307692,
+                  "cash_pnl_usd": 1.0507299999999806,
+                  "profitable": 3,
+                  "routed": 0,
+                  "exit_counts": {
+                    "TARGET": 3,
+                    "SL": 4
+                  },
+                  "winning_exits_by_bot": {
+                    "crypto": 3
+                  },
+                  "losing_exits_by_bot": {
+                    "crypto": 4,
+                    "stocks": 0
+                  },
+                  "overlapping_cross_bot_loss_pairs": 0,
+                  "overlapping_loss_pairs": 1,
+                  "exposure_counts": {
+                    "eligible_attempts": 8,
+                    "btc_loaded_attempts": 8,
+                    "state_opposed_True_high_volatility_False": 1,
+                    "refused:crypto": 1
+                  },
+                  "rejected_baseline_positions": [
+                    {
+                      "bot": "crypto",
+                      "symbol": "ETHUSDT",
+                      "entry_ms": 1795255210000,
+                      "cash_pnl_usd": -0.7202200000000012,
+                      "outcome": "SL",
+                      "blocked_by": [
+                        [
+                          "BTCUSDT",
+                          "crypto",
+                          -1.0
+                        ],
+                        [
+                          "LINKUSDT",
+                          "crypto",
+                          -0.9121110346580079
+                        ]
+                      ]
+                    }
+                  ],
+                  "attribution": {
+                    "removed": [
+                      {
+                        "bot": "crypto",
+                        "symbol": "ETHUSDT",
+                        "entry_ms": 1795255210000,
+                        "reason": "two_btc_loadings",
+                        "cash_pnl_usd": -0.7202200000000012,
+                        "outcome": "SL"
+                      }
+                    ],
+                    "added": 0
+                  },
+                  "book_cash_difference": {
+                    "transition": {
+                      "crypto TARGET -> TARGET": {
+                        "positions": 1,
+                        "cash_delta_usd": 0.01859999999999995
+                      }
+                    },
+                    "removed": 1,
+                    "added": 0,
+                    "added_positions": [],
+                    "removed_positions": [
+                      {
+                        "bot": "crypto",
+                        "symbol": "ETHUSDT",
+                        "entry_ms": 1795255210000,
+                        "exit": "SL",
+                        "cash_pnl_usd": -0.7202200000000012
+                      }
+                    ]
+                  },
+                  "weak_candidates": 0
+                }
+              },
+              "interaction_pct_points": 0.0
+            },
+            "1000": {
+              "cases": {
+                "baseline": {
+                  "status": "SCORED_PUBLIC_L2_SIMULATION",
+                  "trades": 8,
+                  "skipped": {
+                    "crypto:publication_rate_limit": 23,
+                    "crypto:wide": 12,
+                    "crypto:position_cap": 4,
+                    "crypto:depth slippage exceeds limit": 1
+                  },
+                  "return_pct": 0.2633846153845987,
+                  "drawdown_pct": 1.5540042273153292,
+                  "contribution_pct": {
+                    "crypto": 0.2633846153845969,
+                    "stocks": 0.0
+                  },
+                  "peak_reservations": 4,
+                  "peak_margin_pct": 11.181175706588105,
+                  "cash_pnl_usd": 0.34239999999997595,
+                  "profitable": 3,
+                  "routed": 0,
+                  "exit_counts": {
+                    "TARGET": 3,
+                    "SL": 5
+                  },
+                  "winning_exits_by_bot": {
+                    "crypto": 3
+                  },
+                  "losing_exits_by_bot": {
+                    "crypto": 5,
+                    "stocks": 0
+                  },
+                  "overlapping_cross_bot_loss_pairs": 0,
+                  "overlapping_loss_pairs": 2,
+                  "exposure_counts": {},
+                  "rejected_baseline_positions": [],
+                  "attribution": {
+                    "removed": [],
+                    "added": 0
+                  },
+                  "book_cash_difference": {
+                    "transition": {},
+                    "removed": 0,
+                    "added": 0,
+                    "added_positions": [],
+                    "removed_positions": []
+                  },
+                  "weak_candidates": 0
+                },
+                "weak_breakout_only": {
+                  "status": "SCORED_PUBLIC_L2_SIMULATION",
+                  "trades": 8,
+                  "skipped": {
+                    "crypto:publication_rate_limit": 23,
+                    "crypto:wide": 12,
+                    "crypto:position_cap": 4,
+                    "crypto:depth slippage exceeds limit": 1
+                  },
+                  "return_pct": 0.2633846153845987,
+                  "drawdown_pct": 1.5540042273153292,
+                  "contribution_pct": {
+                    "crypto": 0.2633846153845969,
+                    "stocks": 0.0
+                  },
+                  "peak_reservations": 4,
+                  "peak_margin_pct": 11.181175706588105,
+                  "cash_pnl_usd": 0.34239999999997595,
+                  "profitable": 3,
+                  "routed": 0,
+                  "exit_counts": {
+                    "TARGET": 3,
+                    "SL": 5
+                  },
+                  "winning_exits_by_bot": {
+                    "crypto": 3
+                  },
+                  "losing_exits_by_bot": {
+                    "crypto": 5,
+                    "stocks": 0
+                  },
+                  "overlapping_cross_bot_loss_pairs": 0,
+                  "overlapping_loss_pairs": 2,
+                  "exposure_counts": {
+                    "eligible_attempts": 8,
+                    "same:pairs": 11,
+                    "same:known": 11,
+                    "same:signed_above_065": 4
+                  },
+                  "rejected_baseline_positions": [],
+                  "attribution": {
+                    "removed": [],
+                    "added": 0
+                  },
+                  "book_cash_difference": {
+                    "transition": {},
+                    "removed": 0,
+                    "added": 0,
+                    "added_positions": [],
+                    "removed_positions": []
+                  },
+                  "weak_candidates": 0
+                },
+                "shared_exposure_only": {
+                  "status": "SCORED_PUBLIC_L2_SIMULATION",
+                  "trades": 7,
+                  "skipped": {
+                    "crypto:publication_rate_limit": 23,
+                    "crypto:wide": 12,
+                    "crypto:position_cap": 4,
+                    "crypto:two_btc_loadings": 1,
+                    "crypto:depth slippage exceeds limit": 1
+                  },
+                  "return_pct": 0.81166153846155,
+                  "drawdown_pct": 1.0256963774306884,
+                  "contribution_pct": {
+                    "crypto": 0.8116615384615223,
+                    "stocks": 0.0
+                  },
+                  "peak_reservations": 3,
+                  "peak_margin_pct": 8.602827692307692,
+                  "cash_pnl_usd": 1.055159999999979,
+                  "profitable": 3,
+                  "routed": 0,
+                  "exit_counts": {
+                    "TARGET": 3,
+                    "SL": 4
+                  },
+                  "winning_exits_by_bot": {
+                    "crypto": 3
+                  },
+                  "losing_exits_by_bot": {
+                    "crypto": 4,
+                    "stocks": 0
+                  },
+                  "overlapping_cross_bot_loss_pairs": 0,
+                  "overlapping_loss_pairs": 1,
+                  "exposure_counts": {
+                    "eligible_attempts": 8,
+                    "btc_loaded_attempts": 8,
+                    "state_opposed_True_high_volatility_False": 1,
+                    "refused:crypto": 1
+                  },
+                  "rejected_baseline_positions": [
+                    {
+                      "bot": "crypto",
+                      "symbol": "ETHUSDT",
+                      "entry_ms": 1795255210000,
+                      "cash_pnl_usd": -0.6940600000000031,
+                      "outcome": "SL",
+                      "blocked_by": [
+                        [
+                          "BTCUSDT",
+                          "crypto",
+                          -1.0
+                        ],
+                        [
+                          "LINKUSDT",
+                          "crypto",
+                          -0.9121110346580079
+                        ]
+                      ]
+                    }
+                  ],
+                  "attribution": {
+                    "removed": [
+                      {
+                        "bot": "crypto",
+                        "symbol": "ETHUSDT",
+                        "entry_ms": 1795255210000,
+                        "reason": "two_btc_loadings",
+                        "cash_pnl_usd": -0.6940600000000031,
+                        "outcome": "SL"
+                      }
+                    ],
+                    "added": 0
+                  },
+                  "book_cash_difference": {
+                    "transition": {
+                      "crypto TARGET -> TARGET": {
+                        "positions": 1,
+                        "cash_delta_usd": 0.01869999999999994
+                      }
+                    },
+                    "removed": 1,
+                    "added": 0,
+                    "added_positions": [],
+                    "removed_positions": [
+                      {
+                        "bot": "crypto",
+                        "symbol": "ETHUSDT",
+                        "entry_ms": 1795255210000,
+                        "exit": "SL",
+                        "cash_pnl_usd": -0.6940600000000031
+                      }
+                    ]
+                  },
+                  "weak_candidates": 0
+                },
+                "combined": {
+                  "status": "SCORED_PUBLIC_L2_SIMULATION",
+                  "trades": 7,
+                  "skipped": {
+                    "crypto:publication_rate_limit": 23,
+                    "crypto:wide": 12,
+                    "crypto:position_cap": 4,
+                    "crypto:two_btc_loadings": 1,
+                    "crypto:depth slippage exceeds limit": 1
+                  },
+                  "return_pct": 0.81166153846155,
+                  "drawdown_pct": 1.0256963774306884,
+                  "contribution_pct": {
+                    "crypto": 0.8116615384615223,
+                    "stocks": 0.0
+                  },
+                  "peak_reservations": 3,
+                  "peak_margin_pct": 8.602827692307692,
+                  "cash_pnl_usd": 1.055159999999979,
+                  "profitable": 3,
+                  "routed": 0,
+                  "exit_counts": {
+                    "TARGET": 3,
+                    "SL": 4
+                  },
+                  "winning_exits_by_bot": {
+                    "crypto": 3
+                  },
+                  "losing_exits_by_bot": {
+                    "crypto": 4,
+                    "stocks": 0
+                  },
+                  "overlapping_cross_bot_loss_pairs": 0,
+                  "overlapping_loss_pairs": 1,
+                  "exposure_counts": {
+                    "eligible_attempts": 8,
+                    "btc_loaded_attempts": 8,
+                    "state_opposed_True_high_volatility_False": 1,
+                    "refused:crypto": 1
+                  },
+                  "rejected_baseline_positions": [
+                    {
+                      "bot": "crypto",
+                      "symbol": "ETHUSDT",
+                      "entry_ms": 1795255210000,
+                      "cash_pnl_usd": -0.6940600000000031,
+                      "outcome": "SL",
+                      "blocked_by": [
+                        [
+                          "BTCUSDT",
+                          "crypto",
+                          -1.0
+                        ],
+                        [
+                          "LINKUSDT",
+                          "crypto",
+                          -0.9121110346580079
+                        ]
+                      ]
+                    }
+                  ],
+                  "attribution": {
+                    "removed": [
+                      {
+                        "bot": "crypto",
+                        "symbol": "ETHUSDT",
+                        "entry_ms": 1795255210000,
+                        "reason": "two_btc_loadings",
+                        "cash_pnl_usd": -0.6940600000000031,
+                        "outcome": "SL"
+                      }
+                    ],
+                    "added": 0
+                  },
+                  "book_cash_difference": {
+                    "transition": {
+                      "crypto TARGET -> TARGET": {
+                        "positions": 1,
+                        "cash_delta_usd": 0.01869999999999994
+                      }
+                    },
+                    "removed": 1,
+                    "added": 0,
+                    "added_positions": [],
+                    "removed_positions": [
+                      {
+                        "bot": "crypto",
+                        "symbol": "ETHUSDT",
+                        "entry_ms": 1795255210000,
+                        "exit": "SL",
+                        "cash_pnl_usd": -0.6940600000000031
+                      }
+                    ]
+                  },
+                  "weak_candidates": 0
+                }
+              },
+              "interaction_pct_points": 0.0
+            }
+          },
+          "repricing": {
+            "repriced": [
+              {
+                "symbol": "ETHUSDT",
+                "entry_ms": 1795255210000,
+                "initial_fill": 1634.7195652173912,
+                "actual_fill": 1634.7108333333333,
+                "reentry_parent_ms": null,
+                "path": {
+                  "known": true,
+                  "code": "SL",
+                  "end_ms": 1795260760711,
+                  "trigger_price": 1665.16,
+                  "bank": null,
+                  "be_level": 1634.71
+                }
+              }
+            ],
+            "extra_exit_checks": {}
+          }
+        },
+        "opposed_or_high_volatility": {
+          "results": {
+            "200": {
+              "cases": {
+                "baseline": {
+                  "status": "SCORED_PUBLIC_L2_SIMULATION",
+                  "trades": 8,
+                  "skipped": {
+                    "crypto:publication_rate_limit": 23,
+                    "crypto:wide": 12,
+                    "crypto:position_cap": 4,
+                    "crypto:depth slippage exceeds limit": 1
+                  },
+                  "return_pct": 0.23993076923076728,
+                  "drawdown_pct": 1.5804215934171046,
+                  "contribution_pct": {
+                    "crypto": 0.2399307692307533,
+                    "stocks": 0.0
+                  },
+                  "peak_reservations": 4,
+                  "peak_margin_pct": 11.182069645112172,
+                  "cash_pnl_usd": 0.3119099999999794,
+                  "profitable": 3,
+                  "routed": 0,
+                  "exit_counts": {
+                    "TARGET": 3,
+                    "SL": 5
+                  },
+                  "winning_exits_by_bot": {
+                    "crypto": 3
+                  },
+                  "losing_exits_by_bot": {
+                    "crypto": 5,
+                    "stocks": 0
+                  },
+                  "overlapping_cross_bot_loss_pairs": 0,
+                  "overlapping_loss_pairs": 2,
+                  "exposure_counts": {},
+                  "rejected_baseline_positions": [],
+                  "attribution": {
+                    "removed": [],
+                    "added": 0
+                  },
+                  "book_cash_difference": {
+                    "transition": {},
+                    "removed": 0,
+                    "added": 0,
+                    "added_positions": [],
+                    "removed_positions": []
+                  },
+                  "weak_candidates": 0
+                },
+                "weak_breakout_only": {
+                  "status": "SCORED_PUBLIC_L2_SIMULATION",
+                  "trades": 8,
+                  "skipped": {
+                    "crypto:publication_rate_limit": 23,
+                    "crypto:wide": 12,
+                    "crypto:position_cap": 4,
+                    "crypto:depth slippage exceeds limit": 1
+                  },
+                  "return_pct": 0.23993076923076728,
+                  "drawdown_pct": 1.5804215934171046,
+                  "contribution_pct": {
+                    "crypto": 0.2399307692307533,
+                    "stocks": 0.0
+                  },
+                  "peak_reservations": 4,
+                  "peak_margin_pct": 11.182069645112172,
+                  "cash_pnl_usd": 0.3119099999999794,
+                  "profitable": 3,
+                  "routed": 0,
+                  "exit_counts": {
+                    "TARGET": 3,
+                    "SL": 5
+                  },
+                  "winning_exits_by_bot": {
+                    "crypto": 3
+                  },
+                  "losing_exits_by_bot": {
+                    "crypto": 5,
+                    "stocks": 0
+                  },
+                  "overlapping_cross_bot_loss_pairs": 0,
+                  "overlapping_loss_pairs": 2,
+                  "exposure_counts": {
+                    "eligible_attempts": 8,
+                    "same:pairs": 11,
+                    "same:known": 11,
+                    "same:signed_above_065": 4
+                  },
+                  "rejected_baseline_positions": [],
+                  "attribution": {
+                    "removed": [],
+                    "added": 0
+                  },
+                  "book_cash_difference": {
+                    "transition": {},
+                    "removed": 0,
+                    "added": 0,
+                    "added_positions": [],
+                    "removed_positions": []
+                  },
+                  "weak_candidates": 0
+                },
+                "shared_exposure_only": {
+                  "status": "SCORED_PUBLIC_L2_SIMULATION",
+                  "trades": 7,
+                  "skipped": {
+                    "crypto:publication_rate_limit": 23,
+                    "crypto:wide": 12,
+                    "crypto:position_cap": 4,
+                    "crypto:two_btc_loadings": 1,
+                    "crypto:depth slippage exceeds limit": 1
+                  },
+                  "return_pct": 0.8082538461538391,
+                  "drawdown_pct": 1.0322419187795655,
+                  "contribution_pct": {
+                    "crypto": 0.8082538461538311,
+                    "stocks": 0.0
+                  },
+                  "peak_reservations": 3,
+                  "peak_margin_pct": 8.602827692307692,
+                  "cash_pnl_usd": 1.0507299999999806,
+                  "profitable": 3,
+                  "routed": 0,
+                  "exit_counts": {
+                    "TARGET": 3,
+                    "SL": 4
+                  },
+                  "winning_exits_by_bot": {
+                    "crypto": 3
+                  },
+                  "losing_exits_by_bot": {
+                    "crypto": 4,
+                    "stocks": 0
+                  },
+                  "overlapping_cross_bot_loss_pairs": 0,
+                  "overlapping_loss_pairs": 1,
+                  "exposure_counts": {
+                    "eligible_attempts": 8,
+                    "btc_loaded_attempts": 8,
+                    "state_opposed_True_high_volatility_False": 1,
+                    "refused:crypto": 1
+                  },
+                  "rejected_baseline_positions": [
+                    {
+                      "bot": "crypto",
+                      "symbol": "ETHUSDT",
+                      "entry_ms": 1795255210000,
+                      "cash_pnl_usd": -0.7202200000000012,
+                      "outcome": "SL",
+                      "blocked_by": [
+                        [
+                          "BTCUSDT",
+                          "crypto",
+                          -1.0
+                        ],
+                        [
+                          "LINKUSDT",
+                          "crypto",
+                          -0.9121110346580079
+                        ]
+                      ]
+                    }
+                  ],
+                  "attribution": {
+                    "removed": [
+                      {
+                        "bot": "crypto",
+                        "symbol": "ETHUSDT",
+                        "entry_ms": 1795255210000,
+                        "reason": "two_btc_loadings",
+                        "cash_pnl_usd": -0.7202200000000012,
+                        "outcome": "SL"
+                      }
+                    ],
+                    "added": 0
+                  },
+                  "book_cash_difference": {
+                    "transition": {
+                      "crypto TARGET -> TARGET": {
+                        "positions": 1,
+                        "cash_delta_usd": 0.01859999999999995
+                      }
+                    },
+                    "removed": 1,
+                    "added": 0,
+                    "added_positions": [],
+                    "removed_positions": [
+                      {
+                        "bot": "crypto",
+                        "symbol": "ETHUSDT",
+                        "entry_ms": 1795255210000,
+                        "exit": "SL",
+                        "cash_pnl_usd": -0.7202200000000012
+                      }
+                    ]
+                  },
+                  "weak_candidates": 0
+                },
+                "combined": {
+                  "status": "SCORED_PUBLIC_L2_SIMULATION",
+                  "trades": 7,
+                  "skipped": {
+                    "crypto:publication_rate_limit": 23,
+                    "crypto:wide": 12,
+                    "crypto:position_cap": 4,
+                    "crypto:two_btc_loadings": 1,
+                    "crypto:depth slippage exceeds limit": 1
+                  },
+                  "return_pct": 0.8082538461538391,
+                  "drawdown_pct": 1.0322419187795655,
+                  "contribution_pct": {
+                    "crypto": 0.8082538461538311,
+                    "stocks": 0.0
+                  },
+                  "peak_reservations": 3,
+                  "peak_margin_pct": 8.602827692307692,
+                  "cash_pnl_usd": 1.0507299999999806,
+                  "profitable": 3,
+                  "routed": 0,
+                  "exit_counts": {
+                    "TARGET": 3,
+                    "SL": 4
+                  },
+                  "winning_exits_by_bot": {
+                    "crypto": 3
+                  },
+                  "losing_exits_by_bot": {
+                    "crypto": 4,
+                    "stocks": 0
+                  },
+                  "overlapping_cross_bot_loss_pairs": 0,
+                  "overlapping_loss_pairs": 1,
+                  "exposure_counts": {
+                    "eligible_attempts": 8,
+                    "btc_loaded_attempts": 8,
+                    "state_opposed_True_high_volatility_False": 1,
+                    "refused:crypto": 1
+                  },
+                  "rejected_baseline_positions": [
+                    {
+                      "bot": "crypto",
+                      "symbol": "ETHUSDT",
+                      "entry_ms": 1795255210000,
+                      "cash_pnl_usd": -0.7202200000000012,
+                      "outcome": "SL",
+                      "blocked_by": [
+                        [
+                          "BTCUSDT",
+                          "crypto",
+                          -1.0
+                        ],
+                        [
+                          "LINKUSDT",
+                          "crypto",
+                          -0.9121110346580079
+                        ]
+                      ]
+                    }
+                  ],
+                  "attribution": {
+                    "removed": [
+                      {
+                        "bot": "crypto",
+                        "symbol": "ETHUSDT",
+                        "entry_ms": 1795255210000,
+                        "reason": "two_btc_loadings",
+                        "cash_pnl_usd": -0.7202200000000012,
+                        "outcome": "SL"
+                      }
+                    ],
+                    "added": 0
+                  },
+                  "book_cash_difference": {
+                    "transition": {
+                      "crypto TARGET -> TARGET": {
+                        "positions": 1,
+                        "cash_delta_usd": 0.01859999999999995
+                      }
+                    },
+                    "removed": 1,
+                    "added": 0,
+                    "added_positions": [],
+                    "removed_positions": [
+                      {
+                        "bot": "crypto",
+                        "symbol": "ETHUSDT",
+                        "entry_ms": 1795255210000,
+                        "exit": "SL",
+                        "cash_pnl_usd": -0.7202200000000012
+                      }
+                    ]
+                  },
+                  "weak_candidates": 0
+                }
+              },
+              "interaction_pct_points": 0.0
+            },
+            "1000": {
+              "cases": {
+                "baseline": {
+                  "status": "SCORED_PUBLIC_L2_SIMULATION",
+                  "trades": 8,
+                  "skipped": {
+                    "crypto:publication_rate_limit": 23,
+                    "crypto:wide": 12,
+                    "crypto:position_cap": 4,
+                    "crypto:depth slippage exceeds limit": 1
+                  },
+                  "return_pct": 0.2633846153845987,
+                  "drawdown_pct": 1.5540042273153292,
+                  "contribution_pct": {
+                    "crypto": 0.2633846153845969,
+                    "stocks": 0.0
+                  },
+                  "peak_reservations": 4,
+                  "peak_margin_pct": 11.181175706588105,
+                  "cash_pnl_usd": 0.34239999999997595,
+                  "profitable": 3,
+                  "routed": 0,
+                  "exit_counts": {
+                    "TARGET": 3,
+                    "SL": 5
+                  },
+                  "winning_exits_by_bot": {
+                    "crypto": 3
+                  },
+                  "losing_exits_by_bot": {
+                    "crypto": 5,
+                    "stocks": 0
+                  },
+                  "overlapping_cross_bot_loss_pairs": 0,
+                  "overlapping_loss_pairs": 2,
+                  "exposure_counts": {},
+                  "rejected_baseline_positions": [],
+                  "attribution": {
+                    "removed": [],
+                    "added": 0
+                  },
+                  "book_cash_difference": {
+                    "transition": {},
+                    "removed": 0,
+                    "added": 0,
+                    "added_positions": [],
+                    "removed_positions": []
+                  },
+                  "weak_candidates": 0
+                },
+                "weak_breakout_only": {
+                  "status": "SCORED_PUBLIC_L2_SIMULATION",
+                  "trades": 8,
+                  "skipped": {
+                    "crypto:publication_rate_limit": 23,
+                    "crypto:wide": 12,
+                    "crypto:position_cap": 4,
+                    "crypto:depth slippage exceeds limit": 1
+                  },
+                  "return_pct": 0.2633846153845987,
+                  "drawdown_pct": 1.5540042273153292,
+                  "contribution_pct": {
+                    "crypto": 0.2633846153845969,
+                    "stocks": 0.0
+                  },
+                  "peak_reservations": 4,
+                  "peak_margin_pct": 11.181175706588105,
+                  "cash_pnl_usd": 0.34239999999997595,
+                  "profitable": 3,
+                  "routed": 0,
+                  "exit_counts": {
+                    "TARGET": 3,
+                    "SL": 5
+                  },
+                  "winning_exits_by_bot": {
+                    "crypto": 3
+                  },
+                  "losing_exits_by_bot": {
+                    "crypto": 5,
+                    "stocks": 0
+                  },
+                  "overlapping_cross_bot_loss_pairs": 0,
+                  "overlapping_loss_pairs": 2,
+                  "exposure_counts": {
+                    "eligible_attempts": 8,
+                    "same:pairs": 11,
+                    "same:known": 11,
+                    "same:signed_above_065": 4
+                  },
+                  "rejected_baseline_positions": [],
+                  "attribution": {
+                    "removed": [],
+                    "added": 0
+                  },
+                  "book_cash_difference": {
+                    "transition": {},
+                    "removed": 0,
+                    "added": 0,
+                    "added_positions": [],
+                    "removed_positions": []
+                  },
+                  "weak_candidates": 0
+                },
+                "shared_exposure_only": {
+                  "status": "SCORED_PUBLIC_L2_SIMULATION",
+                  "trades": 7,
+                  "skipped": {
+                    "crypto:publication_rate_limit": 23,
+                    "crypto:wide": 12,
+                    "crypto:position_cap": 4,
+                    "crypto:two_btc_loadings": 1,
+                    "crypto:depth slippage exceeds limit": 1
+                  },
+                  "return_pct": 0.81166153846155,
+                  "drawdown_pct": 1.0256963774306884,
+                  "contribution_pct": {
+                    "crypto": 0.8116615384615223,
+                    "stocks": 0.0
+                  },
+                  "peak_reservations": 3,
+                  "peak_margin_pct": 8.602827692307692,
+                  "cash_pnl_usd": 1.055159999999979,
+                  "profitable": 3,
+                  "routed": 0,
+                  "exit_counts": {
+                    "TARGET": 3,
+                    "SL": 4
+                  },
+                  "winning_exits_by_bot": {
+                    "crypto": 3
+                  },
+                  "losing_exits_by_bot": {
+                    "crypto": 4,
+                    "stocks": 0
+                  },
+                  "overlapping_cross_bot_loss_pairs": 0,
+                  "overlapping_loss_pairs": 1,
+                  "exposure_counts": {
+                    "eligible_attempts": 8,
+                    "btc_loaded_attempts": 8,
+                    "state_opposed_True_high_volatility_False": 1,
+                    "refused:crypto": 1
+                  },
+                  "rejected_baseline_positions": [
+                    {
+                      "bot": "crypto",
+                      "symbol": "ETHUSDT",
+                      "entry_ms": 1795255210000,
+                      "cash_pnl_usd": -0.6940600000000031,
+                      "outcome": "SL",
+                      "blocked_by": [
+                        [
+                          "BTCUSDT",
+                          "crypto",
+                          -1.0
+                        ],
+                        [
+                          "LINKUSDT",
+                          "crypto",
+                          -0.9121110346580079
+                        ]
+                      ]
+                    }
+                  ],
+                  "attribution": {
+                    "removed": [
+                      {
+                        "bot": "crypto",
+                        "symbol": "ETHUSDT",
+                        "entry_ms": 1795255210000,
+                        "reason": "two_btc_loadings",
+                        "cash_pnl_usd": -0.6940600000000031,
+                        "outcome": "SL"
+                      }
+                    ],
+                    "added": 0
+                  },
+                  "book_cash_difference": {
+                    "transition": {
+                      "crypto TARGET -> TARGET": {
+                        "positions": 1,
+                        "cash_delta_usd": 0.01869999999999994
+                      }
+                    },
+                    "removed": 1,
+                    "added": 0,
+                    "added_positions": [],
+                    "removed_positions": [
+                      {
+                        "bot": "crypto",
+                        "symbol": "ETHUSDT",
+                        "entry_ms": 1795255210000,
+                        "exit": "SL",
+                        "cash_pnl_usd": -0.6940600000000031
+                      }
+                    ]
+                  },
+                  "weak_candidates": 0
+                },
+                "combined": {
+                  "status": "SCORED_PUBLIC_L2_SIMULATION",
+                  "trades": 7,
+                  "skipped": {
+                    "crypto:publication_rate_limit": 23,
+                    "crypto:wide": 12,
+                    "crypto:position_cap": 4,
+                    "crypto:two_btc_loadings": 1,
+                    "crypto:depth slippage exceeds limit": 1
+                  },
+                  "return_pct": 0.81166153846155,
+                  "drawdown_pct": 1.0256963774306884,
+                  "contribution_pct": {
+                    "crypto": 0.8116615384615223,
+                    "stocks": 0.0
+                  },
+                  "peak_reservations": 3,
+                  "peak_margin_pct": 8.602827692307692,
+                  "cash_pnl_usd": 1.055159999999979,
+                  "profitable": 3,
+                  "routed": 0,
+                  "exit_counts": {
+                    "TARGET": 3,
+                    "SL": 4
+                  },
+                  "winning_exits_by_bot": {
+                    "crypto": 3
+                  },
+                  "losing_exits_by_bot": {
+                    "crypto": 4,
+                    "stocks": 0
+                  },
+                  "overlapping_cross_bot_loss_pairs": 0,
+                  "overlapping_loss_pairs": 1,
+                  "exposure_counts": {
+                    "eligible_attempts": 8,
+                    "btc_loaded_attempts": 8,
+                    "state_opposed_True_high_volatility_False": 1,
+                    "refused:crypto": 1
+                  },
+                  "rejected_baseline_positions": [
+                    {
+                      "bot": "crypto",
+                      "symbol": "ETHUSDT",
+                      "entry_ms": 1795255210000,
+                      "cash_pnl_usd": -0.6940600000000031,
+                      "outcome": "SL",
+                      "blocked_by": [
+                        [
+                          "BTCUSDT",
+                          "crypto",
+                          -1.0
+                        ],
+                        [
+                          "LINKUSDT",
+                          "crypto",
+                          -0.9121110346580079
+                        ]
+                      ]
+                    }
+                  ],
+                  "attribution": {
+                    "removed": [
+                      {
+                        "bot": "crypto",
+                        "symbol": "ETHUSDT",
+                        "entry_ms": 1795255210000,
+                        "reason": "two_btc_loadings",
+                        "cash_pnl_usd": -0.6940600000000031,
+                        "outcome": "SL"
+                      }
+                    ],
+                    "added": 0
+                  },
+                  "book_cash_difference": {
+                    "transition": {
+                      "crypto TARGET -> TARGET": {
+                        "positions": 1,
+                        "cash_delta_usd": 0.01869999999999994
+                      }
+                    },
+                    "removed": 1,
+                    "added": 0,
+                    "added_positions": [],
+                    "removed_positions": [
+                      {
+                        "bot": "crypto",
+                        "symbol": "ETHUSDT",
+                        "entry_ms": 1795255210000,
+                        "exit": "SL",
+                        "cash_pnl_usd": -0.6940600000000031
+                      }
+                    ]
+                  },
+                  "weak_candidates": 0
+                }
+              },
+              "interaction_pct_points": 0.0
+            }
+          },
+          "repricing": {
+            "repriced": [
+              {
+                "symbol": "ETHUSDT",
+                "entry_ms": 1795255210000,
+                "initial_fill": 1634.7195652173912,
+                "actual_fill": 1634.7108333333333,
+                "reentry_parent_ms": null,
+                "path": {
+                  "known": true,
+                  "code": "SL",
+                  "end_ms": 1795260760711,
+                  "trigger_price": 1665.16,
+                  "bank": null,
+                  "be_level": 1634.71
+                }
+              }
+            ],
+            "extra_exit_checks": {}
+          }
+        }
+      },
+      "reference_sha256": "96c3a7583d8173b95f721a0140a7b6b4ade5fb9ce57608b62ebf6e3827aa6806",
+      "entry_window_utc": [
+        1795219200,
+        1795262400
+      ]
+    }
+  },
+  "policies": [
+    "opposed_four_hours",
+    "opposed_or_high_volatility"
+  ],
+  "volatility_threshold": 1.25,
+  "source_sha256": {
+    "regime_conditioned_exposure_nov25.py": "483a22a336c1e5f8d26ab171aac4ab53f26cc1a217087d2852b0fe7fe8254aac",
+    "combined_breakout_exposure_nov25.py": "addd9d28cfcc1e35edefc81c7708ec41dd2975a497dc78205753fd8cda25dc6d",
+    "shared_correlated_exposure_nov25.py": "d927cf17e63af46ef6db31eb65d0fe3870039eb422d3555f2893a2a97920397e",
+    "combined_breakout_exposure_alternate21_nov25.json": "96aede7bd751036e14a501bf2d462349de428aa48e5fc864de707c2fc31603f0"
+  },
+  "live_activation_supported": false,
+  "limitations": [
+    "Condition variants are compared against the frozen unconditional combined replay.",
+    "Volatility is four-hour RMS against the earlier 20 hours. Returns must come from active closed bars.",
+    "The rule stays effective when insufficient price evidence prevents classification.",
+    "The base and weak-only scenarios are unchanged. Exposure-only and combined use the tested conditional rule.",
+    "Public-book and candle replays do not represent private execution or guaranteed return."
+  ]
+}
